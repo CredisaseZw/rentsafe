@@ -669,7 +669,7 @@ def track_lease_balances():
                             lease.save()
                         except Exception as e:
                             pass
-                    lease.status = lease.status_cache
+                    lease.status_cache = lease.status
                     lease.save()
 
                     if lease.is_company:
