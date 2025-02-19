@@ -1,5 +1,4 @@
 import { Modal } from 'react-bootstrap';
-import { Toaster } from 'react-hot-toast';
 import Receipt from './Receipt.jsx';
 import { formatCurrency } from '../../../utils/formatting.js';
 import { MultipleUpload } from '../../../components/MultipleUpload.jsx';
@@ -93,11 +92,6 @@ const CompanyLeaseForm = ({
                 onSubmit={handleSubmit}
               >
                 <div className="row mb-4">
-                  <Toaster
-                    position="top-right"
-                    toastOptions={{ duration: 5000 }}
-                  />
-
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Company Name:</label>
                     <SearchComponent

@@ -1,6 +1,4 @@
-import moment from 'moment';
 import { Modal } from 'react-bootstrap';
-import { Toaster } from 'react-hot-toast';
 import Receipt from './Receipt.jsx';
 import { formatCurrency } from '../../../utils/formatting.js';
 import { MultipleUpload } from '../../../components/MultipleUpload.jsx';
@@ -91,11 +89,6 @@ export default function IndividualLeaseForm({
                 onSubmit={handleSubmit}
               >
                 <div className="row mb-4">
-                  <Toaster
-                    position="top-right"
-                    toastOptions={{ duration: 5000 }}
-                  />
-
                   <div className="row">
                     <div className="mt-1 col-lg-4">
                       <label className="form-label">

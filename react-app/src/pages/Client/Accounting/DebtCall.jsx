@@ -1,4 +1,3 @@
-import { Toaster } from 'react-hot-toast';
 import Layout from '../../../components/Layouts/client/Layout.jsx';
 import useDebtCall from '../../../hooks/page-hooks/useDebtCall.js';
 import { fmtAmount } from '../../../utils/index.js';
@@ -8,8 +7,6 @@ export default function DebtCall() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       <h5 className="text-center p-2 mb-4 text-white custom-bg-grey-2 rounded">
         DEBT CALL
       </h5>

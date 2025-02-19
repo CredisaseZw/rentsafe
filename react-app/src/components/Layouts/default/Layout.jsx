@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/inertia-react';
 import Sidebar from '../../Sidebar.jsx';
-import { Toaster } from 'react-hot-toast';
+import CustomToaster from '../../CustomToaster.jsx';
+
 const Layout = ({ children }) => {
   const { Auth } = usePage().props;
   const { lastName, setLastName } = useState();
@@ -26,7 +27,7 @@ const Layout = ({ children }) => {
   }
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
+      <CustomToaster />
 
       <div className="nav-fixed bg-light bar">
         <nav className="top-app-bar navbar navbar-expand bg-info navbar-dark">

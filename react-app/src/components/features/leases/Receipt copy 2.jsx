@@ -1,8 +1,7 @@
-import axios from 'axios';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useForm } from '@inertiajs/inertia-react';
 import { Modal } from 'react-bootstrap';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { formatCurrency } from '../../../utils/formatting';
 import CustomAsyncSelect from '../../CustomAsyncSelect.jsx';
 import { Inertia } from '@inertiajs/inertia'; // Make sure you have this import
@@ -312,7 +311,6 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
   return (
     <div className="container-xl p-5">
       <div className=" ">
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         <Modal
           show={show}
           onHide={handleClose}

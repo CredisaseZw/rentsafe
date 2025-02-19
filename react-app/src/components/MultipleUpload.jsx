@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from '@inertiajs/inertia-react';
 import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 export const MultipleUpload = ({ type, actionType }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -73,7 +73,6 @@ export const MultipleUpload = ({ type, actionType }) => {
   };
   return (
     <div>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
       <div className="card card-raised">
         <div className="card-header bg-info">
           <div

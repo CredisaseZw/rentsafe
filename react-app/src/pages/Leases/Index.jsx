@@ -11,7 +11,6 @@ import ClientView from '../../components/Client/ClientView/ClientView.jsx';
 import useLeaseManagement from '../../hooks/page-hooks/useLeaseManagement.js';
 import { formatCurrency } from '../../utils/formatting.js';
 import { DrawerContent } from '../../components/DrawerContent.jsx';
-import { Toaster } from 'react-hot-toast';
 
 export default function Index({ leases, total_pages, current_page }) {
   const {
@@ -47,8 +46,6 @@ export default function Index({ leases, total_pages, current_page }) {
     <>
       <>
         <ClientView clientViewProps={clientViewProps} />
-
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
 
         {showIndividualLeaseForm && (
           <IndividualLeaseForm

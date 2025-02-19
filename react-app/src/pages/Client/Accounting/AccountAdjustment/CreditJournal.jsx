@@ -3,7 +3,6 @@ import Layout from '../../../../components/Layouts/client/Layout.jsx';
 import useCreditJournal from '../../../../hooks/page-hooks/useCreditJournal.js';
 import SearchCustomerComponent from './SearchCustomer.jsx';
 import { formatCurrency } from '../../../../utils/formatting.js';
-import { Toaster } from 'react-hot-toast';
 
 export default function CreditJournal() {
   const {
@@ -19,8 +18,6 @@ export default function CreditJournal() {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       <div className="bg-white border rounded-3">
         <h5 className="text-center p-2 mb-0 text-white bg-danger">
           Credit Journal

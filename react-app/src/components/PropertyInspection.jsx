@@ -1,5 +1,4 @@
 import { Modal } from 'react-bootstrap';
-import { Toaster } from 'react-hot-toast';
 import { residentialInspectionChecklist } from '../constants';
 import usePropertyInspection from '../hooks/modal-hooks/usePropertyInspection';
 import Checklist from './Checklist.jsx';
@@ -79,8 +78,6 @@ export default function PropertyInspection({ isOpen, close }) {
         </Modal.Header>
 
         <Modal.Body>
-          <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
           <div className="custom-mn-h-5 position-relative p-3 pb-0">
             {isLoading && (
               <div className="text-center position-absolute top-50 start-50 translate-middle">

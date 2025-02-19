@@ -1,4 +1,3 @@
-import { Toaster } from 'react-hot-toast';
 import Layout from '../../../components/Layouts/client/Layout.jsx';
 import DeleteUser from '../../../components/modals/Client/DeleteUser.jsx';
 import UserForm from '../../../components/modals/Client/UserForm.jsx';
@@ -16,8 +15,6 @@ export default function Index({ users }) {
 
   return (
     <main>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       {userModalOptions?.type !== '' && (
         <>
           <UserForm

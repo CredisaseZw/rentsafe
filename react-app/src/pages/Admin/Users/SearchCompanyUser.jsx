@@ -1,6 +1,6 @@
 import { useForm, usePage } from '@inertiajs/inertia-react';
-import React, { useEffect, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { CompanyAdd } from '../../../components/Admin/CompanyAdd.jsx';
 import DeleteUserConfirmation from '../../../components/Admin/DeleteUserConfirmition.jsx';
 import { NotFound } from '../../../components/NotFound.jsx';
@@ -83,7 +83,6 @@ export default function CompanySearch() {
   return (
     <main>
       <PageHeader title={'Company Users'} />
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
       <div className="container-xl p-5">
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">

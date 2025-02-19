@@ -6,7 +6,6 @@ import { Inertia } from '@inertiajs/inertia';
 import { formatCurrency } from '../../../utils/formatting.js';
 import CreditorView from '../../../components/Client/ClientView/CreditorView.jsx';
 import useCreditorStatements from '../../../hooks/modal-hooks/useCreditorStatements.js';
-import { Toaster } from 'react-hot-toast';
 
 export default function CreditorStatements({
   creditors,
@@ -23,8 +22,6 @@ export default function CreditorStatements({
 
   return (
     <div>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       <CreditorView creditorViewProps={creditorViewProps} />
 
       <h5 className="bg-danger text-center text-white p-2 mb-4 rounded-2">

@@ -69,7 +69,6 @@ const ResetPassword = () => {
   return (
     <div className="card card-raised">
       <div className="card-header bg-info px-4">
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         <div className="d-flex justify-content-between align-items-center">
           <div className="me-4">
             <h2 className="display-6 mb-0 text-white">Reset Password</h2>

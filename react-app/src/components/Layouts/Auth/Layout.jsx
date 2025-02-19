@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Head, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+import CustomToaster from '../../CustomToaster';
 
 const Layout = ({ children, title }) => {
   const { error } = usePage().props;
@@ -19,10 +20,8 @@ const Layout = ({ children, title }) => {
               <div className="row justify-content-center">
                 <div className="col-xxl-10 col-xl-10 col-lg-12">
                   <div className="card card-raised shadow-10 mt-5 mt-xl-10 mb-4">
-                    <Toaster
-                      position="top-right"
-                      toastOptions={{ duration: 5000 }}
-                    />
+                    <CustomToaster />
+
                     {children}
                   </div>
                 </div>

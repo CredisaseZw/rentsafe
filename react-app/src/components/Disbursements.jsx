@@ -2,7 +2,6 @@ import { Modal } from 'react-bootstrap';
 import React from 'react';
 import DisbursementsAsyncSelect from '../components/DisbursementsAsyncSelect.jsx';
 import useDisbursements from '../hooks/modal-hooks/useDisbursements.js';
-import { Toaster } from 'react-hot-toast';
 import { truncate } from 'lodash';
 
 export default function Disbursements({
@@ -43,7 +42,6 @@ export default function Disbursements({
       >
         Disbursements
       </a>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
 
       <Modal
         show={show}
