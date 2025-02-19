@@ -1,0 +1,3 @@
+Company Registration Number,Trading Name,Rent Guarantor ID/Passport number,Rent Guarantor Position,Government,Lease Address,Lease Details,Lease Currency,Monthly Rental,Is Variable,Deposit Period (Months),Deposit Amount,Lease Start Date,Payment Period End,Current Month,1 - 30 days outstanding,31 - 60 days outstanding,61 - 90 days outstanding,+90 days outstanding,Errors
+,,,,,,,,,,,,,,,,,,,,,
+,test com,3234,12227272G12,Developer,FALSE,129 Club Chambers Building cnr Nelson Mandela & Third,office rentals,USD,500,no,2,1000,12/05/2024,11,0,0,0,0,0,Company does not exist

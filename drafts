@@ -1,0 +1,12 @@
+cl-verify-individual-otp - individual-verify on add
+cl-is-individual-verified - individual details after account creation
+
+
+cl-verify-individual-otp
+
+                    i.status = "NON-PAYER"
+                    i.status = "HIGH"
+                    i.status = "HIGH"
+                        i.status = "MEDIUM"
+                    i.status = "MEDIUM"
+                        i.status = "SAFE"

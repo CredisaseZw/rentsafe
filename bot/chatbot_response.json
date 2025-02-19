@@ -1,0 +1,5 @@
+{
+    "goodbye":"Thanks for using our service. Goodbye 👋!",
+    "welcome":"Select option to proceed\n\n1.\t->\tRegister\n2.\t->\tAvailable policies\n3.\t->\tPayment methods\n\n0.\t->\tCancel",
+    "session_end":"Your chat session has come to a close. If you need further assistance, please feel free to initiate a new chat session at any time."
+}

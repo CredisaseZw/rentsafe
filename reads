@@ -1,0 +1,10 @@
+start celery worker commands  >>>  celery -A core worker -l info | celery -A core worker -l warning | 
+
+start celery beats commands >>>> -A core beat --loglevel=warning | celery -A core beat -l WARNING --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+clear queue: celery -A core purge
+
+sudo apt-get install rabbitmq-server
+sudo systemctl enable rabbitmq-server
+sudo systemctl start rabbitmq-server
+systemctl status rabbitmq-server
