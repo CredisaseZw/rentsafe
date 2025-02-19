@@ -1,4 +1,3 @@
-import { Toaster } from 'react-hot-toast';
 import { NotFound } from '../NotFound.jsx';
 import IndividualAdd from './IndividualAdd.jsx';
 import BulkIconButton from '../BulkIconButton.jsx';
@@ -39,8 +38,6 @@ export default function IndividualSearch({ url }) {
     <div>
       <>
         <Head title="Search Individual" />
-
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
 
         <BulkUploadModal
           type={'individual'}

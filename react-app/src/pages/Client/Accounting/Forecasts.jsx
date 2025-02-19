@@ -1,4 +1,3 @@
-import { Toaster } from 'react-hot-toast';
 import Layout from '../../../components/Layouts/client/Layout.jsx';
 import useForecasts from '../../../hooks/page-hooks/useForecasts.js';
 import { fmtAmount } from '../../../utils/index.js';
@@ -18,8 +17,6 @@ export default function Forecasts({
   console.log(inflows_statement);
   return (
     <div className="bg-white border rounded-3">
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       <h5 className="text-center p-2 mb-0 text-white bg-info">
         {company_name}
       </h5>

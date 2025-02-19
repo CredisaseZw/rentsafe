@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { usePage } from '@inertiajs/inertia-react';
 import SearchComponent from '../../../components/search.jsx';
 import { formatCurrency } from '../../../utils/formatting.js';
@@ -169,7 +169,6 @@ const Pricing = () => {
   return (
     <>
       <div className="card mt-2" style={{ width: '100%', marginLeft: '-3px' }}>
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         <div className="card">
           <div
             className="card-header bg-info px-4"

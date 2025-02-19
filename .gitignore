@@ -7,4 +7,5 @@ env/
 __pycache__/
 *.pyc
 db.sqlite33
+db.sqlite3
 .vscode

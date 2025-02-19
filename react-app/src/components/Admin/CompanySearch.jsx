@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useForm, usePage } from '@inertiajs/inertia-react';
 import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { NotFound } from '../NotFound.jsx';
 import PageHeader from '../PageHeader.jsx';
 import { CompanyAdd } from './CompanyAdd.jsx';
-import { CompanyVerify } from './OTP/CompanyVerify.jsx';
 import CompanyReport from './Report/CompanyReport.jsx';
 import ConfirmEnquirerType from './ConfirmEnquirerType.jsx';
 import { ExternalEnquirerInputDialog } from './ExternalEnquirerInputDialog.jsx';
@@ -146,7 +145,6 @@ export default function CompanySearch({ url }) {
   return (
     <main>
       <PageHeader title={'Search Company'} />
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
       <div className="container-xl p-5">
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">

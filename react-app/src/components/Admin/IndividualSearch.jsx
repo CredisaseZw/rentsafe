@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 // import { Add } from './Add.jsx';
-import { Toaster } from 'react-hot-toast';
 import { NotFound } from '../NotFound.jsx';
 
 import { useForm, usePage } from '@inertiajs/inertia-react';
@@ -150,7 +149,6 @@ export default function IndividualSearch({ individuals, url }) {
     <main>
       <PageHeader title={'Search Individual'} />
       <div className="container-xl p-5">
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">
             <form className="mb-5" onSubmit={submitHandler}>

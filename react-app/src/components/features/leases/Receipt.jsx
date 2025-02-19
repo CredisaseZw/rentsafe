@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { Toaster } from 'react-hot-toast';
 import CustomAsyncSelect from '../../CustomAsyncSelect.jsx';
 import useReceipt from '../../../hooks/modal-hooks/useReceipt.js';
 
@@ -19,8 +18,6 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       <Modal
         show={show}
         onHide={handleClose}

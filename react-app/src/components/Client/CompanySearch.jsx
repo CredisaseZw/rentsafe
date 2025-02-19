@@ -5,7 +5,6 @@ import useCompanySearch from '../../hooks/component-hooks/useCompanySearch.js';
 import { CompanyVerify } from './OTP/CompanyVerify.jsx';
 import { CompanyAdd } from './CompanyAdd.jsx';
 import { NotFound } from '../NotFound.jsx';
-import { Toaster } from 'react-hot-toast';
 import { Head } from '@inertiajs/inertia-react';
 
 export default function CompanySearch({ url }) {
@@ -43,8 +42,6 @@ export default function CompanySearch({ url }) {
     <div>
       <>
         <Head title="Search Company" />
-
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
 
         <BulkUploadModal
           type={'company'}

@@ -1,6 +1,5 @@
 import { Modal } from 'react-bootstrap';
 import useCurrencySettings from '../../../hooks/modal-hooks/useCurrencySettings';
-import { Toaster } from 'react-hot-toast';
 
 export default function CurrencySettings({
   className,
@@ -60,8 +59,6 @@ export default function CurrencySettings({
         </Modal.Header>
 
         <Modal.Body>
-          <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
           <form
             className="custom-mn-h-5 justify-content-center w-75  mx-auto d-flex flex-column"
             onSubmit={handleSubmit}

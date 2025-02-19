@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { useForm } from '@inertiajs/inertia-react';
+import toast from 'react-hot-toast';
 
 export const ExternalUserForm = ({
   show,
@@ -107,10 +107,6 @@ export const ExternalUserForm = ({
                     <div className="row mb-4">
                       <div className="col-md-12">
                         <div className="row">
-                          <Toaster
-                            position="top-right"
-                            toastOptions={{ duration: 5000 }}
-                          />
                           <div className="col-lg-4">
                             <label className="form-label">Surname</label>
                             <input

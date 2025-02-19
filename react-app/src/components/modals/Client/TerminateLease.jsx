@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useForm } from '@inertiajs/inertia-react';
 
 const TerminateLease = ({ show, handleClose, leaseData }) => {
@@ -42,7 +42,6 @@ const TerminateLease = ({ show, handleClose, leaseData }) => {
         Confirm Lease Termination
       </Modal.Header>
       <Modal.Body className="p-4 d-flex justify-content-between align-items-center gap-4">
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         <p className="my-3 text-center">
           Are you sure you want to terninate lease for {leaseData.name}? This
           action cannot be undone.
