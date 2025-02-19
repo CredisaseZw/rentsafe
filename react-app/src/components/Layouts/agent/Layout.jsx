@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/inertia-react';
 import AgeentSideBar from '../../AgeentSideBar.jsx';
-import CustomToaster from '../CustomToaster.jsx';
+import CustomToaster from '../../CustomToaster.jsx';
 
 const Layout = ({ children }) => {
   const { Auth } = usePage().props;

@@ -1,7 +1,7 @@
 import ClientSidebar from '../../ClientSidebar.jsx';
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/inertia-react';
-import CustomToaster from '../CustomToaster.jsx';
+import CustomToaster from '../../CustomToaster.jsx';
 
 const Layout = ({ children, title }) => {
   const { Auth } = usePage().props;
