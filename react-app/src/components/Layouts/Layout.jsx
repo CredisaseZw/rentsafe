@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Head, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+import CustomToaster from '../CustomToaster.jsx';
 
 const Layout = ({ children, title }) => {
   const { error } = usePage().props;
@@ -18,7 +19,7 @@ const Layout = ({ children, title }) => {
       <main>
         <div className="container">
           <div className="row  h-100 justify-content-center">
-            <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
+            <CustomToaster />
             {children}
           </div>
         </div>
