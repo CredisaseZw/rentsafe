@@ -1,6 +1,5 @@
 import { Head } from '@inertiajs/inertia-react';
 import { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
 import ActiveSub from '../../../components/ActiveSub.jsx';
 import PageHeader from '../../../components/PageHeader.jsx';
 import SubOrigination from '../../../components/SubOrigination.jsx';
@@ -13,7 +12,6 @@ export default function Active() {
     <main>
       <Head title="Active Subscriptions" />
       <PageHeader title={'Active Subscriptions'} />
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
 
       {isAdding && (
         <Modal

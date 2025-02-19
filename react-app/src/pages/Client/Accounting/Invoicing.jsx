@@ -2,7 +2,6 @@ import Layout from '../../../components/Layouts/client/Layout.jsx';
 import DismissInvoice from '../../../components/modals/Client/DismissInvoice.jsx';
 import useInvoicing from '../../../hooks/page-hooks/useInvoicing.js';
 import { formatCurrency } from '../../../utils/formatting.js';
-import { Toaster } from 'react-hot-toast';
 
 export default function Invoicing(props) {
   const {
@@ -32,8 +31,6 @@ export default function Invoicing(props) {
           handleClose={() => setInvoiceToDismiss(null)}
         />
       )}
-
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
 
       <div className="h5 m-0 p-3 bg-info text-center text-white">
         Rental Invoicing - {headerDate}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { Toaster } from 'react-hot-toast';
 import IndividualLeaseForm from '../../components/features/leases/IndividualLeaseForm.jsx';
 import CompanyLeaseForm from '../../components/features/leases/CompanyLeaseForm.jsx';
 import useSubscriptionsManagement from '../../hooks/component-hooks/useSubscriptionsManagement.js';
@@ -31,8 +30,6 @@ export default function SubscriptionsManagement({
       </a>
 
       <>
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
         {showIndividualLeaseForm && (
           <IndividualLeaseForm
             action="add"

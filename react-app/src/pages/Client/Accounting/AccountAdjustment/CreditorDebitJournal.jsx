@@ -1,7 +1,6 @@
 import React from 'react';
 import Layout from '../../../../components/Layouts/client/Layout.jsx';
 import SearchCreditorComponent from './SearchCreditor.jsx';
-import { Toaster } from 'react-hot-toast';
 import { formatCurrency } from '../../../../utils/formatting.js';
 import useCreditorDebitJournal from '../../../../hooks/page-hooks/useCreditorDebitJournal.js';
 
@@ -18,8 +17,6 @@ export default function CreditorDebitJournal() {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-
       <div className="bg-white border rounded-3">
         <h5 className="text-center p-2 mb-0 text-white bg-info">
           Debit Journal

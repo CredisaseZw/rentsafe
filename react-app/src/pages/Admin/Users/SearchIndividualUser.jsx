@@ -1,7 +1,6 @@
 import { useForm, usePage } from '@inertiajs/inertia-react';
 // import axios from 'axios';
 import React, { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
 import DeleteUserConfirmation from '../../../components/Admin/DeleteUserConfirmition.jsx';
 import BulkIconButton from '../../../components/BulkIconButton.jsx';
 import IndividualAdd from '../../../components/Client/IndividualAdd.jsx';
@@ -79,7 +78,6 @@ export default function IndividualSearch() {
     <main>
       <PageHeader title={'Individual Users'} />
       <div className="container-xl p-5">
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">
             <form className="mb-5" onSubmit={submitHandler}>
