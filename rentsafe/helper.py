@@ -475,17 +475,19 @@ def update_lease_colors(request):
     today = date.today()
     count = 0
     MAX_MESSAGES_PER_SECOND = 90
+    can_send_message =True
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
-            can_send_message =True
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
             lease_giver_name = (
                 lease_giver.registration_name if lease_giver else "Creditor"
             )
             custom_day = today.replace(day=int(lease.payment_period_end))
             limit_day = today.replace(day=int(lease.payment_period_end) + 1)
+            
             if custom_day < today: # <= limit_day:
+                print('dates passed')
                 if opening_balance_object := Opening_balance.objects.filter(
                     lease_id=lease_id
                 ).last():
@@ -525,7 +527,7 @@ def update_lease_colors(request):
                             lease.save()
                         except Exception as e:
                             pass
-                    lease.status = lease.status_cache
+                    lease.status_cache = lease.status
                     lease.save()
 
                     if lease.is_company:
