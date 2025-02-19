@@ -618,11 +618,11 @@ def track_lease_balances():
     leases = Lease.objects.filter(is_active=True, is_government=False).all()
     today = date.today()
     count = 0
+    can_send_message =True
     MAX_MESSAGES_PER_SECOND = 90
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
-            can_send_message =True
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
             lease_giver_name = (
                 lease_giver.registration_name if lease_giver else "Creditor"
