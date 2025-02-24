@@ -6,6 +6,6 @@ env/
 .tfa
 __pycache__/
 *.pyc
-db.sqlite33
 db.sqlite3
+db.sqlite33
 .vscode
