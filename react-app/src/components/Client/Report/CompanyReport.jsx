@@ -20,6 +20,7 @@ export default function CompanyReport({
       })
       .save();
   };
+  console.log(reportData);
   return (
     <>
       <Modal show={showReport} onHide={handleCloseReport} fullscreen={true}>
@@ -58,7 +59,8 @@ export default function CompanyReport({
               <h6>
                 Rent Payment Status Report on{' '}
                 <span style={{ fontWeight: 'bold', color: '#176987' }}>
-                  {reportData?.company_details?.registration_name}{' '}
+                  {reportData?.company_details?.trading_name ||
+                    reportData?.company_details?.registration_name}{' '}
                 </span>
                 as at {Date().toLocaleString()}
               </h6>
