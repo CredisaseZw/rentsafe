@@ -2,6 +2,7 @@ import React from 'react';
 
 export default function useSalesCategories() {
   const [showAdd, setShowAdd] = React.useState(false);
+  const [categoryToDelete, setCategoryToDelete] = React.useState(null);
 
   function handleClose() {
     setShowAdd(false);
@@ -11,20 +12,23 @@ export default function useSalesCategories() {
     setShowAdd(true);
   }
 
-  function handleSubmit(e) {
+  function handleAddCategory(e) {
     e.preventDefault();
     console.log(Object.fromEntries(new FormData(e.target)));
     handleClose();
   }
 
-  function deleteCategory(category) {
-    console.log(category);
+  function deleteCategory() {
+    console.log(categoryToDelete);
+    setCategoryToDelete(null);
   }
 
   return {
     showAdd,
-    handleSubmit,
+    categoryToDelete,
+    setCategoryToDelete,
     deleteCategory,
+    handleAddCategory,
     openShowAdd,
     handleClose,
   };

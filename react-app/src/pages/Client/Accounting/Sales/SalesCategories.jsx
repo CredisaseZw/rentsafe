@@ -1,21 +1,49 @@
 import ContentModal from '../../../../components/ContentModal.jsx';
 import Layout from '../../../../components/Layouts/client/Layout.jsx';
+import MessageModal from '../../../../components/MessageModal.jsx';
 import useSalesCategories from '../../../../hooks/page-hooks/useSalesCategories.js';
 import { friendlyDate } from '../../../../utils/index.js';
 
 export default function SalesCategories({ categories = [] }) {
-  const { showAdd, handleSubmit, handleClose, openShowAdd, deleteCategory } =
-    useSalesCategories();
+  const {
+    showAdd,
+    categoryToDelete,
+    setCategoryToDelete,
+    handleAddCategory,
+    deleteCategory,
+    openShowAdd,
+    handleClose,
+  } = useSalesCategories();
 
   return (
     <main>
+      <MessageModal
+        show={Boolean(categoryToDelete)}
+        handleClose={() => setCategoryToDelete(null)}
+        title="Delete Category"
+        message={`Are you sure you want to delete ${categoryToDelete?.category}?`}
+        actionButtons={
+          <>
+            <button
+              className="btn btn-sm btn-info text-white"
+              onClick={() => setCategoryToDelete(null)}
+            >
+              Cancel
+            </button>
+            <button className="btn btn-sm btn-danger" onClick={deleteCategory}>
+              Delete
+            </button>
+          </>
+        }
+      />
+
       <ContentModal
         show={showAdd}
         handleClose={handleClose}
         title="Add Category"
         size="md"
       >
-        <form className="px-4 pb-5" onSubmit={handleSubmit}>
+        <form className="px-4 pb-5" onSubmit={handleAddCategory}>
           <div className="c-bg-light p-1 mb-3 text-center">Sales Category</div>
 
           <div className="d-flex gap-4 justify-content-between align-items-center">
@@ -106,7 +134,7 @@ export default function SalesCategories({ categories = [] }) {
 
               <td className="pe-3 custom-mx-w-05 text-center">
                 <button
-                  onClick={() => deleteCategory(category)}
+                  onClick={() => setCategoryToDelete(category)}
                   className="btn btn-sm btn-danger"
                 >
                   Delete
