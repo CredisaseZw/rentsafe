@@ -4544,7 +4544,7 @@ def get_invoicing_details(request):
 
         if (
             (today >= custom_day) or (today < next_month_end_day)
-        ) and difference.months >= 0:  # FIXME: SWITCH DATES comment
+        ) and difference.days >= 20:  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
                 invoiced_month = invoice_status.date_updated.strftime("%B")
                 invoice_year = invoice_status.date_updated.strftime("%Y")
