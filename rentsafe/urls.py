@@ -434,6 +434,12 @@ urlpatterns = [
                     name="client_invoice",
                 ),
                 path(
+                    "accounting/sales/",
+                    include([
+                        path("sales-categories", clients.sales_categories, name="sales_categories"),
+                    ])
+              ),
+                path(
                     "bulk_individuals/",
                     clients.create_bulk_individuals,
                     name="create_bulk_individuals",
