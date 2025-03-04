@@ -92,8 +92,8 @@ export default function VatSettings({ vat_options = [] }) {
                           <input
                             type="text"
                             className="form-control"
-                            name={'description-' + index}
-                            id={'description-' + index}
+                            name={'rate-' + index}
+                            id={'rate-' + index}
                             defaultValue={option.rate}
                           />
                         </div>

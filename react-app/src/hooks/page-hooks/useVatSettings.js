@@ -1,8 +1,7 @@
-import { useForm } from '@inertiajs/inertia-react';
+import { useState } from 'react';
 
 export default function useVatSettings(initialTaxOptions) {
-  const { data: taxOptions, setData: setTaxOptions } =
-    useForm(initialTaxOptions);
+  const [taxOptions, setTaxOptions] = useState(initialTaxOptions);
 
   function addTaxOption() {
     console.log('adding');
@@ -15,7 +14,16 @@ export default function useVatSettings(initialTaxOptions) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log(taxOptions);
+    const form = new FormData(e.target);
+    const data = Array.from(form.entries()).reduce((acc, [key, value]) => {
+      const [prefix, index] = key.split('-');
+      if (!acc[index]) {
+        acc[index] = {};
+      }
+      acc[index][prefix] = value;
+      return acc;
+    }, []);
+    console.log(data);
   }
 
   return {
