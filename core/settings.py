@@ -99,6 +99,26 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
+DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
+DB_USERNAME = os.getenv('DB_USERNAME' , None)
+DB_PASS     = os.getenv('DB_PASS'     , None)
+DB_HOST     = os.getenv('DB_HOST'     , None)
+DB_PORT     = os.getenv('DB_PORT'     , None)
+DB_NAME     = os.getenv('DB_NAME'     , None)
+
+# if DB_ENGINE and DB_NAME and DB_USERNAME:
+# DATABASES = { 
+#     'default': {
+#     'ENGINE'  : 'django.db.backends.mysql', 
+#     'NAME'    : 'finchec1_rentsafe',
+#     'USER'    : 'finchec1_admin',
+#     'PASSWORD': 'n2(&lJweshvu',
+#     'HOST'    : '129.232.213.107',
+#     'PORT'    : '3306',
+#     }, 
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
