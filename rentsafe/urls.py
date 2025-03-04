@@ -438,6 +438,7 @@ urlpatterns = [
                     include([
                         path("sales-categories", clients.sales_categories, name="sales_categories"),
                         path("products-and-services", clients.products_and_services, name="products_and_services"),
+                        path("vat-settings", clients.vat_settings, name="vat_settings"),
                     ])
               ),
                 path(

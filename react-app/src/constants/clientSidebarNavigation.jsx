@@ -79,7 +79,7 @@ export const clientSidebarNavigation = [
             navLink: 'V.A.T Settings',
             // color: 'firebrick',
             type: 'link',
-            href: '',
+            href: reverseUrl('vat_settings'),
           },
         ],
       },

@@ -6033,6 +6033,11 @@ def sales_categories(request):
 def products_and_services(request):
     return render(request, "Client/Accounting/Sales/ProductsAndServices")
 
+@login_required
+@clients_required
+def vat_settings(request):
+    return render(request, "Client/Accounting/Sales/VatSettings")
+
 
 
 
