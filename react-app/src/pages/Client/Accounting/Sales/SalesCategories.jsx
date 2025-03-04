@@ -4,20 +4,19 @@ import { friendlyDate } from '../../../../utils/index.js';
 export default function SalesCategories({ categories = [] }) {
   return (
     <main>
-      <h5 className="text-center mb-2 p-2 mb-0 text-white bg-info">
+      <h5 className="position-relative text-center mb-2 p-2 mb-0">
         Sales Categories
+        <div className="position-absolute top-0 end-0">
+          <button className="btn btn-info text-white">
+            <i className="leading-icon material-icons">add</i>
+            New
+          </button>
+        </div>
       </h5>
 
-      <div className="text-end">
-        <button className="btn btn-info text-white rounded-0 rounded-top rounded-top-5">
-          <i className="leading-icon material-icons">add</i>
-          New
-        </button>
-      </div>
-
       <table className="table table-sm table-striped border bg-white">
-        <thead className="position-sticky c-table-top bg-white shadow-sm c-z-5">
-          <tr className="c-force-borders">
+        <thead className="position-sticky c-table-top text-white bg-info shadow-sm c-z-5">
+          <tr className="c-force-borders c-force-borders-white">
             <th className="ps-3">
               <div> Code</div>
             </th>
