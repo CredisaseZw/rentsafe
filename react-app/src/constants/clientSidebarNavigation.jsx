@@ -58,7 +58,7 @@ export const clientSidebarNavigation = [
             href: '',
           },
           {
-            navLink: 'Product & Services',
+            navLink: 'Products & Services',
             // color: 'firebrick',
             type: 'link',
             href: '',
