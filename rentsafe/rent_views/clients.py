@@ -6022,3 +6022,13 @@ def debt_call(request):
                         message,
                     )
     return render(request, "Client/Accounting/DebtCall", {"props": "Debt Call Sent Successfully!"})
+
+@login_required
+@clients_required
+def sales_categories(request):
+    return render(request, "Client/Accounting/Sales/SalesCategories")
+
+
+
+
+

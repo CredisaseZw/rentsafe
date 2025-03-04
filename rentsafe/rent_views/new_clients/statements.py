@@ -242,6 +242,7 @@ def disbursements(request):
 
     return JsonResponse(props, status=200, safe=False)
         # return render(request, "Client/Accounting/Disbursements", props)
+        
 
 @login_required
 def create_disbursement(request):

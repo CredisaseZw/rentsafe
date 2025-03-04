@@ -354,6 +354,8 @@ JS_ROUTES_INCLUSION_LIST = [
     "creditor_debit_journal",
     "creditor_credit_journal",
     "save_inspection_document", # save inspection document
+    # acounting -> sales
+    "sales_categories"
 ]
 
 LOGIN_URL = "login"

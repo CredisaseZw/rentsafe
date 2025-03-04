@@ -24,7 +24,7 @@ from django.urls import include, path
 
 from rentsafe.rent_views.new_clients import claims, leases, statements, works, forecasts, inspection
 
-from . import views, helper
+from . import views
 from .rent_views import agents, clients, company,creditors
 from .rent_views.templates import download_template
 
@@ -434,6 +434,12 @@ urlpatterns = [
                     name="client_invoice",
                 ),
                 path(
+                    "accounting/sales/",
+                    include([
+                        path("sales-categories", clients.sales_categories, name="sales_categories"),
+                    ])
+              ),
+                path(
                     "bulk_individuals/",
                     clients.create_bulk_individuals,
                     name="create_bulk_individuals",
@@ -577,11 +583,6 @@ urlpatterns = [
                     "inspection-save/",
                     inspection.save_inspection_document,
                     name="save_inspection_document",
-                ),
-                path(
-                    "colors/",
-                    helper.update_lease_colors,
-                    name="update_lease_colors",
                 ),
                 
             ]
