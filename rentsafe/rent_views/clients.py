@@ -6028,6 +6028,12 @@ def debt_call(request):
 def sales_categories(request):
     return render(request, "Client/Accounting/Sales/SalesCategories")
 
+@login_required
+@clients_required
+def products_and_services(request):
+    return render(request, "Client/Accounting/Sales/ProductsAndServices")
+
+
 
 
 
