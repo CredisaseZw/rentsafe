@@ -597,6 +597,10 @@
   border-right: solid thin gray !important;
   padding: 0 1rem !important;
 }
+.c-force-borders-white th div {
+  border-right: solid thin white !important;
+  padding: 0 1rem !important;
+}
 .c-force-borders th:last-child div {
   border-right: none !important;
 }
