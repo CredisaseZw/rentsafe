@@ -3,7 +3,7 @@ import { camelCase } from 'lodash';
 import { cloneElement, useRef } from 'react';
 
 export default function NavLink({
-  data: { navLink, type, href, subNavLinks, component },
+  data: { navLink, type, href, subNavLinks, component, color },
   level,
   activeNavLinkId,
   makeActive,
@@ -27,6 +27,7 @@ export default function NavLink({
   if (isCollapsable) {
     label = (
       <a
+        style={{ color: color || 'black !important' }}
         className={`justify-content-between gap-2 ${labelClassName}`}
         data-bs-toggle="collapse"
         href={'#' + id}
@@ -38,7 +39,12 @@ export default function NavLink({
         {navLink}
 
         <div className="c-collapse-arrow">
-          <i className="material-icons">expand_more</i>
+          <i
+            style={{ color: color || 'black !important' }}
+            className="material-icons"
+          >
+            expand_more
+          </i>
         </div>
       </a>
     );
@@ -46,6 +52,7 @@ export default function NavLink({
     label =
       type === 'link' ? (
         <Link
+          style={{ color: color || 'black !important' }}
           className={labelClassName}
           href={href}
           onClick={() => {
@@ -59,6 +66,7 @@ export default function NavLink({
         cloneElement(component, {
           key: id,
           className: labelClassName,
+          style: { color: color || 'black !important' },
           id,
           makeActive,
           beforeOpenningModal: () => {
@@ -70,7 +78,8 @@ export default function NavLink({
 
   const collapsableContent = isCollapsable ? (
     <div
-      className="collapse"
+      style={{ color: color || 'black !important' }}
+      className="collapse bg-white"
       id={id}
       data-bs-parent={`#${parent?.current?.id}`}
     >
