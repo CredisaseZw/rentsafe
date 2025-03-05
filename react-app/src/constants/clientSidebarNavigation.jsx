@@ -43,41 +43,41 @@ export const clientSidebarNavigation = [
     subNavLinks: [
       {
         navLink: 'Sales',
-        // color: 'firebrick',
+        color: 'firebrick',
         subNavLinks: [
           {
             navLink: 'Invoicing',
-            // color: 'firebrick',
+            color: 'firebrick',
             type: 'link',
             href: reverseUrl('client_invoice'),
           },
           {
             navLink: 'Cash Sales',
-            // color: 'firebrick',
+            color: 'firebrick',
             type: 'link',
             href: '',
           },
           {
             navLink: 'Products & Services',
-            // color: 'firebrick',
+            color: 'firebrick',
             type: 'link',
             href: reverseUrl('products_and_services'),
           },
           {
             navLink: 'Sales Categories',
-            // color: 'firebrick',
+            color: 'firebrick',
             type: 'link',
             href: reverseUrl('sales_categories'),
           },
           {
             navLink: 'Sales Accounts',
-            // color: 'firebrick',
+            color: 'firebrick',
             type: 'link',
             href: '',
           },
           {
             navLink: 'V.A.T Settings',
-            // color: 'firebrick',
+            color: 'firebrick',
             type: 'link',
             href: reverseUrl('vat_settings'),
           },
@@ -85,39 +85,39 @@ export const clientSidebarNavigation = [
       },
       {
         navLink: 'Cashbooks',
-        // color: '#00823d',
+        color: '#00823d',
         type: 'link',
         href: '',
       },
       {
         navLink: 'Customers',
-        // color: 'black',
+        color: 'black',
         subNavLinks: [
           {
             navLink: 'Receipts',
-            // color: 'black',
+            color: 'black',
             type: 'modal',
             component: <ClientSidebarReceipts />,
           },
           {
             navLink: 'Customer Statements',
-            // color: 'black',
+            color: 'black',
             type: 'link',
             href: reverseUrl('tenant_statements'),
           },
           {
             navLink: 'Journals',
-            // color: 'black',
+            color: 'black',
             subNavLinks: [
               {
                 navLink: 'Debit Journal',
-                // color: 'black',
+                color: 'black',
                 type: 'link',
                 href: reverseUrl('debit_journal'),
               },
               {
                 navLink: 'Credit Journal',
-                // color: 'black',
+                color: 'black',
                 type: 'link',
                 href: reverseUrl('credit_journal'),
               },
@@ -125,7 +125,7 @@ export const clientSidebarNavigation = [
           },
           {
             navLink: 'Debt Call',
-            // color: 'black',
+            color: 'black',
             type: 'link',
             href: reverseUrl('debt_call'),
           },
@@ -133,33 +133,33 @@ export const clientSidebarNavigation = [
       },
       {
         navLink: 'Creditors',
-        // color: '#11158f',
+        color: '#11158f',
         subNavLinks: [
           {
             navLink: 'Disbursements',
-            // color: '#11158f',
+            color: '#11158f',
             type: 'modal',
             component: <Disbursements />,
           },
           {
             navLink: 'Creditor Statements',
-            // color: '#11158f',
+            color: '#11158f',
             type: 'link',
             href: reverseUrl('creditor_statements'),
           },
           {
             navLink: 'Journals',
-            // color: '#11158f',
+            color: '#11158f',
             subNavLinks: [
               {
                 navLink: 'Debit Journal',
-                // color: '#11158f',
+                color: '#11158f',
                 type: 'link',
                 href: reverseUrl('creditor_debit_journal'),
               },
               {
                 navLink: 'Credit Journal',
-                // color: '#11158f',
+                color: '#11158f',
                 type: 'link',
                 href: reverseUrl('creditor_credit_journal'),
               },
@@ -169,23 +169,23 @@ export const clientSidebarNavigation = [
       },
       {
         navLink: 'General Ledger',
-        // color: '#2aa7d1',
+        color: '#2aa7d1',
         type: 'link',
         href: '',
       },
       {
         navLink: 'Reports',
-        // color: 'red',
+        color: 'red',
         subNavLinks: [
           {
             navLink: 'Commission Statements',
-            // color: 'red',
+            color: 'red',
             type: 'modal',
             component: <CommissionStatementsSelection />,
           },
           {
             navLink: 'Cashflow Forecasts',
-            // color: 'red',
+            color: 'red',
             type: 'link',
             href: reverseUrl('forecasts'),
           },
@@ -193,11 +193,11 @@ export const clientSidebarNavigation = [
       },
       {
         navLink: 'Settings',
-        // color: 'purple',
+        color: 'purple',
         subNavLinks: [
           {
             navLink: 'Currency',
-            // color: 'purple',
+            color: 'purple',
             type: 'modal',
             component: <CurrencySettings />,
           },
