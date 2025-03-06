@@ -1,38 +1,20 @@
-import React from 'react';
-import { Head, usePage } from '@inertiajs/inertia-react';
-import toast from 'react-hot-toast';
 import CustomToaster from '../../CustomToaster.jsx';
+import { Head } from '@inertiajs/inertia-react';
 
-const Layout = ({ children, title }) => {
-  const { error } = usePage().props;
-
-  if (error) {
-    // console.log(error.type)
-    error.type && toast[error.type](error.message);
-  }
+export default function Layout({ children, title }) {
   return (
-    <div className="bg-pattern-waihou">
+    <>
       <Head title={title} />
-      <div id="layoutAuthentication">
-        <div id="layoutAuthentication_content">
-          <main>
-            <div className="container">
-              <div className="row justify-content-center">
-                <div className="col-xxl-10 col-xl-10 col-lg-12">
-                  <div className="card card-raised shadow-10 mt-5 mt-xl-10 mb-4">
-                    <CustomToaster />
+      <CustomToaster />
 
-                    {children}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
+      <div
+        style={{ minHeight: '100vh', backgroundColor: 'rgb(230, 230, 230)' }}
+        className="d-flex align-items-center justify-content-center "
+      >
+        <div className="custom-mn-w-5 c-w-fit shadow-lg bg-white custom-rounded-2">
+          {children}
         </div>
-        <div id="layoutAuthentication_footer"></div>
       </div>
-    </div>
+    </>
   );
-};
-
-export default Layout;
+}
