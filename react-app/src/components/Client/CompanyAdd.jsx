@@ -23,6 +23,7 @@ export const CompanyAdd = ({
     changeHandler,
     handleSubmitIndividual,
   } = useCompanyAdd(url, companyData, handleClose, setFetchedData);
+
   return (
     <>
       <Modal size="lg" show={show} onHide={handleClose}>
@@ -51,6 +52,7 @@ export const CompanyAdd = ({
               </button>
             </div>
           </Modal.Header>
+
           <div
             className="card-body"
             style={{
@@ -77,6 +79,7 @@ export const CompanyAdd = ({
                       <div className="d-flex gap-2"></div>
                     </div>
                   </div>
+
                   <div className="card-body p-4">
                     <div className="card">
                       <div
@@ -95,6 +98,7 @@ export const CompanyAdd = ({
                           </div>
                         </div>
                       </div>
+
                       <div
                         className="card-body p-4"
                         style={{
@@ -116,6 +120,7 @@ export const CompanyAdd = ({
                             <span className="text-danger">*</span>) are
                             required.
                           </h5>
+
                           <div className="row">
                             <div className="col-md-12 my-4">
                               <div className="row">
@@ -162,6 +167,7 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
+
                                 <div className="col-md-4">
                                   <label className="form-label">Branch</label>
                                   <input
@@ -182,6 +188,7 @@ export const CompanyAdd = ({
                               </div>
                             </div>
                           </div>
+
                           <div className="row mb-4">
                             <div className="col-md-12">
                               <div className="row">
@@ -204,6 +211,7 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
+
                                 <div className="col-md-4">
                                   <label className="form-label">
                                     Registration Date
@@ -245,9 +253,29 @@ export const CompanyAdd = ({
                               </div>
                             </div>
                           </div>
+
                           <div className="row mb-4">
                             <div className="col-md-12">
                               <div className="row">
+                                <div className="col-md-4">
+                                  <label className="form-label">
+                                    TIN Number
+                                  </label>
+                                  <input
+                                    value={data.tinNumber}
+                                    onChange={changeHandler}
+                                    type="text"
+                                    name="tinNumber"
+                                    id="tinNumber"
+                                    className="form-control form-control-sm"
+                                  />
+                                  {errors && (
+                                    <div className="text-danger mt-1">
+                                      {errors.tinNumber}
+                                    </div>
+                                  )}
+                                </div>
+
                                 <div className="col-md-4">
                                   <label className="form-label">
                                     Current Address
@@ -270,6 +298,7 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
+
                                 <div className="col-md-4">
                                   <label className="form-label">
                                     Telephone Number
@@ -289,7 +318,13 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
+                              </div>
+                            </div>
+                          </div>
 
+                          <div className="row mb-4">
+                            <div className="col-md-12">
+                              <div className="row">
                                 <div className="col-md-4">
                                   <label className="form-label">
                                     Mobile Number
@@ -309,12 +344,7 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row mb-4">
-                            <div className="col-md-12">
-                              <div className="row">
+
                                 <div className="col-md-4">
                                   <label className="form-label">
                                     Email Address
@@ -336,6 +366,7 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
+
                                 <div className="col-md-4">
                                   <label className="form-label">Website</label>
                                   <input
@@ -353,7 +384,13 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
+                              </div>
+                            </div>
+                          </div>
 
+                          <div className="row mb-4">
+                            <div className="col-md-12">
+                              <div className="row">
                                 <div className="col-md-4">
                                   <label className="form-label">Industry</label>
                                   <select
@@ -382,12 +419,7 @@ export const CompanyAdd = ({
                                     </div>
                                   )}
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="row mb-4">
-                            <div className="col-md-12">
-                              <div className="row">
+
                                 <div className="col-md-4 d-flex gap-2">
                                   <label className="form-label">
                                     Government Org
@@ -401,6 +433,7 @@ export const CompanyAdd = ({
                                     className="form-check-input border-1 border-black"
                                   />
                                 </div>
+
                                 <div className="col-md-4">
                                   <label className="form-label">Note</label>
                                   <textarea
@@ -422,6 +455,7 @@ export const CompanyAdd = ({
                             </div>
                           </div>
                         </Modal.Body>
+
                         <Modal.Footer>
                           <Button
                             className="text-white"

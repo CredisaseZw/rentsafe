@@ -22,6 +22,7 @@ export default function useCompanyAdd(
 
     registrationDate: companyData ? companyData.registration_date : '',
     vatNumber: companyData ? companyData.vat_number : '',
+    tinNumber: companyData ? companyData.tin_number : '',
     currentAddress: companyData ? companyData.address : '',
     landLine: companyData ? companyData.landline : '',
     mobileNumber: companyData ? companyData.mobile_phone : '',
@@ -64,6 +65,7 @@ export default function useCompanyAdd(
               registration_number: data.companyRegistrationNumber,
               registration_date: data.registrationDate,
               vat_number: data.vatNumber,
+              tin_number: data.tinNumber,
               address: data.currentAddress,
               landline: data.landLine,
               mobile_phone: data.mobileNumber,
