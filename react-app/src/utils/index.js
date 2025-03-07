@@ -135,7 +135,8 @@ export function userFriendlyErrorOrResponse(obj) {
       else return capitalize(content);
     }
   } else if (typeof obj === 'object') return flattenObjectOrList(obj);
-  else return JSON.stringify(obj);
+  else if (typeof obj === 'string') return capitalize(obj);
+  else return 'something went wrong! Please try again.';
 }
 
 export function flattenObjectOrList(objOrList) {
