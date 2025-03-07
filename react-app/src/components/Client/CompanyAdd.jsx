@@ -15,14 +15,8 @@ export const CompanyAdd = ({
   companyData,
   setFetchedData,
 }) => {
-  const {
-    data,
-    errors,
-    isLoading,
-    handleEdit,
-    changeHandler,
-    handleSubmitIndividual,
-  } = useCompanyAdd(url, companyData, handleClose, setFetchedData);
+  const { data, errors, isLoading, handleEdit, changeHandler, submitSingle } =
+    useCompanyAdd(url, companyData, handleClose, setFetchedData);
 
   const activeTab = isSingle ? 'single' : isMultiple ? 'multiple' : '';
 
@@ -50,7 +44,7 @@ export const CompanyAdd = ({
     >
       <div style={{ minHeight: '600px' }} className="p-3">
         {activeTab === 'single' ? (
-          <form>
+          <form onSubmit={action === 'create' ? submitSingle : handleEdit}>
             <fieldset className="p-4 mb-4">
               <legend>
                 {action === 'create' ? 'Add Company' : 'Edit Company'}
@@ -379,12 +373,9 @@ export const CompanyAdd = ({
 
             <div className="text-end">
               <button
-                type="button"
+                type="submit"
                 disabled={isLoading}
                 className="btn btn-info text-white"
-                onClick={
-                  action === 'create' ? handleSubmitIndividual : handleEdit
-                }
               >
                 {isLoading ? (
                   <>
