@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django_cron",
     "whatsappchatbot",
     "django_celery_beat",
+    "accounting",
 ]
 
 MIDDLEWARE = [
@@ -122,7 +123,7 @@ DB_NAME     = os.getenv('DB_NAME'     , None)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite311",
     }
 }
 
@@ -147,6 +148,16 @@ AUTH_PASSWORD_VALIDATORS = [
 CRON_CLASSES = [
     "rentsafe.cronjob.LeaseOwingBalances",
 ]
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.SessionAuthentication', 
+#         'rest_framework.authentication.TokenAuthentication', 
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+# }
+
 
 
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -190,7 +201,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
 
 # If we should use HMR or not.
-# DJANGO_VITE_DEV_MODE = DEBUG
+DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
 DJANGO_VITE_DEV_SERVER_HOST = "localhost"
@@ -208,6 +219,33 @@ STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_DIRS = [DJANGO_VITE_ASSETS_PATH]
 
 JS_ROUTES_INCLUSION_LIST = [
+    
+    
+    # New Accounting routes
+    "products_list",  # GET /accounting/products/
+    "products_detail",  # GET/PUT/DELETE /accounting/products/{id}/
+    "sales_categories_list",
+    "sales_categories_detail",
+    "sales_accounts_list",
+    "sales_accounts_detail",
+    "invoices_list",
+    "invoices_detail",
+    "cash_sales_list",
+    "cash_sales_detail",
+    "cashbook_entries_list",
+    "cashbook_entries_detail",
+    "ledger_accounts_list",
+    "ledger_accounts_detail",
+    "journal_entries_list",
+    "journal_entries_detail",
+    "ledger_transactions_list",
+    "ledger_transactions_detail",
+    
+    
+    
+    
+    
+    
     "creditor_debit_journal",
     "creditor_credit_journal",
     "debit_journal",
