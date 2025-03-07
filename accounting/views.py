@@ -2,6 +2,9 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
     """
@@ -46,3 +49,5 @@ class JournalEntryViewSet(BaseCompanyViewSet):
 class LedgerTransactionViewSet(BaseCompanyViewSet):
     queryset = LedgerTransaction.objects.all()
     serializer_class = LedgerTransactionSerializer
+
+
