@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, usePage } from '@inertiajs/inertia-react';
 import toast from 'react-hot-toast';
-import CustomToaster from '../CustomToaster';
+import CustomToaster from '../CustomToaster.jsx';
 
 const Layout = ({ children, title }) => {
   const { error } = usePage().props;
