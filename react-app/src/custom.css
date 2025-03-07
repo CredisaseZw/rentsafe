@@ -1,3 +1,16 @@
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background-color: rgb(114, 114, 114);
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgb(255, 255, 255);
+  border: solid 2px rgb(114, 114, 114);
+  border-radius: 10px;
+}
+
 /* custom styles */
 .c-text-inherit {
   color: inherit !important;
@@ -444,8 +457,12 @@
     padding: 0.5rem 1.5rem;
     font-size: 0.875rem;
     line-height: 1;
-    min-height: 2.75rem;
+    /* min-height: 2.75rem; */
+    min-height: 2.5rem;
     cursor: pointer;
+    width: 95%;
+    margin: 0 auto;
+    border-radius: 5px;
   }
   .c-new-nav-link:hover {
     color: inherit;

@@ -78,8 +78,11 @@ export default function NavLink({
 
   const collapsableContent = isCollapsable ? (
     <div
-      style={{ color: color || 'black !important' }}
-      className="collapse bg-white"
+      style={{
+        color: color || 'black !important',
+        width: '95%',
+      }}
+      className={`${level === 1 ? 'mx-auto custom-rounded-05 py-2 mt-2 overflow-hidden c-bg-whitesmoke' : ''}  collapse`}
       id={id}
       data-bs-parent={`#${parent?.current?.id}`}
     >

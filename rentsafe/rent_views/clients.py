@@ -2206,7 +2206,7 @@ def create_company_helper(request):
                 ).first():
                     err = "Company already exists"
                     props = {
-                        "errors": err.messages,
+                        "errors": err,
                     }
                     return render(request, "Client/Search/SearchCompany", props)
             # Create the company
