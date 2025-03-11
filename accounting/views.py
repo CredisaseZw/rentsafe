@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
 from django.shortcuts import render
+from rest_framework import status
+from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 
 
@@ -30,6 +32,38 @@ class ItemViewSet(BaseCompanyViewSet):
 class VATSettingViewSet(BaseCompanyViewSet):
     queryset = VATSetting.objects.all()
     serializer_class = VATSettingSerializer
+    from rest_framework import status
+from rest_framework.response import Response
+
+class VATSettingViewSet(BaseCompanyViewSet):
+    queryset = VATSetting.objects.all()
+    serializer_class = VATSettingSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Allows bulk creation of VAT settings.
+        Ensures that no duplicate VAT settings (same company & rate) are created.
+        """
+        data = request.data
+
+        if not isinstance(data, list):
+            return super().create(request, *args, **kwargs)  
+
+        company = request.user.company
+
+        existing_rates = set(VATSetting.objects.filter(company=company).values_list('rate', flat=True))
+
+        valid_data = [item for item in data if item.get("rate") not in existing_rates]
+
+        if not valid_data:
+            return Response({"error": "All VAT settings already exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=valid_data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 class ProductServiceViewSet(BaseCompanyViewSet):
