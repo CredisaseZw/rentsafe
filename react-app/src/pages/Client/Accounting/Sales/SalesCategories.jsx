@@ -4,9 +4,11 @@ import MessageModal from '../../../../components/MessageModal.jsx';
 import useSalesCategories from '../../../../hooks/page-hooks/useSalesCategories.js';
 import { friendlyDate } from '../../../../utils/index.js';
 
-export default function SalesCategories({ categories = [] }) {
+export default function SalesCategories() {
   const {
     showAdd,
+    loading,
+    categories,
     categoryToDelete,
     setCategoryToDelete,
     handleAddCategory,
@@ -71,15 +73,26 @@ export default function SalesCategories({ categories = [] }) {
                 type="text"
                 className="form-control"
                 id="category"
-                name="category"
+                name="name"
                 required
               />
             </div>
           </div>
 
           <div className="mt-5 text-center">
-            <button type="submit" className="btn btn-primary">
-              Save
+            <button
+              disabled={loading}
+              type="submit"
+              className="btn btn-primary"
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-grow spinner-grow-sm"></span>
+                  <span className="d-inline-block ms-2">Saving..</span>
+                </>
+              ) : (
+                'Save'
+              )}
             </button>
           </div>
         </form>
@@ -128,9 +141,11 @@ export default function SalesCategories({ categories = [] }) {
             <tr key={index}>
               <td className="ps-3">{category.code}</td>
 
-              <td className="custom-mn-w-2 ps-3">{category.category}</td>
+              <td className="custom-mn-w-2 ps-3">{category.name}</td>
 
-              <td className="ps-3">{friendlyDate(category.date_created)}</td>
+              <td className="ps-3">
+                {category.date_created && friendlyDate(category.date_created)}
+              </td>
 
               <td className="pe-3 custom-mx-w-05 text-center">
                 <button
