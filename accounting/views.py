@@ -41,29 +41,34 @@ class VATSettingViewSet(BaseCompanyViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Allows bulk creation of VAT settings.
-        Ensures that no duplicate VAT settings (same company & rate) are created.
+        Allows bulk creation of VAT settings and prevents duplicate descriptions per company.
         """
         data = request.data
-
         if not isinstance(data, list):
-            return super().create(request, *args, **kwargs)  
+            return super().create(request, *args, **kwargs)  # Fall back to single create
 
         company = request.user.company
 
-        existing_rates = set(VATSetting.objects.filter(company=company).values_list('rate', flat=True))
+        existing_descriptions = set(
+            VATSetting.objects.filter(company=company).values_list("description", flat=True)
+        )
 
-        valid_data = [item for item in data if item.get("rate") not in existing_rates]
+        valid_data = [
+            item for item in data if item.get("description") not in existing_descriptions
+        ]
 
         if not valid_data:
             return Response({"error": "All VAT settings already exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        for item in valid_data:
+            item["company"] = company
+            item["user"] = request.user.id
 
         serializer = self.get_serializer(data=valid_data, many=True)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 
 class ProductServiceViewSet(BaseCompanyViewSet):
