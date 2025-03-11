@@ -26,14 +26,11 @@ class Item(models.Model):
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
-    
     unit_price_currency = models.CharField(max_length=10, choices=[('USD', 'USD'), ('ZIG', 'ZIG')])
     price = models.DecimalField(max_digits=10, decimal_places=2)
     unit_name = models.CharField(max_length=255, blank=True, null=True)
-
     tax_configuration = models.ForeignKey('VATSetting', on_delete=models.CASCADE, related_name='items')
     sales_account = models.ForeignKey('SalesAccount', on_delete=models.CASCADE, related_name='items')
-    
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -44,7 +41,8 @@ class Item(models.Model):
 class SalesCategory(models.Model):
     company = models.CharField(max_length=255)  
     name = models.CharField(max_length=255, unique=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE) 
+    code = models.CharField(max_length=255, blank=True, null=True) 
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 

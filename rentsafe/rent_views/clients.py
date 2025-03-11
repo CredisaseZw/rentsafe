@@ -5752,7 +5752,6 @@ def manual_send_otp(request):
     count = 0
     MAX_MESSAGES_PER_SECOND = 90
     if leases:
-        print('leases all',leases.count())
         for lease in leases:
             lease_id = lease.lease_id
             can_send_message =True
@@ -5761,7 +5760,7 @@ def manual_send_otp(request):
                 lease_giver.registration_name if lease_giver else "Creditor"
             )
             custom_day = today.replace(day=int(lease.payment_period_end))
-            limit_day = today.replace(day=int(lease.payment_period_end) +4)
+            limit_day = today.replace(day=int(lease.payment_period_end) +5)
             if custom_day < today <= limit_day:
                 if opening_balance_object := Opening_balance.objects.filter(
                     lease_id=lease_id
@@ -5827,35 +5826,33 @@ def manual_send_otp(request):
                                 print('sleeping...')
                                 time.sleep(1)
                             # print(f'sending to {requested_user_ob}, #', lease.lease_id)
-                            if requested_user_ob == "individual":
+                            if requested_user_ob == "individual": #and int(lease.lease_giver) == 15:
                                 print('sending on lease #', lease.lease_id,'..STATUS...',lease.status,contact_detail,'giver>>',lease_giver_name)
                                 # continue
-                                if count < 20:
-                                    send_otp(
+                                send_otp.delay(
+                                    "",
+                                    lease_id,
+                                    contact_detail,
+                                    lease.lease_giver,
+                                    lease.reg_ID_Number,
+                                    requested_user_ob,
+                                    settings.LEASE_STATUS,
+                                    registration_message,
+                                )
+                            if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
+                                if rent_guarantor_mobile := Individual.objects.filter(
+                                    identification_number=lease.rent_guarantor_id
+                                ).first():
+                                    send_otp.delay(
                                         "",
                                         lease_id,
-                                        '263717003473',
+                                        rent_guarantor_mobile.mobile,
                                         lease.lease_giver,
                                         lease.reg_ID_Number,
-                                        requested_user_ob,
+                                        "individual",
                                         settings.LEASE_STATUS,
                                         registration_message,
                                     )
-                            if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
-                                print('sending to rent Guarantor, #', lease.lease_id)
-                                # if rent_guarantor_mobile := Individual.objects.filter(
-                                #     identification_number=lease.rent_guarantor_id
-                                # ).first():
-                                #     send_otp.delay(
-                                #         "",
-                                #         lease_id,
-                                #         rent_guarantor_mobile.mobile,
-                                #         lease.lease_giver,
-                                #         lease.reg_ID_Number,
-                                #         "individual",
-                                #         settings.LEASE_STATUS,
-                                #         registration_message,
-                                    # )
                         else:
                             ...
 
