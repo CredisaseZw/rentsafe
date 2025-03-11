@@ -152,7 +152,7 @@ export default function ProductsAndServices({
 
               <div className="w-50 d-flex">
                 <label
-                  htmlFor="unit_price"
+                  htmlFor="price"
                   className="px-2 text-nowrap c-bg-light d-flex align-items-center"
                 >
                   Unit Price
@@ -161,10 +161,10 @@ export default function ProductsAndServices({
                 <input
                   type="number"
                   className="form-control rounded-0"
-                  id="unit_price"
-                  name="unit_price"
+                  id="price"
+                  name="price"
                   required
-                  defaultValue={itemToEdit ? itemToEdit.unit_price : ''}
+                  defaultValue={itemToEdit ? itemToEdit.price : ''}
                 />
               </div>
             </div>

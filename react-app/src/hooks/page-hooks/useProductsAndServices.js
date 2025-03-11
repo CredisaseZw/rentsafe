@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { userFriendlyErrorOrResponse } from '../../utils';
 
@@ -12,7 +12,7 @@ export default function useProductsAndServices() {
 
   function fetchItems() {
     axios
-      .get('/accounting/products')
+      .get('/accounting/products/')
       .then((res) => {
         console.log(res);
         setItems(res.data);
@@ -39,7 +39,7 @@ export default function useProductsAndServices() {
     setLoading(true);
     const data = Object.fromEntries(new FormData(e.target));
     axios
-      .post('/accounting/products', data)
+      .post('/accounting/products/', data)
       .then((res) => {
         setLoading(false);
         console.log(res);
@@ -58,10 +58,23 @@ export default function useProductsAndServices() {
     console.log('Deleting item:', itemToDelete);
     setItemToDelete(null);
   }
+
   function handleEdit(e) {
     e.preventDefault();
-    console.log(Object.fromEntries(new FormData(e.target)));
-    setItemToEdit(null);
+    const data = Object.fromEntries(new FormData(e.target));
+    console.log(data);
+    axios
+      .patch(`/accounting/products/${itemToEdit.id}/`, data)
+      .then((res) => {
+        console.log(res);
+        toast.success(userFriendlyErrorOrResponse(res));
+        fetchItems();
+        handleClose();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      });
   }
 
   return {
