@@ -8,19 +8,29 @@ from django.contrib.auth.decorators import login_required
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
     """
-    Base ViewSet that automatically assigns the requesting user's company.
+    Base ViewSet that automatically filters data for the requesting user's company.
     """
     # permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        """Ensure users only access objects belonging to their company."""
+        return self.queryset.filter(company=self.request.user.company)
+
     def perform_create(self, serializer):
+        """Automatically assign the user's company when creating objects."""
         serializer.save(user=self.request.user, company=self.request.user.company)
 
     def perform_update(self, serializer):
+        """Ensure the company is not changed during updates."""
         serializer.save(company=self.request.user.company)
-
 class ItemViewSet(BaseCompanyViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+
+class VATSettingViewSet(BaseCompanyViewSet):
+    queryset = VATSetting.objects.all()
+    serializer_class = VATSettingSerializer
+
 
 class ProductServiceViewSet(BaseCompanyViewSet):
     queryset = ProductService.objects.all()

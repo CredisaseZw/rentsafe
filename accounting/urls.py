@@ -16,6 +16,7 @@ router.register(r'ledger-accounts', GeneralLedgerAccountViewSet, basename="ledge
 router.register(r'journal-entries', JournalEntryViewSet, basename="journal_entries")
 router.register(r'ledger-transactions', LedgerTransactionViewSet, basename="ledger_transactions")
 router.register(r'items', ItemViewSet, basename="items") 
+router.register(r'vat-settings', VATSettingViewSet, basename="vat_settings")
 
 urlpatterns = [
     path("", include(router.urls)),

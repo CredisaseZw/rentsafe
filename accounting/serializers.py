@@ -17,6 +17,10 @@ class ItemSerializer(BaseCompanySerializer):
 
     class Meta(BaseCompanySerializer.Meta):
         model = Item
+        
+class VATSettingSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = VATSetting
 
 class SalesCategorySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
