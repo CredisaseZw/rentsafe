@@ -16,7 +16,8 @@ class ProductService(models.Model):
 class SalesCategory(models.Model):
     company = models.CharField(max_length=255)  
     name = models.CharField(max_length=255, unique=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    code = models.CharField(max_length=255, unique=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     
 
     def __str__(self):
@@ -25,14 +26,14 @@ class SalesCategory(models.Model):
 class SalesAccount(models.Model):
     company = models.CharField(max_length=255)  
     account_name = models.CharField(max_length=255, unique=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     
 
     def __str__(self):
         return self.account_name
 
 class CashSale(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     company = models.CharField(max_length=255)  
     sale_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -44,7 +45,7 @@ class VATSetting(models.Model):
     company = models.CharField(max_length=255)  # Company Relation
     rate = models.DecimalField(max_digits=5, decimal_places=2)
     description = models.CharField(max_length=255)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     
 
     def __str__(self):
@@ -56,7 +57,7 @@ class CashbookEntry(models.Model):
         ("receipt", "Receipt"),
     )
 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     company = models.CharField(max_length=255)  # Company Relation
     transaction_date = models.DateTimeField(auto_now_add=True)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
@@ -75,7 +76,7 @@ class GeneralLedgerAccount(models.Model):
         ("expense", "Expense"),
     )
 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     company = models.CharField(max_length=255)  # Company Relation
     name = models.CharField(max_length=255, unique=True)
     account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
@@ -84,7 +85,7 @@ class GeneralLedgerAccount(models.Model):
         return f"{self.name} - {self.account_type}"
 
 class JournalEntry(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # User Relation
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
     company = models.CharField(max_length=255)  # Company Relation
     date = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
@@ -93,7 +94,7 @@ class JournalEntry(models.Model):
         return f"Journal Entry {self.id} - {self.date}"
 
 class LedgerTransaction(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # User Relation
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
     company = models.CharField(max_length=255)  # Company Relation
     entry = models.ForeignKey(JournalEntry, on_delete=models.CASCADE)
     account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE)
