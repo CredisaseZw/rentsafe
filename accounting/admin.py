@@ -6,6 +6,14 @@ from .models import *
 # from simple_history.admin import SimpleHistoryAdmin
 
 
+@admin.register(Item)
+class ProductServiceAdmin(admin.ModelAdmin):
+    list_display = ("company", "name", "price",)
+    list_display_links = ("name",)
+    search_fields = ("name",)
+    list_filter = ("name",)
+    ordering = ("name",)
+
 @admin.register(ProductService)
 class ProductServiceAdmin(admin.ModelAdmin):
     list_display = ("company", "name", "price", "vat_applicable")
