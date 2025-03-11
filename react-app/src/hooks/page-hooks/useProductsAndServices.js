@@ -9,6 +9,7 @@ export default function useProductsAndServices() {
   const [itemToEdit, setItemToEdit] = React.useState(null);
   const [items, setItems] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [categories, setCategories] = React.useState([]);
 
   function fetchItems() {
     axios
@@ -22,8 +23,21 @@ export default function useProductsAndServices() {
       });
   }
 
+  function fetchCategories() {
+    axios
+      .get('/accounting/sales-categories/')
+      .then((res) => {
+        console.log(res);
+        setCategories(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   useEffect(() => {
     fetchItems();
+    fetchCategories();
   }, []);
 
   function handleClose() {
@@ -81,6 +95,7 @@ export default function useProductsAndServices() {
     items,
     loading,
     showAdd,
+    categories,
     itemToEdit,
     itemToDelete,
     setItemToDelete,

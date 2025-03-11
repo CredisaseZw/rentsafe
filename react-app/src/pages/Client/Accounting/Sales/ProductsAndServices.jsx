@@ -5,7 +5,6 @@ import useProductsAndServices from '../../../../hooks/page-hooks/useProductsAndS
 import { friendlyDate } from '../../../../utils/index.js';
 
 export default function ProductsAndServices({
-  categories = [],
   currencies = [],
   tax_configurations = [],
 }) {
@@ -13,6 +12,7 @@ export default function ProductsAndServices({
     items,
     loading,
     showAdd,
+    categories,
     itemToEdit,
     itemToDelete,
     setItemToDelete,
@@ -77,8 +77,8 @@ export default function ProductsAndServices({
                 Select one
               </option>
               {categories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
+                <option key={index} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>
