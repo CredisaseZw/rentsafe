@@ -1,9 +1,9 @@
 import Layout from '../../../../components/Layouts/client/Layout.jsx';
 import useVatSettings from '../../../../hooks/page-hooks/useVatSettings.js';
 
-export default function VatSettings({ vat_options = [] }) {
-  const { taxOptions, addTaxOption, handleSubmit, removeTaxOption } =
-    useVatSettings(vat_options);
+export default function VatSettings({}) {
+  const { taxOptions, loading, addTaxOption, handleSubmit, removeTaxOption } =
+    useVatSettings();
 
   return (
     <main>
@@ -15,7 +15,7 @@ export default function VatSettings({ vat_options = [] }) {
             <div className="form-check mb-4">
               <input
                 className="form-check-input"
-                name="vat_registered"
+                // name="vat_registered"
                 type="checkbox"
                 value="registered"
                 id="vat_registered"
@@ -32,7 +32,7 @@ export default function VatSettings({ vat_options = [] }) {
               <input
                 type="text"
                 className="form-control"
-                name="vat_registration_number"
+                // name="vat_registration_number"
                 id="vat_registration_number"
               />
             </div>
@@ -116,6 +116,7 @@ export default function VatSettings({ vat_options = [] }) {
             <div className="text-end">
               <button
                 type="button"
+                disabled={loading}
                 className="btn btn-outline-info "
                 onClick={addTaxOption}
               >
@@ -125,9 +126,20 @@ export default function VatSettings({ vat_options = [] }) {
             </div>
 
             <div className="text-center">
-              <button type="submit" className="btn btn-info text-white">
-                <i className="leading-icon material-icons">save</i>
-                Update{' '}
+              <button
+                disabled={loading}
+                type="submit"
+                className="btn btn-info text-white"
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner-grow spinner-grow-sm"></span>
+                    <span className="d-inline-block ms-2">Updating..</span>
+                  </>
+                ) : (
+                  'Update'
+                )}
+                <i className="trailing-icon material-icons">save</i>
               </button>
             </div>
           </div>
