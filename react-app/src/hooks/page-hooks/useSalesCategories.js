@@ -56,8 +56,18 @@ export default function useSalesCategories() {
   }
 
   function deleteCategory() {
-    console.log(categoryToDelete);
-    setCategoryToDelete(null);
+    axios
+      .delete(`/accounting/sales-categories/${categoryToDelete.id}/`)
+      .then((res) => {
+        console.log(res);
+        toast.success('Category deleted successfully');
+        setCategoryToDelete(null);
+        getCategories();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      });
   }
 
   return {
