@@ -13,6 +13,7 @@ class ProductServiceSerializer(BaseCompanySerializer):
 class ItemSerializer(BaseCompanySerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=SalesCategory.objects.all())
     tax_configuration = serializers.PrimaryKeyRelatedField(queryset=VATSetting.objects.all())
+    category_name = serializers.CharField(source='category.name', read_only=True) 
     # sales_account = serializers.PrimaryKeyRelatedField(queryset=SalesAccount.objects.all())
 
     class Meta(BaseCompanySerializer.Meta):
