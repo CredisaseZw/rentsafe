@@ -5,12 +5,13 @@ import useProductsAndServices from '../../../../hooks/page-hooks/useProductsAndS
 import { friendlyDate } from '../../../../utils/index.js';
 
 export default function ProductsAndServices({
-  items = [],
   categories = [],
   currencies = [],
   tax_configurations = [],
 }) {
   const {
+    items,
+    loading,
     showAdd,
     itemToEdit,
     itemToDelete,
@@ -220,8 +221,19 @@ export default function ProductsAndServices({
           </div>
 
           <div className="mt-5 text-center">
-            <button type="submit" className="btn btn-primary">
-              Save
+            <button
+              disabled={loading}
+              type="submit"
+              className="btn btn-primary"
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-grow spinner-grow-sm"></span>
+                  <span className="d-inline-block ms-2">saving..</span>
+                </>
+              ) : (
+                'Save'
+              )}
             </button>
           </div>
         </form>
@@ -280,9 +292,11 @@ export default function ProductsAndServices({
 
               <td className="ps-3">{item.name}</td>
 
-              <td className="ps-3">{item.unit_price}</td>
+              <td className="ps-3"> {item.price}</td>
 
-              <td className="ps-3">{friendlyDate(item.date_created)}</td>
+              <td className="ps-3">
+                {item.date_created && friendlyDate(item.date_created)}
+              </td>
 
               <td className="d-flex gap-2 justify-content-end pe-3">
                 <button
