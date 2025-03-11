@@ -18,6 +18,10 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(company=self.request.user.company)
 
+class ItemViewSet(BaseCompanyViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+
 class ProductServiceViewSet(BaseCompanyViewSet):
     queryset = ProductService.objects.all()
     serializer_class = ProductServiceSerializer

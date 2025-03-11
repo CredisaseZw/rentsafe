@@ -5830,16 +5830,17 @@ def manual_send_otp(request):
                             if requested_user_ob == "individual":
                                 print('sending on lease #', lease.lease_id,'..STATUS...',lease.status,contact_detail,'giver>>',lease_giver_name)
                                 # continue
-                                # send_otp(
-                                #     "",
-                                #     lease_id,
-                                #     '263717003473',
-                                #     lease.lease_giver,
-                                #     lease.reg_ID_Number,
-                                #     requested_user_ob,
-                                #     settings.LEASE_STATUS,
-                                #     registration_message,
-                                # )
+                                if count < 20:
+                                    send_otp(
+                                        "",
+                                        lease_id,
+                                        '263717003473',
+                                        lease.lease_giver,
+                                        lease.reg_ID_Number,
+                                        requested_user_ob,
+                                        settings.LEASE_STATUS,
+                                        registration_message,
+                                    )
                             if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
                                 print('sending to rent Guarantor, #', lease.lease_id)
                                 # if rent_guarantor_mobile := Individual.objects.filter(

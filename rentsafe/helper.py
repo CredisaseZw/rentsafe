@@ -25,7 +25,7 @@ auth_token = settings.AUTH_TOKEN
 client = Client(account_sid, auth_token)
 
 
-# @shared_task
+@shared_task
 def send_otp(
     request_path,
     generated_otp,
@@ -143,11 +143,14 @@ def send_otp(
             # send email to company
             subject = "New Lease - credisafe."
             message = registration_message
-            mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
-            # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
-            # creating a pdf reader object
-            # mail.attach('manual.pdf', pdf, 'application/pdf')
-            mail.send(fail_silently=False)
+            try:
+                mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
+                # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
+                # creating a pdf reader object
+                # mail.attach('manual.pdf', pdf, 'application/pdf')
+                mail.send(fail_silently=False)
+            except Exception as e:
+                pass
         else:
             # Save OTP to the OTP model
             if otp:
@@ -174,12 +177,15 @@ def send_otp(
                 otp_link = f"{url_path}/clients/cl-verify-lease/{random_string}T{generated_otp}L{random_string}!{requested_user}B/"
                 # send email to company
                 subject = "New Lease - credisafe."
-                message = f"{registration_message}  "  # + otp_link
-                mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
-                # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
-                # creating a pdf reader object
-                # mail.attach('manual.pdf', pdf, 'application/pdf')
-                mail.send(fail_silently=False)
+                try:
+                    message = f"{registration_message}  "  # + otp_link
+                    mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
+                    # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
+                    # creating a pdf reader object
+                    # mail.attach('manual.pdf', pdf, 'application/pdf')
+                    mail.send(fail_silently=False)
+                except Exception as e:
+                    pass
 
     elif (
         request_user_type == "company"
@@ -210,13 +216,15 @@ def send_otp(
             is_email=True,
             is_creditor=is_creditor,
         )
-
-        message = registration_message
-        mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
-        # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
-        # creating a pdf reader object
-        # mail.attach('manual.pdf', pdf, 'application/pdf')
-        mail.send(fail_silently=False)
+        try:
+            message = registration_message
+            mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
+            # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
+            # creating a pdf reader object
+            # mail.attach('manual.pdf', pdf, 'application/pdf')
+            mail.send(fail_silently=False)
+        except Exception as e:
+            pass
 
 
 def generate_random_password(length=10):
@@ -574,9 +582,11 @@ def track_lease_balances():
                         registration_message = None
                  
                     otp_object = OTP.objects.filter(otp_code=lease_id).last()
+                    
                     if not otp_object or otp_object.created_at.strftime(
                         "%B"
                     ) != today.strftime("%B"):
+                        
                         try:
                             can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
                         except Exception as e:

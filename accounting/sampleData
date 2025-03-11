@@ -108,3 +108,48 @@ POST /accounting/ledger-transactions/
 - DELETE /accounting/ledger-transactions/{id}/
 
 
+// ITEM CREATION
+
+
+ 1️⃣ Create an Item (POST /items/)
+json
+{
+    "category": 1,
+    "item_id": "ITEM001",
+    "name": "Wireless Mouse",
+    "unit_price_currency": "USD",
+    "price": 19.99,
+    "unit_name": "Piece",
+    "tax_configuration": 2,
+    "sales_account": 3
+}
+
+
+ 2️⃣ Get All Items (GET /items/)
+Response:
+json
+[
+    {
+        "id": 1,
+        "company": 4,
+        "category": 1,
+        "item_id": "ITEM001",
+        "name": "Wireless Mouse",
+        "unit_price_currency": "USD",
+        "price": 19.99,
+        "unit_name": "Piece",
+        "tax_configuration": 2,
+        "sales_account": 3
+    }
+]
+
+
+ 3️⃣ Update an Item (PUT /items/1/)
+
+{
+    "name": "Gaming Mouse",
+    "price": 29.99
+}
+
+
+4️⃣ Delete an Item (DELETE /items/1/)
