@@ -5949,6 +5949,16 @@ def products_and_services(request):
 def vat_settings(request):
     return render(request, "Client/Accounting/Sales/VatSettings")
 
+@login_required
+@clients_required
+def cash_sales(request):
+    return render(request, "Client/Accounting/Sales/CashSales")
+
+@login_required
+@clients_required
+def sales_accounts(request):
+    return render(request, "Client/Accounting/Sales/SalesAccounts")
+
 
 
 
