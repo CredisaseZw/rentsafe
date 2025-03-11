@@ -395,7 +395,9 @@ JS_ROUTES_INCLUSION_LIST = [
     # acounting -> sales
     "sales_categories",
     "products_and_services",
-    "vat_settings"
+    "vat_settings",
+    "cash_sales",
+    "sales_accounts",
 ]
 
 LOGIN_URL = "login"

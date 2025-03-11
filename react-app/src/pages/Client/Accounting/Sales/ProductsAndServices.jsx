@@ -4,15 +4,13 @@ import MessageModal from '../../../../components/MessageModal.jsx';
 import useProductsAndServices from '../../../../hooks/page-hooks/useProductsAndServices.js';
 import { friendlyDate } from '../../../../utils/index.js';
 
-export default function ProductsAndServices({
-  categories = [],
-  currencies = [],
-  tax_configurations = [],
-}) {
+export default function ProductsAndServices({ currencies = [] }) {
   const {
     items,
     loading,
     showAdd,
+    categories,
+    taxOptions,
     itemToEdit,
     itemToDelete,
     setItemToDelete,
@@ -48,10 +46,7 @@ export default function ProductsAndServices({
 
       <ContentModal
         show={showAdd || Boolean(itemToEdit)}
-        handleClose={() => {
-          handleClose();
-          setItemToEdit(null);
-        }}
+        handleClose={handleClose}
         title={itemToEdit ? 'Edit Item' : 'Add Item'}
         size="md"
       >
@@ -77,8 +72,8 @@ export default function ProductsAndServices({
                 Select one
               </option>
               {categories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
+                <option key={index} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -91,8 +86,8 @@ export default function ProductsAndServices({
             <input
               type="text"
               className="form-control"
-              id="id"
-              name="id"
+              id="item_id"
+              name="item_id"
               required
               defaultValue={itemToEdit?.id}
             />
@@ -198,9 +193,9 @@ export default function ProductsAndServices({
                 Select one
               </option>
 
-              {tax_configurations.map((taxConfig, index) => (
-                <option key={index} value={taxConfig}>
-                  {taxConfig}
+              {taxOptions.map((option, index) => (
+                <option key={index} value={option.id}>
+                  {option.description} - {option.rate}%
                 </option>
               ))}
             </select>

@@ -55,7 +55,7 @@ export const clientSidebarNavigation = [
             navLink: 'Cash Sales',
             color: 'firebrick',
             type: 'link',
-            href: '',
+            href: reverseUrl('cash_sales'),
           },
           {
             navLink: 'Products & Services',
@@ -73,7 +73,7 @@ export const clientSidebarNavigation = [
             navLink: 'Sales Accounts',
             color: 'firebrick',
             type: 'link',
-            href: '',
+            href: reverseUrl('sales_accounts'),
           },
           {
             navLink: 'V.A.T Settings',

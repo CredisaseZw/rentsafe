@@ -9,13 +9,36 @@ export default function useProductsAndServices() {
   const [itemToEdit, setItemToEdit] = React.useState(null);
   const [items, setItems] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [categories, setCategories] = React.useState([]);
+  const [taxOptions, setTaxOptions] = React.useState([]);
+
+  function fetchTaxOptions() {
+    axios
+      .get('/accounting/vat-settings/')
+      .then((res) => {
+        setTaxOptions(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
 
   function fetchItems() {
     axios
-      .get('/accounting/products/')
+      .get('/accounting/items/')
       .then((res) => {
-        console.log(res);
         setItems(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function fetchCategories() {
+    axios
+      .get('/accounting/sales-categories/')
+      .then((res) => {
+        setCategories(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -24,9 +47,12 @@ export default function useProductsAndServices() {
 
   useEffect(() => {
     fetchItems();
+    fetchCategories();
+    fetchTaxOptions();
   }, []);
 
   function handleClose() {
+    setItemToEdit(null);
     setShowAdd(false);
   }
 
@@ -39,11 +65,11 @@ export default function useProductsAndServices() {
     setLoading(true);
     const data = Object.fromEntries(new FormData(e.target));
     axios
-      .post('/accounting/products/', data)
+      .post('/accounting/items/', data)
       .then((res) => {
         setLoading(false);
         console.log(res);
-        toast.success(userFriendlyErrorOrResponse(res));
+        toast.success('Item added successfully');
         fetchItems();
         handleClose();
       })
@@ -54,22 +80,30 @@ export default function useProductsAndServices() {
       });
   }
 
-  function handleDelete() {
-    console.log('Deleting item:', itemToDelete);
-    setItemToDelete(null);
-  }
-
   function handleEdit(e) {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
     console.log(data);
     axios
-      .patch(`/accounting/products/${itemToEdit.id}/`, data)
+      .patch(`/accounting/items/${itemToEdit.id}/`, data)
       .then((res) => {
-        console.log(res);
-        toast.success(userFriendlyErrorOrResponse(res));
-        fetchItems();
+        toast.success('Item updated successfully');
         handleClose();
+        fetchItems();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      });
+  }
+
+  function handleDelete() {
+    axios
+      .delete(`/accounting/items/${itemToDelete.id}/`)
+      .then(() => {
+        toast.success('Item deleted successfully');
+        fetchItems();
+        setItemToDelete(null);
       })
       .catch((err) => {
         console.log(err);
@@ -81,6 +115,8 @@ export default function useProductsAndServices() {
     items,
     loading,
     showAdd,
+    categories,
+    taxOptions,
     itemToEdit,
     itemToDelete,
     setItemToDelete,

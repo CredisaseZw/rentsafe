@@ -1,7 +1,27 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { use, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { userFriendlyErrorOrResponse } from '../../utils';
 
-export default function useVatSettings(initialTaxOptions) {
-  const [taxOptions, setTaxOptions] = useState(initialTaxOptions);
+export default function useVatSettings() {
+  const [taxOptions, setTaxOptions] = useState();
+  const [loading, setLoading] = useState(false);
+
+  function fetchTaxOptions() {
+    axios
+      .get('/accounting/vat-settings/')
+      .then((res) => {
+        console.log(res);
+        setTaxOptions(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  useEffect(() => {
+    fetchTaxOptions();
+  }, []);
 
   function addTaxOption() {
     console.log('adding');
@@ -14,6 +34,7 @@ export default function useVatSettings(initialTaxOptions) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
     const form = new FormData(e.target);
     const data = Array.from(form.entries()).reduce((acc, [key, value]) => {
       const [prefix, index] = key.split('-');
@@ -24,9 +45,24 @@ export default function useVatSettings(initialTaxOptions) {
       return acc;
     }, []);
     console.log(data);
+
+    axios
+      .post('/accounting/vat-settings/', data)
+      .then((res) => {
+        setLoading(false);
+        console.log(res);
+        toast.success(userFriendlyErrorOrResponse(res));
+        fetchTaxOptions();
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.error(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      });
   }
 
   return {
+    loading,
     taxOptions,
     addTaxOption,
     handleSubmit,
