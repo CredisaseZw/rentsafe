@@ -1,0 +1,18 @@
+Identification Number,Account Number,Lease Mobile Number,Lease Address,Lease Details,Lease Currency,Monthly Rental,Is Variable,Deposit Period (Months),Deposit Amount,Lease Start Date,Payment Period End,Current Month,1 - 30 days outstanding,31 - 60 days outstanding,61 - 90 days outstanding,+90 days outstanding,Errors
+,,,,,,,,,,,,,,,,,,,
+11111111A11,80040,263779586059,LeaseAdd1,1 room,ZiG,500,no,1,500,12/05/24,10,0,0,0,0,0,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A12,80041,263717003473,LeaseAdd2,2 rooms,USD,200,no,1,200,12/05/24,10,200,0,0,0,0,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A13,80042,263772000000,LeaseAdd3,3 rooms,USD,300,no,1,300,12/05/24,10,300,150,0,0,0,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A14,80043,263779586059,LeaseAdd4,4 rooms,USD,400,no,1,400,12/05/24,10,400,400,200,0,0,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A15,80044,263772000000,LeaseAdd5,5 rooms,USD,500,no,1,500,12/05/24,10,500,500,500,250,0,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A16,80045,263717003473,LeaseAdd6,6 rooms,USD,600,no,1,600,12/05/24,10,600,600,600,600,300,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A17,80046,263772000000,LeaseAdd7,7 rooms,USD,700,no,1,700,12/05/24,10,700,700,700,700,700,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A18,80047,263717003473,LeaseAdd8,8 rooms,USD,800,no,1,800,12/05/24,10,800,800,800,800,1200,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A19,80048,263772000000,LeaseAdd9,9 rooms,USD,900,no,1,900,12/05/24,10,900,900,900,900,1800,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A20,80049,263717003473,LeaseAdd10,10 rooms,USD,1000,no,1,1000,12/05/24,10,1000,1000,1000,1000,3000,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A21,80050,263772000000,LeaseAdd11,11 rooms,USD,500,no,1,500,12/05/24,10,500,500,500,500,1500,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A22,80051,263779586059,LeaseAdd12,12 rooms,USD,200,no,1,200,12/05/24,10,200,200,200,200,400,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A23,80052,263772000000,LeaseAdd13,13 rooms,USD,300,no,1,300,12/05/24,10,300,300,300,300,450,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A24,80053,263772000000,LeaseAdd14,14 rooms,USD,400,no,1,400,12/05/24,10,400,400,400,400,400,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A25,80054,263779586059,LeaseAdd15,15 rooms,USD,500,no,1,500,12/05/24,10,500,500,500,500,250,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"
+11111111A26,80055,263772000000,LeaseAdd16,16 rooms,USD,600,no,1,600,12/05/24,10,600,600,600,300,0,"Invalid Lease Start date format, use yyyy-mm-dd or dd/mm/yyyy date format"

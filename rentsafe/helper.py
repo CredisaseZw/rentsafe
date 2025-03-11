@@ -25,7 +25,7 @@ auth_token = settings.AUTH_TOKEN
 client = Client(account_sid, auth_token)
 
 
-@shared_task
+# @shared_task
 def send_otp(
     request_path,
     generated_otp,
@@ -547,6 +547,8 @@ def track_lease_balances():
                         else:
                             contact_detail = "gtkandeya@gmail.com"
                     else:
+                        count += 1
+                        
                         requested_user_ob = "individual"
                         lease_receiver = Individual.objects.filter(
                             identification_number=lease.reg_ID_Number
@@ -570,8 +572,7 @@ def track_lease_balances():
                         registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to MEDIUM RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
                     else:
                         registration_message = None
-                    if float(opening_balance_object.outstanding_balance) <= 0:
-                        registration_message = None
+                 
                     otp_object = OTP.objects.filter(otp_code=lease_id).last()
                     if not otp_object or otp_object.created_at.strftime(
                         "%B"
@@ -582,7 +583,6 @@ def track_lease_balances():
                             ...
                         can_send_message = False if can_send_message_ob else True
                         if registration_message and  can_send_message:
-                            count += 1
                             if count % MAX_MESSAGES_PER_SECOND == 0:
                                 time.sleep(1)
                             send_otp.delay(

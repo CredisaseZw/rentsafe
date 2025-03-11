@@ -18,8 +18,8 @@ POST /accounting/products/
 
 POST /accounting/sales-categories/
 {
-    "company": 1,
-    "name": "Electronics"
+    "name": "Electronics",
+    "code": "ELEC",
 }
 
 - GET /accounting/sales-categories/
@@ -31,7 +31,6 @@ POST /accounting/sales-categories/
 
 POST /accounting/sales-accounts/
 {
-    "company": 1,
     "account_name": "Main Sales Account"
 }
 
@@ -44,8 +43,7 @@ POST /accounting/sales-accounts/
 
 POST /accounting/cash-sales/
 {
-    "user": 3,
-    "company": 1,
+
     "total_amount": 150.00
 }
 
@@ -58,8 +56,7 @@ POST /accounting/cash-sales/
 
 POST /accounting/cashbook-entries/
 {
-    "user": 4,
-    "company": 1,
+
     "transaction_type": "receipt",
     "amount": 200.00,
     "description": "Customer payment"
@@ -74,8 +71,6 @@ POST /accounting/cashbook-entries/
 
 POST /accounting/ledger-accounts/
 {
-    "user": 5,
-    "company": 1,
     "name": "Accounts Receivable",
     "account_type": "asset"
 }
@@ -89,8 +84,6 @@ POST /accounting/ledger-accounts/
 
 POST /accounting/journal-entries/
 {
-    "user": 6,
-    "company": 1,
     "description": "End of month adjustments"
 }
 
@@ -103,8 +96,6 @@ POST /accounting/journal-entries/
 
 POST /accounting/ledger-transactions/
 {
-    "user": 7,
-    "company": 1,
     "entry": 2,
     "account": 3,
     "debit": 100.00,
@@ -115,4 +106,5 @@ POST /accounting/ledger-transactions/
 - GET /accounting/ledger-transactions/{id}/
 - PUT /accounting/ledger-transactions/{id}/
 - DELETE /accounting/ledger-transactions/{id}/
+
 
