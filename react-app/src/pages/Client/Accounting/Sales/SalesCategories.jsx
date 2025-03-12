@@ -147,7 +147,7 @@ export default function SalesCategories() {
                 {category.date_created && friendlyDate(category.date_created)}
               </td>
 
-              <td className="pe-3 custom-mx-w-05 text-center">
+              <td className="pe-3 custom-mx-w-05 text-end">
                 <button
                   onClick={() => setCategoryToDelete(category)}
                   className="btn btn-sm btn-danger"
