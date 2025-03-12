@@ -2,19 +2,28 @@ import Layout from '../../../../components/Layouts/client/Layout.jsx';
 import useVatSettings from '../../../../hooks/page-hooks/useVatSettings.js';
 
 export default function VatSettings({}) {
-  const { taxOptions, loading, addTaxOption, handleSubmit, removeTaxOption } =
-    useVatSettings();
+  const {
+    loading,
+    taxOptions,
+    newTaxOptions,
+    handleSubmit,
+    changeHandler,
+    removeTaxOption,
+    addNewTaxOption,
+    removeNewTaxOption,
+  } = useVatSettings();
 
   return (
     <main>
       <form className="row" onSubmit={handleSubmit}>
         <div className="col col-3 py-0">
-          <div className="bg-white border shadow-sm p-4">
+          <div className="bg-white border custom-rounded-2 shadow-sm p-4">
             <div className="mb-5 fw-bold">Registration</div>
 
             <div className="form-check mb-4">
               <input
                 className="form-check-input"
+                disabled
                 // name="vat_registered"
                 type="checkbox"
                 value="registered"
@@ -30,8 +39,9 @@ export default function VatSettings({}) {
                 V.A.T Registration Number
               </label>
               <input
+                disabled
                 type="text"
-                className="form-control"
+                className="form-control border"
                 // name="vat_registration_number"
                 id="vat_registration_number"
               />
@@ -44,13 +54,13 @@ export default function VatSettings({}) {
             <div className="p-2 fw-bold text-center">Tax Options</div>
 
             <div className="custom-mn-h-2 mb-3">
-              <table className="table table-sm table-respnsive border shadow-sm bg-white">
+              <table className="table table-sm table-respnsive shadow-sm bg-white">
                 <thead className="position-sticky c-table-top c-bg-light shadow-sm c-z-5">
                   <tr className="c-force-borders text-center">
-                    <th className="ps-3" style={{ width: '60%' }}>
+                    <th className="ps-3 text-start" style={{ width: '60%' }}>
                       <div> Description</div>
                     </th>
-                    <th>
+                    <th className="text-start">
                       <div>Rate (%) </div>
                     </th>
                     <th>
@@ -60,7 +70,7 @@ export default function VatSettings({}) {
                 </thead>
 
                 <tbody>
-                  {!Boolean(taxOptions?.length) && (
+                  {!Boolean(taxOptions?.length || newTaxOptions?.length) && (
                     <tr>
                       <td colSpan={3}>
                         <div className="p-5 bg-white d-flex justify-content-center align-items-center">
@@ -72,17 +82,40 @@ export default function VatSettings({}) {
 
                   {taxOptions?.map((option, index) => (
                     <tr key={index}>
-                      <td
-                        style={{ width: '60%' }}
-                        className="custom-mn-w-2 ps-3"
-                      >
+                      <td className="ps-3">{option.description}</td>
+
+                      <td className="ps-3">{option.rate} %</td>
+
+                      <td className="pe-3 custom-mx-w-05 text-end">
+                        <button
+                          type="button"
+                          className="btn p-1 btn-sm btn-danger"
+                          onClick={() => removeTaxOption(option)}
+                        >
+                          <i className="material-icons">close</i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {newTaxOptions?.map((option, index) => (
+                    <tr key={index}>
+                      <td className="ps-3">
                         <div>
                           <input
                             type="text"
                             className="form-control"
+                            placeholder="description"
                             name={'description-' + index}
                             id={'description-' + index}
-                            defaultValue={option.description}
+                            value={option.description}
+                            onChange={(e) =>
+                              changeHandler(
+                                'description',
+                                e.target.value,
+                                option.id
+                              )
+                            }
                           />
                         </div>
                       </td>
@@ -90,19 +123,25 @@ export default function VatSettings({}) {
                       <td className="ps-3">
                         <div>
                           <input
-                            type="text"
+                            type="number"
+                            step={0.001}
                             className="form-control"
+                            placeholder="rate in %"
                             name={'rate-' + index}
                             id={'rate-' + index}
-                            defaultValue={option.rate}
+                            value={option.rate}
+                            onChange={(e) =>
+                              changeHandler('rate', e.target.value, option.id)
+                            }
                           />
                         </div>
                       </td>
 
-                      <td className="pe-3 custom-mx-w-05 text-center">
+                      <td className="pe-3 custom-mx-w-05 text-end">
                         <button
+                          type="button"
                           className="btn btn-sm btn-danger"
-                          onClick={() => removeTaxOption(index)}
+                          onClick={() => removeNewTaxOption(option.id)}
                         >
                           <i className="material-icons">close</i>
                         </button>
@@ -118,7 +157,7 @@ export default function VatSettings({}) {
                 type="button"
                 disabled={loading}
                 className="btn btn-outline-info "
-                onClick={addTaxOption}
+                onClick={addNewTaxOption}
               >
                 <i className="leading-icon material-icons">add</i>
                 Add Tax Item
