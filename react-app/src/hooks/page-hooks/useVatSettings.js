@@ -51,7 +51,7 @@ export default function useVatSettings() {
       .then((res) => {
         setLoading(false);
         console.log(res);
-        toast.success(userFriendlyErrorOrResponse(res));
+        toast.success('VAT settings updated successfully');
         fetchTaxOptions();
       })
       .catch((err) => {
