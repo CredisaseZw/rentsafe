@@ -5959,6 +5959,16 @@ def cash_sales(request):
 def sales_accounts(request):
     return render(request, "Client/Accounting/Sales/SalesAccounts")
 
+@login_required
+@clients_required
+def cash_books(request):
+    return render(request, "Client/Accounting/Sales/CashBooks")
+
+@login_required
+@clients_required
+def general_ledger(request):
+    return render(request, "Client/Accounting/Sales/GeneralLedger")
+
 
 
 
