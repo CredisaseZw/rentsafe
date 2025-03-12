@@ -398,6 +398,8 @@ JS_ROUTES_INCLUSION_LIST = [
     "vat_settings",
     "cash_sales",
     "sales_accounts",
+    "cash_books",
+    "general_ledger",
 ]
 
 LOGIN_URL = "login"

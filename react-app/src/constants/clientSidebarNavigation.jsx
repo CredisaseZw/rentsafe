@@ -87,7 +87,7 @@ export const clientSidebarNavigation = [
         navLink: 'Cashbooks',
         color: '#00823d',
         type: 'link',
-        href: '',
+        href: reverseUrl('cash_books'),
       },
       {
         navLink: 'Customers',
@@ -171,7 +171,7 @@ export const clientSidebarNavigation = [
         navLink: 'General Ledger',
         color: '#2aa7d1',
         type: 'link',
-        href: '',
+        href: reverseUrl('general_ledger'),
       },
       {
         navLink: 'Reports',
