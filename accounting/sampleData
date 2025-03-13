@@ -71,8 +71,9 @@ POST /accounting/cashbook-entries/
 
 POST /accounting/ledger-accounts/
 {
-    "name": "Accounts Receivable",
-    "account_type": "asset"
+    "account_name": "Accounts Receivable",
+    "account_number": 123,
+    "account_sector": #TODO:this will be the selected sector id
 }
 
 - GET /accounting/ledger-accounts/
@@ -153,3 +154,19 @@ json
 
 
 4️⃣ Delete an Item (DELETE /accounting/items/1/)
+
+
+
+// ACCOUNT SECTOR SECTION
+
+1️⃣ Create an Account Sector (POST /accounting/account-sectors/)
+json
+{
+    "name": "Assets",
+    "code": "ASSET"
+}
+
+- GET /accounting/account-sectors/
+- GET /accounting/account-sectors/{id}/
+- PUT /accounting/account-sectors/{id}/
+- DELETE /accounting/account-sectors/{id}/
