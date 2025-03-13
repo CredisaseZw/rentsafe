@@ -98,22 +98,16 @@ class CashbookEntry(models.Model):
         return f"{self.transaction_type} - {self.amount}"
 
 class GeneralLedgerAccount(models.Model):
-    ACCOUNT_TYPES = (
-        ("asset", "Asset"),
-        ("liability", "Liability"),
-        ("equity", "Equity"),
-        ("revenue", "Revenue"),
-        ("expense", "Expense"),
-    )
-
+ 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
     company = models.CharField(max_length=255)  # Company Relation
-    name = models.CharField(max_length=255, unique=True)
-    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
+    account_name = models.CharField(max_length=255, unique=True)
+    account_number = models.CharField(max_length=255)
+    account_sector =   models.ForeignKey('AccountSector', on_delete=models.CASCADE, related_name='sector')
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
-        return f"{self.name} - {self.account_type}"
+        return f"{self.account_number} - {self.account_name}"
 
 class JournalEntry(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
@@ -135,4 +129,13 @@ class LedgerTransaction(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
-        return f"{self.account.name} - Debit: {self.debit} Credit: {self.credit}"
+        return f"{self.account.account_name} - Debit: {self.debit} Credit: {self.credit}"
+
+class AccountSector(models.Model):
+    company = models.CharField(max_length=255)  # Company Relation
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=255)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.name

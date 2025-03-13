@@ -40,6 +40,8 @@ class CashbookEntrySerializer(BaseCompanySerializer):
         model = CashbookEntry
 
 class GeneralLedgerAccountSerializer(BaseCompanySerializer):
+    acount_sector = serializers.PrimaryKeyRelatedField(queryset=AccountSector.objects.all())
+    
     class Meta(BaseCompanySerializer.Meta):
         model = GeneralLedgerAccount
 
@@ -50,3 +52,8 @@ class JournalEntrySerializer(BaseCompanySerializer):
 class LedgerTransactionSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = LedgerTransaction
+    
+    
+class AccountSectorSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = AccountSector
