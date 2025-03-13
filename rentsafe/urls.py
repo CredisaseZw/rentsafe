@@ -240,6 +240,7 @@ urlpatterns = [
                 path("vat-settings", clients.vat_settings, name="vat_settings"),
                 path("cash-books", clients.cash_books, name="cash_books"),
                 path("general-ledger", clients.general_ledger, name="general_ledger"),
+                path("sales-invoicing", clients.sales_invoicing, name="sales_invoicing"),
                 path(
                     "claims/",
                     claims.create_claim,
