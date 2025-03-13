@@ -49,7 +49,7 @@ export const clientSidebarNavigation = [
             navLink: 'Invoicing',
             color: 'firebrick',
             type: 'link',
-            href: reverseUrl('client_invoice'),
+            href: reverseUrl('sales_invoicing'),
           },
           {
             navLink: 'Cash Sales',
@@ -93,6 +93,12 @@ export const clientSidebarNavigation = [
         navLink: 'Customers',
         color: 'black',
         subNavLinks: [
+          {
+            navLink: 'Invoicing',
+            color: 'black',
+            type: 'link',
+            href: reverseUrl('client_invoice'),
+          },
           {
             navLink: 'Receipts',
             color: 'black',
