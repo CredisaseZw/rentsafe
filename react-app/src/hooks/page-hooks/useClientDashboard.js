@@ -3,9 +3,13 @@ import { usePage } from '@inertiajs/inertia-react';
 import { Inertia } from '@inertiajs/inertia';
 
 export default function useClientDashboard() {
-  const creditGiven = usePage().props.client_credits_given;
-  const creditTaken = usePage().props.client_credits_taken;
-  const worstCreditStatus = usePage().props.worst_credit_status;
+  const {
+    props: {
+      client_credits_given: creditGiven,
+      client_credits_taken: creditTaken,
+      worst_credit_status: worstCreditStatus,
+    },
+  } = usePage();
 
   function navigateToLeases(color) {
     Inertia.visit(reverseUrl('client-leases'), {
