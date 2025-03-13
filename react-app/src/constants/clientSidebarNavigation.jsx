@@ -75,12 +75,6 @@ export const clientSidebarNavigation = [
             type: 'link',
             href: reverseUrl('sales_accounts'),
           },
-          {
-            navLink: 'V.A.T Settings',
-            color: 'firebrick',
-            type: 'link',
-            href: reverseUrl('vat_settings'),
-          },
         ],
       },
       {
@@ -206,6 +200,12 @@ export const clientSidebarNavigation = [
             color: 'purple',
             type: 'modal',
             component: <CurrencySettings />,
+          },
+          {
+            navLink: 'V.A.T Settings',
+            color: 'purple',
+            type: 'link',
+            href: reverseUrl('vat_settings'),
           },
         ],
       },
