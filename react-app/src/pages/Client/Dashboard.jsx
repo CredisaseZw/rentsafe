@@ -1,66 +1,21 @@
-import React from 'react';
 import Layout from '../../components/Layouts/client/Layout.jsx';
-import PageHeader from '../../components/PageHeader.jsx';
-import { Link, usePage } from '@inertiajs/inertia-react';
 import PieChart from '../../components/PieChart.jsx';
-import { formatCurrency, transformCreditData } from '../../utils/formatting.js';
-import { Inertia } from '@inertiajs/inertia';
+import PageHeader from '../../components/PageHeader.jsx';
+import useClientDashboard from '../../hooks/page-hooks/useClientDashboard.js';
+import { formatCurrency } from '../../utils/formatting.js';
+import { Link } from '@inertiajs/inertia-react';
 
 export default function Dashboard() {
-  const creditGiven = usePage().props.client_credits_given;
-  const creditTaken = usePage().props.client_credits_taken;
-  const worstCreditStatus = usePage().props.worst_credit_status;
-
-  function navigateToLeases(color) {
-    Inertia.visit(reverseUrl('client-leases'), {
-      data: {
-        color,
-      },
-    });
-  }
-
   const {
+    data1,
+    data2,
     totalCreditGiven,
     totalCreditTaken,
+    worstCreditStatus,
     creditGivenWithPercentages,
     creditTakenWithPercentages,
-  } = transformCreditData(creditGiven, creditTaken);
-
-  const data1 = {
-    labels: [
-      'Current',
-      'Past Due 1-30 days',
-      'Past Due 31-60 days',
-      'Past Due 61-90 days',
-      'Past Due 90+ days',
-    ],
-    datasets: [
-      {
-        label: '% of Total Credit Taken',
-        data: creditGivenWithPercentages.map((item) => item.percentage),
-        backgroundColor: ['green', 'orange', '#f87171', '#991b1b', 'black'],
-        borderWidth: 0,
-      },
-    ],
-  };
-
-  const data2 = {
-    labels: [
-      'Current',
-      'Past Due 1-30 days',
-      'Past Due 31-60 days',
-      'Past Due 61-90 days',
-      'Past Due 90+ days',
-    ],
-    datasets: [
-      {
-        label: '% of Total Credit Given',
-        data: creditTakenWithPercentages.map((item) => item.percentage),
-        backgroundColor: ['green', 'orange', '#f87171', '#991b1b', 'black'],
-        borderWidth: 0,
-      },
-    ],
-  };
+    navigateToLeases,
+  } = useClientDashboard();
 
   return (
     <main>
