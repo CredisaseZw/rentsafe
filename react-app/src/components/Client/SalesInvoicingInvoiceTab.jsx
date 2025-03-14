@@ -1,6 +1,7 @@
 import useSalesInvoicingInvoiceTab from '../../hooks/component-hooks/useSalesInvoicingInvoiceTab.js';
 import { friendlyDate } from '../../utils/index.js';
 import SearchBar from '../SearchBar.jsx';
+import { SalesInvoiceForm } from './SalesInvoiceForm.jsx';
 
 export default function SalesInvoicingInvoiceTab() {
   const { loading, invoiceList, handleFilters } = useSalesInvoicingInvoiceTab();
@@ -63,10 +64,7 @@ export default function SalesInvoicingInvoiceTab() {
         <h5 className="position-relative text-center mb-2 p-2 mb-0">
           Invoice List
           <div className="position-absolute top-0 end-0">
-            <button className="btn btn-info text-white" onClick={undefined}>
-              <i className="leading-icon material-icons">add</i>
-              New
-            </button>
+            <SalesInvoiceForm />
           </div>
         </h5>
 
