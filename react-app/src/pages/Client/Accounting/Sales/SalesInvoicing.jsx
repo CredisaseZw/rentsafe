@@ -1,11 +1,13 @@
+import ProformaInvoicingInvoiceTab from '../../../../components/Client/ProformaInvoicingInvoiceTab.jsx';
+import RecurringInvoicingInvoiceTab from '../../../../components/Client/RecurringInvoicingInvoiceTab.jsx';
 import SalesInvoicingInvoiceTab from '../../../../components/Client/SalesInvoicingInvoiceTab.jsx';
 import Layout from '../../../../components/Layouts/client/Layout.jsx';
 import { useState } from 'react';
 
 const tabs = [
   { key: 'Invoice', content: <SalesInvoicingInvoiceTab /> },
-  { key: 'Recurring', content: <div>Recurring</div> },
-  { key: 'Proforma', content: <div>Proforma</div> },
+  { key: 'Recurring', content: <RecurringInvoicingInvoiceTab /> },
+  { key: 'Proforma', content: <ProformaInvoicingInvoiceTab /> },
 ];
 
 export default function SalesInvoicing() {
