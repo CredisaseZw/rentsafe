@@ -1,5 +1,6 @@
 import ContentModal from '../ContentModal.jsx';
 import useSalesInvoiceForm from '../../hooks/component-hooks/useSalesInvoiceForm.js';
+import UserSelector from '../UserSelector.jsx';
 
 export function SalesInvoiceForm() {
   const {
@@ -29,21 +30,26 @@ export function SalesInvoiceForm() {
         title="FISCAL TAX INVOICE"
       >
         <form className="p-3" onSubmit={onSubmit}>
-          <fieldset className="p-4 mb-4">
-            <legend>Document Number: 112108</legend>
-
+          <div className="p-4 mb-4">
             <div className="pb-5">
               <div className="mb-3 d-flex gap-4 align-items-center">
-                <label htmlFor="bill_to" className="form-label">
-                  Bill To:
+                <label htmlFor="document_number" className="form-label">
+                  Document Number:
                 </label>
                 <input
                   className="form-control border-0 border-bottom flex-fill border-3 custom-mx-w-4"
                   required
-                  name="bill_to"
-                  id="bill_to"
-                  placeholder="Customer name..."
+                  name="document_number"
+                  id="document_number"
+                  placeholder="e.g 112108"
                 />
+              </div>
+
+              <div className="mb-3 d-flex gap-4 align-items-center">
+                <label htmlFor="bill_to" className="form-label">
+                  Bill To:
+                </label>
+                <UserSelector />
               </div>
 
               <div className="mb-3 d-flex gap-4 align-items-center">
@@ -286,7 +292,7 @@ export function SalesInvoiceForm() {
                 </tr>
               </tfoot>
             </table>
-          </fieldset>
+          </div>
 
           <div className="text-end">
             <button disabled={isLoading} className="btn btn-info text-white">
