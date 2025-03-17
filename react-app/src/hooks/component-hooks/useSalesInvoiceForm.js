@@ -2,6 +2,9 @@ import { useState } from 'react';
 
 export default function useSalesInvoiceForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [show, setShow] = useState(true);
+  const [currency, setCurrency] = useState('USD');
+
   const [items, setItems] = useState([
     {
       sales_code: '',
@@ -12,8 +15,6 @@ export default function useSalesInvoiceForm() {
       total: '',
     },
   ]);
-
-  const [show, setShow] = useState(false);
 
   function addRow() {
     setItems([
@@ -77,11 +78,13 @@ export default function useSalesInvoiceForm() {
     show,
     items,
     totals,
+    currency,
     isLoading,
     addRow,
     onSubmit,
     removeRow,
     handleShow,
+    setCurrency,
     handleClose,
     changeHandler,
   };

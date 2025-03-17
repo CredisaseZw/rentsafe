@@ -7,11 +7,13 @@ export function SalesInvoiceForm() {
     show,
     items,
     totals,
+    currency,
     isLoading,
     addRow,
     onSubmit,
     removeRow,
     handleShow,
+    setCurrency,
     handleClose,
     changeHandler,
   } = useSalesInvoiceForm();
@@ -125,6 +127,11 @@ export function SalesInvoiceForm() {
                   className="form-control border-0 border-bottom flex-fill border-3 custom-mx-w-4"
                   required
                   name="date"
+                  defaultValue={new Date().toISOString().split('T')[0]}
+                  max={new Date().toISOString().split('T')[0]}
+                  min={
+                    new Date(new Date().setDate(1)).toISOString().split('T')[0]
+                  }
                   id="date"
                   type="date"
                 />
@@ -141,7 +148,17 @@ export function SalesInvoiceForm() {
                     Currency
                   </th>
                   <th colSpan={2} className="bg-danger text-white">
-                    United States Dollar (USD)
+                    <div>
+                      <select
+                        value={currency}
+                        name="currency"
+                        id="currency"
+                        onChange={(e) => setCurrency(e.target.value)}
+                      >
+                        <option value="USD">United States Dollar (USD)</option>
+                        <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
+                      </select>
+                    </div>
                   </th>
                 </tr>
 
@@ -175,7 +192,6 @@ export function SalesInvoiceForm() {
                         type="text"
                         name="sales_code"
                         id="sales_code"
-                        required
                         disabled={isLoading}
                         value={item.salesCode}
                         onChange={(e) => changeHandler(e, index)}
@@ -188,7 +204,6 @@ export function SalesInvoiceForm() {
                         type="text"
                         name="sales_item"
                         id="sales_item"
-                        required
                         disabled={isLoading}
                         value={item.salesItem}
                         onChange={(e) => changeHandler(e, index)}
@@ -201,7 +216,6 @@ export function SalesInvoiceForm() {
                         type="number"
                         name="price"
                         id="price"
-                        required
                         disabled={isLoading}
                         value={item.price}
                         onChange={(e) => changeHandler(e, index)}
@@ -214,7 +228,6 @@ export function SalesInvoiceForm() {
                         type="number"
                         name="qty"
                         id="qty"
-                        required
                         disabled={isLoading}
                         value={item.qty}
                         onChange={(e) => changeHandler(e, index)}
@@ -227,7 +240,6 @@ export function SalesInvoiceForm() {
                         type="text"
                         name="vat"
                         id="vat"
-                        required
                         disabled={isLoading}
                         value={item.vat}
                         onChange={(e) => changeHandler(e, index)}
@@ -240,7 +252,6 @@ export function SalesInvoiceForm() {
                         type="text"
                         name="total"
                         id="total"
-                        required
                         disabled={isLoading}
                         value={item.total}
                         onChange={(e) => changeHandler(e, index)}
@@ -287,7 +298,7 @@ export function SalesInvoiceForm() {
 
                 <tr>
                   <td></td>
-                  <td colSpan={5}>Invoice Total USD</td>
+                  <td colSpan={5}>Invoice Total {currency}</td>
                   <td>{totals.InvoiceTotal}</td>
                 </tr>
               </tfoot>
