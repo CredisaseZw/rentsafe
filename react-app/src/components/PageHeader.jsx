@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-const PageHeader = ({title}) => {
+const PageHeader = ({ title }) => {
   return (
     <header className="bg-info">
       <div className="container-xl px-5">

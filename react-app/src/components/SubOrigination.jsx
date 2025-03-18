@@ -1,6 +1,6 @@
-import SearchComponent from './search.jsx';
-import useSubOrigination from '../hooks/admin/component-hooks/useSubOrigination.js';
-import { formatCurrency } from '../utils/formatting.js';
+import SearchComponent from "./search.jsx";
+import useSubOrigination from "../hooks/admin/component-hooks/useSubOrigination.js";
+import { formatCurrency } from "../utils/formatting.js";
 
 export default function SubOrigination() {
   const {
@@ -22,9 +22,7 @@ export default function SubOrigination() {
 
   return (
     <div>
-      <h5 className="p-2 m-0 bg-info text-white text-center">
-        Subscription Origination
-      </h5>
+      <h5 className="p-2 m-0 bg-info text-white text-center">Subscription Origination</h5>
 
       <table className="table table-responsive table-sm table-bordered bg-white">
         <thead>
@@ -69,9 +67,7 @@ export default function SubOrigination() {
                 setClientId={setClientId}
                 setRegNumber={setRegNumber}
               />
-              {errors && (
-                <div className="text-danger mt-1">{errors.subscriberName}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.subscriberName}</div>}
             </td>
 
             <td>
@@ -96,9 +92,7 @@ export default function SubOrigination() {
                 })}
               </select>
 
-              {errors && (
-                <div className="text-danger mt-1">{errors.product}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.product}</div>}
             </td>
 
             {/* <td>
@@ -142,9 +136,7 @@ export default function SubOrigination() {
                   );
                 })}
               </select>
-              {errors && (
-                <div className="text-danger mt-1">{errors.subPeriod}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.subPeriod}</div>}
             </td>
 
             <td>
@@ -157,9 +149,7 @@ export default function SubOrigination() {
                 id="numberOfSubs"
                 className="form-control form-control-sm"
               />
-              {errors && (
-                <div className="text-danger mt-1">{errors.numberOfSubs}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.numberOfSubs}</div>}
             </td>
 
             <td>
@@ -172,9 +162,7 @@ export default function SubOrigination() {
                 id="startDate"
                 className="form-control form-control-sm"
               />
-              {errors && (
-                <div className="text-danger mt-1">{errors.startDate}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.startDate}</div>}
             </td>
 
             <td>
@@ -189,29 +177,23 @@ export default function SubOrigination() {
                 <option disabled value="">
                   Select
                 </option>
-                <option value={'USD'}>USD</option>
-                <option value={'ZWG'}>ZWG</option>
+                <option value={"USD"}>USD</option>
+                <option value={"ZWG"}>ZWG</option>
               </select>
 
-              {errors && (
-                <div className="text-danger mt-1">{errors.currency}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.currency}</div>}
             </td>
 
             <td>
-              {data.currency === 'USD'
+              {data.currency === "USD"
                 ? formatCurrency(data.monthlyPrice)
                 : formatCurrency(data.monthlyPriceZWL)}
-              {errors && (
-                <div className="text-danger mt-1">{errors.monthlyPrice}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.monthlyPrice}</div>}
             </td>
 
             <td>
               {formatCurrency(data.subsAmount)}
-              {errors && (
-                <div className="text-danger mt-1">{errors.subsAmount}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.subsAmount}</div>}
             </td>
 
             <td>
@@ -236,20 +218,14 @@ export default function SubOrigination() {
                 <option value="ECOCASH ZWG">ECOCASH ZWG</option>
               </select>
 
-              {errors && (
-                <div className="text-danger mt-1">{errors.paymentMethod}</div>
-              )}
+              {errors && <div className="text-danger mt-1">{errors.paymentMethod}</div>}
             </td>
           </tr>
         </tbody>
       </table>
 
       <div className="text-end">
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={handleSubmit}
-        >
+        <button type="button" className="btn btn-primary" onClick={handleSubmit}>
           {isLoading ? (
             <>
               <span className="spinner-grow spinner-grow-sm"></span>

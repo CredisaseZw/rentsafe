@@ -1,13 +1,13 @@
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { useState } from 'react';
-import { useForm } from '@inertiajs/inertia-react';
-import { isNumeric, userFriendlyErrorOrResponse } from '../../utils';
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useState } from "react";
+import { useForm } from "@inertiajs/inertia-react";
+import { isNumeric, userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useDisbursements() {
   const [show, setShow] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const { data, setData, reset } = useForm({
     rows: [{ ...sampleRow }],
@@ -16,7 +16,7 @@ export default function useDisbursements() {
   const openModal = () => setShow(true);
   const closeModal = () => {
     setProcessing(false);
-    setError('');
+    setError("");
     reset();
     setShow(false);
   };
@@ -36,7 +36,7 @@ export default function useDisbursements() {
   const handleInputChange = (e, index) => {
     const { name, value } = e.target;
 
-    if (name === 'paidAmount' && !isNumeric(value) && value !== '') return;
+    if (name === "paidAmount" && !isNumeric(value) && value !== "") return;
 
     setData((prev) => ({
       ...prev,
@@ -46,9 +46,7 @@ export default function useDisbursements() {
               ...row,
               [name]: value,
               netBalance:
-                name === 'paidAmount'
-                  ? Number(row.amountOwing) - Number(value)
-                  : row.netBalance,
+                name === "paidAmount" ? Number(row.amountOwing) - Number(value) : row.netBalance,
             }
           : row
       ),
@@ -58,7 +56,7 @@ export default function useDisbursements() {
   function handleSubmit(e) {
     e.preventDefault();
     setProcessing(true);
-    setError('');
+    setError("");
 
     const payload = {
       disbursements: data.rows.map((row) => ({
@@ -76,7 +74,7 @@ export default function useDisbursements() {
     console.log({ data, payload });
 
     axios
-      .post(reverseUrl('create_disbursement'), payload)
+      .post(reverseUrl("create_disbursement"), payload)
       .then((res) => {
         console.log(res);
         if (res.status === 200 || res.status === 201) {
@@ -106,7 +104,7 @@ export default function useDisbursements() {
               leaseId: selectedCreditor.lease_id,
               creditor: selectedCreditor.landlord_id,
               amountOwing: selectedCreditor.amount,
-              paidAmount: '',
+              paidAmount: "",
               netBalance: selectedCreditor.amount,
             }
           : row
@@ -133,12 +131,12 @@ export default function useDisbursements() {
 const sampleRow = {
   leaseId: undefined,
   id: 1,
-  date: new Date().toISOString().split('T')[0],
-  creditor: '',
-  ref: '',
-  details: '',
-  currency: '',
-  amountOwing: '',
-  paidAmount: '',
-  netBalance: '',
+  date: new Date().toISOString().split("T")[0],
+  creditor: "",
+  ref: "",
+  details: "",
+  currency: "",
+  amountOwing: "",
+  paidAmount: "",
+  netBalance: "",
 };

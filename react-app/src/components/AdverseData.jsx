@@ -1,14 +1,9 @@
-import { Modal } from 'react-bootstrap';
-import useAdverseDataVersion2 from '../hooks/modal-hooks/useAdverseDataVersion2.js';
-import CustomAsyncSelect from './CustomAsyncSelect.jsx';
-import { truncate } from 'lodash';
+import { Modal } from "react-bootstrap";
+import useAdverseDataVersion2 from "../hooks/modal-hooks/useAdverseDataVersion2.js";
+import CustomAsyncSelect from "./CustomAsyncSelect.jsx";
+import { truncate } from "lodash";
 
-export default function AdverseData({
-  className,
-  id,
-  makeActive,
-  beforeOpenningModal,
-}) {
+export default function AdverseData({ className, id, makeActive, beforeOpenningModal }) {
   const {
     show,
     openModal,
@@ -26,7 +21,7 @@ export default function AdverseData({
   } = useAdverseDataVersion2();
 
   function closeModal() {
-    makeActive('use-last-last');
+    makeActive("use-last-last");
     hookCloseModal();
   }
 
@@ -59,9 +54,7 @@ export default function AdverseData({
                   <button
                     type="button"
                     onClick={showSingleTab}
-                    className={
-                      activeTab === 'single' ? 'btn btn-info text-white' : 'btn'
-                    }
+                    className={activeTab === "single" ? "btn btn-info text-white" : "btn"}
                   >
                     Single
                   </button>
@@ -70,11 +63,7 @@ export default function AdverseData({
                     type="button"
                     onClick={showMultipleTab}
                     disabled
-                    className={
-                      activeTab === 'multiple'
-                        ? 'btn btn-info text-white'
-                        : 'btn'
-                    }
+                    className={activeTab === "multiple" ? "btn btn-info text-white" : "btn"}
                   >
                     Multiple
                   </button>
@@ -90,11 +79,7 @@ export default function AdverseData({
                   Add Individual
                 </button> */}
 
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="btn btn-danger btn-sm"
-                >
+                <button type="button" onClick={closeModal} className="btn btn-danger btn-sm">
                   <i className="material-icons fs-3">close</i>
                 </button>
               </div>
@@ -106,10 +91,7 @@ export default function AdverseData({
           <div className="custom-mn-h-5 position-relative">
             {form.processing && (
               <div className="text-center position-absolute top-50 start-50 translate-middle">
-                <div
-                  className="spinner-border text-info spinner-border-md"
-                  role="status"
-                >
+                <div className="spinner-border text-info spinner-border-md" role="status">
                   <span className="visually-hidden">Submitting...</span>
                 </div>
                 <p>Submitting...please wait</p>
@@ -119,9 +101,7 @@ export default function AdverseData({
             {form.wasSuccessful && (
               <div className="position-absolute text-center top-50 start-50 translate-middle">
                 <div>
-                  <i className="material-icons fs-1 text-success">
-                    check_circle
-                  </i>
+                  <i className="material-icons fs-1 text-success">check_circle</i>
                 </div>
                 <p>
                   Submission was successful! <br />
@@ -136,12 +116,8 @@ export default function AdverseData({
               </div>
             )}
 
-            <div
-              className={
-                form.processing || form.wasSuccessful ? 'd-none' : 'd-block'
-              }
-            >
-              {activeTab === 'single' ? (
+            <div className={form.processing || form.wasSuccessful ? "d-none" : "d-block"}>
+              {activeTab === "single" ? (
                 <SingleTab
                   {...{
                     creditor,
@@ -163,18 +139,12 @@ export default function AdverseData({
   );
 }
 
-function SingleTab({
-  creditor,
-  form,
-  handleSingleSubmit,
-  tenantType,
-  setTenantType,
-}) {
+function SingleTab({ creditor, form, handleSingleSubmit, tenantType, setTenantType }) {
   return (
     <form onSubmit={handleSingleSubmit}>
       <div
         className="text-center text-danger"
-        style={{ display: form.hasErrors ? 'block' : 'none' }}
+        style={{ display: form.hasErrors ? "block" : "none" }}
       >
         <p>
           <i className="material-icons fs-1">warning</i>
@@ -195,7 +165,7 @@ function SingleTab({
           name="data_type"
           id="data_type"
           required
-          defaultValue={'claim'}
+          defaultValue={"claim"}
         >
           <option value="claim">Claim</option>
           <option value="absconder">Absconder</option>
@@ -205,9 +175,7 @@ function SingleTab({
       </div>
 
       <div className="my-3">
-        <div className="bg-info p-2 mb-2 rounded-2 text-center text-white">
-          Creditor
-        </div>
+        <div className="bg-info p-2 mb-2 rounded-2 text-center text-white">Creditor</div>
 
         <div className="py-3 d-flex align-items-center justify-content-start">
           <div className="d-flex flex-column align-items-start gap-2 custom-w-03 px-5">
@@ -236,16 +204,14 @@ function SingleTab({
               name="date"
               id="date"
               required
-              defaultValue={new Date().toISOString().split('T')[0]}
+              defaultValue={new Date().toISOString().split("T")[0]}
             />
           </div>
         </div>
       </div>
 
       <div className="my-3">
-        <div className="bg-info p-2 mb-2 rounded-2 text-center text-white">
-          Debtor
-        </div>
+        <div className="bg-info p-2 mb-2 rounded-2 text-center text-white">Debtor</div>
 
         <div className="py-3">
           <div className="d-flex align-items-center justify-content-between">
@@ -279,12 +245,12 @@ function SingleTab({
                 key={tenantType}
                 extraProps={{
                   required: true,
-                  id: 'debtor_id',
-                  className: 'w-100',
-                  name: 'debtor_id',
+                  id: "debtor_id",
+                  className: "w-100",
+                  name: "debtor_id",
                 }}
                 defaultValue={null}
-                isDisabled={tenantType === ''}
+                isDisabled={tenantType === ""}
                 useAlternateFetchOptions={{ type: tenantType.toLowerCase() }}
               />
             </div>
@@ -294,11 +260,7 @@ function SingleTab({
                 Account Number
               </label>
 
-              <input
-                className="form-control"
-                name="account_number"
-                id="account_number"
-              />
+              <input className="form-control" name="account_number" id="account_number" />
             </div>
           </div>
 
@@ -313,7 +275,7 @@ function SingleTab({
                 name="currency"
                 id="currency"
                 required
-                defaultValue={'usd'}
+                defaultValue={"usd"}
               >
                 <option value="USD">USD</option>
                 <option value="ZWL">ZWL</option>
@@ -326,13 +288,7 @@ function SingleTab({
                 Claim Amount
               </label>
 
-              <input
-                type="number"
-                className="form-control"
-                name="amount"
-                id="amount"
-                required
-              />
+              <input type="number" className="form-control" name="amount" id="amount" required />
             </div>
           </div>
         </div>

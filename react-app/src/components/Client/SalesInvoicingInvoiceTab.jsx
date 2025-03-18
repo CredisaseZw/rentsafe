@@ -1,7 +1,7 @@
-import useSalesInvoicingInvoiceTab from '../../hooks/component-hooks/useSalesInvoicingInvoiceTab.js';
-import { friendlyDate } from '../../utils/index.js';
-import SearchBar from '../SearchBar.jsx';
-import { SalesInvoiceForm } from './SalesInvoiceForm.jsx';
+import useSalesInvoicingInvoiceTab from "../../hooks/component-hooks/useSalesInvoicingInvoiceTab.js";
+import { friendlyDate } from "../../utils/index.js";
+import SearchBar from "../SearchBar.jsx";
+import { SalesInvoiceForm } from "./SalesInvoiceForm.jsx";
 
 export default function SalesInvoicingInvoiceTab() {
   const { loading, invoiceList, handleFilters } = useSalesInvoicingInvoiceTab();
@@ -9,10 +9,7 @@ export default function SalesInvoicingInvoiceTab() {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center gap-4 mb-5">
-        <form
-          onSubmit={handleFilters}
-          className="d-flex border  gap-2 align-items-center"
-        >
+        <form onSubmit={handleFilters} className="d-flex border  gap-2 align-items-center">
           <select
             className="form-select"
             name="year"

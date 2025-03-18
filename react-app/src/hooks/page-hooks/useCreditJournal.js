@@ -1,6 +1,6 @@
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import { useState } from 'react';
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useState } from "react";
 
 export default function useCreditJournal() {
   const [rows, setRows] = useState(initialRows);
@@ -9,19 +9,17 @@ export default function useCreditJournal() {
   function handleInputChange(e, index) {
     const { name, value } = e.target;
     setRows((prev) =>
-      prev.map((row, rowIndex) =>
-        index === rowIndex ? { ...row, [name]: value } : row
-      )
+      prev.map((row, rowIndex) => (index === rowIndex ? { ...row, [name]: value } : row))
     );
   }
 
   function getCustomerUrl(customerType) {
-    if (customerType === 'individual') {
-      return reverseUrl('get_client_individual_journals');
-    } else if (customerType === 'company') {
-      return reverseUrl('get_client_company_journals');
+    if (customerType === "individual") {
+      return reverseUrl("get_client_individual_journals");
+    } else if (customerType === "company") {
+      return reverseUrl("get_client_company_journals");
     } else {
-      return reverseUrl('get_client_individual_journals');
+      return reverseUrl("get_client_individual_journals");
     }
   }
 
@@ -30,30 +28,30 @@ export default function useCreditJournal() {
     setIsLoading(true);
 
     axios
-      .post(reverseUrl('credit_journal'), { rows })
+      .post(reverseUrl("credit_journal"), { rows })
       .then((res) => {
         console.log(res);
         if (res.data.error) throw new Error(res.data.error);
-        toast.success('Journal entry(s) created successfully');
+        toast.success("Journal entry(s) created successfully");
         setRows([
           {
             id: 1,
-            date: new Date().toISOString().split('T')[0],
-            customerType: 'individual',
-            customerName: '',
-            details: '',
-            accountBalance: '',
-            creditAmount: '',
-            endBalance: '',
-            leaseId: '',
-            accountBalance: '',
-            endDate: '',
+            date: new Date().toISOString().split("T")[0],
+            customerType: "individual",
+            customerName: "",
+            details: "",
+            accountBalance: "",
+            creditAmount: "",
+            endBalance: "",
+            leaseId: "",
+            accountBalance: "",
+            endDate: "",
           },
         ]);
       })
       .catch((error) => {
         console.log(error);
-        toast.error('Failed to submit data \n' + error);
+        toast.error("Failed to submit data \n" + error);
       });
 
     setIsLoading(false);
@@ -69,16 +67,16 @@ export default function useCreditJournal() {
       {
         ...{
           id: prev.length + 1,
-          date: new Date().toISOString().split('T')[0],
-          customerType: 'individual',
-          customerName: '',
-          details: '',
-          accountBalance: '',
-          endBalance: '',
-          creditAmount: '',
-          leaseId: '',
-          accountBalance: '',
-          endDate: '',
+          date: new Date().toISOString().split("T")[0],
+          customerType: "individual",
+          customerName: "",
+          details: "",
+          accountBalance: "",
+          endBalance: "",
+          creditAmount: "",
+          leaseId: "",
+          accountBalance: "",
+          endDate: "",
         },
       },
     ]);
@@ -99,15 +97,15 @@ export default function useCreditJournal() {
 const initialRows = [
   {
     id: 1,
-    date: new Date().toISOString().split('T')[0],
-    customerType: 'individual',
-    customerName: '',
-    details: '',
-    accountBalance: '',
-    creditAmount: '',
-    endBalance: '',
-    leaseId: '',
-    accountBalance: '',
-    endDate: '',
+    date: new Date().toISOString().split("T")[0],
+    customerType: "individual",
+    customerName: "",
+    details: "",
+    accountBalance: "",
+    creditAmount: "",
+    endBalance: "",
+    leaseId: "",
+    accountBalance: "",
+    endDate: "",
   },
 ];

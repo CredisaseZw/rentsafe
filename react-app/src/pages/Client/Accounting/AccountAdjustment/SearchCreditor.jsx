@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import _ from 'lodash';
-import axios from 'axios';
-import { userFriendlyErrorOrResponse } from '../../../../utils';
+import { useState, useEffect } from "react";
+import _ from "lodash";
+import axios from "axios";
+import { userFriendlyErrorOrResponse } from "../../../../utils";
 
 export default function SearchCreditor({
   delay = 500,
@@ -17,7 +17,7 @@ export default function SearchCreditor({
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [clients, setClients] = useState([]);
   const [rawData, setRawData] = useState([]);
 
@@ -34,11 +34,11 @@ export default function SearchCreditor({
       setIsLoading(true);
       axios
         .post(url, {
-          searchParam: 'guess',
+          searchParam: "guess",
           searchValue: newValue,
         })
         .then((response) => {
-          if (response.data?.status !== 'failed') {
+          if (response.data?.status !== "failed") {
             setRawData([...response.data]);
             setClients(
               response.data.map((client) => ({
@@ -46,7 +46,7 @@ export default function SearchCreditor({
                 value: client.lease_id,
               }))
             );
-            setError('');
+            setError("");
             setIsLoading(false);
           } else {
             setClients([]);
@@ -71,13 +71,11 @@ export default function SearchCreditor({
     setCreditorName && setCreditorName(client.label);
     setOpeningBalance &&
       setOpeningBalance(
-        selectedCreditor.company_opening_balance ||
-          selectedCreditor.opening_balance
+        selectedCreditor.company_opening_balance || selectedCreditor.opening_balance
       );
     setEndDate &&
       setEndDate(
-        selectedCreditor.company_opening_balance_date ||
-          selectedCreditor.opening_balance_date
+        selectedCreditor.company_opening_balance_date || selectedCreditor.opening_balance_date
       );
 
     setShowDropdown(false);
@@ -100,7 +98,7 @@ export default function SearchCreditor({
       />
       {showDropdown && value && (
         <div
-          style={{ overflowY: 'auto' }}
+          style={{ overflowY: "auto" }}
           className="border border-dark rounded-1 c-bg-light custom-h-2 w-100 position-absolute mt-1 top-100 start-0 z-1"
         >
           {!isLoading && error ? (

@@ -50,7 +50,7 @@ const movements = [-31.45, -2.98, -3.41, 1.6, 36.24];
 
 const weeklyData = [
   {
-    date: '17-Jun-24',
+    date: "17-Jun-24",
     value1: 68.5,
     value2: 2.5,
     value3: 0.12,
@@ -58,7 +58,7 @@ const weeklyData = [
     value5: 19.98,
   },
   {
-    date: '24-Jun-24',
+    date: "24-Jun-24",
     value1: 55.0,
     value2: 2.4,
     value3: 5.2,
@@ -66,7 +66,7 @@ const weeklyData = [
     value5: 31.2,
   },
   {
-    date: '01-Jul-24',
+    date: "01-Jul-24",
     value1: 23.55,
     value2: -0.58,
     value3: 1.79,

@@ -59,16 +59,12 @@
   --bs-black-rgb: 0, 0, 0;
   --bs-body-color-rgb: 66, 66, 66;
   --bs-body-bg-rgb: 255, 255, 255;
-  --bs-font-sans-serif: 'Roboto', system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --bs-font-monospace: 'Roboto Mono', SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', 'Courier New', monospace;
-  --bs-gradient: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.15),
-    rgba(255, 255, 255, 0)
-  );
+  --bs-font-sans-serif: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --bs-font-monospace: "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
   --bs-body-font-family: var(--bs-font-sans-serif);
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
@@ -434,7 +430,7 @@ select {
   text-transform: none;
 }
 
-[role='button'] {
+[role="button"] {
   cursor: pointer;
 }
 
@@ -450,15 +446,15 @@ select:disabled {
 }
 
 button,
-[type='button'],
-[type='reset'],
-[type='submit'] {
+[type="button"],
+[type="reset"],
+[type="submit"] {
   -webkit-appearance: button;
 }
 button:not(:disabled),
-[type='button']:not(:disabled),
-[type='reset']:not(:disabled),
-[type='submit']:not(:disabled) {
+[type="button"]:not(:disabled),
+[type="reset"]:not(:disabled),
+[type="submit"]:not(:disabled) {
   cursor: pointer;
 }
 
@@ -520,7 +516,7 @@ legend + * {
   height: auto;
 }
 
-[type='search'] {
+[type="search"] {
   outline-offset: -2px;
   -webkit-appearance: textfield;
 }
@@ -680,7 +676,7 @@ progress {
   color: #757575;
 }
 .blockquote-footer::before {
-  content: '— ';
+  content: "— ";
 }
 
 .img-fluid {
@@ -2620,12 +2616,12 @@ progress {
     transition: none;
   }
 }
-.form-control[type='file'],
-[type='file'].dataTable-input {
+.form-control[type="file"],
+[type="file"].dataTable-input {
   overflow: hidden;
 }
-.form-control[type='file']:not(:disabled):not([readonly]),
-[type='file'].dataTable-input:not(:disabled):not([readonly]) {
+.form-control[type="file"]:not(:disabled):not([readonly]),
+[type="file"].dataTable-input:not(:disabled):not([readonly]) {
   cursor: pointer;
 }
 .form-control:focus,
@@ -2708,9 +2704,7 @@ progress {
   }
 }
 .form-control:hover:not(:disabled):not([readonly])::-webkit-file-upload-button,
-.dataTable-input:hover:not(:disabled):not(
-    [readonly]
-  )::-webkit-file-upload-button {
+.dataTable-input:hover:not(:disabled):not([readonly])::-webkit-file-upload-button {
   background-color: #e9e9e9;
 }
 .form-control:hover:not(:disabled):not([readonly])::file-selector-button,
@@ -2742,9 +2736,7 @@ progress {
   }
 }
 .form-control:hover:not(:disabled):not([readonly])::-webkit-file-upload-button,
-.dataTable-input:hover:not(:disabled):not(
-    [readonly]
-  )::-webkit-file-upload-button {
+.dataTable-input:hover:not(:disabled):not([readonly])::-webkit-file-upload-button {
   background-color: #e9e9e9;
 }
 
@@ -2879,8 +2871,8 @@ textarea.form-control-lg {
 }
 .form-select[multiple],
 [multiple].dataTable-selector,
-.form-select[size]:not([size='1']),
-[size].dataTable-selector:not([size='1']) {
+.form-select[size]:not([size="1"]),
+[size].dataTable-selector:not([size="1"]) {
   padding-right: 1rem;
   background-image: none;
 }
@@ -2938,10 +2930,10 @@ textarea.form-control-lg {
   -webkit-print-color-adjust: exact;
   color-adjust: exact;
 }
-.form-check-input[type='checkbox'] {
+.form-check-input[type="checkbox"] {
   border-radius: 0.25em;
 }
-.form-check-input[type='radio'] {
+.form-check-input[type="radio"] {
   border-radius: 50%;
 }
 .form-check-input:active {
@@ -2956,13 +2948,13 @@ textarea.form-control-lg {
   background-color: #6200ea;
   border-color: #6200ea;
 }
-.form-check-input:checked[type='checkbox'] {
+.form-check-input:checked[type="checkbox"] {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
 }
-.form-check-input:checked[type='radio'] {
+.form-check-input:checked[type="radio"] {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e");
 }
-.form-check-input[type='checkbox']:indeterminate {
+.form-check-input[type="checkbox"]:indeterminate {
   background-color: #6200ea;
   border-color: #6200ea;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/%3e%3c/svg%3e");
@@ -3302,22 +3294,20 @@ div.code-toolbar > .toolbar .input-group-sm > span {
   padding-right: 4rem;
 }
 
-.input-group:not(.has-validation)
-  > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu),
+.input-group:not(.has-validation) > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu),
 .input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n + 3) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-.input-group.has-validation
-  > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu),
+.input-group.has-validation > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu),
 .input-group.has-validation > .dropdown-toggle:nth-last-child(n + 4) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 .input-group
-  > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(
-    .valid-feedback
-  ):not(.invalid-tooltip):not(.invalid-feedback) {
+  > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(
+    .invalid-tooltip
+  ):not(.invalid-feedback) {
   margin-left: -1px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -3376,8 +3366,7 @@ div.code-toolbar > .toolbar .input-group-sm > span {
 textarea.form-control.is-valid,
 textarea.is-valid.dataTable-input {
   padding-right: calc(1.5em + 0.8125rem);
-  background-position: top calc(0.375em + 0.203125rem) right
-    calc(0.375em + 0.203125rem);
+  background-position: top calc(0.375em + 0.203125rem) right calc(0.375em + 0.203125rem);
 }
 
 .was-validated .form-select:valid,
@@ -3388,12 +3377,12 @@ textarea.is-valid.dataTable-input {
 }
 .was-validated .form-select:valid:not([multiple]):not([size]),
 .was-validated .dataTable-selector:valid:not([multiple]):not([size]),
-.was-validated .form-select:valid:not([multiple])[size='1'],
-.was-validated .dataTable-selector:valid:not([multiple])[size='1'],
+.was-validated .form-select:valid:not([multiple])[size="1"],
+.was-validated .dataTable-selector:valid:not([multiple])[size="1"],
 .form-select.is-valid:not([multiple]):not([size]),
 .is-valid.dataTable-selector:not([multiple]):not([size]),
-.form-select.is-valid:not([multiple])[size='1'],
-.is-valid.dataTable-selector:not([multiple])[size='1'] {
+.form-select.is-valid:not([multiple])[size="1"],
+.is-valid.dataTable-selector:not([multiple])[size="1"] {
   padding-right: 5.5rem;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23424242' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"),
     url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%232e7d32' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
@@ -3507,8 +3496,7 @@ textarea.is-valid.dataTable-input {
 textarea.form-control.is-invalid,
 textarea.is-invalid.dataTable-input {
   padding-right: calc(1.5em + 0.8125rem);
-  background-position: top calc(0.375em + 0.203125rem) right
-    calc(0.375em + 0.203125rem);
+  background-position: top calc(0.375em + 0.203125rem) right calc(0.375em + 0.203125rem);
 }
 
 .was-validated .form-select:invalid,
@@ -3519,12 +3507,12 @@ textarea.is-invalid.dataTable-input {
 }
 .was-validated .form-select:invalid:not([multiple]):not([size]),
 .was-validated .dataTable-selector:invalid:not([multiple]):not([size]),
-.was-validated .form-select:invalid:not([multiple])[size='1'],
-.was-validated .dataTable-selector:invalid:not([multiple])[size='1'],
+.was-validated .form-select:invalid:not([multiple])[size="1"],
+.was-validated .dataTable-selector:invalid:not([multiple])[size="1"],
 .form-select.is-invalid:not([multiple]):not([size]),
 .is-invalid.dataTable-selector:not([multiple]):not([size]),
-.form-select.is-invalid:not([multiple])[size='1'],
-.is-invalid.dataTable-selector:not([multiple])[size='1'] {
+.form-select.is-invalid:not([multiple])[size="1"],
+.is-invalid.dataTable-selector:not([multiple])[size="1"] {
   padding-right: 5.5rem;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23424242' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"),
     url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23d32f2f'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23d32f2f' stroke='none'/%3e%3c/svg%3e");
@@ -4995,18 +4983,9 @@ div.code-toolbar > .toolbar .btn-group > span:not(:first-child),
   margin-left: -1px;
 }
 .btn-group > .btn:not(:last-child):not(.dropdown-toggle),
-div.code-toolbar
-  > .toolbar
-  .btn-group
-  > a:not(:last-child):not(.dropdown-toggle),
-div.code-toolbar
-  > .toolbar
-  .btn-group
-  > button:not(:last-child):not(.dropdown-toggle),
-div.code-toolbar
-  > .toolbar
-  .btn-group
-  > span:not(:last-child):not(.dropdown-toggle),
+div.code-toolbar > .toolbar .btn-group > a:not(:last-child):not(.dropdown-toggle),
+div.code-toolbar > .toolbar .btn-group > button:not(:last-child):not(.dropdown-toggle),
+div.code-toolbar > .toolbar .btn-group > span:not(:last-child):not(.dropdown-toggle),
 .btn-group > .btn-group:not(:last-child) > .btn,
 div.code-toolbar > .toolbar .btn-group > .btn-group:not(:last-child) > a,
 div.code-toolbar > .toolbar .btn-group > .btn-group:not(:last-child) > button,
@@ -5081,34 +5060,13 @@ div.code-toolbar > .toolbar .btn-group-vertical > span:not(:first-child),
   margin-top: -1px;
 }
 .btn-group-vertical > .btn:not(:last-child):not(.dropdown-toggle),
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > a:not(:last-child):not(.dropdown-toggle),
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > button:not(:last-child):not(.dropdown-toggle),
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > span:not(:last-child):not(.dropdown-toggle),
+div.code-toolbar > .toolbar .btn-group-vertical > a:not(:last-child):not(.dropdown-toggle),
+div.code-toolbar > .toolbar .btn-group-vertical > button:not(:last-child):not(.dropdown-toggle),
+div.code-toolbar > .toolbar .btn-group-vertical > span:not(:last-child):not(.dropdown-toggle),
 .btn-group-vertical > .btn-group:not(:last-child) > .btn,
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > .btn-group:not(:last-child)
-  > a,
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > .btn-group:not(:last-child)
-  > button,
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > .btn-group:not(:last-child)
-  > span {
+div.code-toolbar > .toolbar .btn-group-vertical > .btn-group:not(:last-child) > a,
+div.code-toolbar > .toolbar .btn-group-vertical > .btn-group:not(:last-child) > button,
+div.code-toolbar > .toolbar .btn-group-vertical > .btn-group:not(:last-child) > span {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -5129,21 +5087,9 @@ div.code-toolbar > .toolbar .btn-group-vertical > a ~ span,
 div.code-toolbar > .toolbar .btn-group-vertical > button ~ span,
 div.code-toolbar > .toolbar .btn-group-vertical > span ~ span,
 .btn-group-vertical > .btn-group:not(:first-child) > .btn,
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > .btn-group:not(:first-child)
-  > a,
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > .btn-group:not(:first-child)
-  > button,
-div.code-toolbar
-  > .toolbar
-  .btn-group-vertical
-  > .btn-group:not(:first-child)
-  > span {
+div.code-toolbar > .toolbar .btn-group-vertical > .btn-group:not(:first-child) > a,
+div.code-toolbar > .toolbar .btn-group-vertical > .btn-group:not(:first-child) > button,
+div.code-toolbar > .toolbar .btn-group-vertical > .btn-group:not(:first-child) > span {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
@@ -5926,7 +5872,7 @@ div.code-toolbar
   width: 1.25rem;
   height: 1.25rem;
   margin-left: auto;
-  content: '';
+  content: "";
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23424242'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-size: 1.25rem;
@@ -6016,8 +5962,7 @@ div.code-toolbar
   float: left;
   padding-right: 0.5rem;
   color: #757575;
-  content: var(--bs-breadcrumb-divider, '/')
-    /* rtl: var(--bs-breadcrumb-divider, "/") */;
+  content: var(--bs-breadcrumb-divider, "/") /* rtl: var(--bs-breadcrumb-divider, "/") */;
 }
 .breadcrumb-item.active {
   color: #757575;
@@ -6395,7 +6340,7 @@ div.code-toolbar > .toolbar span .badge {
   counter-reset: section;
 }
 .list-group-numbered > li::before {
-  content: counters(section, '.') '. ';
+  content: counters(section, ".") ". ";
   counter-increment: section;
 }
 
@@ -7175,70 +7120,70 @@ div.code-toolbar > .toolbar span .badge {
 }
 .tooltip .tooltip-arrow::before {
   position: absolute;
-  content: '';
+  content: "";
   border-color: transparent;
   border-style: solid;
 }
 
 .bs-tooltip-top,
-.bs-tooltip-auto[data-popper-placement^='top'] {
+.bs-tooltip-auto[data-popper-placement^="top"] {
   padding: 0.5rem 0;
 }
 .bs-tooltip-top .tooltip-arrow,
-.bs-tooltip-auto[data-popper-placement^='top'] .tooltip-arrow {
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow {
   bottom: 0;
 }
 .bs-tooltip-top .tooltip-arrow::before,
-.bs-tooltip-auto[data-popper-placement^='top'] .tooltip-arrow::before {
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
   top: -1px;
   border-width: 0.5rem 0.25rem 0;
   border-top-color: transparent;
 }
 
 .bs-tooltip-end,
-.bs-tooltip-auto[data-popper-placement^='right'] {
+.bs-tooltip-auto[data-popper-placement^="right"] {
   padding: 0 0.5rem;
 }
 .bs-tooltip-end .tooltip-arrow,
-.bs-tooltip-auto[data-popper-placement^='right'] .tooltip-arrow {
+.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow {
   left: 0;
   width: 0.5rem;
   height: 0.5rem;
 }
 .bs-tooltip-end .tooltip-arrow::before,
-.bs-tooltip-auto[data-popper-placement^='right'] .tooltip-arrow::before {
+.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
   right: -1px;
   border-width: 0.25rem 0.5rem 0.25rem 0;
   border-right-color: transparent;
 }
 
 .bs-tooltip-bottom,
-.bs-tooltip-auto[data-popper-placement^='bottom'] {
+.bs-tooltip-auto[data-popper-placement^="bottom"] {
   padding: 0.5rem 0;
 }
 .bs-tooltip-bottom .tooltip-arrow,
-.bs-tooltip-auto[data-popper-placement^='bottom'] .tooltip-arrow {
+.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow {
   top: 0;
 }
 .bs-tooltip-bottom .tooltip-arrow::before,
-.bs-tooltip-auto[data-popper-placement^='bottom'] .tooltip-arrow::before {
+.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
   bottom: -1px;
   border-width: 0 0.25rem 0.5rem;
   border-bottom-color: transparent;
 }
 
 .bs-tooltip-start,
-.bs-tooltip-auto[data-popper-placement^='left'] {
+.bs-tooltip-auto[data-popper-placement^="left"] {
   padding: 0 0.5rem;
 }
 .bs-tooltip-start .tooltip-arrow,
-.bs-tooltip-auto[data-popper-placement^='left'] .tooltip-arrow {
+.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow {
   right: 0;
   width: 0.5rem;
   height: 0.5rem;
 }
 .bs-tooltip-start .tooltip-arrow::before,
-.bs-tooltip-auto[data-popper-placement^='left'] .tooltip-arrow::before {
+.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
   left: -1px;
   border-width: 0.25rem 0 0.25rem 0.5rem;
   border-left-color: transparent;
@@ -7291,89 +7236,89 @@ div.code-toolbar > .toolbar span .badge {
 .popover .popover-arrow::after {
   position: absolute;
   display: block;
-  content: '';
+  content: "";
   border-color: transparent;
   border-style: solid;
 }
 
 .bs-popover-top > .popover-arrow,
-.bs-popover-auto[data-popper-placement^='top'] > .popover-arrow {
+.bs-popover-auto[data-popper-placement^="top"] > .popover-arrow {
   bottom: -0.5rem;
 }
 .bs-popover-top > .popover-arrow::before,
-.bs-popover-auto[data-popper-placement^='top'] > .popover-arrow::before {
+.bs-popover-auto[data-popper-placement^="top"] > .popover-arrow::before {
   bottom: 0;
   border-width: 0.5rem 0.25rem 0;
   border-top-color: transparent;
 }
 .bs-popover-top > .popover-arrow::after,
-.bs-popover-auto[data-popper-placement^='top'] > .popover-arrow::after {
+.bs-popover-auto[data-popper-placement^="top"] > .popover-arrow::after {
   bottom: 0;
   border-width: 0.5rem 0.25rem 0;
   border-top-color: transparent;
 }
 
 .bs-popover-end > .popover-arrow,
-.bs-popover-auto[data-popper-placement^='right'] > .popover-arrow {
+.bs-popover-auto[data-popper-placement^="right"] > .popover-arrow {
   left: -0.5rem;
   width: 0.5rem;
   height: 0.5rem;
 }
 .bs-popover-end > .popover-arrow::before,
-.bs-popover-auto[data-popper-placement^='right'] > .popover-arrow::before {
+.bs-popover-auto[data-popper-placement^="right"] > .popover-arrow::before {
   left: 0;
   border-width: 0.25rem 0.5rem 0.25rem 0;
   border-right-color: transparent;
 }
 .bs-popover-end > .popover-arrow::after,
-.bs-popover-auto[data-popper-placement^='right'] > .popover-arrow::after {
+.bs-popover-auto[data-popper-placement^="right"] > .popover-arrow::after {
   left: 0;
   border-width: 0.25rem 0.5rem 0.25rem 0;
   border-right-color: transparent;
 }
 
 .bs-popover-bottom > .popover-arrow,
-.bs-popover-auto[data-popper-placement^='bottom'] > .popover-arrow {
+.bs-popover-auto[data-popper-placement^="bottom"] > .popover-arrow {
   top: -0.5rem;
 }
 .bs-popover-bottom > .popover-arrow::before,
-.bs-popover-auto[data-popper-placement^='bottom'] > .popover-arrow::before {
+.bs-popover-auto[data-popper-placement^="bottom"] > .popover-arrow::before {
   top: 0;
   border-width: 0 0.25rem 0.5rem 0.25rem;
   border-bottom-color: transparent;
 }
 .bs-popover-bottom > .popover-arrow::after,
-.bs-popover-auto[data-popper-placement^='bottom'] > .popover-arrow::after {
+.bs-popover-auto[data-popper-placement^="bottom"] > .popover-arrow::after {
   top: 0;
   border-width: 0 0.25rem 0.5rem 0.25rem;
   border-bottom-color: transparent;
 }
 .bs-popover-bottom .popover-header::before,
-.bs-popover-auto[data-popper-placement^='bottom'] .popover-header::before {
+.bs-popover-auto[data-popper-placement^="bottom"] .popover-header::before {
   position: absolute;
   top: 0;
   left: 50%;
   display: block;
   width: 0.5rem;
   margin-left: -0.25rem;
-  content: '';
+  content: "";
   border-bottom: 0 solid #fff;
 }
 
 .bs-popover-start > .popover-arrow,
-.bs-popover-auto[data-popper-placement^='left'] > .popover-arrow {
+.bs-popover-auto[data-popper-placement^="left"] > .popover-arrow {
   right: -0.5rem;
   width: 0.5rem;
   height: 0.5rem;
 }
 .bs-popover-start > .popover-arrow::before,
-.bs-popover-auto[data-popper-placement^='left'] > .popover-arrow::before {
+.bs-popover-auto[data-popper-placement^="left"] > .popover-arrow::before {
   right: 0;
   border-width: 0.25rem 0 0.25rem 0.5rem;
   border-left-color: transparent;
 }
 .bs-popover-start > .popover-arrow::after,
-.bs-popover-auto[data-popper-placement^='left'] > .popover-arrow::after {
+.bs-popover-auto[data-popper-placement^="left"] > .popover-arrow::after {
   right: 0;
   border-width: 0.25rem 0 0.25rem 0.5rem;
   border-left-color: transparent;
@@ -7414,7 +7359,7 @@ div.code-toolbar > .toolbar span .badge {
 .carousel-inner::after {
   display: block;
   clear: both;
-  content: '';
+  content: "";
 }
 
 .carousel-item {
@@ -7790,7 +7735,7 @@ div.code-toolbar > .toolbar a.placeholder::before,
 div.code-toolbar > .toolbar button.placeholder::before,
 div.code-toolbar > .toolbar span.placeholder::before {
   display: inline-block;
-  content: '';
+  content: "";
 }
 
 .placeholder-xs {
@@ -7822,18 +7767,8 @@ div.code-toolbar > .toolbar span.placeholder::before {
   }
 }
 .placeholder-wave {
-  -webkit-mask-image: linear-gradient(
-    130deg,
-    #000 55%,
-    rgba(0, 0, 0, 0.8) 75%,
-    #000 95%
-  );
-  mask-image: linear-gradient(
-    130deg,
-    #000 55%,
-    rgba(0, 0, 0, 0.8) 75%,
-    #000 95%
-  );
+  -webkit-mask-image: linear-gradient(130deg, #000 55%, rgba(0, 0, 0, 0.8) 75%, #000 95%);
+  mask-image: linear-gradient(130deg, #000 55%, rgba(0, 0, 0, 0.8) 75%, #000 95%);
   -webkit-mask-size: 200% 100%;
   mask-size: 200% 100%;
   -webkit-animation: placeholder-wave 2s linear infinite;
@@ -7856,7 +7791,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
 .clearfix::after {
   display: block;
   clear: both;
-  content: '';
+  content: "";
 }
 
 .link-primary {
@@ -7957,7 +7892,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
 .ratio::before {
   display: block;
   padding-top: var(--bs-aspect-ratio);
-  content: '';
+  content: "";
 }
 .ratio > * {
   position: absolute;
@@ -8082,7 +8017,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
   bottom: 0;
   left: 0;
   z-index: 1;
-  content: '';
+  content: "";
 }
 
 .text-truncate {
@@ -9911,26 +9846,17 @@ div.code-toolbar > .toolbar span.placeholder::before {
 
 .bg-primary {
   --bs-bg-opacity: 1;
-  background-color: rgba(
-    var(--bs-primary-rgb),
-    var(--bs-bg-opacity)
-  ) !important;
+  background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
 }
 
 .bg-secondary {
   --bs-bg-opacity: 1;
-  background-color: rgba(
-    var(--bs-secondary-rgb),
-    var(--bs-bg-opacity)
-  ) !important;
+  background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important;
 }
 
 .bg-success {
   --bs-bg-opacity: 1;
-  background-color: rgba(
-    var(--bs-success-rgb),
-    var(--bs-bg-opacity)
-  ) !important;
+  background-color: rgba(var(--bs-success-rgb), var(--bs-bg-opacity)) !important;
 }
 
 .bg-info {
@@ -9940,10 +9866,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
 
 .bg-warning {
   --bs-bg-opacity: 1;
-  background-color: rgba(
-    var(--bs-warning-rgb),
-    var(--bs-bg-opacity)
-  ) !important;
+  background-color: rgba(var(--bs-warning-rgb), var(--bs-bg-opacity)) !important;
 }
 
 .bg-danger {
@@ -9979,10 +9902,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
 
 .bg-body {
   --bs-bg-opacity: 1;
-  background-color: rgba(
-    var(--bs-body-bg-rgb),
-    var(--bs-bg-opacity)
-  ) !important;
+  background-color: rgba(var(--bs-body-bg-rgb), var(--bs-bg-opacity)) !important;
 }
 
 .bg-transparent {
@@ -16518,8 +16438,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
     transform: translate(var(--mdc-ripple-fg-translate-start, 0)) scale(1);
   }
   to {
-    transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-      scale(var(--mdc-ripple-fg-scale, 1));
+    transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
   }
 }
 @keyframes mdc-ripple-fg-radius-in {
@@ -16529,8 +16448,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
     transform: translate(var(--mdc-ripple-fg-translate-start, 0)) scale(1);
   }
   to {
-    transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-      scale(var(--mdc-ripple-fg-scale, 1));
+    transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
   }
 }
 @-webkit-keyframes mdc-ripple-fg-opacity-in {
@@ -16592,7 +16510,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .mdc-ripple-surface::before {
   transition:
@@ -16635,8 +16553,7 @@ div.code-toolbar > .toolbar span.placeholder::before {
 .mdc-ripple-surface.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .mdc-ripple-surface::before,
 .mdc-ripple-surface::after {
@@ -16731,7 +16648,7 @@ body {
 }
 
 :target:before {
-  content: '';
+  content: "";
   display: block;
   height: 8.75rem;
   margin: -8.75rem 0 0;
@@ -16775,7 +16692,7 @@ body {
   transform: translateX(0);
 }
 .drawer-toggled #layoutDrawer #layoutDrawer_content:before {
-  content: '';
+  content: "";
   display: block;
   position: absolute;
   top: 0;
@@ -16850,7 +16767,7 @@ body {
 .bg-pattern-doubs {
   background-size: cover;
   background-repeat: no-repeat;
-  background-image: url('../img/patterns/doubs.svg');
+  background-image: url("../img/patterns/doubs.svg");
 
   background-position: center;
 }
@@ -16858,7 +16775,7 @@ body {
 .bg-pattern-waihou {
   background-size: cover;
   background-repeat: no-repeat;
-  background-image: url('https://material-admin-pro.startbootstrap.com/assets/img/patterns/waihou.svg');
+  background-image: url("https://material-admin-pro.startbootstrap.com/assets/img/patterns/waihou.svg");
   background-position: center;
 }
 
@@ -17166,7 +17083,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-primary::before {
   transition:
@@ -17209,8 +17126,7 @@ body {
 .ripple-primary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-primary::before,
 .ripple-primary::after {
@@ -17280,7 +17196,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-secondary::before {
   transition:
@@ -17323,8 +17239,7 @@ body {
 .ripple-secondary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-secondary::before,
 .ripple-secondary::after {
@@ -17394,7 +17309,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-success::before {
   transition:
@@ -17437,8 +17352,7 @@ body {
 .ripple-success.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-success::before,
 .ripple-success::after {
@@ -17508,7 +17422,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-info::before {
   transition:
@@ -17551,8 +17465,7 @@ body {
 .ripple-info.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-info::before,
 .ripple-info::after {
@@ -17622,7 +17535,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-warning::before {
   transition:
@@ -17665,8 +17578,7 @@ body {
 .ripple-warning.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-warning::before,
 .ripple-warning::after {
@@ -17736,7 +17648,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-danger::before {
   transition:
@@ -17779,8 +17691,7 @@ body {
 .ripple-danger.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-danger::before,
 .ripple-danger::after {
@@ -17850,7 +17761,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-light::before {
   transition:
@@ -17893,8 +17804,7 @@ body {
 .ripple-light.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-light::before,
 .ripple-light::after {
@@ -17964,7 +17874,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-dark::before {
   transition:
@@ -18007,8 +17917,7 @@ body {
 .ripple-dark.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-dark::before,
 .ripple-dark::after {
@@ -18078,7 +17987,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-white::before {
   transition:
@@ -18121,8 +18030,7 @@ body {
 .ripple-white.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-white::before,
 .ripple-white::after {
@@ -18192,7 +18100,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-black::before {
   transition:
@@ -18235,8 +18143,7 @@ body {
 .ripple-black.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-black::before,
 .ripple-black::after {
@@ -18306,7 +18213,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .ripple-gray::before {
   transition:
@@ -18349,8 +18256,7 @@ body {
 .ripple-gray.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .ripple-gray::before,
 .ripple-gray::after {
@@ -18579,7 +18485,7 @@ strong,
   letter-spacing: 0.0073529412em;
 }
 
-*[class*='display-'] {
+*[class*="display-"] {
   color: #212121;
 }
 
@@ -18850,7 +18756,7 @@ div.code-toolbar > .toolbar span {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-primary::before {
   transition:
@@ -18893,8 +18799,7 @@ div.code-toolbar > .toolbar span {
 .btn-primary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-primary::before,
 .btn-primary::after {
@@ -19019,7 +18924,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-primary {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-secondary::before {
   transition:
@@ -19062,8 +18967,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-primary {
 .btn-secondary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-secondary::before,
 .btn-secondary::after {
@@ -19188,7 +19092,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-secondary {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-success::before {
   transition:
@@ -19231,8 +19135,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-secondary {
 .btn-success.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-success::before,
 .btn-success::after {
@@ -19357,7 +19260,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-success {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-info::before {
   transition:
@@ -19400,8 +19303,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-success {
 .btn-info.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-info::before,
 .btn-info::after {
@@ -19526,7 +19428,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-info {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-warning::before {
   transition:
@@ -19569,8 +19471,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-info {
 .btn-warning.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-warning::before,
 .btn-warning::after {
@@ -19695,7 +19596,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-warning {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-danger::before {
   transition:
@@ -19738,8 +19639,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-warning {
 .btn-danger.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-danger::before,
 .btn-danger::after {
@@ -19864,7 +19764,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-danger {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-light::before {
   transition:
@@ -19907,8 +19807,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-danger {
 .btn-light.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-light::before,
 .btn-light::after {
@@ -20033,7 +19932,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-light {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-dark::before {
   transition:
@@ -20076,8 +19975,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-light {
 .btn-dark.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-dark::before,
 .btn-dark::after {
@@ -20202,7 +20100,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-dark {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-white::before {
   transition:
@@ -20245,8 +20143,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-dark {
 .btn-white.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-white::before,
 .btn-white::after {
@@ -20371,7 +20268,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-white {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-black::before {
   transition:
@@ -20414,8 +20311,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-white {
 .btn-black.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-black::before,
 .btn-black::after {
@@ -20540,7 +20436,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-black {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-gray::before {
   transition:
@@ -20583,8 +20479,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-black {
 .btn-gray.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-gray::before,
 .btn-gray::after {
@@ -20709,7 +20604,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-gray {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-primary::before {
   transition:
@@ -20752,8 +20647,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-gray {
 .btn-raised-primary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-primary::before,
 .btn-raised-primary::after {
@@ -20878,7 +20772,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-primary {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-secondary::before {
   transition:
@@ -20921,8 +20815,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-primary {
 .btn-raised-secondary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-secondary::before,
 .btn-raised-secondary::after {
@@ -21047,7 +20940,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-secondary {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-success::before {
   transition:
@@ -21090,8 +20983,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-secondary {
 .btn-raised-success.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-success::before,
 .btn-raised-success::after {
@@ -21216,7 +21108,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-success {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-info::before {
   transition:
@@ -21259,8 +21151,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-success {
 .btn-raised-info.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-info::before,
 .btn-raised-info::after {
@@ -21385,7 +21276,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-info {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-warning::before {
   transition:
@@ -21428,8 +21319,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-info {
 .btn-raised-warning.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-warning::before,
 .btn-raised-warning::after {
@@ -21554,7 +21444,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-warning {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-danger::before {
   transition:
@@ -21597,8 +21487,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-warning {
 .btn-raised-danger.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-danger::before,
 .btn-raised-danger::after {
@@ -21723,7 +21612,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-danger {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-light::before {
   transition:
@@ -21766,8 +21655,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-danger {
 .btn-raised-light.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-light::before,
 .btn-raised-light::after {
@@ -21892,7 +21780,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-light {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-dark::before {
   transition:
@@ -21935,8 +21823,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-light {
 .btn-raised-dark.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-dark::before,
 .btn-raised-dark::after {
@@ -22061,7 +21948,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-dark {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-white::before {
   transition:
@@ -22104,8 +21991,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-dark {
 .btn-raised-white.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-white::before,
 .btn-raised-white::after {
@@ -22230,7 +22116,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-white {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-black::before {
   transition:
@@ -22273,8 +22159,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-white {
 .btn-raised-black.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-black::before,
 .btn-raised-black::after {
@@ -22399,7 +22284,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-black {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-raised-gray::before {
   transition:
@@ -22442,8 +22327,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-raised-black {
 .btn-raised-gray.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-raised-gray::before,
 .btn-raised-gray::after {
@@ -22615,7 +22499,7 @@ div.code-toolbar > .toolbar span::after {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-primary::before,
 div.code-toolbar > .toolbar a::before,
@@ -22664,12 +22548,8 @@ div.code-toolbar > .toolbar span.mdc-ripple-upgraded--unbounded::after {
 }
 .btn-outline-primary.mdc-ripple-upgraded--foreground-activation::after,
 div.code-toolbar > .toolbar a.mdc-ripple-upgraded--foreground-activation::after,
-div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded--foreground-activation::after,
-div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded--foreground-activation::after {
+div.code-toolbar > .toolbar button.mdc-ripple-upgraded--foreground-activation::after,
+div.code-toolbar > .toolbar span.mdc-ripple-upgraded--foreground-activation::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -22678,19 +22558,12 @@ div.code-toolbar
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .btn-outline-primary.mdc-ripple-upgraded--foreground-deactivation::after,
-div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded--foreground-deactivation::after,
-div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded--foreground-deactivation::after,
-div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded--foreground-deactivation::after {
+div.code-toolbar > .toolbar a.mdc-ripple-upgraded--foreground-deactivation::after,
+div.code-toolbar > .toolbar button.mdc-ripple-upgraded--foreground-deactivation::after,
+div.code-toolbar > .toolbar span.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-primary::before,
 div.code-toolbar > .toolbar a::before,
@@ -22740,12 +22613,8 @@ div.code-toolbar > .toolbar span.mdc-ripple-surface--hover::before {
 }
 .btn-outline-primary.mdc-ripple-upgraded--background-focused::before,
 div.code-toolbar > .toolbar a.mdc-ripple-upgraded--background-focused::before,
-div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded--background-focused::before,
-div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded--background-focused::before,
+div.code-toolbar > .toolbar button.mdc-ripple-upgraded--background-focused::before,
+div.code-toolbar > .toolbar span.mdc-ripple-upgraded--background-focused::before,
 .btn-outline-primary:not(.mdc-ripple-upgraded):focus::before,
 div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded):focus::before,
 div.code-toolbar > .toolbar button:not(.mdc-ripple-upgraded):focus::before,
@@ -22842,7 +22711,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-secondary::before {
   transition:
@@ -22885,8 +22754,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-secondary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-secondary::before,
 .btn-outline-secondary::after {
@@ -22989,7 +22857,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-success::before {
   transition:
@@ -23032,8 +22900,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-success.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-success::before,
 .btn-outline-success::after {
@@ -23136,7 +23003,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-info::before {
   transition:
@@ -23179,8 +23046,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-info.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-info::before,
 .btn-outline-info::after {
@@ -23283,7 +23149,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-warning::before {
   transition:
@@ -23326,8 +23192,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-warning.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-warning::before,
 .btn-outline-warning::after {
@@ -23430,7 +23295,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-danger::before {
   transition:
@@ -23473,8 +23338,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-danger.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-danger::before,
 .btn-outline-danger::after {
@@ -23595,7 +23459,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-light::before,
 .masthead .btn-masthead::before {
@@ -23645,8 +23509,7 @@ div.code-toolbar > .toolbar span:active {
 .masthead .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-light::before,
 .masthead .btn-masthead::before,
@@ -23818,7 +23681,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-dark::before,
 .masthead.bg-light .btn-masthead::before,
@@ -23866,12 +23729,9 @@ div.code-toolbar > .toolbar span:active {
   left: var(--mdc-ripple-left, 0);
 }
 .btn-outline-dark.mdc-ripple-upgraded--foreground-activation::after,
-.masthead.bg-light
-  .mdc-ripple-upgraded--foreground-activation.btn-masthead::after,
-.masthead.footer-light
-  .mdc-ripple-upgraded--foreground-activation.btn-masthead::after,
-.masthead.bg-white
-  .mdc-ripple-upgraded--foreground-activation.btn-masthead::after {
+.masthead.bg-light .mdc-ripple-upgraded--foreground-activation.btn-masthead::after,
+.masthead.footer-light .mdc-ripple-upgraded--foreground-activation.btn-masthead::after,
+.masthead.bg-white .mdc-ripple-upgraded--foreground-activation.btn-masthead::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -23880,16 +23740,12 @@ div.code-toolbar > .toolbar span:active {
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .btn-outline-dark.mdc-ripple-upgraded--foreground-deactivation::after,
-.masthead.bg-light
-  .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after,
-.masthead.footer-light
-  .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after,
-.masthead.bg-white
-  .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after {
+.masthead.bg-light .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after,
+.masthead.footer-light .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after,
+.masthead.bg-white .mdc-ripple-upgraded--foreground-deactivation.btn-masthead::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-dark::before,
 .masthead.bg-light .btn-masthead::before,
@@ -23938,12 +23794,9 @@ div.code-toolbar > .toolbar span:active {
   opacity: var(--mdc-ripple-hover-opacity, 0.06);
 }
 .btn-outline-dark.mdc-ripple-upgraded--background-focused::before,
-.masthead.bg-light
-  .mdc-ripple-upgraded--background-focused.btn-masthead::before,
-.masthead.footer-light
-  .mdc-ripple-upgraded--background-focused.btn-masthead::before,
-.masthead.bg-white
-  .mdc-ripple-upgraded--background-focused.btn-masthead::before,
+.masthead.bg-light .mdc-ripple-upgraded--background-focused.btn-masthead::before,
+.masthead.footer-light .mdc-ripple-upgraded--background-focused.btn-masthead::before,
+.masthead.bg-white .mdc-ripple-upgraded--background-focused.btn-masthead::before,
 .btn-outline-dark:not(.mdc-ripple-upgraded):focus::before,
 .masthead.bg-light .btn-masthead:not(.mdc-ripple-upgraded):focus::before,
 .masthead.footer-light .btn-masthead:not(.mdc-ripple-upgraded):focus::before,
@@ -24040,7 +23893,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-white::before {
   transition:
@@ -24083,8 +23936,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-white.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-white::before,
 .btn-outline-white::after {
@@ -24187,7 +24039,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-black::before {
   transition:
@@ -24230,8 +24082,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-black.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-black::before,
 .btn-outline-black::after {
@@ -24334,7 +24185,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-outline-gray::before {
   transition:
@@ -24377,8 +24228,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-outline-gray.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-outline-gray::before,
 .btn-outline-gray::after {
@@ -24452,7 +24302,7 @@ div.code-toolbar > .toolbar span:active {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-primary::before {
   transition:
@@ -24495,8 +24345,7 @@ div.code-toolbar > .toolbar span:active {
 .btn-text-primary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-primary::before,
 .btn-text-primary::after {
@@ -24587,7 +24436,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-primary {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-secondary::before {
   transition:
@@ -24630,8 +24479,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-primary {
 .btn-text-secondary.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-secondary::before,
 .btn-text-secondary::after {
@@ -24722,7 +24570,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-secondary {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-success::before {
   transition:
@@ -24765,8 +24613,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-secondary {
 .btn-text-success.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-success::before,
 .btn-text-success::after {
@@ -24857,7 +24704,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-success {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-info::before {
   transition:
@@ -24900,8 +24747,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-success {
 .btn-text-info.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-info::before,
 .btn-text-info::after {
@@ -24992,7 +24838,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-info {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-warning::before {
   transition:
@@ -25035,8 +24881,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-info {
 .btn-text-warning.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-warning::before,
 .btn-text-warning::after {
@@ -25127,7 +24972,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-warning {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-danger::before {
   transition:
@@ -25170,8 +25015,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-warning {
 .btn-text-danger.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-danger::before,
 .btn-text-danger::after {
@@ -25262,7 +25106,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-danger {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-light::before {
   transition:
@@ -25305,8 +25149,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-danger {
 .btn-text-light.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-light::before,
 .btn-text-light::after {
@@ -25418,7 +25261,7 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-light span::after {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-dark::before,
 .top-app-bar.navbar-light .btn::before,
@@ -25449,58 +25292,22 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-light span::after {
 }
 .btn-text-dark.mdc-ripple-upgraded::before,
 .top-app-bar.navbar-light .mdc-ripple-upgraded.btn::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a.mdc-ripple-upgraded::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button.mdc-ripple-upgraded::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span.mdc-ripple-upgraded::before {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a.mdc-ripple-upgraded::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a.mdc-ripple-upgraded::before,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button.mdc-ripple-upgraded::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button.mdc-ripple-upgraded::before,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span.mdc-ripple-upgraded::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span.mdc-ripple-upgraded::before {
   transform: scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-dark.mdc-ripple-upgraded::after,
 .top-app-bar.navbar-light .mdc-ripple-upgraded.btn::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span.mdc-ripple-upgraded::after {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span.mdc-ripple-upgraded::after {
   top: 0;
   /* @noflip */
   /*rtl:ignore*/
@@ -25510,38 +25317,19 @@ div.code-toolbar
 }
 .btn-text-dark.mdc-ripple-upgraded--unbounded::after,
 .top-app-bar.navbar-light .mdc-ripple-upgraded--unbounded.btn::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded--unbounded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a.mdc-ripple-upgraded--unbounded::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded--unbounded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button.mdc-ripple-upgraded--unbounded::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded--unbounded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span.mdc-ripple-upgraded--unbounded::after {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a.mdc-ripple-upgraded--unbounded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a.mdc-ripple-upgraded--unbounded::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button.mdc-ripple-upgraded--unbounded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button.mdc-ripple-upgraded--unbounded::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span.mdc-ripple-upgraded--unbounded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span.mdc-ripple-upgraded--unbounded::after {
   top: var(--mdc-ripple-top, 0);
   /* @noflip */
   /*rtl:ignore*/
   left: var(--mdc-ripple-left, 0);
 }
 .btn-text-dark.mdc-ripple-upgraded--foreground-activation::after,
-.top-app-bar.navbar-light
-  .mdc-ripple-upgraded--foreground-activation.btn::after,
+.top-app-bar.navbar-light .mdc-ripple-upgraded--foreground-activation.btn::after,
 .top-app-bar.navbar-light
   div.code-toolbar
   > .toolbar
@@ -25574,8 +25362,7 @@ div.code-toolbar
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .btn-text-dark.mdc-ripple-upgraded--foreground-deactivation::after,
-.top-app-bar.navbar-light
-  .mdc-ripple-upgraded--foreground-deactivation.btn::after,
+.top-app-bar.navbar-light .mdc-ripple-upgraded--foreground-deactivation.btn::after,
 .top-app-bar.navbar-light
   div.code-toolbar
   > .toolbar
@@ -25602,8 +25389,7 @@ div.code-toolbar
   span.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-dark::before,
 .top-app-bar.navbar-light .btn::before,
@@ -25630,30 +25416,12 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-light span::after {
 }
 .btn-text-dark.mdc-ripple-upgraded::after,
 .top-app-bar.navbar-light .mdc-ripple-upgraded.btn::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span.mdc-ripple-upgraded::after {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span.mdc-ripple-upgraded::after {
   width: var(--mdc-ripple-fg-size, 100%);
   height: var(--mdc-ripple-fg-size, 100%);
 }
@@ -25687,30 +25455,12 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-light button:hover::before,
 div.code-toolbar > .toolbar .top-app-bar.navbar-light span:hover::before,
 .btn-text-dark.mdc-ripple-surface--hover::before,
 .top-app-bar.navbar-light .mdc-ripple-surface--hover.btn::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-surface--hover::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a.mdc-ripple-surface--hover::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-surface--hover::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button.mdc-ripple-surface--hover::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-surface--hover::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span.mdc-ripple-surface--hover::before {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a.mdc-ripple-surface--hover::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a.mdc-ripple-surface--hover::before,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button.mdc-ripple-surface--hover::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button.mdc-ripple-surface--hover::before,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span.mdc-ripple-surface--hover::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span.mdc-ripple-surface--hover::before {
   opacity: 0.06;
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.06);
@@ -25743,14 +25493,8 @@ div.code-toolbar
   span.mdc-ripple-upgraded--background-focused::before,
 .btn-text-dark:not(.mdc-ripple-upgraded):focus::before,
 .top-app-bar.navbar-light .btn:not(.mdc-ripple-upgraded):focus::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a:not(.mdc-ripple-upgraded):focus::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a:not(.mdc-ripple-upgraded):focus::before,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded):focus::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a:not(.mdc-ripple-upgraded):focus::before,
 .top-app-bar.navbar-light
   div.code-toolbar
   > .toolbar
@@ -25759,14 +25503,8 @@ div.code-toolbar
   > .toolbar
   .top-app-bar.navbar-light
   button:not(.mdc-ripple-upgraded):focus::before,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span:not(.mdc-ripple-upgraded):focus::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span:not(.mdc-ripple-upgraded):focus::before {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span:not(.mdc-ripple-upgraded):focus::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.12;
   /* @alternate */
@@ -25774,42 +25512,18 @@ div.code-toolbar
 }
 .btn-text-dark:not(.mdc-ripple-upgraded)::after,
 .top-app-bar.navbar-light .btn:not(.mdc-ripple-upgraded)::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a:not(.mdc-ripple-upgraded)::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a:not(.mdc-ripple-upgraded)::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button:not(.mdc-ripple-upgraded)::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button:not(.mdc-ripple-upgraded)::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span:not(.mdc-ripple-upgraded)::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span:not(.mdc-ripple-upgraded)::after {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded)::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a:not(.mdc-ripple-upgraded)::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button:not(.mdc-ripple-upgraded)::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button:not(.mdc-ripple-upgraded)::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span:not(.mdc-ripple-upgraded)::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span:not(.mdc-ripple-upgraded)::after {
   transition: opacity 150ms linear;
 }
 .btn-text-dark:not(.mdc-ripple-upgraded):active::after,
 .top-app-bar.navbar-light .btn:not(.mdc-ripple-upgraded):active::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a:not(.mdc-ripple-upgraded):active::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  a:not(.mdc-ripple-upgraded):active::after,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded):active::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light a:not(.mdc-ripple-upgraded):active::after,
 .top-app-bar.navbar-light
   div.code-toolbar
   > .toolbar
@@ -25818,14 +25532,8 @@ div.code-toolbar
   > .toolbar
   .top-app-bar.navbar-light
   button:not(.mdc-ripple-upgraded):active::after,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span:not(.mdc-ripple-upgraded):active::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  span:not(.mdc-ripple-upgraded):active::after {
+.top-app-bar.navbar-light div.code-toolbar > .toolbar span:not(.mdc-ripple-upgraded):active::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light span:not(.mdc-ripple-upgraded):active::after {
   transition-duration: 75ms;
   opacity: 0.18;
   /* @alternate */
@@ -25835,14 +25543,8 @@ div.code-toolbar
 .top-app-bar.navbar-light .mdc-ripple-upgraded.btn,
 .top-app-bar.navbar-light div.code-toolbar > .toolbar a.mdc-ripple-upgraded,
 div.code-toolbar > .toolbar .top-app-bar.navbar-light a.mdc-ripple-upgraded,
-.top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  button.mdc-ripple-upgraded,
+.top-app-bar.navbar-light div.code-toolbar > .toolbar button.mdc-ripple-upgraded,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light button.mdc-ripple-upgraded,
 .top-app-bar.navbar-light div.code-toolbar > .toolbar span.mdc-ripple-upgraded,
 div.code-toolbar > .toolbar .top-app-bar.navbar-light span.mdc-ripple-upgraded {
   --mdc-ripple-fg-opacity: var(--mdc-ripple-press-opacity, 0.18);
@@ -25969,7 +25671,7 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-dark span::after {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-white::before,
 .top-app-bar.navbar-dark .btn::before,
@@ -26000,58 +25702,22 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-dark span::after {
 }
 .btn-text-white.mdc-ripple-upgraded::before,
 .top-app-bar.navbar-dark .mdc-ripple-upgraded.btn::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a.mdc-ripple-upgraded::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button.mdc-ripple-upgraded::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span.mdc-ripple-upgraded::before {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a.mdc-ripple-upgraded::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a.mdc-ripple-upgraded::before,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button.mdc-ripple-upgraded::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button.mdc-ripple-upgraded::before,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span.mdc-ripple-upgraded::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span.mdc-ripple-upgraded::before {
   transform: scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-white.mdc-ripple-upgraded::after,
 .top-app-bar.navbar-dark .mdc-ripple-upgraded.btn::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span.mdc-ripple-upgraded::after {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span.mdc-ripple-upgraded::after {
   top: 0;
   /* @noflip */
   /*rtl:ignore*/
@@ -26061,30 +25727,12 @@ div.code-toolbar
 }
 .btn-text-white.mdc-ripple-upgraded--unbounded::after,
 .top-app-bar.navbar-dark .mdc-ripple-upgraded--unbounded.btn::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded--unbounded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a.mdc-ripple-upgraded--unbounded::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded--unbounded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button.mdc-ripple-upgraded--unbounded::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded--unbounded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span.mdc-ripple-upgraded--unbounded::after {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a.mdc-ripple-upgraded--unbounded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a.mdc-ripple-upgraded--unbounded::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button.mdc-ripple-upgraded--unbounded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button.mdc-ripple-upgraded--unbounded::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span.mdc-ripple-upgraded--unbounded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span.mdc-ripple-upgraded--unbounded::after {
   top: var(--mdc-ripple-top, 0);
   /* @noflip */
   /*rtl:ignore*/
@@ -26124,8 +25772,7 @@ div.code-toolbar
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .btn-text-white.mdc-ripple-upgraded--foreground-deactivation::after,
-.top-app-bar.navbar-dark
-  .mdc-ripple-upgraded--foreground-deactivation.btn::after,
+.top-app-bar.navbar-dark .mdc-ripple-upgraded--foreground-deactivation.btn::after,
 .top-app-bar.navbar-dark
   div.code-toolbar
   > .toolbar
@@ -26152,8 +25799,7 @@ div.code-toolbar
   span.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-white::before,
 .top-app-bar.navbar-dark .btn::before,
@@ -26180,30 +25826,12 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-dark span::after {
 }
 .btn-text-white.mdc-ripple-upgraded::after,
 .top-app-bar.navbar-dark .mdc-ripple-upgraded.btn::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button.mdc-ripple-upgraded::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-upgraded::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span.mdc-ripple-upgraded::after {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button.mdc-ripple-upgraded::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span.mdc-ripple-upgraded::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span.mdc-ripple-upgraded::after {
   width: var(--mdc-ripple-fg-size, 100%);
   height: var(--mdc-ripple-fg-size, 100%);
 }
@@ -26237,30 +25865,12 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-dark button:hover::before,
 div.code-toolbar > .toolbar .top-app-bar.navbar-dark span:hover::before,
 .btn-text-white.mdc-ripple-surface--hover::before,
 .top-app-bar.navbar-dark .mdc-ripple-surface--hover.btn::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a.mdc-ripple-surface--hover::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a.mdc-ripple-surface--hover::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button.mdc-ripple-surface--hover::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button.mdc-ripple-surface--hover::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span.mdc-ripple-surface--hover::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span.mdc-ripple-surface--hover::before {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a.mdc-ripple-surface--hover::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a.mdc-ripple-surface--hover::before,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button.mdc-ripple-surface--hover::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button.mdc-ripple-surface--hover::before,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span.mdc-ripple-surface--hover::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span.mdc-ripple-surface--hover::before {
   opacity: 0.06;
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.06);
@@ -26293,30 +25903,12 @@ div.code-toolbar
   span.mdc-ripple-upgraded--background-focused::before,
 .btn-text-white:not(.mdc-ripple-upgraded):focus::before,
 .top-app-bar.navbar-dark .btn:not(.mdc-ripple-upgraded):focus::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a:not(.mdc-ripple-upgraded):focus::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a:not(.mdc-ripple-upgraded):focus::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button:not(.mdc-ripple-upgraded):focus::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button:not(.mdc-ripple-upgraded):focus::before,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span:not(.mdc-ripple-upgraded):focus::before,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span:not(.mdc-ripple-upgraded):focus::before {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded):focus::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a:not(.mdc-ripple-upgraded):focus::before,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button:not(.mdc-ripple-upgraded):focus::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button:not(.mdc-ripple-upgraded):focus::before,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span:not(.mdc-ripple-upgraded):focus::before,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.12;
   /* @alternate */
@@ -26324,58 +25916,22 @@ div.code-toolbar
 }
 .btn-text-white:not(.mdc-ripple-upgraded)::after,
 .top-app-bar.navbar-dark .btn:not(.mdc-ripple-upgraded)::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a:not(.mdc-ripple-upgraded)::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a:not(.mdc-ripple-upgraded)::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button:not(.mdc-ripple-upgraded)::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button:not(.mdc-ripple-upgraded)::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span:not(.mdc-ripple-upgraded)::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span:not(.mdc-ripple-upgraded)::after {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded)::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a:not(.mdc-ripple-upgraded)::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button:not(.mdc-ripple-upgraded)::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button:not(.mdc-ripple-upgraded)::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span:not(.mdc-ripple-upgraded)::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span:not(.mdc-ripple-upgraded)::after {
   transition: opacity 150ms linear;
 }
 .btn-text-white:not(.mdc-ripple-upgraded):active::after,
 .top-app-bar.navbar-dark .btn:not(.mdc-ripple-upgraded):active::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  a:not(.mdc-ripple-upgraded):active::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  a:not(.mdc-ripple-upgraded):active::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  button:not(.mdc-ripple-upgraded):active::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  button:not(.mdc-ripple-upgraded):active::after,
-.top-app-bar.navbar-dark
-  div.code-toolbar
-  > .toolbar
-  span:not(.mdc-ripple-upgraded):active::after,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-dark
-  span:not(.mdc-ripple-upgraded):active::after {
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar a:not(.mdc-ripple-upgraded):active::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark a:not(.mdc-ripple-upgraded):active::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar button:not(.mdc-ripple-upgraded):active::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark button:not(.mdc-ripple-upgraded):active::after,
+.top-app-bar.navbar-dark div.code-toolbar > .toolbar span:not(.mdc-ripple-upgraded):active::after,
+div.code-toolbar > .toolbar .top-app-bar.navbar-dark span:not(.mdc-ripple-upgraded):active::after {
   transition-duration: 75ms;
   opacity: 0.18;
   /* @alternate */
@@ -26492,7 +26048,7 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-dark .btn-group-lg > span {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-black::before {
   transition:
@@ -26535,8 +26091,7 @@ div.code-toolbar > .toolbar .top-app-bar.navbar-dark .btn-group-lg > span {
 .btn-text-black.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-black::before,
 .btn-text-black::after {
@@ -26627,7 +26182,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-black {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .btn-text-gray::before {
   transition:
@@ -26670,8 +26225,7 @@ div.code-toolbar > .toolbar .btn-group-lg > span.btn-text-black {
 .btn-text-gray.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .btn-text-gray::before,
 .btn-text-gray::after {
@@ -26937,42 +26491,12 @@ div.code-toolbar > .toolbar .card .card-actions .card-action-buttons span {
   margin-right: 0.5rem;
 }
 .card .card-actions .card-action-buttons .btn:last-child,
-.card
-  .card-actions
-  .card-action-buttons
-  div.code-toolbar
-  > .toolbar
-  a:last-child,
-div.code-toolbar
-  > .toolbar
-  .card
-  .card-actions
-  .card-action-buttons
-  a:last-child,
-.card
-  .card-actions
-  .card-action-buttons
-  div.code-toolbar
-  > .toolbar
-  button:last-child,
-div.code-toolbar
-  > .toolbar
-  .card
-  .card-actions
-  .card-action-buttons
-  button:last-child,
-.card
-  .card-actions
-  .card-action-buttons
-  div.code-toolbar
-  > .toolbar
-  span:last-child,
-div.code-toolbar
-  > .toolbar
-  .card
-  .card-actions
-  .card-action-buttons
-  span:last-child {
+.card .card-actions .card-action-buttons div.code-toolbar > .toolbar a:last-child,
+div.code-toolbar > .toolbar .card .card-actions .card-action-buttons a:last-child,
+.card .card-actions .card-action-buttons div.code-toolbar > .toolbar button:last-child,
+div.code-toolbar > .toolbar .card .card-actions .card-action-buttons button:last-child,
+.card .card-actions .card-action-buttons div.code-toolbar > .toolbar span:last-child,
+div.code-toolbar > .toolbar .card .card-actions .card-action-buttons span:last-child {
   margin-right: 0;
 }
 .card .card-actions .card-action-icons {
@@ -26990,91 +26514,19 @@ div.code-toolbar > .toolbar .card .card-actions .card-action-icons span {
 }
 .card .card-actions .card-action-icons .btn-text-dark,
 .card .card-actions .card-action-icons .top-app-bar.navbar-light .btn,
-.card
-  .card-actions
-  .card-action-icons
-  .top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  a,
-div.code-toolbar
-  > .toolbar
-  .card
-  .card-actions
-  .card-action-icons
-  .top-app-bar.navbar-light
-  a,
-.card
-  .card-actions
-  .card-action-icons
-  .top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  button,
-div.code-toolbar
-  > .toolbar
-  .card
-  .card-actions
-  .card-action-icons
-  .top-app-bar.navbar-light
-  button,
-.card
-  .card-actions
-  .card-action-icons
-  .top-app-bar.navbar-light
-  div.code-toolbar
-  > .toolbar
-  span,
-div.code-toolbar
-  > .toolbar
-  .card
-  .card-actions
-  .card-action-icons
-  .top-app-bar.navbar-light
-  span,
+.card .card-actions .card-action-icons .top-app-bar.navbar-light div.code-toolbar > .toolbar a,
+div.code-toolbar > .toolbar .card .card-actions .card-action-icons .top-app-bar.navbar-light a,
+.card .card-actions .card-action-icons .top-app-bar.navbar-light div.code-toolbar > .toolbar button,
+div.code-toolbar > .toolbar .card .card-actions .card-action-icons .top-app-bar.navbar-light button,
+.card .card-actions .card-action-icons .top-app-bar.navbar-light div.code-toolbar > .toolbar span,
+div.code-toolbar > .toolbar .card .card-actions .card-action-icons .top-app-bar.navbar-light span,
 .top-app-bar.navbar-light .card .card-actions .card-action-icons .btn,
-.top-app-bar.navbar-light
-  .card
-  .card-actions
-  .card-action-icons
-  div.code-toolbar
-  > .toolbar
-  a,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  .card
-  .card-actions
-  .card-action-icons
-  a,
-.top-app-bar.navbar-light
-  .card
-  .card-actions
-  .card-action-icons
-  div.code-toolbar
-  > .toolbar
-  button,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  .card
-  .card-actions
-  .card-action-icons
-  button,
-.top-app-bar.navbar-light
-  .card
-  .card-actions
-  .card-action-icons
-  div.code-toolbar
-  > .toolbar
-  span,
-div.code-toolbar
-  > .toolbar
-  .top-app-bar.navbar-light
-  .card
-  .card-actions
-  .card-action-icons
-  span {
+.top-app-bar.navbar-light .card .card-actions .card-action-icons div.code-toolbar > .toolbar a,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light .card .card-actions .card-action-icons a,
+.top-app-bar.navbar-light .card .card-actions .card-action-icons div.code-toolbar > .toolbar button,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light .card .card-actions .card-action-icons button,
+.top-app-bar.navbar-light .card .card-actions .card-action-icons div.code-toolbar > .toolbar span,
+div.code-toolbar > .toolbar .top-app-bar.navbar-light .card .card-actions .card-action-icons span {
   color: rgba(0, 0, 0, 0.6) !important;
 }
 @media (min-width: 425px) {
@@ -27146,7 +26598,7 @@ div.code-toolbar
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .card-collapsible .card-header::before {
   transition:
@@ -27178,8 +26630,7 @@ div.code-toolbar
   /*rtl:ignore*/
   left: var(--mdc-ripple-left, 0);
 }
-.card-collapsible
-  .card-header.mdc-ripple-upgraded--foreground-activation::after {
+.card-collapsible .card-header.mdc-ripple-upgraded--foreground-activation::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -27187,12 +26638,10 @@ div.code-toolbar
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
-.card-collapsible
-  .card-header.mdc-ripple-upgraded--foreground-deactivation::after {
+.card-collapsible .card-header.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .card-collapsible .card-header::before,
 .card-collapsible .card-header::after {
@@ -27287,7 +26736,7 @@ div.code-toolbar
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .chip-set .chip::before {
   transition:
@@ -27330,8 +26779,7 @@ div.code-toolbar
 .chip-set .chip.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .chip-set .chip::before,
 .chip-set .chip::after {
@@ -27503,20 +26951,8 @@ div.code-toolbar
 .drawer .drawer-menu .nav .drawer-menu-nested .nav-link {
   padding-left: 3.75rem;
 }
-.drawer
-  .drawer-menu
-  .nav
-  .drawer-menu-nested
-  > .collapsing
-  > .drawer-menu-nested
-  .nav-link,
-.drawer
-  .drawer-menu
-  .nav
-  .drawer-menu-nested
-  > .collapse.show
-  > .drawer-menu-nested
-  .nav-link {
+.drawer .drawer-menu .nav .drawer-menu-nested > .collapsing > .drawer-menu-nested .nav-link,
+.drawer .drawer-menu .nav .drawer-menu-nested > .collapse.show > .drawer-menu-nested .nav-link {
   padding-left: 5.25rem;
 }
 .drawer .drawer-footer {
@@ -27556,7 +26992,7 @@ div.code-toolbar
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .drawer-light .drawer-menu .nav-link::before {
   transition:
@@ -27588,9 +27024,7 @@ div.code-toolbar
   /*rtl:ignore*/
   left: var(--mdc-ripple-left, 0);
 }
-.drawer-light
-  .drawer-menu
-  .nav-link.mdc-ripple-upgraded--foreground-activation::after {
+.drawer-light .drawer-menu .nav-link.mdc-ripple-upgraded--foreground-activation::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -27598,13 +27032,10 @@ div.code-toolbar
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
-.drawer-light
-  .drawer-menu
-  .nav-link.mdc-ripple-upgraded--foreground-deactivation::after {
+.drawer-light .drawer-menu .nav-link.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .drawer-light .drawer-menu .nav-link::before,
 .drawer-light .drawer-menu .nav-link::after {
@@ -27631,9 +27062,7 @@ div.code-toolbar
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.1);
 }
-.drawer-light
-  .drawer-menu
-  .nav-link.mdc-ripple-upgraded--background-focused::before,
+.drawer-light .drawer-menu .nav-link.mdc-ripple-upgraded--background-focused::before,
 .drawer-light .drawer-menu .nav-link:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.15;
@@ -27717,7 +27146,7 @@ div.code-toolbar
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .drawer-dark .drawer-menu .nav-link::before {
   transition:
@@ -27749,9 +27178,7 @@ div.code-toolbar
   /*rtl:ignore*/
   left: var(--mdc-ripple-left, 0);
 }
-.drawer-dark
-  .drawer-menu
-  .nav-link.mdc-ripple-upgraded--foreground-activation::after {
+.drawer-dark .drawer-menu .nav-link.mdc-ripple-upgraded--foreground-activation::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -27759,13 +27186,10 @@ div.code-toolbar
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
-.drawer-dark
-  .drawer-menu
-  .nav-link.mdc-ripple-upgraded--foreground-deactivation::after {
+.drawer-dark .drawer-menu .nav-link.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .drawer-dark .drawer-menu .nav-link::before,
 .drawer-dark .drawer-menu .nav-link::after {
@@ -27792,9 +27216,7 @@ div.code-toolbar
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.05);
 }
-.drawer-dark
-  .drawer-menu
-  .nav-link.mdc-ripple-upgraded--background-focused::before,
+.drawer-dark .drawer-menu .nav-link.mdc-ripple-upgraded--background-focused::before,
 .drawer-dark .drawer-menu .nav-link:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.1;
@@ -27867,7 +27289,7 @@ div.code-toolbar
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item::before {
   transition:
@@ -27882,14 +27304,10 @@ div.code-toolbar
   /* @alternate */
   z-index: var(--mdc-ripple-z-index, 0);
 }
-.dropdown
-  .dropdown-menu:not(.dropdown-menu-dark)
-  .dropdown-item.mdc-ripple-upgraded::before {
+.dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item.mdc-ripple-upgraded::before {
   transform: scale(var(--mdc-ripple-fg-scale, 1));
 }
-.dropdown
-  .dropdown-menu:not(.dropdown-menu-dark)
-  .dropdown-item.mdc-ripple-upgraded::after {
+.dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item.mdc-ripple-upgraded::after {
   top: 0;
   /* @noflip */
   /*rtl:ignore*/
@@ -27920,8 +27338,7 @@ div.code-toolbar
   .dropdown-item.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item::before,
 .dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item::after {
@@ -27932,9 +27349,7 @@ div.code-toolbar
   width: 200%;
   height: 200%;
 }
-.dropdown
-  .dropdown-menu:not(.dropdown-menu-dark)
-  .dropdown-item.mdc-ripple-upgraded::after {
+.dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item.mdc-ripple-upgraded::after {
   width: var(--mdc-ripple-fg-size, 100%);
   height: var(--mdc-ripple-fg-size, 100%);
 }
@@ -27945,9 +27360,7 @@ div.code-toolbar
   background-color: var(--mdc-ripple-color, #424242);
 }
 .dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item:hover::before,
-.dropdown
-  .dropdown-menu:not(.dropdown-menu-dark)
-  .dropdown-item.mdc-ripple-surface--hover::before {
+.dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item.mdc-ripple-surface--hover::before {
   opacity: 0.1;
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.1);
@@ -27963,9 +27376,7 @@ div.code-toolbar
   /* @alternate */
   opacity: var(--mdc-ripple-focus-opacity, 0.15);
 }
-.dropdown
-  .dropdown-menu:not(.dropdown-menu-dark)
-  .dropdown-item:not(.mdc-ripple-upgraded)::after {
+.dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item:not(.mdc-ripple-upgraded)::after {
   transition: opacity 150ms linear;
 }
 .dropdown
@@ -27976,9 +27387,7 @@ div.code-toolbar
   /* @alternate */
   opacity: var(--mdc-ripple-press-opacity, 0.2);
 }
-.dropdown
-  .dropdown-menu:not(.dropdown-menu-dark)
-  .dropdown-item.mdc-ripple-upgraded {
+.dropdown .dropdown-menu:not(.dropdown-menu-dark) .dropdown-item.mdc-ripple-upgraded {
   --mdc-ripple-fg-opacity: var(--mdc-ripple-press-opacity, 0.2);
 }
 .dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item {
@@ -27997,7 +27406,7 @@ div.code-toolbar
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item::before {
   transition:
@@ -28012,14 +27421,10 @@ div.code-toolbar
   /* @alternate */
   z-index: var(--mdc-ripple-z-index, 0);
 }
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item.mdc-ripple-upgraded::before {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item.mdc-ripple-upgraded::before {
   transform: scale(var(--mdc-ripple-fg-scale, 1));
 }
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item.mdc-ripple-upgraded::after {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item.mdc-ripple-upgraded::after {
   top: 0;
   /* @noflip */
   /*rtl:ignore*/
@@ -28027,9 +27432,7 @@ div.code-toolbar
   transform: scale(0);
   transform-origin: center center;
 }
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item.mdc-ripple-upgraded--unbounded::after {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item.mdc-ripple-upgraded--unbounded::after {
   top: var(--mdc-ripple-top, 0);
   /* @noflip */
   /*rtl:ignore*/
@@ -28050,8 +27453,7 @@ div.code-toolbar
   .dropdown-item.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item::before,
 .dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item::after {
@@ -28062,9 +27464,7 @@ div.code-toolbar
   width: 200%;
   height: 200%;
 }
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item.mdc-ripple-upgraded::after {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item.mdc-ripple-upgraded::after {
   width: var(--mdc-ripple-fg-size, 100%);
   height: var(--mdc-ripple-fg-size, 100%);
 }
@@ -28075,9 +27475,7 @@ div.code-toolbar
   background-color: var(--mdc-ripple-color, #fff);
 }
 .dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item:hover::before,
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item.mdc-ripple-surface--hover::before {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item.mdc-ripple-surface--hover::before {
   opacity: 0.1;
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.1);
@@ -28085,22 +27483,16 @@ div.code-toolbar
 .dropdown
   .dropdown-menu.dropdown-menu-dark
   .dropdown-item.mdc-ripple-upgraded--background-focused::before,
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item:not(.mdc-ripple-upgraded):focus::before {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.15;
   /* @alternate */
   opacity: var(--mdc-ripple-focus-opacity, 0.15);
 }
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item:not(.mdc-ripple-upgraded)::after {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item:not(.mdc-ripple-upgraded)::after {
   transition: opacity 150ms linear;
 }
-.dropdown
-  .dropdown-menu.dropdown-menu-dark
-  .dropdown-item:not(.mdc-ripple-upgraded):active::after {
+.dropdown .dropdown-menu.dropdown-menu-dark .dropdown-item:not(.mdc-ripple-upgraded):active::after {
   transition-duration: 75ms;
   opacity: 0.2;
   /* @alternate */
@@ -28138,10 +27530,7 @@ div.code-toolbar
   font-size: 0.75rem;
   white-space: normal;
 }
-.dropdown.dropdown-notifications
-  .dropdown-menu
-  .dropdown-item.unread
-  .dropdown-item-content-text {
+.dropdown.dropdown-notifications .dropdown-menu .dropdown-item.unread .dropdown-item-content-text {
   font-weight: 500;
 }
 
@@ -28226,7 +27615,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .list-group .list-group-item-action::before {
   transition:
@@ -28258,8 +27647,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   /*rtl:ignore*/
   left: var(--mdc-ripple-left, 0);
 }
-.list-group
-  .list-group-item-action.mdc-ripple-upgraded--foreground-activation::after {
+.list-group .list-group-item-action.mdc-ripple-upgraded--foreground-activation::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -28267,12 +27655,10 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
-.list-group
-  .list-group-item-action.mdc-ripple-upgraded--foreground-deactivation::after {
+.list-group .list-group-item-action.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .list-group .list-group-item-action::before,
 .list-group .list-group-item-action::after {
@@ -28299,8 +27685,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.1);
 }
-.list-group
-  .list-group-item-action.mdc-ripple-upgraded--background-focused::before,
+.list-group .list-group-item-action.mdc-ripple-upgraded--background-focused::before,
 .list-group .list-group-item-action:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.15;
@@ -28346,7 +27731,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .list-group.list-group-light .list-group-item-action::before {
   transition:
@@ -28361,12 +27746,10 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   /* @alternate */
   z-index: var(--mdc-ripple-z-index, 0);
 }
-.list-group.list-group-light
-  .list-group-item-action.mdc-ripple-upgraded::before {
+.list-group.list-group-light .list-group-item-action.mdc-ripple-upgraded::before {
   transform: scale(var(--mdc-ripple-fg-scale, 1));
 }
-.list-group.list-group-light
-  .list-group-item-action.mdc-ripple-upgraded::after {
+.list-group.list-group-light .list-group-item-action.mdc-ripple-upgraded::after {
   top: 0;
   /* @noflip */
   /*rtl:ignore*/
@@ -28374,8 +27757,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   transform: scale(0);
   transform-origin: center center;
 }
-.list-group.list-group-light
-  .list-group-item-action.mdc-ripple-upgraded--unbounded::after {
+.list-group.list-group-light .list-group-item-action.mdc-ripple-upgraded--unbounded::after {
   top: var(--mdc-ripple-top, 0);
   /* @noflip */
   /*rtl:ignore*/
@@ -28394,8 +27776,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   .list-group-item-action.mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .list-group.list-group-light .list-group-item-action::before,
 .list-group.list-group-light .list-group-item-action::after {
@@ -28406,8 +27787,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   width: 200%;
   height: 200%;
 }
-.list-group.list-group-light
-  .list-group-item-action.mdc-ripple-upgraded::after {
+.list-group.list-group-light .list-group-item-action.mdc-ripple-upgraded::after {
   width: var(--mdc-ripple-fg-size, 100%);
   height: var(--mdc-ripple-fg-size, 100%);
 }
@@ -28418,27 +27798,23 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   background-color: var(--mdc-ripple-color, #f5f5f5);
 }
 .list-group.list-group-light .list-group-item-action:hover::before,
-.list-group.list-group-light
-  .list-group-item-action.mdc-ripple-surface--hover::before {
+.list-group.list-group-light .list-group-item-action.mdc-ripple-surface--hover::before {
   opacity: 0.1;
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.1);
 }
 .list-group.list-group-light
   .list-group-item-action.mdc-ripple-upgraded--background-focused::before,
-.list-group.list-group-light
-  .list-group-item-action:not(.mdc-ripple-upgraded):focus::before {
+.list-group.list-group-light .list-group-item-action:not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.15;
   /* @alternate */
   opacity: var(--mdc-ripple-focus-opacity, 0.15);
 }
-.list-group.list-group-light
-  .list-group-item-action:not(.mdc-ripple-upgraded)::after {
+.list-group.list-group-light .list-group-item-action:not(.mdc-ripple-upgraded)::after {
   transition: opacity 150ms linear;
 }
-.list-group.list-group-light
-  .list-group-item-action:not(.mdc-ripple-upgraded):active::after {
+.list-group.list-group-light .list-group-item-action:not(.mdc-ripple-upgraded):active::after {
   transition-duration: 75ms;
   opacity: 0.2;
   /* @alternate */
@@ -28514,7 +27890,7 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
-  content: '';
+  content: "";
 }
 .nav.nav-pills .nav-link:not(.active)::before,
 .nav.nav-tabs .nav-link:not(.active)::before {
@@ -28551,10 +27927,8 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   /*rtl:ignore*/
   left: var(--mdc-ripple-left, 0);
 }
-.nav.nav-pills
-  .nav-link:not(.active).mdc-ripple-upgraded--foreground-activation::after,
-.nav.nav-tabs
-  .nav-link:not(.active).mdc-ripple-upgraded--foreground-activation::after {
+.nav.nav-pills .nav-link:not(.active).mdc-ripple-upgraded--foreground-activation::after,
+.nav.nav-tabs .nav-link:not(.active).mdc-ripple-upgraded--foreground-activation::after {
   -webkit-animation:
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
@@ -28562,14 +27936,11 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
     mdc-ripple-fg-radius-in 225ms forwards,
     mdc-ripple-fg-opacity-in 75ms forwards;
 }
-.nav.nav-pills
-  .nav-link:not(.active).mdc-ripple-upgraded--foreground-deactivation::after,
-.nav.nav-tabs
-  .nav-link:not(.active).mdc-ripple-upgraded--foreground-deactivation::after {
+.nav.nav-pills .nav-link:not(.active).mdc-ripple-upgraded--foreground-deactivation::after,
+.nav.nav-tabs .nav-link:not(.active).mdc-ripple-upgraded--foreground-deactivation::after {
   -webkit-animation: mdc-ripple-fg-opacity-out 150ms;
   animation: mdc-ripple-fg-opacity-out 150ms;
-  transform: translate(var(--mdc-ripple-fg-translate-end, 0))
-    scale(var(--mdc-ripple-fg-scale, 1));
+  transform: translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1));
 }
 .nav.nav-pills .nav-link:not(.active)::before,
 .nav.nav-pills .nav-link:not(.active)::after,
@@ -28603,11 +27974,9 @@ div.code-toolbar > .toolbar .btn-group-sm > span.btn-icon i {
   /* @alternate */
   opacity: var(--mdc-ripple-hover-opacity, 0.08);
 }
-.nav.nav-pills
-  .nav-link:not(.active).mdc-ripple-upgraded--background-focused::before,
+.nav.nav-pills .nav-link:not(.active).mdc-ripple-upgraded--background-focused::before,
 .nav.nav-pills .nav-link:not(.active):not(.mdc-ripple-upgraded):focus::before,
-.nav.nav-tabs
-  .nav-link:not(.active).mdc-ripple-upgraded--background-focused::before,
+.nav.nav-tabs .nav-link:not(.active).mdc-ripple-upgraded--background-focused::before,
 .nav.nav-tabs .nav-link:not(.active):not(.mdc-ripple-upgraded):focus::before {
   transition-duration: 75ms;
   opacity: 0.12;
@@ -28655,8 +28024,8 @@ mwc-circular-progress {
   color: #616161;
 }
 .nav-stick .nav-heading {
-  font-family: 'Roboto Mono', SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', 'Courier New', monospace;
+  font-family: "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   margin-bottom: 0.25rem;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -28722,7 +28091,7 @@ mwc-snackbar {
 }
 .top-app-bar .navbar-nav .nav-link.active::after {
   display: block;
-  content: '';
+  content: "";
   background-color: #fff;
   width: calc(100% - 2rem);
   height: 4px;
@@ -28766,20 +28135,20 @@ mwc-snackbar {
 
 .litepicker {
   font-family:
-    'Roboto',
+    "Roboto",
     system-ui,
     -apple-system,
-    'Segoe UI',
+    "Segoe UI",
     Roboto,
-    'Helvetica Neue',
+    "Helvetica Neue",
     Arial,
-    'Noto Sans',
-    'Liberation Sans',
+    "Noto Sans",
+    "Liberation Sans",
     sans-serif,
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol',
-    'Noto Color Emoji' !important;
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji" !important;
   font-size: 0.875rem !important;
 }
 .litepicker .container__months {
@@ -28823,11 +28192,7 @@ mwc-snackbar {
 .litepicker .container__months .month-item-header .button-previous-month:hover {
   color: var(--litepicker-button-prev-month-color-hover) !important;
 }
-.litepicker
-  .container__months
-  .month-item-header
-  .button-previous-month:hover
-  > svg {
+.litepicker .container__months .month-item-header .button-previous-month:hover > svg {
   fill: var(--litepicker-button-prev-month-color-hover) !important;
 }
 .litepicker .container__months .month-item-header .button-next-month {
@@ -28840,11 +28205,7 @@ mwc-snackbar {
 .litepicker .container__months .month-item-header .button-next-month:hover {
   color: var(--litepicker-button-next-month-color-hover) !important;
 }
-.litepicker
-  .container__months
-  .month-item-header
-  .button-next-month:hover
-  > svg {
+.litepicker .container__months .month-item-header .button-next-month:hover > svg {
   fill: var(--litepicker-button-next-month-color-hover) !important;
 }
 .litepicker .container__months .month-item-weekdays-row {
@@ -28879,7 +28240,7 @@ mwc-snackbar {
   background-color: transparent !important;
 }
 .litepicker .container__days .day-item.is-in-range:after {
-  content: '';
+  content: "";
   display: block;
   height: 100%;
   width: calc(100% + 4px);
@@ -28892,7 +28253,7 @@ mwc-snackbar {
   position: relative;
 }
 .litepicker .container__days .day-item.is-start-date:after {
-  content: '';
+  content: "";
   display: block;
   height: 100%;
   width: calc(50% + 2px);
@@ -28911,7 +28272,7 @@ mwc-snackbar {
   position: relative;
 }
 .litepicker .container__days .day-item.is-end-date:after {
-  content: '';
+  content: "";
   display: block;
   height: 100%;
   width: calc(50% + 2px);
@@ -29032,8 +28393,8 @@ div.code-toolbar > .toolbar span:focus {
   color: #6200ea;
 }
 
-code[class*='language-'],
-pre[class*='language-'] {
+code[class*="language-"],
+pre[class*="language-"] {
   text-align: left;
   white-space: pre;
   word-spacing: normal;
@@ -29041,7 +28402,7 @@ pre[class*='language-'] {
   word-wrap: normal;
   color: #90a4ae;
   background: transparent;
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
   font-size: 14px;
   line-height: 1.5em;
   font-weight: 400;
@@ -29053,37 +28414,37 @@ pre[class*='language-'] {
   hyphens: none;
 }
 
-code[class*='language-']::-moz-selection,
-pre[class*='language-']::-moz-selection,
-code[class*='language-'] ::-moz-selection,
-pre[class*='language-'] ::-moz-selection {
+code[class*="language-"]::-moz-selection,
+pre[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection,
+pre[class*="language-"] ::-moz-selection {
   background: #cceae7;
   color: #263238;
 }
 
-code[class*='language-']::-moz-selection,
-pre[class*='language-']::-moz-selection,
-code[class*='language-'] ::-moz-selection,
-pre[class*='language-'] ::-moz-selection {
+code[class*="language-"]::-moz-selection,
+pre[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection,
+pre[class*="language-"] ::-moz-selection {
   background: #cceae7;
   color: #263238;
 }
 
-code[class*='language-']::selection,
-pre[class*='language-']::selection,
-code[class*='language-'] ::selection,
-pre[class*='language-'] ::selection {
+code[class*="language-"]::selection,
+pre[class*="language-"]::selection,
+code[class*="language-"] ::selection,
+pre[class*="language-"] ::selection {
   background: #cceae7;
   color: #263238;
 }
 
-:not(pre) > code[class*='language-'] {
+:not(pre) > code[class*="language-"] {
   white-space: normal;
   border-radius: 0.2em;
   padding: 0.1em;
 }
 
-pre[class*='language-'] {
+pre[class*="language-"] {
   overflow: auto;
   position: relative;
   margin: 0;
@@ -29096,7 +28457,7 @@ pre[class*='language-'] {
   color: #f76d47;
 }
 
-[class*='language-'] .namespace {
+[class*="language-"] .namespace {
   opacity: 0.7;
 }
 
@@ -29364,7 +28725,7 @@ pre[class*='language-'] {
 
 .dataTable-sorter::before,
 .dataTable-sorter::after {
-  content: '';
+  content: "";
   height: 0;
   width: 0;
   position: absolute;
@@ -29394,6 +28755,6 @@ pre[class*='language-'] {
 .dataTable-top::after,
 .dataTable-bottom::after {
   clear: both;
-  content: ' ';
+  content: " ";
   display: table;
 }

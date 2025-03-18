@@ -1,10 +1,10 @@
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import React, { useState } from 'react';
-import toast from 'react-hot-toast';
-import { CompanyAdd } from '../../../components/Admin/CompanyAdd.jsx';
-import DeleteUserConfirmation from '../../../components/Admin/DeleteUserConfirmition.jsx';
-import { NotFound } from '../../../components/NotFound.jsx';
-import PageHeader from '../../../components/PageHeader.jsx';
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { CompanyAdd } from "../../../components/Admin/CompanyAdd.jsx";
+import DeleteUserConfirmation from "../../../components/Admin/DeleteUserConfirmition.jsx";
+import { NotFound } from "../../../components/NotFound.jsx";
+import PageHeader from "../../../components/PageHeader.jsx";
 
 export default function CompanySearch() {
   const [addSuccessful, setAddSuccessful] = useState(false);
@@ -33,21 +33,21 @@ export default function CompanySearch() {
   };
 
   const { data, setData, post } = useForm({
-    searchParam: 'registration_name',
-    searchValue: '',
+    searchParam: "registration_name",
+    searchValue: "",
   });
 
   const changeHandler = (e) => setData(e.target.name, e.target.value);
   const submitHandler = (e) => {
     e.preventDefault();
-    if (data.searchValue === '') {
+    if (data.searchValue === "") {
       setErrors({
-        searchValue: 'Please enter a search value',
+        searchValue: "Please enter a search value",
       });
       setBtnAdd(false);
       return;
     }
-    post(reverseUrl('search_contracted_companies'), {
+    post(reverseUrl("search_contracted_companies"), {
       onStart: () => {
         setIsLoading(true);
         setBtnAdd(false);
@@ -57,7 +57,7 @@ export default function CompanySearch() {
       onSuccess: (response) => {
         //This will return true if the object is empty, otherwise false
         const isObjectEmpty = (objectName) => {
-          return JSON.stringify(objectName) === '{}';
+          return JSON.stringify(objectName) === "{}";
         };
         console.log(response.props.result.length);
         if (response.props.result.length > 0) {
@@ -69,7 +69,7 @@ export default function CompanySearch() {
         setIsLoading(false);
       },
       onError: (e) => {
-        toast.error('Nothing to search...');
+        toast.error("Nothing to search...");
 
         setIsLoading(false);
       },
@@ -78,7 +78,7 @@ export default function CompanySearch() {
 
   return (
     <main>
-      <PageHeader title={'Client Users'} />
+      <PageHeader title={"Client Users"} />
       <div className="container-xl p-5">
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">
@@ -113,9 +113,7 @@ export default function CompanySearch() {
                     onChange={changeHandler}
                   >
                     <option value="registration_name">Registration Name</option>
-                    <option value="registration_number">
-                      Registration Number
-                    </option>
+                    <option value="registration_number">Registration Number</option>
                   </select>
                 </div>
 
@@ -132,7 +130,7 @@ export default function CompanySearch() {
                         <span className="ml-2">Searching..</span>
                       </>
                     ) : (
-                      'Search'
+                      "Search"
                     )}
                   </button>
                 </div>
@@ -150,8 +148,8 @@ export default function CompanySearch() {
           isMultiple={isMultiple}
           handleMultiple={handleMultiple}
           setAddSuccessful={setAddSuccessful}
-          action={'create'}
-          url={is_internal !== 1 ? 'client-create-company' : 'create-company'} // user type 1 is client
+          action={"create"}
+          url={is_internal !== 1 ? "client-create-company" : "create-company"} // user type 1 is client
         />
         <div className="card card-raised">
           <div className="card-body p-4">
@@ -159,7 +157,7 @@ export default function CompanySearch() {
               <div className="datatable-container">
                 <table className="table table-striped">
                   <tbody>
-                    <tr style={{ backgroundColor: '#e4e4e4' }}>
+                    <tr style={{ backgroundColor: "#e4e4e4" }}>
                       <th scope="col">Registration Name</th>
                       <th scope="col">Registration Number</th>
                       <th scope="col">Edit</th>
@@ -172,62 +170,52 @@ export default function CompanySearch() {
                         <span className="ml-2">searching..</span>
                       </>
                     ) : fetchedData?.length > 0 ? (
-                      fetchedData?.map(
-                        ({ id, registration_number, registration_name }) => {
-                          return (
-                            <tr key={id}>
-                              <th scope="row">{registration_name}</th>
-                              <td>{registration_number}</td>
-                              <td>
-                                {id ? (
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-info d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setEditBtn(true);
-                                      setUserToActOn(
-                                        fetchedData?.find(
-                                          (user) => user.id === id
-                                        )
-                                      );
-                                      setFetchedData([]);
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      edit
-                                    </i>
-                                  </button>
-                                ) : (
-                                  ''
-                                )}
-                              </td>
-                              <td>
-                                {id ? (
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setDeleteBtn(true);
-                                      setUserToActOn({
-                                        id,
-                                        name: registration_name,
-                                      });
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      delete
-                                    </i>
-                                  </button>
-                                ) : (
-                                  ''
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        }
-                      )
+                      fetchedData?.map(({ id, registration_number, registration_name }) => {
+                        return (
+                          <tr key={id}>
+                            <th scope="row">{registration_name}</th>
+                            <td>{registration_number}</td>
+                            <td>
+                              {id ? (
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-info d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setEditBtn(true);
+                                    setUserToActOn(fetchedData?.find((user) => user.id === id));
+                                    setFetchedData([]);
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">edit</i>
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </td>
+                            <td>
+                              {id ? (
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setDeleteBtn(true);
+                                    setUserToActOn({
+                                      id,
+                                      name: registration_name,
+                                    });
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">delete</i>
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
-                      ''
+                      ""
                     )}
                   </tbody>
                 </table>
@@ -240,21 +228,21 @@ export default function CompanySearch() {
                         handleShow={handleShow}
                         handleCloseModal={() => {
                           setBtnAdd(false);
-                          data.searchValue = '';
+                          data.searchValue = "";
                         }}
-                        userType={'company'}
+                        userType={"company"}
                         searchValue={data.searchValue}
                       />
                     )}
                     {deleteBtn && (
                       <DeleteUserConfirmation
-                        url={'delete_company_user'}
+                        url={"delete_company_user"}
                         handleClose={() => {
                           setDeleteBtn(false);
                           setUserToActOn({});
                         }}
                         show={deleteBtn}
-                        type={'company'}
+                        type={"company"}
                         setFetchedData={setFetchedData}
                         userId={userToActOn.id}
                         name={userToActOn.name}
@@ -273,12 +261,8 @@ export default function CompanySearch() {
                         isMultiple={isMultiple}
                         handleMultiple={handleMultiple}
                         setAddSuccessful={setAddSuccessful}
-                        action={'edit'}
-                        url={
-                          is_internal !== 1
-                            ? 'edit_company_user'
-                            : 'client-edit-company'
-                        }
+                        action={"edit"}
+                        url={is_internal !== 1 ? "edit_company_user" : "client-edit-company"}
                         companyData={userToActOn}
                       />
                     )}

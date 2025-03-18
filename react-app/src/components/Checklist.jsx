@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
 export default function Checklist({ category }) {
   return (
     <div
       style={{
-        gridColumn: category.subCategories ? 'span 2' : 'span 1',
-        gridRow: 'auto',
+        gridColumn: category.subCategories ? "span 2" : "span 1",
+        gridRow: "auto",
       }}
       className="p-3"
     >
@@ -15,9 +15,7 @@ export default function Checklist({ category }) {
             {category.subCategories ? (
               <>
                 <tr>
-                  <th className="c-bg-light text-body text-start">
-                    {category.category}
-                  </th>
+                  <th className="c-bg-light text-body text-start">{category.category}</th>
                   {category.subCategories.map((sub) => (
                     <th colSpan={3} key={sub}>
                       {sub}
@@ -29,21 +27,19 @@ export default function Checklist({ category }) {
                   <th></th>
                   {category.subCategories.map((sub) => (
                     <React.Fragment key={sub}>
-                      <th style={{ width: '3.5rem' }}>Good</th>
-                      <th style={{ width: '3.5rem' }}>Ok</th>
-                      <th style={{ width: '3.5rem' }}>Bad</th>
+                      <th style={{ width: "3.5rem" }}>Good</th>
+                      <th style={{ width: "3.5rem" }}>Ok</th>
+                      <th style={{ width: "3.5rem" }}>Bad</th>
                     </React.Fragment>
                   ))}
                 </tr>
               </>
             ) : (
               <tr>
-                <th className="c-bg-light text-body text-start">
-                  {category.category}
-                </th>
-                <th style={{ width: '3.5rem' }}>Good</th>
-                <th style={{ width: '3.5rem' }}>Ok</th>
-                <th style={{ width: '3.5rem' }}>Bad</th>
+                <th className="c-bg-light text-body text-start">{category.category}</th>
+                <th style={{ width: "3.5rem" }}>Good</th>
+                <th style={{ width: "3.5rem" }}>Ok</th>
+                <th style={{ width: "3.5rem" }}>Bad</th>
               </tr>
             )}
           </thead>
@@ -130,15 +126,13 @@ export default function Checklist({ category }) {
           </tbody>
         </table>
 
-        <div className="c-bg-light p-2 rounded-bottom rounded-bottom-5">
-          {category.description}
-        </div>
+        <div className="c-bg-light p-2 rounded-bottom rounded-bottom-5">{category.description}</div>
 
         <div>
           <textarea
             className="form-control border-0 rounded rounded-5"
-            name={category.category + '_notes'}
-            id={category.category + '_notes'}
+            name={category.category + "_notes"}
+            id={category.category + "_notes"}
             placeholder="Notes..."
             rows={3}
           ></textarea>

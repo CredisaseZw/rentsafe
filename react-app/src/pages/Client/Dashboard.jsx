@@ -1,8 +1,8 @@
-import Layout from '../../components/Layouts/client/Layout.jsx';
-import PieChart from '../../components/PieChart.jsx';
-import useClientDashboard from '../../hooks/page-hooks/useClientDashboard.js';
-import { formatCurrency } from '../../utils/formatting.js';
-import { Link } from '@inertiajs/inertia-react';
+import Layout from "../../components/Layouts/client/Layout.jsx";
+import PieChart from "../../components/PieChart.jsx";
+import useClientDashboard from "../../hooks/page-hooks/useClientDashboard.js";
+import { formatCurrency } from "../../utils/formatting.js";
+import { Link } from "@inertiajs/inertia-react";
 
 export default function Dashboard() {
   const {
@@ -18,20 +18,16 @@ export default function Dashboard() {
 
   return (
     <main className="container-xl">
-      <h5 className="bg-info text-center rounded-3 p-3 text-white mb-5">
-        Dashboard
-      </h5>
+      <h5 className="bg-info text-center rounded-3 p-3 text-white mb-5">Dashboard</h5>
 
       <div className="row row-cols-2 mb-5">
         <div>
           <div className="border shadow-sm bg-white custom-rounded-1 overflow-hidden">
-            <div className="bg-info fw-500 text-white p-2 text-center">
-              Payment Status Check
-            </div>
+            <div className="bg-info fw-500 text-white p-2 text-center">Payment Status Check</div>
 
             <div className="d-flex justify-content-around py-3">
               <Link
-                href={reverseUrl('cl-search-individuals')}
+                href={reverseUrl("cl-search-individuals")}
                 className="c-text-link text-decoration-none"
               >
                 Individual
@@ -40,7 +36,7 @@ export default function Dashboard() {
               <div>|</div>
 
               <Link
-                href={reverseUrl('cl-search-companies')}
+                href={reverseUrl("cl-search-companies")}
                 className="c-text-link text-decoration-none"
               >
                 Company
@@ -51,33 +47,31 @@ export default function Dashboard() {
 
         <div>
           <div className="border shadow-sm bg-white custom-rounded-1 overflow-hidden">
-            <div className="c-bg-light fw-500 p-2 text-center">
-              Your Payment Status
-            </div>
+            <div className="c-bg-light fw-500 p-2 text-center">Your Payment Status</div>
 
             <table className="table table-sm table-responsive table-bordered m-0">
               <tbody>
                 <tr>
                   <td
                     className={`text-white px-4 ${
-                      worstCreditStatus.color === 'black'
-                        ? 'bg-black'
-                        : worstCreditStatus.color === 'orange'
-                          ? 'bg-warning'
-                          : worstCreditStatus.color === 'red'
-                            ? 'bg-danger'
-                            : 'bg-success'
+                      worstCreditStatus.color === "black"
+                        ? "bg-black"
+                        : worstCreditStatus.color === "orange"
+                          ? "bg-warning"
+                          : worstCreditStatus.color === "red"
+                            ? "bg-danger"
+                            : "bg-success"
                     }`}
                   >
-                    {worstCreditStatus.score_level === 'HHR'
-                      ? 'High High Risk'
-                      : worstCreditStatus.score_level === 'LHR'
-                        ? 'Low High Risk'
-                        : worstCreditStatus.score_level === 'HLR'
-                          ? 'High Low Risk'
-                          : worstCreditStatus.score_level === 'NP'
-                            ? 'Non Payer'
-                            : 'Low Low Risk'}
+                    {worstCreditStatus.score_level === "HHR"
+                      ? "High High Risk"
+                      : worstCreditStatus.score_level === "LHR"
+                        ? "Low High Risk"
+                        : worstCreditStatus.score_level === "HLR"
+                          ? "High Low Risk"
+                          : worstCreditStatus.score_level === "NP"
+                            ? "Non Payer"
+                            : "Low Low Risk"}
                   </td>
                   <td></td>
                   <td></td>
@@ -89,10 +83,10 @@ export default function Dashboard() {
                   <td>{worstCreditStatus.lease_giver_name}</td>
                   <td>{worstCreditStatus.payment_date}</td>
                   <td className="text-end">
-                    {worstCreditStatus.currency}{' '}
+                    {worstCreditStatus.currency}{" "}
                     {worstCreditStatus.balance
                       ? formatCurrency(Number(worstCreditStatus.balance))
-                      : ''}
+                      : ""}
                   </td>
                 </tr>
               </tbody>
@@ -104,9 +98,7 @@ export default function Dashboard() {
       <div className="row row-cols-2  mb-5">
         <div>
           <div className="border shadow-sm custom-rounded-1 bg-white overflow-hidden">
-            <div className="bg-info fw-500 text-white p-2 text-center">
-              Credit Given
-            </div>
+            <div className="bg-info fw-500 text-white p-2 text-center">Credit Given</div>
 
             <table className="table table-sm table-responsive table-bordered m-0">
               <thead>
@@ -124,7 +116,7 @@ export default function Dashboard() {
                       className="c-pointer  px-3"
                       title="Double click to view all"
                       onDoubleClick={() => navigateToLeases(item.bg)}
-                      style={{ backgroundColor: item.bg, color: 'white' }}
+                      style={{ backgroundColor: item.bg, color: "white" }}
                     >
                       {item.label}
                     </th>
@@ -133,7 +125,7 @@ export default function Dashboard() {
                       className="text-end c-pointer px-3"
                       title="Double click to view all"
                       onDoubleClick={() => navigateToLeases(item.bg)}
-                      style={{ backgroundColor: item.bg, color: 'white' }}
+                      style={{ backgroundColor: item.bg, color: "white" }}
                     >
                       {formatCurrency(Number(item.amount))}
                     </td>
@@ -158,9 +150,7 @@ export default function Dashboard() {
 
         <div>
           <div className="border shadow-sm custom-rounded-1 bg-white overflow-hidden">
-            <div className="bg-danger fw-500 text-white p-2 text-center">
-              Credit Taken
-            </div>
+            <div className="bg-danger fw-500 text-white p-2 text-center">Credit Taken</div>
 
             <table className="table table-sm table-responsive table-bordered m-0">
               <thead>
@@ -174,17 +164,11 @@ export default function Dashboard() {
               <tbody>
                 {creditTakenWithPercentages.map((item) => (
                   <tr key={item.label}>
-                    <th
-                      className="px-3"
-                      style={{ backgroundColor: item.bg, color: 'white' }}
-                    >
+                    <th className="px-3" style={{ backgroundColor: item.bg, color: "white" }}>
                       {item.label}
                     </th>
 
-                    <td
-                      className="text-end"
-                      style={{ backgroundColor: item.bg, color: 'white' }}
-                    >
+                    <td className="text-end" style={{ backgroundColor: item.bg, color: "white" }}>
                       {formatCurrency(Number(item.amount))}
                     </td>
 
@@ -210,9 +194,7 @@ export default function Dashboard() {
       <div className="row row-cols-2">
         <div>
           <div className="border shadow-sm bg-white custom-rounded-1 overflow-hidden">
-            <div className="c-bg-light fw-500 text-center p-2">
-              Credit Given
-            </div>
+            <div className="c-bg-light fw-500 text-center p-2">Credit Given</div>
 
             <div className="p-4">
               <PieChart data={data1} />
@@ -222,9 +204,7 @@ export default function Dashboard() {
 
         <div>
           <div className="border shadow-sm bg-white custom-rounded-1 overflow-hidden">
-            <div className="c-bg-light fw-500 text-center p-2">
-              Credit Taken
-            </div>
+            <div className="c-bg-light fw-500 text-center p-2">Credit Taken</div>
 
             <div className="p-4">
               <PieChart data={data2} />

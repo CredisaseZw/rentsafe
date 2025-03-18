@@ -1,7 +1,7 @@
-import React from 'react';
-import { Modal } from 'react-bootstrap';
-import CustomAsyncSelect from '../../CustomAsyncSelect.jsx';
-import useReceipt from '../../../hooks/modal-hooks/useReceipt.js';
+import React from "react";
+import { Modal } from "react-bootstrap";
+import CustomAsyncSelect from "../../CustomAsyncSelect.jsx";
+import useReceipt from "../../../hooks/modal-hooks/useReceipt.js";
 
 export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
   const {
@@ -18,13 +18,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
 
   return (
     <>
-      <Modal
-        show={show}
-        onHide={handleClose}
-        size="xl"
-        backdrop="static"
-        centered
-      >
+      <Modal show={show} onHide={handleClose} size="xl" backdrop="static" centered>
         <Modal.Header>
           <div className="w-100 p-4 position-relative">
             <h4 className="text-center">Rent Receipt</h4>
@@ -74,7 +68,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                         type="date"
                         name="paymentDate"
                         min={minDate}
-                        max={new Date().toISOString().split('T')[0]}
+                        max={new Date().toISOString().split("T")[0]}
                         value={row.paymentDate}
                         onChange={(e) => handleInputChange(e, index)}
                         required
@@ -83,16 +77,10 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
 
                     <td className="custom-w-2">
                       <CustomAsyncSelect
-                        extraProps={{ className: 'w-100', required: true }}
-                        url={reverseUrl('get_all_active_leases')}
-                        onChange={(selectedOption) =>
-                          handleTenantSelect(selectedOption, index)
-                        }
-                        value={
-                          row.tenant
-                            ? { label: row.tenant, value: row.lease_id }
-                            : null
-                        }
+                        extraProps={{ className: "w-100", required: true }}
+                        url={reverseUrl("get_all_active_leases")}
+                        onChange={(selectedOption) => handleTenantSelect(selectedOption, index)}
+                        value={row.tenant ? { label: row.tenant, value: row.lease_id } : null}
                         defaultValue={null}
                         isDisabled={false}
                       />
@@ -121,16 +109,15 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                     </td>
 
                     <td className="text-center">
-                      <div className="mt-2">{row.currency || ''}</div>
+                      <div className="mt-2">{row.currency || ""}</div>
                     </td>
 
                     <td
                       style={{
-                        backgroundColor:
-                          row.color == 'light-red' ? '#f87171' : '',
+                        backgroundColor: row.color == "light-red" ? "#f87171" : "",
                       }}
                       className={`bg-${
-                        row.color || ''
+                        row.color || ""
                       } text-white text-center d-block rounded border border-white border-3`}
                     >
                       <div className="mt-2">{row.rent_owing}</div>
@@ -147,8 +134,8 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                         onChange={(e) => handleInputChange(e, index)}
                         className={
                           row.isVariable
-                            ? 'form-control border-2 custom-no-pointer-events'
-                            : 'form-control'
+                            ? "form-control border-2 custom-no-pointer-events"
+                            : "form-control"
                         }
                         readOnly={row.isVariable}
                       />
@@ -200,9 +187,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                       <input
                         name="accountBalance"
                         value={Number(
-                          (
-                            Number(row.rent_owing) - Number(row.paymentAmount)
-                          ).toFixed(2)
+                          (Number(row.rent_owing) - Number(row.paymentAmount)).toFixed(2)
                         )}
                         readOnly
                         className="form-control custom-no-pointer-events"
@@ -214,11 +199,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
             </table>
 
             <div className="text-end">
-              <button
-                type="button"
-                className="btn btn-success"
-                onClick={addRow}
-              >
+              <button type="button" className="btn btn-success" onClick={addRow}>
                 <i className="leading-icon material-icons">add</i>
                 Add Receipts
               </button>
@@ -232,7 +213,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                     <span>Processing..</span>
                   </>
                 ) : (
-                  'Submit'
+                  "Submit"
                 )}
               </button>
             </div>

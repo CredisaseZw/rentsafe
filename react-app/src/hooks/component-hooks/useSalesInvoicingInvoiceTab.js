@@ -1,8 +1,8 @@
-import { Inertia } from '@inertiajs/inertia';
-import { usePage } from '@inertiajs/inertia-react';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { wait } from '../../utils/index.js';
+import { Inertia } from "@inertiajs/inertia";
+import { usePage } from "@inertiajs/inertia-react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { wait } from "../../utils/index.js";
 export default function useSalesInvoicingInvoiceTab() {
   const [invoiceList, setInvoiceList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -120,8 +120,8 @@ export default function useSalesInvoicingInvoiceTab() {
     const month = e.target.month.value;
 
     const updatesdUrl = new URL(url);
-    updatesdUrl.searchParams.set('year', year);
-    updatesdUrl.searchParams.set('month', month);
+    updatesdUrl.searchParams.set("year", year);
+    updatesdUrl.searchParams.set("month", month);
 
     Inertia.replace(updatesdUrl.href, { preserveState: true });
   }

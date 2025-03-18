@@ -1,6 +1,6 @@
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import { useState } from 'react';
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useState } from "react";
 
 export default function useCreditorDebitJournal() {
   const [rows, setRows] = useState(initialRows);
@@ -9,9 +9,7 @@ export default function useCreditorDebitJournal() {
   function handleInputChange(e, index) {
     const { name, value } = e.target;
     setRows((prev) =>
-      prev.map((row, rowIndex) =>
-        index === rowIndex ? { ...row, [name]: value } : row
-      )
+      prev.map((row, rowIndex) => (index === rowIndex ? { ...row, [name]: value } : row))
     );
   }
 
@@ -20,29 +18,29 @@ export default function useCreditorDebitJournal() {
     setIsLoading(true);
 
     axios
-      .post(reverseUrl('creditor_debit_journal'), { rows })
+      .post(reverseUrl("creditor_debit_journal"), { rows })
       .then((res) => {
         console.log(res);
         if (res.data.error) throw new Error(res.data.error);
-        toast.success('Journal entry(s) created successfully');
+        toast.success("Journal entry(s) created successfully");
         setRows([
           {
             id: 1,
-            date: new Date().toISOString().split('T')[0],
-            creditorName: '',
-            details: '',
-            accountBalance: '',
-            debitAmount: '',
-            endBalance: '',
-            leaseId: '',
-            accountBalance: '',
-            endDate: '',
+            date: new Date().toISOString().split("T")[0],
+            creditorName: "",
+            details: "",
+            accountBalance: "",
+            debitAmount: "",
+            endBalance: "",
+            leaseId: "",
+            accountBalance: "",
+            endDate: "",
           },
         ]);
       })
       .catch((error) => {
         console.log(error);
-        toast.error('Failed to submit data \n' + error);
+        toast.error("Failed to submit data \n" + error);
       });
 
     setIsLoading(false);
@@ -58,15 +56,15 @@ export default function useCreditorDebitJournal() {
       {
         ...{
           id: prev.length + 1,
-          date: new Date().toISOString().split('T')[0],
-          creditorName: '',
-          details: '',
-          accountBalance: '',
-          debitAmount: '',
-          endBalance: '',
-          leaseId: '',
-          accountBalance: '',
-          endDate: '',
+          date: new Date().toISOString().split("T")[0],
+          creditorName: "",
+          details: "",
+          accountBalance: "",
+          debitAmount: "",
+          endBalance: "",
+          leaseId: "",
+          accountBalance: "",
+          endDate: "",
         },
       },
     ]);
@@ -86,14 +84,14 @@ export default function useCreditorDebitJournal() {
 const initialRows = [
   {
     id: 1,
-    date: new Date().toISOString().split('T')[0],
-    creditorName: '',
-    details: '',
-    accountBalance: '',
-    debitAmount: '',
-    endBalance: '',
-    leaseId: '',
-    accountBalance: '',
-    endDate: '',
+    date: new Date().toISOString().split("T")[0],
+    creditorName: "",
+    details: "",
+    accountBalance: "",
+    debitAmount: "",
+    endBalance: "",
+    leaseId: "",
+    accountBalance: "",
+    endDate: "",
   },
 ];

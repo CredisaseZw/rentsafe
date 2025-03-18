@@ -1,4 +1,4 @@
-import { Modal } from 'react-bootstrap';
+import { Modal } from "react-bootstrap";
 
 export default function ContentModal({
   show,
@@ -13,8 +13,8 @@ export default function ContentModal({
     <Modal
       show={show}
       onHide={handleClose}
-      size={size || 'xl'}
-      backdrop={backdrop || 'static'}
+      size={size || "xl"}
+      backdrop={backdrop || "static"}
       centered
     >
       <Modal.Header closeButton onHide={handleClose}>

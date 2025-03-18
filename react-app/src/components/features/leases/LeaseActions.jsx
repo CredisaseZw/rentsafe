@@ -1,30 +1,24 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import LeaseForm from './IndividualLeaseForm.jsx';
-import DeleteLeaseConfirm from './DeleteLeaseConfirm.jsx';
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import LeaseForm from "./IndividualLeaseForm.jsx";
+import DeleteLeaseConfirm from "./DeleteLeaseConfirm.jsx";
 
 const LeaseActions = ({ show, handleClose, setAction, leaseDetails }) => {
   const [openForm, setOpenForm] = useState(false);
-  const [btnAction, setBtnAction] = useState('');
+  const [btnAction, setBtnAction] = useState("");
   return (
     <div className="container-xl p-5">
       <div className="card card-raised">
         <div className="card-body p-4">
-          <Modal
-            show={show}
-            onHide={handleClose}
-            size="auto"
-            backdrop="static"
-            centered
-          >
+          <Modal show={show} onHide={handleClose} size="auto" backdrop="static" centered>
             <Modal.Header closeButton>
               <Modal.Title>Actions</Modal.Title>
             </Modal.Header>
             <Modal.Body className="p-4 d-flex justify-content-between align-items-center gap-4">
               <Button
                 onClick={() => {
-                  setAction('view');
-                  setBtnAction('view');
+                  setAction("view");
+                  setBtnAction("view");
                   setOpenForm(true);
                 }}
                 variant="info"
@@ -34,8 +28,8 @@ const LeaseActions = ({ show, handleClose, setAction, leaseDetails }) => {
               </Button>
               <Button
                 onClick={() => {
-                  setAction('edit');
-                  setBtnAction('edit');
+                  setAction("edit");
+                  setBtnAction("edit");
                   setOpenForm(true);
                 }}
                 variant="primary"
@@ -45,8 +39,8 @@ const LeaseActions = ({ show, handleClose, setAction, leaseDetails }) => {
               </Button>
               <Button
                 onClick={() => {
-                  setAction('delete');
-                  setBtnAction('delete');
+                  setAction("delete");
+                  setBtnAction("delete");
                   setOpenForm(true);
                 }}
                 variant="danger"
@@ -56,7 +50,7 @@ const LeaseActions = ({ show, handleClose, setAction, leaseDetails }) => {
               </Button>
             </Modal.Body>
           </Modal>
-          {openForm && btnAction === 'view' && (
+          {openForm && btnAction === "view" && (
             <LeaseForm
               show={openForm}
               handleClose={() => {
@@ -67,19 +61,18 @@ const LeaseActions = ({ show, handleClose, setAction, leaseDetails }) => {
               lesseeDetails={leaseDetails}
             />
           )}
-          {openForm && btnAction === 'edit' && (
+          {openForm && btnAction === "edit" && (
             <LeaseForm
               show={openForm}
               handleClose={() => {
-                setOpenForm(false)
+                setOpenForm(false);
                 handleClose();
-              }
-              }
+              }}
               action={btnAction}
               lesseeDetails={leaseDetails}
             />
           )}
-          {openForm && btnAction === 'delete' && (
+          {openForm && btnAction === "delete" && (
             <DeleteLeaseConfirm
               show={openForm}
               handleClose={() => {

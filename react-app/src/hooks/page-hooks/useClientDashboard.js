@@ -1,6 +1,6 @@
-import { transformCreditData } from '../../utils/formatting';
-import { usePage } from '@inertiajs/inertia-react';
-import { Inertia } from '@inertiajs/inertia';
+import { transformCreditData } from "../../utils/formatting";
+import { usePage } from "@inertiajs/inertia-react";
+import { Inertia } from "@inertiajs/inertia";
 
 export default function useClientDashboard() {
   const {
@@ -12,7 +12,7 @@ export default function useClientDashboard() {
   } = usePage();
 
   function navigateToLeases(color) {
-    Inertia.visit(reverseUrl('client-leases'), {
+    Inertia.visit(reverseUrl("client-leases"), {
       data: {
         color,
       },
@@ -28,17 +28,17 @@ export default function useClientDashboard() {
 
   const data1 = {
     labels: [
-      'Current',
-      'Past Due 1-30 days',
-      'Past Due 31-60 days',
-      'Past Due 61-90 days',
-      'Past Due 90+ days',
+      "Current",
+      "Past Due 1-30 days",
+      "Past Due 31-60 days",
+      "Past Due 61-90 days",
+      "Past Due 90+ days",
     ],
     datasets: [
       {
-        label: '% of Total Credit Taken',
+        label: "% of Total Credit Taken",
         data: creditGivenWithPercentages.map((item) => item.percentage),
-        backgroundColor: ['green', 'orange', '#f87171', '#991b1b', 'black'],
+        backgroundColor: ["green", "orange", "#f87171", "#991b1b", "black"],
         borderWidth: 0,
       },
     ],
@@ -46,17 +46,17 @@ export default function useClientDashboard() {
 
   const data2 = {
     labels: [
-      'Current',
-      'Past Due 1-30 days',
-      'Past Due 31-60 days',
-      'Past Due 61-90 days',
-      'Past Due 90+ days',
+      "Current",
+      "Past Due 1-30 days",
+      "Past Due 31-60 days",
+      "Past Due 61-90 days",
+      "Past Due 90+ days",
     ],
     datasets: [
       {
-        label: '% of Total Credit Given',
+        label: "% of Total Credit Given",
         data: creditTakenWithPercentages.map((item) => item.percentage),
-        backgroundColor: ['green', 'orange', '#f87171', '#991b1b', 'black'],
+        backgroundColor: ["green", "orange", "#f87171", "#991b1b", "black"],
         borderWidth: 0,
       },
     ],

@@ -1,11 +1,7 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function useSubscriptionsManagement(
-  makeActive,
-  id,
-  beforeOpenningModal
-) {
+export default function useSubscriptionsManagement(makeActive, id, beforeOpenningModal) {
   const [show, setShow] = useState(false);
   const [subLength, setSubLength] = useState(0);
   const [subscriptions, setSubscriptions] = useState([]);
@@ -14,18 +10,18 @@ export default function useSubscriptionsManagement(
 
   useEffect(() => {
     axios
-      .post(reverseUrl('open_subscription'))
+      .post(reverseUrl("open_subscription"))
       .then((res) => setSubscriptions(res.data))
       .catch((err) => console.log(err));
   }, [show]);
 
   function showLeaseFormFor(leaseType) {
-    if (leaseType === 'company') setShowCompanyLeaseForm(true);
+    if (leaseType === "company") setShowCompanyLeaseForm(true);
     else setShowIndividualLeaseForm(true);
   }
 
   function closeModal() {
-    makeActive('use-last-last');
+    makeActive("use-last-last");
     setShow(false);
   }
 

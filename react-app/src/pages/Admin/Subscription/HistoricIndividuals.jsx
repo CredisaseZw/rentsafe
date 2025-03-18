@@ -1,16 +1,16 @@
-import { usePage } from '@inertiajs/inertia-react';
-import React from 'react';
-import PageHeader from '../../../components/PageHeader.jsx';
+import { usePage } from "@inertiajs/inertia-react";
+import React from "react";
+import PageHeader from "../../../components/PageHeader.jsx";
 
 export default function HistoricIndividuals() {
   const { individual_list: subscriptions } = usePage().props;
   console.log(subscriptions);
   return (
     <main>
-      <PageHeader title={'Historic Subscriptions'} />
+      <PageHeader title={"Historic Subscriptions"} />
       <div className="container-xl p-5">
         <div class="card card-raised mb-5">
-          <div class="card-header px-4 bg-info" style={{ height: '50px' }}>
+          <div class="card-header px-4 bg-info" style={{ height: "50px" }}>
             <div class="d-flex justify-content-center align-items-center">
               <div class="">
                 <h2 class="display-6 text-white">Individuals</h2>
@@ -21,38 +21,38 @@ export default function HistoricIndividuals() {
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead>
-                  <tr style={{ borderTop: '0px', fontSize: '12px' }}>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                  <tr style={{ borderTop: "0px", fontSize: "12px" }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Trans No.
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Subscriber Name
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       ID
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Contact No.
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Sub Name
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Sub ID/Reg No.
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Product
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Sub Class
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Sub Period
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Start Date
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       End Date
                     </th>
                     <th scope="col" className="tf-borderRight"></th>
@@ -74,7 +74,7 @@ export default function HistoricIndividuals() {
                       subscription_end_date: endDate,
                     }) => {
                       return (
-                        <tr key={id} style={{ fontSize: '12px' }}>
+                        <tr key={id} style={{ fontSize: "12px" }}>
                           <th scope="row">{id}</th>
                           <td>{subscriberName}</td>
                           <td>{id_number}</td>
@@ -82,13 +82,11 @@ export default function HistoricIndividuals() {
                           <td>{sub_name}</td>
                           <td>{sub_id}</td>
                           <td>{product}</td>
-                          <td>{subClass === 'company' ? 'C' : 'I'}</td>
+                          <td>{subClass === "company" ? "C" : "I"}</td>
                           <td>{period}</td>
                           <td>{startDate}</td>
                           <td>{endDate}</td>
-                          <td className="bg-success text-white text-center tfRow">
-                            View
-                          </td>
+                          <td className="bg-success text-white text-center tfRow">View</td>
                         </tr>
                       );
                     }

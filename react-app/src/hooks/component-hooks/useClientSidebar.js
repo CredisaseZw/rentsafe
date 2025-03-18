@@ -1,18 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
-import { usePage } from '@inertiajs/inertia-react';
-import { determineInitial } from '../../utils/jsxUtils.jsx';
+import { useEffect, useRef, useState } from "react";
+import { usePage } from "@inertiajs/inertia-react";
+import { determineInitial } from "../../utils/jsxUtils.jsx";
 
 export default function useClientSidebar() {
   const parentRef = useRef();
   const lastActiveRef = useRef(undefined);
   const [key, setKey] = useState(1);
   const path = new URL(usePage().url).pathname;
-  const [activeNavLinkId, setActiveNavLinkId] = useState(() =>
-    determineInitial(path)
-  );
+  const [activeNavLinkId, setActiveNavLinkId] = useState(() => determineInitial(path));
 
   useEffect(() => {
-    if (activeNavLinkId === 'use-last-last') {
+    if (activeNavLinkId === "use-last-last") {
       console.log(lastActiveRef);
       setActiveNavLinkId(lastActiveRef.current);
     }

@@ -1,18 +1,13 @@
-import SearchBar from '../../../components/SearchBar.jsx';
-import PaginationControls from '../../../components/PaginationControls.jsx';
-import React from 'react';
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import { Inertia } from '@inertiajs/inertia';
-import { formatCurrency } from '../../../utils/formatting.js';
-import CreditorView from '../../../components/Client/ClientView/CreditorView.jsx';
-import useCreditorStatements from '../../../hooks/modal-hooks/useCreditorStatements.js';
+import SearchBar from "../../../components/SearchBar.jsx";
+import PaginationControls from "../../../components/PaginationControls.jsx";
+import React from "react";
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import { Inertia } from "@inertiajs/inertia";
+import { formatCurrency } from "../../../utils/formatting.js";
+import CreditorView from "../../../components/Client/ClientView/CreditorView.jsx";
+import useCreditorStatements from "../../../hooks/modal-hooks/useCreditorStatements.js";
 
-export default function CreditorStatements({
-  creditors,
-  current_page,
-  total_pages,
-  total_items,
-}) {
+export default function CreditorStatements({ creditors, current_page, total_pages, total_items }) {
   const { balanceTotal, creditorViewProps } = useCreditorStatements(
     creditors,
     current_page,
@@ -24,9 +19,7 @@ export default function CreditorStatements({
     <div>
       <CreditorView creditorViewProps={creditorViewProps} />
 
-      <h5 className="bg-danger text-center text-white p-2 mb-4 rounded-2">
-        CREDITOR SUMMARY
-      </h5>
+      <h5 className="bg-danger text-center text-white p-2 mb-4 rounded-2">CREDITOR SUMMARY</h5>
 
       <table className="table table-bordered table-responsive table-sm c-fs-small">
         <thead className="position-sticky c-table-top c-bg-whitesmoke">
@@ -58,7 +51,7 @@ export default function CreditorStatements({
           <>
             <tbody>
               {creditors.map((creditor, index) => (
-                <tr key={creditor.creditor_id + ' - ' + index}>
+                <tr key={creditor.creditor_id + " - " + index}>
                   <td>{creditor.creditor_id}</td>
 
                   <td>
@@ -66,9 +59,7 @@ export default function CreditorStatements({
                       type="button"
                       title="double click for communication history"
                       className="custom-btn text-decoration-underline"
-                      onDoubleClick={() =>
-                        creditorViewProps.openCreditorView(creditor)
-                      }
+                      onDoubleClick={() => creditorViewProps.openCreditorView(creditor)}
                     >
                       {creditor.creditor_name}
                     </button>
@@ -83,17 +74,14 @@ export default function CreditorStatements({
                   <td
                     className="bg-info text-center"
                     style={{
-                      fontWeight: '500',
-                      fontSize: '16px',
-                      color: 'white',
-                      cursor: 'pointer',
+                      fontWeight: "500",
+                      fontSize: "16px",
+                      color: "white",
+                      cursor: "pointer",
                     }}
                     onClick={() =>
                       Inertia.visit(
-                        reverseUrl(
-                          'detailed_creditor_statement',
-                          creditor.creditor_id
-                        ),
+                        reverseUrl("detailed_creditor_statement", creditor.creditor_id),
                         { data: { lease_id: creditor.lease_id } }
                       )
                     }
@@ -127,15 +115,10 @@ export default function CreditorStatements({
       )}
 
       <div className="px-3">
-        <PaginationControls
-          currentPage={current_page || 1}
-          totalPages={total_pages || 1}
-        />
+        <PaginationControls currentPage={current_page || 1} totalPages={total_pages || 1} />
       </div>
     </div>
   );
 }
 
-CreditorStatements.layout = (page) => (
-  <Layout children={page} title={'Creditor Statements'} />
-);
+CreditorStatements.layout = (page) => <Layout children={page} title={"Creditor Statements"} />;

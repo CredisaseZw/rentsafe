@@ -1,6 +1,6 @@
-import { Link } from '@inertiajs/inertia-react';
-import { camelCase } from 'lodash';
-import { cloneElement, useRef } from 'react';
+import { Link } from "@inertiajs/inertia-react";
+import { camelCase } from "lodash";
+import { cloneElement, useRef } from "react";
 
 export default function NavLink({
   data: { navLink, type, href, subNavLinks, component, color },
@@ -12,25 +12,25 @@ export default function NavLink({
   incrementKey,
 }) {
   let id;
-  if (navLink.toLowerCase() === 'dashboard') {
-    id = 'dashboard';
+  if (navLink.toLowerCase() === "dashboard") {
+    id = "dashboard";
   } else {
-    id = `${parent?.current?.id || ''}${camelCase(navLink)}${level}${type}${href}${subNavLinks?.length}${Boolean(component)}`;
+    id = `${parent?.current?.id || ""}${camelCase(navLink)}${level}${type}${href}${subNavLinks?.length}${Boolean(component)}`;
   }
   const isActive = id === activeNavLinkId;
   const isCollapsable = Boolean(subNavLinks);
   const parentRef = useRef();
 
   let label;
-  const labelClassName = `c-new-nav-link c-level-${level}  ${isActive ? 'c-new-nav-link-active' : ''}`;
+  const labelClassName = `c-new-nav-link c-level-${level}  ${isActive ? "c-new-nav-link-active" : ""}`;
 
   if (isCollapsable) {
     label = (
       <a
-        style={{ color: color || 'black !important' }}
+        style={{ color: color || "black !important" }}
         className={`justify-content-between gap-2 ${labelClassName}`}
         data-bs-toggle="collapse"
-        href={'#' + id}
+        href={"#" + id}
         role="button"
         aria-expanded="false"
         aria-controls={id}
@@ -39,10 +39,7 @@ export default function NavLink({
         {navLink}
 
         <div className="c-collapse-arrow">
-          <i
-            style={{ color: color || 'black !important' }}
-            className="material-icons"
-          >
+          <i style={{ color: color || "black !important" }} className="material-icons">
             expand_more
           </i>
         </div>
@@ -50,13 +47,13 @@ export default function NavLink({
     );
   } else {
     label =
-      type === 'link' ? (
+      type === "link" ? (
         <Link
-          style={{ color: color || 'black !important' }}
+          style={{ color: color || "black !important" }}
           className={labelClassName}
           href={href}
           onClick={() => {
-            if (parent.current.id === 'mainParent') incrementKey();
+            if (parent.current.id === "mainParent") incrementKey();
             makeActive(id);
           }}
         >
@@ -66,7 +63,7 @@ export default function NavLink({
         cloneElement(component, {
           key: id,
           className: labelClassName,
-          style: { color: color || 'black !important' },
+          style: { color: color || "black !important" },
           id,
           makeActive,
           beforeOpenningModal: () => {
@@ -79,10 +76,10 @@ export default function NavLink({
   const collapsableContent = isCollapsable ? (
     <div
       style={{
-        color: color || 'black !important',
-        width: '95%',
+        color: color || "black !important",
+        width: "95%",
       }}
-      className={`${level === 1 ? 'mx-auto custom-rounded-05 py-2 mt-2 overflow-hidden c-bg-whitesmoke' : ''}  collapse`}
+      className={`${level === 1 ? "mx-auto custom-rounded-05 py-2 mt-2 overflow-hidden c-bg-whitesmoke" : ""}  collapse`}
       id={id}
       data-bs-parent={`#${parent?.current?.id}`}
     >
@@ -99,7 +96,7 @@ export default function NavLink({
       </div>
     </div>
   ) : (
-    ''
+    ""
   );
 
   return (

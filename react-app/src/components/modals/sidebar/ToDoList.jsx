@@ -1,16 +1,11 @@
-import React from 'react';
-import { Modal } from 'react-bootstrap';
-import { formatCurrency } from '../../../utils/formatting.js';
-import useToDoList from '../../../hooks/modal-hooks/useToDoList.js';
-import WorksAndMaintenance from '../../Client/ClientView/WorksAndMaintenance.jsx';
-import { truncate } from 'lodash';
+import React from "react";
+import { Modal } from "react-bootstrap";
+import { formatCurrency } from "../../../utils/formatting.js";
+import useToDoList from "../../../hooks/modal-hooks/useToDoList.js";
+import WorksAndMaintenance from "../../Client/ClientView/WorksAndMaintenance.jsx";
+import { truncate } from "lodash";
 
-export default function ToDoList({
-  className,
-  id,
-  makeActive,
-  beforeOpenningModal,
-}) {
+export default function ToDoList({ className, id, makeActive, beforeOpenningModal }) {
   const {
     error,
     show,
@@ -51,16 +46,10 @@ export default function ToDoList({
           viewDefaults={viewDefaults}
         />
       ) : (
-        ''
+        ""
       )}
 
-      <Modal
-        show={show}
-        onHide={closeModal}
-        size="xl"
-        backdrop="static"
-        centered
-      >
+      <Modal show={show} onHide={closeModal} size="xl" backdrop="static" centered>
         <Modal.Header>
           <div className="w-100 p-4 position-relative">
             <button
@@ -74,20 +63,11 @@ export default function ToDoList({
         </Modal.Header>
 
         <Modal.Body>
-          <h5 className="text-center bg-danger p-3 mb-0 text-white bg-info">
-            To Do List
-          </h5>
+          <h5 className="text-center bg-danger p-3 mb-0 text-white bg-info">To Do List</h5>
 
           {error && (
-            <div
-              className="alert alert-danger d-flex gap-2 align-items-center"
-              role="alert"
-            >
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setError('')}
-              />
+            <div className="alert alert-danger d-flex gap-2 align-items-center" role="alert">
+              <button type="button" className="btn-close" onClick={() => setError("")} />
               {truncate(error, { length: 200 })}
             </div>
           )}
@@ -113,48 +93,34 @@ export default function ToDoList({
 
             <tbody>
               {todos.map((todo, index) => (
-                <tr
-                  key={index}
-                  className={todo.status === 'DONE' ? 'c-done-block' : ''}
-                >
+                <tr key={index} className={todo.status === "DONE" ? "c-done-block" : ""}>
                   <th className="text-nowrap">{index + 1}</th>
 
-                  <td>
-                    {todo.date
-                      ? new Date(todo.date).toISOString().split('T')[0]
-                      : 'N/A'}
-                  </td>
+                  <td>{todo.date ? new Date(todo.date).toISOString().split("T")[0] : "N/A"}</td>
 
-                  {todo.function.toLowerCase() === 'works' ? (
+                  {todo.function.toLowerCase() === "works" ? (
                     <td
                       onClick={() => openScheduledWorks(todo)}
-                      className={`text-white bg-primary text-center ${todo.function === 'works' ? 'c-pointer' : ''}`}
+                      className={`text-white bg-primary text-center ${todo.function === "works" ? "c-pointer" : ""}`}
                     >
                       {todo.function}
                     </td>
                   ) : (
-                    <th className="text-nowrap text-center bg-light">
-                      {todo.function}
-                    </th>
+                    <th className="text-nowrap text-center bg-light">{todo.function}</th>
                   )}
 
                   <th className="custom-w-5">
-                    <p
-                      className={
-                        'm-0 c-line-clamp-1 ' +
-                        (todo.status === 'DONE' ? 'c-done' : '')
-                      }
-                    >
+                    <p className={"m-0 c-line-clamp-1 " + (todo.status === "DONE" ? "c-done" : "")}>
                       <span className="text-capitalize">{todo?.title}</span>
-                      {todo?.title && todo?.details ? ' - ' : ''}
+                      {todo?.title && todo?.details ? " - " : ""}
                       <span className="text-capitalize"> {todo?.details}</span>
                     </p>
                   </th>
 
                   <td
                     style={{
-                      backgroundColor: todo.color ? todo.color : 'inherit',
-                      color: todo.color ? 'white' : 'inherit',
+                      backgroundColor: todo.color ? todo.color : "inherit",
+                      color: todo.color ? "white" : "inherit",
                     }}
                     className="text-center d-block"
                   >
@@ -163,7 +129,7 @@ export default function ToDoList({
                         ? todo.balance_owing < 0
                           ? `(${formatCurrency(todo.balance_owing * -1)})`
                           : formatCurrency(todo.balance_owing)
-                        : '_'}
+                        : "_"}
                     </div>
                   </td>
 
@@ -176,14 +142,10 @@ export default function ToDoList({
 
                   <td
                     className={
-                      'text-white text-center ' +
-                      (todo.status === 'DONE'
-                        ? 'c-muted c-not-allowed'
-                        : 'bg-success c-pointer')
+                      "text-white text-center " +
+                      (todo.status === "DONE" ? "c-muted c-not-allowed" : "bg-success c-pointer")
                     }
-                    onClick={
-                      todo.status === 'DONE' ? undefined : () => done(todo)
-                    }
+                    onClick={todo.status === "DONE" ? undefined : () => done(todo)}
                   >
                     Done
                   </td>

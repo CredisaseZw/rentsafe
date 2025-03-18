@@ -1,9 +1,9 @@
-import { Modal } from 'react-bootstrap';
-import Receipt from './Receipt.jsx';
-import { formatCurrency } from '../../../utils/formatting.js';
-import { MultipleUpload } from '../../../components/MultipleUpload.jsx';
-import useIndividualLeaseForm from '../../../hooks/modal-hooks/useIndividualLeaseForm.js';
-import CustomAsyncSelect from '../../CustomAsyncSelect.jsx';
+import { Modal } from "react-bootstrap";
+import Receipt from "./Receipt.jsx";
+import { formatCurrency } from "../../../utils/formatting.js";
+import { MultipleUpload } from "../../../components/MultipleUpload.jsx";
+import useIndividualLeaseForm from "../../../hooks/modal-hooks/useIndividualLeaseForm.js";
+import CustomAsyncSelect from "../../CustomAsyncSelect.jsx";
 
 export default function IndividualLeaseForm({
   show,
@@ -34,12 +34,7 @@ export default function IndividualLeaseForm({
     changeLandlordType,
     changeLandlord,
     changeRentGuarantorId,
-  } = useIndividualLeaseForm(
-    handleClose,
-    action,
-    lesseeDetails,
-    subscriptionPeriod
-  );
+  } = useIndividualLeaseForm(handleClose, action, lesseeDetails, subscriptionPeriod);
 
   console.log(data);
   console.log(data.landlordType);
@@ -49,17 +44,13 @@ export default function IndividualLeaseForm({
     <Modal size="lg" show={show} onHide={handleClose} centered>
       <Modal.Header closeButton className="card-header bg-transparent ps-0">
         <button
-          className={`btn btn-sm ${
-            isSingleTab ? 'btn-info text-white' : 'btn-light'
-          }`}
+          className={`btn btn-sm ${isSingleTab ? "btn-info text-white" : "btn-light"}`}
           onClick={toggleTab}
         >
           Single
         </button>
         <button
-          className={`btn btn-sm ${
-            !isSingleTab ? 'btn-info text-white' : 'btn-light'
-          }`}
+          className={`btn btn-sm ${!isSingleTab ? "btn-info text-white" : "btn-light"}`}
           onClick={toggleTab}
         >
           Multiple
@@ -71,29 +62,22 @@ export default function IndividualLeaseForm({
           <div className="card card-raised">
             <div className="card-header bg-info">
               <h2 className="display-6 mb-0 text-white">
-                {action === 'view'
-                  ? 'View Lease - Individual'
-                  : action === 'edit'
-                    ? 'Edit Lease - Individual'
-                    : 'Add Lease - Individual'}
+                {action === "view"
+                  ? "View Lease - Individual"
+                  : action === "edit"
+                    ? "Edit Lease - Individual"
+                    : "Add Lease - Individual"}
               </h2>
             </div>
 
             <div className="card-body p-4">
-              <h6 className="bg-info p-1 display-6 m-0 text-center text-white">
-                Lease details
-              </h6>
+              <h6 className="bg-info p-1 display-6 m-0 text-center text-white">Lease details</h6>
 
-              <form
-                className="p-5 border border-2 border-info"
-                onSubmit={handleSubmit}
-              >
+              <form className="p-5 border border-2 border-info" onSubmit={handleSubmit}>
                 <div className="row mb-4">
                   <div className="row">
                     <div className="mt-1 col-lg-4">
-                      <label className="form-label">
-                        National ID/Passport:
-                      </label>
+                      <label className="form-label">National ID/Passport:</label>
 
                       <div className="d-flex align-items-center justify-content-between">
                         <select
@@ -112,9 +96,7 @@ export default function IndividualLeaseForm({
                         >
                           <option value="id">ID</option>
                           <option value="passport">
-                            {idSelectValue === 'passport' || isIdSelectExpanded
-                              ? 'Passport'
-                              : ''}
+                            {idSelectValue === "passport" || isIdSelectExpanded ? "Passport" : ""}
                           </option>
                         </select>
                         <input
@@ -129,9 +111,7 @@ export default function IndividualLeaseForm({
                       </div>
 
                       {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.identificationNumber}
-                        </div>
+                        <div className="text-danger mt-1">{errors.identificationNumber}</div>
                       )}
                     </div>
 
@@ -147,11 +127,7 @@ export default function IndividualLeaseForm({
                         className="form-control form-control-sm"
                         readOnly
                       />
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.lesseeName}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.lesseeName}</div>}
                     </div>
 
                     <div className="mt-1 col-lg-4">
@@ -164,13 +140,9 @@ export default function IndividualLeaseForm({
                         id="lesseePhone"
                         required
                         className="form-control form-control-sm"
-                        readOnly={action === 'view'}
+                        readOnly={action === "view"}
                       />
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.lesseePhone}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.lesseePhone}</div>}
                     </div>
                   </div>
                 </div>
@@ -186,13 +158,9 @@ export default function IndividualLeaseForm({
                       name="lesseeAddress"
                       id="lesseeAddress"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.lesseeAddress}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.lesseeAddress}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
@@ -202,25 +170,19 @@ export default function IndividualLeaseForm({
                       onChange={(res) => changeRentGuarantorId(res)}
                       extraProps={{
                         required: false,
-                        className: 'w-100',
-                        name: 'rentGuarantorId',
-                        id: 'rentGuarantorId',
+                        className: "w-100",
+                        name: "rentGuarantorId",
+                        id: "rentGuarantorId",
                         placeholder: data.rentGuarantorId || undefined,
                       }}
-                      isDisabled={action === 'view'}
-                      defaultValue={
-                        action === 'view' ? data.rentGuarantorId : ''
-                      }
+                      isDisabled={action === "view"}
+                      defaultValue={action === "view" ? data.rentGuarantorId : ""}
                       useAlternateFetchOptions={{
-                        type: 'individual',
+                        type: "individual",
                       }}
                     />
 
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.rentGuarantorId}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.rentGuarantorId}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
@@ -234,11 +196,7 @@ export default function IndividualLeaseForm({
                       className="form-control form-control-sm"
                       readOnly
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.rentGuarantorName}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.rentGuarantorName}</div>}
                   </div>
                 </div>
 
@@ -251,13 +209,9 @@ export default function IndividualLeaseForm({
                       name="leaseDetails"
                       id="leaseDetails"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.leaseDetails}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.leaseDetails}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
@@ -268,7 +222,7 @@ export default function IndividualLeaseForm({
                       id="leaseCurrency"
                       name="leaseCurrency"
                       className="form-select form-select-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     >
                       <option value="USD">USD</option>
                       <option value="ZWG">ZWG</option>
@@ -276,11 +230,7 @@ export default function IndividualLeaseForm({
                               <option value="EUR">EUR</option>
                               <option value="Pula">Pula</option> */}
                     </select>
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.leaseCurrency}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.leaseCurrency}</div>}
                   </div>
                 </div>
 
@@ -288,7 +238,7 @@ export default function IndividualLeaseForm({
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Monthly Rental:</label>
                     <input
-                      value={data.monthlyRental === 0 ? '' : data.monthlyRental}
+                      value={data.monthlyRental === 0 ? "" : data.monthlyRental}
                       placeholder="enter monthly rental"
                       onChange={changeHandler}
                       type="text"
@@ -296,13 +246,9 @@ export default function IndividualLeaseForm({
                       id="monthlyRental"
                       name="monthlyRental"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.monthlyRental}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.monthlyRental}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4 d-flex flex-column">
@@ -315,32 +261,22 @@ export default function IndividualLeaseForm({
                       name="rentVariable"
                       className="form-check-input border-1 p-2 border-black"
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.rentVariable}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.rentVariable}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
-                    <label className="form-label">
-                      Deposit Period(Months):
-                    </label>
+                    <label className="form-label">Deposit Period(Months):</label>
                     <input
-                      value={data.depositPeriod === 0 ? '' : data.depositPeriod}
+                      value={data.depositPeriod === 0 ? "" : data.depositPeriod}
                       placeholder="enter deposit period"
                       onChange={changeHandler}
                       type="text"
                       id="depositPeriod"
                       name="depositPeriod"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.depositPeriod}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.depositPeriod}</div>}
                   </div>
                 </div>
 
@@ -348,26 +284,20 @@ export default function IndividualLeaseForm({
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Deposit Amount:</label>
                     <input
-                      value={data.depositAmount === 0 ? '' : data.depositAmount}
+                      value={data.depositAmount === 0 ? "" : data.depositAmount}
                       placeholder="enter deposit amount"
                       onChange={changeHandler}
                       type="text"
                       name="depositAmount"
                       id="depositAmount"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.depositAmount}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.depositAmount}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
-                    <label className="form-label">
-                      Subscription period left (months):
-                    </label>
+                    <label className="form-label">Subscription period left (months):</label>
                     <input
                       value={data.leasePeriod}
                       // onChange={changeHandler}
@@ -377,11 +307,7 @@ export default function IndividualLeaseForm({
                       name="leasePeriod"
                       className="form-control form-control-sm"
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.leasePeriod}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.leasePeriod}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
@@ -394,13 +320,9 @@ export default function IndividualLeaseForm({
                       name="leaseStartDate"
                       id="leaseStartDate"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.leaseStartDate}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.leaseStartDate}</div>}
                   </div>
                 </div>
 
@@ -416,20 +338,14 @@ export default function IndividualLeaseForm({
                       name="leaseEndDate"
                       id="leaseEndDate"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
 
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.leaseEndDate}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.leaseEndDate}</div>}
                   </div>
 
                   <div className="col-lg-4 mt-1">
-                    <label className="form-label">
-                      Payment Period Start Date:
-                    </label>
+                    <label className="form-label">Payment Period Start Date:</label>
                     <input
                       value={data.paymentPeriodStart}
                       type="number"
@@ -439,17 +355,11 @@ export default function IndividualLeaseForm({
                       readOnly
                       disabled
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.paymentPeriodStart}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.paymentPeriodStart}</div>}
                   </div>
 
                   <div className="mt-1 col-lg-4">
-                    <label className="form-label">
-                      Payment Period End Date:
-                    </label>
+                    <label className="form-label">Payment Period End Date:</label>
                     <input
                       value={data.paymentPeriodEnd}
                       onChange={changeHandler}
@@ -460,17 +370,13 @@ export default function IndividualLeaseForm({
                       name="paymentPeriodEnd"
                       id="paymentPeriodEnd"
                       className="form-control form-control-sm"
-                      readOnly={action === 'view'}
+                      readOnly={action === "view"}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.paymentPeriodEnd}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.paymentPeriodEnd}</div>}
                   </div>
                 </div>
 
-                {action === 'add' && (
+                {action === "add" && (
                   <div className="mb-4">
                     <h3 className="text-center p-2 fw-bolder h6 custom-bg-grey">
                       Tenant Opening Rent Balances
@@ -480,43 +386,36 @@ export default function IndividualLeaseForm({
                       <tbody>
                         <tr
                           style={{
-                            lineHeight: '5px',
-                            fontSize: '12px',
+                            lineHeight: "5px",
+                            fontSize: "12px",
                           }}
                         >
-                          <th
-                            scope="row"
-                            className="fw-bold"
-                            style={{ lineHeight: '15px' }}
-                          >
+                          <th scope="row" className="fw-bold" style={{ lineHeight: "15px" }}>
                             Payment Date
                           </th>
-                          <td className="" style={{ lineHeight: '15px' }}>
+                          <td className="" style={{ lineHeight: "15px" }}>
                             More than 3 months
                           </td>
-                          <td className="" style={{ lineHeight: '15px' }}>
+                          <td className="" style={{ lineHeight: "15px" }}>
                             {monthThree}
                           </td>
-                          <td className="" style={{ lineHeight: '15px' }}>
+                          <td className="" style={{ lineHeight: "15px" }}>
                             {monthTwo}
                           </td>
-                          <td className="" style={{ lineHeight: '15px' }}>
+                          <td className="" style={{ lineHeight: "15px" }}>
                             {monthOne}
                           </td>
-                          <td className="" style={{ lineHeight: '15px' }}>
+                          <td className="" style={{ lineHeight: "15px" }}>
                             {currentDate}
                           </td>
-                          <td
-                            className="fw-bold"
-                            style={{ lineHeight: '15px' }}
-                          >
+                          <td className="fw-bold" style={{ lineHeight: "15px" }}>
                             Outstanding Balance
                           </td>
                         </tr>
                         <tr
                           style={{
-                            lineHeight: '5px',
-                            fontSize: '12px',
+                            lineHeight: "5px",
+                            fontSize: "12px",
                           }}
                         >
                           <th scope="row" className="fw-bold">
@@ -575,20 +474,17 @@ export default function IndividualLeaseForm({
                           <td
                             className={`text-white d-flex align-items-center justify-content-center py-4 my-auto ${
                               Number(data.moreThanThreeMonthsBalance) > 0
-                                ? 'bg-black'
+                                ? "bg-black"
                                 : Number(data.monthThreeBalance) > 0
-                                  ? 'bg-danger'
+                                  ? "bg-danger"
                                   : Number(data.monthTwoBalance) > 0
-                                    ? 'custom-bg-pink'
+                                    ? "custom-bg-pink"
                                     : Number(data.monthOneBalance) > 0
-                                      ? 'bg-warning'
-                                      : 'bg-success'
+                                      ? "bg-warning"
+                                      : "bg-success"
                             }`}
                             style={{
-                              backgroundColor:
-                                Number(data.monthTwoBalance) > 0
-                                  ? '#f87171'
-                                  : '',
+                              backgroundColor: Number(data.monthTwoBalance) > 0 ? "#f87171" : "",
                             }}
                           >
                             {formatCurrency(
@@ -619,24 +515,20 @@ export default function IndividualLeaseForm({
                         name="landlordType"
                         id="landlordType"
                         value={data.landlordType}
-                        disabled={action === 'view' || action === 'edit'}
+                        disabled={action === "view" || action === "edit"}
                         onChange={(e) => changeLandlordType(e.target.value)}
                       >
                         <option value="INDIVIDUAL">Individual</option>
                         <option value="COMPANY">Company</option>
                       </select>
 
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.landlordType}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.landlordType}</div>}
                     </div>
 
                     <div className="mt-1 col-lg-4">
                       <label htmlFor="regIdNumber" className="form-label">
-                        {data.landlordType === 'COMPANY' ? 'Reg Number' : 'ID'}
-                        {' (or Name)'}:
+                        {data.landlordType === "COMPANY" ? "Reg Number" : "ID"}
+                        {" (or Name)"}:
                       </label>
 
                       <CustomAsyncSelect
@@ -644,32 +536,24 @@ export default function IndividualLeaseForm({
                         onChange={(res) => changeLandlord(res)}
                         extraProps={{
                           required: false,
-                          id: 'regIdNumber',
-                          className: 'w-100',
-                          name: 'regIdNumber',
+                          id: "regIdNumber",
+                          className: "w-100",
+                          name: "regIdNumber",
                           placeholder:
                             data.regIdNumber || data.landlordName
-                              ? data.regIdNumber ||
-                                '' + ' - ' + data.landlordName ||
-                                ''
-                              : '',
+                              ? data.regIdNumber || "" + " - " + data.landlordName || ""
+                              : "",
                         }}
-                        defaultValue={data.regIdNumber ? data.regIdNumber : ''}
+                        defaultValue={data.regIdNumber ? data.regIdNumber : ""}
                         isDisabled={
-                          action === 'view' ||
-                          action === 'edit' ||
-                          data.landlordType === ''
+                          action === "view" || action === "edit" || data.landlordType === ""
                         }
                         useAlternateFetchOptions={{
                           type: data.landlordType.toLowerCase(),
                         }}
                       />
 
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.idRegOrName}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.idRegOrName}</div>}
                     </div>
 
                     <div className="mt-1 col-lg-4">
@@ -684,11 +568,7 @@ export default function IndividualLeaseForm({
                         readOnly
                       />
 
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.landlordName}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.landlordName}</div>}
                     </div>
 
                     <div className="mt-2 col-lg-4">
@@ -703,16 +583,11 @@ export default function IndividualLeaseForm({
                         className="form-control form-control-sm"
                         disabled={
                           !data.landlordName ||
-                          String(data.landlordName).toLowerCase().trim() ===
-                            'n/a'
+                          String(data.landlordName).toLowerCase().trim() === "n/a"
                         }
                       />
 
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.commission}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.commission}</div>}
                     </div>
 
                     <div className="mt-2 col-lg-4">
@@ -725,25 +600,18 @@ export default function IndividualLeaseForm({
                         name="openingBalance"
                         id="openingBalance"
                         className="form-control form-control-sm"
-                        disabled={action === 'view' || action === 'edit'}
+                        disabled={action === "view" || action === "edit"}
                       />
 
-                      {errors && (
-                        <div className="text-danger mt-1">
-                          {errors.openingBalance}
-                        </div>
-                      )}
+                      {errors && <div className="text-danger mt-1">{errors.openingBalance}</div>}
                     </div>
                   </div>
                 </div>
 
                 <div className="d-flex justify-content-end align-items-center gap-3">
-                  {action === 'view' ? (
+                  {action === "view" ? (
                     <>
-                      <button
-                        className="btn btn-info text-white"
-                        onClick={viewReceipt}
-                      >
+                      <button className="btn btn-info text-white" onClick={viewReceipt}>
                         Receipt
                       </button>
 
@@ -757,10 +625,7 @@ export default function IndividualLeaseForm({
                     </>
                   ) : (
                     <>
-                      <button
-                        className="btn btn-secondary"
-                        onClick={handleClose}
-                      >
+                      <button className="btn btn-secondary" onClick={handleClose}>
                         Cancel
                       </button>
 
@@ -772,12 +637,10 @@ export default function IndividualLeaseForm({
                         {isLoading ? (
                           <>
                             <span className="spinner-grow spinner-grow-sm"></span>
-                            <span className="d-inline-block ml-2">
-                              processing..
-                            </span>
+                            <span className="d-inline-block ml-2">processing..</span>
                           </>
                         ) : (
-                          'Submit'
+                          "Submit"
                         )}
                       </button>
                     </>

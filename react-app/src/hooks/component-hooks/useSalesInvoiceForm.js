@@ -1,27 +1,27 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function useSalesInvoiceForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(true);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState("USD");
   const [salesCodes, setSalesCodes] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [key, setKey] = useState(0);
   const [items, setItems] = useState([
     {
-      sales_code: '',
-      sales_item: '',
-      price: '',
-      qty: '',
-      vat: '',
-      total: '',
+      sales_code: "",
+      sales_item: "",
+      price: "",
+      qty: "",
+      vat: "",
+      total: "",
     },
   ]);
 
   function fetchSalesCodes() {
     axios
-      .get('/accounting/items/')
+      .get("/accounting/items/")
       .then((res) => {
         setSalesCodes(res.data);
       })
@@ -32,7 +32,7 @@ export default function useSalesInvoiceForm() {
 
   function fetchTaxConfigs() {
     axios
-      .get('/accounting/vat-settings/')
+      .get("/accounting/vat-settings/")
       .then((res) => {
         setTaxConfigs(res.data);
       })
@@ -50,12 +50,12 @@ export default function useSalesInvoiceForm() {
     setItems([
       ...items,
       {
-        sales_code: '',
-        sales_item: '',
-        price: '',
-        qty: '',
-        vat: '',
-        total: '',
+        sales_code: "",
+        sales_item: "",
+        price: "",
+        qty: "",
+        vat: "",
+        total: "",
       },
     ]);
   }
@@ -102,12 +102,12 @@ export default function useSalesInvoiceForm() {
   function changeCurrency(e) {
     setItems([
       {
-        sales_code: '',
-        sales_item: '',
-        price: '',
-        qty: '',
-        vat: '',
-        total: '',
+        sales_code: "",
+        sales_item: "",
+        price: "",
+        qty: "",
+        vat: "",
+        total: "",
       },
     ]);
     setCurrency(e.target.value);

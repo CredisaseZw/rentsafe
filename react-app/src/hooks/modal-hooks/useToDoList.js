@@ -1,26 +1,23 @@
-import { usePage } from '@inertiajs/inertia-react';
-import axios from 'axios';
-import { capitalize } from 'lodash';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils/index.js';
-import { Inertia } from '@inertiajs/inertia';
+import { usePage } from "@inertiajs/inertia-react";
+import axios from "axios";
+import { capitalize } from "lodash";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils/index.js";
+import { Inertia } from "@inertiajs/inertia";
 
 export default function useToDoList(makeActive) {
   const auth = usePage().props.Auth;
   const [show, setShow] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [lease, setLease] = useState({});
   const [todos, setTodos] = useState([]);
   const [viewDefaults, setViewDefaults] = useState(undefined);
 
   function fetchAndSetTodos() {
-    axios(reverseUrl('todo_list'))
+    axios(reverseUrl("todo_list"))
       .then((res) => {
-        const worksAndMaintenanceData = [
-          ...res.data.works,
-          ...res.data.maintenance,
-        ].map((item) => {
+        const worksAndMaintenanceData = [...res.data.works, ...res.data.maintenance].map((item) => {
           let details = `${item.title.toUpperCase()}: ${item.details}`;
           return {
             lease: {},
@@ -55,7 +52,7 @@ export default function useToDoList(makeActive) {
   const openModal = () => setShow(true);
 
   function closeModal() {
-    makeActive('use-last-last');
+    makeActive("use-last-last");
     setShow(false);
   }
 
@@ -93,12 +90,12 @@ export default function useToDoList(makeActive) {
 
   function done(todo) {
     axios
-      .post(reverseUrl('resolve_task', todo.id), {
+      .post(reverseUrl("resolve_task", todo.id), {
         type: Boolean(todo.frequency)
-          ? 'maintenance'
-          : todo.function === 'works'
-            ? 'works'
-            : 'reminder',
+          ? "maintenance"
+          : todo.function === "works"
+            ? "works"
+            : "reminder",
       })
       .then((res) => {
         console.log(res);
@@ -112,12 +109,8 @@ export default function useToDoList(makeActive) {
 
   function dismiss(todo) {
     axios
-      .post(reverseUrl('delete_work_schedule', todo.id), {
-        type: todo.scheduled_day
-          ? 'maintenance'
-          : todo.function === 'works'
-            ? 'works'
-            : 'reminder',
+      .post(reverseUrl("delete_work_schedule", todo.id), {
+        type: todo.scheduled_day ? "maintenance" : todo.function === "works" ? "works" : "reminder",
       })
       .then((res) => {
         console.log(res);
@@ -132,13 +125,13 @@ export default function useToDoList(makeActive) {
   function goToOrigin(todo) {
     console.log(todo);
     if (todo.is_creditor) {
-      Inertia.visit(reverseUrl('creditor_statements'), {
+      Inertia.visit(reverseUrl("creditor_statements"), {
         data: {
           open_view_for: todo.lease_id,
         },
       });
     } else {
-      Inertia.visit(reverseUrl('client-leases'), {
+      Inertia.visit(reverseUrl("client-leases"), {
         data: {
           open_view_for: todo.lease_id,
         },

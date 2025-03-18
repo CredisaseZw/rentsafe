@@ -1,15 +1,15 @@
-import { useForm } from '@inertiajs/inertia-react';
-import { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { useForm } from "@inertiajs/inertia-react";
+import { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
 
 const PeriodRequest = ({ show, handleClose, tenantData }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { data, post, setData, errors } = useForm({
-    tenantNumber: tenantData?.tenantNumber || '',
-    name: tenantData?.name || '',
-    adress: tenantData?.adress || '',
-    startDate: '',
-    endDate: '',
+    tenantNumber: tenantData?.tenantNumber || "",
+    name: tenantData?.name || "",
+    adress: tenantData?.adress || "",
+    startDate: "",
+    endDate: "",
   });
 
   const changeHandler = (e) => {
@@ -22,7 +22,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
   const handleSubmitit = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    post('/client/period-request', {
+    post("/client/period-request", {
       onSuccess: () => {
         setIsLoading(false);
         handleClose();
@@ -41,9 +41,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                             align-items-center"
               >
                 <div className="me-4">
-                  <h2 className="display-6 mb-0 text-white">
-                    Tenant Statement Period Request
-                  </h2>
+                  <h2 className="display-6 mb-0 text-white">Tenant Statement Period Request</h2>
                   <div className="card-text"></div>
                 </div>
                 <div className="d-flex gap-2"></div>
@@ -54,30 +52,28 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                 <div
                   className="card-body p-4"
                   style={{
-                    borderStyle: 'solid',
-                    borderColor: '#26a69a',
+                    borderStyle: "solid",
+                    borderColor: "#26a69a",
                   }}
                 >
                   <Modal.Body>
                     <div className="row">
                       <h5
                         style={{
-                          backgroundColor: '#dda196',
-                          padding: '5px 10px',
-                          textAlign: 'center',
-                          borderRadius: '5px',
+                          backgroundColor: "#dda196",
+                          padding: "5px 10px",
+                          textAlign: "center",
+                          borderRadius: "5px",
                         }}
                       >
-                        <span className="fw-bold">Note</span>: All fields marked
-                        with a star (<span className="text-danger">*</span>) are
-                        required.
+                        <span className="fw-bold">Note</span>: All fields marked with a star (
+                        <span className="text-danger">*</span>) are required.
                       </h5>
                       <div className="col-md-12 my-4">
                         <div className="row">
                           <div className="col-md-4">
                             <label className="form-label">
-                              Tenant Number{' '}
-                              <span className="text-danger">*</span>
+                              Tenant Number <span className="text-danger">*</span>
                             </label>
                             <input
                               value={data.tenantNumber}
@@ -90,9 +86,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                               className="form-control form-control-sm"
                             />
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.tenantNumber}
-                              </div>
+                              <div className="text-danger mt-1">{errors.tenantNumber}</div>
                             )}
                           </div>
 
@@ -110,11 +104,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                               placeholder="Enter tenant's full name"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.name}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.name}</div>}
                           </div>
                           <div className="col-md-4">
                             <label className="form-label">
@@ -131,11 +121,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                               placeholder="Enter tenant's address"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.adress}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.adress}</div>}
                           </div>
                         </div>
                       </div>
@@ -156,11 +142,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                               id="startDate"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.startDate}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.startDate}</div>}
                           </div>
                           <div className="col-md-4">
                             <label className="form-label">
@@ -174,11 +156,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                               id="endDate"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.endDate}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.endDate}</div>}
                           </div>
                         </div>
                       </div>
@@ -197,7 +175,7 @@ const PeriodRequest = ({ show, handleClose, tenantData }) => {
                           <span className="ml-2">processing..</span>
                         </>
                       ) : (
-                        'Submit'
+                        "Submit"
                       )}
                     </Button>
                   </Modal.Footer>

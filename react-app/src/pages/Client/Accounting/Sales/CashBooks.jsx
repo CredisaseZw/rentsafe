@@ -1,5 +1,5 @@
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import InDevelopment from '../../../../components/InDevelopment.jsx';
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import InDevelopment from "../../../../components/InDevelopment.jsx";
 
 export default function CashBooks() {
   return (
@@ -9,6 +9,4 @@ export default function CashBooks() {
   );
 }
 
-CashBooks.layout = (page) => (
-  <Layout children={page} title={'Sales Categories'} />
-);
+CashBooks.layout = (page) => <Layout children={page} title={"Sales Categories"} />;

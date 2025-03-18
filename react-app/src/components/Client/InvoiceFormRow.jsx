@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import ContentModal from '../ContentModal.jsx';
+import { useState } from "react";
+import ContentModal from "../ContentModal.jsx";
 
 export default function InvoiceFormRow({
   item,
@@ -19,9 +19,7 @@ export default function InvoiceFormRow({
   const [propmtedCurrencyRate, setPromptedCurrencyRate] = useState(1);
 
   function handleSalesCodeSelect(e) {
-    const salesCode = salesCodes.find(
-      (code) => code.item_id === e.target.value
-    );
+    const salesCode = salesCodes.find((code) => code.item_id === e.target.value);
 
     if (salesCode.unit_price_currency !== currency) {
       setShowCurrencyPrompt(true);
@@ -29,9 +27,7 @@ export default function InvoiceFormRow({
       return;
     }
 
-    const taxConfig = taxConfigs.find(
-      (config) => config.id === salesCode.tax_configuration
-    );
+    const taxConfig = taxConfigs.find((config) => config.id === salesCode.tax_configuration);
 
     const unitVat = ((taxConfig?.rate || 0) / 100) * (salesCode?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
@@ -42,9 +38,9 @@ export default function InvoiceFormRow({
         if (prevIndex === index) {
           return {
             ...prevItem,
-            sales_code: salesCode?.item_id || '',
-            sales_item: salesCode?.name || '',
-            price: salesCode?.price || '',
+            sales_code: salesCode?.item_id || "",
+            sales_item: salesCode?.name || "",
+            price: salesCode?.price || "",
             vat: taxConfig?.rate || 0,
             total: vatIncTotal,
           };
@@ -58,14 +54,11 @@ export default function InvoiceFormRow({
 
   function proceedToHandleSalesCodeSelect() {
     const salesCode = { ...preSelectedSalesCode };
-    salesCode.price =
-      parseFloat(propmtedCurrencyRate) * (parseFloat(salesCode.price) || 0);
+    salesCode.price = parseFloat(propmtedCurrencyRate) * (parseFloat(salesCode.price) || 0);
 
     salesCode.unit_price_currency = currency;
 
-    const taxConfig = taxConfigs.find(
-      (config) => config.id === salesCode.tax_configuration
-    );
+    const taxConfig = taxConfigs.find((config) => config.id === salesCode.tax_configuration);
 
     const unitVat = ((taxConfig?.rate || 0) / 100) * (salesCode?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
@@ -76,9 +69,9 @@ export default function InvoiceFormRow({
         if (prevIndex === index) {
           return {
             ...prevItem,
-            sales_code: salesCode?.item_id || '',
-            sales_item: salesCode?.name || '',
-            price: salesCode?.price || '',
+            sales_code: salesCode?.item_id || "",
+            sales_item: salesCode?.name || "",
+            price: salesCode?.price || "",
             vat: taxConfig?.rate || 0,
             total: vatIncTotal,
           };
@@ -95,7 +88,7 @@ export default function InvoiceFormRow({
 
   const vatDisplay = selectedTaxConfig?.rate
     ? `${((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesCode?.price || 0) * parseFloat(item.qty || 0)} (${selectedTaxConfig.rate}%)`
-    : '';
+    : "";
 
   return (
     <>
@@ -112,9 +105,8 @@ export default function InvoiceFormRow({
         >
           <div>
             <div className="alert alert-danger">
-              The item you have selected is listed in{' '}
-              {preSelectedSalesCode.unit_price_currency} but your invoice is to
-              be in {currency}, please input below the rate to be used
+              The item you have selected is listed in {preSelectedSalesCode.unit_price_currency} but
+              your invoice is to be in {currency}, please input below the rate to be used
             </div>
 
             <div className="d-flex gap-3 align-items-center">
@@ -172,17 +164,15 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center custom-mn-w-1 custom-mx-w-2">
-            {item.sales_item}
-          </div>
+          <div className="text-center custom-mn-w-1 custom-mx-w-2">{item.sales_item}</div>
         </td>
 
         <td>
           <div className="text-center text-nowrap custom-mn-w-1">
             {`${
               // selectedSalesCode.unit_price_currency || ''
-              ''
-            } ${item.price || ''}`}
+              ""
+            } ${item.price || ""}`}
           </div>
         </td>
 
@@ -216,15 +206,11 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">
-            {vatDisplay}
-          </div>
+          <div className="text-center text-nowrap custom-mn-w-1">{vatDisplay}</div>
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">
-            {item.total}
-          </div>
+          <div className="text-center text-nowrap custom-mn-w-1">{item.total}</div>
         </td>
       </tr>
     </>

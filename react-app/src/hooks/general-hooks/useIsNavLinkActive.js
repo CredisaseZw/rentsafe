@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/inertia-react';
+import { usePage } from "@inertiajs/inertia-react";
 
 export default function useIsNavLinkActive() {
   const { component, url } = usePage();
@@ -9,8 +9,8 @@ export default function useIsNavLinkActive() {
       component.startsWith(componentToCompare) ||
       component === componentToCompare
     ) {
-      return 'c-nav-link-active';
-    } else return '';
+      return "c-nav-link-active";
+    } else return "";
   }
 
   return isActive;

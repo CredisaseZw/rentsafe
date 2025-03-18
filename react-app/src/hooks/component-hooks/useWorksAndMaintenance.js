@@ -1,21 +1,16 @@
-import axios, { AxiosError } from 'axios';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
-export default function useWorksAndMaintenance(
-  leaseId,
-  creditorId,
-  refresh,
-  viewDefaults
-) {
+export default function useWorksAndMaintenance(leaseId, creditorId, refresh, viewDefaults) {
   const [isLoading, setIsLoading] = useState(false);
   const [wasSuccessful, setWasSuccessful] = useState(false);
   const [activeTab, setActiveTab] = useState(
-    viewDefaults ? (viewDefaults.isWorks ? 'works' : 'maintenance') : 'works'
+    viewDefaults ? (viewDefaults.isWorks ? "works" : "maintenance") : "works"
   );
   const [oncePerMonths, setOncePerMonths] = useState(2);
-  const [maintenanceFrequency, setMaintenanceFrequency] = useState('weekly');
+  const [maintenanceFrequency, setMaintenanceFrequency] = useState("weekly");
 
   async function submitWorks(e) {
     e.preventDefault();
@@ -40,10 +35,10 @@ export default function useWorksAndMaintenance(
 
     console.log({ formData, data });
     axios
-      .post(reverseUrl('create_work_schedule'), data)
+      .post(reverseUrl("create_work_schedule"), data)
       .then((res) => {
         console.log(res);
-        toast.success('Works data submitted!');
+        toast.success("Works data submitted!");
         setWasSuccessful(true);
         refresh();
       })
@@ -73,7 +68,7 @@ export default function useWorksAndMaintenance(
       reason: formData.reason,
       frequency: formData.frequency,
       scheduled_day: formData.day_date,
-      ...(formData.frequency === 'once_per'
+      ...(formData.frequency === "once_per"
         ? {
             month_frequency: Number(formData.month_frequency),
           }
@@ -84,10 +79,10 @@ export default function useWorksAndMaintenance(
 
     console.log({ data, formData });
     axios
-      .post(reverseUrl('create_maintenance_schedule'), data)
+      .post(reverseUrl("create_maintenance_schedule"), data)
       .then((res) => {
         console.log(res);
-        toast.success('Maintenance data submited!');
+        toast.success("Maintenance data submited!");
         setWasSuccessful(true);
         refresh();
       })
@@ -100,9 +95,9 @@ export default function useWorksAndMaintenance(
   }
 
   function validateAndSetMonths(e) {
-    setMaintenanceFrequency('once_per');
-    if (e.target.value.trim() === '') {
-      setOncePerMonths('');
+    setMaintenanceFrequency("once_per");
+    if (e.target.value.trim() === "") {
+      setOncePerMonths("");
       return;
     }
     let value = Number(e.target.value);
@@ -116,8 +111,8 @@ export default function useWorksAndMaintenance(
     oncePerMonths,
     wasSuccessful,
     maintenanceFrequency,
-    showMaintenance: () => setActiveTab('maintenance'),
-    showWorks: () => setActiveTab('works'),
+    showMaintenance: () => setActiveTab("maintenance"),
+    showWorks: () => setActiveTab("works"),
     setOncePerMonths: validateAndSetMonths,
     setMaintenanceFrequency,
     setWasSuccessful,

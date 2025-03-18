@@ -1,12 +1,12 @@
-import { useForm, usePage } from '@inertiajs/inertia-react';
+import { useForm, usePage } from "@inertiajs/inertia-react";
 // import axios from 'axios';
-import React, { useState } from 'react';
-import DeleteUserConfirmation from '../../../components/Admin/DeleteUserConfirmition.jsx';
-import BulkIconButton from '../../../components/BulkIconButton.jsx';
-import IndividualAdd from '../../../components/Client/IndividualAdd.jsx';
+import React, { useState } from "react";
+import DeleteUserConfirmation from "../../../components/Admin/DeleteUserConfirmition.jsx";
+import BulkIconButton from "../../../components/BulkIconButton.jsx";
+import IndividualAdd from "../../../components/Client/IndividualAdd.jsx";
 // import { IndividualVerify } from '../../../components/Client/OTP/IndividualVerify.jsx';
-import { NotFound } from '../../../components/NotFound.jsx';
-import PageHeader from '../../../components/PageHeader.jsx';
+import { NotFound } from "../../../components/NotFound.jsx";
+import PageHeader from "../../../components/PageHeader.jsx";
 
 export default function IndividualSearch() {
   const [show, setShow] = useState(false);
@@ -25,20 +25,19 @@ export default function IndividualSearch() {
   const { is_internal } = usePage().props.Auth;
 
   const { data, setData, post } = useForm({
-    searchParam: 'fullname',
-    searchValue: '',
+    searchParam: "fullname",
+    searchValue: "",
   });
-  const changeHandler = (e) =>
-    setData({ ...data, [e.target.id]: e.target.value });
+  const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (data.searchValue === '') {
+    if (data.searchValue === "") {
       return setErrors({
-        searchValue: 'Please enter a search value',
+        searchValue: "Please enter a search value",
       });
     }
-    post(reverseUrl('search_individual_users'), {
+    post(reverseUrl("search_individual_users"), {
       onStart: () => {
         setIsLoading(true);
         setEditBtn(false);
@@ -48,7 +47,7 @@ export default function IndividualSearch() {
       onSuccess: (response) => {
         //This will return true if the object is empty, otherwise false
         const isObjectEmpty = (objectName) => {
-          return JSON.stringify(objectName) === '{}';
+          return JSON.stringify(objectName) === "{}";
         };
         if (response.props.result.length < 1) {
           setNotFound(true);
@@ -76,7 +75,7 @@ export default function IndividualSearch() {
   };
   return (
     <main>
-      <PageHeader title={'Individual Users'} />
+      <PageHeader title={"Individual Users"} />
       <div className="container-xl p-5">
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">
@@ -130,7 +129,7 @@ export default function IndividualSearch() {
                         <span className="ml-2">Searching..</span>
                       </>
                     ) : (
-                      'Search'
+                      "Search"
                     )}
                   </button>
                 </div>
@@ -150,12 +149,8 @@ export default function IndividualSearch() {
             handleSingle={handleSingle}
             handleClose={handleClose}
             setAddSuccessful={setAddSuccessful}
-            action={'create'}
-            url={
-              is_internal !== 1
-                ? 'client-create-individual'
-                : 'create-individual-user'
-            }
+            action={"create"}
+            url={is_internal !== 1 ? "client-create-individual" : "create-individual-user"}
           />
         )}
         {editBtn && (
@@ -171,19 +166,19 @@ export default function IndividualSearch() {
             handleSingle={handleSingle}
             setAddSuccessful={() => {}}
             setFetchedData={() => {}}
-            action={'edit'}
+            action={"edit"}
             userDetails={userToActOn}
           />
         )}
         {deleteBtn && (
           <DeleteUserConfirmation
-            url={'delete_individual_user'}
+            url={"delete_individual_user"}
             handleClose={() => {
               setDeleteBtn(false);
               setUserToActOn({});
             }}
             show={deleteBtn}
-            type={'individual'}
+            type={"individual"}
             setFetchedData={setFetchedData}
             userId={userToActOn.id}
             name={userToActOn.name}
@@ -214,7 +209,7 @@ export default function IndividualSearch() {
               <div className="datatable-container">
                 <table className="table table-striped">
                   <tbody>
-                    <tr style={{ backgroundColor: '#e4e4e4' }}>
+                    <tr style={{ backgroundColor: "#e4e4e4" }}>
                       <th scope="col">Forenames</th>
                       <th scope="col">surname</th>
                       <th scope="col">National ID</th>
@@ -229,56 +224,46 @@ export default function IndividualSearch() {
                       </>
                     ) : (
                       fetchedData &&
-                      fetchedData?.map(
-                        ({ id, firstname, surname, identification_number }) => (
-                          <tr key={id}>
-                            <th scope="row">{firstname}</th>
-                            <td>{surname}</td>
-                            <td>{identification_number}</td>
+                      fetchedData?.map(({ id, firstname, surname, identification_number }) => (
+                        <tr key={id}>
+                          <th scope="row">{firstname}</th>
+                          <td>{surname}</td>
+                          <td>{identification_number}</td>
 
-                            {id ? (
-                              <>
-                                <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-info d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setEditBtn(true);
-                                      setUserToActOn(
-                                        fetchedData?.find(
-                                          (user) => user.id === id
-                                        )
-                                      );
-                                      setFetchedData([]);
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      edit
-                                    </i>
-                                  </button>
-                                </td>
-                                <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setDeleteBtn(true);
-                                      setUserToActOn({
-                                        id,
-                                        name: firstname + ' ' + surname,
-                                      });
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      delete
-                                    </i>
-                                  </button>
-                                </td>
-                              </>
-                            ) : null}
-                          </tr>
-                        )
-                      )
+                          {id ? (
+                            <>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-info d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setEditBtn(true);
+                                    setUserToActOn(fetchedData?.find((user) => user.id === id));
+                                    setFetchedData([]);
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">edit</i>
+                                </button>
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setDeleteBtn(true);
+                                    setUserToActOn({
+                                      id,
+                                      name: firstname + " " + surname,
+                                    });
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">delete</i>
+                                </button>
+                              </td>
+                            </>
+                          ) : null}
+                        </tr>
+                      ))
                     )}
                   </tbody>
                 </table>

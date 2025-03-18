@@ -1,13 +1,8 @@
-import React from 'react';
-import { MultipleUpload } from './MultipleUpload.jsx';
-import { Modal } from 'react-bootstrap';
+import React from "react";
+import { MultipleUpload } from "./MultipleUpload.jsx";
+import { Modal } from "react-bootstrap";
 
-export default function BulkUploadModal({
-  type,
-  actionType,
-  show,
-  handleClose,
-}) {
+export default function BulkUploadModal({ type, actionType, show, handleClose }) {
   return (
     <div>
       <Modal size="lg" show={show} onHide={handleClose} centered>
@@ -29,8 +24,8 @@ export default function BulkUploadModal({
                 <div
                   className="card-body p-4"
                   style={{
-                    borderStyle: 'solid',
-                    borderColor: '#26a69a',
+                    borderStyle: "solid",
+                    borderColor: "#26a69a",
                   }}
                 >
                   <Modal.Body>

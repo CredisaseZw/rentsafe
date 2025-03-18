@@ -1,31 +1,16 @@
-import { Modal } from 'react-bootstrap';
+import { Modal } from "react-bootstrap";
 
-export default function DismissInvoice({
-  show,
-  invoice,
-  confirmDismissal,
-  handleClose,
-}) {
+export default function DismissInvoice({ show, invoice, confirmDismissal, handleClose }) {
   return (
-    <Modal
-      centered
-      size="md"
-      backdrop="static"
-      show={show}
-      onHide={handleClose}
-    >
-      <Modal.Header
-        closeButton
-        className="h4 bg-info text-white text-center text-uppercase"
-      >
+    <Modal centered size="md" backdrop="static" show={show} onHide={handleClose}>
+      <Modal.Header closeButton className="h4 bg-info text-white text-center text-uppercase">
         Confirm Invoice Dismissal
       </Modal.Header>
 
       <Modal.Body className="p-4 d-flex justify-content-between align-items-center gap-4">
         <p className="my-3">
-          Are you sure you want to dismiss invoice for {invoice.tenant_name}? No
-          invoice amount or record will be posted for the customer for the
-          month.
+          Are you sure you want to dismiss invoice for {invoice.tenant_name}? No invoice amount or
+          record will be posted for the customer for the month.
         </p>
       </Modal.Body>
 

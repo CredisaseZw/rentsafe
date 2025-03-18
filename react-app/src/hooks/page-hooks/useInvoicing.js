@@ -1,31 +1,21 @@
-import moment from 'moment';
-import { useEffect, useReducer, useState } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { AxiosError } from 'axios';
-import { userFriendlyErrorOrResponse } from '../../utils/index.js';
-import { Inertia } from '@inertiajs/inertia';
+import moment from "moment";
+import { useEffect, useReducer, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { userFriendlyErrorOrResponse } from "../../utils/index.js";
+import { Inertia } from "@inertiajs/inertia";
 
-export default function useInvoicing({
-  tenant_list: invoices,
-  errors,
-  result,
-  status,
-  message,
-}) {
+export default function useInvoicing({ tenant_list: invoices, errors, result, status, message }) {
   const [isLoading, setIsLoading] = useState(false);
   const [invoiceToDismiss, setInvoiceToDismiss] = useState(null);
   const today = new Date();
 
   const usdInvoices =
-    invoices?.filter(
-      (invoice) => invoice.lease_currency_type.toUpperCase() === 'USD'
-    ) || [];
+    invoices?.filter((invoice) => invoice.lease_currency_type.toUpperCase() === "USD") || [];
 
   const zwlInvoices =
-    invoices?.filter(
-      (invoice) => invoice.lease_currency_type.toUpperCase() === 'ZWG'
-    ) || [];
+    invoices?.filter((invoice) => invoice.lease_currency_type.toUpperCase() === "ZWG") || [];
 
   const [usdBatchTotal, setUsdBatchTotal] = useState(
     usdInvoices?.reduce((acc, curr) => acc + Number(curr.owing_amount), 0) || 0
@@ -39,12 +29,12 @@ export default function useInvoicing({
     usdReducer,
     usdInvoices.map((invoice) => ({
       ...invoice,
-      invoice_date: today.toISOString().split('T')[0],
+      invoice_date: today.toISOString().split("T")[0],
       edited: false,
       total: invoice?.owing_amount || 0,
-      operationalCosts: '',
-      tenant_acc_no: '',
-      invoice_no: '',
+      operationalCosts: "",
+      tenant_acc_no: "",
+      invoice_no: "",
     }))
   );
 
@@ -52,35 +42,31 @@ export default function useInvoicing({
     zwlReducer,
     zwlInvoices.map((invoice) => ({
       ...invoice,
-      invoice_date: today.toISOString().split('T')[0],
+      invoice_date: today.toISOString().split("T")[0],
       edited: false,
-      total: invoice?.owing_amount || '',
-      operationalCosts: '',
-      tenant_acc_no: '',
-      invoice_no: '',
+      total: invoice?.owing_amount || "",
+      operationalCosts: "",
+      tenant_acc_no: "",
+      invoice_no: "",
     }))
   );
 
   function usdReducer(state, action) {
     switch (action.type) {
-      case 'updateBaseRental':
+      case "updateBaseRental":
         let newState = state.map((invoice) =>
           invoice.id === action.id
             ? {
                 ...invoice,
                 owing_amount: action.owing_amount,
                 edited: true,
-                total:
-                  Number(invoice.operationalCosts) +
-                  Number(action.owing_amount),
+                total: Number(invoice.operationalCosts) + Number(action.owing_amount),
               }
             : invoice
         );
-        setUsdBatchTotal(
-          newState.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setUsdBatchTotal(newState.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState;
-      case 'updateInvDate':
+      case "updateInvDate":
         let newState8 = state.map((invoice) =>
           invoice.id === action.id
             ? {
@@ -90,12 +76,10 @@ export default function useInvoicing({
               }
             : invoice
         );
-        setUsdBatchTotal(
-          newState8.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setUsdBatchTotal(newState8.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState8;
 
-      case 'updateInvNumber':
+      case "updateInvNumber":
         let newState9 = state.map((invoice) =>
           invoice.id === action.id
             ? {
@@ -105,11 +89,9 @@ export default function useInvoicing({
               }
             : invoice
         );
-        setUsdBatchTotal(
-          newState9.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setUsdBatchTotal(newState9.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState9;
-      case 'updateTenantAccNumber':
+      case "updateTenantAccNumber":
         let newState10 = state.map((invoice) =>
           invoice.id === action.id
             ? {
@@ -119,34 +101,24 @@ export default function useInvoicing({
               }
             : invoice
         );
-        setUsdBatchTotal(
-          newState10.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setUsdBatchTotal(newState10.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState10;
-      case 'updateOperatingCosts':
+      case "updateOperatingCosts":
         let newState2 = state.map((invoice) =>
           invoice.id === action.id
             ? {
                 ...invoice,
                 edited: true,
                 operationalCosts: action.operationalCosts,
-                total:
-                  Number(invoice.owing_amount) +
-                  Number(action.operationalCosts),
+                total: Number(invoice.owing_amount) + Number(action.operationalCosts),
               }
             : invoice
         );
-        setUsdBatchTotal(
-          newState2.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setUsdBatchTotal(newState2.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState2;
-      case 'filterSubmittedInvoices':
-        let newState3 = state.filter(
-          (item) => !action.idsToFilter.includes(item.id)
-        );
-        setUsdBatchTotal(
-          newState3.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+      case "filterSubmittedInvoices":
+        let newState3 = state.filter((item) => !action.idsToFilter.includes(item.id));
+        setUsdBatchTotal(newState3.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState3;
       default:
         return state;
@@ -155,24 +127,20 @@ export default function useInvoicing({
 
   function zwlReducer(state, action) {
     switch (action.type) {
-      case 'updateBaseRental':
+      case "updateBaseRental":
         let newState = state.map((invoice) =>
           invoice.id === action.id
             ? {
                 ...invoice,
                 owing_amount: action.owing_amount,
                 edited: true,
-                total:
-                  Number(invoice.operationalCosts) +
-                  Number(action.owing_amount),
+                total: Number(invoice.operationalCosts) + Number(action.owing_amount),
               }
             : invoice
         );
-        setZwlBatchTotal(
-          newState.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setZwlBatchTotal(newState.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState;
-      case 'updateInvDate':
+      case "updateInvDate":
         let newState9 = state.map((invoice) =>
           invoice.id === action.id
             ? {
@@ -182,11 +150,9 @@ export default function useInvoicing({
               }
             : invoice
         );
-        setZwlBatchTotal(
-          newState9.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setZwlBatchTotal(newState9.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState9;
-      case 'updateInvNumber':
+      case "updateInvNumber":
         let newState11 = state.map((invoice) =>
           invoice.id === action.id
             ? {
@@ -196,11 +162,9 @@ export default function useInvoicing({
               }
             : invoice
         );
-        setZwlBatchTotal(
-          newState11.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setZwlBatchTotal(newState11.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState11;
-      case 'updateTenantAccNumber':
+      case "updateTenantAccNumber":
         let newState13 = state.map((invoice) =>
           invoice.id === action.id
             ? {
@@ -210,34 +174,24 @@ export default function useInvoicing({
               }
             : invoice
         );
-        setZwlBatchTotal(
-          newState13.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setZwlBatchTotal(newState13.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState13;
-      case 'updateOperatingCosts':
+      case "updateOperatingCosts":
         let newState2 = state.map((invoice) =>
           invoice.id === action.id
             ? {
                 ...invoice,
                 edited: true,
                 operationalCosts: action.operationalCosts,
-                total:
-                  Number(invoice.owing_amount) +
-                  Number(action.operationalCosts),
+                total: Number(invoice.owing_amount) + Number(action.operationalCosts),
               }
             : invoice
         );
-        setZwlBatchTotal(
-          newState2.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+        setZwlBatchTotal(newState2.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState2;
-      case 'filterSubmittedInvoices':
-        let newState3 = state.filter(
-          (item) => !action.idsToFilter.includes(item.id)
-        );
-        setZwlBatchTotal(
-          newState3.reduce((acc, curr) => acc + Number(curr.total), 0)
-        );
+      case "filterSubmittedInvoices":
+        let newState3 = state.filter((item) => !action.idsToFilter.includes(item.id));
+        setZwlBatchTotal(newState3.reduce((acc, curr) => acc + Number(curr.total), 0));
         return newState3;
       default:
         return state;
@@ -279,8 +233,8 @@ export default function useInvoicing({
 
     if (data.length === 0) {
       setIsLoading(false);
-      toast.error('No changes detected, please fill in at least one invoice', {
-        icon: '❌',
+      toast.error("No changes detected, please fill in at least one invoice", {
+        icon: "❌",
         duration: 5000,
       });
       return;
@@ -288,16 +242,16 @@ export default function useInvoicing({
 
     try {
       console.log({ data });
-      await axios.post(reverseUrl('client_invoice'), data);
-      usdDispatch({ type: 'filterSubmittedInvoices', idsToFilter });
-      zwlDispatch({ type: 'filterSubmittedInvoices', idsToFilter });
+      await axios.post(reverseUrl("client_invoice"), data);
+      usdDispatch({ type: "filterSubmittedInvoices", idsToFilter });
+      zwlDispatch({ type: "filterSubmittedInvoices", idsToFilter });
     } catch (error) {
       console.log(error);
       if (error instanceof AxiosError)
         toast.error(`An error occurred! ${error.response.statusText}`);
       else {
         toast.error(`An error occurred! ${JSON.stringify(error)}`, {
-          icon: '❌',
+          icon: "❌",
         });
       }
     }
@@ -308,19 +262,19 @@ export default function useInvoicing({
   useEffect(() => {
     if (errors) {
       console.log(errors);
-      toast.error('Error: ' + JSON.stringify(errors), {
+      toast.error("Error: " + JSON.stringify(errors), {
         duration: 5000,
-        icon: '❌',
+        icon: "❌",
       });
-    } else if (result === 'success' && message) {
-      toast.success(message, { duration: 5000, icon: '✔' });
+    } else if (result === "success" && message) {
+      toast.success(message, { duration: 5000, icon: "✔" });
     }
   }, [errors, result, message]);
 
   const headerDate =
     moment().date() > 8 && moment().date() < 25
-      ? moment().subtract(1, 'months').format('MMMM YYYY')
-      : moment().format('MMMM YYYY');
+      ? moment().subtract(1, "months").format("MMMM YYYY")
+      : moment().format("MMMM YYYY");
 
   console.log({
     allState: {
@@ -339,8 +293,7 @@ export default function useInvoicing({
   });
 
   const pastDue = invoices?.some(
-    (inv) =>
-      !!(today.getDate() < inv.payment_period_start && today.getDate() > 8)
+    (inv) => !!(today.getDate() < inv.payment_period_start && today.getDate() > 8)
   );
 
   function confirmDismissal() {
@@ -359,11 +312,11 @@ export default function useInvoicing({
     ];
     console.log({ invoiceToDismiss, data });
 
-    Inertia.post(reverseUrl('client_invoice'), data, {
+    Inertia.post(reverseUrl("client_invoice"), data, {
       onSuccess: (page) => {
         console.log(page);
-        usdDispatch({ type: 'filterSubmittedInvoices', idsToFilter });
-        zwlDispatch({ type: 'filterSubmittedInvoices', idsToFilter });
+        usdDispatch({ type: "filterSubmittedInvoices", idsToFilter });
+        zwlDispatch({ type: "filterSubmittedInvoices", idsToFilter });
         setInvoiceToDismiss(null);
       },
       onError: (errors) => {

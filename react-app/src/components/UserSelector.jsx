@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import CustomAsyncSelect from './CustomAsyncSelect.jsx';
+import { useState } from "react";
+import CustomAsyncSelect from "./CustomAsyncSelect.jsx";
 
 export default function UserSelector() {
-  const [tenantType, setTenantType] = useState('INDIVIDUAL');
+  const [tenantType, setTenantType] = useState("INDIVIDUAL");
 
   return (
     <div className="d-flex">
@@ -21,14 +21,14 @@ export default function UserSelector() {
         <CustomAsyncSelect
           key={tenantType}
           extraProps={{
-            placeholder: 'Customer Name...',
+            placeholder: "Customer Name...",
             required: true,
-            id: 'bill_to',
-            name: 'bill_to',
-            className: 'w-100',
+            id: "bill_to",
+            name: "bill_to",
+            className: "w-100",
           }}
           defaultValue={null}
-          isDisabled={tenantType === ''}
+          isDisabled={tenantType === ""}
           useAlternateFetchOptions={{ type: tenantType.toLowerCase() }}
         />
       </div>

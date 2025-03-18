@@ -1,7 +1,7 @@
-import usePaymentPlans from '../../../hooks/component-hooks/usePaymentPlans.js';
-import PaymentPlan from './PaymentPlan.jsx';
-import PaymentPlans from './PaymentPlans.jsx';
-import PlanDetails from './PlanDetails.jsx';
+import usePaymentPlans from "../../../hooks/component-hooks/usePaymentPlans.js";
+import PaymentPlan from "./PaymentPlan.jsx";
+import PaymentPlans from "./PaymentPlans.jsx";
+import PlanDetails from "./PlanDetails.jsx";
 
 export default function Payments({
   isCreditorView,
@@ -49,10 +49,7 @@ export default function Payments({
           currency,
         }}
       />
-      <PaymentPlans
-        isCreditorView={isCreditorView}
-        paymentPlans={paymentPlans}
-      />
+      <PaymentPlans isCreditorView={isCreditorView} paymentPlans={paymentPlans} />
     </>
   );
 }

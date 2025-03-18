@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { activeTrackableClientNavLinks as NAV_LINKS } from '../../constants';
-import { usePage } from '@inertiajs/inertia-react';
+import { useState, useEffect, useRef } from "react";
+import { activeTrackableClientNavLinks as NAV_LINKS } from "../../constants";
+import { usePage } from "@inertiajs/inertia-react";
 
 export default function useLastNavLinkClicked() {
   const lastLastClickedRef = useRef(undefined);
@@ -14,8 +14,7 @@ export default function useLastNavLinkClicked() {
   // }, []);
 
   useEffect(() => {
-    if (lastClicked === 'use-last-last')
-      setLastClicked(lastLastClickedRef.current);
+    if (lastClicked === "use-last-last") setLastClicked(lastLastClickedRef.current);
   }, [lastClicked]);
 
   return { lastClicked, setLastClicked, key, setKey, lastLastClickedRef };
@@ -23,17 +22,17 @@ export default function useLastNavLinkClicked() {
 
 function determineInitial(path) {
   switch (path) {
-    case '/clients/':
-    case '/clients/get-':
-    case '/clients/companies/':
+    case "/clients/":
+    case "/clients/get-":
+    case "/clients/companies/":
       return NAV_LINKS.DASHBOARD;
-    case '/clients/leases/':
+    case "/clients/leases/":
       return NAV_LINKS.SERVICES;
-    case '/clients/users/':
+    case "/clients/users/":
       return NAV_LINKS.ADMIN;
-    case '/clients/cl-change_password/':
+    case "/clients/cl-change_password/":
       return NAV_LINKS.PROFILE;
     default:
-      return '';
+      return "";
   }
 }
