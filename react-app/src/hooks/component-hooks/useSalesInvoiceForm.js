@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 export default function useSalesInvoiceForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(true);
   const [currency, setCurrency] = useState('USD');
-
+  const [salesCodes, setSalesCodes] = useState([]);
   const [items, setItems] = useState([
     {
       sales_code: '',
@@ -15,6 +16,22 @@ export default function useSalesInvoiceForm() {
       total: '',
     },
   ]);
+
+  function fetchSalesCodes() {
+    axios
+      .get('/accounting/items/')
+      .then((res) => {
+        console.log(res);
+        setSalesCodes(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    fetchSalesCodes();
+  }, []);
 
   function addRow() {
     setItems([
@@ -80,6 +97,7 @@ export default function useSalesInvoiceForm() {
     totals,
     currency,
     isLoading,
+    salesCodes,
     addRow,
     onSubmit,
     removeRow,
