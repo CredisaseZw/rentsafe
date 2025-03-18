@@ -7,6 +7,7 @@ export default function useSalesInvoiceForm() {
   const [currency, setCurrency] = useState('USD');
   const [salesCodes, setSalesCodes] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
+  const [key, setKey] = useState(0);
   const [items, setItems] = useState([
     {
       sales_code: '',
@@ -98,7 +99,23 @@ export default function useSalesInvoiceForm() {
     }
   );
 
+  function changeCurrency(e) {
+    setItems([
+      {
+        sales_code: '',
+        sales_item: '',
+        price: '',
+        qty: '',
+        vat: '',
+        total: '',
+      },
+    ]);
+    setCurrency(e.target.value);
+    setKey((prev) => prev + 1);
+  }
+
   return {
+    key,
     show,
     items,
     totals,
@@ -113,5 +130,6 @@ export default function useSalesInvoiceForm() {
     handleShow,
     setCurrency,
     handleClose,
+    changeCurrency,
   };
 }

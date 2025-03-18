@@ -5,6 +5,7 @@ import InvoiceFormRow from './InvoiceFormRow.jsx';
 
 export function SalesInvoiceForm() {
   const {
+    key,
     show,
     items,
     totals,
@@ -19,6 +20,7 @@ export function SalesInvoiceForm() {
     handleShow,
     setCurrency,
     handleClose,
+    changeCurrency,
   } = useSalesInvoiceForm();
 
   return (
@@ -156,7 +158,7 @@ export function SalesInvoiceForm() {
                         value={currency}
                         name="currency"
                         id="currency"
-                        onChange={(e) => setCurrency(e.target.value)}
+                        onChange={changeCurrency}
                       >
                         <option value="USD">United States Dollar (USD)</option>
                         <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
@@ -179,10 +181,11 @@ export function SalesInvoiceForm() {
               <tbody>
                 {items.map((item, index) => (
                   <InvoiceFormRow
-                    key={index}
+                    key={index + '-' + key}
                     {...{
                       item,
                       index,
+                      currency,
                       setItems,
                       removeRow,
                       isLoading,
