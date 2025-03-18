@@ -60,7 +60,6 @@ export default function InvoiceFormRow({
     const salesCode = { ...preSelectedSalesCode };
     salesCode.price =
       parseFloat(propmtedCurrencyRate) * (parseFloat(salesCode.price) || 0);
-    console.log(salesCode);
 
     salesCode.unit_price_currency = currency;
 
