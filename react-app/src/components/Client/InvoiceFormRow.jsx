@@ -46,7 +46,7 @@ export default function InvoiceFormRow({
   }
 
   const vatDisplay = selectedTaxConfig?.rate
-    ? `${((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesCode?.price || 0)} (${selectedTaxConfig.rate}%)`
+    ? `${((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesCode?.price || 0) * parseFloat(item.qty || 0)} (${selectedTaxConfig.rate}%)`
     : '';
 
   return (
