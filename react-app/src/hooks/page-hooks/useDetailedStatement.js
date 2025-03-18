@@ -1,7 +1,7 @@
-import html2pdf from 'html2pdf.js';
-import { usePage } from '@inertiajs/inertia-react';
-import { useState, useRef } from 'react';
-import { formatDetailedTenantStatementData } from '../../utils/formatting';
+import html2pdf from "html2pdf.js";
+import { usePage } from "@inertiajs/inertia-react";
+import { useState, useRef } from "react";
+import { formatDetailedTenantStatementData } from "../../utils/formatting";
 
 export default function useDetailedStatement() {
   const {
@@ -25,9 +25,9 @@ export default function useDetailedStatement() {
       .from(element)
       .set({
         margin: 1,
-        filename: 'modal-content.pdf',
+        filename: "modal-content.pdf",
         html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait' },
+        jsPDF: { orientation: "portrait" },
       })
       .save();
   }

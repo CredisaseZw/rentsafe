@@ -1,74 +1,69 @@
-import React, { useState } from 'react';
-import { Modal } from 'react-bootstrap';
-import { useForm } from '@inertiajs/inertia-react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { Modal } from "react-bootstrap";
+import { useForm } from "@inertiajs/inertia-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export const MultipleUpload = ({ type, actionType }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [errorFileDownload, setErrorFileDownload] = useState('');
+  const [errorFileDownload, setErrorFileDownload] = useState("");
 
   const { data, setData, post, reset, progress } = useForm({
     csv_file: null,
   });
 
   const handleTemplateDownload = async () => {
-    if (errorFileDownload !== '') {
-      window.open(`/download_template/${errorFileDownload}`, '_blank');
-      setErrorFileDownload('');
-    } else if (type === 'individual') {
-      if (actionType === 'user') {
-        window.open('/download_template/individual_template.csv', '_blank');
-      } else if (actionType === 'lease') {
-        window.open(
-          '/download_template/individual_lease_template.csv',
-          '_blank'
-        );
+    if (errorFileDownload !== "") {
+      window.open(`/download_template/${errorFileDownload}`, "_blank");
+      setErrorFileDownload("");
+    } else if (type === "individual") {
+      if (actionType === "user") {
+        window.open("/download_template/individual_template.csv", "_blank");
+      } else if (actionType === "lease") {
+        window.open("/download_template/individual_lease_template.csv", "_blank");
       }
-    } else if (type === 'company') {
-      if (actionType === 'user') {
-        window.open('/download_template/company_template.csv', '_blank');
-      } else if (actionType === 'lease') {
-        window.open('/download_template/company_lease_template.csv', '_blank');
+    } else if (type === "company") {
+      if (actionType === "user") {
+        window.open("/download_template/company_template.csv", "_blank");
+      } else if (actionType === "lease") {
+        window.open("/download_template/company_lease_template.csv", "_blank");
       }
     }
   };
   const handleSubmitIndividual = async (e) => {
     e.preventDefault();
     if (data.csv_file === null) {
-      toast.error('Please select a file to upload');
+      toast.error("Please select a file to upload");
       return;
     }
     const url =
-      type === 'individual' && actionType === 'user'
-        ? 'create_bulk_individuals'
-        : type === 'company' && actionType === 'user'
-          ? 'create_bulk_companies'
-          : type === 'company' && actionType === 'lease'
-            ? 'create_company_bulk_leases'
-            : 'create_individual_bulk_leases';
+      type === "individual" && actionType === "user"
+        ? "create_bulk_individuals"
+        : type === "company" && actionType === "user"
+          ? "create_bulk_companies"
+          : type === "company" && actionType === "lease"
+            ? "create_company_bulk_leases"
+            : "create_individual_bulk_leases";
 
     try {
       setIsLoading(true);
-      setErrorFileDownload('');
+      setErrorFileDownload("");
       const response = await axios.post(reverseUrl(url), data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      if (response.data.status === 'failed') {
+      if (response.data.status === "failed") {
         reset();
         setErrorFileDownload(response.data.file_path);
-        toast.error(
-          'Some records failed to be created. Download the returned file and try again'
-        );
+        toast.error("Some records failed to be created. Download the returned file and try again");
       } else {
-        toast.success('All records created successfully');
+        toast.success("All records created successfully");
       }
       setIsLoading(false);
     } catch (e) {
-      toast.error('An error occurred. Please try again');
+      toast.error("An error occurred. Please try again");
     }
   };
   return (
@@ -81,13 +76,13 @@ export const MultipleUpload = ({ type, actionType }) => {
           >
             <div className="me-4">
               <h2 className="display-6 mb-0 text-white">
-                {type === 'individual' && actionType === 'user'
-                  ? 'Multiple Individuals Uploader'
-                  : type === 'company' && actionType === 'user'
-                    ? 'Multiple Companies Uploader'
-                    : type === 'company' && actionType === 'lease'
-                      ? 'Multiple Company Lease Uploader'
-                      : 'Multiple Individual Lease Uploader'}
+                {type === "individual" && actionType === "user"
+                  ? "Multiple Individuals Uploader"
+                  : type === "company" && actionType === "user"
+                    ? "Multiple Companies Uploader"
+                    : type === "company" && actionType === "lease"
+                      ? "Multiple Company Lease Uploader"
+                      : "Multiple Individual Lease Uploader"}
               </h2>
               <div className="card-text"></div>
             </div>
@@ -100,11 +95,11 @@ export const MultipleUpload = ({ type, actionType }) => {
               <div
                 className="card-body p-4"
                 style={{
-                  border: '1px dashed #999',
-                  borderColor: '#26a69a',
-                  backgroundColor: 'rgb(239, 239, 239)',
+                  border: "1px dashed #999",
+                  borderColor: "#26a69a",
+                  backgroundColor: "rgb(239, 239, 239)",
                 }}
-                onClick={() => document.getElementById('csv_file').click()}
+                onClick={() => document.getElementById("csv_file").click()}
               >
                 <Modal.Body>
                   <div className="row mb-4">
@@ -112,23 +107,21 @@ export const MultipleUpload = ({ type, actionType }) => {
                       <div className="text-center">
                         <div
                           className="material-icons"
-                          style={{ color: '#26a69a', fontSize: '48px' }}
+                          style={{ color: "#26a69a", fontSize: "48px" }}
                         >
                           cloud_upload
                         </div>
                         <div>
                           {data.csv_file
                             ? data.csv_file.name
-                            : 'Drag and drop files here, or browse your computer.'}
+                            : "Drag and drop files here, or browse your computer."}
                         </div>
                         <input
                           className="form-control d-none"
                           id="csv_file"
                           type="file"
                           accept="text/csv"
-                          onChange={(e) =>
-                            setData('csv_file', e.target.files[0])
-                          }
+                          onChange={(e) => setData("csv_file", e.target.files[0])}
                         />
                       </div>
                     </div>
@@ -143,12 +136,12 @@ export const MultipleUpload = ({ type, actionType }) => {
                 </Modal.Footer>
               </div>
               <div className="card-footer d-flex flex-row align-items-center justify-content-between">
-                {errorFileDownload === '' ? (
+                {errorFileDownload === "" ? (
                   <p>
-                    Use the template provided{' '}
+                    Use the template provided{" "}
                     <a
                       onClick={handleTemplateDownload}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       className="text-info text-decoration-underline "
                     >
                       here
@@ -156,10 +149,10 @@ export const MultipleUpload = ({ type, actionType }) => {
                   </p>
                 ) : (
                   <p className="text-danger">
-                    Download the error file{' '}
+                    Download the error file{" "}
                     <a
                       onClick={handleTemplateDownload}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       className="text-info text-decoration-underline "
                     >
                       here

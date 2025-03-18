@@ -1,26 +1,25 @@
 // import React from 'react'
 // import { render } from 'react-dom'
-import { createRoot } from 'react-dom/client';
-import { createInertiaApp } from '@inertiajs/inertia-react';
-import { InertiaProgress } from '@inertiajs/progress';
-import axios from 'axios';
-import Layout from './components/Layouts/default/Layout.jsx';
-import './style.css';
-import './custom.css';
+import { createRoot } from "react-dom/client";
+import { createInertiaApp } from "@inertiajs/inertia-react";
+import { InertiaProgress } from "@inertiajs/progress";
+import axios from "axios";
+import Layout from "./components/Layouts/default/Layout.jsx";
+import "./style.css";
+import "./custom.css";
 // import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
-const pages = import.meta.glob('./pages/**/*.jsx');
+import "bootstrap/dist/js/bootstrap.bundle.min";
+const pages = import.meta.glob("./pages/**/*.jsx");
 // console.log(pages)
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-  axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+  axios.defaults.headers.common["X-CSRFToken"] = csrfToken;
 
-  const appName =
-    document.getElementsByTagName('title')[0]?.innerText || 'RentSafe';
+  const appName = document.getElementsByTagName("title")[0]?.innerText || "RentSafe";
 
   InertiaProgress.init({
     // The color of the progress bar...
-    color: '#FF0000',
+    color: "#FF0000",
     showSpinner: true,
   });
 

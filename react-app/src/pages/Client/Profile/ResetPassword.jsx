@@ -1,16 +1,16 @@
-import { useForm } from '@inertiajs/inertia-react';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import Layout from '../../../components/Layouts/client/Layout.jsx';
+import { useForm } from "@inertiajs/inertia-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import Layout from "../../../components/Layouts/client/Layout.jsx";
 
 const ResetPassword = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const { data, setData, post } = useForm({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const changeHandler = (e) => {
@@ -19,15 +19,15 @@ const ResetPassword = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (data.oldPassword === '') {
-      setErrors({ oldPassword: 'Please enter old password' });
+    if (data.oldPassword === "") {
+      setErrors({ oldPassword: "Please enter old password" });
       return;
     }
-    if (data.newPassword === '') {
-      setErrors({ newPassword: 'Please enter new password' });
+    if (data.newPassword === "") {
+      setErrors({ newPassword: "Please enter new password" });
       return;
     }
-    post(reverseUrl('cl-change-password'), {
+    post(reverseUrl("cl-change-password"), {
       onStart: () => {
         setIsLoading(true);
       },
@@ -35,26 +35,26 @@ const ResetPassword = () => {
         setIsLoading(false);
         if (response.props?.error) {
           toast.error(response.props?.error, {
-            position: 'top-right',
+            position: "top-right",
             duration: 3000,
             style: {
-              minWidth: '200px',
-              padding: '10px 20px',
-              borderRadius: '10px',
+              minWidth: "200px",
+              padding: "10px 20px",
+              borderRadius: "10px",
             },
-            icon: '❌',
+            icon: "❌",
           });
           return;
         }
         toast.success(response.props?.success, {
-          position: 'top-right',
+          position: "top-right",
           duration: 3000,
           style: {
-            minWidth: '200px',
-            padding: '10px 20px',
-            borderRadius: '10px',
+            minWidth: "200px",
+            padding: "10px 20px",
+            borderRadius: "10px",
           },
-          icon: '✔',
+          icon: "✔",
         });
       },
       onError: (error) => {
@@ -78,7 +78,7 @@ const ResetPassword = () => {
         <div className="card">
           <div
             className="card-header bg-info px-4"
-            style={{ paddingTop: '2px', paddingBottom: '2px' }}
+            style={{ paddingTop: "2px", paddingBottom: "2px" }}
           >
             <div
               className="d-flex justify-content-center
@@ -93,8 +93,8 @@ const ResetPassword = () => {
           <div
             className="card-body p-4"
             style={{
-              borderStyle: 'solid',
-              borderColor: '#26a69a',
+              borderStyle: "solid",
+              borderColor: "#26a69a",
             }}
           >
             <div className="row mb-4">
@@ -114,11 +114,7 @@ const ResetPassword = () => {
                       placeholder="Enter old password"
                       className="form-control form-control-sm"
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.oldPassword}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.oldPassword}</div>}
                   </div>
 
                   <div className="col-md-4">
@@ -135,11 +131,7 @@ const ResetPassword = () => {
                       placeholder="Enter new password"
                       className="form-control form-control-sm"
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.newPassword}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.newPassword}</div>}
                   </div>
                   <div className="col-md-4">
                     <label className="form-label">
@@ -156,18 +148,14 @@ const ResetPassword = () => {
                       onChange={changeHandler}
                       value={data.confirmPassword}
                     />
-                    {errors && (
-                      <div className="text-danger mt-1">
-                        {errors.confirmPassword}
-                      </div>
-                    )}
+                    {errors && <div className="text-danger mt-1">{errors.confirmPassword}</div>}
                   </div>
                 </div>
-                <hr className="my-4 bg-info" style={{ height: '2px' }} />
+                <hr className="my-4 bg-info" style={{ height: "2px" }} />
                 <button
                   onClick={submitHandler}
                   className="btn btn-raised-info d-flex align-items-center justify-content-center gap-2 text-white"
-                  style={{ minWidth: '200px' }}
+                  style={{ minWidth: "200px" }}
                 >
                   <i className="material-icons">done</i>
                   Update
@@ -181,8 +169,6 @@ const ResetPassword = () => {
   );
 };
 
-ResetPassword.layout = (page) => (
-  <Layout children={page} title={'Reset Password'} />
-);
+ResetPassword.layout = (page) => <Layout children={page} title={"Reset Password"} />;
 
 export default ResetPassword;

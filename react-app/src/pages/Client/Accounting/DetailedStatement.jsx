@@ -1,10 +1,10 @@
-import moment from 'moment';
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import Receipt from '../../../components/features/leases/Receipt.jsx';
-import PeriodRequest from '../../../components/Client/PeriodRequest.jsx';
-import useDetailedStatement from '../../../hooks/page-hooks/useDetailedStatement.js';
-import { formatCurrency } from '../../../utils/formatting.js';
-import { usePage } from '@inertiajs/inertia-react';
+import moment from "moment";
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import Receipt from "../../../components/features/leases/Receipt.jsx";
+import PeriodRequest from "../../../components/Client/PeriodRequest.jsx";
+import useDetailedStatement from "../../../hooks/page-hooks/useDetailedStatement.js";
+import { formatCurrency } from "../../../utils/formatting.js";
+import { usePage } from "@inertiajs/inertia-react";
 
 export default function DetailedStatement() {
   const {
@@ -45,8 +45,8 @@ export default function DetailedStatement() {
       <div ref={modalContentRef}>
         <div
           style={{
-            lineHeight: '5px',
-            fontSize: '18px',
+            lineHeight: "5px",
+            fontSize: "18px",
           }}
           className="bg-info"
         >
@@ -54,7 +54,7 @@ export default function DetailedStatement() {
             scope="row"
             colSpan={5}
             className="d-flex justify-content-between align-items-center text-white p-3"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           >
             <div className="d-flex flex-column gap-2">
               <h4 className="fw-bold text-white">
@@ -63,10 +63,10 @@ export default function DetailedStatement() {
               <p>{tenant.lease_receiver_address} </p>
             </div>
             <p>
-              {new Date().toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
+              {new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </p>
           </div>
@@ -76,9 +76,9 @@ export default function DetailedStatement() {
           <thead className="position-sticky c-table-top">
             <tr
               style={{
-                lineHeight: '5px',
-                fontSize: '12px',
-                backgroundColor: '#a0a0af',
+                lineHeight: "5px",
+                fontSize: "12px",
+                backgroundColor: "#a0a0af",
               }}
             >
               <th scope="">Date</th>
@@ -90,19 +90,17 @@ export default function DetailedStatement() {
           </thead>
 
           <tbody>
-            <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+            <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
               <th scope="row">{statement.date}</th>
               <td>{statement.description}</td>
               <td></td>
               <td className="text-end"></td>
-              <td className="text-end">
-                {formatCurrency(statement.balance_amount)}
-              </td>
+              <td className="text-end">{formatCurrency(statement.balance_amount)}</td>
             </tr>
 
             {cleanedData.map((payment, index) => (
-              <tr style={{ lineHeight: '5px', fontSize: '12px' }} key={index}>
-                <th scope="row">{moment(payment.date).format('YYYY-MM-DD')}</th>
+              <tr style={{ lineHeight: "5px", fontSize: "12px" }} key={index}>
+                <th scope="row">{moment(payment.date).format("YYYY-MM-DD")}</th>
                 <td>{payment.description} </td>
                 <td>{payment.reference}</td>
                 <td className="text-end">
@@ -149,13 +147,11 @@ export default function DetailedStatement() {
           setDetails({});
         }}
         leaseDetails={details}
-        myKey={'statements'}
+        myKey={"statements"}
       />
       {/* )} */}
     </div>
   );
 }
 
-DetailedStatement.layout = (page) => (
-  <Layout children={page} title={'Tenant Detailed Statement'} />
-);
+DetailedStatement.layout = (page) => <Layout children={page} title={"Tenant Detailed Statement"} />;

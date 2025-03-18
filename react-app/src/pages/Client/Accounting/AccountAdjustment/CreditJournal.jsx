@@ -1,8 +1,8 @@
-import React from 'react';
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import useCreditJournal from '../../../../hooks/page-hooks/useCreditJournal.js';
-import SearchCustomerComponent from './SearchCustomer.jsx';
-import { formatCurrency } from '../../../../utils/formatting.js';
+import React from "react";
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import useCreditJournal from "../../../../hooks/page-hooks/useCreditJournal.js";
+import SearchCustomerComponent from "./SearchCustomer.jsx";
+import { formatCurrency } from "../../../../utils/formatting.js";
 
 export default function CreditJournal() {
   const {
@@ -19,9 +19,7 @@ export default function CreditJournal() {
   return (
     <>
       <div className="bg-white border rounded-3">
-        <h5 className="text-center p-2 mb-0 text-white bg-danger">
-          Credit Journal
-        </h5>
+        <h5 className="text-center p-2 mb-0 text-white bg-danger">Credit Journal</h5>
 
         <form className="p-2" onSubmit={handleSubmit}>
           <table className="table table-responsive table-bordered table-sm">
@@ -47,11 +45,9 @@ export default function CreditJournal() {
                       type="date"
                       name="date"
                       required
-                      max={new Date().toISOString().split('T')[0]}
+                      max={new Date().toISOString().split("T")[0]}
                       min={
-                        row.endDate
-                          ? new Date(row.endDate).toISOString().split('T')[0]
-                          : undefined
+                        row.endDate ? new Date(row.endDate).toISOString().split("T")[0] : undefined
                       }
                       value={row.date}
                       onChange={(e) => handleInputChange(e, index)}
@@ -120,9 +116,7 @@ export default function CreditJournal() {
                   </td>
 
                   <td className="text-end">
-                    {row.accountBalance
-                      ? formatCurrency(row.accountBalance)
-                      : ''}
+                    {row.accountBalance ? formatCurrency(row.accountBalance) : ""}
                   </td>
 
                   <td className="custom-w-150">
@@ -139,12 +133,10 @@ export default function CreditJournal() {
 
                   <td className="text-end">
                     {row.creditAmount
-                      ? formatCurrency(
-                          Number(row.accountBalance) - Number(row.creditAmount)
-                        )
+                      ? formatCurrency(Number(row.accountBalance) - Number(row.creditAmount))
                       : row.accountBalance
                         ? formatCurrency(Number(row.accountBalance))
-                        : ''}
+                        : ""}
                   </td>
 
                   <td className="text-center">
@@ -177,7 +169,7 @@ export default function CreditJournal() {
                   <span className="ms-2">processing..</span>
                 </>
               ) : (
-                'Submit'
+                "Submit"
               )}
             </button>
           </div>
@@ -188,8 +180,5 @@ export default function CreditJournal() {
 }
 
 CreditJournal.layout = (page) => (
-  <Layout
-    children={page}
-    title={'Customer Credit Adjustment - Credit Journal'}
-  />
+  <Layout children={page} title={"Customer Credit Adjustment - Credit Journal"} />
 );

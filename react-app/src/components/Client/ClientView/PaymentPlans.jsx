@@ -1,11 +1,9 @@
-import { friendlyDate } from '../../../utils/index.js';
-import SectionSkeleton from './SectionSkeleton.jsx';
+import { friendlyDate } from "../../../utils/index.js";
+import SectionSkeleton from "./SectionSkeleton.jsx";
 
 export default function PaymentPlans({ paymentPlans, isCreditorView }) {
   return (
-    <SectionSkeleton
-      title={isCreditorView ? 'active payment plans' : 'payment plans'}
-    >
+    <SectionSkeleton title={isCreditorView ? "active payment plans" : "payment plans"}>
       <div className="custom-mx-h-15 overflow-auto">
         <table className="table table-sm table-responsive position-relative table-bordered mb-0">
           <thead className="custom-bg-grey-2 text-white position-sticky top-0">

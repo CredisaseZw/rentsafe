@@ -1,31 +1,31 @@
-import axios from 'axios';
-import debounce from 'lodash/debounce';
-import AsyncSelect from 'react-select/async';
-import { capitalize } from 'lodash';
+import axios from "axios";
+import debounce from "lodash/debounce";
+import AsyncSelect from "react-select/async";
+import { capitalize } from "lodash";
 
 async function fetchData(inputValue, url) {
   try {
     const response = await fetch(`${url}?query=${inputValue}`);
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error("Network response was not ok");
     }
     const data = await response.json();
     // console.log('data', data.result);
     // Return the full item data, not just label and value
     return data.result.map((item) => ({
-      label: item.tenant + ' - ' + item.lease_id,
+      label: item.tenant + " - " + item.lease_id,
       value: item.lease_id,
       ...item, // Spread all other tenant fields here
     }));
   } catch (error) {
-    console.error('Error fetching tenants:', error);
+    console.error("Error fetching tenants:", error);
     return [];
   }
 }
 
 async function alternativeFetchData(
   inputValue,
-  url = reverseUrl('search_individuals_or_companies'),
+  url = reverseUrl("search_individuals_or_companies"),
   useAlternateFetchOptions
 ) {
   if (!inputValue) {
@@ -43,7 +43,7 @@ async function alternativeFetchData(
 
     const data = res.data.data;
 
-    if (opts.type === 'individual') {
+    if (opts.type === "individual") {
       return data.map((individual) => ({
         label: `${capitalize(individual.firstname)} ${capitalize(
           individual.surname
@@ -66,16 +66,11 @@ async function alternativeFetchData(
   }
 }
 
-const debouncedFetchData = debounce(
-  (inputValue, callback, url, useAlternateFetchOptions) => {
-    if (useAlternateFetchOptions)
-      alternativeFetchData(inputValue, url, useAlternateFetchOptions).then(
-        callback
-      );
-    else fetchData(inputValue, url).then(callback);
-  },
-  1000
-);
+const debouncedFetchData = debounce((inputValue, callback, url, useAlternateFetchOptions) => {
+  if (useAlternateFetchOptions)
+    alternativeFetchData(inputValue, url, useAlternateFetchOptions).then(callback);
+  else fetchData(inputValue, url).then(callback);
+}, 1000);
 
 function promiseOptions(inputValue, url, useAlternateFetchOptions) {
   return new Promise((resolve) => {

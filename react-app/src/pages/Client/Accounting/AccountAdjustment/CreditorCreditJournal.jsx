@@ -1,26 +1,17 @@
-import React from 'react';
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import SearchCreditorComponent from './SearchCreditor.jsx';
-import { formatCurrency } from '../../../../utils/formatting.js';
-import useCreditorCreditJournal from '../../../../hooks/page-hooks/useCreditorCreditJournal.js';
+import React from "react";
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import SearchCreditorComponent from "./SearchCreditor.jsx";
+import { formatCurrency } from "../../../../utils/formatting.js";
+import useCreditorCreditJournal from "../../../../hooks/page-hooks/useCreditorCreditJournal.js";
 
 export default function CreditorCreditJournal() {
-  const {
-    rows,
-    isLoading,
-    addRow,
-    setRows,
-    removeRow,
-    handleSubmit,
-    handleInputChange,
-  } = useCreditorCreditJournal();
+  const { rows, isLoading, addRow, setRows, removeRow, handleSubmit, handleInputChange } =
+    useCreditorCreditJournal();
 
   return (
     <>
       <div className="bg-white border rounded-3">
-        <h5 className="text-center p-2 mb-0 text-white bg-danger">
-          Credit Journal
-        </h5>
+        <h5 className="text-center p-2 mb-0 text-white bg-danger">Credit Journal</h5>
 
         <form className="p-2" onSubmit={handleSubmit}>
           <table className="table table-responsive table-bordered table-sm">
@@ -45,11 +36,9 @@ export default function CreditorCreditJournal() {
                       type="date"
                       name="date"
                       required
-                      max={new Date().toISOString().split('T')[0]}
+                      max={new Date().toISOString().split("T")[0]}
                       min={
-                        row.endDate
-                          ? new Date(row.endDate).toISOString().split('T')[0]
-                          : undefined
+                        row.endDate ? new Date(row.endDate).toISOString().split("T")[0] : undefined
                       }
                       value={row.date}
                       onChange={(e) => handleInputChange(e, index)}
@@ -106,9 +95,7 @@ export default function CreditorCreditJournal() {
                   </td>
 
                   <td className="text-end">
-                    {row.accountBalance
-                      ? formatCurrency(row.accountBalance)
-                      : ''}
+                    {row.accountBalance ? formatCurrency(row.accountBalance) : ""}
                   </td>
 
                   <td className="custom-w-150">
@@ -125,12 +112,10 @@ export default function CreditorCreditJournal() {
 
                   <td className="text-end">
                     {row.creditAmount
-                      ? formatCurrency(
-                          Number(row.accountBalance) + Number(row.creditAmount)
-                        )
+                      ? formatCurrency(Number(row.accountBalance) + Number(row.creditAmount))
                       : row.accountBalance
                         ? formatCurrency(Number(row.accountBalance))
-                        : ''}
+                        : ""}
                   </td>
 
                   <td className="text-center">
@@ -163,7 +148,7 @@ export default function CreditorCreditJournal() {
                   <span className="ms-2">processing..</span>
                 </>
               ) : (
-                'Submit'
+                "Submit"
               )}
             </button>
           </div>
@@ -174,8 +159,5 @@ export default function CreditorCreditJournal() {
 }
 
 CreditorCreditJournal.layout = (page) => (
-  <Layout
-    children={page}
-    title={'Creditor Credit Adjustment - Credit Journal'}
-  />
+  <Layout children={page} title={"Creditor Credit Adjustment - Credit Journal"} />
 );

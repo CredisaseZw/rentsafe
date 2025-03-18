@@ -1,11 +1,11 @@
-import { Modal } from 'react-bootstrap';
-import AgedAnalysis from './AgedAnalysis.jsx';
-import DebtorIntelligence from './DebtorIntelligence.jsx';
-import ContactDetails from './ContactDetails.jsx';
-import ForecastInflows from './ForecastInflows.jsx';
-import CommunicationHistory from './CommunicationHistory.jsx';
-import { truncate } from 'lodash';
-import Payments from './Payments.jsx';
+import { Modal } from "react-bootstrap";
+import AgedAnalysis from "./AgedAnalysis.jsx";
+import DebtorIntelligence from "./DebtorIntelligence.jsx";
+import ContactDetails from "./ContactDetails.jsx";
+import ForecastInflows from "./ForecastInflows.jsx";
+import CommunicationHistory from "./CommunicationHistory.jsx";
+import { truncate } from "lodash";
+import Payments from "./Payments.jsx";
 
 export default function CreditorView({
   creditorViewProps: {
@@ -34,8 +34,8 @@ export default function CreditorView({
           <div className="w-100 p-2 text-center bg-secondary position-relative">
             <h4 className="text-white">
               {isLoading || error || dontShowData
-                ? 'Creditor View'
-                : data.tenantName || 'Creditor View'}
+                ? "Creditor View"
+                : data.tenantName || "Creditor View"}
             </h4>
 
             <button
@@ -52,10 +52,7 @@ export default function CreditorView({
           <div className="position-relative custom-mn-h-5">
             {isLoading && (
               <div className="text-center position-absolute top-50 start-50 translate-middle">
-                <div
-                  className="spinner-border text-info spinner-border-md"
-                  role="status"
-                >
+                <div className="spinner-border text-info spinner-border-md" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
                 <p>Loading...please wait</p>
@@ -82,11 +79,7 @@ export default function CreditorView({
                       data={data.debtorIntelligence}
                       clientId={clientId}
                     />
-                    <ContactDetails
-                      isCreditorView
-                      data={data.contactDetails}
-                      clientId={clientId}
-                    />
+                    <ContactDetails isCreditorView data={data.contactDetails} clientId={clientId} />
                   </div>
 
                   <div className="col p-1">
@@ -101,10 +94,7 @@ export default function CreditorView({
                   </div>
 
                   <div className="col p-1">
-                    <ForecastInflows
-                      isCreditorView
-                      data={data.forecastInflows}
-                    />
+                    <ForecastInflows isCreditorView data={data.forecastInflows} />
                     <Payments
                       {...{
                         isCreditorView: true,

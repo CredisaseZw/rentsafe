@@ -1,9 +1,9 @@
-import { Head } from '@inertiajs/inertia-react';
-import { useState } from 'react';
-import ActiveSub from '../../../components/ActiveSub.jsx';
-import PageHeader from '../../../components/PageHeader.jsx';
-import SubOrigination from '../../../components/SubOrigination.jsx';
-import { Modal } from 'react-bootstrap';
+import { Head } from "@inertiajs/inertia-react";
+import { useState } from "react";
+import ActiveSub from "../../../components/ActiveSub.jsx";
+import PageHeader from "../../../components/PageHeader.jsx";
+import SubOrigination from "../../../components/SubOrigination.jsx";
+import { Modal } from "react-bootstrap";
 
 export default function Active() {
   const [isAdding, setIsAdding] = useState(false);
@@ -11,7 +11,7 @@ export default function Active() {
   return (
     <main>
       <Head title="Active Subscriptions" />
-      <PageHeader title={'Active Subscriptions'} />
+      <PageHeader title={"Active Subscriptions"} />
 
       {isAdding && (
         <Modal
@@ -43,10 +43,7 @@ export default function Active() {
 
       <div className="p-4">
         <div className="text-end">
-          <button
-            className="btn btn-primary"
-            onClick={() => setIsAdding((prev) => !prev)}
-          >
+          <button className="btn btn-primary" onClick={() => setIsAdding((prev) => !prev)}>
             <i className="leading-icon material-icons">add</i>
             Add Subscription
           </button>

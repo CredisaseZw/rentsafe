@@ -1,8 +1,8 @@
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import SearchBar from '../../../components/SearchBar.jsx';
-import PaginationControls from '../../../components/PaginationControls.jsx';
-import useClientStatements from '../../../hooks/page-hooks/useClientStatements.js';
-import { formatCurrency } from '../../../utils/formatting.js';
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import SearchBar from "../../../components/SearchBar.jsx";
+import PaginationControls from "../../../components/PaginationControls.jsx";
+import useClientStatements from "../../../hooks/page-hooks/useClientStatements.js";
+import { formatCurrency } from "../../../utils/formatting.js";
 
 export default function Statements() {
   const {
@@ -17,9 +17,7 @@ export default function Statements() {
 
   return (
     <div>
-      <h5 className="bg-info text-center text-white p-2 mb-4 rounded-2">
-        CUSTOMER SUMMARY
-      </h5>
+      <h5 className="bg-info text-center text-white p-2 mb-4 rounded-2">CUSTOMER SUMMARY</h5>
 
       <div className="p-2 fw-bold d-flex justify-content-between align-items-center">
         <div>USD</div>
@@ -65,8 +63,7 @@ export default function Statements() {
                 <td
                   className={`text-end bg-${tenant.color} text-white`}
                   style={{
-                    backgroundColor:
-                      tenant.color == 'light-red' ? '#f87171' : '',
+                    backgroundColor: tenant.color == "light-red" ? "#f87171" : "",
                   }}
                 >
                   {Number(tenant.owing_amount) >= 0
@@ -76,10 +73,10 @@ export default function Statements() {
                 <td
                   className="bg-info text-center"
                   style={{
-                    fontWeight: '500',
-                    fontSize: '16px',
-                    color: 'white',
-                    cursor: 'pointer',
+                    fontWeight: "500",
+                    fontSize: "16px",
+                    color: "white",
+                    cursor: "pointer",
                   }}
                   onClick={() => onOpenStatement(tenant.id)}
                 >
@@ -95,9 +92,7 @@ export default function Statements() {
             <td></td>
             <td></td>
             <td className="text-end">
-              {usdTotal >= 0
-                ? formatCurrency(usdTotal)
-                : `(${formatCurrency(usdTotal * -1)})`}
+              {usdTotal >= 0 ? formatCurrency(usdTotal) : `(${formatCurrency(usdTotal * -1)})`}
             </td>
             <td></td>
           </tr>
@@ -138,8 +133,7 @@ export default function Statements() {
                 <td
                   className={`text-end bg-${tenant.color} text-white`}
                   style={{
-                    backgroundColor:
-                      tenant.color == 'light-red' ? '#f87171' : '',
+                    backgroundColor: tenant.color == "light-red" ? "#f87171" : "",
                   }}
                 >
                   {Number(tenant.owing_amount) >= 0
@@ -149,10 +143,10 @@ export default function Statements() {
                 <td
                   className="bg-info text-center"
                   style={{
-                    fontWeight: '500',
-                    fontSize: '16px',
-                    color: 'white',
-                    cursor: 'pointer',
+                    fontWeight: "500",
+                    fontSize: "16px",
+                    color: "white",
+                    cursor: "pointer",
                   }}
                   onClick={() => onOpenStatement(tenant.id)}
                 >
@@ -168,9 +162,7 @@ export default function Statements() {
             <td></td>
             <td></td>
             <td className="text-end">
-              {zwlTotal >= 0
-                ? formatCurrency(zwlTotal)
-                : `(${formatCurrency(zwlTotal * -1)})`}
+              {zwlTotal >= 0 ? formatCurrency(zwlTotal) : `(${formatCurrency(zwlTotal * -1)})`}
             </td>
             <td></td>
           </tr>
@@ -178,15 +170,10 @@ export default function Statements() {
       </table>
 
       <div className="px-3">
-        <PaginationControls
-          currentPage={current_page}
-          totalPages={total_pages}
-        />
+        <PaginationControls currentPage={current_page} totalPages={total_pages} />
       </div>
     </div>
   );
 }
 
-Statements.layout = (page) => (
-  <Layout children={page} title={'Customer Statements'} />
-);
+Statements.layout = (page) => <Layout children={page} title={"Customer Statements"} />;

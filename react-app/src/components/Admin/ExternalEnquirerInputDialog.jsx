@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import toast from 'react-hot-toast';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
+import axios from "axios";
 
-export const ExternalEnquirerInputDialog = ({
-  show,
-  handleClose,
-  handleShowReport,
-}) => {
+export const ExternalEnquirerInputDialog = ({ show, handleClose, handleShowReport }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [enquirer, setEnquirer] = useState('');
+  const [enquirer, setEnquirer] = useState("");
   const [enquirers, setEnquirers] = useState([]);
   const [enquirerDetail, setEnquirerDetail] = useState({});
-  const [enquirerCompany, setEnquirerCompany] = useState('');
-  const [companyBranch, setCompanyBranch] = useState('');
+  const [enquirerCompany, setEnquirerCompany] = useState("");
+  const [companyBranch, setCompanyBranch] = useState("");
   const [openDropdown, setOpenDropdown] = useState(false);
   const [errors, setErrors] = useState({});
   const [debounce, setDebounce] = useState(null);
@@ -23,9 +19,9 @@ export const ExternalEnquirerInputDialog = ({
       if (enquirer.length > 0 && enquirerDetail?.individual_name !== enquirer) {
         setIsLoading(true);
         axios
-          .post(reverseUrl('client_company_users'), { userName: enquirer })
+          .post(reverseUrl("client_company_users"), { userName: enquirer })
           .then((response) => {
-            if (response.data.status === 'failed') {
+            if (response.data.status === "failed") {
               setEnquirers([]);
             } else {
               setOpenDropdown(true);
@@ -34,13 +30,13 @@ export const ExternalEnquirerInputDialog = ({
             setIsLoading(false);
           })
           .catch((error) => {
-            toast.error('Error fetching enquirer details');
+            toast.error("Error fetching enquirer details");
             setIsLoading(false);
           });
       }
     }, 300);
 
-    if (enquirer.length > 0 && enquirer !== '') {
+    if (enquirer.length > 0 && enquirer !== "") {
       clearTimeout(debounce);
       setDebounce(debounceFn);
     }
@@ -48,22 +44,22 @@ export const ExternalEnquirerInputDialog = ({
   }, [enquirer]);
 
   const submitHandler = () => {
-    if (enquirer === '') {
+    if (enquirer === "") {
       setErrors({
-        enquirer: 'Please enter a name',
+        enquirer: "Please enter a name",
       });
       return;
     }
-    if (enquirerCompany === '') {
+    if (enquirerCompany === "") {
       setErrors({
-        enquirerCompany: 'Please enter a company name',
+        enquirerCompany: "Please enter a company name",
       });
       return;
     }
 
     setErrors({});
     handleClose();
-    handleShowReport('external', enquirerDetail?.individual_id);
+    handleShowReport("external", enquirerDetail?.individual_id);
   };
 
   return (
@@ -76,9 +72,7 @@ export const ExternalEnquirerInputDialog = ({
                                 align-items-center"
             >
               <div className="me-4">
-                <h2 className="display-6 mb-0 text-white">
-                  External Enquirer Details
-                </h2>
+                <h2 className="display-6 mb-0 text-white">External Enquirer Details</h2>
                 <div className="card-text"></div>
               </div>
               <div className="d-flex gap-2"></div>
@@ -89,8 +83,8 @@ export const ExternalEnquirerInputDialog = ({
               <div
                 className="card-body p-4"
                 style={{
-                  borderStyle: 'solid',
-                  borderColor: '#26a69a',
+                  borderStyle: "solid",
+                  borderColor: "#26a69a",
                 }}
               >
                 <Modal.Body>
@@ -111,16 +105,16 @@ export const ExternalEnquirerInputDialog = ({
                           <div
                             className="bg-info"
                             style={{
-                              borderRadius: '5px',
-                              padding: '5px',
-                              color: 'white',
-                              fontSize: '16px',
-                              width: '100%',
-                              position: 'absolute',
-                              top: '100%',
-                              zIndex: '1000',
-                              height: '200px',
-                              overflowY: 'scroll',
+                              borderRadius: "5px",
+                              padding: "5px",
+                              color: "white",
+                              fontSize: "16px",
+                              width: "100%",
+                              position: "absolute",
+                              top: "100%",
+                              zIndex: "1000",
+                              height: "200px",
+                              overflowY: "scroll",
                             }}
                           >
                             {isLoading ? (
@@ -141,8 +135,7 @@ export const ExternalEnquirerInputDialog = ({
                                     }}
                                     className="cursor-pointer text-white px-2 py-1 hover:bg-secondary"
                                   >
-                                    {enquirer.individual_name} -{' '}
-                                    {enquirer.company_name}
+                                    {enquirer.individual_name} - {enquirer.company_name}
                                   </li>
                                 ))}
                               </ul>
@@ -150,11 +143,7 @@ export const ExternalEnquirerInputDialog = ({
                           </div>
                         )}
 
-                        {errors && (
-                          <div className="text-danger mt-1">
-                            {errors.enquirer}
-                          </div>
-                        )}
+                        {errors && <div className="text-danger mt-1">{errors.enquirer}</div>}
                       </div>
                     </div>
                     <div className="row">
@@ -170,11 +159,7 @@ export const ExternalEnquirerInputDialog = ({
                           className="form-control form-control-sm"
                         />
 
-                        {errors && (
-                          <div className="text-danger mt-1">
-                            {errors.enquirerCompany}
-                          </div>
-                        )}
+                        {errors && <div className="text-danger mt-1">{errors.enquirerCompany}</div>}
                       </div>
                     </div>
                     <div className="row">
@@ -189,11 +174,7 @@ export const ExternalEnquirerInputDialog = ({
                           placeholder="Company Branch"
                           className="form-control form-control-sm"
                         />
-                        {errors && (
-                          <div className="text-danger mt-1">
-                            {errors.companyBranch}
-                          </div>
-                        )}
+                        {errors && <div className="text-danger mt-1">{errors.companyBranch}</div>}
                       </div>
                     </div>
                   </div>

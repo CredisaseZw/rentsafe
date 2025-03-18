@@ -1,5 +1,5 @@
-import useWorksAndMaintenance from '../../../hooks/component-hooks/useWorksAndMaintenance';
-import { Modal } from 'react-bootstrap';
+import useWorksAndMaintenance from "../../../hooks/component-hooks/useWorksAndMaintenance";
+import { Modal } from "react-bootstrap";
 
 export default function WorksAndMaintenance({
   isOpen,
@@ -45,17 +45,9 @@ export default function WorksAndMaintenance({
                   <button
                     type="button"
                     onClick={showWorks}
-                    style={
-                      viewDefaults
-                        ? !viewDefaults.isWorks
-                          ? { display: 'none' }
-                          : {}
-                        : {}
-                    }
+                    style={viewDefaults ? (!viewDefaults.isWorks ? { display: "none" } : {}) : {}}
                     className={
-                      activeTab === 'works'
-                        ? 'btn btn-info text-white'
-                        : 'btn btn-outline-info'
+                      activeTab === "works" ? "btn btn-info text-white" : "btn btn-outline-info"
                     }
                   >
                     Works Schedule
@@ -64,17 +56,11 @@ export default function WorksAndMaintenance({
                   <button
                     type="button"
                     onClick={showMaintenance}
-                    style={
-                      viewDefaults
-                        ? viewDefaults.isWorks
-                          ? { display: 'none' }
-                          : {}
-                        : {}
-                    }
+                    style={viewDefaults ? (viewDefaults.isWorks ? { display: "none" } : {}) : {}}
                     className={
-                      activeTab === 'maintenance'
-                        ? 'btn btn-info text-white'
-                        : 'btn btn-outline-info'
+                      activeTab === "maintenance"
+                        ? "btn btn-info text-white"
+                        : "btn btn-outline-info"
                     }
                   >
                     Maintenance Schedule
@@ -102,10 +88,7 @@ export default function WorksAndMaintenance({
           <div className="custom-mn-h-5 position-relative p-3 pb-0">
             {isLoading && (
               <div className="text-center position-absolute top-50 start-50 translate-middle">
-                <div
-                  className="spinner-border text-info spinner-border-md"
-                  role="status"
-                >
+                <div className="spinner-border text-info spinner-border-md" role="status">
                   <span className="visually-hidden">Submitting...</span>
                 </div>
                 <p>Submitting...please wait</p>
@@ -115,9 +98,7 @@ export default function WorksAndMaintenance({
             {wasSuccessful && (
               <div className="position-absolute text-center top-50 start-50 translate-middle">
                 <div>
-                  <i className="material-icons fs-1 text-success">
-                    check_circle
-                  </i>
+                  <i className="material-icons fs-1 text-success">check_circle</i>
                 </div>
                 <p>
                   Done! <br />
@@ -135,14 +116,9 @@ export default function WorksAndMaintenance({
               </div>
             )}
 
-            <div className={isLoading || wasSuccessful ? 'd-none' : 'd-block'}>
-              {(viewDefaults && viewDefaults.isWorks) ||
-              activeTab === 'works' ? (
-                <WorksTab
-                  viewDefaults={viewDefaults}
-                  lease={lease}
-                  submit={submitWorks}
-                />
+            <div className={isLoading || wasSuccessful ? "d-none" : "d-block"}>
+              {(viewDefaults && viewDefaults.isWorks) || activeTab === "works" ? (
+                <WorksTab viewDefaults={viewDefaults} lease={lease} submit={submitWorks} />
               ) : (
                 <MaintenanceTab
                   {...{
@@ -196,9 +172,7 @@ function WorksTab({ submit, lease, viewDefaults }) {
           name="tenant_landlord"
           id="tenant_landlord"
           defaultValue={
-            viewDefaults?.tenant_landlord
-              ? undefined
-              : lease?.name || lease.trading_name
+            viewDefaults?.tenant_landlord ? undefined : lease?.name || lease.trading_name
           }
           {...(viewDefaults
             ? {
@@ -335,8 +309,8 @@ function WorksTab({ submit, lease, viewDefaults }) {
               {...(viewDefaults
                 ? {
                     checked:
-                      viewDefaults.whose_account === 'tenant' ||
-                      viewDefaults.responsible_person === 'tenant',
+                      viewDefaults.whose_account === "tenant" ||
+                      viewDefaults.responsible_person === "tenant",
                     readOnly: true,
                   }
                 : {
@@ -358,8 +332,8 @@ function WorksTab({ submit, lease, viewDefaults }) {
               {...(viewDefaults
                 ? {
                     checked:
-                      viewDefaults.whose_account === 'landlord' ||
-                      viewDefaults.responsible_person === 'landlord',
+                      viewDefaults.whose_account === "landlord" ||
+                      viewDefaults.responsible_person === "landlord",
                     readOnly: true,
                   }
                 : {
@@ -381,8 +355,8 @@ function WorksTab({ submit, lease, viewDefaults }) {
               {...(viewDefaults
                 ? {
                     checked:
-                      viewDefaults.whose_account === 'agent' ||
-                      viewDefaults.responsible_person === 'agent',
+                      viewDefaults.whose_account === "agent" ||
+                      viewDefaults.responsible_person === "agent",
                     readOnly: true,
                   }
                 : {})}
@@ -427,22 +401,19 @@ function WorksTab({ submit, lease, viewDefaults }) {
             ? {
                 value:
                   viewDefaults.date_schedule || viewDefaults.scheduled_date
-                    ? new Date(
-                        viewDefaults.date_schedule ||
-                          viewDefaults.scheduled_date
-                      )
+                    ? new Date(viewDefaults.date_schedule || viewDefaults.scheduled_date)
                         .toISOString()
-                        .split('T')[0]
-                    : new Date().toISOString().split('T')[0],
+                        .split("T")[0]
+                    : new Date().toISOString().split("T")[0],
                 readOnly: true,
               }
             : {
-                min: new Date().toISOString().split('T')[0],
+                min: new Date().toISOString().split("T")[0],
               })}
         />
       </div>
 
-      <div className={`mt-5 text-end ${viewDefaults ? 'd-none' : ''}`}>
+      <div className={`mt-5 text-end ${viewDefaults ? "d-none" : ""}`}>
         <button type="submit" className="btn btn-info text-white">
           Submit
         </button>
@@ -496,9 +467,7 @@ function MaintenanceTab({
           name="tenant_landlord"
           id="tenant_landlord"
           defaultValue={
-            viewDefaults?.tenant_landlord
-              ? undefined
-              : lease?.name || lease.trading_name
+            viewDefaults?.tenant_landlord ? undefined : lease?.name || lease.trading_name
           }
           {...(viewDefaults
             ? {
@@ -635,8 +604,8 @@ function MaintenanceTab({
               {...(viewDefaults
                 ? {
                     checked:
-                      viewDefaults.whose_account === 'tenant' ||
-                      viewDefaults.responsible_person === 'tenant',
+                      viewDefaults.whose_account === "tenant" ||
+                      viewDefaults.responsible_person === "tenant",
                     readOnly: true,
                   }
                 : {
@@ -658,8 +627,8 @@ function MaintenanceTab({
               {...(viewDefaults
                 ? {
                     checked:
-                      viewDefaults.whose_account === 'landlord' ||
-                      viewDefaults.responsible_person === 'landlord',
+                      viewDefaults.whose_account === "landlord" ||
+                      viewDefaults.responsible_person === "landlord",
                     readOnly: true,
                   }
                 : {
@@ -681,8 +650,8 @@ function MaintenanceTab({
               {...(viewDefaults
                 ? {
                     checked:
-                      viewDefaults.whose_account === 'agent' ||
-                      viewDefaults.responsible_person === 'agent',
+                      viewDefaults.whose_account === "agent" ||
+                      viewDefaults.responsible_person === "agent",
                     readOnly: true,
                   }
                 : {})}
@@ -727,11 +696,11 @@ function MaintenanceTab({
               value="weekly"
               {...(viewDefaults
                 ? {
-                    checked: viewDefaults.frequency === 'weekly',
+                    checked: viewDefaults.frequency === "weekly",
                     readOnly: true,
                   }
                 : {
-                    checked: maintenanceFrequency === 'weekly',
+                    checked: maintenanceFrequency === "weekly",
                     onChange: (e) => setMaintenanceFrequency(e.target.value),
                   })}
             />
@@ -749,11 +718,11 @@ function MaintenanceTab({
               value="monthly"
               {...(viewDefaults
                 ? {
-                    checked: viewDefaults.frequency === 'monthly',
+                    checked: viewDefaults.frequency === "monthly",
                     readOnly: true,
                   }
                 : {
-                    checked: maintenanceFrequency === 'monthly',
+                    checked: maintenanceFrequency === "monthly",
                     onChange: (e) => setMaintenanceFrequency(e.target.value),
                   })}
             />
@@ -771,19 +740,19 @@ function MaintenanceTab({
               value="once_per"
               {...(viewDefaults
                 ? {
-                    checked: viewDefaults.frequency === 'once_per',
+                    checked: viewDefaults.frequency === "once_per",
                     readOnly: true,
                   }
                 : {
-                    checked: maintenanceFrequency === 'once_per',
+                    checked: maintenanceFrequency === "once_per",
                     onChange: (e) => setMaintenanceFrequency(e.target.value),
                   })}
             />
             <label className="form-check-label" htmlFor="once_per">
-              Once every{' '}
+              Once every{" "}
               <input
                 className="c-once-per-months"
-                required={maintenanceFrequency === 'once_per'}
+                required={maintenanceFrequency === "once_per"}
                 name="month_frequency"
                 id="once_per"
                 {...(viewDefaults
@@ -795,7 +764,7 @@ function MaintenanceTab({
                       value: oncePerMonths,
                       onChange: setOncePerMonths,
                     })}
-              />{' '}
+              />{" "}
               months
             </label>
           </div>
@@ -804,10 +773,10 @@ function MaintenanceTab({
 
       <div className="d-flex gap-2 align-items-center mb-2">
         <label htmlFor="date" className="form-label small w-25">
-          {(viewDefaults && viewDefaults.frequency === 'weekly') ||
-          maintenanceFrequency === 'weekly'
-            ? 'Day:'
-            : 'Date:'}
+          {(viewDefaults && viewDefaults.frequency === "weekly") ||
+          maintenanceFrequency === "weekly"
+            ? "Day:"
+            : "Date:"}
         </label>
 
         <select
@@ -821,14 +790,12 @@ function MaintenanceTab({
                 readOnly: true,
               }
             : {
-                defaultValue: '',
+                defaultValue: "",
               })}
         >
           {viewDefaults ? (
-            <option value={viewDefaults.scheduled_day}>
-              {viewDefaults.scheduled_day}
-            </option>
-          ) : maintenanceFrequency === 'weekly' ? (
+            <option value={viewDefaults.scheduled_day}>{viewDefaults.scheduled_day}</option>
+          ) : maintenanceFrequency === "weekly" ? (
             <>
               <option value="" disabled>
                 Select Day
@@ -856,7 +823,7 @@ function MaintenanceTab({
         </select>
       </div>
 
-      <div className={`mt-5 text-end ${viewDefaults ? 'd-none' : ''}`}>
+      <div className={`mt-5 text-end ${viewDefaults ? "d-none" : ""}`}>
         <button type="submit" className="btn btn-info text-white">
           Submit
         </button>

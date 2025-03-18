@@ -1,10 +1,10 @@
-import { useForm } from '@inertiajs/inertia-react';
-import axios from 'axios';
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import toast from 'react-hot-toast';
-import { validateZimbabweanID, validateZimbabweanPassport } from '../../utils';
-import { MultipleUpload } from '../MultipleUpload.jsx';
+import { useForm } from "@inertiajs/inertia-react";
+import axios from "axios";
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { validateZimbabweanID, validateZimbabweanPassport } from "../../utils";
+import { MultipleUpload } from "../MultipleUpload.jsx";
 
 export default function IndividualAdd({
   show,
@@ -21,27 +21,26 @@ export default function IndividualAdd({
 }) {
   // const { errors } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
 
   const { data, setData, post, reset } = useForm({
-    firstName: userDetails?.firstname || '',
-    lastName: userDetails?.surname || '',
-    identificationNumber: userDetails?.identification_number || '',
-    identificationType: userDetails?.identification_type || '',
-    gender: userDetails?.gender || '',
-    dob: userDetails?.dob || '',
-    maritalStatus: userDetails?.marital_status || '',
-    address: userDetails?.address || '',
-    mobileNumber: userDetails?.mobile || '',
-    landLine: userDetails?.landline || '',
-    emailAddress: userDetails?.email || '',
-    currentEmployer: userDetails?.employer_name || '',
-    jobTitle: userDetails?.job_title || '',
-    dateOfemployment: userDetails?.date_of_employment || '',
+    firstName: userDetails?.firstname || "",
+    lastName: userDetails?.surname || "",
+    identificationNumber: userDetails?.identification_number || "",
+    identificationType: userDetails?.identification_type || "",
+    gender: userDetails?.gender || "",
+    dob: userDetails?.dob || "",
+    maritalStatus: userDetails?.marital_status || "",
+    address: userDetails?.address || "",
+    mobileNumber: userDetails?.mobile || "",
+    landLine: userDetails?.landline || "",
+    emailAddress: userDetails?.email || "",
+    currentEmployer: userDetails?.employer_name || "",
+    jobTitle: userDetails?.job_title || "",
+    dateOfemployment: userDetails?.date_of_employment || "",
     individualId: userDetails?.id || -1,
   });
-  const changeHandler = (e) =>
-    setData({ ...data, [e.target.id]: e.target.value });
+  const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
   const handleSubmitIndividual = (e) => {
     e.preventDefault();
@@ -50,35 +49,33 @@ export default function IndividualAdd({
       data.mobileNumber.length > 13 ||
       /\D/.test(data.mobileNumber)
     ) {
-      toast.error('Mobile number must be between 10 and 13 digits');
+      toast.error("Mobile number must be between 10 and 13 digits");
       return;
     }
     if (
-      data.emailAddress !== '' &&
+      data.emailAddress !== "" &&
       !/^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/.test(data.emailAddress)
     ) {
-      toast.error('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
     if (
-      data.identificationType === 'passport' &&
+      data.identificationType === "passport" &&
       !validateZimbabweanPassport(data.identificationNumber)
     ) {
       setIsLoading(false);
-      toast.error('Invalid passport number');
+      toast.error("Invalid passport number");
       return;
     } else if (
-      data.identificationType === 'nationalid' &&
+      data.identificationType === "nationalid" &&
       !validateZimbabweanID(data.identificationNumber)
     ) {
       setIsLoading(false);
-      toast.error('Invalid national id number');
+      toast.error("Invalid national id number");
       return;
     }
-    if (data.identificationType === 'servicesid') {
-      toast.error(
-        'Service ID not supported yet. Please use passport or national ID'
-      );
+    if (data.identificationType === "servicesid") {
+      toast.error("Service ID not supported yet. Please use passport or national ID");
       return;
     }
     post(reverseUrl(url), {
@@ -88,13 +85,13 @@ export default function IndividualAdd({
       },
       onSuccess: (response) => {
         reset();
-        toast.success('User created successfully');
+        toast.success("User created successfully");
         setIsLoading(false);
         handleClose();
         setAddSuccessful(true);
       },
       onError: (e) => {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
         setErrors(e);
         setIsLoading(false);
       },
@@ -103,8 +100,8 @@ export default function IndividualAdd({
 
   const handleUpdateIndividual = (e) => {
     e.preventDefault();
-    axios.post(reverseUrl('edit_individual_user'), data).then((response) => {
-      if (response.data.status === 'success') {
+    axios.post(reverseUrl("edit_individual_user"), data).then((response) => {
+      if (response.data.status === "success") {
         toast.success(response.data.message);
         setFetchedData((prev) => {
           const oldData = prev.filter((item) => item.id !== data.individualId);
@@ -131,7 +128,7 @@ export default function IndividualAdd({
         });
         handleClose();
       } else {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
         handleClose();
       }
     });
@@ -144,21 +141,17 @@ export default function IndividualAdd({
           <Modal.Header
             closeButton
             className="card-header bg-transparent"
-            style={{ paddingLeft: '0px' }}
+            style={{ paddingLeft: "0px" }}
           >
             <div className="">
               <button
-                className={`btn  btn-sm ${
-                  isSingle ? 'btn-info text-white' : 'btn-light'
-                }`}
+                className={`btn  btn-sm ${isSingle ? "btn-info text-white" : "btn-light"}`}
                 onClick={handleSingle}
               >
                 Single
               </button>
               <button
-                className={`btn  btn-sm ${
-                  isMultiple ? 'btn-info text-white' : 'btn-light'
-                }`}
+                className={`btn  btn-sm ${isMultiple ? "btn-info text-white" : "btn-light"}`}
                 onClick={handleMultiple}
               >
                 Multiple
@@ -174,9 +167,7 @@ export default function IndividualAdd({
                 >
                   <div className="me-4">
                     <h2 className="display-6 mb-0 text-white">
-                      {action === 'create'
-                        ? 'Add Individual'
-                        : 'Edit Individual'}
+                      {action === "create" ? "Add Individual" : "Edit Individual"}
                     </h2>
                     <div className="card-text"></div>
                   </div>
@@ -187,16 +178,14 @@ export default function IndividualAdd({
                 <div className="card">
                   <div
                     className="card-header bg-info px-4"
-                    style={{ paddingTop: '2px', paddingBottom: '2px' }}
+                    style={{ paddingTop: "2px", paddingBottom: "2px" }}
                   >
                     <div
                       className="d-flex justify-content-center
                             align-items-center"
                     >
                       <div className="me-4">
-                        <h6 className="display-6 mb-0 text-white">
-                          Personal details
-                        </h6>
+                        <h6 className="display-6 mb-0 text-white">Personal details</h6>
                         <div className="card-text"></div>
                       </div>
                     </div>
@@ -204,22 +193,21 @@ export default function IndividualAdd({
                   <div
                     className="card-body p-4"
                     style={{
-                      borderStyle: 'solid',
-                      borderColor: '#26a69a',
+                      borderStyle: "solid",
+                      borderColor: "#26a69a",
                     }}
                   >
                     <Modal.Body>
                       <h5
                         style={{
-                          backgroundColor: '#dda196',
-                          padding: '5px 10px',
-                          textAlign: 'center',
-                          borderRadius: '5px',
+                          backgroundColor: "#dda196",
+                          padding: "5px 10px",
+                          textAlign: "center",
+                          borderRadius: "5px",
                         }}
                       >
-                        <span className="fw-bold">Note</span>: All fields marked
-                        with a star (<span className="text-danger">*</span>) are
-                        required.
+                        <span className="fw-bold">Note</span>: All fields marked with a star (
+                        <span className="text-danger">*</span>) are required.
                       </h5>
                       <div className="row">
                         <div className="col-md-12 my-4">
@@ -238,11 +226,7 @@ export default function IndividualAdd({
                                 placeholder="Enter last name"
                                 className="form-control form-control-sm"
                               />
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.lastName}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.lastName}</div>}
                             </div>
 
                             <div className="col-md-4">
@@ -259,11 +243,7 @@ export default function IndividualAdd({
                                 placeholder="Enter first name"
                                 className="form-control form-control-sm"
                               />
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.firstName}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.firstName}</div>}
                             </div>
                             <div className="col-md-4">
                               <label className="form-label">
@@ -285,9 +265,7 @@ export default function IndividualAdd({
                                 <option value="servicesid">Service ID</option>
                               </select>
                               {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.identificationType}
-                                </div>
+                                <div className="text-danger mt-1">{errors.identificationType}</div>
                               )}
                             </div>
                           </div>
@@ -333,16 +311,10 @@ export default function IndividualAdd({
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
                               </select>
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.gender}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.gender}</div>}
                             </div>
                             <div className="col-md-4">
-                              <label className="form-label">
-                                Date Of birth
-                              </label>
+                              <label className="form-label">Date Of birth</label>
                               <input
                                 value={data.dob}
                                 onChange={changeHandler}
@@ -351,11 +323,7 @@ export default function IndividualAdd({
                                 id="dob"
                                 className="form-control form-control-sm"
                               />
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.dob}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.dob}</div>}
                             </div>
                           </div>
                         </div>
@@ -364,9 +332,7 @@ export default function IndividualAdd({
                         <div className="col-md-12">
                           <div className="row">
                             <div className="col-md-4">
-                              <label className="form-label">
-                                Marital Status
-                              </label>
+                              <label className="form-label">Marital Status</label>
                               <select
                                 className="form-select form-select-sm"
                                 aria-label="Default select example"
@@ -381,9 +347,7 @@ export default function IndividualAdd({
                                 <option value="Other">Other</option>
                               </select>
                               {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.maritalStatus}
-                                </div>
+                                <div className="text-danger mt-1">{errors.maritalStatus}</div>
                               )}
                             </div>
 
@@ -401,11 +365,7 @@ export default function IndividualAdd({
                                 placeholder="eg. 12 Main Road"
                                 className="form-control form-control-sm"
                               />
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.address}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.address}</div>}
                             </div>
                             <div className="col-md-4">
                               <label className="form-label">
@@ -424,9 +384,7 @@ export default function IndividualAdd({
                                 className="form-control form-control-sm"
                               />
                               {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.mobileNumber}
-                                </div>
+                                <div className="text-danger mt-1">{errors.mobileNumber}</div>
                               )}
                             </div>
                           </div>
@@ -446,17 +404,11 @@ export default function IndividualAdd({
                                 placeholder="eg. 263 123 4567"
                                 className="form-control form-control-sm"
                               />
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.landLine}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.landLine}</div>}
                             </div>
 
                             <div className="col-md-4">
-                              <label className="form-label">
-                                Email Address
-                              </label>
+                              <label className="form-label">Email Address</label>
                               <input
                                 value={data.emailAddress}
                                 onChange={changeHandler}
@@ -467,9 +419,7 @@ export default function IndividualAdd({
                                 className="form-control form-control-sm"
                               />
                               {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.emailAddress}
-                                </div>
+                                <div className="text-danger mt-1">{errors.emailAddress}</div>
                               )}
                             </div>
                           </div>
@@ -478,16 +428,14 @@ export default function IndividualAdd({
                       <div className="card">
                         <div
                           className="card-header bg-info px-4"
-                          style={{ paddingTop: '2px', paddingBottom: '2px' }}
+                          style={{ paddingTop: "2px", paddingBottom: "2px" }}
                         >
                           <div
                             className="d-flex justify-content-center
                             align-items-center"
                           >
                             <div className="me-4">
-                              <h6 className="display-6 mb-0 text-white">
-                                Employment Details
-                              </h6>
+                              <h6 className="display-6 mb-0 text-white">Employment Details</h6>
                               <div className="card-text"></div>
                             </div>
                           </div>
@@ -497,9 +445,7 @@ export default function IndividualAdd({
                         <div className="col-md-12">
                           <div className="row">
                             <div className="col-md-4">
-                              <label className="form-label">
-                                Current Employer
-                              </label>
+                              <label className="form-label">Current Employer</label>
                               <input
                                 value={data.currentEmployer}
                                 onChange={changeHandler}
@@ -510,16 +456,12 @@ export default function IndividualAdd({
                                 className="form-control form-control-sm"
                               />
                               {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.currentEmployer}
-                                </div>
+                                <div className="text-danger mt-1">{errors.currentEmployer}</div>
                               )}
                             </div>
 
                             <div className="col-md-4">
-                              <label className="form-label">
-                                Current Job Title
-                              </label>
+                              <label className="form-label">Current Job Title</label>
                               <input
                                 value={data.jobTitle}
                                 onChange={changeHandler}
@@ -529,16 +471,10 @@ export default function IndividualAdd({
                                 placeholder="eg. Accounts Clerk"
                                 className="form-control form-control-sm"
                               />
-                              {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.jobTitle}
-                                </div>
-                              )}
+                              {errors && <div className="text-danger mt-1">{errors.jobTitle}</div>}
                             </div>
                             <div className="col-md-4">
-                              <label className="form-label">
-                                Date of Employment
-                              </label>
+                              <label className="form-label">Date of Employment</label>
                               <input
                                 value={data.dateOfemployment}
                                 onChange={changeHandler}
@@ -548,9 +484,7 @@ export default function IndividualAdd({
                                 className="form-control form-control-sm"
                               />
                               {errors && (
-                                <div className="text-danger mt-1">
-                                  {errors.dateOfemployment}
-                                </div>
+                                <div className="text-danger mt-1">{errors.dateOfemployment}</div>
                               )}
                             </div>
                           </div>
@@ -562,9 +496,7 @@ export default function IndividualAdd({
                         className="text-white"
                         variant="info"
                         onClick={
-                          action === 'create'
-                            ? handleSubmitIndividual
-                            : handleUpdateIndividual
+                          action === "create" ? handleSubmitIndividual : handleUpdateIndividual
                         }
                         disabled={isLoading}
                       >
@@ -574,7 +506,7 @@ export default function IndividualAdd({
                             <span className="ml-2">processing..</span>
                           </>
                         ) : (
-                          'Save and Proceed'
+                          "Save and Proceed"
                         )}
                       </Button>
                       {/* <Button variant="secondary" onClick={handleClose}>

@@ -1,5 +1,5 @@
-import { Modal } from 'react-bootstrap';
-import useUserForm from '../../../hooks/page-hooks/useUserForm';
+import { Modal } from "react-bootstrap";
+import useUserForm from "../../../hooks/page-hooks/useUserForm";
 
 export default function UserForm({ show, handleClose, action, user, url }) {
   const { data, errors, isLoading, handleSubmit, changeHandler } = useUserForm(
@@ -10,28 +10,15 @@ export default function UserForm({ show, handleClose, action, user, url }) {
   );
 
   return (
-    <Modal
-      size="lg"
-      backdrop="static"
-      centered
-      show={show}
-      onHide={handleClose}
-    >
+    <Modal size="lg" backdrop="static" centered show={show} onHide={handleClose}>
       <Modal.Header closeButton className="bg-info">
         <h3 className="mb-0 text-white">
-          {action === 'add'
-            ? user?.userId
-              ? 'Add Internal User'
-              : 'Add New User'
-            : 'Update User'}
+          {action === "add" ? (user?.userId ? "Add Internal User" : "Add New User") : "Update User"}
         </h3>
       </Modal.Header>
 
       <Modal.Body>
-        <form
-          onSubmit={handleSubmit}
-          className="border border-3 border-info p-4 mt-4"
-        >
+        <form onSubmit={handleSubmit} className="border border-3 border-info p-4 mt-4">
           <div className="row row-cols-3 mb-4">
             <div>
               <label className="form-label">Surname</label>
@@ -45,9 +32,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 id="lastName"
                 className="form-control"
               />
-              {errors && (
-                <div className="text-danger small mt-1">{errors.lastName}</div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.lastName}</div>}
             </div>
 
             <div>
@@ -62,9 +47,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 id="firstName"
                 className="form-control"
               />
-              {errors && (
-                <div className="text-danger small mt-1">{errors.firstName}</div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.firstName}</div>}
             </div>
 
             <div>
@@ -83,11 +66,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 <option value="passport">Passport</option>
                 <option value="servicesid">Service ID</option>
               </select>
-              {errors && (
-                <div className="text-danger small mt-1">
-                  {errors.identificationType}
-                </div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.identificationType}</div>}
             </div>
           </div>
 
@@ -105,9 +84,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 className="form-control"
               />
               {errors && (
-                <div className="text-danger small mt-1">
-                  {errors.identificationNumber}
-                </div>
+                <div className="text-danger small mt-1">{errors.identificationNumber}</div>
               )}
             </div>
 
@@ -123,9 +100,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 name="address"
                 className="form-control"
               />
-              {errors && (
-                <div className="text-danger small mt-1">{errors.address}</div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.address}</div>}
             </div>
 
             <div>
@@ -140,11 +115,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 id="mobileNumber"
                 className="form-control"
               />
-              {errors && (
-                <div className="text-danger small mt-1">
-                  {errors.mobileNumber}
-                </div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.mobileNumber}</div>}
             </div>
           </div>
 
@@ -165,11 +136,7 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 <option value="admin">Admin</option>
                 <option value="user">User</option>
               </select>
-              {errors && (
-                <div className="text-danger small mt-1">
-                  {errors.accessLevel}
-                </div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.accessLevel}</div>}
             </div>
 
             <div>
@@ -184,27 +151,21 @@ export default function UserForm({ show, handleClose, action, user, url }) {
                 required
                 className="form-control"
               />
-              {errors && (
-                <div className="text-danger small mt-1">{errors.userEmail}</div>
-              )}
+              {errors && <div className="text-danger small mt-1">{errors.userEmail}</div>}
             </div>
           </div>
 
           <div className="text-end mt-4">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn btn-info text-white"
-            >
+            <button type="submit" disabled={isLoading} className="btn btn-info text-white">
               {isLoading ? (
                 <>
                   <span className="spinner-grow spinner-grow-sm me-2"></span>
                   <span className="ml-2">processing..</span>
                 </>
-              ) : action === 'add' ? (
-                'Add User'
+              ) : action === "add" ? (
+                "Add User"
               ) : (
-                'Update User'
+                "Update User"
               )}
             </button>
           </div>

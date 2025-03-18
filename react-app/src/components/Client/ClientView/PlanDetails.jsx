@@ -1,6 +1,6 @@
-import { truncate } from 'lodash';
-import { friendlyDate } from '../../../utils/index.js';
-import SectionSkeleton from './SectionSkeleton.jsx';
+import { truncate } from "lodash";
+import { friendlyDate } from "../../../utils/index.js";
+import SectionSkeleton from "./SectionSkeleton.jsx";
 
 export default function PlanDetails({
   newPaymentPlans,
@@ -17,14 +17,12 @@ export default function PlanDetails({
         <div className="custom-h-07 overflow-auto">
           {newPaymentPlans.map((plan, index) => (
             <div key={index} className="p-1 small border-bottom">
-              {`${plan.spoke_with || ''} promised to pay ${String(currency || '').toUpperCase()} ${plan.amount} on ${friendlyDate(plan.expected_pay_date)}`}
+              {`${plan.spoke_with || ""} promised to pay ${String(currency || "").toUpperCase()} ${plan.amount} on ${friendlyDate(plan.expected_pay_date)}`}
             </div>
           ))}
 
           {newPaymentPlans.length === 0 && (
-            <div className="text-center small text-grey py-3">
-              No new payment plans
-            </div>
+            <div className="text-center small text-grey py-3">No new payment plans</div>
           )}
         </div>
 
@@ -33,7 +31,7 @@ export default function PlanDetails({
             <p className="d-flex align-items-start gap-1 small text-danger">
               <button
                 type="button"
-                onClick={() => setError('')}
+                onClick={() => setError("")}
                 className="btn-close btn-sm"
               ></button>
 
@@ -48,7 +46,7 @@ export default function PlanDetails({
               className="d-block btn btn-info w-100 text-white"
               disabled={isLoading || !newPaymentPlans.length}
             >
-              {isLoading ? 'Saving...' : 'Save plan'}
+              {isLoading ? "Saving..." : "Save plan"}
             </button>
 
             <button

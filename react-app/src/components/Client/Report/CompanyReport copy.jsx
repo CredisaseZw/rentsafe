@@ -1,21 +1,16 @@
-import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
-export default function CompanyReport({
-  showReport,
-  handleCloseReport,
-  selectedRow,
-  reportData,
-}) {
+import React from "react";
+import { Button, Modal } from "react-bootstrap";
+export default function CompanyReport({ showReport, handleCloseReport, selectedRow, reportData }) {
   return (
     <>
       <Modal show={showReport} onHide={handleCloseReport} fullscreen={true}>
         <Modal.Body>
           <div
             style={{
-              border: '3px solid #176987',
+              border: "3px solid #176987",
 
-              width: '100%',
-              padding: '20px',
+              width: "100%",
+              padding: "20px",
             }}
           >
             <div class="d-flex justify-content-between">
@@ -29,18 +24,18 @@ export default function CompanyReport({
 
                   <br />
                 </div>
-                <div style={{ lineHeight: '10px' }}>
-                  <p style={{ textAlign: 'right' }}>+263 71 882 2460</p>
-                  <p style={{ textAlign: 'right' }}>credisafezw@gmail.com</p>
-                  <p style={{ textAlign: 'right' }}> www.credi-safe.com</p>
+                <div style={{ lineHeight: "10px" }}>
+                  <p style={{ textAlign: "right" }}>+263 71 882 2460</p>
+                  <p style={{ textAlign: "right" }}>credisafezw@gmail.com</p>
+                  <p style={{ textAlign: "right" }}> www.credi-safe.com</p>
                 </div>
               </div>
             </div>
             <div className="mt-5 mb-2">
               <h6>
-                Payment Risk Report on{' '}
-                <span style={{ fontWeight: 'bold', color: '#176987' }}>
-                  {reportData?.company_details?.registration_name}{' '}
+                Payment Risk Report on{" "}
+                <span style={{ fontWeight: "bold", color: "#176987" }}>
+                  {reportData?.company_details?.registration_name}{" "}
                 </span>
                 as at {Date().toLocaleString()}
               </h6>
@@ -48,125 +43,98 @@ export default function CompanyReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '5px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "5px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={5}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={5} className="text-center text-white">
                         RISK CLASSIFICATION / INDICATOR
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th
                         style={{
                           backgroundColor:
-                            reportData?.risk_data?.class == 'low'
+                            reportData?.risk_data?.class == "low"
                               ? reportData?.risk_data?.color
-                              : '',
-                          color:
-                            reportData?.risk_data?.class == 'low'
-                              ? 'white'
-                              : '',
+                              : "",
+                          color: reportData?.risk_data?.class == "low" ? "white" : "",
                         }}
                         scope="row"
                         className="text-center"
                       >
                         Low Risk[
-                        {reportData?.risk_data?.class == 'low'
-                          ? reportData?.risk_data?.score
-                          : ''}
-                        ]
+                        {reportData?.risk_data?.class == "low" ? reportData?.risk_data?.score : ""}]
                       </th>
                       <td
                         style={{
                           backgroundColor:
-                            reportData?.risk_data?.class == 'medium'
+                            reportData?.risk_data?.class == "medium"
                               ? reportData?.risk_data?.color
-                              : '',
-                          color:
-                            reportData?.risk_data?.class == 'medium'
-                              ? 'white'
-                              : '',
+                              : "",
+                          color: reportData?.risk_data?.class == "medium" ? "white" : "",
                         }}
                         className="text-center"
                       >
                         Medium Risk[
-                        {reportData?.risk_data?.class == 'medium'
+                        {reportData?.risk_data?.class == "medium"
                           ? reportData?.risk_data?.score
-                          : ''}
+                          : ""}
                         ]
                       </td>
 
                       <td
                         style={{
-                          backgroundColor:
-                            reportData?.risk_data?.class == 'high'
-                              ? '#f87171'
-                              : '',
-                          color:
-                            reportData?.risk_data?.class == 'high'
-                              ? 'white'
-                              : '',
+                          backgroundColor: reportData?.risk_data?.class == "high" ? "#f87171" : "",
+                          color: reportData?.risk_data?.class == "high" ? "white" : "",
                         }}
                         className="text-center"
                       >
                         High Risk[
-                        {reportData?.risk_data?.class == 'high'
-                          ? reportData?.risk_data?.score
-                          : ''}
+                        {reportData?.risk_data?.class == "high" ? reportData?.risk_data?.score : ""}
                         ]
                       </td>
                       <td
                         style={{
                           backgroundColor:
-                            reportData?.risk_data?.class == 'high-high'
+                            reportData?.risk_data?.class == "high-high"
                               ? reportData?.risk_data?.color
-                              : '',
-                          color:
-                            reportData?.risk_data?.class == 'high-high'
-                              ? 'white'
-                              : '',
+                              : "",
+                          color: reportData?.risk_data?.class == "high-high" ? "white" : "",
                         }}
                         className="text-center"
                       >
                         High-High Risk[
-                        {reportData?.risk_data?.class == 'high-high'
+                        {reportData?.risk_data?.class == "high-high"
                           ? reportData?.risk_data?.score
-                          : ''}
+                          : ""}
                         ]
                       </td>
                       <td
                         style={{
                           backgroundColor:
-                            reportData?.risk_data?.class == 'non-payer'
+                            reportData?.risk_data?.class == "non-payer"
                               ? reportData?.risk_data?.color
-                              : '',
-                          color:
-                            reportData?.risk_data?.class == 'non-payer'
-                              ? 'white'
-                              : '',
+                              : "",
+                          color: reportData?.risk_data?.class == "non-payer" ? "white" : "",
                         }}
                         className="text-center"
                       >
                         None Payer[
-                        {reportData?.risk_data?.class == 'non-payer'
+                        {reportData?.risk_data?.class == "non-payer"
                           ? reportData?.risk_data?.score
-                          : ''}
+                          : ""}
                         ]
                       </td>
                     </tr>
@@ -296,55 +264,49 @@ export default function CompanyReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={4}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={4} className="text-center text-white">
                         COMPANY DETAILS
                       </th>
                     </tr>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={4} className="text-center ">
                         Registration Details
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Registered Name :</th>
                       <td>{reportData?.company_details?.registration_name} </td>
                       <td>Trading Name:</td>
                       <td>{reportData?.company_details?.trading_name}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Registration number:</th>
-                      <td>
-                        {reportData?.company_details?.registration_number}
-                      </td>
+                      <td>{reportData?.company_details?.registration_number}</td>
                       <td>Year of registration:</td>
                       <td>{reportData?.company_details?.registration_date}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Trading Status:</th>
                       <td>{reportData?.company_details?.trading_status}</td>
                       <td>Industry Sector</td>
@@ -356,28 +318,26 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={6} className="text-center">
                         Contact Details
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Telephone No.:</th>
                       <td>{reportData?.company_details?.telephone}</td>
                       <td>Mobile No.:</td>
                       <td>{reportData?.company_details?.mobile_phone}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Physical Address:</th>
-                      <td colSpan={3}>
-                        {reportData?.company_details?.current_address}
-                      </td>
+                      <td colSpan={3}>{reportData?.company_details?.current_address}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Email :</th>
                       <td>{reportData?.company_details?.email}</td>
                       <td>Website:</td>
@@ -390,41 +350,37 @@ export default function CompanyReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={7}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={7} className="text-center text-white">
                         CREDIT ACCOUNTS
                       </th>
                     </tr>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={7} className="text-center">
                         Active Credit Accounts
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Credit Type</th>
                       <td>Currency</td>
                       <td>Start Date</td>
@@ -434,10 +390,7 @@ export default function CompanyReport({
                       <td>Overdue Amount</td>
                     </tr>
                     {reportData?.credit_details?.map((credit) => (
-                      <tr
-                        key={credit.lease_id}
-                        style={{ lineHeight: '5px', fontSize: '12px' }}
-                      >
+                      <tr key={credit.lease_id} style={{ lineHeight: "5px", fontSize: "12px" }}>
                         <th scope="row">{credit.credit_type}</th>
                         <td>{credit.currency}</td>
                         <td> {credit.start_date}</td>
@@ -454,16 +407,16 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={10} className="text-center ">
                         Hire Purchase Information
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row">
                         Credit Type
                       </th>
@@ -484,16 +437,16 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={10} className="text-center ">
                         Historic Credit Accounts
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row" colSpan={2}>
                         Credit Type
                       </th>
@@ -503,7 +456,7 @@ export default function CompanyReport({
                       <td className="text-center">Principal Amount</td>
                       <td className="text-center">Instalment Amount</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row" colSpan={2}>
                         Bank Loan
                       </th>
@@ -520,41 +473,37 @@ export default function CompanyReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={7}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={7} className="text-center text-white">
                         ADVERSE RECORDS
                       </th>
                     </tr>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={4} className="text-center ">
                         Claims
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Claimant</th>
                       <td>Currency</td>
                       <td>Amount</td>
@@ -562,10 +511,7 @@ export default function CompanyReport({
                     </tr>
                     {reportData?.claims_list?.length > 0 &&
                       reportData?.claims_list?.map((claim, index) => (
-                        <tr
-                          key={'claim' + index}
-                          style={{ lineHeight: '5px', fontSize: '12px' }}
-                        >
+                        <tr key={"claim" + index} style={{ lineHeight: "5px", fontSize: "12px" }}>
                           <th scope="row">{claim.creditor}</th>
                           <td>{claim.currency}</td>
                           <td>{claim.owing_amount}</td>
@@ -579,16 +525,16 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={3} className="text-center ">
                         Absconder
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row">
                         Creditor
                       </th>
@@ -602,16 +548,16 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={10} className="text-center ">
                         Court Judgements
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row" colSpan={2}>
                         Court
                       </th>
@@ -628,31 +574,27 @@ export default function CompanyReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={7}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={7} className="text-center text-white">
                         ENQUIRIES
                       </th>
                     </tr>
 
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Company</th>
                       <td>Enquirer</td>
                       <td>Date Of Enquiry</td>
@@ -660,23 +602,14 @@ export default function CompanyReport({
                     {reportData?.external_enquiry_details_list?.length > 0 && (
                       <>
                         {reportData?.external_enquiry_details_list
-                          ?.sort(
-                            (a, b) =>
-                              new Date(b.enquiry_date) -
-                              new Date(a.enquiry_date)
-                          )
+                          ?.sort((a, b) => new Date(b.enquiry_date) - new Date(a.enquiry_date))
                           ?.map((data, index) => (
-                            <tr
-                              key={index}
-                              style={{ lineHeight: '5px', fontSize: '12px' }}
-                            >
+                            <tr key={index} style={{ lineHeight: "5px", fontSize: "12px" }}>
                               <th className="text-center" scope="row">
                                 {data.company_name}
                               </th>
                               <td className="text-center">{data.enquirer}</td>
-                              <td className="text-center">
-                                {data.enquiry_date}
-                              </td>
+                              <td className="text-center">{data.enquiry_date}</td>
                             </tr>
                           ))}
                       </>
@@ -688,41 +621,31 @@ export default function CompanyReport({
                     <tbody>
                       <tr
                         style={{
-                          lineHeight: '5px',
-                          fontSize: '12px',
-                          backgroundColor: '#b4c6e7',
+                          lineHeight: "5px",
+                          fontSize: "12px",
+                          backgroundColor: "#b4c6e7",
                         }}
                       >
                         <th scope="row" colSpan={3} className="text-center ">
                           Internal
                         </th>
                       </tr>
-                      <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                      <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                         <th className="text-center" scope="row">
                           Enquirer
                         </th>
                         <td className="text-center">Enquiry Date</td>
                       </tr>
-                      {reportData?.internal_enquiry_details_list?.length >
-                        0 && (
+                      {reportData?.internal_enquiry_details_list?.length > 0 && (
                         <>
                           {reportData?.internal_enquiry_details_list
-                            ?.sort(
-                              (a, b) =>
-                                new Date(b.enquiry_date) -
-                                new Date(a.enquiry_date)
-                            )
+                            ?.sort((a, b) => new Date(b.enquiry_date) - new Date(a.enquiry_date))
                             ?.map((data, index) => (
-                              <tr
-                                key={index}
-                                style={{ lineHeight: '5px', fontSize: '12px' }}
-                              >
+                              <tr key={index} style={{ lineHeight: "5px", fontSize: "12px" }}>
                                 <th className="text-center" scope="row">
                                   {data.enquirer}
                                 </th>
-                                <td className="text-center">
-                                  {data.enquiry_date}
-                                </td>
+                                <td className="text-center">{data.enquiry_date}</td>
                               </tr>
                             ))}
                         </>
@@ -735,31 +658,27 @@ export default function CompanyReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={7}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={7} className="text-center text-white">
                         PUBLIC INFORMATION
                       </th>
                     </tr>
 
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Record Date</th>
                       <td>Source</td>
                       <td>Summary</td>
@@ -771,26 +690,22 @@ export default function CompanyReport({
             </div>
             <div
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table class="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={7}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={7} className="text-center text-white">
                         AS KEY PERSON IN COMPANIES
                       </th>
                     </tr>
@@ -801,16 +716,16 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={3} className="text-center ">
                         Directorships
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row">
                         Company
                       </th>
@@ -823,16 +738,16 @@ export default function CompanyReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={3} className="text-center ">
                         Executive
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row">
                         Position
                       </th>
@@ -846,18 +761,17 @@ export default function CompanyReport({
 
             <div
               style={{
-                width: '100%',
-                padding: '2px',
+                width: "100%",
+                padding: "2px",
               }}
             >
               <hr />
               <div>
                 <p>
-                  Disclaimer: This report is confidential and intended solely
-                  for the individual or entity to whom it is addressed.
-                  Information on this report is valid at the time of enquiry
-                  only. If verification is required, please contact us on the
-                  details provided above.
+                  Disclaimer: This report is confidential and intended solely for the individual or
+                  entity to whom it is addressed. Information on this report is valid at the time of
+                  enquiry only. If verification is required, please contact us on the details
+                  provided above.
                 </p>
                 <p>Terms and Conditions apply.</p>
                 <p>Copyrights © CrediSafe Zimbabwe</p>

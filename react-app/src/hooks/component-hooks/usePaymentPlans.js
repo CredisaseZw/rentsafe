@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import { useState } from "react";
+import axios, { AxiosError } from "axios";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function usePaymentPlans(
   initialPaymentPlans,
@@ -11,13 +11,13 @@ export default function usePaymentPlans(
   leaseId
 ) {
   const [paymentPlans, setPaymentPlans] = useState(initialPaymentPlans);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [newPaymentPlans, setNewPaymentPlans] = useState([]);
 
   function confirmNewPaymentPlans() {
     setIsLoading(true);
-    setError('');
+    setError("");
 
     const submitData = {
       plans: newPaymentPlans.map((plan) => ({
@@ -31,7 +31,7 @@ export default function usePaymentPlans(
     };
 
     axios
-      .post(reverseUrl('payment_plans'), submitData)
+      .post(reverseUrl("payment_plans"), submitData)
       .then((res) => {
         setNewPaymentPlans([]);
         // setPaymentPlans((prev) => [
@@ -43,7 +43,7 @@ export default function usePaymentPlans(
         //     amount: item.amount,
         //   })),
         // ]);
-        setError('');
+        setError("");
         setIsLoading(false);
         refreshClientViewData();
       })

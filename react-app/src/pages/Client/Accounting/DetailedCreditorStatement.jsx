@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import { capitalize } from 'lodash';
-import moment from 'moment';
-import { formatCurrency } from '../../../utils/formatting.js';
-import html2pdf from 'html2pdf.js';
+import React, { useRef } from "react";
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import { capitalize } from "lodash";
+import moment from "moment";
+import { formatCurrency } from "../../../utils/formatting.js";
+import html2pdf from "html2pdf.js";
 
 export default function DetailedCreditorStatement({ statement }) {
   const contentRef = useRef();
@@ -15,9 +15,9 @@ export default function DetailedCreditorStatement({ statement }) {
       .from(element)
       .set({
         margin: 1,
-        filename: 'modal-content.pdf',
+        filename: "modal-content.pdf",
         html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait' },
+        jsPDF: { orientation: "portrait" },
       })
       .save();
   };
@@ -27,29 +27,27 @@ export default function DetailedCreditorStatement({ statement }) {
       <div ref={contentRef}>
         <div
           style={{
-            lineHeight: '5px',
-            fontSize: '18px',
+            lineHeight: "5px",
+            fontSize: "18px",
           }}
           className="bg-danger d-flex justify-content-between align-items-center text-white p-3"
         >
           <h4 className="fw-bold text-white mb-4">
-            {capitalize(
-              statement.creditor_name ? statement.creditor_name : 'Creditor'
-            )}{' '}
-            Statement - USD
+            {capitalize(statement.creditor_name ? statement.creditor_name : "Creditor")} Statement -
+            USD
           </h4>
 
           <div>
-            {new Date().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
+            {new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </div>
         </div>
 
         <table
-          style={{ lineHeight: '5px', fontSize: '12px' }}
+          style={{ lineHeight: "5px", fontSize: "12px" }}
           className="table table-bordered table-responsive"
         >
           <thead className="position-sticky c-table-top">
@@ -66,7 +64,7 @@ export default function DetailedCreditorStatement({ statement }) {
             {Boolean(statement.rows?.length) &&
               statement.rows.map((row, index) => (
                 <tr key={index}>
-                  <th>{moment(row.date).format('YYYY-MM-DD')}</th>
+                  <th>{moment(row.date).format("YYYY-MM-DD")}</th>
 
                   <td>{row.description} </td>
 
@@ -109,5 +107,5 @@ export default function DetailedCreditorStatement({ statement }) {
 }
 
 DetailedCreditorStatement.layout = (page) => (
-  <Layout children={page} title={'Detailed Creditor Statement'} />
+  <Layout children={page} title={"Detailed Creditor Statement"} />
 );

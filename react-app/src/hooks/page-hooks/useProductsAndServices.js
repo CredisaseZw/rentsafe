@@ -1,7 +1,7 @@
-import axios from 'axios';
-import React, { useEffect } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import axios from "axios";
+import React, { useEffect } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useProductsAndServices() {
   const [showAdd, setShowAdd] = React.useState(false);
@@ -14,7 +14,7 @@ export default function useProductsAndServices() {
 
   function fetchTaxOptions() {
     axios
-      .get('/accounting/vat-settings/')
+      .get("/accounting/vat-settings/")
       .then((res) => {
         setTaxOptions(res.data);
       })
@@ -25,7 +25,7 @@ export default function useProductsAndServices() {
 
   function fetchItems() {
     axios
-      .get('/accounting/items/')
+      .get("/accounting/items/")
       .then((res) => {
         setItems(res.data);
       })
@@ -36,7 +36,7 @@ export default function useProductsAndServices() {
 
   function fetchCategories() {
     axios
-      .get('/accounting/sales-categories/')
+      .get("/accounting/sales-categories/")
       .then((res) => {
         setCategories(res.data);
       })
@@ -65,11 +65,11 @@ export default function useProductsAndServices() {
     setLoading(true);
     const data = Object.fromEntries(new FormData(e.target));
     axios
-      .post('/accounting/items/', data)
+      .post("/accounting/items/", data)
       .then((res) => {
         setLoading(false);
         console.log(res);
-        toast.success('Item added successfully');
+        toast.success("Item added successfully");
         fetchItems();
         handleClose();
       })
@@ -87,7 +87,7 @@ export default function useProductsAndServices() {
     axios
       .patch(`/accounting/items/${itemToEdit.id}/`, data)
       .then((res) => {
-        toast.success('Item updated successfully');
+        toast.success("Item updated successfully");
         handleClose();
         fetchItems();
       })
@@ -101,7 +101,7 @@ export default function useProductsAndServices() {
     axios
       .delete(`/accounting/items/${itemToDelete.id}/`)
       .then(() => {
-        toast.success('Item deleted successfully');
+        toast.success("Item deleted successfully");
         fetchItems();
         setItemToDelete(null);
       })

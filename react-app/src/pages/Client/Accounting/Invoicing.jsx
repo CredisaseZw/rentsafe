@@ -1,7 +1,7 @@
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import DismissInvoice from '../../../components/modals/Client/DismissInvoice.jsx';
-import useInvoicing from '../../../hooks/page-hooks/useInvoicing.js';
-import { formatCurrency } from '../../../utils/formatting.js';
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import DismissInvoice from "../../../components/modals/Client/DismissInvoice.jsx";
+import useInvoicing from "../../../hooks/page-hooks/useInvoicing.js";
+import { formatCurrency } from "../../../utils/formatting.js";
 
 export default function Invoicing(props) {
   const {
@@ -74,27 +74,21 @@ export default function Invoicing(props) {
                 <td>
                   <input
                     type="date"
-                    max={today.toISOString().split('T')[0]}
+                    max={today.toISOString().split("T")[0]}
                     min={
                       today.getDate() >= invoice.payment_period_start
-                        ? today.toISOString().split('T')[0]
+                        ? today.toISOString().split("T")[0]
                         : today.getMonth() === 0
-                          ? new Date(today.getFullYear() - 1, 11, 26)
+                          ? new Date(today.getFullYear() - 1, 11, 26).toISOString().split("T")[0]
+                          : new Date(today.getFullYear(), today.getMonth() - 1, 26)
                               .toISOString()
-                              .split('T')[0]
-                          : new Date(
-                              today.getFullYear(),
-                              today.getMonth() - 1,
-                              26
-                            )
-                              .toISOString()
-                              .split('T')[0]
+                              .split("T")[0]
                     }
                     className="form-control form-control-sm"
                     value={invoice.invoice_date}
                     onChange={(e) =>
                       usdDispatch({
-                        type: 'updateInvDate',
+                        type: "updateInvDate",
                         id: invoice.id,
                         invoice_date: e.target.value,
                       })
@@ -110,7 +104,7 @@ export default function Invoicing(props) {
                     value={invoice.tenant_acc_no}
                     onChange={(e) =>
                       usdDispatch({
-                        type: 'updateTenantAccNumber',
+                        type: "updateTenantAccNumber",
                         id: invoice.id,
                         tenant_acc_no: e.target.value,
                       })
@@ -124,7 +118,7 @@ export default function Invoicing(props) {
                     value={invoice.invoice_no}
                     onChange={(e) =>
                       usdDispatch({
-                        type: 'updateInvNumber',
+                        type: "updateInvNumber",
                         id: invoice.id,
                         invoice_no: e.target.value,
                       })
@@ -141,7 +135,7 @@ export default function Invoicing(props) {
                     value={invoice.owing_amount}
                     onChange={(e) =>
                       usdDispatch({
-                        type: 'updateBaseRental',
+                        type: "updateBaseRental",
                         id: invoice.id,
                         owing_amount: e.target.value,
                       })
@@ -156,7 +150,7 @@ export default function Invoicing(props) {
                     value={invoice.operationalCosts}
                     onChange={(e) =>
                       usdDispatch({
-                        type: 'updateOperatingCosts',
+                        type: "updateOperatingCosts",
                         id: invoice.id,
                         operationalCosts: e.target.value,
                       })
@@ -191,10 +185,7 @@ export default function Invoicing(props) {
             {zwlState.map((invoice) => (
               <tr key={invoice.id}>
                 {pastDue && (
-                  <td
-                    title="invoice is past payment period"
-                    className="text-center px-0"
-                  >
+                  <td title="invoice is past payment period" className="text-center px-0">
                     <i className="material-icons custom-icon-small text-danger d-block p-0 m-0">
                       timer
                     </i>
@@ -204,27 +195,21 @@ export default function Invoicing(props) {
                 <td>
                   <input
                     type="date"
-                    max={today.toISOString().split('T')[0]}
+                    max={today.toISOString().split("T")[0]}
                     min={
                       today.getDate() >= invoice.payment_period_start
-                        ? today.toISOString().split('T')[0]
+                        ? today.toISOString().split("T")[0]
                         : today.getMonth() === 0
-                          ? new Date(today.getFullYear() - 1, 11, 26)
+                          ? new Date(today.getFullYear() - 1, 11, 26).toISOString().split("T")[0]
+                          : new Date(today.getFullYear(), today.getMonth() - 1, 26)
                               .toISOString()
-                              .split('T')[0]
-                          : new Date(
-                              today.getFullYear(),
-                              today.getMonth() - 1,
-                              26
-                            )
-                              .toISOString()
-                              .split('T')[0]
+                              .split("T")[0]
                     }
                     className="form-control form-control-sm"
                     value={invoice.invoice_date}
                     onChange={(e) =>
                       zwlDispatch({
-                        type: 'updateInvDate',
+                        type: "updateInvDate",
                         id: invoice.id,
                         invoice_date: e.target.value,
                       })
@@ -240,7 +225,7 @@ export default function Invoicing(props) {
                     value={invoice.tenant_acc_no}
                     onChange={(e) =>
                       zwlDispatch({
-                        type: 'updateTenantAccNumber',
+                        type: "updateTenantAccNumber",
                         id: invoice.id,
                         tenant_acc_no: e.target.value,
                       })
@@ -254,7 +239,7 @@ export default function Invoicing(props) {
                     value={invoice.invoice_no}
                     onChange={(e) =>
                       zwlDispatch({
-                        type: 'updateInvNumber',
+                        type: "updateInvNumber",
                         id: invoice.id,
                         invoice_no: e.target.value,
                       })
@@ -271,7 +256,7 @@ export default function Invoicing(props) {
                     value={invoice.owing_amount}
                     onChange={(e) =>
                       zwlDispatch({
-                        type: 'updateBaseRental',
+                        type: "updateBaseRental",
                         id: invoice.id,
                         owing_amount: e.target.value,
                       })
@@ -286,7 +271,7 @@ export default function Invoicing(props) {
                     value={invoice.operationalCosts}
                     onChange={(e) =>
                       zwlDispatch({
-                        type: 'updateOperatingCosts',
+                        type: "updateOperatingCosts",
                         id: invoice.id,
                         operationalCosts: e.target.value,
                       })
@@ -324,7 +309,7 @@ export default function Invoicing(props) {
                 processing..
               </>
             ) : (
-              'Submit'
+              "Submit"
             )}
           </button>
         </div>
@@ -333,6 +318,4 @@ export default function Invoicing(props) {
   );
 }
 
-Invoicing.layout = (page) => (
-  <Layout children={page} title={'Tenant Invoicing'} />
-);
+Invoicing.layout = (page) => <Layout children={page} title={"Tenant Invoicing"} />;

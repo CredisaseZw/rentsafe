@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function useInternalUsers(users) {
   const [filteredUsers, setFilteredUsers] = useState(users);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
   const [userModalOptions, setUserModalOptions] = useState({
-    type: '',
-    action: '',
+    type: "",
+    action: "",
     userToActOn: {},
   });
 

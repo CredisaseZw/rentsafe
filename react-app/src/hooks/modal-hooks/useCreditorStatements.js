@@ -1,14 +1,9 @@
-import { useEffect } from 'react';
-import useCreditorView from './useCreditorView';
-import { usePage } from '@inertiajs/inertia-react';
+import { useEffect } from "react";
+import useCreditorView from "./useCreditorView";
+import { usePage } from "@inertiajs/inertia-react";
 
-export default function useCreditorStatements(
-  creditors,
-  current_page,
-  total_pages,
-  total_items
-) {
-  const viewLeaseId = new URL(usePage().url).searchParams.get('open_view_for');
+export default function useCreditorStatements(creditors, current_page, total_pages, total_items) {
+  const viewLeaseId = new URL(usePage().url).searchParams.get("open_view_for");
 
   useEffect(() => {
     if (!viewLeaseId) return;

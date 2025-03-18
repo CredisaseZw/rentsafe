@@ -1,13 +1,12 @@
-import useLastNavLinkClicked from '../hooks/component-hooks/useLastNavLinkClicked.js';
-import { activeTrackableClientNavLinks as NAV_LINKS } from '../constants';
-import { Link } from '@inertiajs/inertia-react';
-import { camelCase } from 'lodash';
-import { clientSidebarNavigation } from '../constants/clientSidebarNavigation.jsx';
-import React, { cloneElement } from 'react';
+import useLastNavLinkClicked from "../hooks/component-hooks/useLastNavLinkClicked.js";
+import { activeTrackableClientNavLinks as NAV_LINKS } from "../constants";
+import { Link } from "@inertiajs/inertia-react";
+import { camelCase } from "lodash";
+import { clientSidebarNavigation } from "../constants/clientSidebarNavigation.jsx";
+import React, { cloneElement } from "react";
 
 export default function ClientSidebar() {
-  const { lastClicked, setLastClicked, key, setKey, lastLastClickedRef } =
-    useLastNavLinkClicked();
+  const { lastClicked, setLastClicked, key, setKey, lastLastClickedRef } = useLastNavLinkClicked();
 
   function onClick(identifierString, isUpperMost = false) {
     setLastClicked(identifierString);
@@ -15,11 +14,7 @@ export default function ClientSidebar() {
   }
 
   return (
-    <div
-      key={key}
-      id="layoutDrawer_nav"
-      className="bg-info border-end c-border-info-dark"
-    >
+    <div key={key} id="layoutDrawer_nav" className="bg-info border-end c-border-info-dark">
       <nav id="drawerAccordion" className="drawer accordion border-0">
         <div className="drawer-menu pt-4">
           <div className="nav">
@@ -41,13 +36,13 @@ export default function ClientSidebar() {
         <div className="drawer-footer p-0 pb-4">
           <Link
             className={`nav-link c-nav-link d-flex gap-2 ${
-              lastClicked === NAV_LINKS.PROFILE ? 'c-nav-link-active' : ''
+              lastClicked === NAV_LINKS.PROFILE ? "c-nav-link-active" : ""
             }`}
             onClick={() => {
               setLastClicked(NAV_LINKS.PROFILE);
               setKey((prev) => prev + 1);
             }}
-            href={reverseUrl('cl-change-password')}
+            href={reverseUrl("cl-change-password")}
           >
             <i className="material-icons">account_circle</i>
             Profile
@@ -69,7 +64,7 @@ function renderNavLink(
 ) {
   if (navLink.subNavLinks) {
     const navLinkId = `${camelCase(navLink.navLink)}${level}`;
-    const className = `nav-link c-${'sub-'.repeat(level)}nav-link collapsed ${lastClicked === navLinkId ? 'c-nav-link-active' : ''}`;
+    const className = `nav-link c-${"sub-".repeat(level)}nav-link collapsed ${lastClicked === navLinkId ? "c-nav-link-active" : ""}`;
 
     return (
       <>
@@ -90,7 +85,7 @@ function renderNavLink(
         <div
           id={`collapse${navLinkId}`}
           className="collapse"
-          data-bs-parent={`#drawerAccordion${level ? level - 1 : ''}`}
+          data-bs-parent={`#drawerAccordion${level ? level - 1 : ""}`}
         >
           <div
             id={
@@ -119,9 +114,9 @@ function renderNavLink(
     );
   } else {
     const navLinkId = `$${navLink.component} ${navLink.href} ${level}`;
-    const className = `nav-link c-${'sub-'.repeat(level)}nav-link ${lastClicked === navLinkId ? 'c-nav-link-active' : ''}`;
+    const className = `nav-link c-${"sub-".repeat(level)}nav-link ${lastClicked === navLinkId ? "c-nav-link-active" : ""}`;
 
-    if (navLink.type === 'link') {
+    if (navLink.type === "link") {
       return (
         <Link
           className={className}

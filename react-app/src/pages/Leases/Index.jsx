@@ -1,16 +1,16 @@
-import React from 'react';
-import Layout from '../../components/Layouts/client/Layout.jsx';
-import IndividualLeaseForm from '../../components/features/leases/IndividualLeaseForm.jsx';
-import CompanyLeaseForm from '../../components/features/leases/CompanyLeaseForm.jsx';
-import TerminateLease from '../../components/modals/Client/TerminateLease.jsx';
-import Receipt from '../../components/features/leases/Receipt.jsx';
-import BottomDrawer from '../../components/Drawer.jsx';
-import PaginationControls from '../../components/PaginationControls.jsx';
-import SearchBar from '../../components/SearchBar.jsx';
-import ClientView from '../../components/Client/ClientView/ClientView.jsx';
-import useLeaseManagement from '../../hooks/page-hooks/useLeaseManagement.js';
-import { formatCurrency } from '../../utils/formatting.js';
-import { DrawerContent } from '../../components/DrawerContent.jsx';
+import React from "react";
+import Layout from "../../components/Layouts/client/Layout.jsx";
+import IndividualLeaseForm from "../../components/features/leases/IndividualLeaseForm.jsx";
+import CompanyLeaseForm from "../../components/features/leases/CompanyLeaseForm.jsx";
+import TerminateLease from "../../components/modals/Client/TerminateLease.jsx";
+import Receipt from "../../components/features/leases/Receipt.jsx";
+import BottomDrawer from "../../components/Drawer.jsx";
+import PaginationControls from "../../components/PaginationControls.jsx";
+import SearchBar from "../../components/SearchBar.jsx";
+import ClientView from "../../components/Client/ClientView/ClientView.jsx";
+import useLeaseManagement from "../../hooks/page-hooks/useLeaseManagement.js";
+import { formatCurrency } from "../../utils/formatting.js";
+import { DrawerContent } from "../../components/DrawerContent.jsx";
 
 export default function Index({ leases, total_pages, current_page }) {
   const {
@@ -49,38 +49,30 @@ export default function Index({ leases, total_pages, current_page }) {
 
         {showIndividualLeaseForm && (
           <IndividualLeaseForm
-            action={Boolean(Object.keys(details).length) ? 'edit' : 'add'}
+            action={Boolean(Object.keys(details).length) ? "edit" : "add"}
             show={showIndividualLeaseForm}
             handleClose={closeIndividualLeaseForm}
             lesseeDetails={details}
             subscriptionPeriod={
-              Boolean(Object.keys(details).length)
-                ? details.lease_period
-                : subLength
+              Boolean(Object.keys(details).length) ? details.lease_period : subLength
             }
           />
         )}
 
         {showCompanyLeaseForm && (
           <CompanyLeaseForm
-            action={Boolean(Object.keys(details).length) ? 'edit' : 'add'}
+            action={Boolean(Object.keys(details).length) ? "edit" : "add"}
             show={showCompanyLeaseForm}
             handleClose={closeCompanyLeaseForm}
             lesseeDetails={details}
             subscriptionPeriod={
-              Boolean(Object.keys(details).length)
-                ? details.lease_period
-                : subLength
+              Boolean(Object.keys(details).length) ? details.lease_period : subLength
             }
           />
         )}
 
         {terminate && (
-          <TerminateLease
-            show={terminate}
-            handleClose={closeTerminate}
-            leaseData={details}
-          />
+          <TerminateLease show={terminate} handleClose={closeTerminate} leaseData={details} />
         )}
 
         {showReceipt && (
@@ -88,16 +80,14 @@ export default function Index({ leases, total_pages, current_page }) {
             show={showReceipt}
             handleClose={closeReceipt}
             leaseDetails={details}
-            myKey={'leases'}
+            myKey={"leases"}
           />
         )}
       </>
 
       <main id="hide-footer">
         <div className="container-xl p-0 mb-5">
-          <h5 className="bg-info text-center text-white p-2 rounded-2">
-            Lease Management
-          </h5>
+          <h5 className="bg-info text-center text-white p-2 rounded-2">Lease Management</h5>
 
           <div className="position-relative bg-white rounded-2 border">
             <table className="table table-sm table-responsive table-bordered ">
@@ -125,12 +115,8 @@ export default function Index({ leases, total_pages, current_page }) {
                             onChange={changeSort}
                           >
                             <option value="default">default</option>
-                            <option value="rent-owing-asc">
-                              Rent Owing asc
-                            </option>
-                            <option value="rent-owing-des">
-                              Rent Owing des
-                            </option>
+                            <option value="rent-owing-asc">Rent Owing asc</option>
+                            <option value="rent-owing-des">Rent Owing des</option>
                             <option value="color-asc">color (rent asc)</option>
                             <option value="color-des">color (rent des)</option>
                           </select>
@@ -171,19 +157,17 @@ export default function Index({ leases, total_pages, current_page }) {
                 {leases
                   ? sortFunc(leases).map((lease, index) => (
                       <tr
-                        className={lease.terminated ? 'c-terminated' : ''}
-                        key={lease.lease_id + '-' + index}
+                        className={lease.terminated ? "c-terminated" : ""}
+                        key={lease.lease_id + "-" + index}
                       >
-                        <th className="ps-3">{lease.lease_id || ''}</th>
+                        <th className="ps-3">{lease.lease_id || ""}</th>
 
                         <td>
                           <button
                             title="double click to view client"
                             type="button"
-                            onDoubleClick={() =>
-                              clientViewProps.openClientView(lease)
-                            }
-                            className={`custom-btn text-decoration-underline ${lease.terminated ? 'c-terminated' : ''}`}
+                            onDoubleClick={() => clientViewProps.openClientView(lease)}
+                            className={`custom-btn text-decoration-underline ${lease.terminated ? "c-terminated" : ""}`}
                           >
                             {lease.name}
                           </button>
@@ -194,13 +178,13 @@ export default function Index({ leases, total_pages, current_page }) {
                         <td
                           className={`bg-${lease.color} text-white text-end`}
                           style={{
-                            backgroundColor:
-                              lease.color == 'light-red' ? '#f87171' : '',
+                            backgroundColor: lease.color == "light-red" ? "#f87171" : "",
                           }}
                         >
-                          {`${lease.currency} ${formatCurrency(
-                            lease.owing_amount
-                          ).replace('$', '')}`}
+                          {`${lease.currency} ${formatCurrency(lease.owing_amount).replace(
+                            "$",
+                            ""
+                          )}`}
                         </td>
 
                         <td
@@ -212,9 +196,7 @@ export default function Index({ leases, total_pages, current_page }) {
 
                         {lease.terminated ? (
                           <>
-                            <td className="c-terminated text-center">
-                              Terminated
-                            </td>
+                            <td className="c-terminated text-center">Terminated</td>
 
                             <td
                               className="bg-danger text-white text-center c-pointer"
@@ -242,7 +224,7 @@ export default function Index({ leases, total_pages, current_page }) {
                         )}
                       </tr>
                     ))
-                  : ''}
+                  : ""}
               </tbody>
 
               {totalColor && leases?.length ? (
@@ -250,9 +232,7 @@ export default function Index({ leases, total_pages, current_page }) {
                   <tr>
                     <td className="border-0 pt-5"></td>
 
-                    <td className="border-0 pt-5">
-                      Total Debtors: {leases?.length}
-                    </td>
+                    <td className="border-0 pt-5">Total Debtors: {leases?.length}</td>
 
                     <td className="border-0 pt-5">Total mount</td>
 
@@ -260,8 +240,7 @@ export default function Index({ leases, total_pages, current_page }) {
                       <span
                         className={`bg-${totalColor} text-end text-white p-2 w-100 d-inline-block`}
                         style={{
-                          backgroundColor:
-                            totalColor == 'light-red' ? '#f87171' : totalColor,
+                          backgroundColor: totalColor == "light-red" ? "#f87171" : totalColor,
                         }}
                       >
                         {smartNavigationTotalFormated}
@@ -271,7 +250,7 @@ export default function Index({ leases, total_pages, current_page }) {
                           {rateText}
                         </small>
                       ) : (
-                        ''
+                        ""
                       )}
                     </td>
 
@@ -279,14 +258,11 @@ export default function Index({ leases, total_pages, current_page }) {
                   </tr>
                 </tfoot>
               ) : (
-                ''
+                ""
               )}
             </table>
 
-            <PaginationControls
-              currentPage={current_page}
-              totalPages={total_pages}
-            />
+            <PaginationControls currentPage={current_page} totalPages={total_pages} />
           </div>
         </div>
 
@@ -304,7 +280,7 @@ export default function Index({ leases, total_pages, current_page }) {
               </button>
             }
           >
-            <DrawerContent title={'Available Subscriptions'}>
+            <DrawerContent title={"Available Subscriptions"}>
               <table className="table table-responsive table-bordered">
                 <thead>
                   <tr>
@@ -360,4 +336,4 @@ export default function Index({ leases, total_pages, current_page }) {
   );
 }
 
-Index.layout = (page) => <Layout children={page} title={'Leases'} />;
+Index.layout = (page) => <Layout children={page} title={"Leases"} />;

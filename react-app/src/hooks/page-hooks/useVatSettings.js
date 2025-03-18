@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useVatSettings() {
   const [newTaxOptions, setNewTaxOptions] = useState([]);
@@ -10,7 +10,7 @@ export default function useVatSettings() {
 
   function fetchTaxOptions() {
     axios
-      .get('/accounting/vat-settings/')
+      .get("/accounting/vat-settings/")
       .then((res) => {
         setTaxOptions(res.data);
       })
@@ -27,9 +27,9 @@ export default function useVatSettings() {
     setNewTaxOptions((prev) => [
       ...prev,
       {
-        id: 'item-' + Math.random().toString(36).substr(2, 9),
-        description: '',
-        rate: '',
+        id: "item-" + Math.random().toString(36).substr(2, 9),
+        description: "",
+        rate: "",
       },
     ]);
   }
@@ -41,9 +41,7 @@ export default function useVatSettings() {
   function changeHandler(name, value, id) {
     if (id) {
       setNewTaxOptions((prev) =>
-        prev.map((option) =>
-          option.id === id ? { ...option, [name]: value } : option
-        )
+        prev.map((option) => (option.id === id ? { ...option, [name]: value } : option))
       );
     }
   }
@@ -52,7 +50,7 @@ export default function useVatSettings() {
     axios
       .delete(`/accounting/vat-settings/${option.id}/`)
       .then((res) => {
-        toast.success('VAT setting deleted successfully');
+        toast.success("VAT setting deleted successfully");
         fetchTaxOptions();
       })
       .catch((err) => {
@@ -67,7 +65,7 @@ export default function useVatSettings() {
 
     const form = new FormData(e.target);
     const data = Array.from(form.entries()).reduce((acc, [key, value]) => {
-      const [prefix, index] = key.split('-');
+      const [prefix, index] = key.split("-");
       if (!acc[index]) {
         acc[index] = {};
       }
@@ -76,10 +74,10 @@ export default function useVatSettings() {
     }, []);
 
     axios
-      .post('/accounting/vat-settings/', data)
+      .post("/accounting/vat-settings/", data)
       .then((res) => {
         setLoading(false);
-        toast.success('VAT settings updated successfully');
+        toast.success("VAT settings updated successfully");
         fetchTaxOptions();
         setNewTaxOptions([]);
       })

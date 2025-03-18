@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-const DefaultButton = ({type, title}) => {
+const DefaultButton = ({ type, title }) => {
   return (
     <button className="btn btn-raised-info text-white" type={type}>
       {title}

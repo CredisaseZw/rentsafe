@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import _ from 'lodash';
-import axios from 'axios';
-import { userFriendlyErrorOrResponse } from '../../../../utils';
+import { useState, useEffect } from "react";
+import _ from "lodash";
+import axios from "axios";
+import { userFriendlyErrorOrResponse } from "../../../../utils";
 
 // eslint-disable-next-line react/prop-types
 export default function SearchCustomerComponent({
@@ -19,7 +19,7 @@ export default function SearchCustomerComponent({
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [clients, setClients] = useState([]);
   const [rawData, setRawData] = useState([]);
 
@@ -36,13 +36,13 @@ export default function SearchCustomerComponent({
       setIsLoading(true);
       axios
         .post(url, {
-          searchParam: 'guess',
+          searchParam: "guess",
           searchValue: newValue,
         })
         .then((response) => {
-          if (response.data?.status !== 'failed') {
+          if (response.data?.status !== "failed") {
             setRawData([...response.data]);
-            if (type === 'company') {
+            if (type === "company") {
               setClients(
                 response.data.map((client) => ({
                   label: client.company_name,
@@ -57,7 +57,7 @@ export default function SearchCustomerComponent({
                 }))
               );
             }
-            setError('');
+            setError("");
             setIsLoading(false);
           } else {
             setClients([]);
@@ -82,13 +82,13 @@ export default function SearchCustomerComponent({
     setCustomerName && setCustomerName(client.label);
     setOpeningBalance &&
       setOpeningBalance(
-        type === 'company'
+        type === "company"
           ? selectedCustomer.company_opening_balance
           : selectedCustomer.opening_balance
       );
     setEndDate &&
       setEndDate(
-        type === 'company'
+        type === "company"
           ? selectedCustomer.company_opening_balance_date
           : selectedCustomer.opening_balance_date
       );
@@ -113,7 +113,7 @@ export default function SearchCustomerComponent({
       />
       {showDropdown && value && (
         <div
-          style={{ overflowY: 'auto' }}
+          style={{ overflowY: "auto" }}
           className="border border-dark rounded-1 c-bg-light custom-h-2 w-100 position-absolute mt-1 top-100 start-0 z-1"
         >
           {!isLoading && error ? (

@@ -1,16 +1,12 @@
-import { useState } from 'react';
-import { usePage } from '@inertiajs/inertia-react';
-import axios, { AxiosError } from 'axios';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import { useState } from "react";
+import { usePage } from "@inertiajs/inertia-react";
+import axios, { AxiosError } from "axios";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
-export default function useDebtorIntelligence(
-  initialData,
-  clientId,
-  isCreditorView
-) {
+export default function useDebtorIntelligence(initialData, clientId, isCreditorView) {
   const [isEditMode, setIsEditMode] = useState(!Boolean(initialData));
   const [data, setData] = useState(initialData);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { Auth } = usePage().props;
 
@@ -18,7 +14,7 @@ export default function useDebtorIntelligence(
   function handleSave(e) {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     const submitData = Object.fromEntries(new FormData(e.target).entries());
     if (isCreditorView) {
@@ -28,7 +24,7 @@ export default function useDebtorIntelligence(
     }
 
     axios
-      .put(reverseUrl('debtor_intelligence'), submitData)
+      .put(reverseUrl("debtor_intelligence"), submitData)
       .then((res) => {
         const newData = {
           text: res.data.note,
@@ -36,12 +32,12 @@ export default function useDebtorIntelligence(
           timestamp: res.data.updated_at || res.data.created_at,
         };
         setData(newData);
-        setError('');
+        setError("");
         setIsLoading(false);
         setIsEditMode(false);
       })
       .catch((error) => {
-         setError(userFriendlyErrorOrResponse(error));
+        setError(userFriendlyErrorOrResponse(error));
         setIsLoading(false);
         setIsEditMode(!Boolean(data));
       });

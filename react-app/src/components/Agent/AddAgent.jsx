@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 export default function AgentAdd({
   show,
@@ -14,30 +14,29 @@ export default function AgentAdd({
 }) {
   // const { errors } = usePage().props;
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
   const { data, setData, post, reset } = useForm({
-    firstName: userDetails?.firstname || '',
-    lastName: userDetails?.surname || '',
-    identificationNumber: userDetails?.identification_number || '',
-    identificationType: userDetails?.identification_type || '',
-    gender: userDetails?.gender || '',
-    dob: userDetails?.dob || '',
-    maritalStatus: userDetails?.marital_status || '',
-    address: userDetails?.address || '',
-    mobileNumber: userDetails?.mobile || '',
-    landLine: userDetails?.landline || '',
-    emailAddress: userDetails?.email || '',
-    currentEmployer: userDetails?.employer_name || '',
-    jobTitle: userDetails?.job_title || '',
-    dateOfemployment: userDetails?.date_of_employment || '',
+    firstName: userDetails?.firstname || "",
+    lastName: userDetails?.surname || "",
+    identificationNumber: userDetails?.identification_number || "",
+    identificationType: userDetails?.identification_type || "",
+    gender: userDetails?.gender || "",
+    dob: userDetails?.dob || "",
+    maritalStatus: userDetails?.marital_status || "",
+    address: userDetails?.address || "",
+    mobileNumber: userDetails?.mobile || "",
+    landLine: userDetails?.landline || "",
+    emailAddress: userDetails?.email || "",
+    currentEmployer: userDetails?.employer_name || "",
+    jobTitle: userDetails?.job_title || "",
+    dateOfemployment: userDetails?.date_of_employment || "",
     individualId: userDetails?.id || -1,
     isAgent: userDetails?.is_agent || false,
   });
-  const changeHandler = (e) =>
-    setData({ ...data, [e.target.id]: e.target.value });
+  const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
   const handleSubmitIndividual = (e) => {
-    console.log('create agent..');
+    console.log("create agent..");
     e.preventDefault();
     post(reverseUrl(url), {
       onStart: () => {
@@ -46,13 +45,13 @@ export default function AgentAdd({
       },
       onSuccess: (response) => {
         reset();
-        toast.success('OTP has been sent to user');
+        toast.success("OTP has been sent to user");
         setIsLoading(false);
         handleClose();
         setAddSuccessful(true);
       },
       onError: (e) => {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
         setErrors(e);
         setIsLoading(false);
       },
@@ -60,30 +59,30 @@ export default function AgentAdd({
   };
 
   const handleActivateAgent = (e) => {
-    console.log('activate agent..');
+    console.log("activate agent..");
     e.preventDefault();
     setIsLoading(true);
     axios
-      .post(reverseUrl('activate-agent'), {
+      .post(reverseUrl("activate-agent"), {
         userId: data.individualId,
       })
       .then((res) => {
         setIsLoading(false);
         handleClose();
         setAddSuccessful(true);
-        console.log('success');
+        console.log("success");
         console.log(res.data.status);
-        if (res.data.status === 'success') {
-          toast.success('Agent Activated successfully');
+        if (res.data.status === "success") {
+          toast.success("Agent Activated successfully");
         } else {
           throw new Error();
         }
       })
       .catch((err) => {
-        console.log('error');
+        console.log("error");
 
         setIsLoading(false);
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
       });
   };
 
@@ -108,16 +107,14 @@ export default function AgentAdd({
               <div className="card">
                 <div
                   className="card-header bg-info px-4"
-                  style={{ paddingTop: '2px', paddingBottom: '2px' }}
+                  style={{ paddingTop: "2px", paddingBottom: "2px" }}
                 >
                   <div
                     className="d-flex justify-content-center
                             align-items-center"
                   >
                     <div className="me-4">
-                      <h6 className="display-6 mb-0 text-white">
-                        Personal details
-                      </h6>
+                      <h6 className="display-6 mb-0 text-white">Personal details</h6>
                       <div className="card-text"></div>
                     </div>
                   </div>
@@ -125,8 +122,8 @@ export default function AgentAdd({
                 <div
                   className="card-body p-4"
                   style={{
-                    borderStyle: 'solid',
-                    borderColor: '#26a69a',
+                    borderStyle: "solid",
+                    borderColor: "#26a69a",
                   }}
                 >
                   <Modal.Body>
@@ -147,11 +144,7 @@ export default function AgentAdd({
                               placeholder="Enter last name"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.lastName}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.lastName}</div>}
                           </div>
 
                           <div className="col-md-4">
@@ -168,11 +161,7 @@ export default function AgentAdd({
                               placeholder="Enter first name"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.firstName}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.firstName}</div>}
                           </div>
                           <div className="col-md-4">
                             <label className="form-label">
@@ -194,9 +183,7 @@ export default function AgentAdd({
                               <option value="servicesid">Service ID</option>
                             </select>
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.identificationType}
-                              </div>
+                              <div className="text-danger mt-1">{errors.identificationType}</div>
                             )}
                           </div>
                         </div>
@@ -221,9 +208,7 @@ export default function AgentAdd({
                               className="form-control form-control-sm"
                             />
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.identificationNumber}
-                              </div>
+                              <div className="text-danger mt-1">{errors.identificationNumber}</div>
                             )}
                           </div>
 
@@ -242,11 +227,7 @@ export default function AgentAdd({
                               <option value="female">Female</option>
                               <option value="other">Other</option>
                             </select>
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.gender}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.gender}</div>}
                           </div>
                           <div className="col-md-4">
                             <label className="form-label">Date Of birth</label>
@@ -258,11 +239,7 @@ export default function AgentAdd({
                               id="dob"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.dob}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.dob}</div>}
                           </div>
                         </div>
                       </div>
@@ -286,9 +263,7 @@ export default function AgentAdd({
                               <option value="Other">Other</option>
                             </select>
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.maritalStatus}
-                              </div>
+                              <div className="text-danger mt-1">{errors.maritalStatus}</div>
                             )}
                           </div>
 
@@ -306,11 +281,7 @@ export default function AgentAdd({
                               placeholder="eg. 12 Main Road"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.address}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.address}</div>}
                           </div>
                           <div className="col-md-4">
                             <label className="form-label">
@@ -328,9 +299,7 @@ export default function AgentAdd({
                               className="form-control form-control-sm"
                             />
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.mobileNumber}
-                              </div>
+                              <div className="text-danger mt-1">{errors.mobileNumber}</div>
                             )}
                           </div>
                         </div>
@@ -350,11 +319,7 @@ export default function AgentAdd({
                               placeholder="eg. 263 123 4567"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.landLine}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.landLine}</div>}
                           </div>
 
                           <div className="col-md-4">
@@ -369,9 +334,7 @@ export default function AgentAdd({
                               className="form-control form-control-sm"
                             />
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.emailAddress}
-                              </div>
+                              <div className="text-danger mt-1">{errors.emailAddress}</div>
                             )}
                           </div>
                         </div>
@@ -380,16 +343,14 @@ export default function AgentAdd({
                     <div className="card">
                       <div
                         className="card-header bg-info px-4"
-                        style={{ paddingTop: '2px', paddingBottom: '2px' }}
+                        style={{ paddingTop: "2px", paddingBottom: "2px" }}
                       >
                         <div
                           className="d-flex justify-content-center
                             align-items-center"
                         >
                           <div className="me-4">
-                            <h6 className="display-6 mb-0 text-white">
-                              Employment Details
-                            </h6>
+                            <h6 className="display-6 mb-0 text-white">Employment Details</h6>
                             <div className="card-text"></div>
                           </div>
                         </div>
@@ -399,9 +360,7 @@ export default function AgentAdd({
                       <div className="col-md-12">
                         <div className="row">
                           <div className="col-md-4">
-                            <label className="form-label">
-                              Current Employer
-                            </label>
+                            <label className="form-label">Current Employer</label>
                             <input
                               value={data.currentEmployer}
                               onChange={changeHandler}
@@ -412,16 +371,12 @@ export default function AgentAdd({
                               className="form-control form-control-sm"
                             />
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.currentEmployer}
-                              </div>
+                              <div className="text-danger mt-1">{errors.currentEmployer}</div>
                             )}
                           </div>
 
                           <div className="col-md-4">
-                            <label className="form-label">
-                              Current Job Title
-                            </label>
+                            <label className="form-label">Current Job Title</label>
                             <input
                               value={data.jobTitle}
                               onChange={changeHandler}
@@ -431,16 +386,10 @@ export default function AgentAdd({
                               placeholder="eg. Accounts Clerk"
                               className="form-control form-control-sm"
                             />
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.jobTitle}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.jobTitle}</div>}
                           </div>
                           <div className="col-md-4">
-                            <label className="form-label">
-                              Date of Employement
-                            </label>
+                            <label className="form-label">Date of Employement</label>
                             <input
                               value={data.dateOfemployment}
                               onChange={changeHandler}
@@ -450,9 +399,7 @@ export default function AgentAdd({
                               className="form-control form-control-sm"
                             />
                             {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.dateOfemployment}
-                              </div>
+                              <div className="text-danger mt-1">{errors.dateOfemployment}</div>
                             )}
                           </div>
                         </div>
@@ -473,24 +420,20 @@ export default function AgentAdd({
                             <span className="ml-2">processing..</span>
                           </>
                         ) : (
-                          'Save and Proceed'
+                          "Save and Proceed"
                         )}
                       </Button>
                     ) : (
                       <>
                         {data.isAgent ? (
-                          <Button
-                            className="text-white"
-                            variant="info"
-                            disabled={true}
-                          >
+                          <Button className="text-white" variant="info" disabled={true}>
                             {isLoading ? (
                               <>
                                 <span className="spinner-grow spinner-grow-sm"></span>
                                 <span className="ml-2">processing..</span>
                               </>
                             ) : (
-                              'De-activate'
+                              "De-activate"
                             )}
                           </Button>
                         ) : (
@@ -506,7 +449,7 @@ export default function AgentAdd({
                                 <span className="ml-2">processing..</span>
                               </>
                             ) : (
-                              'Activate Agent'
+                              "Activate Agent"
                             )}
                           </Button>
                         )}
