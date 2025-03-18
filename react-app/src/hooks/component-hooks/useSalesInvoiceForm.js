@@ -6,6 +6,7 @@ export default function useSalesInvoiceForm() {
   const [show, setShow] = useState(true);
   const [currency, setCurrency] = useState('USD');
   const [salesCodes, setSalesCodes] = useState([]);
+  const [taxConfigs, setTaxConfigs] = useState([]);
   const [items, setItems] = useState([
     {
       sales_code: '',
@@ -21,7 +22,6 @@ export default function useSalesInvoiceForm() {
     axios
       .get('/accounting/items/')
       .then((res) => {
-        console.log(res);
         setSalesCodes(res.data);
       })
       .catch((err) => {
@@ -29,14 +29,33 @@ export default function useSalesInvoiceForm() {
       });
   }
 
+  function fetchTaxConfigs() {
+    axios
+      .get('/accounting/vat-settings/')
+      .then((res) => {
+        setTaxConfigs(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
   useEffect(() => {
     fetchSalesCodes();
+    fetchTaxConfigs();
   }, []);
 
   function addRow() {
     setItems([
       ...items,
-      { salesCode: '', salesItem: '', price: '', qty: '', vat: '', total: '' },
+      {
+        sales_code: '',
+        sales_item: '',
+        price: '',
+        qty: '',
+        vat: '',
+        total: '',
+      },
     ]);
   }
 
@@ -56,31 +75,19 @@ export default function useSalesInvoiceForm() {
   function onSubmit(e) {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target).entries());
+    data.items = items;
     console.log(data);
-  }
-
-  function changeHandler(e, index) {
-    const { id, value, type } = e.target;
-    setItems((prev) =>
-      prev.map((item, i) => {
-        if (index === i) {
-          return {
-            ...item,
-            [id]: type === 'number' ? parseFloat(value) : value,
-          };
-        }
-        return item;
-      })
-    );
   }
 
   const totals = items.reduce(
     (acc, item) => {
-      acc.totalExcludingVat +=
-        (parseFloat(item.price) || 0) * (parseFloat(item.qty) || 0);
+      const qty = parseFloat(item.qty) || 0;
+      const unitVat = (parseFloat(item.vat) || 0) / 100;
+      const unitPrice = parseFloat(item.price) || 0;
+      acc.totalExcludingVat += unitPrice * qty;
       acc.discount += 0;
-      acc.vatTotal += parseFloat(item.vat);
-      acc.invoiceTotal += parseFloat(item.total);
+      acc.vatTotal += unitPrice * unitVat * qty;
+      acc.invoiceTotal += parseFloat(item.total) || 0;
       return acc;
     },
     {
@@ -98,12 +105,13 @@ export default function useSalesInvoiceForm() {
     currency,
     isLoading,
     salesCodes,
+    taxConfigs,
     addRow,
+    setItems,
     onSubmit,
     removeRow,
     handleShow,
     setCurrency,
     handleClose,
-    changeHandler,
   };
 }

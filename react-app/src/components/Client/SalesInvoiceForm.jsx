@@ -1,6 +1,7 @@
 import ContentModal from '../ContentModal.jsx';
 import useSalesInvoiceForm from '../../hooks/component-hooks/useSalesInvoiceForm.js';
 import UserSelector from '../UserSelector.jsx';
+import InvoiceFormRow from './InvoiceFormRow.jsx';
 
 export function SalesInvoiceForm() {
   const {
@@ -9,13 +10,15 @@ export function SalesInvoiceForm() {
     totals,
     currency,
     isLoading,
+    salesCodes,
+    taxConfigs,
     addRow,
+    setItems,
     onSubmit,
     removeRow,
     handleShow,
     setCurrency,
     handleClose,
-    changeHandler,
   } = useSalesInvoiceForm();
 
   return (
@@ -139,7 +142,7 @@ export function SalesInvoiceForm() {
             </div>
 
             <table className="table table-sm table-bordered table-responsive">
-              <thead className="text-center">
+              <thead className="text-center text-nowrap">
                 <tr>
                   <th></th>
                   <th></th>
@@ -175,90 +178,19 @@ export function SalesInvoiceForm() {
 
               <tbody>
                 {items.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <button
-                        disabled={isLoading || items.length === 1}
-                        type="button"
-                        onClick={() => removeRow(index)}
-                        className="btn btn-danger btn-sm p-1"
-                      >
-                        <i className="material-icons">close</i>
-                      </button>
-                    </td>
-
-                    <td>
-                      <input
-                        type="text"
-                        name="sales_code"
-                        id="sales_code"
-                        disabled={isLoading}
-                        value={item.salesCode}
-                        onChange={(e) => changeHandler(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="text"
-                        name="sales_item"
-                        id="sales_item"
-                        disabled={isLoading}
-                        value={item.salesItem}
-                        onChange={(e) => changeHandler(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="number"
-                        name="price"
-                        id="price"
-                        disabled={isLoading}
-                        value={item.price}
-                        onChange={(e) => changeHandler(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="number"
-                        name="qty"
-                        id="qty"
-                        disabled={isLoading}
-                        value={item.qty}
-                        onChange={(e) => changeHandler(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="text"
-                        name="vat"
-                        id="vat"
-                        disabled={isLoading}
-                        value={item.vat}
-                        onChange={(e) => changeHandler(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="text"
-                        name="total"
-                        id="total"
-                        disabled={isLoading}
-                        value={item.total}
-                        onChange={(e) => changeHandler(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-                  </tr>
+                  <InvoiceFormRow
+                    key={index}
+                    {...{
+                      item,
+                      index,
+                      setItems,
+                      removeRow,
+                      isLoading,
+                      salesCodes,
+                      taxConfigs,
+                      itemsLength: items.length,
+                    }}
+                  />
                 ))}
               </tbody>
 
@@ -293,13 +225,13 @@ export function SalesInvoiceForm() {
                 <tr>
                   <td></td>
                   <td colSpan={5}>VAT Total</td>
-                  <td>{totals.vat}</td>
+                  <td>{totals.vatTotal}</td>
                 </tr>
 
                 <tr>
                   <td></td>
                   <td colSpan={5}>Invoice Total {currency}</td>
-                  <td>{totals.InvoiceTotal}</td>
+                  <td>{totals.invoiceTotal}</td>
                 </tr>
               </tfoot>
             </table>
