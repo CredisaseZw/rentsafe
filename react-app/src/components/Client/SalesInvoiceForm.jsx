@@ -18,7 +18,6 @@ export function SalesInvoiceForm() {
     onSubmit,
     removeRow,
     handleShow,
-    setCurrency,
     handleClose,
     changeCurrency,
   } = useSalesInvoiceForm();
