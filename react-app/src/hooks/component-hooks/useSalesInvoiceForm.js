@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 export default function useSalesInvoiceForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [currency, setCurrency] = useState("USD");
   const [salesCodes, setSalesCodes] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
@@ -128,7 +128,6 @@ export default function useSalesInvoiceForm() {
     onSubmit,
     removeRow,
     handleShow,
-    setCurrency,
     handleClose,
     changeCurrency,
   };
