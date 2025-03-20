@@ -1,9 +1,10 @@
-import { color } from "chart.js/helpers";
 import AdverseData from "../components/AdverseData.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
 import Disbursements from "../components/Disbursements.jsx";
+import AccountsList from "../components/modals/AccountsList.jsx";
+import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 import ToDoList from "../components/modals/sidebar/ToDoList.jsx";
 
@@ -169,9 +170,33 @@ export const clientSidebarNavigation = [
       },
       {
         navLink: "General Ledger",
-        color: "#2aa7d1",
-        type: "link",
-        href: reverseUrl("general_ledger"),
+        color: "steelblue",
+        subNavLinks: [
+          {
+            navLink: "General Journal",
+            color: "steelblue",
+            type: "link",
+            href: "",
+          },
+          {
+            navLink: "Reports",
+            color: "steelblue",
+            subNavLinks: [
+              {
+                navLink: "Accounts List",
+                color: "steelblue",
+                type: "modal",
+                component: <AccountsList />,
+              },
+            ],
+          },
+          {
+            navLink: "Settings",
+            color: "steelblue",
+            type: "link",
+            href: "",
+          },
+        ],
       },
       {
         navLink: "Reports",
@@ -206,6 +231,24 @@ export const clientSidebarNavigation = [
             color: "purple",
             type: "link",
             href: reverseUrl("vat_settings"),
+          },
+          {
+            navLink: "General Ledger",
+            color: "purple",
+            subNavLinks: [
+              {
+                navLink: "Accounts List",
+                color: "purple",
+                type: "link",
+                href: reverseUrl("accounts_list"),
+              },
+              {
+                navLink: "Accounts Sectors",
+                color: "purple",
+                type: "modal",
+                component: <AccountsSectors />,
+              },
+            ],
           },
         ],
       },
