@@ -281,3 +281,17 @@ export const residentialInspectionChecklist = [
     description: "Smoke and carbon monoxide detectors in place?",
   },
 ];
+
+export const accountsSectors = [
+  { code: "S1", sector: "Sales" },
+  { code: "S2", sector: "Cost of Sales" },
+  { code: "S3", sector: "Direct expenses" },
+  { code: "S4", sector: "Other income" },
+  { code: "S5", sector: "Expenses" },
+  { code: "S6", sector: "Fixed Assets" },
+  { code: "S7", sector: "Investments" },
+  { code: "S8", sector: "Current Assets" },
+  { code: "S9", sector: "Equity & Reserves" },
+  { code: "S10", sector: "Long Term Liabilities" },
+  { code: "S11", sector: "Current Liabilities" },
+];

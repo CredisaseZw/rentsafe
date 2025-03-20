@@ -1,9 +1,9 @@
-import { color } from "chart.js/helpers";
 import AdverseData from "../components/AdverseData.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
 import Disbursements from "../components/Disbursements.jsx";
+import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 import ToDoList from "../components/modals/sidebar/ToDoList.jsx";
 
@@ -244,8 +244,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Accounts Sectors",
                 color: "purple",
-                type: "link",
-                href: "",
+                type: "modal",
+                component: <AccountsSectors />,
               },
             ],
           },
