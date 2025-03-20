@@ -3,6 +3,7 @@ import SubscriptionsManagement from "../components/Client/SubscriptionsManagemen
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
 import Disbursements from "../components/Disbursements.jsx";
+import AccountsList from "../components/modals/AccountsList.jsx";
 import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 import ToDoList from "../components/modals/sidebar/ToDoList.jsx";
@@ -184,8 +185,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Accounts List",
                 color: "steelblue",
-                type: "link",
-                href: "",
+                type: "modal",
+                component: <AccountsList />,
               },
             ],
           },
@@ -239,7 +240,7 @@ export const clientSidebarNavigation = [
                 navLink: "Accounts List",
                 color: "purple",
                 type: "link",
-                href: "",
+                href: reverseUrl("accounts_list"),
               },
               {
                 navLink: "Accounts Sectors",
