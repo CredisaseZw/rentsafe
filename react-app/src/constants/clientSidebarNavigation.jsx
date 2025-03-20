@@ -169,9 +169,33 @@ export const clientSidebarNavigation = [
       },
       {
         navLink: "General Ledger",
-        color: "#2aa7d1",
-        type: "link",
-        href: reverseUrl("general_ledger"),
+        color: "steelblue",
+        subNavLinks: [
+          {
+            navLink: "General Journal",
+            color: "steelblue",
+            type: "link",
+            href: "",
+          },
+          {
+            navLink: "Reports",
+            color: "steelblue",
+            subNavLinks: [
+              {
+                navLink: "Accounts List",
+                color: "steelblue",
+                type: "link",
+                href: "",
+              },
+            ],
+          },
+          {
+            navLink: "Settings",
+            color: "steelblue",
+            type: "link",
+            href: "",
+          },
+        ],
       },
       {
         navLink: "Reports",
@@ -206,6 +230,24 @@ export const clientSidebarNavigation = [
             color: "purple",
             type: "link",
             href: reverseUrl("vat_settings"),
+          },
+          {
+            navLink: "General Ledger",
+            color: "purple",
+            subNavLinks: [
+              {
+                navLink: "Accounts List",
+                color: "purple",
+                type: "link",
+                href: "",
+              },
+              {
+                navLink: "Accounts Sectors",
+                color: "purple",
+                type: "link",
+                href: "",
+              },
+            ],
           },
         ],
       },
