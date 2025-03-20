@@ -3,7 +3,7 @@ import useSalesInvoiceForm from "../../hooks/component-hooks/useSalesInvoiceForm
 import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
 
-export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren }) {
+export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, isProforma }) {
   const {
     key,
     show,
@@ -23,7 +23,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren })
     handleClose,
     changeCurrency,
     handleDiscount,
-  } = useSalesInvoiceForm(invoice);
+  } = useSalesInvoiceForm(invoice, isProforma);
 
   return (
     <>
@@ -36,7 +36,12 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren })
         )}
       </button>
 
-      <ContentModal size="xl" show={show} handleClose={handleClose} title="FISCAL TAX INVOICE">
+      <ContentModal
+        size="xl"
+        show={show}
+        handleClose={handleClose}
+        title={isProforma ? "PROFORMA" : "FISCAL TAX INVOICE"}
+      >
         <form className="p-3" onSubmit={onSubmit}>
           <div className="p-4 mb-4">
             <div className="pb-5">

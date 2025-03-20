@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function useSalesInvoiceForm(invoice) {
+export default function useSalesInvoiceForm(invoice, isProforma) {
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
@@ -129,7 +129,9 @@ export default function useSalesInvoiceForm(invoice) {
     Object.keys(totals).forEach((key) => (data[key] = totals[key]));
     data.invoiceTotal += Number(discount);
     data.discount = Number(discount);
-    console.log(data);
+    if (isProforma) {
+      console.log("Proforma Invoice Data: ", data);
+    } else console.log(data);
   }
 
   function changeCurrency(e) {
