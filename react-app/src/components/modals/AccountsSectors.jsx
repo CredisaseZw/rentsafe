@@ -11,7 +11,7 @@ export default function AccountsSectors(props) {
         children: (
           <div>
             <table className="table table-responsive table-sm table-bordered">
-              <thead>
+              <thead className="sticky-top bg-white shadow-sm">
                 <tr>
                   <th>Code</th>
                   <th>Sector</th>
