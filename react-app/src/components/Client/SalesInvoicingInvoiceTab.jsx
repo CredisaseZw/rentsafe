@@ -88,16 +88,15 @@ export default function SalesInvoicingInvoiceTab() {
                   </div>
                 </td>
               </tr>
+            ) : !Boolean(invoiceList?.length) ? (
+              <tr>
+                <td colSpan={6}>
+                  <div className="custom-h-2 bg-white d-flex justify-content-center align-items-center">
+                    Nothing to show
+                  </div>
+                </td>
+              </tr>
             ) : (
-              //  : !Boolean(invoiceList?.length) ? (
-              //   <tr>
-              //     <td colSpan={6}>
-              //       <div className="custom-h-3 bg-white d-flex justify-content-center align-items-center">
-              //         Nothing to show
-              //       </div>
-              //     </td>
-              //   </tr>
-              // )
               invoiceList?.map((invoice, index) => (
                 <tr key={index}>
                   <td className="ps-3">{invoice.id}</td>
