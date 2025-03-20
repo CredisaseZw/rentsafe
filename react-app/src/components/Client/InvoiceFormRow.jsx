@@ -136,7 +136,7 @@ export default function InvoiceFormRow({
       <tr>
         <td>
           <button
-            disabled={isLoading || itemsLength === 1}
+            disabled={item.static || isLoading || itemsLength === 1}
             type="button"
             onClick={() => removeRow(index)}
             className="btn btn-danger btn-sm p-1"
@@ -146,21 +146,28 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <select
-            //  name="sales_code"
-            //  id="sales_code"
-            disabled={isLoading}
-            value={item.sales_code}
-            onChange={handleSalesCodeSelect}
-            className="form-select custom-w-2"
-          >
-            <option value="">Select code..</option>
-            {salesCodes.map((code) => (
-              <option key={code.id} value={code.item_id}>
-                {`${code.item_id} - ${code.name}`}
+          {item.static ? (
+            item.sales_code
+          ) : (
+            <select
+              //  name="sales_code"
+              //  id="sales_code"
+              required
+              disabled={isLoading}
+              value={item.sales_code}
+              onChange={handleSalesCodeSelect}
+              className="form-select custom-w-2"
+            >
+              <option disabled value="">
+                Select code..
               </option>
-            ))}
-          </select>
+              {salesCodes.map((code) => (
+                <option key={code.id} value={code.item_id}>
+                  {`${code.item_id} - ${code.name}`}
+                </option>
+              ))}
+            </select>
+          )}
         </td>
 
         <td>
@@ -177,32 +184,37 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <input
-            type="number"
-            //  name="qty"
-            //  id="qty"
-            className="form-control custom-w-1"
-            disabled={isLoading}
-            value={item.qty}
-            onChange={(e) =>
-              setItems((prev) =>
-                prev.map((prevItem, prevIndex) => {
-                  if (prevIndex === index) {
-                    const qty = parseFloat(e.target.value) || 0;
-                    const unitPrice = parseFloat(item.price) || 0;
-                    const totalCost = unitPrice * qty;
-                    const totalVat = (totalCost * item.vat) / 100;
+          {item.static ? (
+            item.qty
+          ) : (
+            <input
+              type="number"
+              //  name="qty"
+              //  id="qty"
+              className="form-control custom-w-1"
+              disabled={isLoading}
+              value={item.qty}
+              required
+              onChange={(e) =>
+                setItems((prev) =>
+                  prev.map((prevItem, prevIndex) => {
+                    if (prevIndex === index) {
+                      const qty = parseFloat(e.target.value) || 0;
+                      const unitPrice = parseFloat(item.price) || 0;
+                      const totalCost = unitPrice * qty;
+                      const totalVat = (totalCost * item.vat) / 100;
 
-                    return {
-                      ...prevItem,
-                      qty: e.target.value,
-                      total: totalCost + totalVat,
-                    };
-                  } else return prevItem;
-                })
-              )
-            }
-          />
+                      return {
+                        ...prevItem,
+                        qty: e.target.value,
+                        total: totalCost + totalVat,
+                      };
+                    } else return prevItem;
+                  })
+                )
+              }
+            />
+          )}
         </td>
 
         <td>

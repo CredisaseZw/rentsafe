@@ -624,7 +624,7 @@
   border-right: none !important;
 }
 
-#currency {
+#invoice_currency {
   background-color: transparent;
   border: none;
   outline: none;
@@ -634,7 +634,7 @@
   text-align: center;
 }
 
-#currency option {
+#invoice_currency option {
   background-color: white; /* Background color for options */
   width: 100%;
   text-align: center;

@@ -3,16 +3,18 @@ import useSalesInvoiceForm from "../../hooks/component-hooks/useSalesInvoiceForm
 import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
 
-export function SalesInvoiceForm() {
+export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, isProforma }) {
   const {
     key,
     show,
     items,
     totals,
+    discount,
     currency,
     isLoading,
     salesCodes,
     taxConfigs,
+    invoiceData,
     addRow,
     setItems,
     onSubmit,
@@ -20,16 +22,26 @@ export function SalesInvoiceForm() {
     handleShow,
     handleClose,
     changeCurrency,
-  } = useSalesInvoiceForm();
+    handleDiscount,
+  } = useSalesInvoiceForm(invoice, isProforma);
 
   return (
     <>
-      <button className="btn btn-info text-white" onClick={handleShow}>
-        <i className="leading-icon material-icons">add</i>
-        New
+      <button className={triggerClassname || "btn btn-info text-white"} onClick={handleShow}>
+        {triggerChildren || (
+          <>
+            <i className="leading-icon material-icons">add</i>
+            New
+          </>
+        )}
       </button>
 
-      <ContentModal size="xl" show={show} handleClose={handleClose} title="FISCAL TAX INVOICE">
+      <ContentModal
+        size="xl"
+        show={show}
+        handleClose={handleClose}
+        title={isProforma ? "PROFORMA" : "FISCAL TAX INVOICE"}
+      >
         <form className="p-3" onSubmit={onSubmit}>
           <div className="p-4 mb-4">
             <div className="pb-5">
@@ -43,6 +55,8 @@ export function SalesInvoiceForm() {
                   name="document_number"
                   id="document_number"
                   placeholder="e.g 112108"
+                  readOnly={Boolean(invoiceData?.document_number)}
+                  defaultValue={invoiceData?.document_number}
                 />
               </div>
 
@@ -50,7 +64,17 @@ export function SalesInvoiceForm() {
                 <label htmlFor="bill_to" className="form-label">
                   Bill To:
                 </label>
-                <UserSelector />
+                {invoiceData?.bill_to ? (
+                  <input
+                    className="form-control border-0 border-bottom flex-fill border-3 custom-mx-w-4"
+                    name="bill_to"
+                    id="bill_to"
+                    readOnly
+                    value={invoiceData?.bill_to}
+                  />
+                ) : (
+                  <UserSelector />
+                )}
               </div>
 
               <div className="mb-3 d-flex gap-4 align-items-center">
@@ -63,6 +87,8 @@ export function SalesInvoiceForm() {
                   name="address"
                   id="address"
                   placeholder="Address..."
+                  defaultValue={invoiceData?.address}
+                  readOnly={Boolean(invoiceData?.address)}
                 />
               </div>
 
@@ -76,6 +102,8 @@ export function SalesInvoiceForm() {
                   name="phone"
                   id="phone"
                   placeholder="Phone..."
+                  defaultValue={invoiceData?.phone}
+                  readOnly={Boolean(invoiceData?.phone)}
                 />
               </div>
 
@@ -89,6 +117,8 @@ export function SalesInvoiceForm() {
                   name="email"
                   id="email"
                   placeholder="Email..."
+                  defaultValue={invoiceData?.email}
+                  readOnly={Boolean(invoiceData?.email)}
                 />
               </div>
 
@@ -102,6 +132,8 @@ export function SalesInvoiceForm() {
                   name="vat_no"
                   id="vat_no"
                   placeholder="VAT No...."
+                  defaultValue={invoiceData?.vat_no}
+                  readOnly={Boolean(invoiceData?.vat_no)}
                 />
               </div>
 
@@ -115,6 +147,8 @@ export function SalesInvoiceForm() {
                   name="tin"
                   id="tin"
                   placeholder="TIN..."
+                  defaultValue={invoiceData?.tin}
+                  readOnly={Boolean(invoiceData?.tin)}
                 />
               </div>
 
@@ -131,6 +165,7 @@ export function SalesInvoiceForm() {
                   min={new Date(new Date().setDate(1)).toISOString().split("T")[0]}
                   id="date"
                   type="date"
+                  readOnly={Boolean(invoiceData)}
                 />
               </div>
             </div>
@@ -148,12 +183,18 @@ export function SalesInvoiceForm() {
                     <div>
                       <select
                         value={currency}
-                        name="currency"
-                        id="currency"
+                        name="invoice_currency"
+                        id="invoice_currency"
                         onChange={changeCurrency}
                       >
-                        <option value="USD">United States Dollar (USD)</option>
-                        <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
+                        {invoiceData?.currency ? (
+                          <option value={invoiceData.currency}>{invoiceData.currency}</option>
+                        ) : (
+                          <>
+                            <option value="USD">United States Dollar (USD)</option>
+                            <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
+                          </>
+                        )}
                       </select>
                     </div>
                   </th>
@@ -214,7 +255,20 @@ export function SalesInvoiceForm() {
                 <tr>
                   <td></td>
                   <td colSpan={5}>Discount</td>
-                  <td>{totals.discount}</td>
+                  <td>
+                    <input
+                      style={{ width: "150px" }}
+                      className="form-control d-inline-block text-end"
+                      type="number"
+                      name="discount"
+                      id="discount"
+                      vlaue={discount}
+                      max={0}
+                      step={0.001}
+                      onChange={handleDiscount}
+                      readOnly={isLoading}
+                    />
+                  </td>
                 </tr>
 
                 <tr>
@@ -226,7 +280,7 @@ export function SalesInvoiceForm() {
                 <tr>
                   <td></td>
                   <td colSpan={5}>Invoice Total {currency}</td>
-                  <td>{totals.invoiceTotal}</td>
+                  <td>{totals.invoiceTotal + discount}</td>
                 </tr>
               </tfoot>
             </table>

@@ -1,9 +1,10 @@
 import useRecurringInvoicingInvoiceTab from "../../hooks/component-hooks/useRecurringInvoicingInvoiceTab.js";
 import { friendlyDate } from "../../utils/index.js";
+import { SalesInvoiceForm } from "./SalesInvoiceForm.jsx";
 
 export default function RecurringInvoicingInvoiceTab() {
   const { loading, invoiceList } = useRecurringInvoicingInvoiceTab();
-  console.log(invoiceList[0]);
+
   return (
     <div>
       <div>
@@ -52,22 +53,24 @@ export default function RecurringInvoicingInvoiceTab() {
                     {invoice.date_created && friendlyDate(invoice.date_created)}
                   </td>
 
-                  <td className="ps-3"></td>
+                  <td className="ps-3">{invoice.customer_acc || ""}</td>
 
                   <td className="ps-3">{invoice.customer}</td>
 
-                  <td className="p-0">
+                  <td className="p-0 ">
                     <div className="d-flex justify-content-center align-items-center p-1">
-                      <button className="btn btn-sm w-100 justify-content-center btn-info text-white">
-                        View
-                      </button>
+                      <SalesInvoiceForm
+                        invoice={invoice}
+                        triggerChildren="Generate"
+                        triggerClassname="btn btn-sm w-100  justify-content-center btn-danger"
+                      />
                     </div>
                   </td>
 
                   <td className="p-0">
                     <div className="d-flex justify-content-center align-items-center p-1">
                       <button className="btn btn-sm w-100 justify-content-center btn-dark text-white">
-                        <i className="material-icons">close</i>
+                        <span>-</span>
                       </button>
                     </div>
                   </td>
