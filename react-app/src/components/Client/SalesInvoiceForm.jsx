@@ -148,8 +148,8 @@ export function SalesInvoiceForm() {
                     <div>
                       <select
                         value={currency}
-                        name="currency"
-                        id="currency"
+                        name="invoice_currency"
+                        id="invoice_currency"
                         onChange={changeCurrency}
                       >
                         <option value="USD">United States Dollar (USD)</option>
