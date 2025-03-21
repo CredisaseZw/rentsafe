@@ -1,1 +1,0 @@
-const n=["Agriculture","Banking","Construction","Education","Energy","Entertainment","Finance","Food","Health","Hospitality","Insurance","Manufacturing","Media","Retail","Technology","Telecommunications","Transportation","Aviation","Real Estate","Other"];export{n as i};
