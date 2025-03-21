@@ -482,16 +482,6 @@ urlpatterns = [
                     name="credit_journal",
                 ),
                 path(
-                    "accounting/account-adjustment/creditor/debit-journal/",
-                    clients.creditor_debit_journal,
-                    name="creditor_debit_journal",
-                ),
-                path(
-                    "accounting/account-adjustment/creditor/credit-journal/",
-                    clients.creditor_credit_journal,
-                    name="creditor_credit_journal",
-                ),
-                path(
                     "accounting/commission-statement/",
                     statements.commission_statement,
                     name="commission_statement",
@@ -570,6 +560,11 @@ urlpatterns = [
                     "forecasts/",
                     forecasts.get_forecast_inflows,
                     name="forecasts",
+                ),
+                path(
+                    "get-creditor-journals/",
+                    creditors.get_creditor_journals,
+                    name="get_creditor_journals",
                 ),
                 path(
                     "creditor-debit/",

@@ -57,7 +57,7 @@ export default function CreditorCreditJournal() {
                         setRows(newRows);
                       }}
                       // url={reverseUrl('get_client_individual_journals')}
-                      url=""
+                      url={reverseUrl("get_creditor_journals")}
                       placeholder="Start typing"
                       delay={500}
                       setCreditorName={(val) => {
