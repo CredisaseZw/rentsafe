@@ -243,13 +243,6 @@ JS_ROUTES_INCLUSION_LIST = [
     "ledger_transactions_list",
     "ledger_transactions_detail",
     
-    
-    
-    
-    
-    
-    "creditor_debit_journal",
-    "creditor_credit_journal",
     "debit_journal",
     "credit_journal",
     "get_client_company_journals",
@@ -389,7 +382,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "resolve_task",
     "delete_work_schedule",
     "forecasts",
-    "admin_leases" # <str: leases_type> as the url parameter
+    "admin_leases", # <str: leases_type> as the url parameter
     #CREDITORS BALANCES
     "creditor_debit_journal",
     "creditor_credit_journal",

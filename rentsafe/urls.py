@@ -482,16 +482,6 @@ urlpatterns = [
                     name="credit_journal",
                 ),
                 path(
-                    "accounting/account-adjustment/creditor/debit-journal/",
-                    clients.creditor_debit_journal,
-                    name="creditor_debit_journal",
-                ),
-                path(
-                    "accounting/account-adjustment/creditor/credit-journal/",
-                    clients.creditor_credit_journal,
-                    name="creditor_credit_journal",
-                ),
-                path(
                     "accounting/commission-statement/",
                     statements.commission_statement,
                     name="commission_statement",
