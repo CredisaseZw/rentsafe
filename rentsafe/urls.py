@@ -562,6 +562,11 @@ urlpatterns = [
                     name="forecasts",
                 ),
                 path(
+                    "get-creditor-journals/",
+                    creditors.get_creditor_journals,
+                    name="get_creditor_journals",
+                ),
+                path(
                     "creditor-debit/",
                     creditors.creditor_debit_journal,
                     name="creditor_debit_journal",

@@ -376,7 +376,7 @@ def validate_bulk_email_addresses(value):
 def get_creditor_helper(data, request, creditors_data):
     searchValue = data["searchValue"].upper()
     first_name = searchValue.split()[0]
-    surname  = searchValue.split()[1] if len(searchValue.split()) > 1 else first_name 
+    surname  = searchValue.split()[1] if len(searchValue.split()) > 1 else "" 
     if searchValue[:4].isdigit():
         result = Landlord.objects.filter(
             Q(reg_ID_Number__icontains=searchValue)
@@ -385,16 +385,15 @@ def get_creditor_helper(data, request, creditors_data):
         result = Landlord.objects.filter(
             landlord_name__icontains=first_name).first()
 
-    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(landlord_id=result.id)
+    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(landlord_id=result.landlord_id)
     # individual_invoice = Invoicing.objects.filter(lease_id=individual_lease.lease_id).last()
     creditors_data = {
         "opening_balance": creditor_opening_balance.last().total_amount if creditor_opening_balance else 0,
         "opening_balance_date": creditor_opening_balance.first().created_at if creditor_opening_balance else None,
-        "full_name": f"{result.first().landlord_name}",
-        "lease_id": creditor_opening_balance.first().lease_id,
+        "full_name": f"{result.landlord_name}",
+        "lease_id": creditor_opening_balance.first().lease_id if creditor_opening_balance else None,
     }
-    creditors_data.append(creditors_data)
-    return JsonResponse(creditors_data, safe=False)
+    return JsonResponse([creditors_data], safe=False)
 
 
 
