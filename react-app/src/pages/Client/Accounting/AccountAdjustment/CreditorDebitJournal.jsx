@@ -3,7 +3,6 @@ import Layout from "../../../../components/Layouts/client/Layout.jsx";
 import SearchCreditorComponent from "./SearchCreditor.jsx";
 import { formatCurrency } from "../../../../utils/formatting.js";
 import useCreditorDebitJournal from "../../../../hooks/page-hooks/useCreditorDebitJournal.js";
-import { reverse } from "lodash";
 
 export default function CreditorDebitJournal() {
   const { rows, isLoading, addRow, setRows, removeRow, handleSubmit, handleInputChange } =
