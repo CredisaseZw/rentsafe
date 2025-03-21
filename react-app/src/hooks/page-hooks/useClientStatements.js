@@ -1,5 +1,5 @@
-import { usePage } from '@inertiajs/inertia-react';
-import { useForm } from '@inertiajs/inertia-react';
+import { usePage } from "@inertiajs/inertia-react";
+import { useForm } from "@inertiajs/inertia-react";
 
 export default function useClientStatements() {
   const {
@@ -14,22 +14,16 @@ export default function useClientStatements() {
   }
 
   const usdStatements = tenants.filter(
-    (tenant) => tenant.lease_currency_type.toUpperCase() === 'USD'
+    (tenant) => tenant.lease_currency_type.toUpperCase() === "USD"
   );
 
   const zwlStatements = tenants.filter(
-    (tenant) => tenant.lease_currency_type.toUpperCase() !== 'USD'
+    (tenant) => tenant.lease_currency_type.toUpperCase() !== "USD"
   );
 
-  const usdTotal = usdStatements.reduce(
-    (acc, tenant) => acc + parseFloat(tenant.owing_amount),
-    0
-  );
+  const usdTotal = usdStatements.reduce((acc, tenant) => acc + parseFloat(tenant.owing_amount), 0);
 
-  const zwlTotal = zwlStatements.reduce(
-    (acc, tenant) => acc + parseFloat(tenant.owing_amount),
-    0
-  );
+  const zwlTotal = zwlStatements.reduce((acc, tenant) => acc + parseFloat(tenant.owing_amount), 0);
 
   return {
     data,

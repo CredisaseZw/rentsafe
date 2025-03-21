@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useForm } from '@inertiajs/inertia-react';
-import { toast } from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import { useForm } from "@inertiajs/inertia-react";
+import { toast } from "react-hot-toast";
 
 export default function useLogin(flash, error) {
   const [isLoading, setIsLoading] = useState(false);
   const [flashed, setFlashed] = useState(false);
   const { data, setData, post } = useForm({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   useEffect(() => {
     if (error?.type) toast[error.type](error.message);
-    if (flash?.type === 'success' && !flashed) {
+    if (flash?.type === "success" && !flashed) {
       toast.success(flash.message);
       setFlashed(true);
     }
@@ -24,17 +24,17 @@ export default function useLogin(flash, error) {
 
   function forgotPasswordHandler() {
     if (!data.email) {
-      toast.error('Enter your email');
+      toast.error("Enter your email");
       return;
     }
 
-    post(reverseUrl('forgot_password'), {
+    post(reverseUrl("forgot_password"), {
       onStart() {
         setIsLoading(true);
       },
       onError(err) {
         console.log(err);
-        toast.error('something went wrong');
+        toast.error("something went wrong");
         setIsLoading(false);
       },
       onSuccess(res) {
@@ -49,7 +49,7 @@ export default function useLogin(flash, error) {
   function submitHandler(e) {
     e.preventDefault();
 
-    post(reverseUrl('login'), {
+    post(reverseUrl("login"), {
       onStart() {
         setIsLoading(true);
       },

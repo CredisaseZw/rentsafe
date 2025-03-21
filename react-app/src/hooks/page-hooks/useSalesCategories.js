@@ -1,7 +1,7 @@
-import axios from 'axios';
-import React, { use, useEffect } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import axios from "axios";
+import React, { use, useEffect } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useSalesCategories() {
   const [showAdd, setShowAdd] = React.useState(false);
@@ -19,7 +19,7 @@ export default function useSalesCategories() {
 
   function getCategories() {
     axios
-      .get('/accounting/sales-categories/')
+      .get("/accounting/sales-categories/")
       .then((res) => {
         console.log(res);
         setCategories(res.data);
@@ -40,11 +40,11 @@ export default function useSalesCategories() {
     const data = Object.fromEntries(new FormData(e.target));
     console.log(data);
     axios
-      .post('/accounting/sales-categories/', data)
+      .post("/accounting/sales-categories/", data)
       .then((res) => {
         setLoading(false);
         console.log(res);
-        toast.success('Category added successfully');
+        toast.success("Category added successfully");
         handleClose();
         getCategories();
       })
@@ -60,7 +60,7 @@ export default function useSalesCategories() {
       .delete(`/accounting/sales-categories/${categoryToDelete.id}/`)
       .then((res) => {
         console.log(res);
-        toast.success('Category deleted successfully');
+        toast.success("Category deleted successfully");
         setCategoryToDelete(null);
         getCategories();
       })

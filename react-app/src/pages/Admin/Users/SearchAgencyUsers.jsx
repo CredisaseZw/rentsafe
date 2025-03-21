@@ -1,13 +1,13 @@
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import React, { useEffect, useState } from 'react';
-import DeleteUserConfirmation from '../../../components/Admin/DeleteUserConfirmition.jsx';
-import BulkIconButton from '../../../components/BulkIconButton.jsx';
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import React, { useEffect, useState } from "react";
+import DeleteUserConfirmation from "../../../components/Admin/DeleteUserConfirmition.jsx";
+import BulkIconButton from "../../../components/BulkIconButton.jsx";
 // import IndividualAdd from '../../../components/Client/IndividualAdd.jsx';
 // import { IndividualVerify } from '../../../components/Client/OTP/IndividualVerify.jsx';
-import { NotFound } from '../../../components/NotFound.jsx';
-import PageHeader from '../../../components/PageHeader.jsx';
+import { NotFound } from "../../../components/NotFound.jsx";
+import PageHeader from "../../../components/PageHeader.jsx";
 // import axios from 'axios';
-import AgentAdd from '../../../components/Agent/AddAgent.jsx';
+import AgentAdd from "../../../components/Agent/AddAgent.jsx";
 
 export default function SearchAgencyUsers() {
   const [show, setShow] = useState(false);
@@ -59,8 +59,8 @@ export default function SearchAgencyUsers() {
     );
   }, []);
   const { data, setData, post } = useForm({
-    searchParam: 'fullname',
-    searchValue: '',
+    searchParam: "fullname",
+    searchValue: "",
   });
   const changeHandler = (e) => {
     setIsSearching(true);
@@ -69,12 +69,12 @@ export default function SearchAgencyUsers() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (data.searchValue === '') {
+    if (data.searchValue === "") {
       return setErrors({
-        searchValue: 'Please enter a search value',
+        searchValue: "Please enter a search value",
       });
     }
-    post(reverseUrl('search-agents'), {
+    post(reverseUrl("search-agents"), {
       onStart: () => {
         setIsLoading(true);
         setEditBtn(false);
@@ -85,7 +85,7 @@ export default function SearchAgencyUsers() {
       onSuccess: (response) => {
         //This will return true if the object is empty, otherwise false
         const isObjectEmpty = (objectName) => {
-          return JSON.stringify(objectName) === '{}';
+          return JSON.stringify(objectName) === "{}";
         };
         if (response.props.result.length < 1) {
           setNotFound(true);
@@ -106,7 +106,7 @@ export default function SearchAgencyUsers() {
 
   return (
     <main>
-      <PageHeader title={'Agency Users'} />
+      <PageHeader title={"Agency Users"} />
       <div className="container-xl p-5">
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">
@@ -158,7 +158,7 @@ export default function SearchAgencyUsers() {
                         <span className="ml-2">Searching..</span>
                       </>
                     ) : (
-                      'Search'
+                      "Search"
                     )}
                   </button>
                 </div>
@@ -174,8 +174,8 @@ export default function SearchAgencyUsers() {
             show={show}
             handleClose={handleClose}
             setAddSuccessful={setAddSuccessful}
-            action={'create'}
-            url={'create-agent'}
+            action={"create"}
+            url={"create-agent"}
             notFound={true}
           />
         )}
@@ -193,14 +193,14 @@ export default function SearchAgencyUsers() {
         )}
         {deleteBtn && (
           <DeleteUserConfirmation
-            url={'delete-agent'}
+            url={"delete-agent"}
             handleClose={() => {
               setDeleteBtn(false);
               setUserToActOn({});
               setIsSearching(false);
             }}
             show={deleteBtn}
-            type={'agent'}
+            type={"agent"}
             setFetchedData={setFetchedData}
             setAllAgents={setAllAgents}
             userId={userToActOn.id}
@@ -229,7 +229,7 @@ export default function SearchAgencyUsers() {
               <div className="datatable-container">
                 <table className="table table-striped">
                   <tbody>
-                    <tr style={{ backgroundColor: '#e4e4e4' }}>
+                    <tr style={{ backgroundColor: "#e4e4e4" }}>
                       <th scope="col">Forenames</th>
                       <th scope="col">surname</th>
                       <th scope="col">National ID</th>
@@ -244,107 +244,87 @@ export default function SearchAgencyUsers() {
                       </>
                     ) : (
                       fetchedData &&
-                      fetchedData?.map(
-                        ({ id, firstname, surname, identification_number }) => (
-                          <tr key={id}>
-                            <th scope="row">{firstname}</th>
-                            <td>{surname}</td>
-                            <td>{identification_number}</td>
+                      fetchedData?.map(({ id, firstname, surname, identification_number }) => (
+                        <tr key={id}>
+                          <th scope="row">{firstname}</th>
+                          <td>{surname}</td>
+                          <td>{identification_number}</td>
 
-                            {id ? (
-                              <>
-                                <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-info d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setEditBtn(true);
-                                      setUserToActOn(
-                                        fetchedData?.find(
-                                          (user) => user.id === id
-                                        )
-                                      );
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      edit
-                                    </i>
-                                  </button>
-                                </td>
-                                <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setDeleteBtn(true);
-                                      setUserToActOn({
-                                        id,
-                                        name: firstname + ' ' + surname,
-                                      });
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      delete
-                                    </i>
-                                  </button>
-                                </td>
-                              </>
-                            ) : null}
-                          </tr>
-                        )
-                      )
+                          {id ? (
+                            <>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-info d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setEditBtn(true);
+                                    setUserToActOn(fetchedData?.find((user) => user.id === id));
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">edit</i>
+                                </button>
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setDeleteBtn(true);
+                                    setUserToActOn({
+                                      id,
+                                      name: firstname + " " + surname,
+                                    });
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">delete</i>
+                                </button>
+                              </td>
+                            </>
+                          ) : null}
+                        </tr>
+                      ))
                     )}
                     {allAgents &&
                       !isSearching &&
-                      allAgents?.map(
-                        ({ id, firstname, surname, identification_number }) => (
-                          <tr key={id}>
-                            <th scope="row">{firstname}</th>
-                            <td>{surname}</td>
-                            <td>{identification_number}</td>
+                      allAgents?.map(({ id, firstname, surname, identification_number }) => (
+                        <tr key={id}>
+                          <th scope="row">{firstname}</th>
+                          <td>{surname}</td>
+                          <td>{identification_number}</td>
 
-                            {id ? (
-                              <>
-                                <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-info d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setEditBtn(true);
-                                      setUserToActOn(
-                                        allAgents?.find(
-                                          (user) => user.id === id
-                                        )
-                                      );
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      edit
-                                    </i>
-                                  </button>
-                                </td>
-                                <td>
-                                  <button
-                                    type="button"
-                                    className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
-                                    onClick={() => {
-                                      setDeleteBtn(true);
-                                      setUserToActOn({
-                                        id,
-                                        name: firstname + ' ' + surname,
-                                      });
-                                    }}
-                                  >
-                                    <i className="leading-icon material-icons">
-                                      delete
-                                    </i>
-                                  </button>
-                                </td>
-                              </>
-                            ) : null}
-                          </tr>
-                        )
-                      )}
+                          {id ? (
+                            <>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-info d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setEditBtn(true);
+                                    setUserToActOn(allAgents?.find((user) => user.id === id));
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">edit</i>
+                                </button>
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-raised text-danger d-flex align-items-center justify-content-center"
+                                  onClick={() => {
+                                    setDeleteBtn(true);
+                                    setUserToActOn({
+                                      id,
+                                      name: firstname + " " + surname,
+                                    });
+                                  }}
+                                >
+                                  <i className="leading-icon material-icons">delete</i>
+                                </button>
+                              </td>
+                            </>
+                          ) : null}
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
                 <div className="row justify-content-center">

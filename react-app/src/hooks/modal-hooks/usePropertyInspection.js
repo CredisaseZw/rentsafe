@@ -1,13 +1,13 @@
-import axios from 'axios';
-import html2pdf from 'html2pdf.js';
-import { useRef, useState } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import axios from "axios";
+import html2pdf from "html2pdf.js";
+import { useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function usePropertyInspection() {
   const [isLoading, setIsLoading] = useState(false);
   const [wasSuccessful, setWasSuccessful] = useState(false);
-  const [activeTab, setActiveTab] = useState('residential');
+  const [activeTab, setActiveTab] = useState("residential");
   const printContentRef = useRef();
 
   function printForm() {
@@ -16,9 +16,9 @@ export default function usePropertyInspection() {
       .from(element)
       .set({
         margin: 1,
-        filename: 'modal-content.pdf',
+        filename: "modal-content.pdf",
         html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait' },
+        jsPDF: { orientation: "portrait" },
       })
       .save();
   }
@@ -32,23 +32,19 @@ export default function usePropertyInspection() {
       .from(printContentRef.current)
       .set({
         margin: 1,
-        filename: 'modal-content.pdf',
+        filename: "modal-content.pdf",
         html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait' },
+        jsPDF: { orientation: "portrait" },
         // pagebreak: { mode: ['avoid-all', 'css'] },
       })
-      .outputPdf('blob')
+      .outputPdf("blob")
       .then((pdfBlob) => {
         const formData = new FormData();
-        formData.append(
-          'inspection_pdf',
-          pdfBlob,
-          'residential_inspection.pdf'
-        );
+        formData.append("inspection_pdf", pdfBlob, "residential_inspection.pdf");
         console.log(formData);
-        return axios.post(reverseUrl('save_inspection_document'), formData, {
+        return axios.post(reverseUrl("save_inspection_document"), formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
       })
@@ -72,7 +68,7 @@ export default function usePropertyInspection() {
     printForm,
     setWasSuccessful,
     handleResidentialSubmission,
-    showCommercial: () => setActiveTab('commercial'),
-    showResidential: () => setActiveTab('residential'),
+    showCommercial: () => setActiveTab("commercial"),
+    showResidential: () => setActiveTab("residential"),
   };
 }

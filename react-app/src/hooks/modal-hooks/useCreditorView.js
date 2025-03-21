@@ -1,11 +1,11 @@
-import axios, { AxiosError } from 'axios';
-import { useState } from 'react';
-import { mapToMessages, userFriendlyErrorOrResponse } from '../../utils';
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
+import { mapToMessages, userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useCreditorView() {
   const [showModal, setShowModal] = useState(false);
   const [data, setData] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [creditor, setCreditor] = useState(null);
 
@@ -13,7 +13,7 @@ export default function useCreditorView() {
     setCreditor(creditor);
     setShowModal(true);
     setIsLoading(true);
-    setError('');
+    setError("");
 
     if (errMessage) {
       setError(errMessage);
@@ -22,7 +22,7 @@ export default function useCreditorView() {
       return;
     }
 
-    axios(reverseUrl('creditor_details'), {
+    axios(reverseUrl("creditor_details"), {
       params: { creditor_id: creditor.creditor_id },
     })
       .then((res) => {
@@ -30,50 +30,48 @@ export default function useCreditorView() {
           isCreditorView: true,
           tenantName: creditor.creditor_name,
           agedAnalysis: {
-            oneTwentyDays: res.data.aged_analysis['120_days_plus'],
-            ninetyDays: res.data.aged_analysis['90_days'],
-            sixtyDays: res.data.aged_analysis['60_days'],
-            thirtyDays: res.data.aged_analysis['30_days'],
-            current: res.data.aged_analysis['current'],
+            oneTwentyDays: res.data.aged_analysis["120_days_plus"],
+            ninetyDays: res.data.aged_analysis["90_days"],
+            sixtyDays: res.data.aged_analysis["60_days"],
+            thirtyDays: res.data.aged_analysis["30_days"],
+            current: res.data.aged_analysis["current"],
           },
           contactDetails: {
-            contactPerson: `${res.data['creditor']['firstname']} ${res.data['creditor']['surname']}`,
-            smsNumber: res.data['creditor']['sms_number'],
-            otherNumbers: res.data['creditor']['other_number'],
-            emailAddress: res.data['creditor']['email'],
-            address: res.data['creditor']['address'],
+            contactPerson: `${res.data["creditor"]["firstname"]} ${res.data["creditor"]["surname"]}`,
+            smsNumber: res.data["creditor"]["sms_number"],
+            otherNumbers: res.data["creditor"]["other_number"],
+            emailAddress: res.data["creditor"]["email"],
+            address: res.data["creditor"]["address"],
           },
-          paymentPlans: res.data['payment_plans'].map((plan) => ({
+          paymentPlans: res.data["payment_plans"].map((plan) => ({
             id: plan.id,
             person: plan.spoke_with,
             date: plan.expected_pay_date,
             amount: plan.amount,
           })),
-          communicationHistory: res.data['communication_history'].map(
-            (item) => ({
-              text: item.message,
-              timestamp: item.created_at,
-              user: item.user_name,
-              actionDone: item.action_done ? item.action_done : null,
-              communicationType: item.type,
-              data: null,
-            })
-          ),
+          communicationHistory: res.data["communication_history"].map((item) => ({
+            text: item.message,
+            timestamp: item.created_at,
+            user: item.user_name,
+            actionDone: item.action_done ? item.action_done : null,
+            communicationType: item.type,
+            data: null,
+          })),
           debtorIntelligence:
-            Object.values(res.data['debtor_intelligence']).length &&
-            Object.values(res.data['debtor_intelligence']).every(Boolean)
+            Object.values(res.data["debtor_intelligence"]).length &&
+            Object.values(res.data["debtor_intelligence"]).every(Boolean)
               ? {
-                  text: res.data['debtor_intelligence']['note'],
-                  timestamp: res.data['debtor_intelligence']['updated_at'],
-                  user: res.data['debtor_intelligence']['user_name'],
+                  text: res.data["debtor_intelligence"]["note"],
+                  timestamp: res.data["debtor_intelligence"]["updated_at"],
+                  user: res.data["debtor_intelligence"]["user_name"],
                 }
               : null,
           forecastInflows: {
-            zeroToSevenDays: res.data['forecast_inflows']['0-7'],
-            eightToFourteenDays: res.data['forecast_inflows']['8-14'],
-            fourteenToTwentyOneDays: res.data['forecast_inflows']['14-21'],
-            twentyOnePlusDays: res.data['forecast_inflows']['21+'],
-            total: res.data['forecast_inflows']['total'],
+            zeroToSevenDays: res.data["forecast_inflows"]["0-7"],
+            eightToFourteenDays: res.data["forecast_inflows"]["8-14"],
+            fourteenToTwentyOneDays: res.data["forecast_inflows"]["14-21"],
+            twentyOnePlusDays: res.data["forecast_inflows"]["21+"],
+            total: res.data["forecast_inflows"]["total"],
           },
         };
 
@@ -86,7 +84,7 @@ export default function useCreditorView() {
 
         console.log({ res, resData, creditor });
         setData(resData);
-        setError('');
+        setError("");
         setIsLoading(false);
       })
       .catch((error) => {
@@ -97,12 +95,12 @@ export default function useCreditorView() {
   }
 
   function refreshCreditorViewData() {
-    console.log('refreshing..');
+    console.log("refreshing..");
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
-    axios(reverseUrl('creditor_details'), {
+    axios(reverseUrl("creditor_details"), {
       params: { creditor_id: creditor.creditor_id },
     })
       .then((res) => {
@@ -110,50 +108,48 @@ export default function useCreditorView() {
           isCreditorView: true,
           tenantName: creditor.creditor_name,
           agedAnalysis: {
-            oneTwentyDays: res.data.aged_analysis['120_days_plus'],
-            ninetyDays: res.data.aged_analysis['90_days'],
-            sixtyDays: res.data.aged_analysis['60_days'],
-            thirtyDays: res.data.aged_analysis['30_days'],
-            current: res.data.aged_analysis['current'],
+            oneTwentyDays: res.data.aged_analysis["120_days_plus"],
+            ninetyDays: res.data.aged_analysis["90_days"],
+            sixtyDays: res.data.aged_analysis["60_days"],
+            thirtyDays: res.data.aged_analysis["30_days"],
+            current: res.data.aged_analysis["current"],
           },
           contactDetails: {
-            contactPerson: `${res.data['creditor']['firstname']} ${res.data['creditor']['surname']}`,
-            smsNumber: res.data['creditor']['sms_number'],
-            otherNumbers: res.data['creditor']['other_number'],
-            emailAddress: res.data['creditor']['email'],
-            address: res.data['creditor']['address'],
+            contactPerson: `${res.data["creditor"]["firstname"]} ${res.data["creditor"]["surname"]}`,
+            smsNumber: res.data["creditor"]["sms_number"],
+            otherNumbers: res.data["creditor"]["other_number"],
+            emailAddress: res.data["creditor"]["email"],
+            address: res.data["creditor"]["address"],
           },
-          paymentPlans: res.data['payment_plans'].map((plan) => ({
+          paymentPlans: res.data["payment_plans"].map((plan) => ({
             id: plan.id,
             person: plan.spoke_with,
             date: plan.expected_pay_date,
             amount: plan.amount,
           })),
-          communicationHistory: res.data['communication_history'].map(
-            (item) => ({
-              text: item.message,
-              timestamp: item.created_at,
-              user: item.user_name,
-              actionDone: item.action_done ? item.action_done : null,
-              communicationType: item.type,
-              data: null,
-            })
-          ),
+          communicationHistory: res.data["communication_history"].map((item) => ({
+            text: item.message,
+            timestamp: item.created_at,
+            user: item.user_name,
+            actionDone: item.action_done ? item.action_done : null,
+            communicationType: item.type,
+            data: null,
+          })),
           debtorIntelligence:
-            Object.values(res.data['debtor_intelligence']).length &&
-            Object.values(res.data['debtor_intelligence']).every(Boolean)
+            Object.values(res.data["debtor_intelligence"]).length &&
+            Object.values(res.data["debtor_intelligence"]).every(Boolean)
               ? {
-                  text: res.data['debtor_intelligence']['note'],
-                  timestamp: res.data['debtor_intelligence']['updated_at'],
-                  user: res.data['debtor_intelligence']['user_name'],
+                  text: res.data["debtor_intelligence"]["note"],
+                  timestamp: res.data["debtor_intelligence"]["updated_at"],
+                  user: res.data["debtor_intelligence"]["user_name"],
                 }
               : null,
           forecastInflows: {
-            zeroToSevenDays: res.data['forecast_inflows']['0-7'],
-            eightToFourteenDays: res.data['forecast_inflows']['8-14'],
-            fourteenToTwentyOneDays: res.data['forecast_inflows']['14-21'],
-            twentyOnePlusDays: res.data['forecast_inflows']['21+'],
-            total: res.data['forecast_inflows']['total'],
+            zeroToSevenDays: res.data["forecast_inflows"]["0-7"],
+            eightToFourteenDays: res.data["forecast_inflows"]["8-14"],
+            fourteenToTwentyOneDays: res.data["forecast_inflows"]["14-21"],
+            twentyOnePlusDays: res.data["forecast_inflows"]["21+"],
+            total: res.data["forecast_inflows"]["total"],
           },
         };
 
@@ -166,7 +162,7 @@ export default function useCreditorView() {
 
         console.log({ res, resData, creditor });
         setData(resData);
-        setError('');
+        setError("");
         setIsLoading(false);
       })
       .catch((error) => {
@@ -190,6 +186,6 @@ export default function useCreditorView() {
     refreshCreditorViewData,
     openCreditorView,
     hideCreditorView,
-    creditorName: creditor ? creditor.creditor_name : '',
+    creditorName: creditor ? creditor.creditor_name : "",
   };
 }

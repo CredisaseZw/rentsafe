@@ -1,7 +1,7 @@
-import { useForm } from '@inertiajs/inertia-react';
-import { useState } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import { useForm } from "@inertiajs/inertia-react";
+import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function useCompanySearch(url) {
   const [show, setShow] = useState(false);
@@ -19,8 +19,8 @@ export default function useCompanySearch(url) {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const { data, setData, post } = useForm({
-    searchParam: 'registration_name',
-    searchValue: '',
+    searchParam: "registration_name",
+    searchValue: "",
   });
 
   const handleClose = () => setShow(false);
@@ -33,21 +33,21 @@ export default function useCompanySearch(url) {
 
     try {
       setIsReportLoading(true);
-      toast.loading('Loading...', {
+      toast.loading("Loading...", {
         duration: 2500,
-        position: 'top-center',
+        position: "top-center",
       });
 
       if (id) {
         axios
-          .post(reverseUrl('enquiry_count'), {
+          .post(reverseUrl("enquiry_count"), {
             isIndividual: false,
             isCompany: true,
             companyId: id,
           })
           .then((res) => {});
         axios
-          .post(reverseUrl('company-report'), { companyId: id })
+          .post(reverseUrl("company-report"), { companyId: id })
           .then((res) => {
             setSelectedRow(id);
             if (res.data?.is_eligible) {
@@ -60,16 +60,16 @@ export default function useCompanySearch(url) {
               }
             } else {
               toast.error(
-                'You have exhausted your free enquiries. Please subscribe to get more enquiries.',
+                "You have exhausted your free enquiries. Please subscribe to get more enquiries.",
                 {
                   duration: 4000,
-                  id: 'error_',
+                  id: "error_",
                 }
               );
             }
           })
           .catch((error) => {
-            console.error('There was an error!', error);
+            console.error("There was an error!", error);
           });
       }
     } finally {
@@ -94,8 +94,8 @@ export default function useCompanySearch(url) {
   function submitHandler(e) {
     e.preventDefault();
 
-    if (data.searchValue === '') {
-      setErrors({ searchValue: 'Please enter a search value' });
+    if (data.searchValue === "") {
+      setErrors({ searchValue: "Please enter a search value" });
       return;
     }
 
@@ -114,7 +114,7 @@ export default function useCompanySearch(url) {
         setIsLoading(false);
       },
       onError: () => {
-        toast.error('Nothing to search...');
+        toast.error("Nothing to search...");
         setIsLoading(false);
       },
     });

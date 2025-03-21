@@ -1,13 +1,13 @@
-import React, { useEffect, useReducer, useState } from 'react';
-import { useForm } from '@inertiajs/inertia-react';
-import { Modal } from 'react-bootstrap';
-import toast from 'react-hot-toast';
-import { formatCurrency } from '../../../utils/formatting';
-import CustomAsyncSelect from '../../CustomAsyncSelect.jsx';
-import { Inertia } from '@inertiajs/inertia'; // Make sure you have this import
+import React, { useEffect, useReducer, useState } from "react";
+import { useForm } from "@inertiajs/inertia-react";
+import { Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { formatCurrency } from "../../../utils/formatting";
+import CustomAsyncSelect from "../../CustomAsyncSelect.jsx";
+import { Inertia } from "@inertiajs/inertia"; // Make sure you have this import
 
 export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfRows, setNumberOfRows] = useState(0);
   const [lease, setLease] = useState({});
@@ -22,13 +22,13 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
     }
   }, [myKey]);
 
-  console.log('leaseDetails', leaseDetails);
+  console.log("leaseDetails", leaseDetails);
 
   function receiptsReducer(state, action) {
     switch (action.type) {
-      case 'initialize':
+      case "initialize":
         return [...state, ...action.payload];
-      case 'updatePaymentAmount':
+      case "updatePaymentAmount":
         return state.map((item) => {
           if (item.lease_id === action.payload.lease_id) {
             return {
@@ -38,7 +38,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
           }
           return item;
         });
-      case 'updatePaymentDate':
+      case "updatePaymentDate":
         return state.map((item) => {
           if (item.lease_id === action.payload.lease_id) {
             return {
@@ -48,7 +48,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
           }
           return item;
         });
-      case 'updateReceiptNumber':
+      case "updateReceiptNumber":
         return state.map((item) => {
           if (item.lease_id === action.payload.lease_id) {
             return {
@@ -58,7 +58,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
           }
           return item;
         });
-      case 'updateDetails':
+      case "updateDetails":
         return state.map((item) => {
           if (item.lease_id === action.payload.lease_id) {
             return {
@@ -79,21 +79,21 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
     setIsLoading(true); // Set loading state
 
     Inertia.post(
-      reverseUrl('create_receipt_and_payment'),
+      reverseUrl("create_receipt_and_payment"),
       { rows, myKey },
       {
         onSuccess: (response) => {
-          if (response.props?.result === 'error') {
+          if (response.props?.result === "error") {
             toast.error(response.props?.result);
             return;
           }
-          handleClose('Receipts created successfully').then(() => {
+          handleClose("Receipts created successfully").then(() => {
             reset();
           });
         },
         onError: (errors) => {
           setErrors(errors);
-          toast.error('Something went wrong! Please try again');
+          toast.error("Something went wrong! Please try again");
         },
         onFinish: () => {
           setIsLoading(false);
@@ -129,16 +129,16 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
   const initialRows = [
     {
       id: 1,
-      paymentDate: new Date().toISOString().split('T')[0],
-      tenant: '',
-      receiptNumber: '',
-      details: '',
-      currency: '',
-      rent_owing: '',
-      color: '',
-      paymentAmount: '',
-      accountBalance: '',
-      opening_balance_date: '',
+      paymentDate: new Date().toISOString().split("T")[0],
+      tenant: "",
+      receiptNumber: "",
+      details: "",
+      currency: "",
+      rent_owing: "",
+      color: "",
+      paymentAmount: "",
+      accountBalance: "",
+      opening_balance_date: "",
     },
   ];
 
@@ -148,14 +148,14 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
         {
           id: 1,
           lease_id: leaseDetails.lease_id,
-          paymentDate: new Date().toISOString().split('T')[0],
+          paymentDate: new Date().toISOString().split("T")[0],
           tenant: leaseDetails.name,
-          receiptNumber: '',
-          details: '',
+          receiptNumber: "",
+          details: "",
           currency: leaseDetails.currency,
           rent_owing: leaseDetails.owing_amount,
           color: leaseDetails.color,
-          paymentAmount: '',
+          paymentAmount: "",
           accountBalance: leaseDetails.owing_amount,
           opening_balance_date: leaseDetails.opening_balance_date,
         },
@@ -200,13 +200,13 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
     // Create a new row object (you can customize this as needed)
     const newRow = {
       id: rows.length + 1,
-      paymentDate: new Date().toISOString().split('T')[0],
-      customerType: '',
-      customerName: '',
-      details: '',
-      accountBalance: '',
-      endBalance: '',
-      opening_balance_date: '',
+      paymentDate: new Date().toISOString().split("T")[0],
+      customerType: "",
+      customerName: "",
+      details: "",
+      accountBalance: "",
+      endBalance: "",
+      opening_balance_date: "",
     };
 
     // Update the state with the new row
@@ -220,16 +220,16 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
     newRows[index][name] = value;
 
     // Recalculate accountBalance if paymentAmount is updated
-    if (name === 'paymentAmount') {
+    if (name === "paymentAmount") {
       const rentOwing = parseFloat(newRows[index].rent_owing) || 0;
       const paymentAmount = parseFloat(value) || 0;
       newRows[index].accountBalance = rentOwing - paymentAmount;
     }
 
-    if (name === 'paymentDate') {
+    if (name === "paymentDate") {
       const selectedDate = new Date(newRows[index].paymentDate);
       const openingBalanceDate = new Date(newRows[index].opening_balance_date);
-      const maxDate = new Date(new Date().toISOString().split('T')[0]);
+      const maxDate = new Date(new Date().toISOString().split("T")[0]);
       if (selectedDate < openingBalanceDate) {
         toast.error(
           `You are attempting to post a payment/adjustment made before your opening balance date. Received amounts are already factored into the opening balance. If you need to make an adjustment, use the Accounting Adjustment menu option.`
@@ -299,10 +299,8 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
     newRows[index].tenant = selectedTenantData.tenant; // Update tenant name
     newRows[index].lease_id = selectedTenantData.lease_id; // Update lease ID
     newRows[index].currency = selectedTenantData.Currency; // Update currency
-    newRows[index].opening_balance_date =
-      selectedTenantData.opening_balance_date; // Update rent owing
-    newRows[index].accountBalance =
-      newRows[index].rent_owing - (newRows[index].paymentAmount || 0); // Calculate initial account balance
+    newRows[index].opening_balance_date = selectedTenantData.opening_balance_date; // Update rent owing
+    newRows[index].accountBalance = newRows[index].rent_owing - (newRows[index].paymentAmount || 0); // Calculate initial account balance
     newRows[index].color = selectedTenantData.color; // Update color if needed
 
     setRows(newRows); // Update the state
@@ -311,13 +309,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
   return (
     <div className="container-xl p-5">
       <div className=" ">
-        <Modal
-          show={show}
-          onHide={handleClose}
-          size="xl"
-          backdrop="static"
-          centered
-        >
+        <Modal show={show} onHide={handleClose} size="xl" backdrop="static" centered>
           <Modal.Header closeButton></Modal.Header>
           <Modal.Body className="p-4 d-flex w-100 flex-column justify-content-between align-items-center">
             <div className="table-responsive  w-100 ">
@@ -328,38 +320,38 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                 <thead>
                   <tr
                     style={{
-                      borderTop: '0px',
-                      fontSize: '12px',
-                      width: '100%',
+                      borderTop: "0px",
+                      fontSize: "12px",
+                      width: "100%",
                     }}
                   >
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Date
                     </th>
 
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Customer
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Receipt No.
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Details
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Currency
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Amount Owing
                     </th>
-                    <th scope="col" style={{ borderTop: '1px solid #e0e0e0' }}>
+                    <th scope="col" style={{ borderTop: "1px solid #e0e0e0" }}>
                       Received Amount
                     </th>
                     <th
                       scope="col"
                       style={{
-                        borderTop: '1px solid',
-                        borderBottom: '1px solid',
+                        borderTop: "1px solid",
+                        borderBottom: "1px solid",
                       }}
                     >
                       Amount Balance
@@ -372,7 +364,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                     <tr key={row.id}>
                       <td
                         className="tf-borderRight"
-                        style={{ paddingRight: '1px', paddingLeft: '1px' }}
+                        style={{ paddingRight: "1px", paddingLeft: "1px" }}
                       >
                         <input
                           className="form-control form-control-sm tf-borderRight tf-input"
@@ -381,25 +373,19 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                           value={row.paymentDate}
                           onChange={(e) => handleInputChange(e, index)}
                           style={{
-                            width: '100%',
-                            border: '1px solid #111',
+                            width: "100%",
+                            border: "1px solid #111",
                           }}
                         />
                       </td>
                       <td
                         className="tf-borderRight"
-                        style={{ paddingRight: '1px', paddingLeft: '1px' }}
+                        style={{ paddingRight: "1px", paddingLeft: "1px" }}
                       >
                         <CustomAsyncSelect
-                          url={reverseUrl('get_all_active_leases')}
-                          onChange={(selectedOption) =>
-                            handleTenantSelect(selectedOption, index)
-                          }
-                          value={
-                            row.tenant
-                              ? { label: row.tenant, value: row.lease_id }
-                              : null
-                          }
+                          url={reverseUrl("get_all_active_leases")}
+                          onChange={(selectedOption) => handleTenantSelect(selectedOption, index)}
+                          value={row.tenant ? { label: row.tenant, value: row.lease_id } : null}
                           defaultValue={null}
                           isDisabled={false}
                         />
@@ -407,9 +393,9 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                       <td
                         className="tf-borderRight"
                         style={{
-                          paddingRight: '1px',
-                          paddingLeft: '1px',
-                          maxWidth: '60px',
+                          paddingRight: "1px",
+                          paddingLeft: "1px",
+                          maxWidth: "60px",
                         }}
                       >
                         <input
@@ -425,14 +411,14 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                           id="receiptNumber"
                           value={lease?.receiptNumber}
                           style={{
-                            width: '100%',
-                            border: '1px solid #111',
+                            width: "100%",
+                            border: "1px solid #111",
                           }}
                         />
                       </td>
                       <td
                         className="tf-borderRight"
-                        style={{ paddingRight: '1px', paddingLeft: '1px' }}
+                        style={{ paddingRight: "1px", paddingLeft: "1px" }}
                       >
                         <input
                           className="form-control form-control-sm tf-borderRight tf-input"
@@ -442,26 +428,23 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                           value={row.details}
                           onChange={(e) => handleInputChange(e, index)}
                           style={{
-                            width: '100%',
-                            border: '1px solid #111',
+                            width: "100%",
+                            border: "1px solid #111",
                           }}
                         />
                       </td>
                       <td
                         className="tf-borderRight"
-                        style={{ paddingRight: '1px', paddingLeft: '1px' }}
+                        style={{ paddingRight: "1px", paddingLeft: "1px" }}
                       >
                         {row.currency}
                       </td>
                       <td
                         className={`tf-borderRight bg-${row?.color} text-white text-center`}
                         style={{
-                          paddingRight: '1px',
-                          paddingLeft: '1px',
-                          backgroundColor:
-                            row?.color === 'light-red'
-                              ? 'rgb(248, 113, 113)'
-                              : '',
+                          paddingRight: "1px",
+                          paddingLeft: "1px",
+                          backgroundColor: row?.color === "light-red" ? "rgb(248, 113, 113)" : "",
                         }}
                         // style={{ paddingRight: '1px', paddingLeft: '1px' }}
                         // style={row?.color === 'light-red' ? { backgroundColor: 'rgb(248, 113, 113)' } : ''}
@@ -471,7 +454,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                       </td>
                       <td
                         className="tf-borderRight"
-                        style={{ paddingRight: '1px', paddingLeft: '1px' }}
+                        style={{ paddingRight: "1px", paddingLeft: "1px" }}
                       >
                         <input
                           type="text"
@@ -483,9 +466,9 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
                       <td
                         className="tf-borderRight text-end"
                         style={{
-                          paddingRight: '1px',
-                          paddingLeft: '1px',
-                          borderBottom: '1px solid #e0e0e0',
+                          paddingRight: "1px",
+                          paddingLeft: "1px",
+                          borderBottom: "1px solid #e0e0e0",
                         }}
                       >
                         <input
@@ -502,7 +485,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
               <div className="d-flex flex-row-reverse">
                 <button
                   className="btn btn-raised bg-success text-white"
-                  style={{ backgroundColor: '#0d475c' }}
+                  style={{ backgroundColor: "#0d475c" }}
                   onClick={addRow}
                 >
                   <i className="leading-icon material-icons">add</i>
@@ -515,7 +498,7 @@ export default function Receipt({ myKey, show, handleClose, leaseDetails }) {
             <div className="d-flex flex-row-reverse">
               <button
                 className="btn btn-raised bg-info text-white"
-                style={{ backgroundColor: '#0d475c' }}
+                style={{ backgroundColor: "#0d475c" }}
                 onClick={handleSubmitSub}
               >
                 {isLoading ? (
@@ -540,23 +523,18 @@ function ReceiptRow({ leases, dispatch }) {
 
   useEffect(() => {
     if (selectedLease) {
-      setSelectedLease(
-        leases.find((lease) => lease.lease_id === selectedLease.lease_id)
-      );
+      setSelectedLease(leases.find((lease) => lease.lease_id === selectedLease.lease_id));
     }
   }, [leases]);
 
   return (
     <tr>
-      <td
-        className="tf-borderRight"
-        style={{ paddingRight: '1px', paddingLeft: '1px' }}
-      >
+      <td className="tf-borderRight" style={{ paddingRight: "1px", paddingLeft: "1px" }}>
         <input
           onChange={(e) =>
             selectedLease &&
             dispatch({
-              type: 'updatePaymentDate',
+              type: "updatePaymentDate",
               payload: {
                 lease_id: selectedLease.lease_id,
                 paymentDate: e.target.value,
@@ -568,37 +546,32 @@ function ReceiptRow({ leases, dispatch }) {
           name="date"
           id="date"
           value={selectedLease?.paymentDate}
-          max={new Date().toISOString().split('T')[0]}
+          max={new Date().toISOString().split("T")[0]}
           min={
             selectedLease?.opening_balance_date
-              ? new Date(selectedLease.opening_balance_date.split('T')?.[0])
+              ? new Date(selectedLease.opening_balance_date.split("T")?.[0])
                   .toISOString()
-                  .split('T')[0]
-              : ''
+                  .split("T")[0]
+              : ""
           }
           style={{
-            width: '100%',
-            border: '1px solid #111',
+            width: "100%",
+            border: "1px solid #111",
           }}
         />
       </td>
-      <td
-        className="tf-borderRight"
-        style={{ paddingRight: '1px', paddingLeft: '1px' }}
-      >
+      <td className="tf-borderRight" style={{ paddingRight: "1px", paddingLeft: "1px" }}>
         <select
           onChange={(e) => {
-            setSelectedLease(
-              leases.find((l) => l.lease_id === parseInt(e.target.value))
-            );
+            setSelectedLease(leases.find((l) => l.lease_id === parseInt(e.target.value)));
           }}
           className="form-control form-control-sm tf-borderRight tf-input"
           name="lease"
           id="lease"
           style={{
-            width: '100%',
-            border: '1px solid #e0e0e0',
-            borderTop: '0px',
+            width: "100%",
+            border: "1px solid #e0e0e0",
+            borderTop: "0px",
           }}
         >
           <option value="">Select Lease</option>
@@ -611,13 +584,13 @@ function ReceiptRow({ leases, dispatch }) {
       </td>
       <td
         className="tf-borderRight"
-        style={{ paddingRight: '1px', paddingLeft: '1px', maxWidth: '60px' }}
+        style={{ paddingRight: "1px", paddingLeft: "1px", maxWidth: "60px" }}
       >
         <input
           onChange={(e) =>
             selectedLease &&
             dispatch({
-              type: 'updateReceiptNumber',
+              type: "updateReceiptNumber",
               payload: {
                 lease_id: selectedLease.lease_id,
                 receiptNumber: e.target.value,
@@ -629,21 +602,18 @@ function ReceiptRow({ leases, dispatch }) {
           id="receiptNumber"
           value={selectedLease?.receiptNumber}
           style={{
-            width: '100%',
+            width: "100%",
 
-            border: '1px solid #111',
+            border: "1px solid #111",
           }}
         />
       </td>
-      <td
-        className="tf-borderRight"
-        style={{ paddingRight: '1px', paddingLeft: '1px' }}
-      >
+      <td className="tf-borderRight" style={{ paddingRight: "1px", paddingLeft: "1px" }}>
         <input
           onChange={(e) =>
             selectedLease &&
             dispatch({
-              type: 'updateDetails',
+              type: "updateDetails",
               payload: {
                 lease_id: selectedLease.lease_id,
                 receiptNumber: e.target.value,
@@ -655,32 +625,26 @@ function ReceiptRow({ leases, dispatch }) {
           id="details"
           value={selectedLease?.details}
           style={{
-            width: '100%',
-            border: '1px solid #111',
+            width: "100%",
+            border: "1px solid #111",
           }}
         />
       </td>
-      <td
-        className="tf-borderRight"
-        style={{ paddingRight: '1px', paddingLeft: '1px' }}
-      >
+      <td className="tf-borderRight" style={{ paddingRight: "1px", paddingLeft: "1px" }}>
         {selectedLease?.Currency}
       </td>
       <td
         className={`tf-borderRight bg-${selectedLease?.color} text-white text-end`}
-        style={{ paddingRight: '1px', paddingLeft: '1px' }}
+        style={{ paddingRight: "1px", paddingLeft: "1px" }}
       >
         {formatCurrency(selectedLease?.rent_owing ?? 0)}
       </td>
-      <td
-        className="tf-borderRight"
-        style={{ paddingRight: '1px', paddingLeft: '1px' }}
-      >
+      <td className="tf-borderRight" style={{ paddingRight: "1px", paddingLeft: "1px" }}>
         <input
           onChange={(e) =>
             selectedLease &&
             dispatch({
-              type: 'updatePaymentAmount',
+              type: "updatePaymentAmount",
               payload: {
                 lease_id: selectedLease.lease_id,
                 paymentAmount: Number(e.target.value),
@@ -690,30 +654,24 @@ function ReceiptRow({ leases, dispatch }) {
           className="form-control form-control-sm tf-borderRight tf-input"
           name="paymentAmount"
           id="paymentAmount"
-          value={
-            selectedLease?.paymentAmount === 0
-              ? ''
-              : selectedLease?.paymentAmount
-          }
+          value={selectedLease?.paymentAmount === 0 ? "" : selectedLease?.paymentAmount}
           style={{
-            width: '100%',
-            border: '1px solid #111',
+            width: "100%",
+            border: "1px solid #111",
           }}
         />
       </td>
       <td
         className="tf-borderRight text-end"
         style={{
-          paddingRight: '1px',
-          paddingLeft: '1px',
-          borderBottom: '1px solid #e0e0e0',
+          paddingRight: "1px",
+          paddingLeft: "1px",
+          borderBottom: "1px solid #e0e0e0",
         }}
       >
         {selectedLease?.balance_amount
-          ? formatCurrency(
-              selectedLease?.balance_amount - selectedLease?.paymentAmount
-            )
-          : ''}
+          ? formatCurrency(selectedLease?.balance_amount - selectedLease?.paymentAmount)
+          : ""}
       </td>
     </tr>
   );

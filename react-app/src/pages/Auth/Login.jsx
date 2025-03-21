@@ -1,15 +1,12 @@
-import React from 'react';
-import Layout from '../../components/Layouts/Auth/Layout.jsx';
-import useLogin from '../../hooks/page-hooks/useLogin.jsx';
+import React from "react";
+import Layout from "../../components/Layouts/Auth/Layout.jsx";
+import useLogin from "../../hooks/page-hooks/useLogin.jsx";
 
 export default function Login({ flash, error }) {
-  const {
-    data,
-    isLoading,
-    submitHandler,
-    changeHandler,
-    forgotPasswordHandler,
-  } = useLogin(flash, error);
+  const { data, isLoading, submitHandler, changeHandler, forgotPasswordHandler } = useLogin(
+    flash,
+    error
+  );
 
   return (
     <form className="p-5 my-5" onSubmit={submitHandler}>
@@ -55,18 +52,14 @@ export default function Login({ flash, error }) {
             Forgot Password?
           </button>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="btn btn-primary"
-          >
+          <button type="submit" disabled={isLoading} className="btn btn-primary">
             {isLoading ? (
               <>
                 <span className="spinner-grow spinner-grow-sm"></span>
                 <span className="ms-2">processing..</span>
               </>
             ) : (
-              'Login'
+              "Login"
             )}
           </button>
         </div>
@@ -75,4 +68,4 @@ export default function Login({ flash, error }) {
   );
 }
 
-Login.layout = (page) => <Layout children={page} title={'Login'} />;
+Login.layout = (page) => <Layout children={page} title={"Login"} />;

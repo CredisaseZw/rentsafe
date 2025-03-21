@@ -1,4 +1,4 @@
-import SectionSkeleton from './SectionSkeleton.jsx';
+import SectionSkeleton from "./SectionSkeleton.jsx";
 
 export default function AgedAnalysis({ data, isCreditorView }) {
   let total = 0;
@@ -8,7 +8,7 @@ export default function AgedAnalysis({ data, isCreditorView }) {
   });
 
   return (
-    <SectionSkeleton title={isCreditorView ? 'ageing' : 'aged analysis'}>
+    <SectionSkeleton title={isCreditorView ? "ageing" : "aged analysis"}>
       <table className="table table-sm table-responsive table-bordered  mb-0">
         <thead className="custom-bg-grey-2 text-white">
           <tr>

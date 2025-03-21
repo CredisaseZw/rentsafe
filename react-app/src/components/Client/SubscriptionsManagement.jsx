@@ -1,8 +1,8 @@
-import React from 'react';
-import { Modal } from 'react-bootstrap';
-import IndividualLeaseForm from '../../components/features/leases/IndividualLeaseForm.jsx';
-import CompanyLeaseForm from '../../components/features/leases/CompanyLeaseForm.jsx';
-import useSubscriptionsManagement from '../../hooks/component-hooks/useSubscriptionsManagement.js';
+import React from "react";
+import { Modal } from "react-bootstrap";
+import IndividualLeaseForm from "../../components/features/leases/IndividualLeaseForm.jsx";
+import CompanyLeaseForm from "../../components/features/leases/CompanyLeaseForm.jsx";
+import useSubscriptionsManagement from "../../hooks/component-hooks/useSubscriptionsManagement.js";
 
 export default function SubscriptionsManagement({
   className,
@@ -51,13 +51,7 @@ export default function SubscriptionsManagement({
         )}
       </>
 
-      <Modal
-        show={show}
-        onHide={closeModal}
-        size="xl"
-        backdrop="static"
-        centered
-      >
+      <Modal show={show} onHide={closeModal} size="xl" backdrop="static" centered>
         <Modal.Header>
           <div className="w-100 p-4 position-relative">
             <h4 className="text-center">Available Subscriptions</h4>
@@ -97,13 +91,13 @@ export default function SubscriptionsManagement({
                     <td>{sub.end_date}</td>
                     <td
                       className="bg-success text-white text-center c-pointer"
-                      onClick={() => activateSub(sub, 'individual')}
+                      onClick={() => activateSub(sub, "individual")}
                     >
                       Activate Individual
                     </td>
                     <td
                       className="bg-info text-white text-center c-pointer"
-                      onClick={() => activateSub(sub, 'company')}
+                      onClick={() => activateSub(sub, "company")}
                     >
                       Activate Company
                     </td>

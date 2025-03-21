@@ -1,5 +1,5 @@
-import { Link, usePage } from '@inertiajs/inertia-react';
-import React, { useState } from 'react';
+import { Link, usePage } from "@inertiajs/inertia-react";
+import React, { useState } from "react";
 
 const Sidebar = () => {
   const [userToggle, setUserToggle] = useState(false);
@@ -19,17 +19,14 @@ const Sidebar = () => {
   };
   return (
     <div id="layoutDrawer_nav">
-      <nav
-        className="drawer accordion drawer-light bg-white"
-        id="drawerAccordion"
-      >
-        <div className="drawer-menu" style={{ backgroundColor: '#26a69a' }}>
+      <nav className="drawer accordion drawer-light bg-white" id="drawerAccordion">
+        <div className="drawer-menu" style={{ backgroundColor: "#26a69a" }}>
           <div className="nav">
             <div className="drawer-menu-heading"></div>
             <Link
               className="nav-link mdc-ripple-upgraded text-white"
-              href={reverseUrl('home')}
-              style={{ cursor: 'pointer', fontWeight: '500', fontSize: '16px' }}
+              href={reverseUrl("home")}
+              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">dashboard</i>
@@ -39,14 +36,14 @@ const Sidebar = () => {
 
             <Link
               className={`nav-link text-white collapsed mdc-ripple-upgraded collapse ${
-                accToggle ? 'collapse' : ''
+                accToggle ? "collapse" : ""
               }`}
               // onClick={handleClickUserToggle}
               data-bs-toggle="collapse"
               data-bs-target="#collapsePages"
               aria-expanded="true"
               aria-controls="collapsePages"
-              style={{ cursor: 'pointer', fontWeight: '500', fontSize: '16px' }}
+              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">layers</i>
@@ -63,26 +60,23 @@ const Sidebar = () => {
               aria-labelledby="headingTwo"
               data-bs-parent="#drawerAccordion"
             >
-              <nav
-                className="drawer-menu-nested nav accordion"
-                id="drawerAccordionPages"
-              >
+              <nav className="drawer-menu-nested nav accordion" id="drawerAccordionPages">
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('search_company_users')}
+                  href={reverseUrl("search_company_users")}
                 >
                   Company
                 </Link>
 
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('search_contracted_companies')}
+                  href={reverseUrl("search_contracted_companies")}
                 >
                   Clients
                 </Link>
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('search_individual_users')}
+                  href={reverseUrl("search_individual_users")}
                 >
                   Individual
                 </Link>
@@ -90,7 +84,7 @@ const Sidebar = () => {
                 {userType && userType === 2 && (
                   <Link
                     className="nav-link text-white mdc-ripple-upgraded"
-                    href={reverseUrl('search-agents')}
+                    href={reverseUrl("search-agents")}
                   >
                     Agency
                   </Link>
@@ -99,14 +93,14 @@ const Sidebar = () => {
             </div>
             <a
               className={`collapse nav-link collapsed text-white mdc-ripple-upgraded  ${
-                accToggle ? 'collapse' : ''
+                accToggle ? "collapse" : ""
               }`}
               // onClick={handleClickSubToggle}
               data-bs-toggle="collapse"
               data-bs-target="#collapseSubScription"
               aria-expanded="true"
               aria-controls="collapseSubScription"
-              style={{ cursor: 'pointer', fontWeight: 500, fontSize: '16px' }}
+              style={{ cursor: "pointer", fontWeight: 500, fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">layers</i>
@@ -123,13 +117,10 @@ const Sidebar = () => {
               aria-labelledby="headingTwo"
               data-bs-parent="#drawerAccordion"
             >
-              <nav
-                className="drawer-menu-nested nav accordion"
-                id="drawerAccordionSubScription"
-              >
+              <nav className="drawer-menu-nested nav accordion" id="drawerAccordionSubScription">
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('active_subcription')}
+                  href={reverseUrl("active_subcription")}
                 >
                   Active
                 </Link>
@@ -138,13 +129,13 @@ const Sidebar = () => {
                   <>
                     <Link
                       className="nav-link text-white mdc-ripple-upgraded"
-                      href={reverseUrl('unallocated_subcription')}
+                      href={reverseUrl("unallocated_subcription")}
                     >
                       Unallocated
                     </Link>
                     <Link
                       className="nav-link text-white mdc-ripple-upgraded"
-                      href={reverseUrl('historic_subcription')}
+                      href={reverseUrl("historic_subcription")}
                     >
                       Historic
                     </Link>
@@ -158,7 +149,7 @@ const Sidebar = () => {
               data-bs-target="#collapseAccounting"
               aria-expanded="true"
               aria-controls="collapseAccounting"
-              style={{ cursor: 'pointer', fontWeight: 500, fontSize: '16px' }}
+              style={{ cursor: "pointer", fontWeight: 500, fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">layers</i>
@@ -175,14 +166,11 @@ const Sidebar = () => {
               aria-labelledby="headingTwo"
               data-bs-parent="#drawerAccordion"
             >
-              <nav
-                className="drawer-menu-nested nav accordion"
-                id="drawerAccordionAccounting"
-              >
+              <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
                 <a
                   className="nav-link text-white mdc-ripple-upgraded"
                   href="#"
-                  style={{ fontWeight: '500' }}
+                  style={{ fontWeight: "500" }}
                 >
                   Invoicing
                 </a>
@@ -192,13 +180,10 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
                     <a
                       className="nav-link  text-white mdc-ripple-upgraded"
-                      href={reverseUrl('standard_subs_pricing')}
+                      href={reverseUrl("standard_subs_pricing")}
                     >
                       Pricing
                     </a>
@@ -208,7 +193,7 @@ const Sidebar = () => {
                 <a
                   className="nav-link text-white mdc-ripple-upgraded"
                   href="#"
-                  style={{ fontWeight: '500' }}
+                  style={{ fontWeight: "500" }}
                 >
                   Cash Book
                 </a>
@@ -218,14 +203,8 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
-                    <a
-                      className="nav-link  text-white mdc-ripple-upgraded"
-                      href="#"
-                    >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
+                    <a className="nav-link  text-white mdc-ripple-upgraded" href="#">
                       Receipts
                     </a>
                   </nav>
@@ -236,14 +215,8 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
-                    <a
-                      className="nav-link  text-white mdc-ripple-upgraded"
-                      href="#"
-                    >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
+                    <a className="nav-link  text-white mdc-ripple-upgraded" href="#">
                       Payments
                     </a>
                   </nav>
@@ -254,14 +227,8 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
-                    <a
-                      className="nav-link  text-white mdc-ripple-upgraded"
-                      href="#"
-                    >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
+                    <a className="nav-link  text-white mdc-ripple-upgraded" href="#">
                       CashBook Ledger
                     </a>
                   </nav>
@@ -272,14 +239,8 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
-                    <a
-                      className="nav-link  text-white mdc-ripple-upgraded"
-                      href="#"
-                    >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
+                    <a className="nav-link  text-white mdc-ripple-upgraded" href="#">
                       CashBook Settings
                     </a>
                   </nav>
@@ -288,7 +249,7 @@ const Sidebar = () => {
                 <a
                   className="nav-link text-white mdc-ripple-upgraded"
                   href="#"
-                  style={{ fontWeight: '500' }}
+                  style={{ fontWeight: "500" }}
                 >
                   Agency Ledger
                 </a>
@@ -296,7 +257,7 @@ const Sidebar = () => {
                 <a
                   className="nav-link text-white mdc-ripple-upgraded"
                   href="#"
-                  style={{ fontWeight: '500' }}
+                  style={{ fontWeight: "500" }}
                 >
                   Reports
                 </a>
@@ -306,14 +267,8 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
-                    <a
-                      className="nav-link  text-white mdc-ripple-upgraded"
-                      href="#"
-                    >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
+                    <a className="nav-link  text-white mdc-ripple-upgraded" href="#">
                       Income
                     </a>
                   </nav>
@@ -324,14 +279,8 @@ const Sidebar = () => {
                   aria-labelledby="headingTwo"
                   data-bs-parent="#drawerAccordion"
                 >
-                  <nav
-                    className="drawer-menu-nested nav accordion"
-                    id="drawerAccordionAccounting"
-                  >
-                    <a
-                      className="nav-link  text-white mdc-ripple-upgraded"
-                      href="#"
-                    >
+                  <nav className="drawer-menu-nested nav accordion" id="drawerAccordionAccounting">
+                    <a className="nav-link  text-white mdc-ripple-upgraded" href="#">
                       VAT
                     </a>
                   </nav>
@@ -344,7 +293,7 @@ const Sidebar = () => {
           <div className="d-flex align-items-center">
             <i className="material-icons text-muted">account_circle</i>
             <div className="ms-3">
-              <a className="text-muted" href={reverseUrl('change-password')}>
+              <a className="text-muted" href={reverseUrl("change-password")}>
                 Profile
               </a>
             </div>

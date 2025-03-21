@@ -623,3 +623,20 @@
 .c-force-borders th:last-child div {
   border-right: none !important;
 }
+
+#invoice_currency {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  color: white;
+  width: 100%;
+  text-align: center;
+}
+
+#invoice_currency option {
+  background-color: white; /* Background color for options */
+  width: 100%;
+  text-align: center;
+  color: black;
+}

@@ -1,5 +1,5 @@
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import useVatSettings from '../../../../hooks/page-hooks/useVatSettings.js';
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import useVatSettings from "../../../../hooks/page-hooks/useVatSettings.js";
 
 export default function VatSettings({}) {
   const {
@@ -57,7 +57,7 @@ export default function VatSettings({}) {
               <table className="table table-sm table-respnsive shadow-sm bg-white">
                 <thead className="position-sticky c-table-top c-bg-light shadow-sm c-z-5">
                   <tr className="c-force-borders text-center">
-                    <th className="ps-3 text-start" style={{ width: '60%' }}>
+                    <th className="ps-3 text-start" style={{ width: "60%" }}>
                       <div> Description</div>
                     </th>
                     <th className="text-start">
@@ -106,15 +106,11 @@ export default function VatSettings({}) {
                             type="text"
                             className="form-control"
                             placeholder="description"
-                            name={'description-' + index}
-                            id={'description-' + index}
+                            name={"description-" + index}
+                            id={"description-" + index}
                             value={option.description}
                             onChange={(e) =>
-                              changeHandler(
-                                'description',
-                                e.target.value,
-                                option.id
-                              )
+                              changeHandler("description", e.target.value, option.id)
                             }
                           />
                         </div>
@@ -127,12 +123,10 @@ export default function VatSettings({}) {
                             step={0.001}
                             className="form-control"
                             placeholder="rate in %"
-                            name={'rate-' + index}
-                            id={'rate-' + index}
+                            name={"rate-" + index}
+                            id={"rate-" + index}
                             value={option.rate}
-                            onChange={(e) =>
-                              changeHandler('rate', e.target.value, option.id)
-                            }
+                            onChange={(e) => changeHandler("rate", e.target.value, option.id)}
                           />
                         </div>
                       </td>
@@ -165,18 +159,14 @@ export default function VatSettings({}) {
             </div>
 
             <div className="text-center">
-              <button
-                disabled={loading}
-                type="submit"
-                className="btn btn-info text-white"
-              >
+              <button disabled={loading} type="submit" className="btn btn-info text-white">
                 {loading ? (
                   <>
                     <span className="spinner-grow spinner-grow-sm"></span>
                     <span className="d-inline-block ms-2">Updating..</span>
                   </>
                 ) : (
-                  'Update'
+                  "Update"
                 )}
                 <i className="trailing-icon material-icons">save</i>
               </button>
@@ -188,6 +178,4 @@ export default function VatSettings({}) {
   );
 }
 
-VatSettings.layout = (page) => (
-  <Layout children={page} title={'Sales Categories'} />
-);
+VatSettings.layout = (page) => <Layout children={page} title={"Sales Categories"} />;

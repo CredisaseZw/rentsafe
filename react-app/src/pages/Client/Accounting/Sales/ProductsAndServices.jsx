@@ -1,8 +1,8 @@
-import ContentModal from '../../../../components/ContentModal.jsx';
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import MessageModal from '../../../../components/MessageModal.jsx';
-import useProductsAndServices from '../../../../hooks/page-hooks/useProductsAndServices.js';
-import { friendlyDate } from '../../../../utils/index.js';
+import ContentModal from "../../../../components/ContentModal.jsx";
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import MessageModal from "../../../../components/MessageModal.jsx";
+import useProductsAndServices from "../../../../hooks/page-hooks/useProductsAndServices.js";
+import { friendlyDate } from "../../../../utils/index.js";
 
 export default function ProductsAndServices({ currencies = [] }) {
   const {
@@ -47,13 +47,10 @@ export default function ProductsAndServices({ currencies = [] }) {
       <ContentModal
         show={showAdd || Boolean(itemToEdit)}
         handleClose={handleClose}
-        title={itemToEdit ? 'Edit Item' : 'Add Item'}
+        title={itemToEdit ? "Edit Item" : "Add Item"}
         size="md"
       >
-        <form
-          className="px-4 pb-5"
-          onSubmit={itemToEdit ? handleEdit : handleItemAddition}
-        >
+        <form className="px-4 pb-5" onSubmit={itemToEdit ? handleEdit : handleItemAddition}>
           <div className="c-bg-light p-1 mb-3 text-center">Item</div>
 
           <div className="mb-3">
@@ -66,7 +63,7 @@ export default function ProductsAndServices({ currencies = [] }) {
               id="category"
               name="category"
               // required
-              defaultValue={itemToEdit ? itemToEdit.category : ''}
+              defaultValue={itemToEdit ? itemToEdit.category : ""}
             >
               <option value="" disabled>
                 Select one
@@ -123,9 +120,7 @@ export default function ProductsAndServices({ currencies = [] }) {
                   id="unit_price_currency"
                   name="unit_price_currency"
                   required
-                  defaultValue={
-                    itemToEdit ? itemToEdit.unit_price_currency : ''
-                  }
+                  defaultValue={itemToEdit ? itemToEdit.unit_price_currency : ""}
                 >
                   <option value="" disabled>
                     Select one
@@ -159,7 +154,7 @@ export default function ProductsAndServices({ currencies = [] }) {
                   id="price"
                   name="price"
                   required
-                  defaultValue={itemToEdit ? itemToEdit.price : ''}
+                  defaultValue={itemToEdit ? itemToEdit.price : ""}
                 />
               </div>
             </div>
@@ -174,7 +169,7 @@ export default function ProductsAndServices({ currencies = [] }) {
               className="form-control"
               id="unit_name"
               name="unit_name"
-              defaultValue={itemToEdit ? itemToEdit.unit_name : ''}
+              defaultValue={itemToEdit ? itemToEdit.unit_name : ""}
             />
           </div>
 
@@ -187,7 +182,7 @@ export default function ProductsAndServices({ currencies = [] }) {
               id="tax_configuration"
               name="tax_configuration"
               // required
-              defaultValue={itemToEdit ? itemToEdit.tax_configuration : ''}
+              defaultValue={itemToEdit ? itemToEdit.tax_configuration : ""}
             >
               <option value="" disabled>
                 Select one
@@ -211,23 +206,19 @@ export default function ProductsAndServices({ currencies = [] }) {
               id="sales_account"
               name="sales_account"
               required
-              defaultValue={itemToEdit ? itemToEdit.sales_account : ''}
+              defaultValue={itemToEdit ? itemToEdit.sales_account : ""}
             />
           </div>
 
           <div className="mt-5 text-center">
-            <button
-              disabled={loading}
-              type="submit"
-              className="btn btn-primary"
-            >
+            <button disabled={loading} type="submit" className="btn btn-primary">
               {loading ? (
                 <>
                   <span className="spinner-grow spinner-grow-sm"></span>
                   <span className="d-inline-block ms-2">saving..</span>
                 </>
               ) : (
-                'Save'
+                "Save"
               )}
             </button>
           </div>
@@ -288,13 +279,11 @@ export default function ProductsAndServices({ currencies = [] }) {
               <td className="ps-3">{item.name}</td>
 
               <td className="ps-3">
-                {' '}
+                {" "}
                 {`${item.unit_price_currency} ${item.price} / ${item.unit_name}`}
               </td>
 
-              <td className="ps-3">
-                {item.date_created && friendlyDate(item.date_created)}
-              </td>
+              <td className="ps-3">{item.date_created && friendlyDate(item.date_created)}</td>
 
               <td className="d-flex gap-2 justify-content-end pe-3">
                 <button
@@ -304,10 +293,7 @@ export default function ProductsAndServices({ currencies = [] }) {
                   Edit
                 </button>
 
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => setItemToDelete(item)}
-                >
+                <button className="btn btn-sm btn-danger" onClick={() => setItemToDelete(item)}>
                   Delete
                 </button>
               </td>
@@ -319,6 +305,4 @@ export default function ProductsAndServices({ currencies = [] }) {
   );
 }
 
-ProductsAndServices.layout = (page) => (
-  <Layout children={page} title={'Sales Categories'} />
-);
+ProductsAndServices.layout = (page) => <Layout children={page} title={"Sales Categories"} />;

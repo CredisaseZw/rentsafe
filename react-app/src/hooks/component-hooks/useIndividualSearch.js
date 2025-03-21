@@ -1,7 +1,7 @@
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { useForm } from '@inertiajs/inertia-react';
-import { useState } from 'react';
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useForm } from "@inertiajs/inertia-react";
+import { useState } from "react";
 
 export default function useIndividualSearch(url) {
   const [show, setShow] = useState(false);
@@ -20,28 +20,28 @@ export default function useIndividualSearch(url) {
   const [isVerified, setIsVerified] = useState(false);
 
   const { data, setData, post } = useForm({
-    searchParam: 'fullname',
-    searchValue: '',
+    searchParam: "fullname",
+    searchValue: "",
   });
 
   function handleShowReport(e, id) {
     e.preventDefault();
-    toast.loading('Loading...', {
+    toast.loading("Loading...", {
       duration: 2500,
-      position: 'top-center',
+      position: "top-center",
     });
     try {
       setIsReportLoading(true);
       if (id) {
         axios
-          .post(reverseUrl('enquiry_count'), {
+          .post(reverseUrl("enquiry_count"), {
             isIndividual: true,
             isCompany: false,
             individualId: id,
           })
           .then((res) => {});
         axios
-          .post(reverseUrl('individual-report'), { individualId: id })
+          .post(reverseUrl("individual-report"), { individualId: id })
           .then((res) => {
             setSelectedRow(id);
             if (res.data?.is_eligible) {
@@ -53,16 +53,16 @@ export default function useIndividualSearch(url) {
               }
             } else {
               toast.error(
-                'You have exhausted your free enquiries. Please subscribe to get more enquiries.',
+                "You have exhausted your free enquiries. Please subscribe to get more enquiries.",
                 {
                   duration: 4000,
-                  id: 'error_',
+                  id: "error_",
                 }
               );
             }
           })
           .catch((error) => {
-            console.error('There was an error!', error);
+            console.error("There was an error!", error);
           });
       }
     } finally {
@@ -77,8 +77,8 @@ export default function useIndividualSearch(url) {
   function submitHandler(e) {
     e.preventDefault();
 
-    if (data.searchValue === '') {
-      setErrors({ searchValue: 'The search value field is required.' });
+    if (data.searchValue === "") {
+      setErrors({ searchValue: "The search value field is required." });
       return;
     }
 
@@ -92,7 +92,7 @@ export default function useIndividualSearch(url) {
       onSuccess: (response) => {
         //This will return true if the object is empty, otherwise false
         const isObjectEmpty = (objectName) => {
-          return JSON.stringify(objectName) === '{}';
+          return JSON.stringify(objectName) === "{}";
         };
         response.props.result.length === 0 && setNotFound(true);
         if (isObjectEmpty(response.props.result) === true) {

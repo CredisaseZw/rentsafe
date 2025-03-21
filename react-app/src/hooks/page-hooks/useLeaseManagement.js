@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { usePage } from '@inertiajs/inertia-react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import useClientView from '../../hooks/modal-hooks/useClientView.js';
-import { Inertia } from '@inertiajs/inertia';
-import { truncate } from 'lodash';
-import { formatCurrency } from '../../utils/formatting.js';
-import { userFriendlyErrorOrResponse } from '../../utils/index.js';
+import { useState, useEffect } from "react";
+import { usePage } from "@inertiajs/inertia-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import useClientView from "../../hooks/modal-hooks/useClientView.js";
+import { Inertia } from "@inertiajs/inertia";
+import { truncate } from "lodash";
+import { formatCurrency } from "../../utils/formatting.js";
+import { userFriendlyErrorOrResponse } from "../../utils/index.js";
 
 export default function useLeaseManagement(leases) {
   const {
@@ -14,7 +14,7 @@ export default function useLeaseManagement(leases) {
     url,
   } = usePage();
 
-  let totalColor = new URL(url).searchParams.get('color');
+  let totalColor = new URL(url).searchParams.get("color");
 
   const [details, setDetails] = useState({});
   const [subscriptions, setSubscriptions] = useState([]);
@@ -22,12 +22,12 @@ export default function useLeaseManagement(leases) {
   const [showReceipt, setShowReceipt] = useState(false);
   const [subLength, setSubLength] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [sort, setSort] = useState(totalColor ? 'rent-owing-des' : 'default');
+  const [sort, setSort] = useState(totalColor ? "rent-owing-des" : "default");
   const clientViewProps = useClientView();
   const [showIndividualLeaseForm, setShowIndividualLeaseForm] = useState(false);
   const [showCompanyLeaseForm, setShowCompanyLeaseForm] = useState(false);
 
-  const viewLeaseId = new URL(usePage().url).searchParams.get('open_view_for');
+  const viewLeaseId = new URL(usePage().url).searchParams.get("open_view_for");
 
   useEffect(() => {
     if (!viewLeaseId) return;
@@ -42,7 +42,7 @@ export default function useLeaseManagement(leases) {
 
   useEffect(() => {
     axios
-      .post(reverseUrl('open_subscription'))
+      .post(reverseUrl("open_subscription"))
       .then((res) => {
         setSubscriptions(res.data);
       })
@@ -51,34 +51,34 @@ export default function useLeaseManagement(leases) {
       });
   }, [setSubscriptions, isVisible]);
 
-  const hideFooter = document.getElementById('hide-footer');
+  const hideFooter = document.getElementById("hide-footer");
 
   useEffect(() => {
     if (hideFooter !== null) {
-      document.getElementById('footer').classList.add('d-none');
+      document.getElementById("footer").classList.add("d-none");
     }
     return () => {
       if (hideFooter !== null) {
-        document.getElementById('footer').classList.remove('d-none');
+        document.getElementById("footer").classList.remove("d-none");
       }
     };
   }, [hideFooter]);
 
   switch (totalColor) {
-    case 'orange':
-      totalColor = 'warning';
+    case "orange":
+      totalColor = "warning";
       break;
-    case 'black':
-      totalColor = 'black';
+    case "black":
+      totalColor = "black";
       break;
-    case 'red':
-      totalColor = 'red';
+    case "red":
+      totalColor = "red";
       break;
-    case 'green':
-      totalColor = 'success';
+    case "green":
+      totalColor = "success";
       break;
-    case '#991b1b':
-      totalColor = 'danger';
+    case "#991b1b":
+      totalColor = "danger";
       break;
     default:
       break;
@@ -95,7 +95,7 @@ export default function useLeaseManagement(leases) {
   function writeOff(lease) {
     console.log(lease);
     axios
-      .post(reverseUrl('write-off'), { lease_id: lease.lease_id })
+      .post(reverseUrl("write-off"), { lease_id: lease.lease_id })
       .then((res) => {
         console.log(res);
         Inertia.reload();
@@ -105,28 +105,26 @@ export default function useLeaseManagement(leases) {
         const errMessage = err?.response?.data?.errors
           ? JSON.stringify(err.response.data.errors)
           : JSON.stringify(err);
-        toast.error(
-          'An error occured:\n' + truncate(errMessage, { length: 200 })
-        );
+        toast.error("An error occured:\n" + truncate(errMessage, { length: 200 }));
       });
   }
 
   switch (sort) {
-    case 'rent-owing-asc':
+    case "rent-owing-asc":
       sortFunc = (arr) => {
         const arrClone = [...arr];
         arrClone.sort((a, b) => a.owing_amount - b.owing_amount);
         return arrClone;
       };
       break;
-    case 'rent-owing-des':
+    case "rent-owing-des":
       sortFunc = (arr) => {
         const arrClone = [...arr];
         arrClone.sort((a, b) => b.owing_amount - a.owing_amount);
         return arrClone;
       };
       break;
-    case 'color-asc':
+    case "color-asc":
       sortFunc = (arr) => {
         const arrColors = {};
         arr.forEach((item) => {
@@ -147,7 +145,7 @@ export default function useLeaseManagement(leases) {
         return arrClone;
       };
       break;
-    case 'color-des':
+    case "color-des":
       sortFunc = (arr) => {
         const arrColors = {};
         arr.forEach((item) => {
@@ -176,10 +174,10 @@ export default function useLeaseManagement(leases) {
   const [currencySettings, setCurrencySettings] = useState({});
   useEffect(() => {
     axios
-      .get(reverseUrl('rate_setup'))
+      .get(reverseUrl("rate_setup"))
       .then((res) => {
         const settings = res?.data?.currency_settings;
-        if (!settings) throw new Error('failed to fetch currency settings');
+        if (!settings) throw new Error("failed to fetch currency settings");
         setCurrencySettings(settings);
       })
       .catch((err) => {
@@ -197,21 +195,20 @@ export default function useLeaseManagement(leases) {
                 lease.currency.trim().toLowerCase() !==
                 currencySettings?.base_currency.trim().toLowerCase()
               ) {
-                amountInBaseCurrency =
-                  lease.owing_amount / currencySettings?.current_rate;
+                amountInBaseCurrency = lease.owing_amount / currencySettings?.current_rate;
               }
               return sum + amountInBaseCurrency;
             }, 0)
           : 0
-      ).replace('$', '')}`
-    : '';
+      ).replace("$", "")}`
+    : "";
 
   const rateText =
     !nullCurrencySsettings &&
     leases &&
-    leases.find((l) => l.currency.trim().toLowerCase() !== 'usd')
+    leases.find((l) => l.currency.trim().toLowerCase() !== "usd")
       ? `${currencySettings.base_currency.toUpperCase()} 1 = ${currencySettings.currency.toUpperCase()} ${currencySettings.current_rate}`
-      : '';
+      : "";
 
   const activeLeaseCount = leases?.length
     ? leases.reduce((sum, lease) => {

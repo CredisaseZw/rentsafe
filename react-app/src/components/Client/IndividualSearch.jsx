@@ -1,10 +1,10 @@
-import { NotFound } from '../NotFound.jsx';
-import IndividualAdd from './IndividualAdd.jsx';
-import BulkIconButton from '../BulkIconButton.jsx';
-import BulkUploadModal from '../BulkUploadModal.jsx';
-import IndividualReport from './Report/IndividualReport.jsx';
-import useIndividualSearch from '../../hooks/component-hooks/useIndividualSearch.js';
-import { Head } from '@inertiajs/inertia-react';
+import { NotFound } from "../NotFound.jsx";
+import IndividualAdd from "./IndividualAdd.jsx";
+import BulkIconButton from "../BulkIconButton.jsx";
+import BulkUploadModal from "../BulkUploadModal.jsx";
+import IndividualReport from "./Report/IndividualReport.jsx";
+import useIndividualSearch from "../../hooks/component-hooks/useIndividualSearch.js";
+import { Head } from "@inertiajs/inertia-react";
 
 export default function IndividualSearch({ url }) {
   const {
@@ -40,8 +40,8 @@ export default function IndividualSearch({ url }) {
         <Head title="Search Individual" />
 
         <BulkUploadModal
-          type={'individual'}
-          actionType={'user'}
+          type={"individual"}
+          actionType={"user"}
           show={isBulkAdd}
           handleClose={() => setIsBulkAdd(false)}
         />
@@ -62,8 +62,8 @@ export default function IndividualSearch({ url }) {
           handleMultiple={handleMultiple}
           handleSingle={handleSingle}
           handleClose={handleClose}
-          action={'create'}
-          url={'cl-store-individual'}
+          action={"create"}
+          url={"cl-store-individual"}
         />
       </>
 
@@ -76,10 +76,7 @@ export default function IndividualSearch({ url }) {
           <thead className="position-sticky c-table-top bg-white c-z-5">
             <tr>
               <th colSpan={4}>
-                <form
-                  className="d-flex gap-3 align-items-end p-2"
-                  onSubmit={submitHandler}
-                >
+                <form className="d-flex gap-3 align-items-end p-2" onSubmit={submitHandler}>
                   <div>
                     <label className="form-label" htmlFor="searchValue">
                       Filter by Name / Surname / ID
@@ -95,9 +92,7 @@ export default function IndividualSearch({ url }) {
                     />
 
                     {errors.searchValue && (
-                      <small className="text-danger p-1">
-                        {errors.searchValue}
-                      </small>
+                      <small className="text-danger p-1">{errors.searchValue}</small>
                     )}
                   </div>
 
@@ -117,11 +112,7 @@ export default function IndividualSearch({ url }) {
                     </select>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="btn btn-info text-white"
-                  >
+                  <button type="submit" disabled={isLoading} className="btn btn-info text-white">
                     <i className="leading-icon material-icons">search</i>
                     {isLoading ? (
                       <>
@@ -129,7 +120,7 @@ export default function IndividualSearch({ url }) {
                         <span className="ms-2">Searching..</span>
                       </>
                     ) : (
-                      'Search'
+                      "Search"
                     )}
                   </button>
 
@@ -175,7 +166,7 @@ export default function IndividualSearch({ url }) {
                           <span className="ms-2">processing..</span>
                         </>
                       ) : (
-                        'View'
+                        "View"
                       )}
                     </button>
                   </td>
@@ -190,7 +181,7 @@ export default function IndividualSearch({ url }) {
             <NotFound
               handleShow={handleShow}
               handleCloseModal={() => setNotFound(false)}
-              userType={'individual'}
+              userType={"individual"}
               searchValue={data.searchValue}
             />
           </div>

@@ -1,45 +1,42 @@
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-import { useForm } from '@inertiajs/inertia-react';
-import { userFriendlyErrorOrResponse } from '../../../utils';
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
+import { useForm } from "@inertiajs/inertia-react";
+import { userFriendlyErrorOrResponse } from "../../../utils";
 
 export default function useSubOrigination() {
   const { data, setData, reset } = useForm({
-    subscriberName: '',
-    subscriberRegNo: '',
-    product: '',
-    subPeriod: '',
-    numberOfSubs: '',
-    startDate: '',
-    currency: 'USD',
-    monthlyPrice: '',
-    monthlyPriceZWL: '',
-    subsAmount: '',
-    paymentMethod: '',
+    subscriberName: "",
+    subscriberRegNo: "",
+    product: "",
+    subPeriod: "",
+    numberOfSubs: "",
+    startDate: "",
+    currency: "USD",
+    monthlyPrice: "",
+    monthlyPriceZWL: "",
+    subsAmount: "",
+    paymentMethod: "",
   });
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
   const [services, setServices] = useState();
   const [sub_periods, setSubPeriods] = useState();
-  const [subscriberType, setSubscriberType] = useState('individual');
-  const [subscriberName, setSubscriberName] = useState('');
-  const [clientId, setClientId] = useState('');
-  const [regNumber, setRegNumber] = useState('');
+  const [subscriberType, setSubscriberType] = useState("individual");
+  const [subscriberName, setSubscriberName] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [regNumber, setRegNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   function handleSubmit() {
     setIsLoading(true);
 
-    data.subscriberName =
-      subscriberType === 'individual' ? String(regNumber) : String(clientId);
+    data.subscriberName = subscriberType === "individual" ? String(regNumber) : String(clientId);
     data.subscriberRegNo = String(regNumber);
     data.monthlyPrice =
-      data.currency === 'USD'
-        ? data.monthlyPrice.toString()
-        : data.monthlyPriceZWL.toString();
+      data.currency === "USD" ? data.monthlyPrice.toString() : data.monthlyPriceZWL.toString();
 
-    if (data.subscriberName === '') {
-      toast.error('Subscriber Name is required', { id: 'create-sub' });
+    if (data.subscriberName === "") {
+      toast.error("Subscriber Name is required", { id: "create-sub" });
       setIsLoading(false);
       return;
     }
@@ -47,27 +44,27 @@ export default function useSubOrigination() {
     console.log([data]);
 
     axios
-      .post(reverseUrl('active_subcription'), [data])
+      .post(reverseUrl("active_subcription"), [data])
       .then((res) => {
         console.log(res);
         if (res.data.status === 400) {
           setErrors(res.data.errors[0]);
           toast.error(userFriendlyErrorOrResponse(res), {
-            id: 'create-sub',
+            id: "create-sub",
           });
           setIsLoading(false);
           return;
         }
         reset();
-        toast.success('Subscription created successfully', {
-          id: 'create-sub',
+        toast.success("Subscription created successfully", {
+          id: "create-sub",
         });
         setIsLoading(false);
       })
       .catch((e) => {
         console.log(e);
         toast.error(userFriendlyErrorOrResponse(e?.data?.errors || e), {
-          id: 'create-sub',
+          id: "create-sub",
         });
         setErrors(e);
         setIsLoading(false);
@@ -80,9 +77,9 @@ export default function useSubOrigination() {
 
   useEffect(() => {
     Promise.all([
-      axios.post(reverseUrl('get_services')),
-      axios.post(reverseUrl('get_sub_period')),
-      axios.post(reverseUrl('subs_monthly_pricing')),
+      axios.post(reverseUrl("get_services")),
+      axios.post(reverseUrl("get_sub_period")),
+      axios.post(reverseUrl("subs_monthly_pricing")),
     ]).then((all) => {
       console.log(all[2].data);
       setServices(all[0].data.services);
@@ -111,13 +108,10 @@ export default function useSubOrigination() {
       setData((prevData) => ({
         ...prevData,
         subsAmount:
-          data.currency === 'USD'
+          data.currency === "USD"
             ? (
                 Math.round(
-                  Number(data.numberOfSubs) *
-                    Number(periodLength) *
-                    Number(data.monthlyPrice) *
-                    100
+                  Number(data.numberOfSubs) * Number(periodLength) * Number(data.monthlyPrice) * 100
                 ) / 100
               ).toString()
             : (
@@ -130,22 +124,16 @@ export default function useSubOrigination() {
               ).toString(),
       }));
     }
-  }, [
-    data.subPeriod,
-    data.numberOfSubs,
-    data.monthlyPrice,
-    data.monthlyPriceZWL,
-    data.currency,
-  ]);
+  }, [data.subPeriod, data.numberOfSubs, data.monthlyPrice, data.monthlyPriceZWL, data.currency]);
 
   const searchUrl =
-    subscriberType === 'company'
-      ? reverseUrl('get_searched_companies')
-      : subscriberType === 'individual'
-        ? reverseUrl('get_searched_individuals')
-        : '';
+    subscriberType === "company"
+      ? reverseUrl("get_searched_companies")
+      : subscriberType === "individual"
+        ? reverseUrl("get_searched_individuals")
+        : "";
 
-  isLoading && toast.loading('Creating subscription ...', { id: 'create-sub' });
+  isLoading && toast.loading("Creating subscription ...", { id: "create-sub" });
 
   return {
     data,

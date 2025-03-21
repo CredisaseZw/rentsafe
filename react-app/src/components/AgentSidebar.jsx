@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from '@inertiajs/inertia-react';
+import React, { useState } from "react";
+import { Link } from "@inertiajs/inertia-react";
 
 const AgentSidebar = () => {
   const [userToggle, setUserToggle] = useState(false);
@@ -17,17 +17,14 @@ const AgentSidebar = () => {
   };
   return (
     <div id="layoutDrawer_nav">
-      <nav
-        className="drawer accordion drawer-light bg-white"
-        id="drawerAccordion"
-      >
-        <div className="drawer-menu" style={{ backgroundColor: '#26a69a' }}>
+      <nav className="drawer accordion drawer-light bg-white" id="drawerAccordion">
+        <div className="drawer-menu" style={{ backgroundColor: "#26a69a" }}>
           <div className="nav">
             <div className="drawer-menu-heading"></div>
             <Link
               className="nav-link mdc-ripple-upgraded text-white"
-              href={reverseUrl('home')}
-              style={{ cursor: 'pointer', fontWeight: '500', fontSize: '16px' }}
+              href={reverseUrl("home")}
+              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">dashboard</i>
@@ -42,7 +39,7 @@ const AgentSidebar = () => {
               data-bs-target="#collapsePages"
               aria-expanded="true"
               aria-controls="collapsePages"
-              style={{ cursor: 'pointer', fontWeight: '500', fontSize: '16px' }}
+              style={{ cursor: "pointer", fontWeight: "500", fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">layers</i>
@@ -59,20 +56,17 @@ const AgentSidebar = () => {
               aria-labelledby="headingTwo"
               data-bs-parent="#drawerAccordion"
             >
-              <nav
-                className="drawer-menu-nested nav accordion"
-                id="drawerAccordionPages"
-              >
+              <nav className="drawer-menu-nested nav accordion" id="drawerAccordionPages">
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('search_company_users')}
+                  href={reverseUrl("search_company_users")}
                 >
                   Company
                 </Link>
 
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('search_individual_users')}
+                  href={reverseUrl("search_individual_users")}
                 >
                   Individual
                 </Link>
@@ -85,7 +79,7 @@ const AgentSidebar = () => {
               data-bs-target="#collapsePages"
               aria-expanded="true"
               aria-controls="collapsePages"
-              style={{ cursor: 'pointer', fontWeight: 500, fontSize: '16px' }}
+              style={{ cursor: "pointer", fontWeight: 500, fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">layers</i>
@@ -102,13 +96,10 @@ const AgentSidebar = () => {
               aria-labelledby="headingTwo"
               data-bs-parent="#drawerAccordion"
             >
-              <nav
-                className="drawer-menu-nested nav accordion"
-                id="drawerAccordionPages"
-              >
+              <nav className="drawer-menu-nested nav accordion" id="drawerAccordionPages">
                 <Link
                   className="nav-link text-white mdc-ripple-upgraded"
-                  href={reverseUrl('active_subcription')}
+                  href={reverseUrl("active_subcription")}
                 >
                   Active
                 </Link>
@@ -120,7 +111,7 @@ const AgentSidebar = () => {
               data-bs-target="#collapsePages"
               aria-expanded="true"
               aria-controls="collapsePages"
-              style={{ cursor: 'pointer', fontWeight: 500, fontSize: '16px' }}
+              style={{ cursor: "pointer", fontWeight: 500, fontSize: "16px" }}
             >
               <div className="nav-link-icon">
                 <i className="material-icons">layers</i>

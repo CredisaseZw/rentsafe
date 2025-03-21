@@ -1,12 +1,7 @@
-import { Modal } from 'react-bootstrap';
-import useCurrencySettings from '../../../hooks/modal-hooks/useCurrencySettings';
+import { Modal } from "react-bootstrap";
+import useCurrencySettings from "../../../hooks/modal-hooks/useCurrencySettings";
 
-export default function CurrencySettings({
-  className,
-  makeActive,
-  id,
-  beforeOpenningModal,
-}) {
+export default function CurrencySettings({ className, makeActive, id, beforeOpenningModal }) {
   const {
     show,
     data,
@@ -19,7 +14,7 @@ export default function CurrencySettings({
   } = useCurrencySettings();
 
   function closeModal() {
-    makeActive('use-last-last');
+    makeActive("use-last-last");
     hookCloseModal();
   }
 
@@ -130,9 +125,7 @@ export default function CurrencySettings({
                     id="rate"
                     type="number"
                     value={data.rate}
-                    onChange={(e) =>
-                      setData((prev) => ({ ...prev, rate: e.target.value }))
-                    }
+                    onChange={(e) => setData((prev) => ({ ...prev, rate: e.target.value }))}
                     required
                   />
                 </div>

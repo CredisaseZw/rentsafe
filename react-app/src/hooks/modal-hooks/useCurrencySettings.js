@@ -1,16 +1,16 @@
-import axios from 'axios';
-import { truncate } from 'lodash';
-import { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import axios from "axios";
+import { truncate } from "lodash";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useCurrencySettings() {
   const [show, setShow] = useState(false);
   const [data, setData] = useState({
-    baseCurrency: '',
-    conversionCurrency: '',
-    rate: '',
-    date: new Date().toISOString().split('T')[0],
+    baseCurrency: "",
+    conversionCurrency: "",
+    rate: "",
+    date: new Date().toISOString().split("T")[0],
   });
   const initialDataRef = useRef();
 
@@ -19,7 +19,7 @@ export default function useCurrencySettings() {
 
   useEffect(() => {
     axios
-      .get(reverseUrl('rate_setup'))
+      .get(reverseUrl("rate_setup"))
       .then((res) => {
         // console.log(res);
         const settings = res?.data?.currency_settings;
@@ -31,14 +31,12 @@ export default function useCurrencySettings() {
         setData((prev) => ({
           ...prev,
           rate: settings.current_rate || 0,
-          baseCurrency: settings.base_currency || '',
-          conversionCurrency: settings.currency || '',
+          baseCurrency: settings.base_currency || "",
+          conversionCurrency: settings.currency || "",
           date:
             settings.updated_at || settings.date_created
-              ? new Date(settings.updated_at || settings.date_created)
-                  .toISOString()
-                  .split('T')[0]
-              : new Date().toISOString().split('T')[0],
+              ? new Date(settings.updated_at || settings.date_created).toISOString().split("T")[0]
+              : new Date().toISOString().split("T")[0],
         }));
       })
       .catch((err) => {
@@ -52,18 +50,16 @@ export default function useCurrencySettings() {
     console.log(data);
     if (
       initialDataRef.current?.data &&
-      data.baseCurrency ==
-        initialDataRef.current.data.currency_settings.base_currency &&
-      data.conversionCurrency ==
-        initialDataRef.current.data.currency_settings.currency &&
+      data.baseCurrency == initialDataRef.current.data.currency_settings.base_currency &&
+      data.conversionCurrency == initialDataRef.current.data.currency_settings.currency &&
       data.rate == initialDataRef.current.data.currency_settings.current_rate
     ) {
-      toast.error('no changes were made');
+      toast.error("no changes were made");
       return;
     }
 
     axios
-      .post(reverseUrl('rate_setup'), {
+      .post(reverseUrl("rate_setup"), {
         base_currency: data.baseCurrency,
         currency: data.conversionCurrency,
         rate: data.rate,
@@ -85,8 +81,7 @@ export default function useCurrencySettings() {
     setData((prev) => ({
       ...prev,
       baseCurrency: val,
-      conversionCurrency:
-        prev.conversionCurrency === val ? '' : prev.conversionCurrency,
+      conversionCurrency: prev.conversionCurrency === val ? "" : prev.conversionCurrency,
     }));
   }
 
@@ -97,7 +92,7 @@ export default function useCurrencySettings() {
     setData((prev) => ({
       ...prev,
       conversionCurrency: val,
-      baseCurrency: prev.baseCurrency === val ? '' : prev.baseCurrency,
+      baseCurrency: prev.baseCurrency === val ? "" : prev.baseCurrency,
     }));
   }
 

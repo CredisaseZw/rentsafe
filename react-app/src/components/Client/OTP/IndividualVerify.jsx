@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
-export const IndividualVerify = ({
-  show,
-  handleClose,
-  url,
-  setVerified,
-  verification_type,
-}) => {
+export const IndividualVerify = ({ show, handleClose, url, setVerified, verification_type }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [canResend, setCanResend] = useState(false);
   const [errors, setErrors] = useState({});
   const [countdown, setCountdown] = useState(30);
 
   const { data, setData, post, reset } = useForm({
-    otp: '',
+    otp: "",
     verification_type: verification_type,
   });
 
@@ -36,15 +30,14 @@ export const IndividualVerify = ({
     return () => clearInterval(intervalId);
   }, []);
 
-  const changeHandler = (e) =>
-    setData({ ...data, [e.target.id]: e.target.value });
+  const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
   const isOTPValid = () => {
     if (data.otp.length !== 4) {
-      setErrors({ otp: 'otp must be four digits' });
+      setErrors({ otp: "otp must be four digits" });
       return false;
     } else if (!Boolean(parseInt(data.otp, 10))) {
-      setErrors({ otp: 'otp must be a number' });
+      setErrors({ otp: "otp must be a number" });
       return false;
     }
     return true;
@@ -60,16 +53,14 @@ export const IndividualVerify = ({
         onSuccess: (response) => {
           handleClose();
           reset();
-          toast.success('User verified successfully');
+          toast.success("User verified successfully");
           setIsLoading(false);
 
           setVerified && setVerified(true);
-          axios
-            .get(reverseUrl('cl_is_individual_verified'))
-            .then((response) => {});
+          axios.get(reverseUrl("cl_is_individual_verified")).then((response) => {});
         },
         onError: (e) => {
-          toast.error('Something went wrong! Please try again');
+          toast.error("Something went wrong! Please try again");
           setErrors(e);
           setIsLoading(false);
         },
@@ -81,14 +72,14 @@ export const IndividualVerify = ({
   const handleOTPResend = async () => {
     setCanResend(false);
     try {
-      const response = await axios.get(reverseUrl('new_otp'));
-      if (response.data.status === 'success') {
-        toast.success('OTP sent successfully');
+      const response = await axios.get(reverseUrl("new_otp"));
+      if (response.data.status === "success") {
+        toast.success("OTP sent successfully");
       } else {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
       }
     } catch (err) {
-      toast.error('Something went wrong! Please try again');
+      toast.error("Something went wrong! Please try again");
     }
   };
 
@@ -114,8 +105,8 @@ export const IndividualVerify = ({
                 <div
                   className="card-body p-4"
                   style={{
-                    borderStyle: 'solid',
-                    borderColor: '#26a69a',
+                    borderStyle: "solid",
+                    borderColor: "#26a69a",
                   }}
                 >
                   <Modal.Body>
@@ -123,16 +114,14 @@ export const IndividualVerify = ({
                       <div className="col-md-12">
                         <div>
                           <p>
-                            {verification_type === 'individual'
+                            {verification_type === "individual"
                               ? "Enter the 4-digit code we sent to user's mobile number. This code will expire after 5 minutes"
                               : "Enter the 4-digit code we sent to user's email. This code will expire after 5 minutes"}
                           </p>
                         </div>
                         <div className="row">
                           <div className="col-md-6">
-                            <label className="form-label">
-                              Verification Code
-                            </label>
+                            <label className="form-label">Verification Code</label>
                             <input
                               value={data.otp}
                               onChange={changeHandler}
@@ -143,11 +132,7 @@ export const IndividualVerify = ({
                               className="form-control form-control-sm"
                             />
 
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.otp}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.otp}</div>}
                           </div>
                         </div>
                       </div>
@@ -163,9 +148,7 @@ export const IndividualVerify = ({
                           </button>
                         </p>
                         {countdown > 0 && (
-                          <p className="text-success">
-                            {`Resend code in ${countdown} seconds`}
-                          </p>
+                          <p className="text-success">{`Resend code in ${countdown} seconds`}</p>
                         )}
                       </div>
                     </div>
@@ -183,7 +166,7 @@ export const IndividualVerify = ({
                           <span className="ml-2">processing..</span>
                         </>
                       ) : (
-                        'Verify'
+                        "Verify"
                       )}
                     </Button>
                   </Modal.Footer>

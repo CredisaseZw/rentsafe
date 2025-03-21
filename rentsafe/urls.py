@@ -239,8 +239,8 @@ urlpatterns = [
                 path("products-and-services", clients.products_and_services, name="products_and_services"),
                 path("vat-settings", clients.vat_settings, name="vat_settings"),
                 path("cash-books", clients.cash_books, name="cash_books"),
-                path("general-ledger", clients.general_ledger, name="general_ledger"),
                 path("sales-invoicing", clients.sales_invoicing, name="sales_invoicing"),
+                path("accounts-list", clients.accounts_list, name="accounts_list"),
                 path(
                     "claims/",
                     claims.create_claim,
@@ -482,16 +482,6 @@ urlpatterns = [
                     name="credit_journal",
                 ),
                 path(
-                    "accounting/account-adjustment/creditor/debit-journal/",
-                    clients.creditor_debit_journal,
-                    name="creditor_debit_journal",
-                ),
-                path(
-                    "accounting/account-adjustment/creditor/credit-journal/",
-                    clients.creditor_credit_journal,
-                    name="creditor_credit_journal",
-                ),
-                path(
                     "accounting/commission-statement/",
                     statements.commission_statement,
                     name="commission_statement",
@@ -570,6 +560,11 @@ urlpatterns = [
                     "forecasts/",
                     forecasts.get_forecast_inflows,
                     name="forecasts",
+                ),
+                path(
+                    "get-creditor-journals/",
+                    creditors.get_creditor_journals,
+                    name="get_creditor_journals",
                 ),
                 path(
                     "creditor-debit/",

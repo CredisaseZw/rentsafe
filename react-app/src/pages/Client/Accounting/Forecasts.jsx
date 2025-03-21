@@ -1,6 +1,6 @@
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import useForecasts from '../../../hooks/page-hooks/useForecasts.js';
-import { fmtAmount } from '../../../utils/index.js';
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import useForecasts from "../../../hooks/page-hooks/useForecasts.js";
+import { fmtAmount } from "../../../utils/index.js";
 
 export default function Forecasts({
   forecast_inflows: inflows_statement = [],
@@ -17,16 +17,12 @@ export default function Forecasts({
   console.log(inflows_statement);
   return (
     <div className="bg-white border rounded-3">
-      <h5 className="text-center p-2 mb-0 text-white bg-info">
-        {company_name}
-      </h5>
+      <h5 className="text-center p-2 mb-0 text-white bg-info">{company_name}</h5>
 
-      <div className="custom-bg-grey-2 text-white text-center p-1">
-        Cashflow Forecast (USD)
-      </div>
+      <div className="custom-bg-grey-2 text-white text-center p-1">Cashflow Forecast (USD)</div>
 
       <table
-        style={{ lineHeight: '5px', fontSize: '12px' }}
+        style={{ lineHeight: "5px", fontSize: "12px" }}
         className="table table-bordered table-responsive mb-0"
       >
         <thead className="position-sticky c-table-top bg-white shadow-sm">
@@ -43,9 +39,7 @@ export default function Forecasts({
         <tbody>
           <>
             <tr>
-              <td className="fs-larger bg-success text-white fw-bolder">
-                inflows
-              </td>
+              <td className="fs-larger bg-success text-white fw-bolder">inflows</td>
               <td></td>
               <td></td>
               <td></td>
@@ -56,10 +50,10 @@ export default function Forecasts({
             {inflows_statement?.map((row, index) => (
               <tr key={index}>
                 <td>{row.tenant}</td>
-                <td className="text-end">{fmtAmount(row['0-7'])}</td>
-                <td className="text-end">{fmtAmount(row['8-14'])}</td>
-                <td className="text-end">{fmtAmount(row['14-21'])}</td>
-                <td className="text-end">{fmtAmount(row['21+'])}</td>
+                <td className="text-end">{fmtAmount(row["0-7"])}</td>
+                <td className="text-end">{fmtAmount(row["8-14"])}</td>
+                <td className="text-end">{fmtAmount(row["14-21"])}</td>
+                <td className="text-end">{fmtAmount(row["21+"])}</td>
                 <td className="text-end">${fmtAmount(row.total)}</td>
               </tr>
             ))}
@@ -93,9 +87,7 @@ export default function Forecasts({
                   {fmtAmount(inflows_totals.twenty_one_plus_days)}
                 </th>
 
-                <th className="c-border-y-dark text-end">
-                  ${fmtAmount(inflows_totals.total)}
-                </th>
+                <th className="c-border-y-dark text-end">${fmtAmount(inflows_totals.total)}</th>
               </tr>
             )}
           </>
@@ -104,9 +96,7 @@ export default function Forecasts({
 
           <>
             <tr>
-              <td className="fs-larger bg-danger text-white fw-bolder">
-                outflows
-              </td>
+              <td className="fs-larger bg-danger text-white fw-bolder">outflows</td>
               <td></td>
               <td></td>
               <td></td>
@@ -117,10 +107,10 @@ export default function Forecasts({
             {outflows_statement?.map((row, index) => (
               <tr key={index}>
                 <td>{row.tenant}</td>
-                <td className="text-end">({fmtAmount(row['0-7'])})</td>
-                <td className="text-end">({fmtAmount(row['8-14'])})</td>
-                <td className="text-end">({fmtAmount(row['14-21'])})</td>
-                <td className="text-end">({fmtAmount(row['21+'])})</td>
+                <td className="text-end">({fmtAmount(row["0-7"])})</td>
+                <td className="text-end">({fmtAmount(row["8-14"])})</td>
+                <td className="text-end">({fmtAmount(row["14-21"])})</td>
+                <td className="text-end">({fmtAmount(row["21+"])})</td>
                 <td className="text-end">(${fmtAmount(row.total)})</td>
               </tr>
             ))}
@@ -154,9 +144,7 @@ export default function Forecasts({
                   ( {fmtAmount(outflows_totals.twenty_one_plus_days)})
                 </th>
 
-                <th className="c-border-y-dark text-end">
-                  ( ${fmtAmount(outflows_totals.total)})
-                </th>
+                <th className="c-border-y-dark text-end">( ${fmtAmount(outflows_totals.total)})</th>
               </tr>
             )}
           </>
@@ -166,9 +154,7 @@ export default function Forecasts({
           {netFlows && (
             <tr>
               <th className="fs-larger">Net Flows</th>
-              <th className="text-end c-border-y-dark">
-                {fmtAmount(netFlows.zero_to_seven_days)}
-              </th>
+              <th className="text-end c-border-y-dark">{fmtAmount(netFlows.zero_to_seven_days)}</th>
 
               <th className="text-end c-border-y-dark">
                 {fmtAmount(netFlows.eight_to_fourteen_days)}
@@ -182,9 +168,7 @@ export default function Forecasts({
                 {fmtAmount(netFlows.twenty_one_plus_days)}
               </th>
 
-              <th className="text-end c-border-y-dark">
-                ${fmtAmount(netFlows.total)}
-              </th>
+              <th className="text-end c-border-y-dark">${fmtAmount(netFlows.total)}</th>
             </tr>
           )}
         </tbody>
@@ -193,4 +177,4 @@ export default function Forecasts({
   );
 }
 
-Forecasts.layout = (page) => <Layout children={page} title={'forecasts'} />;
+Forecasts.layout = (page) => <Layout children={page} title={"forecasts"} />;

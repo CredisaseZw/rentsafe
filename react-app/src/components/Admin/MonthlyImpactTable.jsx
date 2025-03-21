@@ -49,7 +49,7 @@ const movements = [-44.95, -3.08, 1.67, -1.1, 47.46];
 
 const monthlyData = [
   {
-    month: 'Jan-24',
+    month: "Jan-24",
     value1: 68.5,
     value2: 2.5,
     value3: 0.12,
@@ -57,7 +57,7 @@ const monthlyData = [
     value5: 19.98,
   },
   {
-    month: 'Feb-24',
+    month: "Feb-24",
     value1: 23.55,
     value2: -0.58,
     value3: 1.79,
@@ -65,7 +65,7 @@ const monthlyData = [
     value5: 67.44,
   },
   {
-    month: 'Mar-24',
+    month: "Mar-24",
     value1: 68.5,
     value2: 2.5,
     value3: 0.12,
@@ -73,7 +73,7 @@ const monthlyData = [
     value5: 19.98,
   },
   {
-    month: 'Apr-24',
+    month: "Apr-24",
     value1: 23.55,
     value2: -0.58,
     value3: 1.79,
@@ -81,7 +81,7 @@ const monthlyData = [
     value5: 67.44,
   },
   {
-    month: 'May-24',
+    month: "May-24",
     value1: 68.5,
     value2: 2.5,
     value3: 0.12,
@@ -89,7 +89,7 @@ const monthlyData = [
     value5: 19.98,
   },
   {
-    month: 'Jun-24',
+    month: "Jun-24",
     value1: 23.55,
     value2: -0.58,
     value3: 1.79,

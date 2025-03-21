@@ -1,11 +1,11 @@
-import BulkIconButton from '../BulkIconButton.jsx';
-import CompanyReport from './Report/CompanyReport.jsx';
-import BulkUploadModal from '../BulkUploadModal.jsx';
-import useCompanySearch from '../../hooks/component-hooks/useCompanySearch.js';
-import { CompanyVerify } from './OTP/CompanyVerify.jsx';
-import { CompanyAdd } from './CompanyAdd.jsx';
-import { NotFound } from '../NotFound.jsx';
-import { Head } from '@inertiajs/inertia-react';
+import BulkIconButton from "../BulkIconButton.jsx";
+import CompanyReport from "./Report/CompanyReport.jsx";
+import BulkUploadModal from "../BulkUploadModal.jsx";
+import useCompanySearch from "../../hooks/component-hooks/useCompanySearch.js";
+import { CompanyVerify } from "./OTP/CompanyVerify.jsx";
+import { CompanyAdd } from "./CompanyAdd.jsx";
+import { NotFound } from "../NotFound.jsx";
+import { Head } from "@inertiajs/inertia-react";
 
 export default function CompanySearch({ url }) {
   const {
@@ -44,8 +44,8 @@ export default function CompanySearch({ url }) {
         <Head title="Search Company" />
 
         <BulkUploadModal
-          type={'company'}
-          actionType={'user'}
+          type={"company"}
+          actionType={"user"}
           show={isBulkAdd}
           handleClose={() => setIsBulkAdd(false)}
         />
@@ -63,8 +63,8 @@ export default function CompanySearch({ url }) {
           show={showVerify}
           handleClose={() => setShowVerify(false)}
           setVerified={setShowReport}
-          verification_type={'company'}
-          url={'verify_company_otp'}
+          verification_type={"company"}
+          url={"verify_company_otp"}
         />
 
         <CompanyAdd
@@ -75,8 +75,8 @@ export default function CompanySearch({ url }) {
           handleSingle={handleSingle}
           isMultiple={isMultiple}
           handleMultiple={handleMultiple}
-          url={'client-create-company'}
-          action={'create'}
+          url={"client-create-company"}
+          action={"create"}
         />
       </>
 
@@ -89,10 +89,7 @@ export default function CompanySearch({ url }) {
           <thead className="position-sticky c-table-top bg-white c-z-5">
             <tr>
               <th colSpan={4}>
-                <form
-                  className="d-flex gap-3 align-items-end p-2"
-                  onSubmit={submitHandler}
-                >
+                <form className="d-flex gap-3 align-items-end p-2" onSubmit={submitHandler}>
                   <div>
                     <label className="form-label" htmlFor="searchValue">
                       Filter by Registered Name / Number
@@ -108,9 +105,7 @@ export default function CompanySearch({ url }) {
                     />
 
                     {errors.searchValue && (
-                      <small className="text-danger p-1">
-                        {errors.searchValue}
-                      </small>
+                      <small className="text-danger p-1">{errors.searchValue}</small>
                     )}
                   </div>
 
@@ -126,17 +121,11 @@ export default function CompanySearch({ url }) {
                       onChange={changeHandler}
                     >
                       <option value="registration_name">Registered Name</option>
-                      <option value="registration_number">
-                        Registration Number
-                      </option>
+                      <option value="registration_number">Registration Number</option>
                     </select>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="btn btn-info text-white"
-                  >
+                  <button type="submit" disabled={isLoading} className="btn btn-info text-white">
                     <i className="leading-icon material-icons">search</i>
                     {isLoading ? (
                       <>
@@ -144,7 +133,7 @@ export default function CompanySearch({ url }) {
                         <span className="ms-2">Searching..</span>
                       </>
                     ) : (
-                      'Search'
+                      "Search"
                     )}
                   </button>
 
@@ -188,7 +177,7 @@ export default function CompanySearch({ url }) {
                           <span className="ms-2">processing..</span>
                         </>
                       ) : (
-                        'View'
+                        "View"
                       )}
                     </button>
                   </td>
@@ -202,7 +191,7 @@ export default function CompanySearch({ url }) {
           <div className="d-flex justify-content-center bg-white p-4">
             <NotFound
               handleShow={handleShow}
-              userType={'company'}
+              userType={"company"}
               searchValue={data.searchValue}
               handleCloseModal={() => setNotFound(false)}
             />

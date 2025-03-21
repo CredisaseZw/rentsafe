@@ -1,15 +1,10 @@
-import { Modal } from 'react-bootstrap';
-import React from 'react';
-import DisbursementsAsyncSelect from '../components/DisbursementsAsyncSelect.jsx';
-import useDisbursements from '../hooks/modal-hooks/useDisbursements.js';
-import { truncate } from 'lodash';
+import { Modal } from "react-bootstrap";
+import React from "react";
+import DisbursementsAsyncSelect from "../components/DisbursementsAsyncSelect.jsx";
+import useDisbursements from "../hooks/modal-hooks/useDisbursements.js";
+import { truncate } from "lodash";
 
-export default function Disbursements({
-  className,
-  id,
-  makeActive,
-  beforeOpenningModal,
-}) {
+export default function Disbursements({ className, id, makeActive, beforeOpenningModal }) {
   const {
     show,
     data,
@@ -26,7 +21,7 @@ export default function Disbursements({
   } = useDisbursements();
 
   function closeModal() {
-    makeActive('use-last-last');
+    makeActive("use-last-last");
     hookCloseModal();
   }
 
@@ -43,13 +38,7 @@ export default function Disbursements({
         Disbursements
       </a>
 
-      <Modal
-        show={show}
-        onHide={closeModal}
-        size="xl"
-        backdrop="static"
-        centered
-      >
+      <Modal show={show} onHide={closeModal} size="xl" backdrop="static" centered>
         <Modal.Header>
           <div className="w-100 p-4 position-relative">
             <h4 className="text-center">Disbursements</h4>
@@ -66,15 +55,8 @@ export default function Disbursements({
 
         <Modal.Body>
           {error && (
-            <div
-              className="alert alert-danger d-flex gap-2 align-items-center"
-              role="alert"
-            >
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setError('')}
-              />
+            <div className="alert alert-danger d-flex gap-2 align-items-center" role="alert">
+              <button type="button" className="btn-close" onClick={() => setError("")} />
               {truncate(error, { length: 200 })}
             </div>
           )}
@@ -146,11 +128,11 @@ export default function Disbursements({
                     </td>
 
                     <td className="text-center">
-                      <div className="mt-2">{row.currency || ''}</div>
+                      <div className="mt-2">{row.currency || ""}</div>
                     </td>
 
                     <td className="text-center">
-                      <div className="mt-2">{row.amountOwing || ''}</div>
+                      <div className="mt-2">{row.amountOwing || ""}</div>
                     </td>
 
                     <td>
@@ -177,11 +159,7 @@ export default function Disbursements({
             </table>
 
             <div className="text-end">
-              <button
-                type="button"
-                className="btn btn-success custom-not-allowed"
-                onClick={addRow}
-              >
+              <button type="button" className="btn btn-success custom-not-allowed" onClick={addRow}>
                 <i className="leading-icon material-icons">add</i>
                 Add Disbursement
               </button>
@@ -195,7 +173,7 @@ export default function Disbursements({
                     <span>Processing..</span>
                   </>
                 ) : (
-                  'Submit'
+                  "Submit"
                 )}
               </button>
             </div>

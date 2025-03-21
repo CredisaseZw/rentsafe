@@ -1,13 +1,8 @@
-import toast from 'react-hot-toast';
-import { useForm } from '@inertiajs/inertia-react';
-import { userFriendlyErrorOrResponse } from '../../utils';
+import toast from "react-hot-toast";
+import { useForm } from "@inertiajs/inertia-react";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
-export default function useCompanyAdd(
-  url,
-  companyData,
-  handleClose,
-  setFetchedData
-) {
+export default function useCompanyAdd(url, companyData, handleClose, setFetchedData) {
   const {
     data,
     errors,
@@ -16,27 +11,27 @@ export default function useCompanyAdd(
     reset,
     post,
   } = useForm({
-    note: companyData?.note || '',
-    company_id: companyData?.id || '',
-    branch: companyData?.branch || '',
-    website: companyData?.website || '',
-    landLine: companyData?.landline || '',
-    industry: companyData?.industry || '',
-    emailAddress: companyData?.email || '',
+    note: companyData?.note || "",
+    company_id: companyData?.id || "",
+    branch: companyData?.branch || "",
+    website: companyData?.website || "",
+    landLine: companyData?.landline || "",
+    industry: companyData?.industry || "",
+    emailAddress: companyData?.email || "",
     is_gvt: companyData?.is_government || false,
-    vatNumber: companyData?.vat_number || '',
-    tinNumber: companyData?.tin_number || '',
-    currentAddress: companyData?.address || '',
-    tradingName: companyData?.trading_name || '',
-    mobileNumber: companyData?.mobile_phone || '',
+    vatNumber: companyData?.vat_number || "",
+    tinNumber: companyData?.tin_number || "",
+    currentAddress: companyData?.address || "",
+    tradingName: companyData?.trading_name || "",
+    mobileNumber: companyData?.mobile_phone || "",
     is_contracted: companyData?.is_contracted || false,
-    registeredName: companyData?.registration_name || '',
-    registrationDate: companyData?.registration_date || '',
-    companyRegistrationNumber: companyData?.registration_number || '',
+    registeredName: companyData?.registration_name || "",
+    registrationDate: companyData?.registration_date || "",
+    companyRegistrationNumber: companyData?.registration_number || "",
   });
 
   function changeHandler(e) {
-    if (e.target.id === 'is_gvt') {
+    if (e.target.id === "is_gvt") {
       setData({ ...data, [e.target.id]: e.target.checked });
     } else {
       setData({ ...data, [e.target.id]: e.target.value });
@@ -47,17 +42,15 @@ export default function useCompanyAdd(
     e.preventDefault();
 
     data.registeredName = data.branch
-      ? `${data.registeredName.split(' - ')[0]} - ${data.branch}`
+      ? `${data.registeredName.split(" - ")[0]} - ${data.branch}`
       : data.registeredName;
 
-    post(reverseUrl('edit_company_user'), {
+    post(reverseUrl("edit_company_user"), {
       onSuccess(res) {
-        if (res?.status === 'success') {
+        if (res?.status === "success") {
           toast.success(res.data.message);
           setFetchedData((prev) => {
-            const oldData = prev.filter(
-              (company) => company.id !== data.company_id
-            );
+            const oldData = prev.filter((company) => company.id !== data.company_id);
             return [
               ...oldData,
               {
@@ -87,7 +80,7 @@ export default function useCompanyAdd(
 
   function submitSingle(e) {
     e.preventDefault();
-    data.registeredName += data.branch ? ' - ' + data.branch : '';
+    data.registeredName += data.branch ? " - " + data.branch : "";
 
     post(reverseUrl(url), {
       onSuccess(res) {

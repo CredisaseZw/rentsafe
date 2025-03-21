@@ -1,40 +1,23 @@
-import { capitalize } from 'lodash';
-import { Modal } from 'react-bootstrap';
+import { capitalize } from "lodash";
+import { Modal } from "react-bootstrap";
 
-export default function ActiveCustomerLeases({
-  show,
-  closeModal,
-  customerType,
-  customers = [],
-}) {
+export default function ActiveCustomerLeases({ show, closeModal, customerType, customers = [] }) {
   const headerBg =
-    customerType === 'individual'
-      ? 'bg-info'
-      : customerType === 'company'
-        ? 'bg-secondary'
-        : 'bg-primary';
+    customerType === "individual"
+      ? "bg-info"
+      : customerType === "company"
+        ? "bg-secondary"
+        : "bg-primary";
 
   const grandTotal = {
-    individualLease: customers.reduce(
-      (sum, customer) => sum + customer.individualLease,
-      0
-    ),
-    companyLease: customers.reduce(
-      (sum, customer) => sum + customer.companyLease,
-      0
-    ),
+    individualLease: customers.reduce((sum, customer) => sum + customer.individualLease, 0),
+    companyLease: customers.reduce((sum, customer) => sum + customer.companyLease, 0),
     total: customers.reduce((sum, customer) => sum + customer.total, 0),
   };
 
   return (
     <>
-      <Modal
-        show={show}
-        onHide={closeModal}
-        size="xl"
-        backdrop="static"
-        centered
-      >
+      <Modal show={show} onHide={closeModal} size="xl" backdrop="static" centered>
         <Modal.Header closeButton>
           <Modal.Title>Active Leases</Modal.Title>
         </Modal.Header>
@@ -50,7 +33,7 @@ export default function ActiveCustomerLeases({
                 <tr>
                   <th>Customer No.</th>
                   <th>Company Name</th>
-                  {customerType !== 'company' && <th>Identity No.</th>}
+                  {customerType !== "company" && <th>Identity No.</th>}
                   <th>Address</th>
                   <th colSpan="2" className="text-center">
                     Lease Type
@@ -59,7 +42,7 @@ export default function ActiveCustomerLeases({
                 </tr>
 
                 <tr>
-                  <th colSpan={customerType !== 'company' ? 4 : 3}></th>
+                  <th colSpan={customerType !== "company" ? 4 : 3}></th>
                   <th className="text-center">Individual</th>
                   <th className="text-center">Company</th>
                   <th></th>
@@ -70,7 +53,7 @@ export default function ActiveCustomerLeases({
                 {customers.length === 0 && (
                   <tr>
                     <td
-                      colSpan={customerType !== 'company' ? 7 : 6}
+                      colSpan={customerType !== "company" ? 7 : 6}
                       className="text-center text-muted p-5"
                     >
                       Nothing to show
@@ -82,9 +65,7 @@ export default function ActiveCustomerLeases({
                   <tr key={index}>
                     <td>{customer.customerNo}</td>
                     <td>{customer.companyName}</td>
-                    {customerType !== 'company' && (
-                      <td>{customer.identityNo}</td>
-                    )}
+                    {customerType !== "company" && <td>{customer.identityNo}</td>}
                     <td>{customer.address}</td>
                     <td>{customer.individualLease}</td>
                     <td>{customer.companyLease}</td>
@@ -95,9 +76,7 @@ export default function ActiveCustomerLeases({
 
               <tfoot>
                 <tr>
-                  <th colSpan={customerType !== 'company' ? 4 : 3}>
-                    Grand Total
-                  </th>
+                  <th colSpan={customerType !== "company" ? 4 : 3}>Grand Total</th>
                   <th>{grandTotal.individualLease}</th>
                   <th>{grandTotal.companyLease}</th>
                   <th>{grandTotal.total}</th>

@@ -1,7 +1,7 @@
-import React from 'react';
-import { Head, usePage } from '@inertiajs/inertia-react';
-import toast from 'react-hot-toast';
-import CustomToaster from '../CustomToaster.jsx';
+import React from "react";
+import { Head, usePage } from "@inertiajs/inertia-react";
+import toast from "react-hot-toast";
+import CustomToaster from "../CustomToaster.jsx";
 
 const Layout = ({ children, title }) => {
   const { error } = usePage().props;
@@ -11,10 +11,7 @@ const Layout = ({ children, title }) => {
     error.type && toast[error.type](error.message);
   }
   return (
-    <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ height: '100vh' }}
-    >
+    <div className="d-flex align-items-center justify-content-center" style={{ height: "100vh" }}>
       <Head title={title} />
       <main>
         <div className="container">

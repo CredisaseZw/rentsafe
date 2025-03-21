@@ -1,26 +1,23 @@
-import moment from 'moment';
-import CommissionStatementsSelection from '../../../components/CommissionStatementsSelection.jsx';
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import useCommissionStatement from '../../../hooks/page-hooks/useCommissionStatement.js';
-import { formatCurrency } from '../../../utils/formatting.js';
+import moment from "moment";
+import CommissionStatementsSelection from "../../../components/CommissionStatementsSelection.jsx";
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import useCommissionStatement from "../../../hooks/page-hooks/useCommissionStatement.js";
+import { formatCurrency } from "../../../utils/formatting.js";
 
 export default function CommissionStatement({ statement }) {
-  const { type, date, contentRef, handlePrintToPdf } =
-    useCommissionStatement(statement);
+  const { type, date, contentRef, handlePrintToPdf } = useCommissionStatement(statement);
 
   return (
     <div>
       <div ref={contentRef}>
         <div
           style={{
-            lineHeight: '5px',
-            fontSize: '18px',
+            lineHeight: "5px",
+            fontSize: "18px",
           }}
           className="bg-info d-flex justify-content-between align-items-center text-white p-3"
         >
-          <h4 className="fw-bold text-white mb-4">
-            Commissions Statement - {type} - USD
-          </h4>
+          <h4 className="fw-bold text-white mb-4">Commissions Statement - {type} - USD</h4>
 
           <div>
             Period: <span className="text-decoration-underline"> {date}</span>
@@ -28,7 +25,7 @@ export default function CommissionStatement({ statement }) {
         </div>
 
         <table
-          style={{ lineHeight: '5px', fontSize: '12px' }}
+          style={{ lineHeight: "5px", fontSize: "12px" }}
           className="table table-bordered table-responsive"
         >
           <thead className="position-sticky c-table-top">
@@ -45,7 +42,7 @@ export default function CommissionStatement({ statement }) {
             <tbody>
               {statement.rows.map((item, index) => (
                 <tr key={index}>
-                  <th>{moment(item.date).format('YYYY-MM-DD')}</th>
+                  <th>{moment(item.date).format("YYYY-MM-DD")}</th>
 
                   <td>{item.description} </td>
 
@@ -76,10 +73,7 @@ export default function CommissionStatement({ statement }) {
       </div>
 
       <div className="d-flex justify-content-end align-items-center gap-3 p-4">
-        <CommissionStatementsSelection
-          btnClass="btn btn-primary"
-          btnText="Period request"
-        />
+        <CommissionStatementsSelection btnClass="btn btn-primary" btnText="Period request" />
 
         <button onClick={handlePrintToPdf} className="btn btn-info text-white">
           Print
@@ -90,5 +84,5 @@ export default function CommissionStatement({ statement }) {
 }
 
 CommissionStatement.layout = (page) => (
-  <Layout children={page} title={'Detailed Commission Statement'} />
+  <Layout children={page} title={"Detailed Commission Statement"} />
 );

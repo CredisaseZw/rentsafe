@@ -1,7 +1,7 @@
-import { Modal } from 'react-bootstrap';
-import { residentialInspectionChecklist } from '../constants';
-import usePropertyInspection from '../hooks/modal-hooks/usePropertyInspection';
-import Checklist from './Checklist.jsx';
+import { Modal } from "react-bootstrap";
+import { residentialInspectionChecklist } from "../constants";
+import usePropertyInspection from "../hooks/modal-hooks/usePropertyInspection";
+import Checklist from "./Checklist.jsx";
 
 export default function PropertyInspection({ isOpen, close }) {
   const {
@@ -38,9 +38,9 @@ export default function PropertyInspection({ isOpen, close }) {
                     type="button"
                     onClick={showResidential}
                     className={
-                      activeTab === 'residential'
-                        ? 'btn btn-info text-white'
-                        : 'btn btn-outline-info'
+                      activeTab === "residential"
+                        ? "btn btn-info text-white"
+                        : "btn btn-outline-info"
                     }
                   >
                     Residential
@@ -51,9 +51,9 @@ export default function PropertyInspection({ isOpen, close }) {
                     type="button"
                     onClick={showCommercial}
                     className={
-                      activeTab === 'maintenance'
-                        ? 'btn btn-info text-white'
-                        : 'btn btn-outline-info'
+                      activeTab === "maintenance"
+                        ? "btn btn-info text-white"
+                        : "btn btn-outline-info"
                     }
                   >
                     Commercial
@@ -81,10 +81,7 @@ export default function PropertyInspection({ isOpen, close }) {
           <div className="custom-mn-h-5 position-relative p-3 pb-0">
             {isLoading && (
               <div className="text-center position-absolute top-50 start-50 translate-middle">
-                <div
-                  className="spinner-border text-info spinner-border-md"
-                  role="status"
-                >
+                <div className="spinner-border text-info spinner-border-md" role="status">
                   <span className="visually-hidden">Submitting...</span>
                 </div>
 
@@ -95,9 +92,7 @@ export default function PropertyInspection({ isOpen, close }) {
             {wasSuccessful && (
               <div className="position-absolute text-center top-50 start-50 translate-middle">
                 <div>
-                  <i className="material-icons fs-1 text-success">
-                    check_circle
-                  </i>
+                  <i className="material-icons fs-1 text-success">check_circle</i>
                 </div>
 
                 <p>
@@ -116,8 +111,8 @@ export default function PropertyInspection({ isOpen, close }) {
               </div>
             )}
 
-            <div className={isLoading || wasSuccessful ? 'd-none' : 'd-block'}>
-              {activeTab === 'residential' ? (
+            <div className={isLoading || wasSuccessful ? "d-none" : "d-block"}>
+              {activeTab === "residential" ? (
                 <ResidentialTab
                   printContentRef={printContentRef}
                   printForm={printForm}
@@ -164,12 +159,12 @@ function ResidentialTab({ printContentRef, printForm, handleSubmit }) {
         </div>
 
         <p className="my-5 px-3">
-          M - missing, S - scratched, D - damaged, B - broken, R -
-          repair/replace, W - Water Damage, L - Leaking
+          M - missing, S - scratched, D - damaged, B - broken, R - repair/replace, W - Water Damage,
+          L - Leaking
         </p>
 
         <div
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}
           className="align-items-start mb-4"
         >
           {residentialInspectionChecklist.map((category) => (

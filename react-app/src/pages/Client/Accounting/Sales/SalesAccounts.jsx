@@ -1,5 +1,5 @@
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import InDevelopment from '../../../../components/InDevelopment.jsx';
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import InDevelopment from "../../../../components/InDevelopment.jsx";
 
 export default function SalesAccounts() {
   return (
@@ -9,6 +9,4 @@ export default function SalesAccounts() {
   );
 }
 
-SalesAccounts.layout = (page) => (
-  <Layout children={page} title={'Sales Categories'} />
-);
+SalesAccounts.layout = (page) => <Layout children={page} title={"Sales Categories"} />;

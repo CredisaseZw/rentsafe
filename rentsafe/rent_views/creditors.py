@@ -123,7 +123,7 @@ def creditor_debit_journal(request):
             if op_balance_error:
                 return JsonResponse({"error": "No Opening balance found"}, safe=False)
             return JsonResponse({"status": "success"}, safe=False)
-    return render(request, "Client/Accounting/AccountAdjustment/DebitJournal")
+    return render(request, "Client/Accounting/AccountAdjustment/CreditorDebitJournal")
 
 def creditor_credit_journal(request,lease_no=None):
     if request.method == "POST":
@@ -205,4 +205,4 @@ def creditor_credit_journal(request,lease_no=None):
                 return JsonResponse({"error": "No Opening balance found"}, safe=False)
             return JsonResponse({"status": "success"}, safe=False)
 
-    return render(request, "Client/Accounting/AccountAdjustment/CreditJournal")
+    return render(request, "Client/Accounting/AccountAdjustment/CreditorCreditJournal")
