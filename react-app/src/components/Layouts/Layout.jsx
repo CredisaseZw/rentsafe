@@ -14,7 +14,7 @@ const Layout = ({ children, title }) => {
     <div className="d-flex align-items-center justify-content-center" style={{ height: "100vh" }}>
       <Head title={title} />
       <main>
-        <div className="container">
+        <div className="container-xl">
           <div className="row  h-100 justify-content-center">
             <CustomToaster />
             {children}
