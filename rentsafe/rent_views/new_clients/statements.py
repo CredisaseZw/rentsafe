@@ -185,6 +185,14 @@ def detailed_creditor_statement(request, creditor_id):
             balance -= float(receipt.amount_paid)
             amount = float(receipt.amount_paid)
             description = f"Disbursement to {creditor_name.landlord_name}"
+        elif receipt.receipt_number.startswith("Creditor DBT"):
+            balance -= float(receipt.amount_paid)
+            amount = receipt.amount_paid
+            description = receipt.receipt_number
+        elif receipt.receipt_number.startswith("Creditor CRD"):
+            balance += float(receipt.amount_paid)
+            amount = receipt.amount_paid
+            description = receipt.receipt_number
         else:
             balance += float(receipt.base_amount) 
             amount =receipt.base_amount 

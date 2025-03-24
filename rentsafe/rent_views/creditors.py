@@ -85,29 +85,37 @@ def creditor_debit_journal(request):
             date_error = op_balance_error = False
             for item in data["rows"]:
                 lease_id = item.get("leaseId")
-                debit_amount = item.get("debitAmount")
+                debit_amount = float(item.get("debitAmount"))
                 details = item.get("details")
                 end_balance = item.get("endBalance")
                 date = item.get("date")
                 creditor_balance_ob = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).last()
                 if creditor_balance_ob:
                     if creditor_balance_ob.created_at.date() <= datetime.strptime(date, "%Y-%m-%d").date() < max_date:
-                        creditor_balance_ob.total_amount = creditor_balance_ob.total_amount - debit_amount
-                        creditor_balance_ob.save()
-                        lease_debit_journal = LeasePayments(
+                        total_amount = creditor_balance_ob.total_amount - debit_amount
+                        new_breakdown = LeaseReceiptBreakdown(
                             lease_id=lease_id,
-                            payment_amount=debit_amount,
-                            date=date,
-                            month=datetime.strptime(date, "%Y-%m-%d")
-                            .date()
-                            .strftime("%B %Y"),
-                            payment_reference="Creditor DBT#" + str(random.randint(1000, 9999)),
-                            description=details if details else "creditor Debit",
-                            owing_amount=end_balance,
-                            balance_amount=end_balance,
-                            is_balance_checked=True,
-                        )
-                        lease_debit_journal.save()
+                            total_amount=total_amount,
+                            landlord_id=creditor_balance_ob.landlord_id,
+                            receipt_number="Creditor DBT#" + str(random.randint(1000, 9999)),
+                            amount_paid=debit_amount,
+                            date_received=date,
+                        )   
+                        new_breakdown.save()
+                        # lease_debit_journal = LeasePayments(
+                        #     lease_id=lease_id,
+                        #     payment_amount=debit_amount,
+                        #     date=date,
+                        #     month=datetime.strptime(date, "%Y-%m-%d")
+                        #     .date()
+                        #     .strftime("%B %Y"),
+                        #     payment_reference="Creditor DBT#" + str(random.randint(1000, 9999)),
+                        #     description=details if details else "creditor Debit",
+                        #     owing_amount=end_balance,
+                        #     balance_amount=end_balance,
+                        #     is_balance_checked=True,
+                        # )
+                        # lease_debit_journal.save()
                     else:
                         date_error = True
                 else:
@@ -154,7 +162,7 @@ def creditor_credit_journal(request,lease_no=None):
             for item in data["rows"]:
                 if not lease_no:
                     lease_id = item.get("leaseId")
-                    credit_amount = item.get("creditAmount")
+                    credit_amount = float(item.get("creditAmount"))
                     details = item.get("details")
                     end_balance = item.get("endBalance")
                     date = item.get("date")
@@ -174,21 +182,30 @@ def creditor_credit_journal(request,lease_no=None):
                         <= datetime.strptime(date, "%Y-%m-%d").date()
                         < max_date
                     ):
-                        creditor_opening_balance = creditor_opening_balance.last().total_amount + credit_amount
-                        lease_credit_journal = LeasePayments(
+                        creditor_balance = creditor_opening_balance.last().total_amount + credit_amount
+                        new_breakdown = LeaseReceiptBreakdown(
                             lease_id=lease_id,
-                            payment_amount=credit_amount,
-                            date=date,
-                            month=datetime.strptime(date, "%Y-%m-%d")
-                            .date()
-                            .strftime("%B %Y"),
-                            payment_reference="Creditor CRD#" + str(random.randint(1000, 9999)),
-                            description=details or "Creditor Credit",
-                            owing_amount=end_balance,
-                            balance_amount=end_balance,
-                            is_balance_checked=True,
-                        )
-                        lease_credit_journal.save()
+                            total_amount=creditor_balance,
+                            landlord_id=creditor_opening_balance.first().landlord_id,
+                            receipt_number="Creditor CRD#" + str(random.randint(1000, 9999)),
+                            amount_paid=credit_amount,
+                            date_received=date,
+                        )   
+                        new_breakdown.save()
+                        # lease_credit_journal = LeasePayments(
+                        #     lease_id=lease_id,
+                        #     payment_amount=credit_amount,
+                        #     date=date,
+                        #     month=datetime.strptime(date, "%Y-%m-%d")
+                        #     .date()
+                        #     .strftime("%B %Y"),
+                        #     payment_reference="Creditor CRD#" + str(random.randint(1000, 9999)),
+                        #     description=details or "Creditor Credit",
+                        #     owing_amount=end_balance,
+                        #     balance_amount=end_balance,
+                        #     is_balance_checked=True,
+                        # )
+                        # lease_credit_journal.save()
                     else:
                         date_error = True
                 else:

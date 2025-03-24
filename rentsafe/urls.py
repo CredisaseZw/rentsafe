@@ -512,6 +512,11 @@ urlpatterns = [
                     name="forecasts",
                 ),
                 path(
+                    "customer-invoice-details/",
+                    clients.get_invoicing_details,
+                    name="customer_invoice_details",
+                ),
+                path(
                     "settings/rate-setup/",
                     clients.rate_setup,
                     name="rate_setup",
