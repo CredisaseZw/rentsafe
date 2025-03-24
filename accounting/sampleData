@@ -170,3 +170,17 @@ json
 - GET /accounting/account-sectors/{id}/
 - PUT /accounting/account-sectors/{id}/
 - DELETE /accounting/account-sectors/{id}/
+
+
+Create a Recurring Invoice
+POST /recurring-invoices/
+
+{
+    "customer_id": "2",
+    "is_individual": false,
+    "start_date": "2024-03-24",
+    "next_invoice_date": "2024-04-24",
+    "frequency": "monthly",
+    "is_active": true
+}
+

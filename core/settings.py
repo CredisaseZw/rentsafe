@@ -206,7 +206,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 # DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
-DJANGO_VITE_DEV_SERVER_HOST = "localhost"
+DJANGO_VITE_DEV_SERVER_HOST = "localhost"                                                           
 
 # this is the default, but I'm leaving this here, so you know what to change if you want to run on a different port
 # DJANGO_VITE_PORT = 5173
@@ -242,6 +242,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "journal_entries_detail",
     "ledger_transactions_list",
     "ledger_transactions_detail",
+    "customer_invoice_details", #TODO: url for viewing invoice details | Sales side
     
     "debit_journal",
     "credit_journal",

@@ -6,6 +6,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import action
+from django.utils.timezone import now
 
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
@@ -107,3 +109,46 @@ class LedgerTransactionViewSet(BaseCompanyViewSet):
 class AccountSectorViewSet(BaseCompanyViewSet):
     queryset = AccountSector.objects.all()
     serializer_class = AccountSectorSerializer
+    
+class InvoiceViewSet(viewsets.ModelViewSet):
+    queryset = Invoice.objects.all()
+    serializer_class = InvoiceSerializer
+
+    @action(detail=True, methods=["POST"])
+    def mark_paid(self, request, pk=None):
+        """Mark an invoice as paid."""
+        invoice = self.get_object()
+        invoice.status = "paid"
+        invoice.save()
+        return Response({"success": True, "message": "Invoice marked as paid."})
+
+
+class InvoiceItemViewSet(viewsets.ModelViewSet):
+    queryset = InvoiceItem.objects.all()
+    serializer_class = InvoiceItemSerializer
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+class RecurringInvoiceViewSet(viewsets.ModelViewSet):
+    queryset = RecurringInvoice.objects.all()
+    serializer_class = RecurringInvoiceSerializer
+
+    @action(detail=True, methods=["POST"])
+    def generate_invoice(self, request, pk=None):
+        """Manually triggers the next invoice generation."""
+        recurring_invoice = self.get_object()
+        invoice = recurring_invoice.generate_next_invoice()
+        return Response({"success": True, "message": "New invoice created.", "invoice_id": invoice.id})
+
+class ProformaInvoiceViewSet(viewsets.ModelViewSet):
+    queryset = ProformaInvoice.objects.all()
+    serializer_class = ProformaInvoiceSerializer
+
+    @action(detail=True, methods=["POST"])
+    def convert_to_invoice(self, request, pk=None):
+        """Converts a proforma invoice into a finalized invoice."""
+        proforma_invoice = self.get_object()
+        invoice = proforma_invoice.convert_to_invoice()
+        return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
