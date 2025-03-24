@@ -13,6 +13,7 @@ from rentsafe.models import (
     CommunicationHistoryReminder,
     Company,
     Individual,
+    CompanyProfile,
 )
 from rentsafe.serializers import CreateClaimSchema
 
@@ -137,10 +138,15 @@ def search_individuals_or_companies(request):
             response_dict["data"].append(
                 {
                     "id": individual.id,
-                    "national_id": individual.national_id,
+                    "national_id": individual.identification_number,
                     "firstname": individual.firstname,
                     "surname": individual.surname,
                     "type": ClaimDebtorType.INDIVIDUAL,
+                    "address": individual.address if individual.address else "",
+                    "mobile": individual.mobile if individual.mobile else "",
+                    "email": individual.email if individual.email else "",
+                    "VAT_number":  "",
+                    "tin_number":"",
                 }
             )
 
@@ -151,12 +157,18 @@ def search_individuals_or_companies(request):
         companies = get_companies_by_name(query, limit)
 
         for company in companies:
+            company_profile = CompanyProfile.objects.filter(company=company.id).first()
             response_dict["data"].append(
                 {
                     "id": company.id,
                     "registration_number": company.registration_number if company.registration_number else "",
                     "registration_name": company.registration_name,
                     "type": ClaimDebtorType.COMPANY,
+                    "address": company_profile.current_address if company_profile.current_address else "",
+                    "mobile": company_profile.landline_phone if company_profile.landline_phone else "",
+                    "email": company_profile.email if company_profile.email else "",
+                    "VAT_number": company_profile.vat_number if company_profile.vat_number else "",
+                    "tin_number": "",
                 }
             )
 

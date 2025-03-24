@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import *
+from accounting.models import *
 
 class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,3 +57,42 @@ class LedgerTransactionSerializer(BaseCompanySerializer):
 class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = AccountSector
+        
+class InvoiceItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = "__all__"
+
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    items = InvoiceItemSerializer(many=True, required=False)
+
+    class Meta:
+        model = Invoice
+        fields = "__all__"
+
+    def create(self, validated_data):
+        """Handles creating invoice and associated items."""
+        items_data = validated_data.pop("items", [])
+        invoice = Invoice.objects.create(**validated_data)
+
+        for item in items_data:
+            InvoiceItem.objects.create(invoice=invoice, **item)
+
+        return invoice
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = "__all__"
+
+class RecurringInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecurringInvoice
+        fields = "__all__"
+
+class ProformaInvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProformaInvoice
+        fields = "__all__"

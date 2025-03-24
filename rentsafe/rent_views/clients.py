@@ -4379,7 +4379,12 @@ def request_period_statement(request):
 
 def client_invoicing(request):
     if request.method == "GET":
-        return get_invoicing_details(request)
+        tenant_list = get_invoicing_details(request)
+        return render(
+        request,
+        "Client/Accounting/Invoicing",
+        props={"tenant_list": tenant_list},
+    )
     today_date_obj = datetime.now()
     next_month = (today_date_obj.replace(day=1) + timedelta(days=32)).replace(day=1)
     next_month_name = next_month.strftime("%B %Y")
@@ -4636,11 +4641,7 @@ def get_invoicing_details(request):
                     except:
                         pass
             props = {"tenant_list": tenant_list}
-    return render(
-        request,
-        "Client/Accounting/Invoicing",
-        props={"tenant_list": tenant_list},
-    )
+    return tenant_list
 
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
