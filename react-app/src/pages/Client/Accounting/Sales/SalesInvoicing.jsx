@@ -6,12 +6,12 @@ import Layout from "../../../../components/Layouts/client/Layout.jsx";
 import { useState } from "react";
 
 const tabs = [
-  { key: "Invoice", content: <SalesInvoicingInvoiceTab /> },
-  { key: "Recurring", content: <RecurringInvoicingInvoiceTab /> },
-  // { key: "Proforma", content: <ProformaInvoicingInvoiceTab /> },
+  { key: "Invoice", Content: SalesInvoicingInvoiceTab },
+  { key: "Recurring", Content: RecurringInvoicingInvoiceTab },
+  // { key: "Proforma", Content: ProformaInvoicingInvoiceTab },
 ];
 
-export default function SalesInvoicing() {
+export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   return (
@@ -33,7 +33,9 @@ export default function SalesInvoicing() {
         />
       </div>
 
-      <div className="p-3">{activeTab.content}</div>
+      <div className="p-3">
+        {<activeTab.Content {...(activeTab.key === "Recurring" ? { recurringInvoices } : {})} />}
+      </div>
     </div>
   );
 }
