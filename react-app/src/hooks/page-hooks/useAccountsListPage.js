@@ -1,43 +1,73 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { accountsList } from "../../constants";
 import toast from "react-hot-toast";
 
 export default function useAccountsListPage() {
   const [showConfirmPrompt, setShowConfirmPrompt] = useState(false);
   const [showNewAccForm, setShowNewAccForm] = useState(false);
   const [submittedAccs, setSubmittedAccs] = useState(null);
-
+  const [accountsList, setAccountsList] = useState([]);
   const [adminAccountsList, setAdminAccountsList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  function fetchAccountsList() {
+    setLoading(true);
+    axios
+      .get("/accounting/sales-accounts/")
+      .then((res) => {
+        console.log(res);
+        const newAccountsList = res.data.map((acc) => ({
+          accountName: acc.account_name,
+          accountNumber: acc.account_number,
+          accountsSector: acc.account_sector,
+          sectorName: acc.account_sector,
+          isEditable: false,
+        }));
+
+        setAccountsList(newAccountsList);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }
+
+  const fetchAdminAccounts = () => {
     // dev
-    // const adminAccs = [
-    //   {
-    //     accountName: "Armotisation",
-    //     accountNumber: 30081,
-    //     accountsSector: "S5",
-    //     sectorName: "Expenses",
-    //     isEditable: true,
-    //   },
-    //   {
-    //     accountName: "Cloud charges",
-    //     accountNumber: 30131,
-    //     accountsSector: "S5",
-    //     sectorName: "Expenses",
-    //     isEditable: true,
-    //   },
-    //   {
-    //     accountName: "Mobile expenses",
-    //     accountNumber: 30311,
-    //     accountsSector: "S5",
-    //     sectorName: "Expenses",
-    //     isEditable: true,
-    //   },
-    // ];
-
+    /*
+     const adminAccs = [
+       {
+         accountName: "Armotisation",
+         accountNumber: 30081,
+         accountsSector: "S5",
+         sectorName: "Expenses",
+         isEditable: true,
+       },
+       {
+         accountName: "Cloud charges",
+         accountNumber: 30131,
+         accountsSector: "S5",
+         sectorName: "Expenses",
+         isEditable: true,
+       },
+       {
+         accountName: "Mobile expenses",
+         accountNumber: 30311,
+         accountsSector: "S5",
+         sectorName: "Expenses",
+         isEditable: true,
+       },
+      ];
+    */
     // prod
     const adminAccs = [];
     setAdminAccountsList(adminAccs);
+  };
+
+  useEffect(() => {
+    fetchAccountsList();
+    fetchAdminAccounts();
   }, []);
 
   const mappableAccountsList = [...adminAccountsList, ...accountsList].sort(
@@ -83,6 +113,7 @@ export default function useAccountsListPage() {
     showConfirmPrompt,
     showNewAccForm,
     submittedAccs,
+    loading,
     setShowConfirmPrompt,
     setShowNewAccForm,
     handleAddition,
