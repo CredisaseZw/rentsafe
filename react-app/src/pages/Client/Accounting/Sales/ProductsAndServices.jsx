@@ -13,6 +13,7 @@ export default function ProductsAndServices({ currencies = [] }) {
     taxOptions,
     itemToEdit,
     itemToDelete,
+    salesAccounts,
     setItemToDelete,
     setItemToEdit,
     handleItemAddition,
@@ -200,14 +201,23 @@ export default function ProductsAndServices({ currencies = [] }) {
             <label htmlFor="sales_account" className="form-label">
               Sales Account
             </label>
-            <input
-              type="text"
-              className="form-control"
+
+            <select
+              className="form-select"
               id="sales_account"
               name="sales_account"
               required
               defaultValue={itemToEdit ? itemToEdit.sales_account : ""}
-            />
+            >
+              <option value="" disabled>
+                Select one
+              </option>
+              {salesAccounts.map((acc, index) => (
+                <option key={index} value={acc.id}>
+                  {acc.account_name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mt-5 text-center">
