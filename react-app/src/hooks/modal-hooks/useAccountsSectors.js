@@ -12,7 +12,7 @@ export default function useAccountsSectors() {
         setAccountsSectors(res.data);
       })
       .catch((error) => {
-        console.error(error);
+        console.log("account_sectors: " + error.response?.statusText || "");
       });
   }, []);
 
