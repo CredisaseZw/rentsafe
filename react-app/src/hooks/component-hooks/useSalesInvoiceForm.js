@@ -27,25 +27,15 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   useEffect(() => {
     if (invoice) {
       const newInvoiceData = {
-        ...invoice,
-
-        document_number: 13652,
-        bill_to: "ASSETSAFE",
-        address: "2 Clip Road, Deven",
-        phone: "+2637856123",
-        email: "assetsafe@gmail.com",
-        vat_no: "124523",
-        tin: "65895",
-        currency: "USD",
-        monthly_rental: {
-          static: true,
-          sales_code: "REN001",
-          sales_item: "Rent - Mar25",
-          price: 500.0,
-          qty: 1,
-          vat_id: "",
-          total: 500.0,
-        },
+        document_number: invoice.document_number,
+        bill_to: invoice.bill_to,
+        address: invoice.address,
+        phone: invoice.phone,
+        email: invoice.email,
+        vat_no: invoice.vat_no,
+        tin: invoice.tin,
+        currency: invoice.currency,
+        monthly_rental: invoice.monthly_rental,
       };
 
       setInvoiceData(newInvoiceData);

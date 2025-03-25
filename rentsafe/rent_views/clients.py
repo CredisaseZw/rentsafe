@@ -4535,7 +4535,7 @@ def get_invoicing_details(request):
     tenant_company_details = {}
     today = date.today()
     current_month = today.month
-    current_day = 25
+    current_day = 23
     current_year = today.year
     custom_day = datetime(current_year, current_month, current_day).date()
     tenant_list = []
@@ -5969,7 +5969,8 @@ def cash_books(request):
 @login_required
 @clients_required
 def sales_invoicing(request):
-    return render(request, "Client/Accounting/Sales/SalesInvoicing")
+    invoice_list = get_invoicing_details(request)
+    return render(request, "Client/Accounting/Sales/SalesInvoicing", {"invoice_list": invoice_list}) 
 
 @login_required
 @clients_required
