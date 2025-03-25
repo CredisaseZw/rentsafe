@@ -4,11 +4,7 @@ import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useVatSettings() {
-  const [newTaxOptions, setNewTaxOptions] = useState([
-    { id: "item-1", description: "", rate: "" },
-    { id: "item-2", description: "", rate: "" },
-    { id: "item-3", description: "", rate: "" },
-  ]);
+  const [newTaxOptions, setNewTaxOptions] = useState([]);
   const [taxOptions, setTaxOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
