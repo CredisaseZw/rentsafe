@@ -95,7 +95,7 @@ export default function AccountsListPage() {
       </ContentModal>
 
       <form onSubmit={handleSubmit}>
-        <h5 className="rounded-2 bg-success text-white text-center p-1">Recurring Invoices</h5>
+        <h5 className="rounded-2 bg-success text-white text-center p-1">Accounts List</h5>
 
         <div className="text-end mb-2">
           <button
