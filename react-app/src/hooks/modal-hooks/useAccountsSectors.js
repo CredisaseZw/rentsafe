@@ -8,7 +8,6 @@ export default function useAccountsSectors() {
     axios
       .get("/accounting/account-sectors/")
       .then((res) => {
-        console.log(res.data);
         setAccountsSectors(res.data);
       })
       .catch((error) => {

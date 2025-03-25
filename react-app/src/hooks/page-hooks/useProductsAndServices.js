@@ -28,7 +28,6 @@ export default function useProductsAndServices() {
     axios
       .get("/accounting/sales-accounts/")
       .then((res) => {
-        console.log({ salesAccounts: res });
         setSalesAccounts(res.data);
       })
       .catch((err) => {

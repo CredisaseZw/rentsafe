@@ -10,7 +10,6 @@ export default function useAccountsList() {
     axios
       .get("/accounting/sales-accounts/")
       .then((res) => {
-        console.log(res);
         const newAccountsList = res.data.map((acc) => ({
           accountName: acc.account_name,
           accountNumber: acc.account_number,
