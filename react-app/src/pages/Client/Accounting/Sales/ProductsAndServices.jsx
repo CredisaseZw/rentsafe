@@ -226,7 +226,7 @@ export default function ProductsAndServices({ currencies = [] }) {
       </ContentModal>
 
       <h5 className="position-relative text-center mb-2 p-2 mb-0">
-        Items
+        Sales Items
         <div className="position-absolute top-0 end-0">
           <button className="btn btn-info text-white" onClick={openShowAdd}>
             <i className="leading-icon material-icons">add</i>

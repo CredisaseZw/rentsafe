@@ -59,7 +59,7 @@ export const clientSidebarNavigation = [
             href: reverseUrl("cash_sales"),
           },
           {
-            navLink: "Products & Services",
+            navLink: "Sales Items",
             color: "firebrick",
             type: "link",
             href: reverseUrl("products_and_services"),
