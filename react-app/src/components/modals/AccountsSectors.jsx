@@ -1,7 +1,9 @@
-import { accountsSectors } from "../../constants/index.js";
 import ClientSidebarNavItemModal from "../ClientSidebarNavItemModal.jsx";
+import useAccountsSectors from "../../hooks/modal-hooks/useAccountsSectors.js";
 
 export default function AccountsSectors(props) {
+  const { accountsSectors } = useAccountsSectors();
+
   return (
     <ClientSidebarNavItemModal
       {...props}

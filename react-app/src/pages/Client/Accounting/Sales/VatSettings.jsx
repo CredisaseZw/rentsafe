@@ -109,6 +109,7 @@ export default function VatSettings({}) {
                             name={"description-" + index}
                             id={"description-" + index}
                             value={option.description}
+                            required
                             onChange={(e) =>
                               changeHandler("description", e.target.value, option.id)
                             }
@@ -124,6 +125,7 @@ export default function VatSettings({}) {
                             className="form-control"
                             placeholder="rate in %"
                             name={"rate-" + index}
+                            required
                             id={"rate-" + index}
                             value={option.rate}
                             onChange={(e) => changeHandler("rate", e.target.value, option.id)}
