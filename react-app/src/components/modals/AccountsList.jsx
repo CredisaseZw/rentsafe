@@ -3,6 +3,7 @@ import ClientSidebarNavItemModal from "../ClientSidebarNavItemModal.jsx";
 
 export default function AccountsList(props) {
   const { loading, mappableAccountsList } = useAccountsList();
+
   return (
     <ClientSidebarNavItemModal
       {...props}
@@ -20,6 +21,7 @@ export default function AccountsList(props) {
                   <th>Sector Name</th>
                 </tr>
               </thead>
+
               <tbody>
                 {loading ? (
                   <tr>
