@@ -27,7 +27,7 @@ export default function DetailedGeneralLedgerAccount() {
             <div className="c-bg-light d-flex align-items-center p-1">Account:</div>
 
             <div>
-              <label className="form-label">From</label>
+              <label className="form-label d-block">From</label>
               <select
                 disabled={loading}
                 className="c-form-select"
@@ -47,7 +47,7 @@ export default function DetailedGeneralLedgerAccount() {
             </div>
 
             <div>
-              <label className="form-label">To</label>
+              <label className="form-label d-block">To</label>
               <select
                 disabled={loading}
                 className="c-form-select"
