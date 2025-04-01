@@ -176,7 +176,7 @@ export const clientSidebarNavigation = [
             navLink: "General Journal",
             color: "steelblue",
             type: "link",
-            href: "",
+            href: reverseUrl("in_development"),
           },
           {
             navLink: "Reports",
@@ -194,7 +194,7 @@ export const clientSidebarNavigation = [
             navLink: "Settings",
             color: "steelblue",
             type: "link",
-            href: "",
+            href: reverseUrl("in_development"),
           },
         ],
       },

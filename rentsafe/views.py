@@ -1,4 +1,5 @@
-from django.shortcuts import redirect 
+from django.shortcuts import redirect
+from inertia import render
 from rentsafe.models import Company
 
 def index(request):
@@ -20,3 +21,6 @@ def index(request):
                 else:
                     return redirect("clients_home")
     return redirect('login') 
+
+def in_development(request):
+    return render(request, "PageInDevelopment")

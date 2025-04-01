@@ -398,7 +398,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "cash_books",
     "sales_invoicing",
     "accounts_list",
-
+    "in_development",
 ]
 
 LOGIN_URL = "login"
