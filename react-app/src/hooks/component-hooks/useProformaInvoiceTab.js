@@ -3,7 +3,7 @@ import { usePage } from "@inertiajs/inertia-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function useSalesInvoicingInvoiceTab() {
+export default function useProformaInvoiceTab() {
   const [invoiceList, setInvoiceList] = useState([]);
   const [loading, setLoading] = useState(false);
   const { url } = usePage();
@@ -11,16 +11,15 @@ export default function useSalesInvoicingInvoiceTab() {
   function fetchInvoiceList() {
     setLoading(true);
     axios
-      .get("/accounting/invoices/")
+      .get("/accounting/proforma-invoices/")
       .then((res) => {
         console.log(res);
         setInvoiceList(res.data);
-        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false);
-      });
+      })
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {

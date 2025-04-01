@@ -1,114 +1,44 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { friendlyDate } from "../../utils";
 
-export default function useRecurringInvoicingInvoiceTab() {
-  const [invoiceList, setInvoiceList] = useState([]);
+export default function useRecurringInvoicingInvoiceTab(recurringInvoices) {
+  //   {
+  //     "id": 253,
+  //     "payment_period_start": "25",
+  //     "tenant_name": "ZUVA",
+  //     "address": "1512 Cecile Estate",
+  //     "reg_number": "15/1999",
+  //     "is_company": true,
+  //     "owing_amount": 200,
+  //     "lease_currency_type": "USD"
+  // }
   const [loading, setLoading] = useState(false);
+  const [invoiceList, setInvoiceList] = useState(
+    recurringInvoices?.map((invoice) => ({
+      id: invoice.id,
+      date_created: friendlyDate(new Date()),
+      customer_acc: "",
+      customer: invoice.tenant_name,
 
-  function fetchInvoiceList() {
-    setLoading(true);
-    // ------dev
-    // const list = [
-    //   {
-    //     id: 1,
-    //     date_created: "2021-09-01",
-    //     customer: "John Doe",
-    //     currency: "USD",
-    //     invoice: "INV-001",
-    //     total: 100.0,
-    //   },
-    //   {
-    //     id: 2,
-    //     date_created: "2021-09-02",
-    //     customer: "Jane Doe",
-    //     currency: "USD",
-    //     invoice: "INV-002",
-    //     total: 200.0,
-    //   },
-    //   {
-    //     id: 3,
-    //     date_created: "2021-09-03",
-    //     customer: "John Doe",
-    //     currency: "USD",
-    //     invoice: "INV-003",
-    //     total: 300.0,
-    //   },
-    //   {
-    //     id: 4,
-    //     date_created: "2021-09-04",
-    //     customer: "Jane Doe",
-    //     currency: "USD",
-    //     invoice: "INV-004",
-    //     total: 400.0,
-    //   },
-    //   {
-    //     id: 5,
-    //     date_created: "2021-09-05",
-    //     customer: "John Doe",
-    //     currency: "USD",
-    //     invoice: "INV-005",
-    //     total: 500.0,
-    //   },
-    //   {
-    //     id: 6,
-    //     date_created: "2021-09-06",
-    //     customer: "Jane Doe",
-    //     currency: "USD",
-    //     invoice: "INV-006",
-    //     total: 600.0,
-    //   },
-    //   {
-    //     id: 7,
-    //     date_created: "2021-09-07",
-    //     customer: "John Doe",
-    //     currency: "USD",
-    //     invoice: "INV-007",
-    //     total: 700.0,
-    //   },
-    //   {
-    //     id: 8,
-    //     date_created: "2021-09-08",
-    //     customer: "Jane Doe",
-    //     currency: "USD",
-    //     invoice: "INV-008",
-    //     total: 800.0,
-    //   },
-    //   {
-    //     id: 9,
-    //     date_created: "2021-09-09",
-    //     customer: "John Doe",
-    //     currency: "USD",
-    //     invoice: "INV-009",
-    //     total: 900.0,
-    //   },
-    //   {
-    //     id: 10,
-    //     date_created: "2021-09-10",
-    //     customer: "Jane Doe",
-    //     currency: "USD",
-    //     invoice: "INV-010",
-    //     total: 1000.0,
-    //   },
-    // ];
-    const list = [];
-    setInvoiceList(list);
-    setLoading(false);
-
-    //  -----prod
-    //  axios
-    //    .get('/accounting/invoices')
-    //    .then((res) => {
-    //      setLoading(false);
-    //      setInvoiceList(res.data);
-    //    })
-    //    .catch((err) => {
-    //      setLoading(false);
-    //      console.log(err);
-    //    });
-  }
-
-  useEffect(() => {
-    fetchInvoiceList();
-  }, []);
+      document_number: "",
+      bill_to: invoice.tenant_name,
+      address: invoice.address,
+      phone: "",
+      email: "",
+      vat_no: "",
+      tin: "",
+      currency: invoice.lease_currency_type,
+      monthly_rental: {
+        static: true,
+        sales_code: "",
+        sales_item: `"Rent - ${invoice.payment_period_start} ${new Date().getMonth() + 1}`,
+        price: invoice.owing_amount,
+        qty: 1,
+        vat_id: "",
+        total: invoice.owing_amount,
+      },
+    }))
+  );
 
   return { loading, invoiceList };
 }

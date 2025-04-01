@@ -100,7 +100,7 @@ const Layout = ({ children, title }) => {
           <ClientSidebar />
 
           <div id="layoutDrawer_content">
-            <div className="p-4">{children}</div>
+            <div className="p-4 container-xl">{children}</div>
 
             <footer id="footer" className="py-4 border-top" style={{ minHeight: "74px" }}>
               <div className="container-xl px-5">

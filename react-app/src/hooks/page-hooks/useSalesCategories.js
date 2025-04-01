@@ -21,7 +21,6 @@ export default function useSalesCategories() {
     axios
       .get("/accounting/sales-categories/")
       .then((res) => {
-        console.log(res);
         setCategories(res.data);
       })
       .catch((err) => {

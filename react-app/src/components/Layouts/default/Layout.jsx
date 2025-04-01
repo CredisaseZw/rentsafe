@@ -106,7 +106,7 @@ const Layout = ({ children }) => {
           <Sidebar />
 
           <div id="layoutDrawer_content">
-            {children}
+            <div className="container-xl">{children}</div>
 
             <footer className="py-4 mt-auto border-top" style={{ minHeight: "74px" }}>
               <div className="container-xl px-5">

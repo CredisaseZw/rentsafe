@@ -11,7 +11,6 @@ export default function useClientSidebar() {
 
   useEffect(() => {
     if (activeNavLinkId === "use-last-last") {
-      console.log(lastActiveRef);
       setActiveNavLinkId(lastActiveRef.current);
     }
   }, [activeNavLinkId]);

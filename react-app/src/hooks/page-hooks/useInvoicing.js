@@ -276,21 +276,21 @@ export default function useInvoicing({ tenant_list: invoices, errors, result, st
       ? moment().subtract(1, "months").format("MMMM YYYY")
       : moment().format("MMMM YYYY");
 
-  console.log({
-    allState: {
-      invoices,
-      errors,
-      result,
-      status,
-      message,
-      usdBatchTotal,
-      zwlBatchTotal,
-      usdState,
-      zwlState,
-      isLoading,
-      headerDate,
-    },
-  });
+  // console.log({
+  //   allState: {
+  //     invoices,
+  //     errors,
+  //     result,
+  //     status,
+  //     message,
+  //     usdBatchTotal,
+  //     zwlBatchTotal,
+  //     usdState,
+  //     zwlState,
+  //     isLoading,
+  //     headerDate,
+  //   },
+  // });
 
   const pastDue = invoices?.some(
     (inv) => !!(today.getDate() < inv.payment_period_start && today.getDate() > 8)

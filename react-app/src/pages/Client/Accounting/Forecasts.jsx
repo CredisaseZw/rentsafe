@@ -14,7 +14,6 @@ export default function Forecasts({
     outflows_statement
   );
 
-  console.log(inflows_statement);
   return (
     <div className="bg-white border rounded-3">
       <h5 className="text-center p-2 mb-0 text-white bg-info">{company_name}</h5>

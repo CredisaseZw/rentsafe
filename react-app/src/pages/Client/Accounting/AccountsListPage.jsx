@@ -8,6 +8,7 @@ export default function AccountsListPage() {
     showConfirmPrompt,
     showNewAccForm,
     submittedAccs,
+    loading,
     setShowConfirmPrompt,
     setShowNewAccForm,
     handleAddition,
@@ -95,7 +96,7 @@ export default function AccountsListPage() {
       </ContentModal>
 
       <form onSubmit={handleSubmit}>
-        <h5 className="rounded-2 bg-success text-white text-center p-1">Recurring Invoices</h5>
+        <h5 className="rounded-2 bg-success text-white text-center p-1">Accounts List</h5>
 
         <div className="text-end mb-2">
           <button
@@ -119,58 +120,74 @@ export default function AccountsListPage() {
           </thead>
 
           <tbody>
-            {mappableAccountsList.map((account, index) =>
-              account.isEditable ? (
-                <tr key={index} className="bg-white c-pointer">
-                  <td>
-                    <input
-                      name={"account_name-" + index}
-                      id={"account_name-" + index}
-                      className="form-control"
-                      defaultValue={account.accountName}
-                      placeholder="Account Name"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      name={"account_number-" + index}
-                      id={"account_number-" + index}
-                      className="form-control"
-                      defaultValue={account.accountNumber}
-                      placeholder="Account Number"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      name={"accounts_sector-" + index}
-                      id={"accounts_sector-" + index}
-                      className="form-control"
-                      defaultValue={account.accountsSector}
-                      placeholder="Accounts Sector"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name={"sector_name-" + index}
-                      id={"sector_name-" + index}
-                      className="form-control"
-                      defaultValue={account.sectorName}
-                      placeholder="Sector Name"
-                      required
-                    />
-                  </td>
-                </tr>
-              ) : (
-                <tr key={index}>
-                  <td>{account.accountName}</td>
-                  <td>{account.accountNumber}</td>
-                  <td>{account.accountsSector}</td>
-                  <td>{account.sectorName}</td>
-                </tr>
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="text-center bg-white p-5">
+                  <div className="spinner-border text-success" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : mappableAccountsList.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="text-center bg-white p-5">
+                  Nothing to show
+                </td>
+              </tr>
+            ) : (
+              mappableAccountsList.map((account, index) =>
+                account.isEditable ? (
+                  <tr key={index} className="bg-white c-pointer">
+                    <td>
+                      <input
+                        name={"account_name-" + index}
+                        id={"account_name-" + index}
+                        className="form-control"
+                        defaultValue={account.accountName}
+                        placeholder="Account Name"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name={"account_number-" + index}
+                        id={"account_number-" + index}
+                        className="form-control"
+                        defaultValue={account.accountNumber}
+                        placeholder="Account Number"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        name={"accounts_sector-" + index}
+                        id={"accounts_sector-" + index}
+                        className="form-control"
+                        defaultValue={account.accountsSector}
+                        placeholder="Accounts Sector"
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name={"sector_name-" + index}
+                        id={"sector_name-" + index}
+                        className="form-control"
+                        defaultValue={account.sectorName}
+                        placeholder="Sector Name"
+                        required
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={index}>
+                    <td>{account.accountName}</td>
+                    <td>{account.accountNumber}</td>
+                    <td>{account.accountsSector}</td>
+                    <td>{account.sectorName}</td>
+                  </tr>
+                )
               )
             )}
           </tbody>

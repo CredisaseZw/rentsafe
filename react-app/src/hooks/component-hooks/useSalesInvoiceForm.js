@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useSalesInvoiceForm(invoice, isProforma) {
   const [invoiceData, setInvoiceData] = useState(null);
@@ -27,25 +28,15 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   useEffect(() => {
     if (invoice) {
       const newInvoiceData = {
-        ...invoice,
-
-        document_number: 13652,
-        bill_to: "ASSETSAFE",
-        address: "2 Clip Road, Deven",
-        phone: "+2637856123",
-        email: "assetsafe@gmail.com",
-        vat_no: "124523",
-        tin: "65895",
-        currency: "USD",
-        monthly_rental: {
-          static: true,
-          sales_code: "REN001",
-          sales_item: "Rent - Mar25",
-          price: 500.0,
-          qty: 1,
-          vat_id: "",
-          total: 500.0,
-        },
+        document_number: invoice.document_number,
+        bill_to: invoice.bill_to,
+        address: invoice.address,
+        phone: invoice.phone,
+        email: invoice.email,
+        vat_no: invoice.vat_no,
+        tin: invoice.tin,
+        currency: invoice.currency,
+        monthly_rental: invoice.monthly_rental,
       };
 
       setInvoiceData(newInvoiceData);
@@ -53,6 +44,11 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       setItems([newInvoiceData.monthly_rental]);
     }
   }, [invoice]);
+
+  useEffect(() => {
+    fetchSalesCodes();
+    fetchTaxConfigs();
+  }, []);
 
   function fetchSalesCodes() {
     axios
@@ -75,11 +71,6 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
         console.error(err);
       });
   }
-
-  useEffect(() => {
-    fetchSalesCodes();
-    fetchTaxConfigs();
-  }, []);
 
   function addRow() {
     setItems([
@@ -129,9 +120,40 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     Object.keys(totals).forEach((key) => (data[key] = totals[key]));
     data.invoiceTotal += Number(discount);
     data.discount = Number(discount);
+
     if (isProforma) {
       console.log("Proforma Invoice Data: ", data);
     } else console.log(data);
+
+    const url = isProforma ? "/accounting/proforma-invoices/" : "/accounting/invoices/";
+
+    axios
+      .post(url, data)
+      .then((res) => {
+        console.log(res);
+        if (res.status === 201) {
+          toast.success(userFriendlyErrorOrResponse(res));
+          setItems([
+            {
+              static: false,
+              sales_code: "",
+              sales_item: "",
+              price: "",
+              qty: "",
+              vat: "",
+              total: "",
+            },
+          ]);
+          setDiscount(0);
+          setKey((prev) => prev + 1);
+        } else {
+          toast.error(userFriendlyErrorOrResponse(res));
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      });
   }
 
   function changeCurrency(e) {
