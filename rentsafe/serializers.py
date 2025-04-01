@@ -412,6 +412,7 @@ class CreateCompanySchema(Schema):
     note = fields.Str(data_key="note", required=False)
     companyId = fields.Str(data_key="company_id", required=False)
     pageType = fields.Str(data_key="pageType", required=False)
+    tin_number = fields.Str(data_key="tinNumber", required=False)
 
 
 # Add-Lease
