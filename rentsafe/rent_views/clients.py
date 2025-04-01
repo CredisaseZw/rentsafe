@@ -2473,13 +2473,12 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email with logins details
-                if request.user.id ==11:
-                    send_auth_email.delay(
-                        user_id,
-                        user_password,
-                        data.get("userEmail"),
-                        check_individual.firstname,
-                    )
+                send_auth_email.delay(
+                    user_id,
+                    user_password,
+                    data.get("userEmail"),
+                    check_individual.firstname,
+                )
             else:
                 # create individual and user
                 individual = Individual(
@@ -2509,13 +2508,12 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email
-                if request.user.id ==11:
-                    send_auth_email.delay(
-                        user_id,
-                        user_password,
-                        data.get("userEmail"),
-                        data.get("firstName"),
-                    )
+                send_auth_email.delay(
+                    user_id,
+                    user_password,
+                    data.get("userEmail"),
+                    data.get("firstName"),
+                )
 
             props = {
                 "success": "success",
@@ -3289,6 +3287,7 @@ def store_company(request):
                 registration_name=data.get("registeredName").upper(),
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),
+                tin_number=data.get("tinNumber"),
             )
             company_ob.save()
             CompanyProfile.objects.create(
@@ -3300,6 +3299,7 @@ def store_company(request):
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 branch=data.get("branch"),
+                
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             user_password = generate_random_password(8)
@@ -4546,10 +4546,9 @@ def get_invoicing_details(request):
             next_month_end_day = today.replace(day=int(i.payment_period_end))
         except:
             next_month_end_day = today.replace(day=8)
-
         if (
             (today >= custom_day) or (today < next_month_end_day)
-        ) and difference.days >= 20:  # FIXME: SWITCH DATES comment
+        ) :#and difference.days >= 20:  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
                 invoiced_month = invoice_status.date_updated.strftime("%B")
                 invoice_year = invoice_status.date_updated.strftime("%Y")
@@ -4557,6 +4556,11 @@ def get_invoicing_details(request):
                 current_month = datetime.now().strftime("%B")
                 current_year = datetime.now().strftime("%Y")
                 current_year_month = f"{current_month} {current_year}"
+                next_month_date = datetime.now() + relativedelta(months=1)
+                # Get next month's name and year
+                next_month = next_month_date.strftime("%B")
+                next_year = next_month_date.strftime("%Y")
+                next_month_name = f"{next_month} {next_year}"
                 if str(invoice_month) != str(current_year_month):  # FIXME: remove comment
                     if i.is_individual:
                         try:
