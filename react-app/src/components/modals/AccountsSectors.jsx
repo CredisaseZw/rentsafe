@@ -26,6 +26,14 @@ export default function AccountsSectors(props) {
                     <td>{sector.sector}</td>
                   </tr>
                 ))}
+
+                {accountsSectors.length === 0 && (
+                  <tr>
+                    <td colSpan={2} className="text-center p-5">
+                      Nothing to show
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

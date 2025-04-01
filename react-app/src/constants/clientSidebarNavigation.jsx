@@ -176,12 +176,18 @@ export const clientSidebarNavigation = [
             navLink: "General Journal",
             color: "steelblue",
             type: "link",
-            href: "",
+            href: reverseUrl("in_development"),
           },
           {
             navLink: "Reports",
             color: "steelblue",
             subNavLinks: [
+              {
+                navLink: "Detailed General Ledger Accounts",
+                color: "steelblue",
+                type: "link",
+                href: reverseUrl("detailed_general_ledger"),
+              },
               {
                 navLink: "Accounts List",
                 color: "steelblue",
@@ -194,7 +200,7 @@ export const clientSidebarNavigation = [
             navLink: "Settings",
             color: "steelblue",
             type: "link",
-            href: "",
+            href: reverseUrl("in_development"),
           },
         ],
       },

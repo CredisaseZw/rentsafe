@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useAccountsListPage() {
   const [showConfirmPrompt, setShowConfirmPrompt] = useState(false);
@@ -20,7 +21,7 @@ export default function useAccountsListPage() {
           accountNumber: acc.account_number,
           accountsSector: acc.account_sector,
           sectorName: acc.account_sector,
-          isEditable: false,
+          // isEditable: true,
         }));
 
         setAccountsList(newAccountsList);
@@ -33,33 +34,6 @@ export default function useAccountsListPage() {
   }
 
   const fetchAdminAccounts = () => {
-    // dev
-    /*
-     const adminAccs = [
-       {
-         accountName: "Armotisation",
-         accountNumber: 30081,
-         accountsSector: "S5",
-         sectorName: "Expenses",
-         isEditable: true,
-       },
-       {
-         accountName: "Cloud charges",
-         accountNumber: 30131,
-         accountsSector: "S5",
-         sectorName: "Expenses",
-         isEditable: true,
-       },
-       {
-         accountName: "Mobile expenses",
-         accountNumber: 30311,
-         accountsSector: "S5",
-         sectorName: "Expenses",
-         isEditable: true,
-       },
-      ];
-    */
-    // prod
     const adminAccs = [];
     setAdminAccountsList(adminAccs);
   };
@@ -86,25 +60,50 @@ export default function useAccountsListPage() {
       dataArr[index][field] = value;
     });
     const data = Object.values(dataArr);
-    if (data.length === 0) {
-      toast.error("No accounts are available to edit/were edited");
-      return;
-    }
-    setSubmittedAccs();
+
+    setSubmittedAccs(data);
     setShowConfirmPrompt(true);
   }
 
   function submitUpdates() {
     console.log("Update accounts", submittedAccs);
-    setShowConfirmPrompt(false);
-    setSubmittedAccs(null);
+
+    axios
+      .put("/accounting/sales-accounts/", submittedAccs)
+      .then((res) => {
+        console.log(res);
+        toast.success(userFriendlyErrorOrResponse(res));
+        fetchAccountsList();
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      })
+      .finally(() => {
+        setShowConfirmPrompt(false);
+        setSubmittedAccs(null);
+      });
   }
 
   function handleAddition(e) {
     e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target));
-    console.log("Add new account", formData);
-    setShowNewAccForm(false);
+    const data = Object.fromEntries(new FormData(e.target));
+    console.log("Adding new account", data);
+
+    axios
+      .post("/accounting/sales-accounts/", data)
+      .then((res) => {
+        console.log(res);
+        toast.success(userFriendlyErrorOrResponse(res));
+        fetchAccountsList();
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      })
+      .finally(() => {
+        setShowNewAccForm(false);
+      });
   }
 
   return {
