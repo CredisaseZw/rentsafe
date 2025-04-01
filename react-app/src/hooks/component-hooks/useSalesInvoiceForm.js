@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useSalesInvoiceForm(invoice, isProforma) {
   const [invoiceData, setInvoiceData] = useState(null);
@@ -44,6 +45,11 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     }
   }, [invoice]);
 
+  useEffect(() => {
+    fetchSalesCodes();
+    fetchTaxConfigs();
+  }, []);
+
   function fetchSalesCodes() {
     axios
       .get("/accounting/items/")
@@ -65,11 +71,6 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
         console.error(err);
       });
   }
-
-  useEffect(() => {
-    fetchSalesCodes();
-    fetchTaxConfigs();
-  }, []);
 
   function addRow() {
     setItems([
@@ -119,9 +120,40 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     Object.keys(totals).forEach((key) => (data[key] = totals[key]));
     data.invoiceTotal += Number(discount);
     data.discount = Number(discount);
+
     if (isProforma) {
       console.log("Proforma Invoice Data: ", data);
     } else console.log(data);
+
+    const url = isProforma ? "/accounting/proforma-invoices/" : "/accounting/invoices/";
+
+    axios
+      .post(url, data)
+      .then((res) => {
+        console.log(res);
+        if (res.status === 201) {
+          toast.success(userFriendlyErrorOrResponse(res));
+          setItems([
+            {
+              static: false,
+              sales_code: "",
+              sales_item: "",
+              price: "",
+              qty: "",
+              vat: "",
+              total: "",
+            },
+          ]);
+          setDiscount(0);
+          setKey((prev) => prev + 1);
+        } else {
+          toast.error(userFriendlyErrorOrResponse(res));
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(userFriendlyErrorOrResponse(err));
+      });
   }
 
   function changeCurrency(e) {

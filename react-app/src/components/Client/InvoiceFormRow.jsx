@@ -139,7 +139,7 @@ export default function InvoiceFormRow({
             disabled={item.static || isLoading || itemsLength === 1}
             type="button"
             onClick={() => removeRow(index)}
-            className="btn btn-danger btn-sm p-1"
+            className="btn btn-sm btn-danger p-0"
           >
             <i className="material-icons">close</i>
           </button>
@@ -156,7 +156,7 @@ export default function InvoiceFormRow({
               disabled={isLoading}
               value={item.sales_code}
               onChange={handleSalesCodeSelect}
-              className="form-select custom-w-2"
+              className="form-select form-select-sm custom-w-2"
             >
               <option disabled value="">
                 Select code..
@@ -189,9 +189,9 @@ export default function InvoiceFormRow({
           ) : (
             <input
               type="number"
-              //  name="qty"
-              //  id="qty"
-              className="form-control custom-w-1"
+              name="quantity"
+              id="quantity"
+              className="form-control form-control-sm custom-w-1"
               disabled={isLoading}
               value={item.qty}
               required
