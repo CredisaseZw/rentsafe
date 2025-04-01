@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import action
 from django.utils.timezone import now
-
+from inertia import render as inertia_render
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
     """
@@ -152,3 +152,7 @@ class ProformaInvoiceViewSet(viewsets.ModelViewSet):
         proforma_invoice = self.get_object()
         invoice = proforma_invoice.convert_to_invoice()
         return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
+    
+
+def detailed_general_ledger(request):
+    return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")

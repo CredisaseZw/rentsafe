@@ -26,6 +26,5 @@ router.register(r'proforma-invoices', ProformaInvoiceViewSet, basename="proforma
 
 urlpatterns = [
     path("", include(router.urls)),
-       
-    
+    path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),
 ]

@@ -183,6 +183,12 @@ export const clientSidebarNavigation = [
             color: "steelblue",
             subNavLinks: [
               {
+                navLink: "Detailed General Ledger Accounts",
+                color: "steelblue",
+                type: "link",
+                href: reverseUrl("detailed_general_ledger"),
+              },
+              {
                 navLink: "Accounts List",
                 color: "steelblue",
                 type: "modal",
