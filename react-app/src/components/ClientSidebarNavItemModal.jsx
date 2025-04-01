@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ContentModal from "./ContentModal.jsx";
 
 export default function ClientSidebarNavItemModal({
-  modalProps: { size, title, children, titleOverideContent },
+  modalProps: { size, title, navlinkTitle, children, titleOverideContent },
   id,
   className,
   makeActive,
@@ -21,7 +21,7 @@ export default function ClientSidebarNavItemModal({
           setShowModal(true);
         }}
       >
-        {title}
+        {navlinkTitle || title}
       </a>
 
       <ContentModal
