@@ -68,8 +68,8 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                   {invoiceData?.bill_to ? (
                     <input
                       className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                      name="bill_to"
-                      id="bill_to"
+                      name="customer_id"
+                      id="customer_id"
                       readOnly
                       value={invoiceData?.bill_to}
                     />

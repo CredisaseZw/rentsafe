@@ -189,8 +189,8 @@ export default function InvoiceFormRow({
           ) : (
             <input
               type="number"
-              //  name="qty"
-              //  id="qty"
+              name="quantity"
+              id="quantity"
               className="form-control form-control-sm custom-w-1"
               disabled={isLoading}
               value={item.qty}

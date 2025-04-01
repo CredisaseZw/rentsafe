@@ -23,8 +23,8 @@ export default function UserSelector() {
           extraProps={{
             placeholder: "Customer Name...",
             required: true,
-            id: "bill_to",
-            name: "bill_to",
+            id: "customer_id",
+            name: "customer_id",
             className: "w-100",
           }}
           defaultValue={null}
