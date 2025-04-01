@@ -125,8 +125,10 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       console.log("Proforma Invoice Data: ", data);
     } else console.log(data);
 
+    const url = isProforma ? "/accounting/proforma-invoices/" : "/accounting/invoices/";
+
     axios
-      .post("/accounting/invoices/", data)
+      .post(url, data)
       .then((res) => {
         console.log(res);
         if (res.status === 201) {
