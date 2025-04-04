@@ -400,7 +400,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "accounts_list",
     "in_development",
     "detailed_general_ledger",
-
+    "cash_books_list",
 ]
 
 LOGIN_URL = "login"

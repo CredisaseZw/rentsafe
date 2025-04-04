@@ -268,6 +268,12 @@ export const clientSidebarNavigation = [
                 type: "modal",
                 component: <PaymentTypes />,
               },
+              {
+                navLink: "List",
+                color: "purple",
+                type: "link",
+                href: reverseUrl("cash_books_list"),
+              },
             ],
           },
         ],
