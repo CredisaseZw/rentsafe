@@ -156,3 +156,6 @@ class ProformaInvoiceViewSet(viewsets.ModelViewSet):
 
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
+
+def cash_books_list(request):
+    return inertia_render(request, "Client/Accounting/CashBooksList")
