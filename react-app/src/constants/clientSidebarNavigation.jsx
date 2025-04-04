@@ -5,6 +5,7 @@ import CommissionStatementsSelection from "../components/CommissionStatementsSel
 import Disbursements from "../components/Disbursements.jsx";
 import AccountsList from "../components/modals/AccountsList.jsx";
 import AccountsSectors from "../components/modals/AccountsSectors.jsx";
+import PaymentTypes from "../components/modals/PaymentTypes.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 import ToDoList from "../components/modals/sidebar/ToDoList.jsx";
 
@@ -253,6 +254,18 @@ export const clientSidebarNavigation = [
                 color: "purple",
                 type: "modal",
                 component: <AccountsSectors />,
+              },
+            ],
+          },
+          {
+            navLink: "Cash Books",
+            color: "purple",
+            subNavLinks: [
+              {
+                navLink: "Payment Types",
+                color: "purple",
+                type: "modal",
+                component: <PaymentTypes />,
               },
             ],
           },
