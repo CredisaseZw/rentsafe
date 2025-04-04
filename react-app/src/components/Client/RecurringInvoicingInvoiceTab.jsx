@@ -9,7 +9,7 @@ export default function RecurringInvoicingInvoiceTab({ recurringInvoices }) {
     <div>
       <div>
         <table className="table table-sm table-bordered table-responsive bg-white">
-          <thead className="position-sticky c-table-top shadow-sm c-z-5">
+          <thead className="position-sticky c-table-top shadow-sm bg-white c-z-5">
             <tr>
               <th colSpan={6} className="p-0">
                 <div className=" bg-danger text-white text-center p-2">Recurring Invoices</div>
