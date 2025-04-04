@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ContentModal from "./ContentModal.jsx";
 
 export default function ClientSidebarNavItemModal({
-  modalProps: { size, title, navlinkTitle, children, titleOverideContent },
+  modalProps: { size, title, navlinkTitle, children, titleOverideContent, devOnlyDefaultShow },
   id,
   className,
   makeActive,
@@ -26,7 +26,7 @@ export default function ClientSidebarNavItemModal({
 
       <ContentModal
         title={title}
-        show={showModal}
+        show={devOnlyDefaultShow || showModal}
         handleClose={() => {
           makeActive("use-last-last");
           setShowModal(false);
