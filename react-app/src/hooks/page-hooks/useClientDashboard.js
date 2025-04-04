@@ -36,7 +36,7 @@ export default function useClientDashboard() {
     ],
     datasets: [
       {
-        label: "% of Total Credit Taken",
+        label: "% of Total Credit Given",
         data: creditGivenWithPercentages.map((item) => item.percentage),
         backgroundColor: ["green", "orange", "#f87171", "#991b1b", "black"],
         borderWidth: 0,
