@@ -27,7 +27,10 @@ export default function ClientSidebarReceipts(props) {
       {...props}
       modalProps={{
         requestCloseFlag,
-        title: "Receipts",
+        navlinkTitle: "Receipts",
+        titleOverideContent: (
+          <h5 className="text-center bg-dark text-white rounded-2 p-1 m-0 mb-4">Receipts</h5>
+        ),
         centerTitle: true,
         size: "xl",
         children: (
