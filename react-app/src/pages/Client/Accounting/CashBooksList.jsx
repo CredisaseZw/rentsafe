@@ -68,6 +68,26 @@ export default function CashBooksList({ currencies = [] }) {
             </div>
 
             <div className="mb-3">
+              <label htmlFor="currency" className="form-label">
+                Currency*
+              </label>
+
+              <select
+                className="form-select "
+                id="currency"
+                name="currency"
+                required
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Select one
+                </option>
+                <option value="ZWG">ZWG</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            <div className="mb-3">
               <label htmlFor="account_type" className="form-label">
                 Account Type*
               </label>
@@ -192,12 +212,8 @@ export default function CashBooksList({ currencies = [] }) {
                 <option value="" disabled>
                   Select one
                 </option>
-                <option value="ZWG" disabled>
-                  ZWG
-                </option>
-                <option value="USD" disabled>
-                  USD
-                </option>
+                <option value="ZWG">ZWG</option>
+                <option value="USD">USD</option>
               </select>
             </div>
 
