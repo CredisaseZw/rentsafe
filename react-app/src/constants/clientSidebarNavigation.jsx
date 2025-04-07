@@ -87,8 +87,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Receipts",
             color: "#00823d",
-            type: "link",
-            href: reverseUrl("in_development"),
+            type: "modal",
+            component: <ClientSidebarReceipts />,
           },
           {
             navLink: "Requisitions",
