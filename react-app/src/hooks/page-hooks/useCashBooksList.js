@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 
+const sampleCashBooks = [];
+
 // const sampleCashBooks = [
 //   {
 //     bookId: 1,
 //     cashBookName: "Main Cash Book",
 //     cashBookCurrency: "USD",
 //     bankAccountNumber: "123456789",
+//     activeRequisition: true,
 //     accountType: "Current Account",
 //     branch: "New York",
 //     details: "Main operational cash book",
@@ -16,6 +19,7 @@ import { useEffect, useState } from "react";
 //     cashBookName: "Petty Cash Book",
 //     cashBookCurrency: "USD",
 //     accountNumber: "987654321",
+//     activeRequisition: false,
 //     accountType: "Cash",
 //     branch: "Los Angeles",
 //     details: "Used for small expenses",
@@ -26,6 +30,7 @@ import { useEffect, useState } from "react";
 //     cashBookName: "Savings Cash Book",
 //     cashBookCurrency: "USD",
 //     accountNumber: "112233445",
+//     activeRequisition: false,
 //     accountType: "Savings Account",
 //     branch: "Chicago",
 //     details: "Savings for future projects",
@@ -37,7 +42,7 @@ export default function useCashBooksList() {
   const [shouldShowAddForm, setShouldShowAddForm] = useState(false);
   const [showDetailsFor, setShowDetailsFor] = useState(null);
   const [cashBookToDelete, setCashBookToDelete] = useState(null);
-  const [cashBooks, setCashBooks] = useState([]);
+  const [cashBooks, setCashBooks] = useState(sampleCashBooks);
   const [generalLedgerAccountNumbers, , setGeneralLedgerAccountNumbers] = useState([]);
 
   const accountTypes = ["Current Account", "Cash", "Mobile Money"];
@@ -125,6 +130,10 @@ export default function useCashBooksList() {
     //   });
   }
 
+  function changeActiveRequisitionFor(cashBookId, checked) {
+    console.log(cashBookId, checked);
+  }
+
   return {
     loading,
     cashBooks,
@@ -140,5 +149,6 @@ export default function useCashBooksList() {
     openCashbookForm,
     setShowDetailsFor,
     setCashBookToDelete,
+    changeActiveRequisitionFor,
   };
 }

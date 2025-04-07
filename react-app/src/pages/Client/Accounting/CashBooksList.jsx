@@ -3,7 +3,7 @@ import Layout from "../../../components/Layouts/client/Layout.jsx";
 import MessageModal from "../../../components/MessageModal.jsx";
 import useCashBooksList from "../../../hooks/page-hooks/useCashBooksList.js";
 
-export default function CashBooksList({ currencies = [] }) {
+export default function CashBooksList() {
   const {
     loading,
     cashBooks,
@@ -19,6 +19,7 @@ export default function CashBooksList({ currencies = [] }) {
     openCashbookForm,
     setShowDetailsFor,
     setCashBookToDelete,
+    changeActiveRequisitionFor,
   } = useCashBooksList();
 
   return (
@@ -85,6 +86,42 @@ export default function CashBooksList({ currencies = [] }) {
                 <option value="ZWG">ZWG</option>
                 <option value="USD">USD</option>
               </select>
+            </div>
+
+            <div className="mb-3 d-flex align-items-center gap-4 py-2">
+              <label htmlFor="cashbook_name" className="form-label">
+                Active Requisition*
+              </label>
+
+              <div className="d-flex align-items-center gap-3 justify-content-evenly flex-fill">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="active_requisition"
+                    id="active_requisition_yes"
+                    value="yes"
+                    defaultChecked
+                  />
+                  <label className="form-check-label" htmlFor="active_requisition_yes">
+                    Yes
+                  </label>
+                </div>
+
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="active_requisition"
+                    id="active_requisition_no"
+                    value="no"
+                    defaultChecked
+                  />
+                  <label className="form-check-label" htmlFor="active_requisition_no">
+                    No
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="mb-3">
@@ -217,6 +254,42 @@ export default function CashBooksList({ currencies = [] }) {
               </select>
             </div>
 
+            <div className="mb-3 d-flex align-items-center gap-3">
+              <label htmlFor="cashbook_name" className="form-label">
+                Active Requisition*
+              </label>
+
+              <div className="d-flex align-items-center gap-3 justify-content-evenly flex-fill">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="active_requisition"
+                    id="active_requisition_yes"
+                    value="yes"
+                    defaultChecked={showDetailsFor.activeRequisition}
+                  />
+                  <label className="form-check-label" htmlFor="active_requisition_yes">
+                    Yes
+                  </label>
+                </div>
+
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="active_requisition"
+                    id="active_requisition_no"
+                    value="no"
+                    defaultChecked={!showDetailsFor.activeRequisition}
+                  />
+                  <label className="form-check-label" htmlFor="active_requisition_no">
+                    No
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <div className="mb-3 d-flex align-items-center gap-3 justify-content-between">
               <label htmlFor="account_type" className="w-50 form-label">
                 Account Type
@@ -313,11 +386,12 @@ export default function CashBooksList({ currencies = [] }) {
       </div>
 
       <table className="table table-sm table-responsive table-bordered bg-white">
-        <thead className="position-sticky c-table-top shadow-sm c-z-5">
+        <thead className="position-sticky c-table-top shadow-sm c-z-5 text-nowrap">
           <tr>
             <th className="ps-3">Book ID</th>
             <th className="ps-3">Cashbook Name</th>
             <th className="ps-3">Cashbook Currency</th>
+            <th className="ps-3">Active Requisition</th>
             <th className="ps-3">GL Account Number</th>
             <th className="ps-3">Details</th>
             <th className="ps-3"></th>
@@ -338,11 +412,20 @@ export default function CashBooksList({ currencies = [] }) {
           {cashBooks?.map((book, index) => (
             <tr key={index}>
               <td className="ps-3">{book.bookId}</td>
-              <td className="ps-3 custom-mn-w-3">{book.cashBookName}</td>
+              <td className="ps-3 custom-mn-w-2">{book.cashBookName}</td>
               <td className="ps-3">{book.cashBookCurrency}</td>
+              <td className="ps-3 text-center">
+                {book.activeRequisition}
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  value={book.activeRequisition}
+                  onChange={(e) => changeActiveRequisitionFor(book.bookId, e.target.checked)}
+                />
+              </td>
               <td className="ps-3">{book.bankAccountNumber}</td>
               <td className="ps-3">{book.details}</td>
-              <td className="text-center">
+              <td className="text-center text-nowrap">
                 <button
                   className="btn btn-sm btn-info text-white me-2"
                   onClick={() => setShowDetailsFor(book)}
