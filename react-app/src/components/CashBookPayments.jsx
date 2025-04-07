@@ -26,6 +26,7 @@ export default function CashBookPayments(props) {
       {...props}
       modalProps={{
         requestCloseFlag,
+        navlinkTitle: "Payments",
         titleOverideContent: (
           <h5 className="text-center bg-danger text-white rounded-2 p-1 m-0 mb-4">Payments</h5>
         ),
