@@ -123,7 +123,7 @@ DB_NAME     = os.getenv('DB_NAME'     , None)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite11MARCH2025",
     }
 }
 
@@ -201,7 +201,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
 
 # If we should use HMR or not.
-# DJANGO_VITE_DEV_MODE = DEBUG
+DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
 DJANGO_VITE_DEV_SERVER_HOST = "localhost"
@@ -400,6 +400,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "sales_accounts",
     "cash_books",
     "general_ledger",
+    "sales_invoicing",
 ]
 
 LOGIN_URL = "login"

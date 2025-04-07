@@ -25,7 +25,7 @@ export default function Login({ flash, error }) {
           <input
             value={data.email}
             onChange={changeHandler}
-            type="email"
+            type="text"
             name="email"
             id="email"
             className="form-control"

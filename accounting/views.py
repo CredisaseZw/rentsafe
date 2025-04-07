@@ -104,3 +104,6 @@ class LedgerTransactionViewSet(BaseCompanyViewSet):
     serializer_class = LedgerTransactionSerializer
 
 
+class AccountSectorViewSet(BaseCompanyViewSet):
+    queryset = AccountSector.objects.all()
+    serializer_class = AccountSectorSerializer
