@@ -1,44 +1,33 @@
-import Layout from '../../../components/Layouts/client/Layout.jsx';
-import DeleteUser from '../../../components/modals/Client/DeleteUser.jsx';
-import UserForm from '../../../components/modals/Client/UserForm.jsx';
-import UserSearchModal from '../../../components/modals/Client/UserSearchModal.jsx';
-import useInternalUsers from '../../../hooks/page-hooks/useInternalUsers.js';
+import Layout from "../../../components/Layouts/client/Layout.jsx";
+import DeleteUser from "../../../components/modals/Client/DeleteUser.jsx";
+import UserForm from "../../../components/modals/Client/UserForm.jsx";
+import UserSearchModal from "../../../components/modals/Client/UserSearchModal.jsx";
+import useInternalUsers from "../../../hooks/page-hooks/useInternalUsers.js";
 
 export default function Index({ users }) {
-  const {
-    searchValue,
-    filteredUsers,
-    userModalOptions,
-    setUserModalOptions,
-    handleSearch,
-  } = useInternalUsers(users);
+  const { searchValue, filteredUsers, userModalOptions, setUserModalOptions, handleSearch } =
+    useInternalUsers(users);
 
   return (
     <main>
-      {userModalOptions?.type !== '' && (
+      {userModalOptions?.type !== "" && (
         <>
           <UserForm
             key={JSON.stringify(userModalOptions.userToActOn)}
-            show={userModalOptions.type === 'user'}
+            show={userModalOptions.type === "user"}
             action={userModalOptions.action}
             user={userModalOptions.userToActOn}
-            url={
-              userModalOptions.action === 'add' ? 'create-user' : 'edit-user'
-            }
-            handleClose={() =>
-              setUserModalOptions({ type: '', action: '', userToActOn: {} })
-            }
+            url={userModalOptions.action === "add" ? "create-user" : "edit-user"}
+            handleClose={() => setUserModalOptions({ type: "", action: "", userToActOn: {} })}
           />
 
           <UserSearchModal
-            show={userModalOptions.type === 'add-internal-user'}
-            handleClose={() =>
-              setUserModalOptions({ type: '', action: '', userToActOn: {} })
-            }
+            show={userModalOptions.type === "add-internal-user"}
+            handleClose={() => setUserModalOptions({ type: "", action: "", userToActOn: {} })}
             handleProceed={(userObj) =>
               setUserModalOptions({
-                type: 'user',
-                action: 'add',
+                type: "user",
+                action: "add",
                 userToActOn: userObj,
               })
             }
@@ -46,17 +35,13 @@ export default function Index({ users }) {
 
           <DeleteUser
             userData={userModalOptions.userToActOn}
-            show={userModalOptions.type === 'delete'}
-            handleClose={() =>
-              setUserModalOptions({ type: '', action: '', userToActOn: {} })
-            }
+            show={userModalOptions.type === "delete"}
+            handleClose={() => setUserModalOptions({ type: "", action: "", userToActOn: {} })}
           />
         </>
       )}
 
-      <h5 className="text-center p-2 mb-0 text-white bg-info">
-        Internal Users
-      </h5>
+      <h5 className="text-center p-2 mb-0 text-white bg-info">Internal Users</h5>
 
       <table className="table table-sm table-striped border bg-white ">
         <thead className="position-sticky c-table-top bg-white shadow-sm c-z-5">
@@ -80,8 +65,8 @@ export default function Index({ users }) {
                   className="btn btn-info text-white rounded-0 rounded-top rounded-top-5"
                   onClick={() =>
                     setUserModalOptions({
-                      type: 'add-internal-user',
-                      action: '',
+                      type: "add-internal-user",
+                      action: "",
                       userToActOn: {},
                     })
                   }
@@ -133,8 +118,8 @@ export default function Index({ users }) {
                   className="btn btn-sm btn-info text-white"
                   onClick={() => {
                     setUserModalOptions({
-                      type: 'user',
-                      action: 'edit',
+                      type: "user",
+                      action: "edit",
                       userToActOn: user,
                     });
                   }}
@@ -146,8 +131,8 @@ export default function Index({ users }) {
                   className="btn btn-sm btn-danger"
                   onClick={() => {
                     setUserModalOptions({
-                      type: 'delete',
-                      action: '',
+                      type: "delete",
+                      action: "",
                       userToActOn: user,
                     });
                   }}
@@ -162,14 +147,14 @@ export default function Index({ users }) {
 
       {filteredUsers?.length === 0 && searchValue ? (
         <p className="custom-mx-w-4 mx-auto p-4 border border-2 text-center border-info">
-          This individual is not part of the user list. Click 'Add User' to
-          start the process of adding a new Internal User
+          This individual is not part of the user list. Click 'Add User' to start the process of
+          adding a new Internal User
         </p>
       ) : (
-        ''
+        ""
       )}
     </main>
   );
 }
 
-Index.layout = (page) => <Layout children={page} title={'Users'} />;
+Index.layout = (page) => <Layout children={page} title={"Users"} />;

@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 // import { Add } from './Add.jsx';
-import { NotFound } from '../NotFound.jsx';
+import { NotFound } from "../NotFound.jsx";
 
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import axios from 'axios';
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import axios from "axios";
 // import Report from './Report.jsx';
-import BulkIconButton from '../BulkIconButton.jsx';
-import PageHeader from '../PageHeader.jsx';
-import IndividualAdd from './IndividualAdd.jsx';
+import BulkIconButton from "../BulkIconButton.jsx";
+import PageHeader from "../PageHeader.jsx";
+import IndividualAdd from "./IndividualAdd.jsx";
 // import { IndividualVerify } from './OTP/IndividualVerify.jsx';
-import IndividualReport from './Report/IndividualReport.jsx';
-import ConfirmEnquirerType from './ConfirmEnquirerType.jsx';
-import { ExternalEnquirerInputDialog } from './ExternalEnquirerInputDialog.jsx';
+import IndividualReport from "./Report/IndividualReport.jsx";
+import ConfirmEnquirerType from "./ConfirmEnquirerType.jsx";
+import { ExternalEnquirerInputDialog } from "./ExternalEnquirerInputDialog.jsx";
 export default function IndividualSearch({ individuals, url }) {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -31,8 +31,7 @@ export default function IndividualSearch({ individuals, url }) {
   const [reportData, setReportData] = useState();
   const [errors, setErrors] = useState({});
   const [showEnquirerDialog, setShowEnquirerDialog] = useState(false);
-  const [showExternalEnquirerDialog, setShowExternalEnquirerDialog] =
-    useState(false);
+  const [showExternalEnquirerDialog, setShowExternalEnquirerDialog] = useState(false);
   const [companyId, setCompanyId] = useState();
   const { is_internal } = usePage().props.Auth;
 
@@ -55,9 +54,9 @@ export default function IndividualSearch({ individuals, url }) {
   const handleShowReport = (enquirerType, externalUserId) => {
     try {
       setIsReportLoading(true);
-      if (companyId && enquirerType === 'internal') {
+      if (companyId && enquirerType === "internal") {
         axios
-          .post(reverseUrl('enquiry_count'), {
+          .post(reverseUrl("enquiry_count"), {
             isIndividual: true,
             isCompany: false,
             isInternal: true,
@@ -65,18 +64,18 @@ export default function IndividualSearch({ individuals, url }) {
           })
           .then((res) => {});
         axios
-          .post(reverseUrl('individual-report'), { individualId: companyId })
+          .post(reverseUrl("individual-report"), { individualId: companyId })
           .then((res) => {
             setSelectedRow(companyId);
             setShowReport(true);
             setReportData(res.data);
           })
           .catch((error) => {
-            console.error('There was an error!', error);
+            console.error("There was an error!", error);
           });
-      } else if (companyId && enquirerType === 'external') {
+      } else if (companyId && enquirerType === "external") {
         axios
-          .post(reverseUrl('enquiry_count'), {
+          .post(reverseUrl("enquiry_count"), {
             isIndividual: true,
             isCompany: false,
             isInternal: false,
@@ -84,7 +83,7 @@ export default function IndividualSearch({ individuals, url }) {
           })
           .then((res) => {});
         axios
-          .post(reverseUrl('individual-report'), {
+          .post(reverseUrl("individual-report"), {
             individualId: companyId,
             enquirerId: externalUserId,
           })
@@ -94,7 +93,7 @@ export default function IndividualSearch({ individuals, url }) {
             setReportData(res.data);
           })
           .catch((error) => {
-            console.error('There was an error!', error);
+            console.error("There was an error!", error);
           });
       }
     } finally {
@@ -102,17 +101,16 @@ export default function IndividualSearch({ individuals, url }) {
     }
   };
   const { data, setData, post } = useForm({
-    searchParam: 'fullname',
-    searchValue: '',
+    searchParam: "fullname",
+    searchValue: "",
   });
-  const changeHandler = (e) =>
-    setData({ ...data, [e.target.id]: e.target.value });
+  const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (data.searchValue === '') {
+    if (data.searchValue === "") {
       setErrors({
-        searchValue: 'Please enter a search value',
+        searchValue: "Please enter a search value",
       });
       setBtnAdd(false);
       setNotFound(false);
@@ -129,7 +127,7 @@ export default function IndividualSearch({ individuals, url }) {
       onSuccess: (response) => {
         //This will return true if the object is empty, otherwise false
         const isObjectEmpty = (objectName) => {
-          return JSON.stringify(objectName) === '{}';
+          return JSON.stringify(objectName) === "{}";
         };
         response.props.result.length === 0 && setNotFound(true);
         if (isObjectEmpty(response.props.result) === true) {
@@ -147,7 +145,7 @@ export default function IndividualSearch({ individuals, url }) {
   };
   return (
     <main>
-      <PageHeader title={'Search Individual'} />
+      <PageHeader title={"Search Individual"} />
       <div className="container-xl p-5">
         <div className="row align-items-center mb-5">
           <div className="col-12 col-md-auto">
@@ -198,7 +196,7 @@ export default function IndividualSearch({ individuals, url }) {
                         <span className="ml-2">Searching..</span>
                       </>
                     ) : (
-                      'Search'
+                      "Search"
                     )}
                   </button>
                 </div>
@@ -224,11 +222,9 @@ export default function IndividualSearch({ individuals, url }) {
           handleSingle={handleSingle}
           handleClose={handleClose}
           setAddSuccessful={setAddSuccessful}
-          action={'create'}
+          action={"create"}
           // url={'client-create-individual'}
-          url={
-            is_internal !== 1 ? 'client-create-individual' : 'create-individual'
-          }
+          url={is_internal !== 1 ? "client-create-individual" : "create-individual"}
         />
         {showEnquirerDialog && (
           <ConfirmEnquirerType
@@ -253,7 +249,7 @@ export default function IndividualSearch({ individuals, url }) {
               <div className="datatable-container">
                 <table className="table table-striped">
                   <tbody>
-                    <tr style={{ backgroundColor: '#e4e4e4' }}>
+                    <tr style={{ backgroundColor: "#e4e4e4" }}>
                       <th scope="col">Forenames</th>
                       <th scope="col">surname</th>
                       <th scope="col">National ID</th>
@@ -277,9 +273,7 @@ export default function IndividualSearch({ individuals, url }) {
                               className="btn text-white  btn-info mdc-ripple-upgraded"
                               type="submit"
                               disabled={isReportLoading}
-                              onClick={(e) =>
-                                handleShowEnquirerDialog(e, fetchedData.id)
-                              }
+                              onClick={(e) => handleShowEnquirerDialog(e, fetchedData.id)}
                             >
                               {isReportLoading ? (
                                 <>
@@ -287,7 +281,7 @@ export default function IndividualSearch({ individuals, url }) {
                                   <span className="ml-2">processing..</span>
                                 </>
                               ) : (
-                                'View'
+                                "View"
                               )}
                             </button>
                           </td>
@@ -302,7 +296,7 @@ export default function IndividualSearch({ individuals, url }) {
                       <NotFound
                         handleShow={handleShow}
                         handleCloseModal={() => setNotFound(false)}
-                        userType={'Individual'}
+                        userType={"Individual"}
                         searchValue={data.searchValue}
                       />
                     )}

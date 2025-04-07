@@ -1,26 +1,21 @@
-import { Fragment, useCallback, useState } from 'react';
-import Drawer from 'react-bottom-drawer';
+import { Fragment, useCallback, useState } from "react";
+import Drawer from "react-bottom-drawer";
 
-export default function BottomDrawer({
-  trigger,
-  children,
-  isVisible,
-  setIsVisible,
-}) {
+export default function BottomDrawer({ trigger, children, isVisible, setIsVisible }) {
   const openDrawer = useCallback(() => {
-    const body = document.querySelector('body');
-    body.classList.add('drawer-toggled');
+    const body = document.querySelector("body");
+    body.classList.add("drawer-toggled");
     setIsVisible(true);
   }, []);
   const closeDrawer = useCallback(() => {
-    const body = document.querySelector('body');
-    body.classList.remove('drawer-toggled');
+    const body = document.querySelector("body");
+    body.classList.remove("drawer-toggled");
     setIsVisible(false);
   }, []);
 
   return (
     <Fragment>
-      <span style={{ cursor: 'pointer' }} onClick={openDrawer}>
+      <span style={{ cursor: "pointer" }} onClick={openDrawer}>
         {trigger}
       </span>
       <Drawer
@@ -34,7 +29,7 @@ export default function BottomDrawer({
           <i
             className="material-icons position-absolute top-0"
             onClick={closeDrawer}
-            style={{ cursor: 'pointer', right: '50%', fontSize: '50px' }}
+            style={{ cursor: "pointer", right: "50%", fontSize: "50px" }}
           >
             keyboard_arrow_down
           </i>

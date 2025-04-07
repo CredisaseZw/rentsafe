@@ -1,8 +1,8 @@
-import React from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import React from "react";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const DeleteUserConfirmation = ({
   url,
@@ -15,11 +15,11 @@ const DeleteUserConfirmation = ({
   setAllAgents,
 }) => {
   let data = {};
-  if (type === 'company') {
+  if (type === "company") {
     data = {
       company_id: userId,
     };
-  } else if (type === 'individual' || type === 'agent') {
+  } else if (type === "individual" || type === "agent") {
     data = {
       individual_id: userId,
     };
@@ -28,18 +28,18 @@ const DeleteUserConfirmation = ({
     axios
       .post(reverseUrl(url), { ...data })
       .then((response) => {
-        if (response.data.status === 'success') {
+        if (response.data.status === "success") {
           toast.success(`User ${name} deleted successfully`);
           setFetchedData((prev) => prev?.filter((user) => user.id !== userId));
           setAllAgents((prev) => prev?.filter((user) => user.id !== userId));
           handleClose();
         } else {
-          toast.error('Something went wrong! Please try again');
+          toast.error("Something went wrong! Please try again");
           handleClose();
         }
       })
       .catch((e) => {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
         handleClose();
       });
   };
@@ -48,17 +48,8 @@ const DeleteUserConfirmation = ({
     <div className="container-xl p-5">
       <div className="card card-raised">
         <div className="card-body p-4">
-          <Modal
-            show={show}
-            onHide={handleClose}
-            size="sm"
-            backdrop="static"
-            centered
-          >
-            <Modal.Header
-              closeButton
-              className="h4 bg-info text-white text-center text-uppercase"
-            >
+          <Modal show={show} onHide={handleClose} size="sm" backdrop="static" centered>
+            <Modal.Header closeButton className="h4 bg-info text-white text-center text-uppercase">
               <Modal.Title className="text-white">Delete User</Modal.Title>
             </Modal.Header>
             <Modal.Body className="p-4 d-flex justify-content-between align-items-center gap-4">

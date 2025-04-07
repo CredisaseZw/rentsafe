@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 export const CompanyVerify = ({
   show,
@@ -16,7 +16,7 @@ export const CompanyVerify = ({
   const [errors, setErrors] = useState({});
 
   const { data, setData, post, reset } = useForm({
-    otp: '',
+    otp: "",
     verification_type: verification_type,
   });
 
@@ -39,33 +39,32 @@ export const CompanyVerify = ({
   const handleOTPResend = async () => {
     setCanResend(false);
     try {
-      const response = await axios.get(reverseUrl('new_otp'));
-      if (response.data.status === 'success') {
-        toast.success('OTP sent successfully');
+      const response = await axios.get(reverseUrl("new_otp"));
+      if (response.data.status === "success") {
+        toast.success("OTP sent successfully");
       } else {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
       }
     } catch (err) {
-      toast.error('Something went wrong! Please try again');
+      toast.error("Something went wrong! Please try again");
     }
   };
 
-  const changeHandler = (e) =>
-    setData({ ...data, [e.target.id]: e.target.value });
+  const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
   const isOTPValid = () => {
     if (data.otp.length !== 4) {
-      setErrors({ otp: 'otp must be four digits' });
+      setErrors({ otp: "otp must be four digits" });
       return false;
     } else if (!Boolean(parseInt(data.otp, 10))) {
-      setErrors({ otp: 'otp must be a number' });
+      setErrors({ otp: "otp must be a number" });
       return false;
     }
     return true;
   };
 
   const handleSubmit = (e) => {
-    console.log('indi');
+    console.log("indi");
 
     e.preventDefault();
     if (isOTPValid()) {
@@ -76,7 +75,7 @@ export const CompanyVerify = ({
         onSuccess: (response) => {
           handleClose();
           reset();
-          toast.success('User verified successfully');
+          toast.success("User verified successfully");
           setIsLoading(false);
           // setShow(!show)
           // setCreditInfo(response.props.user);
@@ -84,7 +83,7 @@ export const CompanyVerify = ({
           window.location.reload();
         },
         onError: (e) => {
-          toast.error('Something went wrong! Please try again');
+          toast.error("Something went wrong! Please try again");
           setErrors(e);
           setIsLoading(false);
         },
@@ -114,8 +113,8 @@ export const CompanyVerify = ({
                 <div
                   className="card-body p-4"
                   style={{
-                    borderStyle: 'solid',
-                    borderColor: '#26a69a',
+                    borderStyle: "solid",
+                    borderColor: "#26a69a",
                   }}
                 >
                   <Modal.Body>
@@ -123,16 +122,14 @@ export const CompanyVerify = ({
                       <div className="col-md-12">
                         <div>
                           <p>
-                            {verification_type === 'individual'
+                            {verification_type === "individual"
                               ? "Enter the 4-digit code we sent to user's mobile number. This code will expire after 5 minutes"
                               : "Enter the 4-digit code we sent to user's email. This code will expire after 5 minutes"}
                           </p>
                         </div>
                         <div className="row">
                           <div className="col-md-6">
-                            <label className="form-label">
-                              Verification Code
-                            </label>
+                            <label className="form-label">Verification Code</label>
                             <input
                               value={data.otp}
                               onChange={changeHandler}
@@ -143,11 +140,7 @@ export const CompanyVerify = ({
                               className="form-control form-control-sm"
                             />
 
-                            {errors && (
-                              <div className="text-danger mt-1">
-                                {errors.otp}
-                              </div>
-                            )}
+                            {errors && <div className="text-danger mt-1">{errors.otp}</div>}
                           </div>
                         </div>
                       </div>
@@ -163,9 +156,7 @@ export const CompanyVerify = ({
                           </button>
                         </p>
                         {countdown > 0 && (
-                          <p className="text-success">
-                            {`Resend code in ${countdown} seconds`}
-                          </p>
+                          <p className="text-success">{`Resend code in ${countdown} seconds`}</p>
                         )}
                       </div>
                     </div>
@@ -183,7 +174,7 @@ export const CompanyVerify = ({
                           <span className="ml-2">processing..</span>
                         </>
                       ) : (
-                        'Verify'
+                        "Verify"
                       )}
                     </Button>
                   </Modal.Footer>

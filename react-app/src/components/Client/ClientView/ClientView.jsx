@@ -1,11 +1,11 @@
-import { Modal } from 'react-bootstrap';
-import AgedAnalysis from './AgedAnalysis.jsx';
-import DebtorIntelligence from './DebtorIntelligence.jsx';
-import ContactDetails from './ContactDetails.jsx';
-import ForecastInflows from './ForecastInflows.jsx';
-import CommunicationHistory from './CommunicationHistory.jsx';
-import { truncate } from 'lodash';
-import Payments from './Payments.jsx';
+import { Modal } from "react-bootstrap";
+import AgedAnalysis from "./AgedAnalysis.jsx";
+import DebtorIntelligence from "./DebtorIntelligence.jsx";
+import ContactDetails from "./ContactDetails.jsx";
+import ForecastInflows from "./ForecastInflows.jsx";
+import CommunicationHistory from "./CommunicationHistory.jsx";
+import { truncate } from "lodash";
+import Payments from "./Payments.jsx";
 
 export default function ClientView({
   clientViewProps: {
@@ -31,9 +31,7 @@ export default function ClientView({
         <Modal.Header className="p-0">
           <div className="w-100 p-2 text-center bg-info position-relative">
             <h4 className="text-white">
-              {isLoading || error || dontShowData
-                ? 'Client View'
-                : data.tenantName}
+              {isLoading || error || dontShowData ? "Client View" : data.tenantName}
             </h4>
 
             <button
@@ -50,10 +48,7 @@ export default function ClientView({
           <div className="position-relative custom-mn-h-5">
             {isLoading && (
               <div className="text-center position-absolute top-50 start-50 translate-middle">
-                <div
-                  className="spinner-border text-info spinner-border-md"
-                  role="status"
-                >
+                <div className="spinner-border text-info spinner-border-md" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
                 <p>Loading...please wait</p>
@@ -75,10 +70,7 @@ export default function ClientView({
                 <div className="row row-cols-3 align-items-stretch">
                   <div className="col p-1">
                     <AgedAnalysis data={data.agedAnalysis} />
-                    <DebtorIntelligence
-                      data={data.debtorIntelligence}
-                      clientId={clientId}
-                    />
+                    <DebtorIntelligence data={data.debtorIntelligence} clientId={clientId} />
                     <ContactDetails
                       data={data.contactDetails}
                       clientId={clientId}

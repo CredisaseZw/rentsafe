@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import toast, { Toaster } from 'react-hot-toast';
-import { MultipleUpload } from '../MultipleUpload.jsx';
-import { industries } from '../../constants/index.js';
-import axios from 'axios';
-import { userFriendlyErrorOrResponse } from '../../utils/index.js';
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import toast, { Toaster } from "react-hot-toast";
+import { MultipleUpload } from "../MultipleUpload.jsx";
+import { industries } from "../../constants/index.js";
+import axios from "axios";
+import { userFriendlyErrorOrResponse } from "../../utils/index.js";
 export const CompanyAdd = ({
   show,
   handleClose,
@@ -22,31 +22,29 @@ export const CompanyAdd = ({
   setFetchedData,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState('');
+  const [errors, setErrors] = useState("");
 
   const { data, setData, post, reset } = useForm({
-    registeredName: companyData ? companyData.registration_name : '',
-    tradingName: companyData ? companyData.trading_name : '',
-    branch: companyData ? companyData.branch : '',
-    companyRegistrationNumber: companyData
-      ? companyData.registration_number
-      : '',
-    registrationDate: companyData ? companyData.registration_date : '',
-    vatNumber: companyData ? companyData.vat_number : '',
-    currentAddress: companyData ? companyData.address : '',
-    landLine: companyData ? companyData.landline : '',
-    mobileNumber: companyData ? companyData.mobile_phone : '',
-    emailAddress: companyData ? companyData.email : '',
-    website: companyData ? companyData.website : '',
-    industry: companyData ? companyData.industry : '',
-    note: companyData ? companyData.note : '',
-    company_id: companyData ? companyData.id : '',
+    registeredName: companyData ? companyData.registration_name : "",
+    tradingName: companyData ? companyData.trading_name : "",
+    branch: companyData ? companyData.branch : "",
+    companyRegistrationNumber: companyData ? companyData.registration_number : "",
+    registrationDate: companyData ? companyData.registration_date : "",
+    vatNumber: companyData ? companyData.vat_number : "",
+    currentAddress: companyData ? companyData.address : "",
+    landLine: companyData ? companyData.landline : "",
+    mobileNumber: companyData ? companyData.mobile_phone : "",
+    emailAddress: companyData ? companyData.email : "",
+    website: companyData ? companyData.website : "",
+    industry: companyData ? companyData.industry : "",
+    note: companyData ? companyData.note : "",
+    company_id: companyData ? companyData.id : "",
     is_contracted: companyData ? companyData.is_client : false,
     is_gvt: companyData ? companyData.is_government : false,
-    pageType: pageType || '',
+    pageType: pageType || "",
   });
   const changeHandler = (e) => {
-    if (e.target.id === 'is_contracted' || e.target.id === 'is_gvt') {
+    if (e.target.id === "is_contracted" || e.target.id === "is_gvt") {
       setData({ ...data, [e.target.id]: e.target.checked });
     } else {
       setData({ ...data, [e.target.id]: e.target.value });
@@ -56,17 +54,15 @@ export const CompanyAdd = ({
   const handleEdit = (e) => {
     e.preventDefault();
     data.registeredName =
-      data.branch !== '' && !data.registeredName.split(' - ').at(-1)?.length
-        ? data.registeredName + ' - ' + data.branch
+      data.branch !== "" && !data.registeredName.split(" - ").at(-1)?.length
+        ? data.registeredName + " - " + data.branch
         : data.registeredName;
-    axios.post(reverseUrl('edit_company_user'), data).then((res) => {
-      if (res.data.status === 'success') {
+    axios.post(reverseUrl("edit_company_user"), data).then((res) => {
+      if (res.data.status === "success") {
         toast.success(userFriendlyErrorOrResponse(res));
         handleClose();
       } else {
-        toast.error(
-          res.data?.message || 'Something went wrong! Please try again'
-        );
+        toast.error(res.data?.message || "Something went wrong! Please try again");
         handleClose();
       }
     });
@@ -75,24 +71,22 @@ export const CompanyAdd = ({
   const handleSubmitIndividual = (e) => {
     e.preventDefault();
     data.registeredName =
-      data.branch !== ''
-        ? data.registeredName + ' - ' + data.branch
-        : data.registeredName;
+      data.branch !== "" ? data.registeredName + " - " + data.branch : data.registeredName;
     post(reverseUrl(url), {
       onStart: () => {
         setIsLoading(true);
-        setErrors('');
+        setErrors("");
       },
       onSuccess: (response) => {
         reset();
-        toast.success('Company creacted successfully');
+        toast.success("Company creacted successfully");
         setIsLoading(false);
         handleClose();
         // setAddSuccessful(true);
-        window.location.replace(reverseUrl('search_company_users'));
+        window.location.replace(reverseUrl("search_company_users"));
       },
       onError: (e) => {
-        toast.error('Something went wrong! Please try again');
+        toast.error("Something went wrong! Please try again");
         setErrors(e);
         setIsLoading(false);
       },
@@ -106,21 +100,17 @@ export const CompanyAdd = ({
           <Modal.Header
             closeButton
             className="card-header bg-transparent"
-            style={{ paddingLeft: '0px' }}
+            style={{ paddingLeft: "0px" }}
           >
             <div className="">
               <button
-                className={`btn  btn-sm ${
-                  isSingle ? 'btn-info text-white' : 'btn-light'
-                }`}
+                className={`btn  btn-sm ${isSingle ? "btn-info text-white" : "btn-light"}`}
                 onClick={handleSingle}
               >
                 Single
               </button>
               <button
-                className={`btn  btn-sm ${
-                  isMultiple ? 'btn-info text-white' : 'btn-light'
-                }`}
+                className={`btn  btn-sm ${isMultiple ? "btn-info text-white" : "btn-light"}`}
                 onClick={handleMultiple}
               >
                 Multiple
@@ -130,9 +120,9 @@ export const CompanyAdd = ({
           <div
             className="card-body"
             style={{
-              padding: '0px',
-              borderStyle: 'solid',
-              borderColor: '#26a69a',
+              padding: "0px",
+              borderStyle: "solid",
+              borderColor: "#26a69a",
             }}
           >
             {/* add individual company  */}
@@ -146,7 +136,7 @@ export const CompanyAdd = ({
                     >
                       <div className="me-4">
                         <h2 className="display-6 mb-0 text-white">
-                          {action === 'create' ? 'Add Company' : 'Edit Company'}
+                          {action === "create" ? "Add Company" : "Edit Company"}
                         </h2>
                         <div className="card-text"></div>
                       </div>
@@ -157,16 +147,14 @@ export const CompanyAdd = ({
                     <div className="card">
                       <div
                         className="card-header bg-info px-4"
-                        style={{ paddingTop: '2px', paddingBottom: '2px' }}
+                        style={{ paddingTop: "2px", paddingBottom: "2px" }}
                       >
                         <div
                           className="d-flex justify-content-center
                             align-items-center"
                         >
                           <div className="me-4">
-                            <h6 className="display-6 mb-0 text-white">
-                              Company details
-                            </h6>
+                            <h6 className="display-6 mb-0 text-white">Company details</h6>
                             <div className="card-text"></div>
                           </div>
                         </div>
@@ -174,23 +162,21 @@ export const CompanyAdd = ({
                       <div
                         className="card-body p-4"
                         style={{
-                          borderStyle: 'solid',
-                          borderColor: '#26a69a',
+                          borderStyle: "solid",
+                          borderColor: "#26a69a",
                         }}
                       >
                         <Modal.Body>
                           <h5
                             style={{
-                              backgroundColor: '#dda196',
-                              padding: '5px 10px',
-                              textAlign: 'center',
-                              borderRadius: '5px',
+                              backgroundColor: "#dda196",
+                              padding: "5px 10px",
+                              textAlign: "center",
+                              borderRadius: "5px",
                             }}
                           >
-                            <span className="fw-bold">Note</span>: All fields
-                            marked with a star (
-                            <span className="text-danger">*</span>) are
-                            required.
+                            <span className="fw-bold">Note</span>: All fields marked with a star (
+                            <span className="text-danger">*</span>) are required.
                           </h5>
                           <div className="row">
                             <div className="col-md-12  my-4">
@@ -211,9 +197,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.registeredName}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.registeredName}</div>
                                   )}
                                 </div>
 
@@ -233,9 +217,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.tradingName}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.tradingName}</div>
                                   )}
                                 </div>
                                 <div className="col-md-4">
@@ -254,9 +236,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.branch}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.branch}</div>
                                   )}
                                 </div>
                               </div>
@@ -266,9 +246,7 @@ export const CompanyAdd = ({
                             <div className="col-md-12">
                               <div className="row">
                                 <div className="col-md-4">
-                                  <label className="form-label">
-                                    Registration Number
-                                  </label>
+                                  <label className="form-label">Registration Number</label>
                                   <input
                                     value={data.companyRegistrationNumber}
                                     onChange={changeHandler}
@@ -285,9 +263,7 @@ export const CompanyAdd = ({
                                   )}
                                 </div>
                                 <div className="col-md-4">
-                                  <label className="form-label">
-                                    Registration Date
-                                  </label>
+                                  <label className="form-label">Registration Date</label>
                                   <input
                                     value={data.registrationDate}
                                     onChange={changeHandler}
@@ -304,9 +280,7 @@ export const CompanyAdd = ({
                                 </div>
 
                                 <div className="col-md-4">
-                                  <label className="form-label">
-                                    VAT Number
-                                  </label>
+                                  <label className="form-label">VAT Number</label>
                                   <input
                                     value={data.vatNumber}
                                     onChange={changeHandler}
@@ -317,9 +291,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.vatNumber}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.vatNumber}</div>
                                   )}
                                 </div>
                               </div>
@@ -345,15 +317,11 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.currentAddress}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.currentAddress}</div>
                                   )}
                                 </div>
                                 <div className="col-md-4">
-                                  <label className="form-label">
-                                    LandLine Phone
-                                  </label>
+                                  <label className="form-label">LandLine Phone</label>
                                   <input
                                     value={data.landLine}
                                     onChange={changeHandler}
@@ -364,16 +332,12 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.landLine}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.landLine}</div>
                                   )}
                                 </div>
 
                                 <div className="col-md-4">
-                                  <label className="form-label">
-                                    Mobile Number
-                                  </label>
+                                  <label className="form-label">Mobile Number</label>
                                   <input
                                     value={data.mobileNumber}
                                     onChange={changeHandler}
@@ -383,9 +347,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.mobileNumber}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.mobileNumber}</div>
                                   )}
                                 </div>
                               </div>
@@ -410,9 +372,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.emailAddress}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.emailAddress}</div>
                                   )}
                                 </div>
                                 <div className="col-md-4">
@@ -427,9 +387,7 @@ export const CompanyAdd = ({
                                     className="form-control form-control-sm"
                                   />
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.website}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.website}</div>
                                   )}
                                 </div>
 
@@ -451,14 +409,10 @@ export const CompanyAdd = ({
                                     ))}
                                   </select>
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.industry}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.industry}</div>
                                   )}
                                   {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.industry}
-                                    </div>
+                                    <div className="text-danger mt-1">{errors.industry}</div>
                                   )}
                                 </div>
                               </div>
@@ -468,9 +422,7 @@ export const CompanyAdd = ({
                             <div className="col-md-12">
                               <div className="row">
                                 <div className="col-md-4 d-flex gap-2">
-                                  <label className="form-label">
-                                    Government Org
-                                  </label>
+                                  <label className="form-label">Government Org</label>
                                   <input
                                     type="checkbox"
                                     name="is_gvt"
@@ -502,11 +454,7 @@ export const CompanyAdd = ({
                                     placeholder="Write your additional note here..."
                                     className="form-control form-control-sm"
                                   />
-                                  {errors && (
-                                    <div className="text-danger mt-1">
-                                      {errors.note}
-                                    </div>
-                                  )}
+                                  {errors && <div className="text-danger mt-1">{errors.note}</div>}
                                 </div>
                               </div>
                             </div>
@@ -516,11 +464,7 @@ export const CompanyAdd = ({
                           <Button
                             className="text-white"
                             variant="info"
-                            onClick={
-                              action === 'create'
-                                ? handleSubmitIndividual
-                                : handleEdit
-                            }
+                            onClick={action === "create" ? handleSubmitIndividual : handleEdit}
                             disabled={isLoading}
                           >
                             {isLoading ? (
@@ -529,7 +473,7 @@ export const CompanyAdd = ({
                                 <span className="ml-2">processing..</span>
                               </>
                             ) : (
-                              'Save and Proceed'
+                              "Save and Proceed"
                             )}
                           </Button>
                           {/* <Button variant="secondary" onClick={handleClose}>
@@ -542,15 +486,11 @@ export const CompanyAdd = ({
                 </div>
               </div>
             ) : (
-              ''
+              ""
             )}
 
             {/* upload bulk company */}
-            {isMultiple ? (
-              <MultipleUpload type="company" actionType={'user'} />
-            ) : (
-              ''
-            )}
+            {isMultiple ? <MultipleUpload type="company" actionType={"user"} /> : ""}
           </div>
         </div>
       </Modal>

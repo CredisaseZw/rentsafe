@@ -1,7 +1,7 @@
-import ClientSidebar from '../../ClientSidebar.jsx';
-import React, { useState } from 'react';
-import { Head, Link, usePage } from '@inertiajs/inertia-react';
-import CustomToaster from '../../CustomToaster.jsx';
+import ClientSidebar from "../../ClientSidebar.jsx";
+import React, { useState } from "react";
+import { Head, Link, usePage } from "@inertiajs/inertia-react";
+import CustomToaster from "../../CustomToaster.jsx";
 
 const Layout = ({ children, title }) => {
   const { Auth } = usePage().props;
@@ -10,9 +10,9 @@ const Layout = ({ children, title }) => {
   const handleClick = () => setToggle((prev) => !prev);
 
   if (toggle) {
-    document.body.classList.add('drawer-toggled');
+    document.body.classList.add("drawer-toggled");
   } else {
-    document.body.classList.remove('drawer-toggled');
+    document.body.classList.remove("drawer-toggled");
   }
 
   return (
@@ -33,10 +33,7 @@ const Layout = ({ children, title }) => {
             </button>
 
             <Link className="navbar-brand me-auto" to="/">
-              <div
-                className="font-monospace"
-                style={{ fontWeight: 'bold', fontSize: '20px' }}
-              >
+              <div className="font-monospace" style={{ fontWeight: "bold", fontSize: "20px" }}>
                 CrediSafe
               </div>
             </Link>
@@ -45,9 +42,7 @@ const Layout = ({ children, title }) => {
               <ul className="navbar-nav d-none d-lg-flex">
                 <li className="nav-item">
                   <Link className="nav-link" href="#">
-                    {Auth?.company.company_name
-                      ? Auth.company.company_name
-                      : ''}
+                    {Auth?.company.company_name ? Auth.company.company_name : ""}
                   </Link>
                 </li>
               </ul>
@@ -68,28 +63,19 @@ const Layout = ({ children, title }) => {
                     aria-labelledby="dropdownMenuProfile"
                   >
                     <li>
-                      <a
-                        className="dropdown-item mdc-ripple-upgraded"
-                        href="/client-profile"
-                      >
+                      <a className="dropdown-item mdc-ripple-upgraded" href="/client-profile">
                         <i className="material-icons leading-icon">person</i>
                         <div className="me-3">Profile</div>
                       </a>
                     </li>
                     <li>
-                      <a
-                        className="dropdown-item mdc-ripple-upgraded"
-                        href="/update-password"
-                      >
+                      <a className="dropdown-item mdc-ripple-upgraded" href="/update-password">
                         <i className="material-icons leading-icon">settings</i>
                         <div className="me-3">Settings</div>
                       </a>
                     </li>
                     <li>
-                      <a
-                        className="dropdown-item mdc-ripple-upgraded"
-                        href="#!"
-                      >
+                      <a className="dropdown-item mdc-ripple-upgraded" href="#!">
                         <i className="material-icons leading-icon">help</i>
                         <div className="me-3">Help</div>
                       </a>
@@ -98,10 +84,7 @@ const Layout = ({ children, title }) => {
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <a
-                        className="dropdown-item mdc-ripple-upgraded"
-                        href={reverseUrl('logout')}
-                      >
+                      <a className="dropdown-item mdc-ripple-upgraded" href={reverseUrl("logout")}>
                         <i className="material-icons leading-icon">logout</i>
                         <div className="me-3">Logout</div>
                       </a>
@@ -119,11 +102,7 @@ const Layout = ({ children, title }) => {
           <div id="layoutDrawer_content">
             <div className="p-4">{children}</div>
 
-            <footer
-              id="footer"
-              className="py-4 border-top"
-              style={{ minHeight: '74px' }}
-            >
+            <footer id="footer" className="py-4 border-top" style={{ minHeight: "74px" }}>
               <div className="container-xl px-5">
                 <div className="d-flex flex-column flex-sm-row align-items-center justify-content-sm-between small">
                   <div className="me-sm-2">Copyright © Credit Safe 2023</div>

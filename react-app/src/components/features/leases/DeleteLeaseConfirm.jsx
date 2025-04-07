@@ -1,19 +1,15 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
 
 const DeleteLeaseConfirm = ({ show, handleClose }) => {
   return (
     <div className="container-xl p-5">
       <div className="card card-raised">
         <div className="card-body p-4">
-          <Modal
-            show={show}
-            onHide={handleClose}
-            size="md"
-            backdrop="static"
-            centered
-          >
-            <Modal.Header closeButton className="h4 bg-info text-white text-center text-uppercase">Confirm Termination of Lease</Modal.Header>
+          <Modal show={show} onHide={handleClose} size="md" backdrop="static" centered>
+            <Modal.Header closeButton className="h4 bg-info text-white text-center text-uppercase">
+              Confirm Termination of Lease
+            </Modal.Header>
             <Modal.Body className="p-4 d-flex justify-content-between align-items-center gap-4">
               <p className="my-3 text-center">
                 Are you sure you want to terminate this lease? This action cannot be undone.

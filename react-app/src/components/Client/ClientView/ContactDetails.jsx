@@ -1,22 +1,10 @@
-import { truncate } from 'lodash';
-import useContactDetails from '../../../hooks/component-hooks/useContactDetails.js';
-import SectionSkeleton from './SectionSkeleton.jsx';
+import { truncate } from "lodash";
+import useContactDetails from "../../../hooks/component-hooks/useContactDetails.js";
+import SectionSkeleton from "./SectionSkeleton.jsx";
 
-export default function ContactDetails({
-  data: initialData,
-  clientId,
-  isCreditorView,
-  leaseId,
-}) {
-  const {
-    data,
-    isEditMode,
-    handleSave,
-    setIsEditMode,
-    error,
-    setError,
-    isLoading,
-  } = useContactDetails(initialData, clientId, isCreditorView, leaseId);
+export default function ContactDetails({ data: initialData, clientId, isCreditorView, leaseId }) {
+  const { data, isEditMode, handleSave, setIsEditMode, error, setError, isLoading } =
+    useContactDetails(initialData, clientId, isCreditorView, leaseId);
 
   return (
     <SectionSkeleton title="contact details">
@@ -25,7 +13,7 @@ export default function ContactDetails({
           <p className="d-flex align-items-start px-2 gap-1 small text-danger">
             <button
               type="button"
-              onClick={() => setError('')}
+              onClick={() => setError("")}
               className="btn-close btn-sm"
             ></button>
 
@@ -46,9 +34,7 @@ export default function ContactDetails({
                 id="firstname"
                 disabled={isLoading}
                 defaultValue={
-                  data && data.contactPerson
-                    ? data.contactPerson.trim().split(' ')[0]
-                    : ''
+                  data && data.contactPerson ? data.contactPerson.trim().split(" ")[0] : ""
                 }
               />
             </div>
@@ -64,9 +50,7 @@ export default function ContactDetails({
                 id="surname"
                 disabled={isLoading}
                 defaultValue={
-                  data && data.contactPerson
-                    ? data.contactPerson.trim().split(' ')[1]
-                    : ''
+                  data && data.contactPerson ? data.contactPerson.trim().split(" ")[1] : ""
                 }
               />
             </div>
@@ -81,7 +65,7 @@ export default function ContactDetails({
                 name="sms_number"
                 id="sms_number"
                 disabled={isLoading}
-                defaultValue={data && data.smsNumber ? data.smsNumber : ''}
+                defaultValue={data && data.smsNumber ? data.smsNumber : ""}
               />
             </div>
 
@@ -95,9 +79,7 @@ export default function ContactDetails({
                 name="other_numbers"
                 id="other_numbers"
                 disabled={isLoading}
-                defaultValue={
-                  data && data.otherNumbers ? data.otherNumbers : ''
-                }
+                defaultValue={data && data.otherNumbers ? data.otherNumbers : ""}
               />
             </div>
 
@@ -111,9 +93,7 @@ export default function ContactDetails({
                 name="email_address"
                 id="email_address"
                 disabled={isLoading}
-                defaultValue={
-                  data && data.emailAddress ? data.emailAddress : ''
-                }
+                defaultValue={data && data.emailAddress ? data.emailAddress : ""}
               />
             </div>
 
@@ -127,7 +107,7 @@ export default function ContactDetails({
                 name="address"
                 id="address"
                 disabled={isLoading}
-                defaultValue={data && data.address ? data.address : ''}
+                defaultValue={data && data.address ? data.address : ""}
               />
             </div>
 
@@ -136,34 +116,34 @@ export default function ContactDetails({
               type="submit"
               className="d-block btn btn-info text-white w-100 mt-3"
             >
-              {isLoading ? 'Saving...' : 'Save'}
+              {isLoading ? "Saving..." : "Save"}
             </button>
           </form>
         ) : (
           <div>
             <div className="d-flex gap-2 py-1 px-2 border-bottom custom-bg-whitesmoke">
-              <div style={{ width: '40%' }}>Contact Person: </div>
-              <div style={{ width: '60%' }}>{data.contactPerson}</div>
+              <div style={{ width: "40%" }}>Contact Person: </div>
+              <div style={{ width: "60%" }}>{data.contactPerson}</div>
             </div>
 
             <div className="d-flex gap-2 py-1 px-2 border-bottom">
-              <div style={{ width: '40%' }}>SMS Number: </div>
-              <div style={{ width: '60%' }}>{data.smsNumber}</div>
+              <div style={{ width: "40%" }}>SMS Number: </div>
+              <div style={{ width: "60%" }}>{data.smsNumber}</div>
             </div>
 
             <div className="d-flex gap-2 py-1 px-2 border-bottom custom-bg-whitesmoke">
-              <div style={{ width: '40%' }}>Other Numbers: </div>
-              <div style={{ width: '60%' }}>{data.otherNumbers}</div>
+              <div style={{ width: "40%" }}>Other Numbers: </div>
+              <div style={{ width: "60%" }}>{data.otherNumbers}</div>
             </div>
 
             <div className="d-flex gap-2 py-1 px-2 border-bottom">
-              <div style={{ width: '40%' }}>Email Address: </div>
-              <div style={{ width: '60%' }}>{data.emailAddress}</div>
+              <div style={{ width: "40%" }}>Email Address: </div>
+              <div style={{ width: "60%" }}>{data.emailAddress}</div>
             </div>
 
             <div className="d-flex gap-2 py-1 px-2 border-bottom custom-bg-whitesmoke">
-              <div style={{ width: '40%' }}>Address: </div>
-              <div style={{ width: '60%' }}>{data.address}</div>
+              <div style={{ width: "40%" }}>Address: </div>
+              <div style={{ width: "60%" }}>{data.address}</div>
             </div>
 
             <div className="mt-4 px-2">

@@ -1,17 +1,17 @@
-import { useForm } from '@inertiajs/inertia-react';
-import { capitalize } from 'lodash';
-import toast from 'react-hot-toast';
+import { useForm } from "@inertiajs/inertia-react";
+import { capitalize } from "lodash";
+import toast from "react-hot-toast";
 
 export default function useUserForm(user, url, action, closeModal) {
   const { errors, data, processing, setData, post, put } = useForm({
-    firstName: user.firstName || '',
-    lastName: user.lastName || '',
-    identificationNumber: user.identificationNumber || '',
-    identificationType: user.identificationType || '',
-    mobileNumber: user.mobile || '',
-    userEmail: user.email || '',
-    accessLevel: user.access_level || '',
-    address: user.address || '',
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    identificationNumber: user.identificationNumber || "",
+    identificationType: user.identificationType || "",
+    mobileNumber: user.mobile || "",
+    userEmail: user.email || "",
+    accessLevel: user.access_level || "",
+    address: user.address || "",
     userId: user.userId || -1,
   });
 
@@ -45,7 +45,7 @@ export default function useUserForm(user, url, action, closeModal) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (action === 'add') handleAdd();
+    if (action === "add") handleAdd();
     else handleEdit();
   }
 

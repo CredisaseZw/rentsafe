@@ -1,4 +1,4 @@
-import { Modal } from 'react-bootstrap';
+import { Modal } from "react-bootstrap";
 
 export default function MessageModal({
   show,
@@ -10,13 +10,7 @@ export default function MessageModal({
   actionButtons,
 }) {
   return (
-    <Modal
-      show={show}
-      onHide={handleClose}
-      size={size || 'md'}
-      backdrop={backdrop}
-      centered
-    >
+    <Modal show={show} onHide={handleClose} size={size || "md"} backdrop={backdrop} centered>
       <Modal.Header>
         <div className="w-100 p-3 position-relative">
           <h4 className="text-center">{title}</h4>

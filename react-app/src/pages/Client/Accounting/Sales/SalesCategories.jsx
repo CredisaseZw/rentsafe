@@ -1,8 +1,8 @@
-import ContentModal from '../../../../components/ContentModal.jsx';
-import Layout from '../../../../components/Layouts/client/Layout.jsx';
-import MessageModal from '../../../../components/MessageModal.jsx';
-import useSalesCategories from '../../../../hooks/page-hooks/useSalesCategories.js';
-import { friendlyDate } from '../../../../utils/index.js';
+import ContentModal from "../../../../components/ContentModal.jsx";
+import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import MessageModal from "../../../../components/MessageModal.jsx";
+import useSalesCategories from "../../../../hooks/page-hooks/useSalesCategories.js";
+import { friendlyDate } from "../../../../utils/index.js";
 
 export default function SalesCategories() {
   const {
@@ -39,12 +39,7 @@ export default function SalesCategories() {
         }
       />
 
-      <ContentModal
-        show={showAdd}
-        handleClose={handleClose}
-        title="Add Category"
-        size="md"
-      >
+      <ContentModal show={showAdd} handleClose={handleClose} title="Add Category" size="md">
         <form className="px-4 pb-5" onSubmit={handleAddCategory}>
           <div className="c-bg-light p-1 mb-3 text-center">Sales Category</div>
 
@@ -53,45 +48,26 @@ export default function SalesCategories() {
               <label htmlFor="code" className="text-center w-100 form-label">
                 Code
               </label>
-              <input
-                type="text"
-                className="form-control"
-                id="code"
-                name="code"
-                required
-              />
+              <input type="text" className="form-control" id="code" name="code" required />
             </div>
 
             <div>
-              <label
-                htmlFor="category"
-                className="text-center w-100 form-label"
-              >
+              <label htmlFor="category" className="text-center w-100 form-label">
                 Category
               </label>
-              <input
-                type="text"
-                className="form-control"
-                id="category"
-                name="name"
-                required
-              />
+              <input type="text" className="form-control" id="category" name="name" required />
             </div>
           </div>
 
           <div className="mt-5 text-center">
-            <button
-              disabled={loading}
-              type="submit"
-              className="btn btn-primary"
-            >
+            <button disabled={loading} type="submit" className="btn btn-primary">
               {loading ? (
                 <>
                   <span className="spinner-grow spinner-grow-sm"></span>
                   <span className="d-inline-block ms-2">Saving..</span>
                 </>
               ) : (
-                'Save'
+                "Save"
               )}
             </button>
           </div>
@@ -163,6 +139,4 @@ export default function SalesCategories() {
   );
 }
 
-SalesCategories.layout = (page) => (
-  <Layout children={page} title={'Sales Categories'} />
-);
+SalesCategories.layout = (page) => <Layout children={page} title={"Sales Categories"} />;

@@ -1,7 +1,7 @@
-import NavLink from './NavLink.jsx';
-import useClientSidebar from '../hooks/component-hooks/useClientSidebar.js';
-import { clientSidebarNavigation as navLinks } from '../constants/clientSidebarNavigation.jsx';
-import { Link } from '@inertiajs/inertia-react';
+import NavLink from "./NavLink.jsx";
+import useClientSidebar from "../hooks/component-hooks/useClientSidebar.js";
+import { clientSidebarNavigation as navLinks } from "../constants/clientSidebarNavigation.jsx";
+import { Link } from "@inertiajs/inertia-react";
 
 export default function ClientSidebar() {
   const {
@@ -16,10 +16,7 @@ export default function ClientSidebar() {
   } = useClientSidebar();
 
   return (
-    <div
-      id="layoutDrawer_nav"
-      className="bg-info border-end c-border-info-dark"
-    >
+    <div id="layoutDrawer_nav" className="bg-info border-end c-border-info-dark">
       <nav className="drawer border-0">
         <div className="drawer-menu pt-4">
           <div className="h-100 d-flex flex-column justify-content-between">
@@ -42,8 +39,8 @@ export default function ClientSidebar() {
 
             <div>
               <Link
-                className={`d-flex gap-2 c-new-nav-link c-level-1  ${isProfileActive ? 'c-new-nav-link-active' : ''}`}
-                href={reverseUrl('cl-change-password')}
+                className={`d-flex gap-2 c-new-nav-link c-level-1  ${isProfileActive ? "c-new-nav-link-active" : ""}`}
+                href={reverseUrl("cl-change-password")}
                 onClick={() => {
                   incrementKey();
                   makeActive(profileId);

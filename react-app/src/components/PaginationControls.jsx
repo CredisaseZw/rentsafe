@@ -1,5 +1,5 @@
-import { Pagination } from 'react-bootstrap';
-import usePaginationControls from '../hooks/component-hooks/usePaginationControls.js';
+import { Pagination } from "react-bootstrap";
+import usePaginationControls from "../hooks/component-hooks/usePaginationControls.js";
 
 export default function PaginationControls({ currentPage, totalPages }) {
   const { pageNums, changePage } = usePaginationControls(totalPages);
@@ -25,7 +25,7 @@ export default function PaginationControls({ currentPage, totalPages }) {
           <Pagination.Item
             key={num}
             active={num === currentPage}
-            className={'custom-z-0 ' + (num === currentPage ? 'active' : '')}
+            className={"custom-z-0 " + (num === currentPage ? "active" : "")}
             onClick={() => changePage(num)}
           >
             {num}

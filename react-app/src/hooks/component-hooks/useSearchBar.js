@@ -1,5 +1,5 @@
-import { useForm, usePage } from '@inertiajs/inertia-react';
-import { useRef } from 'react';
+import { useForm, usePage } from "@inertiajs/inertia-react";
+import { useRef } from "react";
 
 export default function useSearchBar(searchBy) {
   const { url: urlProp } = usePage();
@@ -18,14 +18,14 @@ export default function useSearchBar(searchBy) {
       url.searchParams.delete(searchBy);
     }
 
-    url.searchParams.delete('page');
+    url.searchParams.delete("page");
     get(url.href, { preserveState: true });
   }
 
   function clear() {
     const url = new URL(urlProp);
     url.searchParams.delete(searchBy);
-    url.searchParams.delete('page');
+    url.searchParams.delete("page");
     get(url.href, { preserveState: false });
   }
 

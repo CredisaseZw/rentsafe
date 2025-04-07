@@ -1,7 +1,7 @@
-import { MultipleUpload } from '../MultipleUpload.jsx';
-import { industries } from '../../constants/index.js';
-import useCompanyAdd from '../../hooks/modal-hooks/useCompanyAdd.js';
-import ContentModal from '../ContentModal.jsx';
+import { MultipleUpload } from "../MultipleUpload.jsx";
+import { industries } from "../../constants/index.js";
+import useCompanyAdd from "../../hooks/modal-hooks/useCompanyAdd.js";
+import ContentModal from "../ContentModal.jsx";
 
 export const CompanyAdd = ({
   show,
@@ -15,10 +15,14 @@ export const CompanyAdd = ({
   companyData,
   setFetchedData,
 }) => {
-  const { data, errors, isLoading, handleEdit, changeHandler, submitSingle } =
-    useCompanyAdd(url, companyData, handleClose, setFetchedData);
+  const { data, errors, isLoading, handleEdit, changeHandler, submitSingle } = useCompanyAdd(
+    url,
+    companyData,
+    handleClose,
+    setFetchedData
+  );
 
-  const activeTab = isSingle ? 'single' : isMultiple ? 'multiple' : '';
+  const activeTab = isSingle ? "single" : isMultiple ? "multiple" : "";
 
   return (
     <ContentModal
@@ -28,13 +32,13 @@ export const CompanyAdd = ({
       titleOverideContent={
         <div className="d-flex gap-2">
           <button
-            className={`btn btn-sm ${activeTab === 'single' ? 'btn-info text-white' : 'btn-light border border-2'}`}
+            className={`btn btn-sm ${activeTab === "single" ? "btn-info text-white" : "btn-light border border-2"}`}
             onClick={handleSingle}
           >
             Single
           </button>
           <button
-            className={`btn btn-sm ${activeTab === 'multiple' ? 'btn-info text-white' : 'btn-light border border-2'}`}
+            className={`btn btn-sm ${activeTab === "multiple" ? "btn-info text-white" : "btn-light border border-2"}`}
             onClick={handleMultiple}
           >
             Multiple
@@ -42,17 +46,14 @@ export const CompanyAdd = ({
         </div>
       }
     >
-      <div style={{ minHeight: '600px' }} className="p-3">
-        {activeTab === 'single' ? (
-          <form onSubmit={action === 'create' ? submitSingle : handleEdit}>
+      <div style={{ minHeight: "600px" }} className="p-3">
+        {activeTab === "single" ? (
+          <form onSubmit={action === "create" ? submitSingle : handleEdit}>
             <fieldset className="p-4 mb-4">
-              <legend>
-                {action === 'create' ? 'Add Company' : 'Edit Company'}
-              </legend>
+              <legend>{action === "create" ? "Add Company" : "Edit Company"}</legend>
 
               <p className="text-center fw-bold">
-                All fields marked with a star (
-                <span className="text-danger">*</span>) are required.
+                All fields marked with a star (<span className="text-danger">*</span>) are required.
               </p>
 
               <div className="row row-cols-3 mb-4">
@@ -72,9 +73,7 @@ export const CompanyAdd = ({
                   />
 
                   {!errors?.registeredName && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.registeredName}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.registeredName}</div>
                   )}
                 </div>
 
@@ -93,9 +92,7 @@ export const CompanyAdd = ({
                     className="form-control"
                   />
                   {errors?.tradingName && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.tradingName}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.tradingName}</div>
                   )}
                 </div>
 
@@ -111,9 +108,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.branch && (
-                    <div className="px-2 small text-danger mt-1">
-                      {errors.branch}
-                    </div>
+                    <div className="px-2 small text-danger mt-1">{errors.branch}</div>
                   )}
                 </div>
               </div>
@@ -151,9 +146,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors.registrationDate && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.registrationDate}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.registrationDate}</div>
                   )}
                 </div>
 
@@ -170,9 +163,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.vatNumber && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.vatNumber}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.vatNumber}</div>
                   )}
                 </div>
               </div>
@@ -191,9 +182,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.tinNumber && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.tinNumber}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.tinNumber}</div>
                   )}
                 </div>
 
@@ -214,9 +203,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.currentAddress && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.currentAddress}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.currentAddress}</div>
                   )}
                 </div>
 
@@ -234,9 +221,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.landLine && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.landLine}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.landLine}</div>
                   )}
                 </div>
               </div>
@@ -256,9 +241,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.mobileNumber && (
-                    <div className="px-2 small text-danger mt-1">
-                      {errors.mobileNumber}
-                    </div>
+                    <div className="px-2 small text-danger mt-1">{errors.mobileNumber}</div>
                   )}
                 </div>
 
@@ -280,9 +263,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.emailAddress && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.emailAddress}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.emailAddress}</div>
                   )}
                 </div>
 
@@ -300,9 +281,7 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.website && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.website}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.website}</div>
                   )}
                 </div>
               </div>
@@ -328,9 +307,7 @@ export const CompanyAdd = ({
                   </select>
 
                   {errors?.industry && (
-                    <div className="small px-2 text-danger mt-1">
-                      {errors.industry}
-                    </div>
+                    <div className="small px-2 text-danger mt-1">{errors.industry}</div>
                   )}
                 </div>
 
@@ -362,34 +339,26 @@ export const CompanyAdd = ({
                     className="form-control"
                   />
 
-                  {errors?.note && (
-                    <div className="px-2 small text-danger mt-1">
-                      {errors.note}
-                    </div>
-                  )}
+                  {errors?.note && <div className="px-2 small text-danger mt-1">{errors.note}</div>}
                 </div>
               </div>
             </fieldset>
 
             <div className="text-end">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="btn btn-info text-white"
-              >
+              <button type="submit" disabled={isLoading} className="btn btn-info text-white">
                 {isLoading ? (
                   <>
                     <span className="spinner-grow spinner-grow-sm"></span>
                     <span className="ms-2">processing..</span>
                   </>
                 ) : (
-                  'Save and Proceed'
+                  "Save and Proceed"
                 )}
               </button>
             </div>
           </form>
         ) : (
-          <MultipleUpload type={'company'} actionType={'user'} />
+          <MultipleUpload type={"company"} actionType={"user"} />
         )}
       </div>
     </ContentModal>

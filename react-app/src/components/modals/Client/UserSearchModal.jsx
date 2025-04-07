@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Modal } from 'react-bootstrap';
-import CustomAsyncSelect from '../../CustomAsyncSelect.jsx';
+import { useState } from "react";
+import { Modal } from "react-bootstrap";
+import CustomAsyncSelect from "../../CustomAsyncSelect.jsx";
 
 export default function UserSearchModal({ show, handleClose, handleProceed }) {
   const [user, setUser] = useState();
@@ -11,7 +11,7 @@ export default function UserSearchModal({ show, handleClose, handleProceed }) {
       firstName: res.firstname,
       lastName: res.surname,
       identificationNumber: res.national_id,
-      identificationType: 'nationalid',
+      identificationType: "nationalid",
       // email: 'client@client.com',
       // mobile: '263779586059',
       // address: '2312 Chiredzi',
@@ -20,13 +20,7 @@ export default function UserSearchModal({ show, handleClose, handleProceed }) {
   }
 
   return (
-    <Modal
-      size="md"
-      backdrop="static"
-      centered
-      show={show}
-      onHide={handleClose}
-    >
+    <Modal size="md" backdrop="static" centered show={show} onHide={handleClose}>
       <Modal.Header closeButton className="bg-info">
         <h3 className="mb-0 text-white">Add Internal User</h3>
       </Modal.Header>
@@ -37,16 +31,15 @@ export default function UserSearchModal({ show, handleClose, handleProceed }) {
             <CustomAsyncSelect
               onChange={(res) => handleUserChange(res)}
               extraProps={{
-                className: 'flex-grow-1',
-                placeholder: 'ID number or full name...',
+                className: "flex-grow-1",
+                placeholder: "ID number or full name...",
               }}
               useAlternateFetchOptions={{
-                type: 'individual',
+                type: "individual",
               }}
               noOptionsMessage={() => (
                 <p className="m-0 text-center">
-                  No search results found. Please add this individual's details
-                  by clicking
+                  No search results found. Please add this individual's details by clicking
                   <br />
                   <button
                     type="button"

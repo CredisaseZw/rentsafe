@@ -1,4 +1,4 @@
-import useSearchBar from '../hooks/component-hooks/useSearchBar';
+import useSearchBar from "../hooks/component-hooks/useSearchBar";
 
 export default function SearchBar({ searchBy, placeholder }) {
   const { defaultValue, handleSearch, clear, formRef } = useSearchBar(searchBy);
@@ -6,11 +6,7 @@ export default function SearchBar({ searchBy, placeholder }) {
   return (
     <form onSubmit={handleSearch} ref={formRef}>
       <div className="input-group">
-        <button
-          type="button"
-          className="btn border bg-white border-2 custom-z-0"
-          onClick={clear}
-        >
+        <button type="button" className="btn border bg-white border-2 custom-z-0" onClick={clear}>
           <i className="material-icons small">close</i>
         </button>
         <input

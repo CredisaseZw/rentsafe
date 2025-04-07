@@ -1,6 +1,6 @@
-import { Modal } from 'react-bootstrap';
-import useCommissionStatementsSelection from '../hooks/modal-hooks/useCommissionStatementsSelection.js';
-import { activeTrackableClientNavLinks as NAV_LINKS } from '../constants';
+import { Modal } from "react-bootstrap";
+import useCommissionStatementsSelection from "../hooks/modal-hooks/useCommissionStatementsSelection.js";
+import { activeTrackableClientNavLinks as NAV_LINKS } from "../constants";
 
 export default function CommissionStatementsSelection({
   btnText,
@@ -20,7 +20,7 @@ export default function CommissionStatementsSelection({
   } = useCommissionStatementsSelection();
 
   function closeModal() {
-    if (makeActive) makeActive('use-last-last');
+    if (makeActive) makeActive("use-last-last");
     hookCloseModal();
   }
 
@@ -34,7 +34,7 @@ export default function CommissionStatementsSelection({
           if (makeActive && id) makeActive(id);
         }}
       >
-        {btnText || 'Commission Statements'}
+        {btnText || "Commission Statements"}
       </a>
 
       <Modal
@@ -117,16 +117,14 @@ export default function CommissionStatementsSelection({
                   id="year"
                   className="form-select flex-grow-1"
                   required
-                  disabled={periodSelection !== 'month'}
+                  disabled={periodSelection !== "month"}
                   defaultValue={new Date().getFullYear()}
                 >
-                  {new Array(new Date().getFullYear() - 2020)
-                    .fill(0)
-                    .map((_, i) => (
-                      <option key={i} value={new Date().getFullYear() - i}>
-                        {new Date().getFullYear() - i}
-                      </option>
-                    ))}
+                  {new Array(new Date().getFullYear() - 2020).fill(0).map((_, i) => (
+                    <option key={i} value={new Date().getFullYear() - i}>
+                      {new Date().getFullYear() - i}
+                    </option>
+                  ))}
                 </select>
 
                 <small
@@ -143,7 +141,7 @@ export default function CommissionStatementsSelection({
                   id="month"
                   defaultValue={(new Date().getMonth() + 1).toString()}
                   required
-                  disabled={periodSelection !== 'month'}
+                  disabled={periodSelection !== "month"}
                 >
                   <option value="1">January</option>
                   <option value="2">February</option>
@@ -178,7 +176,7 @@ export default function CommissionStatementsSelection({
                   id="start_date"
                   type="date"
                   required
-                  disabled={periodSelection !== 'date'}
+                  disabled={periodSelection !== "date"}
                 />
 
                 <small
@@ -194,7 +192,7 @@ export default function CommissionStatementsSelection({
                   id="end_date"
                   type="date"
                   required
-                  disabled={periodSelection !== 'date'}
+                  disabled={periodSelection !== "date"}
                 />
               </div>
             </div>

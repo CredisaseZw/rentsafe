@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
-import html2pdf from 'html2pdf.js';
-import { Button, Modal } from 'react-bootstrap';
+import React, { useRef } from "react";
+import html2pdf from "html2pdf.js";
+import { Button, Modal } from "react-bootstrap";
 
 export default function IndividualReport({
   showReport,
@@ -10,7 +10,7 @@ export default function IndividualReport({
 }) {
   const modalContentRef = useRef();
   console.log(reportData);
-  console.log('reportData', reportData.historic_claims_list);
+  console.log("reportData", reportData.historic_claims_list);
 
   const handlePrintToPdf = () => {
     // alert('print to pdf');
@@ -19,9 +19,9 @@ export default function IndividualReport({
       .from(element)
       .set({
         margin: 1,
-        filename: 'modal-content.pdf',
+        filename: "modal-content.pdf",
         html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait' },
+        jsPDF: { orientation: "portrait" },
       })
       .save();
   };
@@ -31,9 +31,9 @@ export default function IndividualReport({
         <Modal.Body ref={modalContentRef}>
           <div
             style={{
-              border: '3px solid #176987',
-              width: '100%',
-              padding: '20px',
+              border: "3px solid #176987",
+              width: "100%",
+              padding: "20px",
             }}
             id="report"
           >
@@ -52,19 +52,19 @@ export default function IndividualReport({
 
                   <br />
                 </div>
-                <div style={{ lineHeight: '10px' }}>
-                  <p style={{ textAlign: 'right' }}>+263 71 882 2460</p>
-                  <p style={{ textAlign: 'right' }}>credisafezw@gmail.com</p>
-                  <p style={{ textAlign: 'right' }}> www.credi-safe.com</p>
+                <div style={{ lineHeight: "10px" }}>
+                  <p style={{ textAlign: "right" }}>+263 71 882 2460</p>
+                  <p style={{ textAlign: "right" }}>credisafezw@gmail.com</p>
+                  <p style={{ textAlign: "right" }}> www.credi-safe.com</p>
                 </div>
               </div>
             </div>
             <div className="mt-5 mb-2">
               <h6>
-                Rent Payment Status Report on{' '}
-                <span style={{ fontWeight: 'bold', color: '#176987' }}>
-                  {reportData?.individual_details?.firstname}{' '}
-                  {reportData?.individual_details?.surname}{' '}
+                Rent Payment Status Report on{" "}
+                <span style={{ fontWeight: "bold", color: "#176987" }}>
+                  {reportData?.individual_details?.firstname}{" "}
+                  {reportData?.individual_details?.surname}{" "}
                 </span>
                 as at {Date().toLocaleString()}
               </h6>
@@ -72,30 +72,26 @@ export default function IndividualReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '5px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "5px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table className="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#190062',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#190062",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={5}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={5} className="text-center text-white">
                         PAYMENT STATUS CLASSIFICATION/INDICATOR
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row" className="text-center">
                         Status
                       </th>
@@ -103,35 +99,32 @@ export default function IndividualReport({
                       <td
                         style={{
                           backgroundColor:
-                            reportData?.risk_data?.class == 'non-payer'
+                            reportData?.risk_data?.class == "non-payer"
                               ? reportData?.risk_data?.color
-                              : reportData?.risk_data?.class == 'high-high'
+                              : reportData?.risk_data?.class == "high-high"
                                 ? reportData?.risk_data?.color
-                                : reportData?.risk_data?.class == 'high'
+                                : reportData?.risk_data?.class == "high"
                                   ? reportData?.risk_data?.color
-                                  : reportData?.risk_data?.class == 'medium'
+                                  : reportData?.risk_data?.class == "medium"
                                     ? reportData?.risk_data?.color
-                                    : reportData?.risk_data?.class == 'low'
+                                    : reportData?.risk_data?.class == "low"
                                       ? reportData?.risk_data?.color
-                                      : '',
-                          color:
-                            reportData?.risk_data?.class == 'non-payer'
-                              ? 'white'
-                              : '',
+                                      : "",
+                          color: reportData?.risk_data?.class == "non-payer" ? "white" : "",
                         }}
                         className="text-center text-white"
                       >
-                        {reportData?.risk_data?.class == 'non-payer'
-                          ? 'Non-Payer'
-                          : reportData?.risk_data?.class == 'high-high'
-                            ? 'High-High'
-                            : reportData?.risk_data?.class == 'high'
-                              ? 'High'
-                              : reportData?.risk_data?.class == 'medium'
-                                ? 'Medium'
-                                : reportData?.risk_data?.class == 'low'
-                                  ? 'Low'
-                                  : ''}
+                        {reportData?.risk_data?.class == "non-payer"
+                          ? "Non-Payer"
+                          : reportData?.risk_data?.class == "high-high"
+                            ? "High-High"
+                            : reportData?.risk_data?.class == "high"
+                              ? "High"
+                              : reportData?.risk_data?.class == "medium"
+                                ? "Medium"
+                                : reportData?.risk_data?.class == "low"
+                                  ? "Low"
+                                  : ""}
                       </td>
                     </tr>
                   </tbody>
@@ -140,29 +133,22 @@ export default function IndividualReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#808080',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#808080",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={5}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={5} className="text-center text-white">
                         STATUS INDEX
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
-                      <th
-                        scope="row"
-                        className="text-center bg-success text-white"
-                      >
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
+                      <th scope="row" className="text-center bg-success text-white">
                         Low
                       </th>
                       <td
                         style={{
-                          fontWeight: 'bold',
+                          fontWeight: "bold",
                         }}
                         className="text-center bg-warning text-white"
                       >
@@ -170,8 +156,8 @@ export default function IndividualReport({
                       </td>
                       <td
                         style={{
-                          backgroundColor: '#ff33cc',
-                          fontWeight: 'bold',
+                          backgroundColor: "#ff33cc",
+                          fontWeight: "bold",
                         }}
                         className="text-center text-white"
                       >
@@ -179,8 +165,8 @@ export default function IndividualReport({
                       </td>
                       <td
                         style={{
-                          fontWeight: 'bold',
-                          backgroundColor: 'red',
+                          fontWeight: "bold",
+                          backgroundColor: "red",
                         }}
                         className="text-center text-white"
                       >
@@ -188,29 +174,21 @@ export default function IndividualReport({
                       </td>
                       <td
                         style={{
-                          fontWeight: 'bold',
+                          fontWeight: "bold",
                         }}
                         className="text-center bg-dark text-white"
                       >
                         None Payer
                       </td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row" className="text-center text-nowrap">
                         Current
                       </th>
-                      <td className="text-center text-nowrap">
-                        1st Month Outstanding
-                      </td>
-                      <td className="text-center text-nowrap">
-                        2nd Month Outstanding
-                      </td>
-                      <td className="text-center text-nowrap">
-                        3rd Month Outstanding
-                      </td>
-                      <td className="text-center text-nowrap">
-                        +3 Months Outstanding
-                      </td>
+                      <td className="text-center text-nowrap">1st Month Outstanding</td>
+                      <td className="text-center text-nowrap">2nd Month Outstanding</td>
+                      <td className="text-center text-nowrap">3rd Month Outstanding</td>
+                      <td className="text-center text-nowrap">+3 Months Outstanding</td>
                     </tr>
                   </tbody>
                 </table>
@@ -338,53 +316,49 @@ export default function IndividualReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table className="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={4}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={4} className="text-center text-white">
                         PERSONAL DETAILS
                       </th>
                     </tr>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={4} className="text-center ">
                         Identification Details
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Surname :</th>
                       <td>{reportData?.individual_details?.surname}</td>
                       <td>First Name :</td>
                       <td>{reportData?.individual_details?.firstname}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">National ID No:</th>
                       <td>{reportData?.individual_details?.national_id}</td>
                       <td>Date Of Birth:</td>
                       <td>{reportData?.individual_details?.dob}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Marital Status :</th>
                       <td> {reportData?.individual_details?.marital_status}</td>
                       <td>Gender:</td>
@@ -396,32 +370,28 @@ export default function IndividualReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={6} className="text-center ">
                         Contact Details
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Mobile Number :</th>
                       <td>{reportData?.individual_details?.mobile}</td>
                       <td>Telephone No:</td>
                       <td>{reportData?.individual_details?.landline}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Address :</th>
-                      <td colSpan={3}>
-                        {reportData?.individual_details?.address}
-                      </td>
+                      <td colSpan={3}>{reportData?.individual_details?.address}</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Email :</th>
-                      <td colSpan={3}>
-                        {reportData?.individual_details?.email}
-                      </td>
+                      <td colSpan={3}>{reportData?.individual_details?.email}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -430,29 +400,27 @@ export default function IndividualReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={6} className="text-center ">
                         Employment History
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="text-center" scope="row">
                         Employer
                       </th>
                       <td className="text-center">Position</td>
                       <td className="text-center">Start Date</td>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row" className="text-center">
                         {reportData?.individual_details?.employer_name}
                       </th>
-                      <td className="text-center">
-                        {reportData?.individual_details?.job_title}
-                      </td>
+                      <td className="text-center">{reportData?.individual_details?.job_title}</td>
                       <td className="text-center">
                         {reportData?.individual_details?.date_of_employment}
                       </td>
@@ -464,41 +432,37 @@ export default function IndividualReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table className="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
-                      <th
-                        scope="row"
-                        colSpan={7}
-                        className="text-center text-white"
-                      >
+                      <th scope="row" colSpan={7} className="text-center text-white">
                         OUTSTANDING RENTALS
                       </th>
                     </tr>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={5} className="text-center ">
                         Claims
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Claimant</th>
                       <td>Type</td>
                       <td>Currency</td>
@@ -507,17 +471,12 @@ export default function IndividualReport({
                     </tr>
                     {reportData?.claims_list?.length > 0 &&
                       reportData?.claims_list?.map((claim, index) => (
-                        <tr
-                          key={'claim' + index}
-                          style={{ lineHeight: '5px', fontSize: '12px' }}
-                        >
+                        <tr key={"claim" + index} style={{ lineHeight: "5px", fontSize: "12px" }}>
                           <th scope="row">{claim.creditor}</th>
-                          <td>{claim.type || ''}</td>
+                          <td>{claim.type || ""}</td>
                           <td>{claim.currency}</td>
                           <td>
-                            {claim?.owing_amount
-                              ? Number(claim.owing_amount).toFixed(2)
-                              : ''}
+                            {claim?.owing_amount ? Number(claim.owing_amount).toFixed(2) : ""}
                           </td>
                           <td>{claim.claim_date}</td>
                         </tr>
@@ -555,26 +514,26 @@ export default function IndividualReport({
             <div
               className="mb-5"
               style={{
-                border: '1px solid #176987',
-                width: '100%',
-                padding: '2px',
+                border: "1px solid #176987",
+                width: "100%",
+                padding: "2px",
               }}
             >
-              <div style={{ padding: '10px' }}>
+              <div style={{ padding: "10px" }}>
                 <table className="table table-bordered">
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#305496',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#305496",
                       }}
                     >
                       <th scope="row" colSpan={7} className="text-center">
                         Active
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th scope="row">Creditor</th>
                       <td>Type</td>
                       {/* <td>Currency</td> */}
@@ -582,18 +541,13 @@ export default function IndividualReport({
                       <td>Amount</td>
                     </tr>
                     {reportData?.credit_details?.map((credit) => (
-                      <tr
-                        key={credit.lease_id}
-                        style={{ lineHeight: '5px', fontSize: '12px' }}
-                      >
+                      <tr key={credit.lease_id} style={{ lineHeight: "5px", fontSize: "12px" }}>
                         <th scope="row">{credit.credit_type}</th>
-                        <td> {credit.type || ''}</td>
+                        <td> {credit.type || ""}</td>
                         <td> {credit.start_date}</td>
                         <td>
-                          {credit.currency}{' '}
-                          {credit?.overdue_amount
-                            ? Number(credit.overdue_amount).toFixed(2)
-                            : ''}
+                          {credit.currency}{" "}
+                          {credit?.overdue_amount ? Number(credit.overdue_amount).toFixed(2) : ""}
                         </td>
                       </tr>
                     ))}
@@ -604,16 +558,16 @@ export default function IndividualReport({
                   <tbody>
                     <tr
                       style={{
-                        lineHeight: '5px',
-                        fontSize: '12px',
-                        backgroundColor: '#b4c6e7',
+                        lineHeight: "5px",
+                        fontSize: "12px",
+                        backgroundColor: "#b4c6e7",
                       }}
                     >
                       <th scope="row" colSpan={10} className="text-center ">
                         Historic
                       </th>
                     </tr>
-                    <tr style={{ lineHeight: '5px', fontSize: '12px' }}>
+                    <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
                       <th className="" scope="row" colSpan={2}>
                         Creditor
                       </th>
@@ -624,21 +578,16 @@ export default function IndividualReport({
 
                     {reportData.historic_claims_list?.length > 0 &&
                       reportData.historic_claims_list?.map((claim, index) => (
-                        <tr
-                          key={'claim' + index}
-                          style={{ lineHeight: '5px', fontSize: '12px' }}
-                        >
+                        <tr key={"claim" + index} style={{ lineHeight: "5px", fontSize: "12px" }}>
                           <th scope="row" colSpan={2}>
-                            {' '}
+                            {" "}
                             {claim?.creditor}
                           </th>
-                          <td>{claim?.type || ''}</td>
+                          <td>{claim?.type || ""}</td>
                           {/* <td>{claim.currency}</td> */}
                           <td>{claim?.claim_date}</td>
                           <td>
-                            {claim?.balance_amount
-                              ? Number(claim.balance_amount).toFixed(2)
-                              : ''}
+                            {claim?.balance_amount ? Number(claim.balance_amount).toFixed(2) : ""}
                           </td>
                         </tr> // Close the tr tag here
                       ))}
@@ -864,18 +813,17 @@ export default function IndividualReport({
             </div> */}
             <div
               style={{
-                width: '100%',
-                padding: '2px',
+                width: "100%",
+                padding: "2px",
               }}
             >
               <hr />
               <div>
                 <p>
-                  Disclaimer: This report is confidential and intended solely
-                  for the individual or entity to whom it is addressed.
-                  Information on this report is valid at the time of enquiry
-                  only. If verification is required, please contact us on the
-                  details provided above.
+                  Disclaimer: This report is confidential and intended solely for the individual or
+                  entity to whom it is addressed. Information on this report is valid at the time of
+                  enquiry only. If verification is required, please contact us on the details
+                  provided above.
                 </p>
                 <p>Terms and Conditions apply.</p>
                 <p>Copyrights © CrediSafe Zimbabwe</p>
@@ -885,11 +833,7 @@ export default function IndividualReport({
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            className="mr-4"
-            variant="secondary"
-            onClick={handleCloseReport}
-          >
+          <Button className="mr-4" variant="secondary" onClick={handleCloseReport}>
             Close
           </Button>
           <Button variant="primary" onClick={handlePrintToPdf}>

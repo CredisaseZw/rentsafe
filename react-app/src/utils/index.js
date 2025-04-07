@@ -1,7 +1,7 @@
-import { isAxiosError } from 'axios';
-import { formatCurrency } from './formatting';
-import { capitalize } from 'lodash';
-import { AxiosHeaders } from 'axios';
+import { isAxiosError } from "axios";
+import { formatCurrency } from "./formatting";
+import { capitalize } from "lodash";
+import { AxiosHeaders } from "axios";
 
 export function validateZimbabweanPassport2(passportNumber) {
   // Regular expression for Zimbabwean passport format: 2 uppercase letters + 7 digits
@@ -25,23 +25,23 @@ export function validateZimbabweanID(idNumber) {
 export function friendlyDate(date, format) {
   date = new Date(date);
   switch (format) {
-    case 'second':
-      return Intl.DateTimeFormat('en-GB', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
+    case "second":
+      return Intl.DateTimeFormat("en-GB", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
       }).format(date);
-    case 'third':
-      return Intl.DateTimeFormat('en-GB', {
-        month: 'numeric',
-        day: '2-digit',
-        year: '2-digit',
+    case "third":
+      return Intl.DateTimeFormat("en-GB", {
+        month: "numeric",
+        day: "2-digit",
+        year: "2-digit",
       }).format(date);
     default:
-      return Intl.DateTimeFormat('en-GB', {
-        month: 'short',
-        day: '2-digit',
-        year: '2-digit',
+      return Intl.DateTimeFormat("en-GB", {
+        month: "short",
+        day: "2-digit",
+        year: "2-digit",
       }).format(date);
   }
 }
@@ -49,31 +49,31 @@ export function friendlyDate(date, format) {
 export function friendlyDateAndTime(date, format) {
   date = new Date(date);
   switch (format) {
-    case 'second':
-      return Intl.DateTimeFormat('en-GB', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+    case "second":
+      return Intl.DateTimeFormat("en-GB", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       }).format(date);
-    case 'third':
-      return Intl.DateTimeFormat('en-GB', {
-        month: 'numeric',
-        day: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
+    case "third":
+      return Intl.DateTimeFormat("en-GB", {
+        month: "numeric",
+        day: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       }).format(date);
     default:
-      return Intl.DateTimeFormat('en-GB', {
-        month: 'short',
-        day: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
+      return Intl.DateTimeFormat("en-GB", {
+        month: "short",
+        day: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       }).format(date);
   }
@@ -86,9 +86,7 @@ export async function wait(seconds) {
 }
 
 export function fmtAmount(amount) {
-  return amount >= 0
-    ? formatCurrency(amount)
-    : `(${formatCurrency(amount * -1)})`;
+  return amount >= 0 ? formatCurrency(amount) : `(${formatCurrency(amount * -1)})`;
 }
 
 export function userFriendlyErrorOrResponse(obj) {
@@ -96,8 +94,8 @@ export function userFriendlyErrorOrResponse(obj) {
 
   if (obj.headers || obj.response?.headers) {
     const headers = new AxiosHeaders(obj.headers || obj.response?.headers);
-    if (headers.getContentType().includes('text/html'))
-      return `got invalid response type 'html'. Response text: ${obj.statusText || obj.response?.statusText || ''}`;
+    if (headers.getContentType().includes("text/html"))
+      return `got invalid response type 'html'. Response text: ${obj.statusText || obj.response?.statusText || ""}`;
   }
 
   if (isAxiosError(obj)) {
@@ -115,7 +113,7 @@ export function userFriendlyErrorOrResponse(obj) {
       obj.response?.data;
 
     if (content) {
-      if (typeof content === 'object') return flattenObjectOrList(content);
+      if (typeof content === "object") return flattenObjectOrList(content);
       else return capitalize(content);
     }
   } else if (obj?.data) {
@@ -131,12 +129,12 @@ export function userFriendlyErrorOrResponse(obj) {
       obj.data;
 
     if (content) {
-      if (typeof content === 'object') return flattenObjectOrList(content);
+      if (typeof content === "object") return flattenObjectOrList(content);
       else return capitalize(content);
     }
-  } else if (typeof obj === 'object') return flattenObjectOrList(obj);
-  else if (typeof obj === 'string') return capitalize(obj);
-  else return 'something went wrong! Please try again.';
+  } else if (typeof obj === "object") return flattenObjectOrList(obj);
+  else if (typeof obj === "string") return capitalize(obj);
+  else return "something went wrong! Please try again.";
 }
 
 export function flattenObjectOrList(objOrList) {
@@ -149,16 +147,12 @@ export function flattenObjectOrList(objOrList) {
     );
   }
 
-  let text = '';
+  let text = "";
 
   if (isObject) {
     Object.keys(objOrList).forEach((key) => {
       const value = objOrList[key];
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-      ) {
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
         text += `${capitalize(key)} - ${value}. `;
       } else {
         text += `${capitalize(key)} - ${flattenObjectOrList(value)}`;
@@ -166,11 +160,7 @@ export function flattenObjectOrList(objOrList) {
     });
   } else {
     objOrList.forEach((value) => {
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-      ) {
+      if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
         text += `${capitalize(value)}. `;
       } else {
         text += flattenObjectOrList(value);
@@ -195,7 +185,7 @@ export function mapToMessages(data) {
   const maintenanceMsgs = data.maintenance.map((item) => ({
     timestamp: item.updated_at,
     user: item.user_name,
-    communicationType: 'maintenance',
+    communicationType: "maintenance",
     data: {
       ...item,
     },
@@ -204,7 +194,7 @@ export function mapToMessages(data) {
   const worksMsgs = data.works.map((item) => ({
     timestamp: item.updated_at,
     user: item.user_name,
-    communicationType: 'works',
+    communicationType: "works",
     data: {
       ...item,
     },
@@ -213,9 +203,7 @@ export function mapToMessages(data) {
   return [...worksMsgs, ...maintenanceMsgs];
 }
 
-export function areMonthlyBalancesAllDefinedInOrder(
-  balancesFromLatestToOldest = []
-) {
+export function areMonthlyBalancesAllDefinedInOrder(balancesFromLatestToOldest = []) {
   const reversed = [...balancesFromLatestToOldest].reverse();
   const lastDefinedIndex = reversed.findIndex(Boolean);
 

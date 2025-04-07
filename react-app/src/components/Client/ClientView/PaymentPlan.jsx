@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import SectionSkeleton from './SectionSkeleton.jsx';
+import { useState } from "react";
+import SectionSkeleton from "./SectionSkeleton.jsx";
 
 export default function PaymentPlan({ addNewPaymentPlan, isCreditorView }) {
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState("");
 
   function changeAmount(e) {
     let value = e.target.value;
 
-    if (value.includes('.')) {
-      const [integerPart, decimalPart] = value.split('.');
+    if (value.includes(".")) {
+      const [integerPart, decimalPart] = value.split(".");
       if (decimalPart.length > 2) {
         value = `${integerPart}.${decimalPart.substring(0, 2)}`;
       }
@@ -51,8 +51,8 @@ export default function PaymentPlan({ addNewPaymentPlan, isCreditorView }) {
             id="expected_pay_date"
             className="custom-form-control border-0 custom-pointer border-bottom border-bottom-3 border-dark"
             required
-            defaultValue={new Date().toISOString().split('T')[0]}
-            min={new Date().toISOString().split('T')[0]}
+            defaultValue={new Date().toISOString().split("T")[0]}
+            min={new Date().toISOString().split("T")[0]}
           />
         </div>
 
@@ -73,10 +73,7 @@ export default function PaymentPlan({ addNewPaymentPlan, isCreditorView }) {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="d-block btn btn-info w-100 mt-4 text-white"
-        >
+        <button type="submit" className="d-block btn btn-info w-100 mt-4 text-white">
           Add to payment plan
         </button>
       </form>
