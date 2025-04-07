@@ -3636,7 +3636,6 @@ def client_leases_new(request,leases_type=None):
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
         is_terminated_lease_eligible = True if (i.is_active == False and owing_amount <= 0 or is_100_days_ago)  else False
-        
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
@@ -3670,6 +3669,7 @@ def client_leases_new(request,leases_type=None):
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
+                "expired": True if datetime.now().date() > i.end_date else False,
                 "payment_period_start": i.payment_period_start,
                 "payment_period_end": i.payment_period_end,
             }
