@@ -121,12 +121,6 @@ export const clientSidebarNavigation = [
             href: reverseUrl("client_invoice"),
           },
           {
-            navLink: "Receipts",
-            color: "black",
-            type: "modal",
-            component: <ClientSidebarReceipts />,
-          },
-          {
             navLink: "Customer Statements",
             color: "black",
             type: "link",
