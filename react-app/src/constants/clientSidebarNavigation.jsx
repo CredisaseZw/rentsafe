@@ -1,4 +1,5 @@
 import AdverseData from "../components/AdverseData.jsx";
+import CashBookPayments from "../components/CashBookPayments.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
@@ -83,8 +84,33 @@ export const clientSidebarNavigation = [
       {
         navLink: "Cashbooks",
         color: "#00823d",
-        type: "link",
-        href: reverseUrl("cash_books"),
+        subNavLinks: [
+          {
+            navLink: "Receipts",
+            color: "#00823d",
+            type: "modal",
+            component: <ClientSidebarReceipts />,
+          },
+          {
+            navLink: "Requisitions",
+            color: "#00823d",
+            type: "link",
+            href: reverseUrl("in_development"),
+          },
+          {
+            navLink: "Payments",
+            color: "#00823d",
+            type: "modal",
+            component: <CashBookPayments />,
+          },
+
+          {
+            navLink: "Bank Reconciliations",
+            color: "#00823d",
+            type: "link",
+            href: reverseUrl("in_development"),
+          },
+        ],
       },
       {
         navLink: "Customers",
@@ -95,12 +121,6 @@ export const clientSidebarNavigation = [
             color: "black",
             type: "link",
             href: reverseUrl("client_invoice"),
-          },
-          {
-            navLink: "Receipts",
-            color: "black",
-            type: "modal",
-            component: <ClientSidebarReceipts />,
           },
           {
             navLink: "Customer Statements",

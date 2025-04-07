@@ -1,8 +1,8 @@
 import ClientSidebarNavItemModal from "./ClientSidebarNavItemModal.jsx";
-import useClientSidebarReceipts from "../hooks/modal-hooks/useClientSidebarReceipts.js";
-import CustomAsyncSelect from "./CustomAsyncSelect.jsx";
+import useCashBookPayments from "../hooks/modal-hooks/useCashBookPayments.js";
+import DisbursementsAsyncSelect from "./DisbursementsAsyncSelect.jsx";
 
-export default function ClientSidebarReceipts(props) {
+export default function CashBookPayments(props) {
   const {
     data,
     rate,
@@ -17,19 +17,18 @@ export default function ClientSidebarReceipts(props) {
     setRate,
     handleSubmit,
     handleInputChange,
-    handleTenantSelect,
-    handlePaymentAmount,
+    handleCreditorSelect,
     setSelectedCashBookId,
-  } = useClientSidebarReceipts();
+  } = useCashBookPayments();
 
   return (
     <ClientSidebarNavItemModal
       {...props}
       modalProps={{
         requestCloseFlag,
-        navlinkTitle: "Receipts",
+        navlinkTitle: "Payments",
         titleOverideContent: (
-          <h5 className="text-center bg-dark text-white rounded-2 p-1 m-0 mb-4">Receipts</h5>
+          <h5 className="text-center bg-danger text-white rounded-2 p-1 m-0 mb-4">Payments</h5>
         ),
         centerTitle: true,
         size: "xl",
@@ -72,11 +71,12 @@ export default function ClientSidebarReceipts(props) {
               <thead>
                 <tr>
                   <th className="text-nowrap">Date</th>
-                  <th className="text-nowrap">Receipt Number</th>
+                  <th className="text-nowrap">Pay Ref.</th>
                   <th className="text-nowrap">Type (GL/C)</th>
                   <th className="text-nowrap">Account</th>
                   <th className="text-nowrap">Details</th>
-                  <th className="text-nowrap">Amount</th>
+                  <th className="text-nowrap">Total Pay (Inc. VAT)</th>
+                  <th className="text-nowrap">VAT</th>
                   <th className="text-nowrap">Matching Invoice</th>
                   <th className="text-nowrap">Rate</th>
                   <th></th>
@@ -95,7 +95,12 @@ export default function ClientSidebarReceipts(props) {
                         value={row.paymentDate}
                         onChange={(e) => handleInputChange(e, row.id)}
                         max={new Date().toISOString().split("T")[0]}
-                        min={row.minDate}
+                        min={
+                          row.type === "gl"
+                            ? cashBooks.find((book) => book.id == selectedCashBookId)
+                                ?.opening_balance_date
+                            : row.minDate
+                        }
                       />
                     </td>
 
@@ -118,19 +123,15 @@ export default function ClientSidebarReceipts(props) {
                         onChange={(e) => handleInputChange(e, row.id)}
                       >
                         <option value="gl">GL</option>
-                        <option value="customer">Customer</option>
+                        <option value="creditor">CR</option>
                       </select>
                     </td>
 
                     <td className="custom-w-2">
-                      {row.type === "customer" ? (
-                        <CustomAsyncSelect
-                          extraProps={{ className: "w-100", required: true }}
-                          url={reverseUrl("get_all_active_leases")}
-                          onChange={(selectedOption) => handleTenantSelect(selectedOption, row.id)}
-                          value={row.tenant ? { label: row.tenant, value: row.lease_id } : null}
-                          defaultValue={null}
-                          isDisabled={false}
+                      {row.type === "creditor" ? (
+                        <DisbursementsAsyncSelect
+                          handleCreditorSelect={handleCreditorSelect}
+                          index={row.id}
                         />
                       ) : row.type === "gl" ? (
                         <select
@@ -169,44 +170,25 @@ export default function ClientSidebarReceipts(props) {
                     <td>
                       <input
                         required
-                        name="paymentAmount"
+                        name="paidAmount"
                         placeholder="0.00"
                         type="number"
-                        value={row.paymentAmount}
+                        value={row.paidAmount}
                         onChange={(e) => handleInputChange(e, row.id)}
-                        className={
-                          row.isVariable
-                            ? "form-control border-2 custom-no-pointer-events"
-                            : "form-control custom-mn-w-1"
-                        }
-                        readOnly={row.isVariable}
+                        className="form-control custom-mn-w-1"
                       />
+                    </td>
 
-                      {row.isVariable && (
-                        <div className="mt-1">
-                          <div className="mb-1">
-                            <label className="small form-label">Rent</label>
-                            <input
-                              name="baseAmount"
-                              type="number"
-                              className="form-control form-control-sm"
-                              value={row.baseAmount}
-                              onChange={(e) => handlePaymentAmount(e, row.id)}
-                            />
-                          </div>
-
-                          <div className="mb-1">
-                            <label className="small form-label">OPC</label>
-                            <input
-                              name="operatingCost"
-                              type="number"
-                              className="form-control form-control-sm"
-                              value={row.operatingCost}
-                              onChange={(e) => handlePaymentAmount(e, row.id)}
-                            />
-                          </div>
-                        </div>
-                      )}
+                    <td className="text-center">
+                      <input
+                        name="vat"
+                        type="checkbox"
+                        value="yes"
+                        disabled={row.type === "gl"}
+                        checked={row.vat}
+                        onChange={(e) => handleInputChange(e, row.id)}
+                        className="form-check"
+                      />
                     </td>
 
                     <td
@@ -244,6 +226,23 @@ export default function ClientSidebarReceipts(props) {
                   </tr>
                 ))}
               </tbody>
+
+              <tfoot>
+                <tr>
+                  <td colSpan={5} className="text-end fw-bold">
+                    Batch Total:
+                  </td>
+                  <td className="text-end fw-bold">
+                    {data.rows
+                      .reduce((acc, row) => acc + Number(row.paymentAmount || 0), 0)
+                      .toFixed(2)}
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
 
             <>
