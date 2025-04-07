@@ -83,8 +83,32 @@ export const clientSidebarNavigation = [
       {
         navLink: "Cashbooks",
         color: "#00823d",
-        type: "link",
-        href: reverseUrl("cash_books"),
+        subNavLinks: [
+          {
+            navLink: "Receipts",
+            color: "#00823d",
+            type: "link",
+            href: reverseUrl("in_development"),
+          },
+          {
+            navLink: "Requisitions",
+            color: "#00823d",
+            type: "link",
+            href: reverseUrl("in_development"),
+          },
+          {
+            navLink: "Payments",
+            color: "#00823d",
+            type: "link",
+            href: reverseUrl("in_development"),
+          },
+          {
+            navLink: "Bank Reconciliations",
+            color: "#00823d",
+            type: "link",
+            href: reverseUrl("in_development"),
+          },
+        ],
       },
       {
         navLink: "Customers",
