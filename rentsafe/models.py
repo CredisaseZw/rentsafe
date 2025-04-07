@@ -22,7 +22,7 @@ class Company(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_client = models.BooleanField(default=False)
     company_uploader = models.CharField(max_length=255, blank=True, null=True)
-    tin_number = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    tin_number = models.CharField(max_length=255, blank=True, null=True)
     is_government = models.BooleanField(default=False)  # is government company
     #history = HistoricalRecords()
 

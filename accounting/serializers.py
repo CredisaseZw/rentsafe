@@ -4,7 +4,10 @@ from accounting.models import *
 class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
-        read_only_fields = ['company', 'user']  # Prevent user from setting them
+        try:
+            read_only_fields = ['company', 'user']  # Prevent user from setting them
+        except AttributeError:
+            read_only_fields = []
 
 class ProductServiceSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
