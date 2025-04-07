@@ -3669,7 +3669,7 @@ def client_leases_new(request,leases_type=None):
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
-                "expired": True if datetime.now().date() > i.end_date else False,
+                "expired": True if date.today() > i.end_date else False,
                 "payment_period_start": i.payment_period_start,
                 "payment_period_end": i.payment_period_end,
             }
