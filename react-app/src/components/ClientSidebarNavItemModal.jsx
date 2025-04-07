@@ -1,8 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ContentModal from "./ContentModal.jsx";
 
 export default function ClientSidebarNavItemModal({
-  modalProps: { size, title, navlinkTitle, children, titleOverideContent, devOnlyDefaultShow },
+  modalProps: {
+    requestCloseFlag,
+    centerTitle,
+    size,
+    title,
+    navlinkTitle,
+    children,
+    titleOverideContent,
+    devOnlyDefaultShow,
+  },
   id,
   className,
   makeActive,
@@ -10,6 +19,18 @@ export default function ClientSidebarNavItemModal({
 }) {
   const [showModal, setShowModal] = useState(false);
   const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    if (requestCloseFlag) {
+      handleClose();
+    }
+  }, [requestCloseFlag]);
+
+  const handleClose = () => {
+    makeActive("use-last-last");
+    setShowModal(false);
+    setKey((prev) => prev + 1);
+  };
 
   return (
     <React.Fragment key={key}>
@@ -26,12 +47,9 @@ export default function ClientSidebarNavItemModal({
 
       <ContentModal
         title={title}
+        centerTitle={centerTitle}
         show={devOnlyDefaultShow || showModal}
-        handleClose={() => {
-          makeActive("use-last-last");
-          setShowModal(false);
-          setKey((prev) => prev + 1);
-        }}
+        handleClose={handleClose}
         size={size}
         titleOverideContent={titleOverideContent}
       >
