@@ -507,6 +507,14 @@
   color: whitesmoke !important;
 }
 
+.c-expired {
+  background-color: goldenrod;
+}
+
+.bg-gold {
+  background-color: goldenrod;
+}
+
 .c-once-per-months {
   display: inline-block;
   margin: 0 0.2rem;
