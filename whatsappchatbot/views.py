@@ -1,5 +1,5 @@
-from django.shortcuts import render
+from inertia import render
 
 # Create your views here.
 def home(request):
-    render(request,"landing/index.html")
+    return render(request,"Index")

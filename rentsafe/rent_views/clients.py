@@ -3636,7 +3636,11 @@ def client_leases_new(request,leases_type=None):
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
+<<<<<<< HEAD
         is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
+=======
+        is_terminated_lease_eligible = True if (i.is_active == False and owing_amount <= 0 or is_100_days_ago)  else False
+>>>>>>> b9dee040dcf6a336e0349eab7c5d49da5005f053
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,

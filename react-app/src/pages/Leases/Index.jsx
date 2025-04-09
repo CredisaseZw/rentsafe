@@ -157,7 +157,9 @@ export default function Index({ leases, total_pages, current_page }) {
                 {leases
                   ? sortFunc(leases).map((lease, index) => (
                       <tr
-                        className={lease.terminated ? "c-terminated" : ""}
+                        className={
+                          lease.terminated ? "c-terminated" : lease.expired ? "c-expired" : ""
+                        }
                         key={lease.lease_id + "-" + index}
                       >
                         <th className="ps-3">{lease.lease_id || ""}</th>
@@ -207,12 +209,21 @@ export default function Index({ leases, total_pages, current_page }) {
                           </>
                         ) : (
                           <>
-                            <td
-                              className="bg-primary text-white text-center c-pointer"
-                              onClick={() => showLeaseFormFor(lease)}
-                            >
-                              Adjust
-                            </td>
+                            {lease.expired ? (
+                              <td
+                                className="bg-gold text-center c-pointer"
+                                onClick={() => showLeaseFormFor(lease)}
+                              >
+                                Renew
+                              </td>
+                            ) : (
+                              <td
+                                className="bg-primary text-white text-center c-pointer"
+                                onClick={() => showLeaseFormFor(lease)}
+                              >
+                                Adjust
+                              </td>
+                            )}
 
                             <td
                               className="bg-danger text-white text-center c-pointer"
