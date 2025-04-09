@@ -23,9 +23,9 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounting/', include('accounting.urls')),
+    path('', include('whatsappchatbot.urls')),
     path('', include('rentsafe.urls')),
     path('', include('authentication.urls')),
-    path('', include('whatsappchatbot.urls')),
     path('webhook/', include('bot.urls'))
 
 ]
