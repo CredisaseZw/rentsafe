@@ -2473,12 +2473,13 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email with logins details
-                send_auth_email.delay(
-                    user_id,
-                    user_password,
-                    data.get("userEmail"),
-                    check_individual.firstname,
-                )
+                if request.user.id ==11:
+                    send_auth_email.delay(
+                        user_id,
+                        user_password,
+                        data.get("userEmail"),
+                        check_individual.firstname,
+                    )
             else:
                 # create individual and user
                 individual = Individual(
@@ -2508,12 +2509,13 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email
-                send_auth_email.delay(
-                    user_id,
-                    user_password,
-                    data.get("userEmail"),
-                    data.get("firstName"),
-                )
+                if request.user.id ==11:
+                    send_auth_email.delay(
+                        user_id,
+                        user_password,
+                        data.get("userEmail"),
+                        data.get("firstName"),
+                    )
 
             props = {
                 "success": "success",
@@ -3287,7 +3289,6 @@ def store_company(request):
                 registration_name=data.get("registeredName").upper(),
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),
-                tin_number=data.get("tinNumber"),
             )
             company_ob.save()
             CompanyProfile.objects.create(
@@ -3299,7 +3300,6 @@ def store_company(request):
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 branch=data.get("branch"),
-                
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             user_password = generate_random_password(8)
@@ -3481,6 +3481,7 @@ def delete_lease(request):
     data = json.loads(request.body.decode("utf-8"))
     if lease := Lease.objects.filter(lease_id=data["leaseId"]).first():
         lease.is_active = False
+        lease.is_terminated = True
         lease.termination_date = date.today()
         lease.save()
 
@@ -3566,17 +3567,16 @@ def client_leases_new(request,leases_type=None):
 
     # get active leases for the superuser
     if leases_type == "individuals":
-        base_lease_queryset = Lease.objects.filter(is_individual=True)
+        base_lease_queryset = Lease.objects.filter(is_individual=True,lease_giver=request.user.company)
     elif leases_type == "companies":
-        base_lease_queryset = Lease.objects.filter(is_company=True)
+        base_lease_queryset = Lease.objects.filter(is_company=True,lease_giver=request.user.company)
     elif leases_type == "combined":
-        base_lease_queryset = Lease.objects.all()
+        base_lease_queryset = Lease.objects.all(lease_giver=request.user.company)
     else:
         base_lease_queryset = Lease.objects.filter(
             lease_giver=request.user.company if request.user.is_superuser else request.user.company,
             reg_ID_Number__in=query_ids,
         )
-        
     # Apply color filter if provided
     if color_filter:
         if color_filter == "black":
@@ -3598,6 +3598,7 @@ def client_leases_new(request,leases_type=None):
     lease_dict = {}
     
     for i in leases:
+       
         opening_balance_date = Opening_balance.objects.filter(lease_id=i.lease_id).first()
         remaining_period = subscription_period_remaining(request, "company" if i.is_company else "individual")
         rent_guarantor = Individual.objects.filter(national_id=i.rent_guarantor_id).first() if i.is_company else None
@@ -3635,8 +3636,7 @@ def client_leases_new(request,leases_type=None):
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_active == False and owing_amount <= 0 or is_100_days_ago)  else False
-        
+        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
@@ -3670,6 +3670,7 @@ def client_leases_new(request,leases_type=None):
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
+                "expired": True if date.today() > i.end_date else False,
                 "payment_period_start": i.payment_period_start,
                 "payment_period_end": i.payment_period_end,
             }
@@ -4379,12 +4380,7 @@ def request_period_statement(request):
 
 def client_invoicing(request):
     if request.method == "GET":
-        tenant_list = get_invoicing_details(request)
-        return render(
-        request,
-        "Client/Accounting/Invoicing",
-        props={"tenant_list": tenant_list},
-    )
+        return get_invoicing_details(request)
     today_date_obj = datetime.now()
     next_month = (today_date_obj.replace(day=1) + timedelta(days=32)).replace(day=1)
     next_month_name = next_month.strftime("%B %Y")
@@ -4535,7 +4531,7 @@ def get_invoicing_details(request):
     tenant_company_details = {}
     today = date.today()
     current_month = today.month
-    current_day = 23
+    current_day = 25
     current_year = today.year
     custom_day = datetime(current_year, current_month, current_day).date()
     tenant_list = []
@@ -4546,9 +4542,10 @@ def get_invoicing_details(request):
             next_month_end_day = today.replace(day=int(i.payment_period_end))
         except:
             next_month_end_day = today.replace(day=8)
+
         if (
             (today >= custom_day) or (today < next_month_end_day)
-        ) :#and difference.days >= 20:  # FIXME: SWITCH DATES comment
+        ) and difference.days >= 20:  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
                 invoiced_month = invoice_status.date_updated.strftime("%B")
                 invoice_year = invoice_status.date_updated.strftime("%Y")
@@ -4556,11 +4553,6 @@ def get_invoicing_details(request):
                 current_month = datetime.now().strftime("%B")
                 current_year = datetime.now().strftime("%Y")
                 current_year_month = f"{current_month} {current_year}"
-                next_month_date = datetime.now() + relativedelta(months=1)
-                # Get next month's name and year
-                next_month = next_month_date.strftime("%B")
-                next_year = next_month_date.strftime("%Y")
-                next_month_name = f"{next_month} {next_year}"
                 if str(invoice_month) != str(current_year_month):  # FIXME: remove comment
                     if i.is_individual:
                         try:
@@ -4645,7 +4637,11 @@ def get_invoicing_details(request):
                     except:
                         pass
             props = {"tenant_list": tenant_list}
-    return tenant_list
+    return render(
+        request,
+        "Client/Accounting/Invoicing",
+        props={"tenant_list": tenant_list},
+    )
 
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
@@ -5765,7 +5761,7 @@ def manual_send_otp(request):
                 lease_giver.registration_name if lease_giver else "Creditor"
             )
             custom_day = today.replace(day=int(lease.payment_period_end))
-            limit_day = today.replace(day=int(lease.payment_period_end) +5)
+            limit_day = today.replace(day=int(lease.payment_period_end) +1)
             if custom_day < today <= limit_day:
                 if opening_balance_object := Opening_balance.objects.filter(
                     lease_id=lease_id
@@ -5969,17 +5965,20 @@ def sales_accounts(request):
 def cash_books(request):
     return render(request, "Client/Accounting/Sales/CashBooks")
 
+@login_required
+@clients_required
+def general_ledger(request):
+    return render(request, "Client/Accounting/Sales/GeneralLedger")
 
 @login_required
 @clients_required
 def sales_invoicing(request):
-    invoice_list = get_invoicing_details(request)
-    return render(request, "Client/Accounting/Sales/SalesInvoicing", {"invoice_list": invoice_list}) 
+    return render(request, "Client/Accounting/Sales/SalesInvoicing")
 
-@login_required
-@clients_required
 def accounts_list(request):
-    return render(request, "Client/Accounting/AccountsListPage")
+
+    return render(request, "Client/Accounting/AccountsList")
+
 
 
 

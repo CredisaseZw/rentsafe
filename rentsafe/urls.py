@@ -241,6 +241,7 @@ urlpatterns = [
                 path("vat-settings", clients.vat_settings, name="vat_settings"),
                 path("cash-books", clients.cash_books, name="cash_books"),
                 path("sales-invoicing", clients.sales_invoicing, name="sales_invoicing"),
+                path("general-ledger", clients.sales_invoicing, name="general_ledger"),
                 path("accounts-list", clients.accounts_list, name="accounts_list"),
                 path(
                     "claims/",

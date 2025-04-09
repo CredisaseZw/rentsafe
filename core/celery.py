@@ -17,6 +17,6 @@ app.conf.broker_connection_retry_on_startup = True
 app.conf.beat_schedule = {
     "track-balances-daily": {
         "task": "rentsafe.helper.run_tasks",
-        "schedule": crontab(hour=8, minute=0),
+        "schedule": crontab(hour=9, minute=0),
     },
 }
