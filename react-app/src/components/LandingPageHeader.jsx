@@ -9,20 +9,18 @@ export default function LandingPageHeader() {
         <div className="d-flex justify-content-between align-items-center gap-3">
           <Logo />
 
-          <div>
-            <div className="d-flex gap-3">
-              <HoverDropdown
-                label="Services"
-                items={[
-                  { title: "Credit Scoring", href: "#credit-scoring" },
-                  { title: "RentSafe", href: "#rentsafe" },
-                  { title: "CountSafe", href: "#countsafe" },
-                  { title: "Debt Collection", href: "#debt-collection" },
-                ]}
-              />
+          <div className="d-none d-md-flex gap-3">
+            <HoverDropdown
+              label="Services"
+              items={[
+                { title: "Credit Scoring", href: "#credit-scoring" },
+                { title: "RentSafe", href: "#rentsafe" },
+                { title: "CountSafe", href: "#countsafe" },
+                { title: "Debt Collection", href: "#debt-collection" },
+              ]}
+            />
 
-              <HoverDropdown label="Resources" items={[{ title: "Contact", href: "#contact" }]} />
-            </div>
+            <HoverDropdown label="Resources" items={[{ title: "Contact", href: "#contact" }]} />
           </div>
 
           <nav className="d-flex align-items-center gap-3">

@@ -11,8 +11,8 @@ export default function Index() {
         <>
           <div className="mb-3 px-3 d-flex align-items-center" style={{ minHeight: "20vh" }}>
             <h1 className="fs-2 w-100 text-center">
-              Growing the <span className="text-info">African</span> credit & financial <br />{" "}
-              <span className="text-info"> ecosystem</span>.
+              Growing the <span className="text-info">African</span> credit & financial{" "}
+              <br className="d-none d-md-inline" /> <span className="text-info"> ecosystem</span>.
             </h1>
           </div>
 
@@ -82,7 +82,7 @@ export default function Index() {
               onSubmit={(e) => e.preventDefault()}
               className="row justify-content-around align-items-start"
             >
-              <div className="col col-4">
+              <div className="col col-12 col-md-4">
                 <fieldset className="bg-white p-4 custom-rounded-1">
                   <legend>Call or WhatsApp</legend>
                   <div className="d-flex align-items-center gap-3">
@@ -92,7 +92,7 @@ export default function Index() {
                 </fieldset>
               </div>
 
-              <div className="col col-6">
+              <div className="col col-12 col-md-6">
                 <fieldset className="bg-white p-4 custom-rounded-1">
                   <legend>Email us</legend>
 
@@ -169,8 +169,8 @@ export default function Index() {
 
       <footer className="bg-white border-top border-5 mt-5 py-5">
         <div className="container">
-          <div className="row row-cols-3">
-            <div className="col">
+          <div className="row row-cols-1 row-cols-md-3 g-4">
+            <div className="col order-last order-md-0">
               <div>
                 <h6 className="border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
                   Address
