@@ -167,9 +167,9 @@ export default function Index() {
         </div>
       </div>
 
-      <footer className="bg-white border-top border-5 mt-5 py-5">
+      <footer className="bg-white border-top border-5 mt-5 py-4">
         <div className="container">
-          <div className="row row-cols-1 row-cols-md-3 g-4">
+          <div className="row row-cols-1 row-cols-md-3 g-4 mb-4">
             <div className="col order-last order-md-0">
               <div>
                 <h6 className="border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
@@ -184,7 +184,7 @@ export default function Index() {
                   <p className="m-0">Zimbabwe</p>
                 </div>
 
-                <div className="mt-3">
+                {/* <div className="mt-3">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3798.2212917829142!2d31.05049427499587!3d-17.828258283136076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1931a5e92b293c33%3A0x2e72f90a43b23a12!2sClumb%20Chambers!5e0!3m2!1sen!2szw!4v1744196761560!5m2!1sen!2szw"
                     width="200"
@@ -195,7 +195,7 @@ export default function Index() {
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   ></iframe>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -224,7 +224,7 @@ export default function Index() {
             </div>
           </div>
 
-          <div className="d-flex justify-content-between gap-3 align-items-center my-5">
+          <div className="d-flex justify-content-between gap-3 align-items-center my-3">
             <p className="m-0 small fst-italic text-muted">
               © {new Date().getFullYear()} CrediSafe
             </p>
