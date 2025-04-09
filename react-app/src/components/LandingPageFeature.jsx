@@ -3,7 +3,7 @@ export default function LandingPageFeature({ title, children, image, reversed })
     <>
       <div
         className={`row ${reversed ? "flex-row-reverse" : ""} align-items-center justify-content-around gap-3 mb-5`}
-        style={{ minHeight: "30vh" }}
+        style={{ minHeight: "50vh" }}
       >
         <div className="col col-4">
           <h2 className="fs-5 px-2">{title}</h2>
@@ -17,9 +17,9 @@ export default function LandingPageFeature({ title, children, image, reversed })
             <img
               src={image}
               alt={title}
-              //   className="w-100 d-block p-2 c-bg-light"
-              className="w-100 d-block p-2 "
+              className="w-100 d-block custom-rounded-1"
               style={{
+                objectFit: "cover",
                 aspectRatio: "16/9",
               }}
             />
