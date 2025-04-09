@@ -1,18 +1,18 @@
 {
   "../node_modules/canvg/lib/index.es.js": {
-    "file": "index.es-83fa15fe.js",
+    "file": "index.es-a4071436.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "../node_modules/canvg/lib/index.es.js"
@@ -22,165 +22,171 @@
     "isDynamicEntry": true,
     "src": "../node_modules/dompurify/dist/purify.es.js"
   },
-  "_BulkIconButton-d9b5ea98.js": {
-    "file": "BulkIconButton-d9b5ea98.js",
+  "_BulkIconButton-87c7029b.js": {
+    "file": "BulkIconButton-87c7029b.js",
     "imports": [
       "src/main.jsx"
     ]
   },
-  "_BulkUploadModal-2b6b60a8.js": {
-    "file": "BulkUploadModal-2b6b60a8.js",
+  "_BulkUploadModal-15ffcc8d.js": {
+    "file": "BulkUploadModal-15ffcc8d.js",
     "imports": [
       "src/main.jsx",
-      "_MultipleUpload-d96a866d.js",
-      "_Modal-187d8da3.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_Modal-9de466f6.js"
     ]
   },
-  "_Button-b3071be7.js": {
-    "file": "Button-b3071be7.js",
+  "_Button-314e1f54.js": {
+    "file": "Button-314e1f54.js",
     "imports": [
       "src/main.jsx"
     ]
   },
-  "_Button-b6d67e99.js": {
-    "file": "Button-b6d67e99.js",
+  "_Button-6308210e.js": {
+    "file": "Button-6308210e.js",
     "imports": [
-      "_Modal-187d8da3.js",
+      "_Modal-9de466f6.js",
       "src/main.jsx",
-      "_Button-b3071be7.js"
+      "_Button-314e1f54.js"
     ]
   },
-  "_CompanyAdd-eb077da2.js": {
-    "file": "CompanyAdd-eb077da2.js",
+  "_CompanyAdd-cc5ac92b.js": {
+    "file": "CompanyAdd-cc5ac92b.js",
     "imports": [
       "src/main.jsx",
-      "_MultipleUpload-d96a866d.js",
+      "_MultipleUpload-09b1dc47.js",
       "_index-c8db368f.js",
-      "_index-be7773a3.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js"
+      "_index-ea250f19.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js"
     ]
   },
-  "_ContentModal-21794ab7.js": {
-    "file": "ContentModal-21794ab7.js",
+  "_ContentModal-53fee559.js": {
+    "file": "ContentModal-53fee559.js",
     "imports": [
       "src/main.jsx",
-      "_Modal-187d8da3.js"
+      "_Modal-9de466f6.js"
     ]
   },
-  "_DeleteUserConfirmition-1527642b.js": {
-    "file": "DeleteUserConfirmition-1527642b.js",
+  "_DeleteUserConfirmition-5cfc8d82.js": {
+    "file": "DeleteUserConfirmition-5cfc8d82.js",
     "imports": [
       "src/main.jsx",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js"
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js"
     ]
   },
-  "_DrawerContent-091e0f8b.js": {
-    "file": "DrawerContent-091e0f8b.js",
+  "_DrawerContent-85cf9e33.js": {
+    "file": "DrawerContent-85cf9e33.js",
     "imports": [
       "src/main.jsx",
-      "_index-5f18d908.js",
+      "_index-0c7d6a02.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js"
+      "_removeClass-dd64b22a.js"
     ]
   },
-  "_ExternalEnquirerInputDialog-38612287.js": {
-    "file": "ExternalEnquirerInputDialog-38612287.js",
+  "_ExternalEnquirerInputDialog-c906fa95.js": {
+    "file": "ExternalEnquirerInputDialog-c906fa95.js",
     "imports": [
       "src/main.jsx",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js"
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js"
     ]
   },
-  "_InDevelopment-dbafbe7f.js": {
-    "file": "InDevelopment-dbafbe7f.js",
+  "_InDevelopment-458d9dd9.js": {
+    "file": "InDevelopment-458d9dd9.js",
     "imports": [
       "src/main.jsx"
     ]
   },
-  "_IndividualAdd-257e5ad1.js": {
-    "file": "IndividualAdd-257e5ad1.js",
+  "_IndividualAdd-14224f1b.js": {
+    "file": "IndividualAdd-14224f1b.js",
     "imports": [
       "src/main.jsx",
-      "_index-be7773a3.js",
-      "_MultipleUpload-d96a866d.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js"
+      "_index-ea250f19.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js"
     ]
   },
-  "_Layout-43e13fa9.js": {
-    "file": "Layout-43e13fa9.js",
+  "_Layout-6b67cc43.js": {
+    "file": "Layout-6b67cc43.js",
+    "imports": [
+      "src/main.jsx"
+    ]
+  },
+  "_Layout-767d347c.js": {
+    "file": "Layout-767d347c.js",
     "imports": [
       "src/main.jsx",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ]
   },
-  "_Layout-7e65d71f.js": {
-    "file": "Layout-7e65d71f.js",
+  "_MessageModal-824f0168.js": {
+    "file": "MessageModal-824f0168.js",
+    "imports": [
+      "src/main.jsx",
+      "_Modal-9de466f6.js"
+    ]
+  },
+  "_Modal-9de466f6.js": {
+    "file": "Modal-9de466f6.js",
+    "imports": [
+      "src/main.jsx",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js"
+    ]
+  },
+  "_MultipleUpload-09b1dc47.js": {
+    "file": "MultipleUpload-09b1dc47.js",
+    "imports": [
+      "src/main.jsx",
+      "_Modal-9de466f6.js"
+    ]
+  },
+  "_NotFound-e601eee3.js": {
+    "file": "NotFound-e601eee3.js",
     "imports": [
       "src/main.jsx"
     ]
   },
-  "_MessageModal-b0a7faf0.js": {
-    "file": "MessageModal-b0a7faf0.js",
-    "imports": [
-      "src/main.jsx",
-      "_Modal-187d8da3.js"
-    ]
-  },
-  "_Modal-187d8da3.js": {
-    "file": "Modal-187d8da3.js",
-    "imports": [
-      "src/main.jsx",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js"
-    ]
-  },
-  "_MultipleUpload-d96a866d.js": {
-    "file": "MultipleUpload-d96a866d.js",
-    "imports": [
-      "src/main.jsx",
-      "_Modal-187d8da3.js"
-    ]
-  },
-  "_NotFound-7313ec07.js": {
-    "file": "NotFound-7313ec07.js",
+  "_PageHeader-62ebed4a.js": {
+    "file": "PageHeader-62ebed4a.js",
     "imports": [
       "src/main.jsx"
     ]
   },
-  "_PageHeader-330e7b8b.js": {
-    "file": "PageHeader-330e7b8b.js",
-    "imports": [
-      "src/main.jsx"
-    ]
-  },
-  "_PaginationControls-19a61272.js": {
-    "file": "PaginationControls-19a61272.js",
+  "_PaginationControls-268277f3.js": {
+    "file": "PaginationControls-268277f3.js",
     "imports": [
       "src/main.jsx",
-      "_Modal-187d8da3.js",
-      "_Button-b3071be7.js"
+      "_Modal-9de466f6.js",
+      "_Button-314e1f54.js"
     ]
   },
-  "_Payments-20df22cc.js": {
-    "file": "Payments-20df22cc.js",
+  "_Payments-054144e3.js": {
+    "file": "Payments-054144e3.js",
     "imports": [
       "src/main.jsx",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js",
-      "_Layout-43e13fa9.js",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js",
+      "_Layout-767d347c.js",
       "_index-c8db368f.js",
-      "_html2pdf-da1d79a6.js",
-      "_Modal-187d8da3.js"
+      "_html2pdf-f2c97a02.js",
+      "_Modal-9de466f6.js"
+    ]
+  },
+  "_SearchBar-fd5a454d.js": {
+    "file": "SearchBar-fd5a454d.js",
+    "imports": [
+      "src/main.jsx"
     ]
   },
   "_assertThisInitialized-3be3daa4.js": {
@@ -189,76 +195,76 @@
   "_formatting-9de8c923.js": {
     "file": "formatting-9de8c923.js"
   },
-  "_html2canvas-76e08050.js": {
-    "file": "html2canvas-76e08050.js",
+  "_html2canvas-a34b79fb.js": {
+    "file": "html2canvas-a34b79fb.js",
     "imports": [
       "src/main.jsx",
-      "_html2pdf-da1d79a6.js"
+      "_html2pdf-f2c97a02.js"
     ],
     "isDynamicEntry": true
   },
-  "_html2pdf-da1d79a6.js": {
+  "_html2pdf-f2c97a02.js": {
     "dynamicImports": [
-      "_html2canvas-76e08050.js",
+      "_html2canvas-a34b79fb.js",
       "../node_modules/dompurify/dist/purify.es.js",
       "../node_modules/canvg/lib/index.es.js"
     ],
-    "file": "html2pdf-da1d79a6.js",
+    "file": "html2pdf-f2c97a02.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js"
+      "_Layout-767d347c.js"
     ]
   },
-  "_index-5f18d908.js": {
-    "file": "index-5f18d908.js",
+  "_index-0c7d6a02.js": {
+    "file": "index-0c7d6a02.js",
     "imports": [
       "src/main.jsx"
     ]
   },
-  "_index-be7773a3.js": {
-    "file": "index-be7773a3.js",
+  "_index-b1b333f5.js": {
+    "file": "index-b1b333f5.js",
     "imports": [
-      "src/main.jsx",
-      "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js"
+      "src/main.jsx"
     ]
   },
   "_index-c8db368f.js": {
     "file": "index-c8db368f.js"
   },
-  "_index-cd1641e2.js": {
-    "file": "index-cd1641e2.js",
-    "imports": [
-      "src/main.jsx"
-    ]
-  },
-  "_lodash-b4f5a0b3.js": {
-    "file": "lodash-b4f5a0b3.js",
-    "imports": [
-      "src/main.jsx"
-    ]
-  },
-  "_removeClass-2ac5390d.js": {
-    "file": "removeClass-2ac5390d.js",
-    "imports": [
-      "src/main.jsx"
-    ]
-  },
-  "_search-06c27bea.js": {
-    "file": "search-06c27bea.js",
+  "_index-ea250f19.js": {
+    "file": "index-ea250f19.js",
     "imports": [
       "src/main.jsx",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js"
+      "_formatting-9de8c923.js",
+      "_lodash-a15548bd.js"
+    ]
+  },
+  "_lodash-a15548bd.js": {
+    "file": "lodash-a15548bd.js",
+    "imports": [
+      "src/main.jsx"
+    ]
+  },
+  "_removeClass-dd64b22a.js": {
+    "file": "removeClass-dd64b22a.js",
+    "imports": [
+      "src/main.jsx"
+    ]
+  },
+  "_search-691d1d66.js": {
+    "file": "search-691d1d66.js",
+    "imports": [
+      "src/main.jsx",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js"
     ]
   },
   "src/main.css": {
-    "file": "main-b44662bd.css",
+    "file": "main-c4b8ab34.css",
     "src": "src/main.css"
   },
   "src/main.jsx": {
     "css": [
-      "main-b44662bd.css"
+      "main-c4b8ab34.css"
     ],
     "dynamicImports": [
       "src/pages/Admin/Dashboard.jsx",
@@ -308,26 +314,26 @@
       "src/pages/Leases/ClientCompanyVerify.jsx",
       "src/pages/Leases/Index.jsx"
     ],
-    "file": "main-13c4959c.js",
+    "file": "main-92093c4c.js",
     "isEntry": true,
     "src": "src/main.jsx"
   },
   "src/pages/Admin/Dashboard.jsx": {
-    "file": "Dashboard-31a7b45a.js",
+    "file": "Dashboard-479b41be.js",
     "imports": [
       "src/main.jsx",
-      "_PageHeader-330e7b8b.js",
-      "_lodash-b4f5a0b3.js",
-      "_Modal-187d8da3.js",
-      "_index-cd1641e2.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js"
+      "_PageHeader-62ebed4a.js",
+      "_lodash-a15548bd.js",
+      "_Modal-9de466f6.js",
+      "_index-b1b333f5.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Dashboard.jsx"
   },
   "src/pages/Admin/Profile/ResetPassword.jsx": {
-    "file": "ResetPassword-c2dd9218.js",
+    "file": "ResetPassword-41422ecd.js",
     "imports": [
       "src/main.jsx"
     ],
@@ -335,105 +341,105 @@
     "src": "src/pages/Admin/Profile/ResetPassword.jsx"
   },
   "src/pages/Admin/Search/SearchCompany.jsx": {
-    "file": "SearchCompany-7842360a.js",
+    "file": "SearchCompany-bf5b073e.js",
     "imports": [
       "src/main.jsx",
-      "_NotFound-7313ec07.js",
-      "_PageHeader-330e7b8b.js",
-      "_CompanyAdd-eb077da2.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_ExternalEnquirerInputDialog-38612287.js",
-      "_MultipleUpload-d96a866d.js",
+      "_NotFound-e601eee3.js",
+      "_PageHeader-62ebed4a.js",
+      "_CompanyAdd-cc5ac92b.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_ExternalEnquirerInputDialog-c906fa95.js",
+      "_MultipleUpload-09b1dc47.js",
       "_index-c8db368f.js",
-      "_index-be7773a3.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_lodash-a15548bd.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Search/SearchCompany.jsx"
   },
   "src/pages/Admin/Search/SearchIndividual.jsx": {
-    "file": "SearchIndividual-1ac86ace.js",
+    "file": "SearchIndividual-dc64a5eb.js",
     "imports": [
       "src/main.jsx",
-      "_NotFound-7313ec07.js",
-      "_BulkIconButton-d9b5ea98.js",
-      "_PageHeader-330e7b8b.js",
-      "_index-be7773a3.js",
-      "_MultipleUpload-d96a866d.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_ExternalEnquirerInputDialog-38612287.js",
+      "_NotFound-e601eee3.js",
+      "_BulkIconButton-87c7029b.js",
+      "_PageHeader-62ebed4a.js",
+      "_index-ea250f19.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_ExternalEnquirerInputDialog-c906fa95.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_lodash-a15548bd.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Search/SearchIndividual.jsx"
   },
   "src/pages/Admin/Subscription/Active.jsx": {
-    "file": "Active-9ae600b4.js",
+    "file": "Active-6aac14e0.js",
     "imports": [
       "src/main.jsx",
-      "_PageHeader-330e7b8b.js",
-      "_search-06c27bea.js",
-      "_index-be7773a3.js",
+      "_PageHeader-62ebed4a.js",
+      "_search-691d1d66.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js",
-      "_Modal-187d8da3.js",
-      "_lodash-b4f5a0b3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js"
+      "_Modal-9de466f6.js",
+      "_lodash-a15548bd.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Subscription/Active.jsx"
   },
   "src/pages/Admin/Subscription/Historic.jsx": {
-    "file": "Historic-8cee8454.js",
+    "file": "Historic-c15f399f.js",
     "imports": [
       "src/main.jsx",
-      "_PageHeader-330e7b8b.js"
+      "_PageHeader-62ebed4a.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Subscription/Historic.jsx"
   },
   "src/pages/Admin/Subscription/HistoricCompanies.jsx": {
-    "file": "HistoricCompanies-e957ab3c.js",
+    "file": "HistoricCompanies-4b3ff13c.js",
     "imports": [
       "src/main.jsx",
-      "_PageHeader-330e7b8b.js"
+      "_PageHeader-62ebed4a.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Subscription/HistoricCompanies.jsx"
   },
   "src/pages/Admin/Subscription/HistoricIndividuals.jsx": {
-    "file": "HistoricIndividuals-1c3d7ff8.js",
+    "file": "HistoricIndividuals-5274bde0.js",
     "imports": [
       "src/main.jsx",
-      "_PageHeader-330e7b8b.js"
+      "_PageHeader-62ebed4a.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Subscription/HistoricIndividuals.jsx"
   },
   "src/pages/Admin/Subscription/Pricing.jsx": {
-    "file": "Pricing-20273485.js",
+    "file": "Pricing-61db63e8.js",
     "imports": [
       "src/main.jsx",
-      "_search-06c27bea.js",
+      "_search-691d1d66.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js"
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Subscription/Pricing.jsx"
   },
   "src/pages/Admin/Subscription/Unallocated.jsx": {
-    "file": "Unallocated-ab93bb46.js",
+    "file": "Unallocated-1d1b0829.js",
     "imports": [
       "src/main.jsx"
     ],
@@ -441,666 +447,669 @@
     "src": "src/pages/Admin/Subscription/Unallocated.jsx"
   },
   "src/pages/Admin/Subscription/View.jsx": {
-    "file": "View-bef96c9a.js",
+    "file": "View-9241bafd.js",
     "imports": [
       "src/main.jsx",
-      "_PageHeader-330e7b8b.js",
+      "_PageHeader-62ebed4a.js",
       "_formatting-9de8c923.js",
-      "_DrawerContent-091e0f8b.js",
-      "_index-5f18d908.js",
+      "_DrawerContent-85cf9e33.js",
+      "_index-0c7d6a02.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js"
+      "_removeClass-dd64b22a.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Subscription/View.jsx"
   },
   "src/pages/Admin/Users/SearchAgencyUsers.jsx": {
-    "file": "SearchAgencyUsers-50004c5b.js",
+    "file": "SearchAgencyUsers-9870658f.js",
     "imports": [
       "src/main.jsx",
-      "_DeleteUserConfirmition-1527642b.js",
-      "_BulkIconButton-d9b5ea98.js",
-      "_NotFound-7313ec07.js",
-      "_PageHeader-330e7b8b.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_DeleteUserConfirmition-5cfc8d82.js",
+      "_BulkIconButton-87c7029b.js",
+      "_NotFound-e601eee3.js",
+      "_PageHeader-62ebed4a.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Users/SearchAgencyUsers.jsx"
   },
   "src/pages/Admin/Users/SearchClientUser.jsx": {
-    "file": "SearchClientUser-0444785f.js",
+    "file": "SearchClientUser-469bd2cc.js",
     "imports": [
       "src/main.jsx",
-      "_CompanyAdd-eb077da2.js",
-      "_DeleteUserConfirmition-1527642b.js",
-      "_NotFound-7313ec07.js",
-      "_PageHeader-330e7b8b.js",
-      "_MultipleUpload-d96a866d.js",
-      "_Modal-187d8da3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
+      "_CompanyAdd-cc5ac92b.js",
+      "_DeleteUserConfirmition-5cfc8d82.js",
+      "_NotFound-e601eee3.js",
+      "_PageHeader-62ebed4a.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_Modal-9de466f6.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
       "_index-c8db368f.js",
-      "_index-be7773a3.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
-      "_Button-b6d67e99.js",
-      "_Button-b3071be7.js"
+      "_lodash-a15548bd.js",
+      "_Button-6308210e.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Users/SearchClientUser.jsx"
   },
   "src/pages/Admin/Users/SearchCompanyUser.jsx": {
-    "file": "SearchCompanyUser-2082016a.js",
+    "file": "SearchCompanyUser-9e0e257a.js",
     "imports": [
       "src/main.jsx",
-      "_CompanyAdd-eb077da2.js",
-      "_DeleteUserConfirmition-1527642b.js",
-      "_NotFound-7313ec07.js",
-      "_PageHeader-330e7b8b.js",
-      "_MultipleUpload-d96a866d.js",
-      "_Modal-187d8da3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
+      "_CompanyAdd-cc5ac92b.js",
+      "_DeleteUserConfirmition-5cfc8d82.js",
+      "_NotFound-e601eee3.js",
+      "_PageHeader-62ebed4a.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_Modal-9de466f6.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
       "_index-c8db368f.js",
-      "_index-be7773a3.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
-      "_Button-b6d67e99.js",
-      "_Button-b3071be7.js"
+      "_lodash-a15548bd.js",
+      "_Button-6308210e.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Users/SearchCompanyUser.jsx"
   },
   "src/pages/Admin/Users/SearchIndividualUser.jsx": {
-    "file": "SearchIndividualUser-aa9bc775.js",
+    "file": "SearchIndividualUser-f18423f0.js",
     "imports": [
       "src/main.jsx",
-      "_DeleteUserConfirmition-1527642b.js",
-      "_BulkIconButton-d9b5ea98.js",
-      "_IndividualAdd-257e5ad1.js",
-      "_NotFound-7313ec07.js",
-      "_PageHeader-330e7b8b.js",
-      "_Modal-187d8da3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
-      "_Button-b6d67e99.js",
-      "_Button-b3071be7.js",
-      "_index-be7773a3.js",
+      "_DeleteUserConfirmition-5cfc8d82.js",
+      "_BulkIconButton-87c7029b.js",
+      "_IndividualAdd-14224f1b.js",
+      "_NotFound-e601eee3.js",
+      "_PageHeader-62ebed4a.js",
+      "_Modal-9de466f6.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_Button-6308210e.js",
+      "_Button-314e1f54.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
-      "_MultipleUpload-d96a866d.js"
+      "_lodash-a15548bd.js",
+      "_MultipleUpload-09b1dc47.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Admin/Users/SearchIndividualUser.jsx"
   },
   "src/pages/Auth/ClientCompanyVerify.jsx": {
-    "file": "ClientCompanyVerify-c9fb0df6.js",
+    "file": "ClientCompanyVerify-209cf860.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-7e65d71f.js"
+      "_Layout-6b67cc43.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Auth/ClientCompanyVerify.jsx"
   },
   "src/pages/Auth/Login.jsx": {
-    "file": "Login-938d1fc2.js",
+    "file": "Login-4a0a1a04.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-7e65d71f.js"
+      "_Layout-6b67cc43.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Auth/Login.jsx"
   },
   "src/pages/Client/Accounting/AccountAdjustment/CreditJournal.jsx": {
-    "file": "CreditJournal-62722760.js",
+    "file": "CreditJournal-fd484482.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
+      "_Layout-767d347c.js",
       "src/pages/Client/Accounting/AccountAdjustment/SearchCustomer.jsx",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/AccountAdjustment/CreditJournal.jsx"
   },
   "src/pages/Client/Accounting/AccountAdjustment/CreditorCreditJournal.jsx": {
-    "file": "CreditorCreditJournal-189c045b.js",
+    "file": "CreditorCreditJournal-cf79c776.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
+      "_Layout-767d347c.js",
       "src/pages/Client/Accounting/AccountAdjustment/SearchCreditor.jsx",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/AccountAdjustment/CreditorCreditJournal.jsx"
   },
   "src/pages/Client/Accounting/AccountAdjustment/CreditorDebitJournal.jsx": {
-    "file": "CreditorDebitJournal-77dbb26d.js",
+    "file": "CreditorDebitJournal-b4c9734a.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
+      "_Layout-767d347c.js",
       "src/pages/Client/Accounting/AccountAdjustment/SearchCreditor.jsx",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/AccountAdjustment/CreditorDebitJournal.jsx"
   },
   "src/pages/Client/Accounting/AccountAdjustment/DebitJournal.jsx": {
-    "file": "DebitJournal-3b7c0dda.js",
+    "file": "DebitJournal-ba141b0a.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
+      "_Layout-767d347c.js",
       "src/pages/Client/Accounting/AccountAdjustment/SearchCustomer.jsx",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/AccountAdjustment/DebitJournal.jsx"
   },
   "src/pages/Client/Accounting/AccountAdjustment/SearchCreditor.jsx": {
-    "file": "SearchCreditor-fdb678ab.js",
+    "file": "SearchCreditor-72a57207.js",
     "imports": [
       "src/main.jsx",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/AccountAdjustment/SearchCreditor.jsx"
   },
   "src/pages/Client/Accounting/AccountAdjustment/SearchCustomer.jsx": {
-    "file": "SearchCustomer-e43afb1f.js",
+    "file": "SearchCustomer-2ec00ba7.js",
     "imports": [
       "src/main.jsx",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/AccountAdjustment/SearchCustomer.jsx"
   },
   "src/pages/Client/Accounting/CommissionStatement.jsx": {
-    "file": "CommissionStatement-80e29e52.js",
+    "file": "CommissionStatement-2983b3a4.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js",
-      "_html2pdf-da1d79a6.js",
+      "_Layout-767d347c.js",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js",
+      "_html2pdf-f2c97a02.js",
       "_formatting-9de8c923.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/CommissionStatement.jsx"
   },
   "src/pages/Client/Accounting/CreditorStatements.jsx": {
-    "file": "CreditorStatements-016f5337.js",
+    "file": "CreditorStatements-8b66c227.js",
     "imports": [
       "src/main.jsx",
-      "_PaginationControls-19a61272.js",
-      "_Layout-43e13fa9.js",
+      "_SearchBar-fd5a454d.js",
+      "_PaginationControls-268277f3.js",
+      "_Layout-767d347c.js",
       "_formatting-9de8c923.js",
-      "_Payments-20df22cc.js",
-      "_lodash-b4f5a0b3.js",
-      "_Modal-187d8da3.js",
-      "_index-be7773a3.js",
-      "_Button-b3071be7.js",
+      "_Payments-054144e3.js",
+      "_lodash-a15548bd.js",
+      "_Modal-9de466f6.js",
+      "_index-ea250f19.js",
+      "_Button-314e1f54.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js",
+      "_removeClass-dd64b22a.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js",
       "_index-c8db368f.js",
-      "_html2pdf-da1d79a6.js",
-      "_index-5f18d908.js"
+      "_html2pdf-f2c97a02.js",
+      "_index-0c7d6a02.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/CreditorStatements.jsx"
   },
   "src/pages/Client/Accounting/DebtCall.jsx": {
-    "file": "DebtCall-c6c204be.js",
+    "file": "DebtCall-ff3415e9.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_index-be7773a3.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_index-ea250f19.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/DebtCall.jsx"
   },
   "src/pages/Client/Accounting/DetailedCreditorStatement.jsx": {
-    "file": "DetailedCreditorStatement-9a50946f.js",
+    "file": "DetailedCreditorStatement-a3333e68.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_lodash-a15548bd.js",
       "_formatting-9de8c923.js",
-      "_html2pdf-da1d79a6.js",
+      "_html2pdf-f2c97a02.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/DetailedCreditorStatement.jsx"
   },
   "src/pages/Client/Accounting/DetailedStatement.jsx": {
-    "file": "DetailedStatement-0aa30c97.js",
+    "file": "DetailedStatement-df0c301d.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_html2pdf-da1d79a6.js",
+      "_Layout-767d347c.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_html2pdf-f2c97a02.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_removeClass-dd64b22a.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/DetailedStatement.jsx"
   },
   "src/pages/Client/Accounting/Forecasts.jsx": {
-    "file": "Forecasts-c45b6489.js",
+    "file": "Forecasts-f01b63f1.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_index-be7773a3.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_index-ea250f19.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Forecasts.jsx"
   },
   "src/pages/Client/Accounting/Invoicing.jsx": {
-    "file": "Invoicing-f7e883bd.js",
+    "file": "Invoicing-e0be3db6.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_Modal-187d8da3.js",
-      "_index-be7773a3.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_Modal-9de466f6.js",
+      "_index-ea250f19.js",
+      "_lodash-a15548bd.js",
       "_formatting-9de8c923.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js",
-      "_index-5f18d908.js"
+      "_removeClass-dd64b22a.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js",
+      "_index-0c7d6a02.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Invoicing.jsx"
   },
   "src/pages/Client/Accounting/Sales/CashBooks.jsx": {
-    "file": "CashBooks-d71a0dc3.js",
+    "file": "CashBooks-fd62252d.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_InDevelopment-dbafbe7f.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_InDevelopment-458d9dd9.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/CashBooks.jsx"
   },
   "src/pages/Client/Accounting/Sales/CashSales.jsx": {
-    "file": "CashSales-dd3b47c2.js",
+    "file": "CashSales-699108ee.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_InDevelopment-dbafbe7f.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_InDevelopment-458d9dd9.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/CashSales.jsx"
   },
   "src/pages/Client/Accounting/Sales/GeneralLedger.jsx": {
-    "file": "GeneralLedger-700d19e8.js",
+    "file": "GeneralLedger-0c13ffa1.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_InDevelopment-dbafbe7f.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_InDevelopment-458d9dd9.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/GeneralLedger.jsx"
   },
   "src/pages/Client/Accounting/Sales/ProductsAndServices.jsx": {
-    "file": "ProductsAndServices-b73c83c9.js",
+    "file": "ProductsAndServices-b5344e30.js",
     "imports": [
       "src/main.jsx",
-      "_ContentModal-21794ab7.js",
-      "_Layout-43e13fa9.js",
-      "_MessageModal-b0a7faf0.js",
-      "_index-be7773a3.js",
-      "_Modal-187d8da3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
-      "_lodash-b4f5a0b3.js",
+      "_ContentModal-53fee559.js",
+      "_Layout-767d347c.js",
+      "_MessageModal-824f0168.js",
+      "_index-ea250f19.js",
+      "_Modal-9de466f6.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/ProductsAndServices.jsx"
   },
   "src/pages/Client/Accounting/Sales/SalesAccounts.jsx": {
-    "file": "SalesAccounts-87d29626.js",
+    "file": "SalesAccounts-eafb07d2.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_InDevelopment-dbafbe7f.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_InDevelopment-458d9dd9.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/SalesAccounts.jsx"
   },
   "src/pages/Client/Accounting/Sales/SalesCategories.jsx": {
-    "file": "SalesCategories-a188a054.js",
+    "file": "SalesCategories-3cd044f2.js",
     "imports": [
       "src/main.jsx",
-      "_ContentModal-21794ab7.js",
-      "_Layout-43e13fa9.js",
-      "_MessageModal-b0a7faf0.js",
-      "_index-be7773a3.js",
-      "_Modal-187d8da3.js",
-      "_removeClass-2ac5390d.js",
-      "_index-5f18d908.js",
-      "_lodash-b4f5a0b3.js",
+      "_ContentModal-53fee559.js",
+      "_Layout-767d347c.js",
+      "_MessageModal-824f0168.js",
+      "_index-ea250f19.js",
+      "_Modal-9de466f6.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/SalesCategories.jsx"
   },
   "src/pages/Client/Accounting/Sales/SalesInvoicing.jsx": {
-    "file": "SalesInvoicing-2f8a9caa.js",
+    "file": "SalesInvoicing-694b5d56.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_InDevelopment-dbafbe7f.js",
-      "_lodash-b4f5a0b3.js",
-      "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js",
+      "_SearchBar-fd5a454d.js",
+      "_ContentModal-53fee559.js",
+      "_Layout-767d347c.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_Modal-9de466f6.js",
+      "_removeClass-dd64b22a.js",
+      "_index-0c7d6a02.js",
+      "_assertThisInitialized-3be3daa4.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/SalesInvoicing.jsx"
   },
   "src/pages/Client/Accounting/Sales/VatSettings.jsx": {
-    "file": "VatSettings-6206a3a5.js",
+    "file": "VatSettings-c5205e3d.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_index-be7773a3.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_index-ea250f19.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Sales/VatSettings.jsx"
   },
   "src/pages/Client/Accounting/Statements.jsx": {
-    "file": "Statements-d66ab06f.js",
+    "file": "Statements-971aa279.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_PaginationControls-19a61272.js",
+      "_Layout-767d347c.js",
+      "_SearchBar-fd5a454d.js",
+      "_PaginationControls-268277f3.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js",
-      "_Button-b3071be7.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Accounting/Statements.jsx"
   },
   "src/pages/Client/Dashboard.jsx": {
-    "file": "Dashboard-6e565894.js",
+    "file": "Dashboard-f7a0659e.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_PageHeader-330e7b8b.js",
-      "_index-cd1641e2.js",
+      "_Layout-767d347c.js",
+      "_index-b1b333f5.js",
       "_formatting-9de8c923.js",
-      "_lodash-b4f5a0b3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Dashboard.jsx"
   },
   "src/pages/Client/Profile/ResetPassword.jsx": {
-    "file": "ResetPassword-995115dd.js",
+    "file": "ResetPassword-cfe96158.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_Modal-187d8da3.js",
-      "_index-5f18d908.js",
+      "_removeClass-dd64b22a.js",
+      "_Modal-9de466f6.js",
+      "_index-0c7d6a02.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Profile/ResetPassword.jsx"
   },
   "src/pages/Client/Search/SearchCompany.jsx": {
-    "file": "SearchCompany-1726855c.js",
+    "file": "SearchCompany-5c860e7a.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_BulkIconButton-d9b5ea98.js",
-      "_html2pdf-da1d79a6.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_BulkUploadModal-2b6b60a8.js",
-      "_MultipleUpload-d96a866d.js",
+      "_Layout-767d347c.js",
+      "_BulkIconButton-87c7029b.js",
+      "_html2pdf-f2c97a02.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_BulkUploadModal-15ffcc8d.js",
+      "_MultipleUpload-09b1dc47.js",
       "_index-c8db368f.js",
-      "_index-be7773a3.js",
-      "_ContentModal-21794ab7.js",
-      "_NotFound-7313ec07.js",
-      "_lodash-b4f5a0b3.js",
+      "_index-ea250f19.js",
+      "_ContentModal-53fee559.js",
+      "_NotFound-e601eee3.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
+      "_removeClass-dd64b22a.js",
       "_formatting-9de8c923.js",
-      "_search-06c27bea.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_search-691d1d66.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Search/SearchCompany.jsx"
   },
   "src/pages/Client/Search/SearchIndividual.jsx": {
-    "file": "SearchIndividual-3e06d0e4.js",
+    "file": "SearchIndividual-630e2901.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_NotFound-7313ec07.js",
-      "_IndividualAdd-257e5ad1.js",
-      "_BulkIconButton-d9b5ea98.js",
-      "_BulkUploadModal-2b6b60a8.js",
-      "_html2pdf-da1d79a6.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_NotFound-e601eee3.js",
+      "_IndividualAdd-14224f1b.js",
+      "_BulkIconButton-87c7029b.js",
+      "_BulkUploadModal-15ffcc8d.js",
+      "_html2pdf-f2c97a02.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
+      "_removeClass-dd64b22a.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Search/SearchIndividual.jsx"
   },
   "src/pages/Client/Users/Index.jsx": {
-    "file": "Index-ae01df5e.js",
+    "file": "Index-856c1ef2.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_lodash-b4f5a0b3.js",
+      "_Layout-767d347c.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_lodash-a15548bd.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
+      "_removeClass-dd64b22a.js",
       "_formatting-9de8c923.js",
-      "_MultipleUpload-d96a866d.js",
-      "_index-be7773a3.js",
-      "_search-06c27bea.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js"
+      "_MultipleUpload-09b1dc47.js",
+      "_index-ea250f19.js",
+      "_search-691d1d66.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Client/Users/Index.jsx"
   },
   "src/pages/Leases/ClientCompanyVerify.jsx": {
-    "file": "ClientCompanyVerify-583c4c71.js",
+    "file": "ClientCompanyVerify-9c2f2d7e.js",
     "imports": [
       "src/main.jsx",
-      "_index-5f18d908.js"
+      "_index-0c7d6a02.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Leases/ClientCompanyVerify.jsx"
   },
   "src/pages/Leases/Index.jsx": {
-    "file": "Index-61780fa4.js",
+    "file": "Index-d9d8f727.js",
     "imports": [
       "src/main.jsx",
-      "_Layout-43e13fa9.js",
-      "_Modal-187d8da3.js",
-      "_Button-b6d67e99.js",
-      "_DrawerContent-091e0f8b.js",
-      "_PaginationControls-19a61272.js",
-      "_Payments-20df22cc.js",
-      "_lodash-b4f5a0b3.js",
-      "_index-be7773a3.js",
+      "_Layout-767d347c.js",
+      "_Modal-9de466f6.js",
+      "_Button-6308210e.js",
+      "_DrawerContent-85cf9e33.js",
+      "_PaginationControls-268277f3.js",
+      "_SearchBar-fd5a454d.js",
+      "_Payments-054144e3.js",
+      "_lodash-a15548bd.js",
+      "_index-ea250f19.js",
       "_formatting-9de8c923.js",
       "_assertThisInitialized-3be3daa4.js",
-      "_removeClass-2ac5390d.js",
-      "_MultipleUpload-d96a866d.js",
-      "_search-06c27bea.js",
-      "_index-5f18d908.js",
-      "_Button-b3071be7.js",
+      "_removeClass-dd64b22a.js",
+      "_MultipleUpload-09b1dc47.js",
+      "_search-691d1d66.js",
+      "_index-0c7d6a02.js",
+      "_Button-314e1f54.js",
       "_index-c8db368f.js",
-      "_html2pdf-da1d79a6.js"
+      "_html2pdf-f2c97a02.js"
     ],
     "isDynamicEntry": true,
     "src": "src/pages/Leases/Index.jsx"
