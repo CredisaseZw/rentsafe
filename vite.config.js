@@ -20,20 +20,26 @@ module.exports = {
     },
   },
   resolve: {
-    extensions: ['.js', '.json'],
+    extensions: ['.js', '.json','jsx'],
+    alias: {
+      '@': resolve('./react-app/src'), // Add this alias
+      '~assets': resolve('./react-app/src/assets'), // Optional assets alias
+    },
+    
   },
   build: {
     outDir: resolve('./react-app/dist'),
-    assetsDir: '',
+    assetsDir: 'media',
     manifest: true,
     emptyOutDir: true,
-    target: 'es2015',
+    target: 'esnext',
     rollupOptions: {
       input: {
         main: resolve('./react-app/src/main.jsx'), // <- renamed from main.js
       },
       output: {
         chunkFileNames: undefined,
+        assetFileNames: 'media/[name].[hash].[ext]',
       },
     },
   },
