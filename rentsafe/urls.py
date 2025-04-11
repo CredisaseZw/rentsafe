@@ -29,7 +29,7 @@ from .rent_views import agents, clients, company,creditors
 from .rent_views.templates import download_template
 
 urlpatterns = [
-    path("", views.index, name="home"),
+    path("dashboard/", views.index, name="home"),
     path("in-development/", views.in_development, name="in_development"),
     # templates download url
     path(
