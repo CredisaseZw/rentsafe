@@ -22,7 +22,7 @@ export default function Index() {
               image="https://github.com/credisafe/media-files/blob/main/risk-review-plan.png?raw=true"
             >
               We credit score the formal and informal sectors making sure everyone is financially
-              included and bridging the devide.
+              included and bridging the divide.
             </LandingPageFeature>
           </div>
 
@@ -54,7 +54,7 @@ export default function Index() {
               }
               image="https://github.com/credisafe/media-files/blob/main/analysis.png?raw=true"
             >
-              An aacounting app made for the African environment. Perfom multicurrency commission,
+              An accounting app made for the African environment. Perfom multicurrency commission,
               cashflow management, and forecasts.
             </LandingPageFeature>
           </div>
@@ -131,7 +131,7 @@ export default function Index() {
                     <input
                       className="form-control bg-light"
                       id="subject"
-                      placeholder="Subjejct of your message"
+                      placeholder="Subject of your message"
                       required
                     />
                   </div>
