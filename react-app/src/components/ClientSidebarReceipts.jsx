@@ -247,7 +247,7 @@ export default function ClientSidebarReceipts(props) {
             </table>
 
             <>
-              <div className="text-end px-2">
+              <div className="px-2">
                 <button type="button" className="btn btn-sm btn-success" onClick={addRow}>
                   <i className="material-icons">add</i>
                 </button>
