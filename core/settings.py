@@ -401,6 +401,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "in_development",
     "detailed_general_ledger",
     "cash_books_list",
+    "credit_note",
 ]
 
 LOGIN_URL = "login"

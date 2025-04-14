@@ -3,6 +3,7 @@ import ContentModal from "../ContentModal.jsx";
 
 export default function InvoiceFormRow({
   item,
+  itemName,
   index,
   setItems,
   currency,
@@ -106,7 +107,8 @@ export default function InvoiceFormRow({
           <div>
             <div className="alert alert-danger">
               The item you have selected is listed in {preSelectedSalesCode.unit_price_currency} but
-              your invoice is to be in {currency}, please input below the rate to be used
+              your {itemName || "invoice"} is to be in {currency}, please input below the rate to be
+              used
             </div>
 
             <div className="d-flex gap-3 align-items-center">
