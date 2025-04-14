@@ -8,72 +8,74 @@ export default function Index() {
       <LandingPageHeader />
 
       <div className="container">
-        <>
-          <div className="mb-3 px-3 d-flex align-items-center" style={{ minHeight: "20vh" }}>
-            <h1 className="fs-2 w-100 text-center">
-              Growing the <span className="text-info">African</span> credit & financial{" "}
-              <br className="d-none d-md-inline" /> <span className="text-info"> ecosystem</span>.
-            </h1>
-          </div>
+        <div className="mb-3 px-3 d-flex align-items-center" style={{ minHeight: "20vh" }}>
+          <h1 className="fs-2 w-100 text-center">
+            Growing the <span className="text-info">African</span> credit & financial{" "}
+            <br className="d-none d-md-inline" /> <span className="text-info"> ecosystem</span>.
+          </h1>
+        </div>
 
-          <div id="credit-scoring">
-            <LandingPageFeature
-              title="Credit & Capacity Scoring"
-              image="https://github.com/credisafe/media-files/blob/main/risk-review-plan.png?raw=true"
-            >
-              With the informal sector being over 80% in some parts of Africa, how do you bridge the
-              divide so that everyone is financially included? CrediSafe has innovated to be able to
-              credit score both the formal and informal sector so that all can be included. We are
-              also innovating in providing Capacity Score to gauge what kind of credit capacity an
-              informal player can handle.
-            </LandingPageFeature>
-          </div>
+        <div id="credit-scoring">
+          <LandingPageFeature
+            title="Credit & Capacity Scoring"
+            image="https://github.com/credisafe/media-files/blob/main/risk-review-plan.png?raw=true"
+          >
+            With the informal sector being over 80% in some parts of Africa, how do you bridge the
+            divide so that everyone is financially included? CrediSafe has innovated to be able to
+            credit score both the formal and informal sector so that all can be included. We are
+            also innovating in providing Capacity Score to gauge what kind of credit capacity an
+            informal player can handle.
+          </LandingPageFeature>
+        </div>
 
-          <div id="rentsafe">
-            <LandingPageFeature
-              title="RentSafe - Property & Rental Management"
-              image="https://github.com/credisafe/media-files/blob/main/property.png?raw=true"
-              reversed
-            >
-              Made for unique African markets, RentSafe is the ultimate property and rental
-              management tool that can service not only commercial property players, but also via
-              mobile for individual landlords.
-            </LandingPageFeature>
-          </div>
+        <div id="rentsafe">
+          <LandingPageFeature
+            title="RentSafe - Property & Rental Management"
+            image="https://github.com/credisafe/media-files/blob/main/property.png?raw=true"
+            reversed
+          >
+            Made for unique African markets, RentSafe is the ultimate property and rental management
+            tool that can service not only commercial property players, but also via mobile for
+            individual landlords.
+          </LandingPageFeature>
+        </div>
 
-          <div id="countsafe">
-            <LandingPageFeature
-              title="CountSafe"
-              image="https://github.com/credisafe/media-files/blob/main/analysis.png?raw=true"
-            >
-              An accounting system made for the African environment. Businesses can run
-              multicurrency accounts, manage cashflows and make automated account collections.
-            </LandingPageFeature>
-          </div>
+        <div id="countsafe">
+          <LandingPageFeature
+            title="CountSafe"
+            image="https://github.com/credisafe/media-files/blob/main/analysis.png?raw=true"
+          >
+            An accounting system made for the African environment. Businesses can run multicurrency
+            accounts, manage cashflows and make automated account collections.
+          </LandingPageFeature>
+        </div>
 
-          <div id="debt-collection">
-            <LandingPageFeature
-              title="DebtSafe - Debt Collection"
-              image="https://github.com/credisafe/media-files/blob/main/debt.png?raw=true"
-              reversed
-            >
-              Experience higher recovery rates and reduced operational costs with DebtSafe. Our
-              recovery system exponentially improves efficiency all with less effort through our
-              automated system.
-            </LandingPageFeature>
-          </div>
+        <div id="debt-collection">
+          <LandingPageFeature
+            title="DebtSafe - Debt Collection"
+            image="https://github.com/credisafe/media-files/blob/main/debt.png?raw=true"
+            reversed
+          >
+            Experience higher recovery rates and reduced operational costs with DebtSafe. Our
+            recovery system exponentially improves efficiency all with less effort through our
+            automated system.
+          </LandingPageFeature>
+        </div>
+      </div>
 
-          <div className="">
-            <h2>Our Mission</h2>
+      <div className="py-5 my-5">
+        <div className="px-3 py-5 border-top border-bottom text-center border-4 bg-white">
+          <h2 className="mb-4">Our Mission</h2>
 
-            <p>
-              Our mission is to empower individuals and businesses across Africa by enhancing access
-              to credit and financial services. We aim to create a more inclusive financial system
-              that supports growth and development for all.
-            </p>
-          </div>
-        </>
+          <p className="custom-mx-w-6 mx-auto">
+            Our mission is to empower individuals and businesses across Africa by enhancing access
+            to credit and financial services. We aim to create a more inclusive financial system
+            that supports growth and development for all.
+          </p>
+        </div>
+      </div>
 
+      <div className="container">
         <div
           id="contact"
           style={{ minHeight: "70vh" }}
