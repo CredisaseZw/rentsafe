@@ -18,55 +18,59 @@ export default function Index() {
 
           <div id="credit-scoring">
             <LandingPageFeature
-              title="Credit Scoring"
+              title="Credit & Capacity Scoring"
               image="https://github.com/credisafe/media-files/blob/main/risk-review-plan.png?raw=true"
             >
-              We credit score the formal and informal sectors making sure everyone is financially
-              included and bridging the divide.
+              With the informal sector being over 80% in some parts of Africa, how do you bridge the
+              divide so that everyone is financially included? CrediSafe has innovated to be able to
+              credit score both the formal and informal sector so that all can be included. We are
+              also innovating in providing Capacity Score to gauge what kind of credit capacity an
+              informal player can handle.
             </LandingPageFeature>
           </div>
 
           <div id="rentsafe">
             <LandingPageFeature
-              title={
-                <span className="text-nowrap">
-                  RentSafe{" "}
-                  <i className=" c-fs-07 mx-1 d-inline-block material-icons">arrow_forward</i>{" "}
-                  Property & Rent <br /> Management
-                </span>
-              }
+              title="RentSafe - Property & Rental Management"
               image="https://github.com/credisafe/media-files/blob/main/property.png?raw=true"
               reversed
             >
-              Through RentSafe, you can manage your property investment as a corporate or as an
-              individual
+              Made for unique African markets, RentSafe is the ultimate property and rental
+              management tool that can service not only commercial property players, but also via
+              mobile for individual landlords.
             </LandingPageFeature>
           </div>
 
           <div id="countsafe">
             <LandingPageFeature
-              title={
-                <span className="text-nowrap">
-                  CountSafe{" "}
-                  <i className=" c-fs-07 mx-1 d-inline-block material-icons">arrow_forward</i>{" "}
-                  Accounting
-                </span>
-              }
+              title="CountSafe"
               image="https://github.com/credisafe/media-files/blob/main/analysis.png?raw=true"
             >
-              An accounting app made for the African environment. Perfom multicurrency commission,
-              cashflow management, and forecasts.
+              An accounting system made for the African environment. Businesses can run
+              multicurrency accounts, manage cashflows and make automated account collections.
             </LandingPageFeature>
           </div>
 
           <div id="debt-collection">
             <LandingPageFeature
-              title="Debt Collection"
+              title="DebtSafe - Debt Collection"
               image="https://github.com/credisafe/media-files/blob/main/debt.png?raw=true"
               reversed
             >
-              Be able to follow up your funds automatically at scale and a fraction of the cost.
+              Experience higher recovery rates and reduced operational costs with DebtSafe. Our
+              recovery system exponentially improves efficiency all with less effort through our
+              automated system.
             </LandingPageFeature>
+          </div>
+
+          <div className="">
+            <h2>Our Mission</h2>
+
+            <p>
+              Our mission is to empower individuals and businesses across Africa by enhancing access
+              to credit and financial services. We aim to create a more inclusive financial system
+              that supports growth and development for all.
+            </p>
           </div>
         </>
 
