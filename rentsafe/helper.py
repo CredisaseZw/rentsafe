@@ -479,7 +479,7 @@ def run_tasks():
 
 
 def track_lease_balances():
-    leases = Lease.objects.filter(is_active=True, is_government=False).all()
+    leases = Lease.objects.filter(is_active=True).all()
     today = date.today()
     count = 0
     MAX_MESSAGES_PER_SECOND = 90
