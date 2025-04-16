@@ -33,7 +33,7 @@ export default function CreditorInvoice() {
             Creditor Invoice
           </div>
         }
-        show={!showAddModal}
+        show={showAddModal}
         handleClose={handleClose}
         centerTitle
       >
