@@ -62,6 +62,12 @@ export const clientSidebarNavigation = [
             component: <CashSalesModal />,
           },
           {
+            navLink: "Credit Note",
+            color: "firebrick",
+            type: "link",
+            href: reverseUrl("credit_note"),
+          },
+          {
             navLink: "Sales Items",
             color: "firebrick",
             type: "link",
@@ -158,6 +164,12 @@ export const clientSidebarNavigation = [
         navLink: "Creditors",
         color: "#11158f",
         subNavLinks: [
+          {
+            navLink: "Creditor Invoice",
+            color: "#11158f",
+            type: "link",
+            href: reverseUrl("creditor_invoice"),
+          },
           {
             navLink: "Disbursements",
             color: "#11158f",

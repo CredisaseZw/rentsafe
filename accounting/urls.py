@@ -28,4 +28,6 @@ urlpatterns = [
     path("", include(router.urls)),
     path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),
     path("cash-books-list/", cash_books_list ,name="cash_books_list"),
+    path("credit-note/", credit_note ,name="credit_note"),
+    path("creditor-invoice/", creditor_invoice ,name="creditor_invoice"),
 ]

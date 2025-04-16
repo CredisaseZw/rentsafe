@@ -125,7 +125,7 @@ DB_NAME     = os.getenv('DB_NAME'     , None)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "credisafe.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite11MARCH2025",
     }
 }
 
@@ -190,7 +190,6 @@ LEASE_STATUS = "LEASE_STATUS"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-
 STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -215,6 +214,7 @@ DJANGO_VITE_DEV_SERVER_PORT = 5173
 
 # Name of our static files' folder (after called python manage.py collectstatic)
 STATIC_ROOT = BASE_DIR / "static"
+
 # Include DJANGO_VITE_ASSETS_PATH into STATICFILES_DIRS to be copied inside
 # when run command python manage.py collectstatic
 # STATICFILES_DIRS = [DJANGO_VITE_ASSETS_PATH]
@@ -401,6 +401,8 @@ JS_ROUTES_INCLUSION_LIST = [
     "in_development",
     "detailed_general_ledger",
     "cash_books_list",
+    "credit_note",
+    "creditor_invoice",
 ]
 
 LOGIN_URL = "login"
