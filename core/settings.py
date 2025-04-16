@@ -125,7 +125,7 @@ DB_NAME     = os.getenv('DB_NAME'     , None)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite11MARCH2025",
+        "NAME": BASE_DIR / "credisafe.sqlite3",
     }
 }
 
