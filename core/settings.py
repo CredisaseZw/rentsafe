@@ -402,6 +402,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "detailed_general_ledger",
     "cash_books_list",
     "credit_note",
+    "creditor_invoice",
 ]
 
 LOGIN_URL = "login"
