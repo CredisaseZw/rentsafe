@@ -127,4 +127,4 @@ export default function CreditNote() {
   );
 }
 
-CreditNote.layout = (page) => <Layout children={page} title={"Sales Categories"} />;
+CreditNote.layout = (page) => <Layout children={page} title={"Credit Note"} />;
