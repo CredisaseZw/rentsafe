@@ -165,6 +165,12 @@ export const clientSidebarNavigation = [
         color: "#11158f",
         subNavLinks: [
           {
+            navLink: "Creditor Invoice",
+            color: "#11158f",
+            type: "link",
+            href: reverseUrl("creditor_invoice"),
+          },
+          {
             navLink: "Disbursements",
             color: "#11158f",
             type: "modal",

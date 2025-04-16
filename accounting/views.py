@@ -162,3 +162,6 @@ def cash_books_list(request):
 
 def credit_note(request):
     return inertia_render(request, "Client/Accounting/CreditNote")
+
+def creditor_invoice(request):
+    return inertia_render(request, "Client/Accounting/CreditorInvoice")
