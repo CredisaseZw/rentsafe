@@ -479,7 +479,7 @@ def run_tasks():
 
 
 def track_lease_balances():
-    leases = Lease.objects.filter(is_active=True, is_government=False).all()
+    leases = Lease.objects.filter(is_active=True).all()
     today = date.today()
     count = 0
     MAX_MESSAGES_PER_SECOND = 90
@@ -580,46 +580,40 @@ def track_lease_balances():
                     else:
                         registration_message = None
                  
-                    otp_object = OTP.objects.filter(otp_code=lease_id).last()
-                    
-                    if not otp_object or otp_object.created_at.strftime(
-                        "%B"
-                    ) != today.strftime("%B"):
-                        
-                        try:
-                            can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
-                        except Exception as e:
-                            ...
-                        can_send_message = False if can_send_message_ob else True
-                        if registration_message and  can_send_message:
-                            if count % MAX_MESSAGES_PER_SECOND == 0:
-                                time.sleep(1)
-                            send_otp.delay(
-                                "",
-                                lease_id,
-                                contact_detail,
-                                lease.lease_giver,
-                                lease.reg_ID_Number,
-                                requested_user_ob,
-                                settings.LEASE_STATUS,
-                                registration_message,
-                            )
-                            if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
-                                if rent_guarantor_mobile := Individual.objects.filter(
-                                    identification_number=lease.rent_guarantor_id
-                                ).first():
-                                    send_otp.delay(
-                                        "",
-                                        lease_id,
-                                        rent_guarantor_mobile.mobile,
-                                        lease.lease_giver,
-                                        lease.reg_ID_Number,
-                                        "individual",
-                                        settings.LEASE_STATUS,
-                                        registration_message,
-                                    )
-                        else:
-                            ...
+                    try:
+                        can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
+                    except Exception as e:
+                        ...
+                    can_send_message = False if can_send_message_ob else True
+                    if registration_message and  can_send_message:
+                        if count % MAX_MESSAGES_PER_SECOND == 0:
+                            time.sleep(1)
+                        send_otp.delay(
+                            "",
+                            lease_id,
+                            contact_detail,
+                            lease.lease_giver,
+                            lease.reg_ID_Number,
+                            requested_user_ob,
+                            settings.LEASE_STATUS,
+                            registration_message,
+                        )
+                        if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
+                            if rent_guarantor_mobile := Individual.objects.filter(
+                                identification_number=lease.rent_guarantor_id
+                            ).first():
+                                send_otp.delay(
+                                    "",
+                                    lease_id,
+                                    rent_guarantor_mobile.mobile,
+                                    lease.lease_giver,
+                                    lease.reg_ID_Number,
+                                    "individual",
+                                    settings.LEASE_STATUS,
+                                    registration_message,
+                                )
+                    else:
+                        ...
                 
 
 

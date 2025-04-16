@@ -78,7 +78,7 @@ class LeaseAdmin(admin.ModelAdmin):
     list_display = ("is_company", "is_individual", "lease_id", "status", "is_active", "rent_variables", "reg_ID_Number", "payment_period_end", "lease_giver","created_date")
     list_display_links = ("lease_id", "is_company", "is_individual")
     search_fields = ("lease_id", "reg_ID_Number", "lease_giver")
-    list_filter = ("status", "is_active", "payment_period_end")
+    list_filter = ("status", "is_active", "payment_period_end","is_terminated")
     ordering = ("-created_date",)
 
 

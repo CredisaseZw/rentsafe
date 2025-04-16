@@ -2473,12 +2473,13 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email with logins details
-                send_auth_email.delay(
-                    user_id,
-                    user_password,
-                    data.get("userEmail"),
-                    check_individual.firstname,
-                )
+                if request.user.id ==11:
+                    send_auth_email.delay(
+                        user_id,
+                        user_password,
+                        data.get("userEmail"),
+                        check_individual.firstname,
+                    )
             else:
                 # create individual and user
                 individual = Individual(
@@ -2508,12 +2509,13 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email
-                send_auth_email.delay(
-                    user_id,
-                    user_password,
-                    data.get("userEmail"),
-                    data.get("firstName"),
-                )
+                if request.user.id ==11:
+                    send_auth_email.delay(
+                        user_id,
+                        user_password,
+                        data.get("userEmail"),
+                        data.get("firstName"),
+                    )
 
             props = {
                 "success": "success",
@@ -3287,7 +3289,6 @@ def store_company(request):
                 registration_name=data.get("registeredName").upper(),
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),
-                tin_number=data.get("tinNumber"),
             )
             company_ob.save()
             CompanyProfile.objects.create(
@@ -3299,7 +3300,6 @@ def store_company(request):
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 branch=data.get("branch"),
-                
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             user_password = generate_random_password(8)
@@ -3481,6 +3481,7 @@ def delete_lease(request):
     data = json.loads(request.body.decode("utf-8"))
     if lease := Lease.objects.filter(lease_id=data["leaseId"]).first():
         lease.is_active = False
+        lease.is_terminated = True
         lease.termination_date = date.today()
         lease.save()
 
@@ -3566,17 +3567,16 @@ def client_leases_new(request,leases_type=None):
 
     # get active leases for the superuser
     if leases_type == "individuals":
-        base_lease_queryset = Lease.objects.filter(is_individual=True)
+        base_lease_queryset = Lease.objects.filter(is_individual=True,lease_giver=request.user.company)
     elif leases_type == "companies":
-        base_lease_queryset = Lease.objects.filter(is_company=True)
+        base_lease_queryset = Lease.objects.filter(is_company=True,lease_giver=request.user.company)
     elif leases_type == "combined":
-        base_lease_queryset = Lease.objects.all()
+        base_lease_queryset = Lease.objects.all(lease_giver=request.user.company)
     else:
         base_lease_queryset = Lease.objects.filter(
             lease_giver=request.user.company if request.user.is_superuser else request.user.company,
             reg_ID_Number__in=query_ids,
         )
-        
     # Apply color filter if provided
     if color_filter:
         if color_filter == "black":
@@ -3598,6 +3598,7 @@ def client_leases_new(request,leases_type=None):
     lease_dict = {}
     
     for i in leases:
+       
         opening_balance_date = Opening_balance.objects.filter(lease_id=i.lease_id).first()
         remaining_period = subscription_period_remaining(request, "company" if i.is_company else "individual")
         rent_guarantor = Individual.objects.filter(national_id=i.rent_guarantor_id).first() if i.is_company else None
@@ -3635,8 +3636,7 @@ def client_leases_new(request,leases_type=None):
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_active == False and owing_amount <= 0 or is_100_days_ago)  else False
-        
+        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
@@ -3670,6 +3670,7 @@ def client_leases_new(request,leases_type=None):
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
+                "expired": True if date.today() > i.end_date else False,
                 "payment_period_start": i.payment_period_start,
                 "payment_period_end": i.payment_period_end,
             }
@@ -4379,12 +4380,7 @@ def request_period_statement(request):
 
 def client_invoicing(request):
     if request.method == "GET":
-        tenant_list = get_invoicing_details(request)
-        return render(
-        request,
-        "Client/Accounting/Invoicing",
-        props={"tenant_list": tenant_list},
-    )
+        return get_invoicing_details(request)
     today_date_obj = datetime.now()
     next_month = (today_date_obj.replace(day=1) + timedelta(days=32)).replace(day=1)
     next_month_name = next_month.strftime("%B %Y")
@@ -4535,7 +4531,7 @@ def get_invoicing_details(request):
     tenant_company_details = {}
     today = date.today()
     current_month = today.month
-    current_day = 23
+    current_day = 25
     current_year = today.year
     custom_day = datetime(current_year, current_month, current_day).date()
     tenant_list = []
@@ -4546,9 +4542,10 @@ def get_invoicing_details(request):
             next_month_end_day = today.replace(day=int(i.payment_period_end))
         except:
             next_month_end_day = today.replace(day=8)
+
         if (
             (today >= custom_day) or (today < next_month_end_day)
-        ) :#and difference.days >= 20:  # FIXME: SWITCH DATES comment
+        ) and difference.days >= 20:  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
                 invoiced_month = invoice_status.date_updated.strftime("%B")
                 invoice_year = invoice_status.date_updated.strftime("%Y")
@@ -4556,11 +4553,6 @@ def get_invoicing_details(request):
                 current_month = datetime.now().strftime("%B")
                 current_year = datetime.now().strftime("%Y")
                 current_year_month = f"{current_month} {current_year}"
-                next_month_date = datetime.now() + relativedelta(months=1)
-                # Get next month's name and year
-                next_month = next_month_date.strftime("%B")
-                next_year = next_month_date.strftime("%Y")
-                next_month_name = f"{next_month} {next_year}"
                 if str(invoice_month) != str(current_year_month):  # FIXME: remove comment
                     if i.is_individual:
                         try:
@@ -4645,7 +4637,11 @@ def get_invoicing_details(request):
                     except:
                         pass
             props = {"tenant_list": tenant_list}
-    return tenant_list
+    return render(
+        request,
+        "Client/Accounting/Invoicing",
+        props={"tenant_list": tenant_list},
+    )
 
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
@@ -5765,7 +5761,7 @@ def manual_send_otp(request):
                 lease_giver.registration_name if lease_giver else "Creditor"
             )
             custom_day = today.replace(day=int(lease.payment_period_end))
-            limit_day = today.replace(day=int(lease.payment_period_end) +5)
+            limit_day = today.replace(day=int(lease.payment_period_end) +1)
             if custom_day < today <= limit_day:
                 if opening_balance_object := Opening_balance.objects.filter(
                     lease_id=lease_id
@@ -5862,6 +5858,161 @@ def manual_send_otp(request):
                             ...
 
     return HttpResponse("otps were resend!")
+
+def manual_color_update(request):
+    
+    data = json.loads(request.body.decode('utf-8'))
+    
+    company_id = data.get('company_id')
+    color = data.get('color')
+    if company_id:
+        leases = Lease.objects.filter(lease_giver=int(company_id),is_active=True).all()
+    else:
+        leases = Lease.objects.filter(is_active=True).all()
+    today = date.today()
+    count = 0
+    MAX_MESSAGES_PER_SECOND = 90
+    if leases:
+        for lease in leases:
+            lease_id = lease.lease_id
+            can_send_message =True
+            lease_giver = Company.objects.filter(id=lease.lease_giver).first()
+            lease_giver_name = (
+                lease_giver.registration_name if lease_giver else "Creditor"
+            )
+            custom_day = today.replace(day=int(lease.payment_period_end))
+            limit_day = today.replace(day=int(lease.payment_period_end) + 1)
+            if custom_day < today :#<= limit_day:
+                if opening_balance_object := Opening_balance.objects.filter(
+                    lease_id=lease_id
+                ).last():
+                    current_month = float(opening_balance_object.current_month)
+                    one_months_ago = float(opening_balance_object.one_month_back)
+                    two_months_ago = float(opening_balance_object.two_months_back)
+                    three_months_ago = float(opening_balance_object.three_months_back)
+                    four_months_ago = float(opening_balance_object.three_months_plus)
+                    outstanding_balance = float(
+                        opening_balance_object.outstanding_balance
+                    )
+                    if (
+                        lease.status == lease.status_cache
+                        and float(opening_balance_object.outstanding_balance) > 0
+                    ):
+                        try:
+                            if not color:
+                                opening_balance_object.three_months_plus = (    
+                                    four_months_ago + three_months_ago
+                                )
+                                opening_balance_object.three_months_back = two_months_ago
+                                opening_balance_object.two_months_back = one_months_ago
+                                opening_balance_object.one_month_back = current_month
+                                opening_balance_object.current_month = 0
+                                opening_balance_object.outstanding_balance = (
+                                    outstanding_balance
+                                )
+                                opening_balance_object.save()
+
+                            if float(opening_balance_object.three_months_plus) > 0:
+                                status = "NON-PAYER"
+                            elif float(opening_balance_object.three_months_back) > 0:
+                                status = "HIGH-HIGH"
+                            elif float(opening_balance_object.two_months_back) > 0:
+                                status = "HIGH"
+                            elif float(opening_balance_object.one_month_back) > 0:
+                                status = "MEDIUM"
+                            lease.status = status
+                            lease.save()
+                        except Exception as e:
+                            pass
+                    lease.status_cache =lease.status
+                    lease.save()
+
+                    if lease.is_company:
+                        requested_user_ob = "company"
+                        lease_receiver = Company.objects.filter(
+                            id=lease.reg_ID_Number
+                        ).first()
+                        lease_receiver_name = (
+                            lease_receiver.trading_name
+                            if lease_receiver
+                            else "Creditor"
+                        )
+                        if lease_receiver:
+                            company_email = CompanyProfile.objects.filter(
+                                company=lease_receiver.id
+                            ).first()
+                            contact_detail = company_email.email
+                        else:
+                            contact_detail = "gtkandeya@gmail.com"
+                    else:
+                        count += 1
+                        
+                        requested_user_ob = "individual"
+                        lease_receiver = Individual.objects.filter(
+                            identification_number=lease.reg_ID_Number
+                        ).first()
+                        lease_receiver_name = (
+                            lease_receiver.firstname + " " + lease_receiver.surname
+                            if lease_receiver
+                            else "Creditor"
+                        )
+                        contact_detail = lease_receiver.mobile if lease_receiver else None
+                    if float(opening_balance_object.outstanding_balance) > 0:
+                        left_balance = round(float(opening_balance_object.outstanding_balance), 2)
+                    else:
+                        left_balance = 0
+                    
+                    if lease.status == "NON-PAYER":
+                        registration_message = f" Hi {lease_receiver_name },Your Payment status to {lease_giver_name} has downgraded to NON-PAYER. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
+                    elif lease.status in ["HIGH", "HIGH-HIGH"]:
+                        registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to HIGH RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
+                    elif lease.status == "MEDIUM":
+                        registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to MEDIUM RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
+                    else:
+                        registration_message = None
+                 
+                    try:
+                        can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
+                    except Exception as e:
+                        ...
+                    can_send_message = False if can_send_message_ob else True
+                    if registration_message and  can_send_message:
+                        if count % MAX_MESSAGES_PER_SECOND == 0:
+                            time.sleep(1)
+                        send_otp.delay(
+                            "",
+                            lease_id,
+                            contact_detail,
+                            lease.lease_giver,
+                            lease.reg_ID_Number,
+                            requested_user_ob,
+                            settings.LEASE_STATUS,
+                            registration_message,
+                        )
+                        if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
+                            if rent_guarantor_mobile := Individual.objects.filter(
+                                identification_number=lease.rent_guarantor_id
+                            ).first():
+                                send_otp.delay(
+                                    "",
+                                    lease_id,
+                                    rent_guarantor_mobile.mobile,
+                                    lease.lease_giver,
+                                    lease.reg_ID_Number,
+                                    "individual",
+                                    settings.LEASE_STATUS,
+                                    registration_message,
+                                )
+                    else:
+                        ...
+            else:
+                print('skipping lease...',lease.lease_id)
+    return JsonResponse(
+        {"status": "success", "message": "Lease status updated successfully."},
+        safe=False,
+    )
+                
+
 
 from itertools import chain
 from django.http import JsonResponse
@@ -5969,17 +6120,20 @@ def sales_accounts(request):
 def cash_books(request):
     return render(request, "Client/Accounting/Sales/CashBooks")
 
+@login_required
+@clients_required
+def general_ledger(request):
+    return render(request, "Client/Accounting/Sales/GeneralLedger")
 
 @login_required
 @clients_required
 def sales_invoicing(request):
-    invoice_list = get_invoicing_details(request)
-    return render(request, "Client/Accounting/Sales/SalesInvoicing", {"invoice_list": invoice_list}) 
+    return render(request, "Client/Accounting/Sales/SalesInvoicing")
 
-@login_required
-@clients_required
 def accounts_list(request):
-    return render(request, "Client/Accounting/AccountsListPage")
+
+    return render(request, "Client/Accounting/AccountsList")
+
 
 
 

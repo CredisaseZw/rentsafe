@@ -216,6 +216,7 @@ class Lease(models.Model):
     payment_period_start = models.CharField(max_length=255, null=False)
     payment_period_end = models.CharField(max_length=255, null=False, default=7)
     is_active = models.BooleanField(default=True)
+    is_terminated = models.BooleanField(default=False)
     landlord_id = models.IntegerField(null=True, blank=True)
     #history = HistoricalRecords()
     

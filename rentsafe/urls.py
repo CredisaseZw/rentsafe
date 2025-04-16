@@ -235,12 +235,14 @@ urlpatterns = [
         include(
             [
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
+                path("manual-colors/", clients.manual_color_update, name="cash_sales"),
                 path("sales-accounts", clients.sales_accounts, name="sales_accounts"),
                 path("sales-categories", clients.sales_categories, name="sales_categories"),
                 path("products-and-services", clients.products_and_services, name="products_and_services"),
                 path("vat-settings", clients.vat_settings, name="vat_settings"),
                 path("cash-books", clients.cash_books, name="cash_books"),
                 path("sales-invoicing", clients.sales_invoicing, name="sales_invoicing"),
+                path("general-ledger", clients.sales_invoicing, name="general_ledger"),
                 path("accounts-list", clients.accounts_list, name="accounts_list"),
                 path(
                     "claims/",
