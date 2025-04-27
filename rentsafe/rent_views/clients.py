@@ -777,11 +777,16 @@ def edit_lease(request):
                     lease, old_payment_end, new_payment_end, today, lease_status
                 )
         if agent_details:
-            print('agent_details',agent_details,'agent commission',agent_details.agent_commission,'new commision',data.get("commission"))
             agent_details.agent_commission = data.get("commission")
             agent_details.save()
 
         if lease:
+            if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
+                from ..validators import validate_phone_number
+                mobile_number_owner = Individual.objects.filter(identification_number=lease.reg_ID_Number).first()
+                if mobile_number_owner and validate_phone_number(data.get("lesseePhone")):
+                    mobile_number_owner.mobile = data.get("lesseePhone")
+                    mobile_number_owner.save()
             lease.lease_details = data.get("leaseDetails")
             lease.deposit_amount = data.get("depositAmount")
             lease.deposit_period = data.get("depositPeriod")
