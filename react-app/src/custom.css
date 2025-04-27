@@ -649,6 +649,19 @@
   text-align: center;
   color: black;
 }
+
+.c-form-select {
+  background-color: white;
+  border: solid 1px rgb(201, 201, 201);
+  border-radius: 5px;
+  padding: 0.3rem 0.4rem;
+  font-family: inherit;
+  font-size: 90%;
+  font-weight: inherit;
+}
+.c-form-select:disabled {
+  opacity: 0.6;
+}
 .c-hover-fade {
   transition: all 0.1s linear;
 }
