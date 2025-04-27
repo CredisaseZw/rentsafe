@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:static/html2canvas-29a3fd88.87c2487dbb53.js
-import{g as c}from"./main-27bc9caa.js";import{r as f}from"./html2pdf-405d7059.js";function l(r,n){for(var o=0;o<n.length;o++){const e=n[o];if(typeof e!="string"&&!Array.isArray(e)){for(const t in e)if(t!=="default"&&!(t in r)){const a=Object.getOwnPropertyDescriptor(e,t);a&&Object.defineProperty(r,t,a.get?a:{enumerable:!0,get:()=>e[t]})}}}return Object.freeze(Object.defineProperty(r,Symbol.toStringTag,{value:"Module"}))}var s=f();const i=c(s),u=l({__proto__:null,default:i},[s]);export{u as h};
-========
-import{g as c}from"./main-92093c4c.js";import{r as f}from"./html2pdf-f2c97a02.js";function l(r,n){for(var o=0;o<n.length;o++){const e=n[o];if(typeof e!="string"&&!Array.isArray(e)){for(const t in e)if(t!=="default"&&!(t in r)){const a=Object.getOwnPropertyDescriptor(e,t);a&&Object.defineProperty(r,t,a.get?a:{enumerable:!0,get:()=>e[t]})}}}return Object.freeze(Object.defineProperty(r,Symbol.toStringTag,{value:"Module"}))}var s=f();const i=c(s),u=l({__proto__:null,default:i},[s]);export{u as h};
->>>>>>>> b9dee040dcf6a336e0349eab7c5d49da5005f053:react-app/dist/html2canvas-a34b79fb.js
