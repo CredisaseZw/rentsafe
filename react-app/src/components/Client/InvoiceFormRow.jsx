@@ -9,86 +9,86 @@ export default function InvoiceFormRow({
   currency,
   isLoading,
   removeRow,
-  salesCodes,
+  salesItems,
   itemsLength,
   taxConfigs,
 }) {
-  const [selectedSalesCode, setSelectedSalesCode] = useState(null);
-  const [preSelectedSalesCode, setPreSelectedSalesCode] = useState(null);
+  const [selectedSalesItem, setSelectedSalesItem] = useState(null);
+  const [preSelectedSalesItem, setPreSelectedSalesItem] = useState(null);
   const [selectedTaxConfig, setSelectedTaxConfig] = useState(null);
   const [showCurrencyPrompt, setShowCurrencyPrompt] = useState(false);
   const [propmtedCurrencyRate, setPromptedCurrencyRate] = useState(1);
 
-  function handleSalesCodeSelect(e) {
-    const salesCode = salesCodes.find((code) => code.item_id === e.target.value);
+  function handleSalesItemSelect(e) {
+    const salesItem = salesItems.find((code) => code.item_id === e.target.value);
 
-    if (salesCode.unit_price_currency !== currency) {
+    if (salesItem.unit_price_currency !== currency) {
       setShowCurrencyPrompt(true);
-      setPreSelectedSalesCode(salesCode);
+      setPreSelectedSalesItem(salesItem);
       return;
     }
 
-    const taxConfig = taxConfigs.find((config) => config.id === salesCode.tax_configuration);
+    const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
 
-    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesCode?.price || 0);
+    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
-    const vatIncTotal = (salesCode?.price || 0) * (item.qty || 0) + totalVat;
+    const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
 
     setItems((prev) =>
       prev.map((prevItem, prevIndex) => {
         if (prevIndex === index) {
           return {
             ...prevItem,
-            sales_code: salesCode?.item_id || "",
-            sales_item: salesCode?.name || "",
-            price: salesCode?.price || "",
+            sales_code: salesItem?.item_id || "",
+            sales_item: salesItem?.name || "",
+            price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
             vat: taxConfig?.rate || 0,
-            total: vatIncTotal,
+            total: vatIncTotal.toFixed(2),
           };
         } else return prevItem;
       })
     );
 
-    setSelectedSalesCode(salesCode);
+    setSelectedSalesItem(salesItem);
     setSelectedTaxConfig(taxConfig);
   }
 
-  function proceedToHandleSalesCodeSelect() {
-    const salesCode = { ...preSelectedSalesCode };
-    salesCode.price = parseFloat(propmtedCurrencyRate) * (parseFloat(salesCode.price) || 0);
+  function proceedToHandleSalesItemSelect() {
+    const salesItem = { ...preSelectedSalesItem };
+    salesItem.price = parseFloat(propmtedCurrencyRate) * (parseFloat(salesItem.price) || 0);
 
-    salesCode.unit_price_currency = currency;
+    salesItem.unit_price_currency = currency;
 
-    const taxConfig = taxConfigs.find((config) => config.id === salesCode.tax_configuration);
+    const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
 
-    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesCode?.price || 0);
+    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
-    const vatIncTotal = (salesCode?.price || 0) * (item.qty || 0) + totalVat;
+    const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
 
     setItems((prev) =>
       prev.map((prevItem, prevIndex) => {
         if (prevIndex === index) {
           return {
             ...prevItem,
-            sales_code: salesCode?.item_id || "",
-            sales_item: salesCode?.name || "",
-            price: salesCode?.price || "",
+            sales_code: salesItem?.item_id || "",
+            sales_item: salesItem?.name || "",
+            price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
             vat: taxConfig?.rate || 0,
-            total: vatIncTotal,
+            total: vatIncTotal.toFixed(2),
           };
         } else return prevItem;
       })
     );
 
-    setSelectedSalesCode(salesCode);
+    setSelectedSalesItem(salesItem);
     setSelectedTaxConfig(taxConfig);
-    setPreSelectedSalesCode(null);
+    setPreSelectedSalesItem(null);
     setShowCurrencyPrompt(false);
     setPromptedCurrencyRate(1);
   }
 
   const vatDisplay = selectedTaxConfig?.rate
-    ? `${((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesCode?.price || 0) * parseFloat(item.qty || 0)} (${selectedTaxConfig.rate}%)`
+    ? `${(((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesItem?.price || 0) * parseFloat(item.qty || 0)).toFixed(2)} (${selectedTaxConfig.rate}%)`
     : "";
 
   return (
@@ -99,21 +99,21 @@ export default function InvoiceFormRow({
           show={showCurrencyPrompt}
           handleClose={() => {
             setShowCurrencyPrompt(false);
-            setPreSelectedSalesCode(null);
+            setPreSelectedSalesItem(null);
             setPromptedCurrencyRate(1);
           }}
           size="md"
         >
           <div>
             <div className="alert alert-danger">
-              The item you have selected is listed in {preSelectedSalesCode.unit_price_currency} but
+              The item you have selected is listed in {preSelectedSalesItem.unit_price_currency} but
               your {itemName || "invoice"} is to be in {currency}, please input below the rate to be
               used
             </div>
 
             <div className="d-flex gap-3 align-items-center">
               <label className="form-label text-nowrap px-3">
-                {`${preSelectedSalesCode.unit_price_currency} to ${currency}`}
+                {`${preSelectedSalesItem.unit_price_currency} to ${currency}`}
               </label>
               <input
                 type="number"
@@ -124,7 +124,7 @@ export default function InvoiceFormRow({
             </div>
             <div className="mt-3 text-end">
               <button
-                onClick={proceedToHandleSalesCodeSelect}
+                onClick={proceedToHandleSalesItemSelect}
                 type="button"
                 className="btn btn-info text-white"
               >
@@ -149,23 +149,21 @@ export default function InvoiceFormRow({
 
         <td>
           {item.static ? (
-            item.sales_code
+            item.sales_item
           ) : (
             <select
-              //  name="sales_code"
-              //  id="sales_code"
               required
               disabled={isLoading}
               value={item.sales_code}
-              onChange={handleSalesCodeSelect}
+              onChange={handleSalesItemSelect}
               className="form-select form-select-sm custom-w-2"
             >
               <option disabled value="">
-                Select code..
+                Select item..
               </option>
-              {salesCodes.map((code) => (
-                <option key={code.id} value={code.item_id}>
-                  {`${code.item_id} - ${code.name}`}
+              {salesItems.map((item) => (
+                <option key={item.id} value={item.item_id}>
+                  {`${item.item_id} - ${item.name}`}
                 </option>
               ))}
             </select>
@@ -173,16 +171,13 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center custom-mn-w-1 custom-mx-w-2">{item.sales_item}</div>
+          <div className="text-center custom-mn-w-1 custom-mx-w-2">
+            {item.sales_code} <br />
+          </div>
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">
-            {`${
-              // selectedSalesCode.unit_price_currency || ''
-              ""
-            } ${item.price || ""}`}
-          </div>
+          <div className="text-center text-nowrap custom-mn-w-1">{item.price || ""}</div>
         </td>
 
         <td>
@@ -224,7 +219,9 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">{item.total}</div>
+          <div className="text-center text-nowrap custom-mn-w-1">
+            {(parseFloat(item.total) || 0).toFixed(2)}
+          </div>
         </td>
       </tr>
     </>

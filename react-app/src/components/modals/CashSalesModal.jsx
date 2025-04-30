@@ -14,7 +14,7 @@ export default function CashSalesModal(props) {
     currency,
     cashBooks,
     isLoading,
-    salesCodes,
+    salesItems,
     taxConfigs,
     contentRef,
     paymentItems,
@@ -195,12 +195,12 @@ export default function CashSalesModal(props) {
 
                     <tr>
                       <th></th>
-                      <th>Sales Code</th>
                       <th>Sales Item</th>
-                      <th>Price(Inc)</th>
+                      <th>Sales Code</th>
+                      <th>Price (Vat Inc)</th>
                       <th>QTY</th>
                       <th>VAT</th>
-                      <th>Total (Inc)</th>
+                      <th>Total (Vat Inc)</th>
                     </tr>
                   </thead>
 
@@ -215,7 +215,7 @@ export default function CashSalesModal(props) {
                           setItems,
                           removeRow,
                           isLoading,
-                          salesCodes,
+                          salesItems,
                           taxConfigs,
                           itemsLength: items.length,
                         }}
@@ -239,7 +239,7 @@ export default function CashSalesModal(props) {
                         </div>
                       </th>
                       <th>
-                        <span>{totals.totalExcludingVat}</span>
+                        <span>{totals.totalExcludingVat.toFixed(2)}</span>
                       </th>
                     </tr>
 
@@ -269,7 +269,7 @@ export default function CashSalesModal(props) {
                       <th className="text-end" colSpan={5}>
                         VAT Total
                       </th>
-                      <th>{totals.vatTotal}</th>
+                      <th>{totals.vatTotal.toFixed(2)}</th>
                     </tr>
 
                     <tr>
@@ -277,7 +277,7 @@ export default function CashSalesModal(props) {
                       <th className="text-end" colSpan={5}>
                         Invoice Total {currency}
                       </th>
-                      <th>{totals.invoiceTotal + discount}</th>
+                      <th>{(totals.invoiceTotal + discount).toFixed(2)}</th>
                     </tr>
                   </tbody>
 

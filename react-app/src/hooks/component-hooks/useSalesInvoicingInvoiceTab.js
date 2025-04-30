@@ -13,7 +13,6 @@ export default function useSalesInvoicingInvoiceTab() {
     axios
       .get("/accounting/invoices/")
       .then((res) => {
-        console.log(res);
         setInvoiceList(res.data);
         setLoading(false);
       })

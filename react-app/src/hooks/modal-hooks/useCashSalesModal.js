@@ -7,7 +7,7 @@ import html2pdf from "html2pdf.js";
 export default function useSalesInvoiceForm(invoice, isProforma) {
   const [isLoading, setIsLoading] = useState(false);
   const [currency, setCurrency] = useState("USD");
-  const [salesCodes, setSalesCodes] = useState([]);
+  const [salesItems, setSalesItems] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [cashBooks, setCashBooks] = useState([]);
@@ -54,7 +54,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   ]);
 
   useEffect(() => {
-    fetchSalesCodes();
+    fetchSalesItems();
     fetchTaxConfigs();
     fetchPaymentTypes();
     fetchCashBooks();
@@ -82,11 +82,11 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     //   });
   }
 
-  function fetchSalesCodes() {
+  function fetchSalesItems() {
     axios
       .get("/accounting/items/")
       .then((res) => {
-        setSalesCodes(res.data);
+        setSalesItems(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -261,7 +261,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     currency,
     cashBooks,
     isLoading,
-    salesCodes,
+    salesItems,
     taxConfigs,
     contentRef,
     paymentItems,

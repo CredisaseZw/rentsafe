@@ -1,7 +1,7 @@
 import { useState } from "react";
 import CustomAsyncSelect from "./CustomAsyncSelect.jsx";
 
-export default function UserSelector() {
+export default function UserSelector({ onChange }) {
   const [tenantType, setTenantType] = useState("INDIVIDUAL");
 
   return (
@@ -30,6 +30,7 @@ export default function UserSelector() {
           defaultValue={null}
           isDisabled={tenantType === ""}
           useAlternateFetchOptions={{ type: tenantType.toLowerCase() }}
+          onChange={onChange}
         />
       </div>
     </div>
