@@ -194,8 +194,6 @@ export default function useCreditNoteForm(creditNote) {
   }
 
   function handleUserSelected(data) {
-    console.log("Selected User Data: ", data);
-
     const newCreditNoteData = {
       address: data.address,
       phone: data.mobile,

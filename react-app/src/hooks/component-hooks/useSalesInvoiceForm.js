@@ -199,8 +199,6 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   }
 
   function handleUserSelected(data) {
-    console.log("Selected User Data: ", data);
-
     const newInvoiceData = {
       address: data.address,
       phone: data.mobile,
