@@ -198,6 +198,20 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     }
   }
 
+  function handleUserSelected(data) {
+    console.log("Selected User Data: ", data);
+
+    const newInvoiceData = {
+      address: data.address,
+      phone: data.mobile,
+      email: data.email,
+      vat_no: data.VAT_number,
+      tin: data.tin_number,
+    };
+
+    setInvoiceData(newInvoiceData);
+  }
+
   return {
     key,
     show,
@@ -218,5 +232,6 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     setDiscount,
     changeCurrency,
     handleDiscount,
+    handleUserSelected,
   };
 }

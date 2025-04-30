@@ -23,6 +23,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
     handleClose,
     changeCurrency,
     handleDiscount,
+    handleUserSelected,
   } = useSalesInvoiceForm(invoice, isProforma);
 
   return (
@@ -74,7 +75,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                       value={invoiceData?.bill_to}
                     />
                   ) : (
-                    <UserSelector />
+                    <UserSelector onChange={handleUserSelected} />
                   )}
                 </div>
 
