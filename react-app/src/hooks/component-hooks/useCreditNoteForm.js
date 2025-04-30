@@ -193,6 +193,20 @@ export default function useCreditNoteForm(creditNote) {
     }
   }
 
+  function handleUserSelected(data) {
+    console.log("Selected User Data: ", data);
+
+    const newCreditNoteData = {
+      address: data.address,
+      phone: data.mobile,
+      email: data.email,
+      vat_no: data.VAT_number,
+      tin: data.tin_number,
+    };
+
+    setCreditNoteData(newCreditNoteData);
+  }
+
   return {
     key,
     show,
@@ -213,5 +227,6 @@ export default function useCreditNoteForm(creditNote) {
     setDiscount,
     changeCurrency,
     handleDiscount,
+    handleUserSelected,
   };
 }

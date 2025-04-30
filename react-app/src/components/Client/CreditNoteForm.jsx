@@ -23,6 +23,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
     handleClose,
     changeCurrency,
     handleDiscount,
+    handleUserSelected,
   } = useCreditNoteForm(creditNote);
 
   return (
@@ -69,7 +70,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                       value={creditNoteData?.credit_to}
                     />
                   ) : (
-                    <UserSelector />
+                    <UserSelector onChange={handleUserSelected} />
                   )}
                 </div>
 
