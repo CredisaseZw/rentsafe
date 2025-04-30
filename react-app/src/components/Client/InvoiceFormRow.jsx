@@ -33,7 +33,7 @@ export default function InvoiceFormRow({
     const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
     const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
-
+    console.log(unitVat);
     setItems((prev) =>
       prev.map((prevItem, prevIndex) => {
         if (prevIndex === index) {
@@ -41,9 +41,9 @@ export default function InvoiceFormRow({
             ...prevItem,
             sales_code: salesItem?.item_id || "",
             sales_item: salesItem?.name || "",
-            price: salesItem?.price || "",
+            price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
             vat: taxConfig?.rate || 0,
-            total: vatIncTotal,
+            total: vatIncTotal.toFixed(2),
           };
         } else return prevItem;
       })
@@ -72,9 +72,9 @@ export default function InvoiceFormRow({
             ...prevItem,
             sales_code: salesItem?.item_id || "",
             sales_item: salesItem?.name || "",
-            price: salesItem?.price || "",
+            price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
             vat: taxConfig?.rate || 0,
-            total: vatIncTotal,
+            total: vatIncTotal.toFixed(2),
           };
         } else return prevItem;
       })
@@ -88,7 +88,7 @@ export default function InvoiceFormRow({
   }
 
   const vatDisplay = selectedTaxConfig?.rate
-    ? `${((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesItem?.price || 0) * parseFloat(item.qty || 0)} (${selectedTaxConfig.rate}%)`
+    ? `${(((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesItem?.price || 0) * parseFloat(item.qty || 0)).toFixed(2)} (${selectedTaxConfig.rate}%)`
     : "";
 
   return (
@@ -149,11 +149,9 @@ export default function InvoiceFormRow({
 
         <td>
           {item.static ? (
-            item.sales_code
+            item.sales_item
           ) : (
             <select
-              //  name="sales_code"
-              //  id="sales_code"
               required
               disabled={isLoading}
               value={item.sales_code}
@@ -161,11 +159,11 @@ export default function InvoiceFormRow({
               className="form-select form-select-sm custom-w-2"
             >
               <option disabled value="">
-                Select code..
+                Select item..
               </option>
-              {salesItems.map((code) => (
-                <option key={code.id} value={code.item_id}>
-                  {`${code.item_id} - ${code.name}`}
+              {salesItems.map((item) => (
+                <option key={item.id} value={item.item_id}>
+                  {`${item.item_id} - ${item.name}`}
                 </option>
               ))}
             </select>
@@ -173,16 +171,13 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center custom-mn-w-1 custom-mx-w-2">{item.sales_item}</div>
+          <div className="text-center custom-mn-w-1 custom-mx-w-2">
+            {item.sales_code} <br />
+          </div>
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">
-            {`${
-              // selectedSalesItem.unit_price_currency || ''
-              ""
-            } ${item.price || ""}`}
-          </div>
+          <div className="text-center text-nowrap custom-mn-w-1">{item.price || ""}</div>
         </td>
 
         <td>
@@ -224,7 +219,9 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">{item.total}</div>
+          <div className="text-center text-nowrap custom-mn-w-1">
+            {(parseFloat(item.total) || 0).toFixed(2)}
+          </div>
         </td>
       </tr>
     </>

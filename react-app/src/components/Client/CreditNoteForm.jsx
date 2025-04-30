@@ -210,12 +210,12 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
 
                 <tr>
                   <th></th>
-                  <th>Sales Code</th>
                   <th>Sales Item</th>
-                  <th>Price(Inc)</th>
+                  <th>Sales Code</th>
+                  <th>Price (Vat Inc)</th>
                   <th>QTY</th>
                   <th>VAT</th>
-                  <th>Total (Inc)</th>
+                  <th>Total (Vat Inc)</th>
                 </tr>
               </thead>
 
@@ -257,7 +257,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                     </div>
                   </td>
                   <td>
-                    <span>{totals.totalExcludingVat}</span>
+                    <span>{totals.totalExcludingVat.toFixed(2)}</span>
                   </td>
                 </tr>
 
@@ -283,13 +283,13 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                 <tr>
                   <td></td>
                   <td colSpan={5}>VAT Total</td>
-                  <td>{totals.vatTotal}</td>
+                  <td>{totals.vatTotal.toFixed(2)}</td>
                 </tr>
 
                 <tr>
                   <td></td>
                   <td colSpan={5}>Credit Note Total {currency}</td>
-                  <td>{totals.creditNoteTotal + discount}</td>
+                  <td>{(totals.creditNoteTotal + discount).toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>

@@ -39,7 +39,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
 
       <ContentModal
         size="xl"
-        show={!show}
+        show={show}
         handleClose={handleClose}
         title={isProforma ? "PROFORMA" : "FISCAL TAX INVOICE"}
       >
@@ -207,12 +207,12 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
 
                 <tr>
                   <th></th>
-                  <th>Sales Code</th>
                   <th>Sales Item</th>
-                  <th>Price(Inc)</th>
+                  <th>Sales Code</th>
+                  <th>Price (Vat Inc)</th>
                   <th>QTY</th>
                   <th>VAT</th>
-                  <th>Total (Inc)</th>
+                  <th>Total (Vat Inc)</th>
                 </tr>
               </thead>
 
@@ -253,7 +253,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                     </div>
                   </td>
                   <td>
-                    <span>{totals.totalExcludingVat}</span>
+                    <span>{totals.totalExcludingVat.toFixed(2)}</span>
                   </td>
                 </tr>
 
@@ -279,13 +279,13 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                 <tr>
                   <td></td>
                   <td colSpan={5}>VAT Total</td>
-                  <td>{totals.vatTotal}</td>
+                  <td>{totals.vatTotal.toFixed(2)}</td>
                 </tr>
 
                 <tr>
                   <td></td>
                   <td colSpan={5}>Invoice Total {currency}</td>
-                  <td>{totals.invoiceTotal + discount}</td>
+                  <td>{(totals.invoiceTotal + discount).toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>
