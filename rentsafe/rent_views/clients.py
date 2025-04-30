@@ -6112,8 +6112,8 @@ def cash_sales(request):
 
 @login_required
 @clients_required
-def sales_accounts(request):
-    return render(request, "Client/Accounting/Sales/SalesAccounts")
+def sales_reports(request):
+    return render(request, "Client/Accounting/Sales/SalesReports")
 
 @login_required
 @clients_required
