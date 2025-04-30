@@ -83,7 +83,7 @@ export const clientSidebarNavigation = [
             navLink: "Sales Reports",
             color: "firebrick",
             type: "link",
-            href: reverseUrl("sales_accounts"),
+            href: reverseUrl("sales_reports"),
           },
         ],
       },

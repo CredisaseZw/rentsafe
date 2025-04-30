@@ -236,7 +236,7 @@ urlpatterns = [
             [
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
                 path("manual-colors/", clients.manual_color_update, name="cash_sales"),
-                path("sales-accounts", clients.sales_accounts, name="sales_accounts"),
+                path("sales-reports", clients.sales_reports, name="sales_reports"),
                 path("sales-categories", clients.sales_categories, name="sales_categories"),
                 path("products-and-services", clients.products_and_services, name="products_and_services"),
                 path("vat-settings", clients.vat_settings, name="vat_settings"),
