@@ -33,7 +33,7 @@ export default function InvoiceFormRow({
     const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
     const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
-    console.log(unitVat);
+
     setItems((prev) =>
       prev.map((prevItem, prevIndex) => {
         if (prevIndex === index) {
