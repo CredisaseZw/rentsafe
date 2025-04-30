@@ -12,7 +12,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
     discount,
     currency,
     isLoading,
-    salesCodes,
+    salesItems,
     taxConfigs,
     invoiceData,
     addRow,
@@ -39,7 +39,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
 
       <ContentModal
         size="xl"
-        show={show}
+        show={!show}
         handleClose={handleClose}
         title={isProforma ? "PROFORMA" : "FISCAL TAX INVOICE"}
       >
@@ -227,7 +227,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                       setItems,
                       removeRow,
                       isLoading,
-                      salesCodes,
+                      salesItems,
                       taxConfigs,
                       itemsLength: items.length,
                     }}

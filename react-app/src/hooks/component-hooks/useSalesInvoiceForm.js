@@ -8,7 +8,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [currency, setCurrency] = useState("USD");
-  const [salesCodes, setSalesCodes] = useState([]);
+  const [salesItems, setSalesItems] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [key, setKey] = useState(0);
   const [discount, setDiscount] = useState(0);
@@ -46,15 +46,15 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   }, [invoice]);
 
   useEffect(() => {
-    fetchSalesCodes();
+    fetchSalesItems();
     fetchTaxConfigs();
   }, []);
 
-  function fetchSalesCodes() {
+  function fetchSalesItems() {
     axios
       .get("/accounting/items/")
       .then((res) => {
-        setSalesCodes(res.data);
+        setSalesItems(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -218,7 +218,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     discount,
     currency,
     isLoading,
-    salesCodes,
+    salesItems,
     taxConfigs,
     invoiceData,
     addRow,

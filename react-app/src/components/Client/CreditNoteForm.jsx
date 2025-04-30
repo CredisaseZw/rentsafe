@@ -12,7 +12,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
     discount,
     currency,
     isLoading,
-    salesCodes,
+    salesItems,
     taxConfigs,
     creditNoteData,
     addRow,
@@ -231,7 +231,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                       setItems,
                       removeRow,
                       isLoading,
-                      salesCodes,
+                      salesItems,
                       taxConfigs,
                       itemsLength: items.length,
                     }}

@@ -14,7 +14,7 @@ export default function CashSalesModal(props) {
     currency,
     cashBooks,
     isLoading,
-    salesCodes,
+    salesItems,
     taxConfigs,
     contentRef,
     paymentItems,
@@ -215,7 +215,7 @@ export default function CashSalesModal(props) {
                           setItems,
                           removeRow,
                           isLoading,
-                          salesCodes,
+                          salesItems,
                           taxConfigs,
                           itemsLength: items.length,
                         }}
