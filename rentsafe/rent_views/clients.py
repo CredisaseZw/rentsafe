@@ -777,7 +777,6 @@ def edit_lease(request):
                     lease, old_payment_end, new_payment_end, today, lease_status
                 )
         if agent_details:
-            print('agent_details',agent_details,'agent commission',agent_details.agent_commission,'new commision',data.get("commission"))
             agent_details.agent_commission = data.get("commission")
             agent_details.save()
 
@@ -4536,6 +4535,8 @@ def get_invoicing_details(request):
     custom_day = datetime(current_year, current_month, current_day).date()
     tenant_list = []
     today_date_check = timezone.now().date()
+    print('leases....', tenant)
+    count = 0
     for i in tenant:
         difference = relativedelta(today_date_check, i.created_date)
         try:
@@ -4545,7 +4546,7 @@ def get_invoicing_details(request):
 
         if (
             (today >= custom_day) or (today < next_month_end_day)
-        ) and difference.days >= 20:  # FIXME: SWITCH DATES comment
+        ) and difference.days > 10:  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
                 invoiced_month = invoice_status.date_updated.strftime("%B")
                 invoice_year = invoice_status.date_updated.strftime("%Y")
@@ -5571,7 +5572,7 @@ def debit_journal(request):
                 date = datetime.strptime(date_ob, "%Y-%m-%d").date()
                 lease_opening_balance = Opening_balance.objects.filter(
                     lease_id=lease_id
-                )
+                ).first()
                 if lease_opening_balance:
                     if lease_opening_balance.count() < 2:
                         Opening_balance.objects.create(
