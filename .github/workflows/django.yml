@@ -10,10 +10,33 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      EMAIL_BACKEND: ${{ secrets.EMAIL_BACKEND }}
+      EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+      EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+      EMAIL_USE_SSL: ${{ secrets.EMAIL_USE_SSL }}
+      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+      SMS_USERNAME: ${{ secrets.SMS_USERNAME }}
+      SMS_PASSWORD: ${{ secrets.SMS_PASSWORD }}
+      SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
+      ACCOUNT_SID: ${{ secrets.ACCOUNT_SID }}
+      AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+      WHATSAPP_API_MEDIA_URL: ${{ secrets.WHATSAPP_API_MEDIA_URL }}
+      WHATSAPP_API_URL: ${{ secrets.WHATSAPP_API_URL }}
+      WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+      DB_ENGINE: ${{ secrets.DB_ENGINE }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASS: ${{ secrets.DB_PASS }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.10.13]
 
     steps:
     - uses: actions/checkout@v4
