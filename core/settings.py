@@ -404,6 +404,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "credit_note",
     "creditor_invoice",
     "sales_reports",
+    "rate_audit_trail",
 ]
 
 LOGIN_URL = "login"

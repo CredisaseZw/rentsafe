@@ -165,3 +165,6 @@ def credit_note(request):
 
 def creditor_invoice(request):
     return inertia_render(request, "Client/Accounting/CreditorInvoice")
+
+def rate_audit_trail(request):
+    return inertia_render(request, "Client/Accounting/RateAuditTrail")
