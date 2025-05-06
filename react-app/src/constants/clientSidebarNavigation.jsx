@@ -254,6 +254,12 @@ export const clientSidebarNavigation = [
             type: "link",
             href: reverseUrl("forecasts"),
           },
+          {
+            navLink: "Rate Audit Trail",
+            color: "red",
+            type: "link",
+            href: reverseUrl("rate_audit_trail"),
+          },
         ],
       },
       {
