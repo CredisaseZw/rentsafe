@@ -85,18 +85,20 @@ def creditor_debit_journal(request):
             date_error = op_balance_error = False
             for item in data["rows"]:
                 lease_id = item.get("leaseId")
+                print('lease_id')
+                print(lease_id)
                 debit_amount = float(item.get("debitAmount"))
                 details = item.get("details")
                 end_balance = item.get("endBalance")
                 date = item.get("date")
-                creditor_balance_ob = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).last()
+                creditor_balance_ob = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id)
                 if creditor_balance_ob:
-                    if creditor_balance_ob.created_at.date() <= datetime.strptime(date, "%Y-%m-%d").date() < max_date:
-                        total_amount = creditor_balance_ob.total_amount - debit_amount
+                    if creditor_balance_ob.first().created_at.date() <= datetime.strptime(date, "%Y-%m-%d").date() < max_date:
+                        total_amount = creditor_balance_ob.last().total_amount - debit_amount
                         new_breakdown = LeaseReceiptBreakdown(
-                            lease_id=lease_id,
+                            lease_id=creditor_balance_ob.first().lease_id,
                             total_amount=total_amount,
-                            landlord_id=creditor_balance_ob.landlord_id,
+                            landlord_id=creditor_balance_ob.first().landlord_id,
                             receipt_number="Creditor DBT#" + str(random.randint(1000, 9999)),
                             amount_paid=debit_amount,
                             date_received=date,
