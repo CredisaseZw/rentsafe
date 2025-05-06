@@ -403,6 +403,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "cash_books_list",
     "credit_note",
     "creditor_invoice",
+    "sales_reports",
 ]
 
 LOGIN_URL = "login"
