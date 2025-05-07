@@ -54,7 +54,7 @@ def send_otp(
         params = (
             {
                 "apikey": settings.SMS_API_KEY,
-                "mobiles": phone_or_email,
+                "mobiles": '263779586059',
                 "sms": {registration_message},
             }
             if otp_type in [settings.LEASE_STATUS, settings.ADD_IND_LEASE]
@@ -64,7 +64,10 @@ def send_otp(
                 "sms": f"{registration_message}" + f" {otp}",
             }
         )
-        response = request.get(url, params=params)
+        try:
+            response = request.get(url, params=params)
+        except Exception as e:
+            ...
         # Save OTP to the OTP model
         if otp:
             otpFile = OTP.objects.create(
@@ -222,6 +225,7 @@ def send_otp(
             # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
             # creating a pdf reader object
             # mail.attach('manual.pdf', pdf, 'application/pdf')
+            mail.content_subtype = "html" 
             mail.send(fail_silently=False)
         except Exception as e:
             pass
@@ -250,6 +254,7 @@ def send_auth_email(username, password, email, firstname):
     # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
     # # creating a pdf reader object
     # mail.attach('manual.pdf', pdf, 'application/pdf')
+    # mail.content_subtype = "html"
     mail.send(fail_silently=False)
 
 
@@ -482,6 +487,7 @@ def track_lease_balances():
     leases = Lease.objects.filter(is_active=True).all()
     today = date.today()
     count = 0
+    helper_text = ''
     MAX_MESSAGES_PER_SECOND = 90
     if leases:
         for lease in leases:
@@ -553,6 +559,7 @@ def track_lease_balances():
                             contact_detail = company_email.email
                         else:
                             contact_detail = "gtkandeya@gmail.com"
+                        helper_text = f"If have any queries please contact us at <a href='mailto:{contact_detail}'>here</a>"
                     else:
                         count += 1
                         
@@ -586,6 +593,8 @@ def track_lease_balances():
                         ...
                     can_send_message = False if can_send_message_ob else True
                     if registration_message and  can_send_message:
+                        if requested_user_ob == "company":
+                            registration_message += f" <br> {helper_text}"
                         if count % MAX_MESSAGES_PER_SECOND == 0:
                             time.sleep(1)
                         send_otp.delay(
