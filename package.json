@@ -14,9 +14,8 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.4",
     "prettier": "^3.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "vite": "^4.5.1"
+    "react": "^16.14.0",
+    "vite": "^6.3.4"
   },
   "dependencies": {
     "@eyelly/react-printer": "^1.0.0",
@@ -28,7 +27,7 @@
     "chart.js": "^4.4.2",
     "html-to-image": "^1.11.11",
     "html2pdf.js": "^0.10.2",
-    "jspdf": "^2.5.1",
+    "jspdf": "^3.0.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "react-bootstrap": "^2.8.0",

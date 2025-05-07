@@ -7,6 +7,16 @@ from django.utils.timezone import now, timedelta
 import uuid
 # Create your models here.
 
+class BaseModel(models.Model):
+    """Abstract base model to add common fields."""
+    company = models.CharField(max_length=255)  
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class ProductService(models.Model):
     company = models.CharField(max_length=255)  
     name = models.CharField(max_length=255, unique=True)
@@ -254,3 +264,4 @@ class ProformaInvoice(models.Model):
 
     def __str__(self):
         return f"Proforma {self.invoice.document_number}"
+
