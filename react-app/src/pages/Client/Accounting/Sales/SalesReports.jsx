@@ -3,9 +3,13 @@ import useSalesReports from "../../../../hooks/page-hooks/useSalesReports.js";
 
 export default function SalesReports() {
   const {
-    totals,
+    rate,
     loading,
-    rowsObject,
+    zwgTotals,
+    usdTotals,
+    grandTotals,
+    zwgRowsObject,
+    usdRowsObject,
     selectedCurrency,
     periodSelectionType,
     setPeriodSelectionType,
@@ -163,6 +167,7 @@ export default function SalesReports() {
               <th className="custom-mn-w-2">
                 <div>Customer</div>
               </th>
+
               <th className="text-end">
                 <div>Amount (Excl)</div>
               </th>
@@ -172,7 +177,37 @@ export default function SalesReports() {
               <th className="text-end">
                 <div>Total (Inc)</div>
               </th>
+
+              {selectedCurrency === "combined" && (
+                <>
+                  <th className="text-center">
+                    <div>Rate</div>
+                  </th>
+                  <th className="text-end">
+                    <div>Amount (Excl)</div>
+                  </th>
+                  <th className="text-end">
+                    <div>VAT</div>
+                  </th>
+                  <th className="text-end">
+                    <div>Total (Inc)</div>
+                  </th>
+                </>
+              )}
             </tr>
+
+            {selectedCurrency === "combined" && (
+              <tr>
+                <th colSpan="3"></th>
+                <th colSpan="3" className="text-center bg-danger text-white">
+                  ZWG
+                </th>
+                <th></th>
+                <th colSpan="3" className="text-center bg-danger text-white">
+                  USD
+                </th>
+              </tr>
+            )}
           </thead>
 
           <tbody>
@@ -186,100 +221,386 @@ export default function SalesReports() {
               </tr>
             ) : (
               <>
-                <tr>
-                  <td colSpan="6">
-                    <b className="bg-danger text-white p-2 d-inline-block mt-1 rounded-2 ">
-                      {String(selectedCurrency).toUpperCase()}
-                    </b>
-                  </td>
-                </tr>
-
-                <>
-                  <tr>
-                    <th colSpan="6">
-                      <div className="fs-6 py-2">BUR001 - Consumer Enquiries</div>
-                    </th>
-                  </tr>
-
-                  {rowsObject?.consumer_enquiries.map((row, index) => (
-                    <tr key={index}>
-                      <td>{row.date}</td>
-                      <td>{row.inv}</td>
-                      <td>{row.customer}</td>
-                      <td className="text-end">{row.amountExcl}</td>
-                      <td className="text-end">{row.vat}</td>
-                      <td className="text-end">{row.totalInc}</td>
+                {selectedCurrency !== "zwg" && (
+                  <>
+                    <tr>
+                      <td colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                        <b className="bg-danger text-white p-2 d-inline-block mt-1 rounded-2 ">
+                          USD
+                        </b>
+                      </td>
                     </tr>
-                  ))}
 
-                  <tr>
-                    <th colSpan={3} className="text-end">
-                      Sales Totals
-                    </th>
-                    <th className="text-end">{totals.consumer_enquiries.amountExcl.toFixed(2)}</th>
-                    <th className="text-end">{totals.consumer_enquiries.vat.toFixed(2)}</th>
-                    <th className="text-end">{totals.consumer_enquiries.totalInc.toFixed(2)}</th>
-                  </tr>
-                </>
+                    <>
+                      <tr>
+                        <th colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                          <div className="fs-6 py-2">BUR001 - Consumer Enquiries</div>
+                        </th>
+                      </tr>
 
-                <>
-                  <tr>
-                    <th colSpan="6">
-                      <div className="fs-6 py-2">BUR002 - Company Enquiries</div>
-                    </th>
-                  </tr>
+                      {usdRowsObject?.consumer_enquiries.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.inv}</td>
+                          <td>{row.customer}</td>
 
-                  {rowsObject?.company_enquiries.map((row, index) => (
-                    <tr key={index}>
-                      <td>{row.date}</td>
-                      <td>{row.inv}</td>
-                      <td>{row.customer}</td>
-                      <td className="text-end">{row.amountExcl}</td>
-                      <td className="text-end">{row.vat}</td>
-                      <td className="text-end">{row.totalInc}</td>
+                          {selectedCurrency === "combined" && (
+                            <>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </>
+                          )}
+
+                          <td className="text-end">{row.amountExcl}</td>
+                          <td className="text-end">{row.vat}</td>
+                          <td className="text-end">{row.totalInc}</td>
+                        </tr>
+                      ))}
+
+                      <tr>
+                        <th colSpan={3} className="text-end">
+                          Totals Sales USD
+                        </th>
+
+                        {selectedCurrency === "combined" && (
+                          <>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                          </>
+                        )}
+
+                        <th className="text-end">
+                          {usdTotals.consumer_enquiries.amountExcl.toFixed(2)}
+                        </th>
+                        <th className="text-end">{usdTotals.consumer_enquiries.vat.toFixed(2)}</th>
+                        <th className="text-end">
+                          {usdTotals.consumer_enquiries.totalInc.toFixed(2)}
+                        </th>
+                      </tr>
+                    </>
+
+                    <>
+                      <tr>
+                        <th colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                          <div className="fs-6 py-2">BUR002 - Company Enquiries</div>
+                        </th>
+                      </tr>
+
+                      {usdRowsObject?.company_enquiries.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.inv}</td>
+                          <td>{row.customer}</td>
+
+                          {selectedCurrency === "combined" && (
+                            <>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </>
+                          )}
+
+                          <td className="text-end">{row.amountExcl}</td>
+                          <td className="text-end">{row.vat}</td>
+                          <td className="text-end">{row.totalInc}</td>
+                        </tr>
+                      ))}
+
+                      <tr>
+                        <th colSpan={3} className="text-end">
+                          Totals Sales USD
+                        </th>
+
+                        {selectedCurrency === "combined" && (
+                          <>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                          </>
+                        )}
+
+                        <th className="text-end">
+                          {usdTotals.company_enquiries.amountExcl.toFixed(2)}
+                        </th>
+                        <th className="text-end">{usdTotals.company_enquiries.vat.toFixed(2)}</th>
+                        <th className="text-end">
+                          {usdTotals.company_enquiries.totalInc.toFixed(2)}
+                        </th>
+                      </tr>
+                    </>
+
+                    <>
+                      <tr>
+                        <th colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                          <div className="fs-6 py-2">BUR003 - Rescission</div>
+                        </th>
+                      </tr>
+
+                      {usdRowsObject?.rescission.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.inv}</td>
+                          <td>{row.customer}</td>
+
+                          {selectedCurrency === "combined" && (
+                            <>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            </>
+                          )}
+
+                          <td className="text-end">{row.amountExcl}</td>
+                          <td className="text-end">{row.vat}</td>
+                          <td className="text-end">{row.totalInc}</td>
+                        </tr>
+                      ))}
+
+                      <tr>
+                        <th colSpan={3} className="text-end">
+                          Totals Sales USD
+                        </th>
+
+                        {selectedCurrency === "combined" && (
+                          <>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                          </>
+                        )}
+
+                        <th className="text-end">{usdTotals.rescission.amountExcl.toFixed(2)}</th>
+                        <th className="text-end">{usdTotals.rescission.vat.toFixed(2)}</th>
+                        <th className="text-end">{usdTotals.rescission.totalInc.toFixed(2)}</th>
+                      </tr>
+                    </>
+                  </>
+                )}
+
+                {selectedCurrency !== "usd" && (
+                  <>
+                    <tr>
+                      <td colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                        <b className="bg-danger text-white p-2 d-inline-block mt-1 rounded-2 ">
+                          ZWG
+                        </b>
+                      </td>
                     </tr>
-                  ))}
 
-                  <tr>
-                    <th colSpan={3} className="text-end">
-                      Sales Totals
-                    </th>
-                    <th className="text-end">{totals.company_enquiries.amountExcl.toFixed(2)}</th>
-                    <th className="text-end">{totals.company_enquiries.vat.toFixed(2)}</th>
-                    <th className="text-end">{totals.company_enquiries.totalInc.toFixed(2)}</th>
-                  </tr>
-                </>
+                    <>
+                      <tr>
+                        <th colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                          <div className="fs-6 py-2">BUR001 - Consumer Enquiries</div>
+                        </th>
+                      </tr>
 
-                <>
-                  <tr>
-                    <th colSpan="6">
-                      <div className="fs-6 py-2">BUR003 - Rescission</div>
-                    </th>
-                  </tr>
+                      {zwgRowsObject?.consumer_enquiries.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.inv}</td>
+                          <td>{row.customer}</td>
 
-                  {rowsObject?.rescission.map((row, index) => (
-                    <tr key={index}>
-                      <td>{row.date}</td>
-                      <td>{row.inv}</td>
-                      <td>{row.customer}</td>
-                      <td className="text-end">{row.amountExcl}</td>
-                      <td className="text-end">{row.vat}</td>
-                      <td className="text-end">{row.totalInc}</td>
-                    </tr>
-                  ))}
+                          <td className="text-end">{row.amountExcl}</td>
+                          <td className="text-end">{row.vat}</td>
+                          <td className="text-end">{row.totalInc}</td>
 
-                  <tr>
-                    <th colSpan={3} className="text-end">
-                      Sales Totals
-                    </th>
-                    <th className="text-end">{totals.rescission.amountExcl.toFixed(2)}</th>
-                    <th className="text-end">{totals.rescission.vat.toFixed(2)}</th>
-                    <th className="text-end">{totals.rescission.totalInc.toFixed(2)}</th>
-                  </tr>
-                </>
+                          {selectedCurrency === "combined" && (
+                            <>
+                              <td className="text-danger text-center">{rate || ""}</td>
+                              <td className="text-end">
+                                {(Number(row.amountExcl || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                              <td className="text-end">
+                                {(Number(row.vat || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                              <td className="text-end">
+                                {(Number(row.totalInc || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      ))}
+
+                      <tr>
+                        <th colSpan={3} className="text-end">
+                          Total Sales ZWG / USD equivalent
+                        </th>
+
+                        <th className="text-end">
+                          {zwgTotals.consumer_enquiries.amountExcl.toFixed(2)}
+                        </th>
+                        <th className="text-end">{zwgTotals.consumer_enquiries.vat.toFixed(2)}</th>
+                        <th className="text-end">
+                          {zwgTotals.consumer_enquiries.totalInc.toFixed(2)}
+                        </th>
+
+                        {selectedCurrency === "combined" && (
+                          <>
+                            <td className="text-danger text-center">{rate || ""}</td>
+                            <th className="text-end">
+                              {(zwgTotals.consumer_enquiries.amountExcl / (rate || 1)).toFixed(2)}
+                            </th>
+                            <th className="text-end">
+                              {(zwgTotals.consumer_enquiries.vat / (rate || 1)).toFixed(2)}
+                            </th>
+                            <th className="text-end">
+                              {(zwgTotals.consumer_enquiries.totalInc / (rate || 1)).toFixed(2)}
+                            </th>
+                          </>
+                        )}
+                      </tr>
+                    </>
+
+                    <>
+                      <tr>
+                        <th colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                          <div className="fs-6 py-2">BUR002 - Company Enquiries</div>
+                        </th>
+                      </tr>
+
+                      {zwgRowsObject?.company_enquiries.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.inv}</td>
+                          <td>{row.customer}</td>
+
+                          <td className="text-end">{row.amountExcl}</td>
+                          <td className="text-end">{row.vat}</td>
+                          <td className="text-end">{row.totalInc}</td>
+
+                          {selectedCurrency === "combined" && (
+                            <>
+                              <td className="text-danger text-center">{rate || ""}</td>
+                              <td className="text-end">
+                                {(Number(row.amountExcl || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                              <td className="text-end">
+                                {(Number(row.vat || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                              <td className="text-end">
+                                {(Number(row.totalInc || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      ))}
+
+                      <tr>
+                        <th colSpan={3} className="text-end">
+                          Total Sales ZWG / USD equivalent
+                        </th>
+
+                        <th className="text-end">
+                          {zwgTotals.company_enquiries.amountExcl.toFixed(2)}
+                        </th>
+                        <th className="text-end">{zwgTotals.company_enquiries.vat.toFixed(2)}</th>
+                        <th className="text-end">
+                          {zwgTotals.company_enquiries.totalInc.toFixed(2)}
+                        </th>
+
+                        {selectedCurrency === "combined" && (
+                          <>
+                            <td className="text-danger text-center">{rate || ""}</td>
+                            <th className="text-end">
+                              {(zwgTotals.company_enquiries.amountExcl / (rate || 1)).toFixed(2)}
+                            </th>
+                            <th className="text-end">
+                              {(zwgTotals.company_enquiries.vat / (rate || 1)).toFixed(2)}
+                            </th>
+                            <th className="text-end">
+                              {(zwgTotals.company_enquiries.totalInc / (rate || 1)).toFixed(2)}
+                            </th>
+                          </>
+                        )}
+                      </tr>
+                    </>
+
+                    <>
+                      <tr>
+                        <th colSpan={selectedCurrency === "combined" ? 10 : 6}>
+                          <div className="fs-6 py-2">BUR003 - Rescission</div>
+                        </th>
+                      </tr>
+
+                      {zwgRowsObject?.rescission.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.date}</td>
+                          <td>{row.inv}</td>
+                          <td>{row.customer}</td>
+
+                          <td className="text-end">{row.amountExcl}</td>
+                          <td className="text-end">{row.vat}</td>
+                          <td className="text-end">{row.totalInc}</td>
+
+                          {selectedCurrency === "combined" && (
+                            <>
+                              <td className="text-danger text-center">{rate || ""}</td>
+                              <td className="text-end">
+                                {(Number(row.amountExcl || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                              <td className="text-end">
+                                {(Number(row.vat || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                              <td className="text-end">
+                                {(Number(row.totalInc || 0) / (rate || 1)).toFixed(2)}
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      ))}
+
+                      <tr>
+                        <th colSpan={3} className="text-end">
+                          Total Sales ZWG / USD equivalent
+                        </th>
+
+                        <th className="text-end">{zwgTotals.rescission.amountExcl.toFixed(2)}</th>
+                        <th className="text-end">{zwgTotals.rescission.vat.toFixed(2)}</th>
+                        <th className="text-end">{zwgTotals.rescission.totalInc.toFixed(2)}</th>
+
+                        {selectedCurrency === "combined" && (
+                          <>
+                            <td className="text-danger text-center">{rate || ""}</td>
+                            <th className="text-end">
+                              {(zwgTotals.rescission.amountExcl / (rate || 1)).toFixed(2)}
+                            </th>
+                            <th className="text-end">
+                              {(zwgTotals.rescission.vat / (rate || 1)).toFixed(2)}
+                            </th>
+                            <th className="text-end">
+                              {(zwgTotals.rescission.totalInc / (rate || 1)).toFixed(2)}
+                            </th>
+                          </>
+                        )}
+                      </tr>
+                    </>
+                  </>
+                )}
               </>
             )}
           </tbody>
+
+          {!loading && (
+            <tfoot className="bg-light">
+              <tr>
+                <th colSpan={selectedCurrency === "combined" ? 7 : 3} className="text-end">
+                  Grand Total Sales USD
+                </th>
+
+                <th className="text-end">{grandTotals.amountExcl.toFixed(2)}</th>
+                <th className="text-end">{grandTotals.vat.toFixed(2)}</th>
+                <th className="text-end">{grandTotals.totalInc.toFixed(2)}</th>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
     </div>
