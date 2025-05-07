@@ -42,13 +42,14 @@ def login_view(request):
             )
 
             if user != None:
+                login(request, user)
                 if data.get("request_client") == "postman":
+                    print(user)
                     refresh = RefreshToken.for_user(user)
                     return JsonResponse({
                         "access": str(refresh.access_token),
                         "refresh": str(refresh),
                     })
-                login(request, user)
                 return redirect("home")
             else:
                 props = {

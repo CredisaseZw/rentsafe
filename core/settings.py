@@ -150,15 +150,15 @@ AUTH_PASSWORD_VALIDATORS = [
 CRON_CLASSES = [
     "rentsafe.cronjob.LeaseOwingBalances",
 ]
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.SessionAuthentication', 
-#         'rest_framework.authentication.TokenAuthentication', 
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     ),
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication', 
+        'rest_framework.authentication.TokenAuthentication', 
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 
 
@@ -197,7 +197,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 INERTIA_LAYOUT = "base.html"
 # We need this for django form posting
 CSRF_HEADER_NAME = "HTTP_X_XSRF_TOKEN"
-CSRF_COOKIE_NAME = "XSRF-TOKEN"
+# CSRF_COOKIE_NAME = "XSRF-TOKEN"
 # Where ViteJS assets are built.
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
