@@ -66,25 +66,28 @@ def send_otp(
         )
         try:
             response = request.get(url, params=params)
+            error=False
         except Exception as e:
+            error=True
             ...
+            
         # Save OTP to the OTP model
-        if otp:
+        if otp and not error:
             otpFile = OTP.objects.create(
                 otp_code=otp,
                 otp_type=otp_type,
                 request_user=request_user,
                 requested_user=requested_user,
             )
-
-        add_msg_to_comms_hist(
-            user_id=request_user,
-            client_id=requested_user,
-            message=registration_message,
-            is_sms=True,
-            is_email=False,
-            is_creditor=is_creditor,
-        )
+        if not error:
+            add_msg_to_comms_hist(
+                user_id=request_user,
+                client_id=requested_user,
+                message=registration_message,
+                is_sms=True,
+                is_email=False,
+                is_creditor=is_creditor,
+            )
 
     elif request_user_type == "company" and otp_type == settings.ADD_COMPANY:
         # Save OTP to the OTP model
@@ -591,36 +594,42 @@ def track_lease_balances():
                         can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
                     except Exception as e:
                         ...
-                    can_send_message = False if can_send_message_ob else True
+                    can_send_message = not can_send_message_ob
                     if registration_message and  can_send_message:
                         if requested_user_ob == "company":
                             registration_message += f" <br> {helper_text}"
                         if count % MAX_MESSAGES_PER_SECOND == 0:
                             time.sleep(1)
-                        send_otp.delay(
-                            "",
-                            lease_id,
-                            contact_detail,
-                            lease.lease_giver,
-                            lease.reg_ID_Number,
-                            requested_user_ob,
-                            settings.LEASE_STATUS,
-                            registration_message,
-                        )
+                        try:
+                            send_otp.delay(
+                                "",
+                                lease_id,
+                                contact_detail,
+                                lease.lease_giver,
+                                lease.reg_ID_Number,
+                                requested_user_ob,
+                                settings.LEASE_STATUS,
+                                registration_message,
+                            )
+                        except Exception as e:
+                            ...
                         if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
                             if rent_guarantor_mobile := Individual.objects.filter(
                                 identification_number=lease.rent_guarantor_id
                             ).first():
-                                send_otp.delay(
-                                    "",
-                                    lease_id,
-                                    rent_guarantor_mobile.mobile,
-                                    lease.lease_giver,
-                                    lease.reg_ID_Number,
-                                    "individual",
-                                    settings.LEASE_STATUS,
-                                    registration_message,
-                                )
+                                try:
+                                    send_otp.delay(
+                                        "",
+                                        lease_id,
+                                        rent_guarantor_mobile.mobile,
+                                        lease.lease_giver,
+                                        lease.reg_ID_Number,
+                                        "individual",
+                                        settings.LEASE_STATUS,
+                                        registration_message,
+                                    )
+                                except Exception as e:
+                                    ...
                     else:
                         ...
                 

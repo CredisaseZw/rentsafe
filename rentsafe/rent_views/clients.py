@@ -5572,7 +5572,7 @@ def debit_journal(request):
                 date = datetime.strptime(date_ob, "%Y-%m-%d").date()
                 lease_opening_balance = Opening_balance.objects.filter(
                     lease_id=lease_id
-                ).first()
+                )
                 if lease_opening_balance:
                     if lease_opening_balance.count() < 2:
                         Opening_balance.objects.create(
@@ -5611,6 +5611,7 @@ def debit_journal(request):
                             lease_ob.status = move_up(lease_ob.status)
                         lease_ob.save()
                     # Categorize the date
+                    print('calculated month diff:....',month_diff)
                     if month_diff == 0:
                         last_ob.current_month = float(debit_amount) + float(last_ob.current_month)
                     elif month_diff == 1:
