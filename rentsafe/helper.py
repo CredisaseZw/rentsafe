@@ -392,9 +392,9 @@ def get_creditor_helper(data, request, creditors_data):
     elif surname != first_name:
         result = Landlord.objects.filter(
             landlord_name__icontains=first_name).first()
-
-    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(landlord_id=result.landlord_id)
-    # individual_invoice = Invoicing.objects.filter(lease_id=individual_lease.lease_id).last()
+    uploader_user_company = CustomUser.objects.filter(id=result.user_id).first() 
+    # if request.user.company == uploader_user_company.company:
+    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(lease_id=result.lease_id)
     creditors_data = {
         "opening_balance": creditor_opening_balance.last().total_amount if creditor_opening_balance else 0,
         "opening_balance_date": creditor_opening_balance.first().created_at if creditor_opening_balance else None,

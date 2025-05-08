@@ -781,6 +781,12 @@ def edit_lease(request):
             agent_details.save()
 
         if lease:
+            if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
+                from ..validators import validate_phone_number
+                mobile_number_owner = Individual.objects.filter(identification_number=lease.reg_ID_Number).first()
+                if mobile_number_owner and validate_phone_number(data.get("lesseePhone")):
+                    mobile_number_owner.mobile = data.get("lesseePhone")
+                    mobile_number_owner.save()
             lease.lease_details = data.get("leaseDetails")
             lease.deposit_amount = data.get("depositAmount")
             lease.deposit_period = data.get("depositPeriod")
