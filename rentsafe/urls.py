@@ -31,7 +31,6 @@ from .rent_views.templates import download_template
 urlpatterns = [
     path("dashboard/", views.index, name="home"),
     path("in-development/", views.in_development, name="in_development"),
-    # templates download url
     path(
         "download_template/<template_name>", download_template, name="download_template"
     ),
