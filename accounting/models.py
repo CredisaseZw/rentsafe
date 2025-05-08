@@ -8,7 +8,7 @@ import uuid
 # Create your models here.
 
 class ProductService(models.Model):
-    company = models.CharField(max_length=255)  
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -22,6 +22,7 @@ class ProductService(models.Model):
 class AccountSector(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
+    company = models.CharField(max_length=255, null=True)  # User Company Relation
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -29,9 +30,9 @@ class AccountSector(models.Model):
 
 class SalesAccount(models.Model):
     """Stores different sales accounts and links them to sectors."""
-    company = models.CharField(max_length=255)  
     account_name = models.CharField(max_length=255, unique=True)
-    account_number = models.CharField(max_length=10, unique=True)  # Numeric Account Code
+      # User Company Relation
+    account_number = models.CharField(max_length=15, default="")  # Numeric Account Code
     account_sector = models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name="accounts")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
     date_created = models.DateTimeField(auto_now_add=True)
@@ -41,7 +42,7 @@ class SalesAccount(models.Model):
         return f"{self.account_number} - {self.account_name}"
     
 class Item(models.Model):
-    company = models.CharField(max_length=255)  
+      
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -58,7 +59,7 @@ class Item(models.Model):
         return f"{self.name} ({self.category.name})"
 
 class SalesCategory(models.Model):
-    company = models.CharField(max_length=255)  
+      
     name = models.CharField(max_length=255, unique=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE) 
     code = models.CharField(max_length=255, blank=True, null=True) 
@@ -68,11 +69,9 @@ class SalesCategory(models.Model):
     def __str__(self):
         return self.name
 
-
-
 class CashSale(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
-    company = models.CharField(max_length=255)  
+      
     sale_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -81,7 +80,7 @@ class CashSale(models.Model):
         return f"Cash Sale {self.id} - {self.user.user_id}"
 
 class VATSetting(models.Model):
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     rate = models.DecimalField(max_digits=5, decimal_places=2)
     description = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
@@ -98,7 +97,7 @@ class CashbookEntry(models.Model):
     )
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     transaction_date = models.DateTimeField(auto_now_add=True)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -111,7 +110,7 @@ class CashbookEntry(models.Model):
 class GeneralLedgerAccount(models.Model):
  
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     account_name = models.ForeignKey(SalesAccount, on_delete=models.CASCADE, related_name='account')
     account_sector =   models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name='sector')
     date_created = models.DateTimeField(auto_now_add=True)
@@ -121,7 +120,7 @@ class GeneralLedgerAccount(models.Model):
 
 class JournalEntry(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     date = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
@@ -131,7 +130,7 @@ class JournalEntry(models.Model):
 
 class LedgerTransaction(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     entry = models.ForeignKey(JournalEntry, on_delete=models.CASCADE)
     account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE)
     debit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -153,7 +152,7 @@ class Invoice(models.Model):
     
     document_number = models.CharField(max_length=10, unique=True)
     customer_id = models.CharField(max_length=255)  
-    company = models.CharField(max_length=255) # User Company Relation
+     # User Company Relation
     is_individual = models.BooleanField(default=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Creator of the invoice
     sale_date = models.DateField(default=now)
@@ -165,13 +164,12 @@ class Invoice(models.Model):
     def __str__(self):
         return f"Invoice {self.document_number} - {self.customer_id} ({self.is_individual})"
 
-
 class InvoiceItem(models.Model):
     """Stores products or services added to an invoice."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey('ProductService', on_delete=models.CASCADE) 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Creator of the invoice
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     vat_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -180,13 +178,12 @@ class InvoiceItem(models.Model):
     def __str__(self):
         return f"{self.invoice.document_number} - {self.product.name}"
 
-
 class Payment(models.Model):
     """Stores payments made against invoices."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Processed by
     payment_date = models.DateTimeField(default=now)
-    company = models.CharField(max_length=255)  # User Company Relation
+      # User Company Relation
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     method = models.CharField(
         max_length=50,
@@ -207,7 +204,7 @@ class RecurringInvoice(models.Model):
     
     customer_id = models.CharField(max_length=255)  # Stores Customer ID
     is_individual = models.BooleanField(default=True)
-    company = models.CharField(max_length=255)  #User Company Relation
+      #User Company Relation
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Created by
     start_date = models.DateField(null=True,blank=True)
     next_invoice_date = models.DateField(null=True,blank=True)

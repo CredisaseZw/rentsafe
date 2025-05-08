@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import action
 from django.utils.timezone import now
 from inertia import render as inertia_render
+from rest_framework.response import Response
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
     """
@@ -18,24 +19,15 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Ensure users only access objects belonging to their company."""
-        return self.queryset.filter(company=self.request.user.company)
+        return self.queryset.filter(user__company=self.request.user.company)
 
     def perform_create(self, serializer):
         """Automatically assign the user's company when creating objects."""
-        serializer.save(user=self.request.user, company=self.request.user.company)
+        serializer.save(user=self.request.user)
 
-    def perform_update(self, serializer):
-        """Ensure the company is not changed during updates."""
-        serializer.save(company=self.request.user.company)
 class ItemViewSet(BaseCompanyViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-
-class VATSettingViewSet(BaseCompanyViewSet):
-    queryset = VATSetting.objects.all()
-    serializer_class = VATSettingSerializer
-    from rest_framework import status
-from rest_framework.response import Response
 
 class VATSettingViewSet(BaseCompanyViewSet):
     queryset = VATSetting.objects.all()
@@ -72,7 +64,6 @@ class VATSettingViewSet(BaseCompanyViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
 class ProductServiceViewSet(BaseCompanyViewSet):
     queryset = ProductService.objects.all()
     serializer_class = ProductServiceSerializer
@@ -105,12 +96,11 @@ class LedgerTransactionViewSet(BaseCompanyViewSet):
     queryset = LedgerTransaction.objects.all()
     serializer_class = LedgerTransactionSerializer
 
-
 class AccountSectorViewSet(BaseCompanyViewSet):
     queryset = AccountSector.objects.all()
     serializer_class = AccountSectorSerializer
     
-class InvoiceViewSet(viewsets.ModelViewSet):
+class InvoiceViewSet(BaseCompanyViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
 
@@ -123,11 +113,12 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         return Response({"success": True, "message": "Invoice marked as paid."})
 
 
-class InvoiceItemViewSet(viewsets.ModelViewSet):
-    queryset = InvoiceItem.objects.all()
-    serializer_class = InvoiceItemSerializer
+# class InvoiceItemViewSet(viewsets.ModelViewSet):
+#     queryset = InvoiceItem.objects.all()
+#     serializer_class = InvoiceItemSerializer
 
-class PaymentViewSet(viewsets.ModelViewSet):
+class PaymentViewSet(BaseCompanyViewSet):
+    """Handles payments related to invoices."""
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 

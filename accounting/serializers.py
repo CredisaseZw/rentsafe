@@ -5,7 +5,7 @@ class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         try:
-            read_only_fields = ['company', 'user']  # Prevent user from setting them
+            read_only_fields = ['user']  # Prevent user from setting them
         except AttributeError:
             read_only_fields = []
 
@@ -43,7 +43,7 @@ class CashbookEntrySerializer(BaseCompanySerializer):
         model = CashbookEntry
 
 class GeneralLedgerAccountSerializer(BaseCompanySerializer):
-    acount_sector = serializers.PrimaryKeyRelatedField(queryset=AccountSector.objects.all())
+    account_sector = serializers.PrimaryKeyRelatedField(queryset=AccountSector.objects.all())
     
     class Meta(BaseCompanySerializer.Meta):
         model = GeneralLedgerAccount
@@ -61,14 +61,14 @@ class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = AccountSector
         
-class InvoiceItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InvoiceItem
-        fields = "__all__"
+# class InvoiceItemSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = InvoiceItem
+#         fields = "__all__"
 
 
-class InvoiceSerializer(serializers.ModelSerializer):
-    items = InvoiceItemSerializer(many=True, required=False)
+class InvoiceSerializer(BaseCompanySerializer):
+    items = []#InvoiceItemSerializer(many=True, required=False)
 
     class Meta:
         model = Invoice
@@ -85,7 +85,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         return invoice
 
 
-class PaymentSerializer(serializers.ModelSerializer):
+class PaymentSerializer(BaseCompanySerializer):
     class Meta:
         model = Payment
         fields = "__all__"
