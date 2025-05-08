@@ -54,7 +54,7 @@ def send_otp(
         params = (
             {
                 "apikey": settings.SMS_API_KEY,
-                "mobiles": '263779586059',
+                "mobiles": phone_or_email,
                 "sms": {registration_message},
             }
             if otp_type in [settings.LEASE_STATUS, settings.ADD_IND_LEASE]
@@ -403,9 +403,6 @@ def get_creditor_helper(data, request, creditors_data):
     }
     return JsonResponse([creditors_data], safe=False)
 
-
-
-
 def get_individual_journals_helper(data, request, individual_data):
     searchValue = data["searchValue"].upper()
     first_name = searchValue.split()[0]
@@ -487,7 +484,7 @@ def run_tasks():
 
 
 def track_lease_balances():
-    leases = Lease.objects.filter(is_active=True).all()
+    leases = Lease.objects.filter(is_active=True,is_government=False).all()
     today = date.today()
     count = 0
     helper_text = ''
@@ -539,11 +536,13 @@ def track_lease_balances():
                                 lease.status = "HIGH"
                             elif float(opening_balance_object.one_month_back) > 0:
                                 lease.status = "MEDIUM"
+                            lease.status_cache = lease.status
                             lease.save()
                         except Exception as e:
                             pass
-                    lease.status = lease.status_cache
-                    lease.save()
+                    else:
+                        lease.status = lease.status_cache
+                        lease.save()
 
                     if lease.is_company:
                         requested_user_ob = "company"
@@ -571,7 +570,7 @@ def track_lease_balances():
                             identification_number=lease.reg_ID_Number
                         ).first()
                         lease_receiver_name = (
-                            lease_receiver.firstname + " " + lease_receiver.surname
+                            f"{lease_receiver.firstname} {lease_receiver.surname}"
                             if lease_receiver
                             else "Creditor"
                         )
@@ -633,7 +632,6 @@ def track_lease_balances():
                     else:
                         ...
                 
-
 
 def send_message():
     reminders = CommunicationHistoryReminder.objects.filter(
@@ -742,3 +740,52 @@ def add_msg_to_comms_hist(
     )
 
     new_message.save()
+
+def update_debited_customer_status(lease_id):
+    with contextlib.suppress(Exception):
+        if lease := Lease.objects.filter(lease_id=lease_id).first():
+            if opening_balance := Opening_balance.objects.filter(
+                lease_id=lease.lease_id
+            ).last():
+                if float(opening_balance.outstanding_balance) > 0:
+                    if float(opening_balance.three_months_plus) > 0:
+                        lease.status = "NON-PAYER"
+                    elif float(opening_balance.three_months_back) > 0:
+                        lease.status = "HIGH-HIGH"
+                    elif float(opening_balance.two_months_back) > 0:
+                        lease.status = "HIGH"
+                    elif float(opening_balance.one_month_back) > 0:
+                        lease.status = "MEDIUM"
+                else:
+                    lease.status = "SAFE"
+                lease.status_cache = lease.status
+                lease.save()
+                return lease.status_cache
+
+def visualize_statements_according_to_dates(last_ob, days_diff, payment_is_past,debit_amount):
+    if days_diff <= 30:
+        if payment_is_past:
+            last_ob.one_month_back = float(debit_amount) + float(last_ob.one_month_back)
+        else:
+            last_ob.current_month = float(debit_amount) + float(last_ob.current_month)
+    elif 31 <= days_diff <= 60:
+        if payment_is_past:
+            last_ob.two_months_back = float(debit_amount) + float(last_ob.two_months_back)
+        else:
+            last_ob.one_month_back = float(debit_amount) + float(last_ob.one_month_back)
+    elif 61 <= days_diff <= 90:
+        if payment_is_past:
+            last_ob.three_months_back = float(debit_amount) + float(last_ob.three_months_back)
+        else:
+            last_ob.two_months_back = float(debit_amount) + float(last_ob.two_months_back)
+    elif 91 <= days_diff <= 120:
+        if payment_is_past:
+            last_ob.three_months_plus = float(debit_amount) + float(last_ob.three_months_plus)
+        else:
+            last_ob.three_months_back = float(debit_amount) + float(last_ob.three_months_back)
+    else:
+        last_ob.three_months_plus = float(debit_amount) + float(last_ob.three_months_plus)
+
+    last_ob.outstanding_balance = float(debit_amount) + float(last_ob.outstanding_balance)
+    last_ob.save()
+    return last_ob
