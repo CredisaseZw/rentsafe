@@ -1,10 +1,10 @@
-name: Django CI
+name: Rentsafe Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main","testing" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main","testing" ]
 
 jobs:
   build:
@@ -26,7 +26,7 @@ jobs:
       WHATSAPP_API_MEDIA_URL: ${{ secrets.WHATSAPP_API_MEDIA_URL }}
       WHATSAPP_API_URL: ${{ secrets.WHATSAPP_API_URL }}
       WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
-      WHATSAPP_VERIFY_TOKEN: ${{secrets.WHATSAPP_VERIFY_TOKEN}}
+      WHATSAPP_VERIFY_TOKEN: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
       DB_ENGINE: ${{ secrets.DB_ENGINE }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASS: ${{ secrets.DB_PASS }}
@@ -52,4 +52,5 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py migrate
+        
         python manage.py test
