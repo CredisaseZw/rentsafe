@@ -55,8 +55,7 @@ class JournalEntrySerializer(BaseCompanySerializer):
 class LedgerTransactionSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = LedgerTransaction
-    
-    
+   
 class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = AccountSector
@@ -70,9 +69,8 @@ class AccountSectorSerializer(BaseCompanySerializer):
 class InvoiceSerializer(BaseCompanySerializer):
     items = []#InvoiceItemSerializer(many=True, required=False)
 
-    class Meta:
+    class Meta(BaseCompanySerializer.Meta):
         model = Invoice
-        fields = "__all__"
 
     def create(self, validated_data):
         """Handles creating invoice and associated items."""
@@ -84,11 +82,9 @@ class InvoiceSerializer(BaseCompanySerializer):
 
         return invoice
 
-
 class PaymentSerializer(BaseCompanySerializer):
-    class Meta:
+    class Meta(BaseCompanySerializer.Meta):
         model = Payment
-        fields = "__all__"
 
 class RecurringInvoiceSerializer(serializers.ModelSerializer):
     class Meta:

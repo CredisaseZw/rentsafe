@@ -155,7 +155,7 @@ class Invoice(models.Model):
      # User Company Relation
     is_individual = models.BooleanField(default=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Creator of the invoice
-    sale_date = models.DateField(default=now)
+    sale_date = models.DateTimeField(default=now)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     total_excluding_vat = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
     vat_total = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
@@ -236,7 +236,6 @@ class RecurringInvoice(models.Model):
     def __str__(self):
         is_company_or_individual = "Company" if not self.is_individual else "Individual"
         return f"Recurring Invoice for {is_company_or_individual} - {self.customer_id} every {self.frequency}"
-
 
 class ProformaInvoice(models.Model):
     """Stores a draft invoice before conversion into a final invoice."""

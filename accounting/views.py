@@ -23,6 +23,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Automatically assign the user's company when creating objects."""
+        print("--------Testing--------")
         serializer.save(user=self.request.user)
 
 class ItemViewSet(BaseCompanyViewSet):
@@ -112,7 +113,6 @@ class InvoiceViewSet(BaseCompanyViewSet):
         invoice.save()
         return Response({"success": True, "message": "Invoice marked as paid."})
 
-
 # class InvoiceItemViewSet(viewsets.ModelViewSet):
 #     queryset = InvoiceItem.objects.all()
 #     serializer_class = InvoiceItemSerializer
@@ -121,6 +121,11 @@ class PaymentViewSet(BaseCompanyViewSet):
     """Handles payments related to invoices."""
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+
+    def perform_create(self, serializer):
+        """Automatically assign the user's company when creating objects."""
+        print("--------Testing--------")
+        serializer.save(user=self.request.user)
 
 class RecurringInvoiceViewSet(viewsets.ModelViewSet):
     queryset = RecurringInvoice.objects.all()
