@@ -1,11 +1,12 @@
 .env
 venv
-node_modules/
-/rentsafe/migrations/
 env/
 .tfa
-
+node_modules/
+*.egg-info/
 __pycache__/
+__pych*
 *.pyc
+*.pyo
 *db.sqlite3*
 .vscode
