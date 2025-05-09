@@ -66,7 +66,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -197,7 +197,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 INERTIA_LAYOUT = "base.html"
 # We need this for django form posting
 CSRF_HEADER_NAME = "HTTP_X_XSRF_TOKEN"
-# CSRF_COOKIE_NAME = "XSRF-TOKEN"
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
 # Where ViteJS assets are built.
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
