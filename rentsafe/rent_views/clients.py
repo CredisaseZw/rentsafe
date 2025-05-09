@@ -5995,6 +5995,10 @@ def accounts_list(request):
 
     return render(request, "Client/Accounting/AccountsList")
 
+@login_required
+@clients_required
+def sales_accounts(request):
+    return render(request, "Client/Accounting/Sales/SalesAccounts")
 
 
 

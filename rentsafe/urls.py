@@ -234,6 +234,7 @@ urlpatterns = [
         include(
             [
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
+                path("sales-accounts/", clients.cash_sales, name="sales_accounts"),
                 path("manual-colors/", clients.manual_color_update, name="manual_colors"),
                 path("sales-reports", clients.sales_reports, name="sales_reports"),
                 path("sales-categories", clients.sales_categories, name="sales_categories"),
