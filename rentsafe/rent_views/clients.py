@@ -3641,7 +3641,9 @@ def client_leases_new(request,leases_type=None):
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
+        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount > 0 and is_100_days_ago)  else False
+        if float(owing_amount) <= 0 and i.is_terminated == True:
+            is_terminated_lease_eligible = True
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
@@ -5841,14 +5843,12 @@ def manual_send_otp(request):
     return HttpResponse("otps were resend!")
 
 def manual_color_update(request):
-    
-   
+
     leases = Lease.objects.filter(is_active=True).all()
    
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
-           
             if opening_balance_object := Opening_balance.objects.filter(
                 lease_id=lease_id
             ).last():

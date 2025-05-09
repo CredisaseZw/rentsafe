@@ -10,6 +10,5 @@ node_modules/
 *.pot
 *.mo
 *.pyc
-
 *db.sqlite3*
 .vscode
