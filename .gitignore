@@ -2,6 +2,14 @@
 venv
 env/
 .tfa
+__pycache__/
+*.py[cod]
+*.pyo
+node_modules/
+*.log
+*.pot
+*.mo
+*.pyc
 
 *db.sqlite3*
 .vscode
