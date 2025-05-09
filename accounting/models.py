@@ -22,7 +22,7 @@ class ProductService(models.Model):
 class AccountSector(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
-    company = models.CharField(max_length=255, null=True)  # User Company Relation
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=1)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
