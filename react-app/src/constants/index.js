@@ -669,3 +669,5 @@ export const accountsList = [
     sectorName: "Current Liabilities",
   },
 ];
+
+export const defaultRowCount = 3;

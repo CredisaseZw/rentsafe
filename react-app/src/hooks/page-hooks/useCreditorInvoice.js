@@ -2,11 +2,12 @@ import { Inertia } from "@inertiajs/inertia";
 import { usePage } from "@inertiajs/inertia-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { defaultRowCount } from "../../constants";
 
 export default function useCreditorInvoice() {
   const [creditorInvoices, setCreditorInvoices] = useState([]);
-  const [rows, setRows] = useState([
-    {
+  const [rows, setRows] = useState(
+    new Array(defaultRowCount).fill({
       date: new Date().toISOString().split("T")[0],
       creditor: "",
       details: "",
@@ -17,8 +18,8 @@ export default function useCreditorInvoice() {
       vat: 0,
       net_amount_excl: 0,
       rate: 0,
-    },
-  ]);
+    })
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const { url } = usePage();
