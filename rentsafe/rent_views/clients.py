@@ -781,6 +781,12 @@ def edit_lease(request):
             agent_details.save()
 
         if lease:
+            if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
+                from ..validators import validate_phone_number
+                mobile_number_owner = Individual.objects.filter(identification_number=lease.reg_ID_Number).first()
+                if mobile_number_owner and validate_phone_number(data.get("lesseePhone")):
+                    mobile_number_owner.mobile = data.get("lesseePhone")
+                    mobile_number_owner.save()
             lease.lease_details = data.get("leaseDetails")
             lease.deposit_amount = data.get("depositAmount")
             lease.deposit_period = data.get("depositPeriod")
@@ -4401,13 +4407,14 @@ def client_invoicing(request):
         formatted_date = date_obj.strftime("%Y-%m-%d")
         new_var = random.randint(100000, 999999)
         new_var1 = invoice_data.get("invoiceNumber")
-        invoice_code = f"inv#{new_var}" if not invoice_data.get("invoiceNumber") else f"inv#{new_var1}"
+        invoice_code = f"inv#{new_var1}" if invoice_data.get("invoiceNumber") else f"inv#{new_var}"
         
         try:
             invoice = Invoicing(
                 lease_id=lease_id,
                 amount=invoice_amount,
                 operation_costs=operation_costs,
+                invoice_date=formatted_date,
                 description="terminated variable rental invoice" if invoice_data.get("terminated") else "variable rental invoice",
                 invoice_number = invoice_code,
                 account_number = invoice_data.get("tenantAccNumber"),
@@ -4523,7 +4530,7 @@ def get_invoicing_details(request):
             is_active=True,
             lease_giver=request.user.company,
             rent_variables=True,
-            lease_activator=request.user.id,
+            # lease_activator=request.user.id,
         )
     )
     tenant_individual_details = {}
@@ -4535,7 +4542,6 @@ def get_invoicing_details(request):
     custom_day = datetime(current_year, current_month, current_day).date()
     tenant_list = []
     today_date_check = timezone.now().date()
-    print('leases....', tenant)
     count = 0
     for i in tenant:
         difference = relativedelta(today_date_check, i.created_date)
@@ -4544,12 +4550,10 @@ def get_invoicing_details(request):
         except:
             next_month_end_day = today.replace(day=8)
 
-        if (
-            (today >= custom_day) or (today < next_month_end_day)
-        ) and difference.days > 10:  # FIXME: SWITCH DATES comment
+        if (today >= custom_day) or (today < next_month_end_day):  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
-                invoiced_month = invoice_status.date_updated.strftime("%B")
-                invoice_year = invoice_status.date_updated.strftime("%Y")
+                invoiced_month = invoice_status.invoice_date.strftime("%B") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%B")
+                invoice_year = invoice_status.invoice_date.strftime("%Y") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%Y")
                 invoice_month = f"{invoiced_month} {invoice_year}"
                 current_month = datetime.now().strftime("%B")
                 current_year = datetime.now().strftime("%Y")
@@ -5572,7 +5576,7 @@ def debit_journal(request):
                 date = datetime.strptime(date_ob, "%Y-%m-%d").date()
                 lease_opening_balance = Opening_balance.objects.filter(
                     lease_id=lease_id
-                ).first()
+                )
                 if lease_opening_balance:
                     if lease_opening_balance.count() < 2:
                         Opening_balance.objects.create(
@@ -5585,46 +5589,21 @@ def debit_journal(request):
                             outstanding_balance=lease_opening_balance.first().outstanding_balance,
                         )
                     last_ob = lease_opening_balance.last()
-                    outstanding_balance = float(last_ob.outstanding_balance)
-                    entered_year, entered_month = date.year, date.month
-                    current_year, current_month = today.year, today.month
-
-                    # Calculate month difference
-                    month_diff = (current_year - entered_year) * 12 + (current_month - entered_month)
-                    statuses = ["SAFE", "MEDIUM", "HIGH", "HIGH-HIGH", "NON-PAYER"]
-                    # Fetch lease object
-                    lease_status = check_lease_status(lease_id)
-                    lease_ob = Lease.objects.filter(lease_id=lease_id).first()
-
-                    if lease_ob:
-                        # If the current status is the same as the cached status, update them both
-                        if lease_ob.status == lease_ob.status_cache:
-                            lease_ob.status_cache = lease_ob.status = lease_status
-                        else:
-                            def move_up(status):
-                                if status == "NON-PAYER":
-                                    return status  # Don't change "NON-PAYER"
-                                index = statuses.index(status)
-                                return statuses[min(index + 1, len(statuses) - 1)]  # Ensure it doesn't go out of bounds
-
-                            lease_ob.status_cache = move_up(lease_ob.status_cache)
-                            lease_ob.status = move_up(lease_ob.status)
-                        lease_ob.save()
+                    days_diff = (today - date).days 
+                    lease_object = Lease.objects.filter(lease_id=lease_id).first()
                     # Categorize the date
-                    if month_diff == 0:
-                        last_ob.current_month = float(debit_amount) + float(last_ob.current_month)
-                    elif month_diff == 1:
-                        last_ob.one_month_back = float(debit_amount) + float(last_ob.one_month_back)
-                    elif month_diff == 2:
-                        last_ob.two_months_back = float(debit_amount) + float(last_ob.two_months_back)
-                    elif month_diff == 3:
-                        last_ob.three_months_back = float(debit_amount) + float(last_ob.three_months_back)
-                    elif month_diff > 3:
-                        last_ob.three_months_plus= float(debit_amount) + float(last_ob.three_months_plus)
+                    print('days diff', days_diff)
+                    print('check1', days_diff <= 30)
+                    print('check2', 31 <= days_diff <= 60)
+                    print('check3', 61 <= days_diff <= 90)
+                    print('check4', 91 <= days_diff <= 120)
+                    if int(today.day) > int(lease_object.payment_period_end):
+                        payment_is_past= True
                     else:
-                        ...
-                    last_ob.outstanding_balance = float(debit_amount) + float(last_ob.outstanding_balance)
-                    last_ob.save()
+                        payment_is_past= False
+                    
+                    visualize_statements_according_to_dates(last_ob, days_diff, payment_is_past,debit_amount)
+                    
                     lease_debit_journal = LeasePayments(
                         lease_id=lease_id,
                         payment_amount=debit_amount,
@@ -5639,6 +5618,7 @@ def debit_journal(request):
                         is_balance_checked=True,
                     )
                     lease_debit_journal.save()
+                    update_debited_customer_status(lease_id)
                 else:
                     date_error = True
             if date_error:
@@ -5862,152 +5842,32 @@ def manual_send_otp(request):
 
 def manual_color_update(request):
     
-    data = json.loads(request.body.decode('utf-8'))
-    
-    company_id = data.get('company_id')
-    color = data.get('color')
-    if company_id:
-        leases = Lease.objects.filter(lease_giver=int(company_id),is_active=True).all()
-    else:
-        leases = Lease.objects.filter(is_active=True).all()
-    today = date.today()
-    count = 0
-    MAX_MESSAGES_PER_SECOND = 90
+   
+    leases = Lease.objects.filter(is_active=True).all()
+   
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
-            can_send_message =True
-            lease_giver = Company.objects.filter(id=lease.lease_giver).first()
-            lease_giver_name = (
-                lease_giver.registration_name if lease_giver else "Creditor"
-            )
-            custom_day = today.replace(day=int(lease.payment_period_end))
-            limit_day = today.replace(day=int(lease.payment_period_end) + 1)
-            if custom_day < today :#<= limit_day:
-                if opening_balance_object := Opening_balance.objects.filter(
-                    lease_id=lease_id
-                ).last():
-                    current_month = float(opening_balance_object.current_month)
-                    one_months_ago = float(opening_balance_object.one_month_back)
-                    two_months_ago = float(opening_balance_object.two_months_back)
-                    three_months_ago = float(opening_balance_object.three_months_back)
-                    four_months_ago = float(opening_balance_object.three_months_plus)
-                    outstanding_balance = float(
-                        opening_balance_object.outstanding_balance
-                    )
-                    if (
-                        lease.status == lease.status_cache
-                        and float(opening_balance_object.outstanding_balance) > 0
-                    ):
-                        try:
-                            if not color:
-                                opening_balance_object.three_months_plus = (    
-                                    four_months_ago + three_months_ago
-                                )
-                                opening_balance_object.three_months_back = two_months_ago
-                                opening_balance_object.two_months_back = one_months_ago
-                                opening_balance_object.one_month_back = current_month
-                                opening_balance_object.current_month = 0
-                                opening_balance_object.outstanding_balance = (
-                                    outstanding_balance
-                                )
-                                opening_balance_object.save()
-
-                            if float(opening_balance_object.three_months_plus) > 0:
-                                status = "NON-PAYER"
-                            elif float(opening_balance_object.three_months_back) > 0:
-                                status = "HIGH-HIGH"
-                            elif float(opening_balance_object.two_months_back) > 0:
-                                status = "HIGH"
-                            elif float(opening_balance_object.one_month_back) > 0:
-                                status = "MEDIUM"
-                            lease.status = status
-                            lease.save()
-                        except Exception as e:
-                            pass
-                    lease.status_cache =lease.status
+           
+            if opening_balance_object := Opening_balance.objects.filter(
+                lease_id=lease_id
+            ).last():
+                try:
+                    if float(opening_balance_object.three_months_plus) > 0:
+                        status = "NON-PAYER"
+                    elif float(opening_balance_object.three_months_back) > 0:
+                        status = "HIGH-HIGH"
+                    elif float(opening_balance_object.two_months_back) > 0:
+                        status = "HIGH"
+                    elif float(opening_balance_object.one_month_back) > 0:
+                        status = "MEDIUM"
+                    lease.status = status
                     lease.save()
+                except Exception as e:
+                    pass
+                lease.status_cache =lease.status
+                lease.save()
 
-                    if lease.is_company:
-                        requested_user_ob = "company"
-                        lease_receiver = Company.objects.filter(
-                            id=lease.reg_ID_Number
-                        ).first()
-                        lease_receiver_name = (
-                            lease_receiver.trading_name
-                            if lease_receiver
-                            else "Creditor"
-                        )
-                        if lease_receiver:
-                            company_email = CompanyProfile.objects.filter(
-                                company=lease_receiver.id
-                            ).first()
-                            contact_detail = company_email.email
-                        else:
-                            contact_detail = "gtkandeya@gmail.com"
-                    else:
-                        count += 1
-                        
-                        requested_user_ob = "individual"
-                        lease_receiver = Individual.objects.filter(
-                            identification_number=lease.reg_ID_Number
-                        ).first()
-                        lease_receiver_name = (
-                            lease_receiver.firstname + " " + lease_receiver.surname
-                            if lease_receiver
-                            else "Creditor"
-                        )
-                        contact_detail = lease_receiver.mobile if lease_receiver else None
-                    if float(opening_balance_object.outstanding_balance) > 0:
-                        left_balance = round(float(opening_balance_object.outstanding_balance), 2)
-                    else:
-                        left_balance = 0
-                    
-                    if lease.status == "NON-PAYER":
-                        registration_message = f" Hi {lease_receiver_name },Your Payment status to {lease_giver_name} has downgraded to NON-PAYER. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
-                    elif lease.status in ["HIGH", "HIGH-HIGH"]:
-                        registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to HIGH RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
-                    elif lease.status == "MEDIUM":
-                        registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to MEDIUM RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
-                    else:
-                        registration_message = None
-                 
-                    try:
-                        can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
-                    except Exception as e:
-                        ...
-                    can_send_message = False if can_send_message_ob else True
-                    if registration_message and  can_send_message:
-                        if count % MAX_MESSAGES_PER_SECOND == 0:
-                            time.sleep(1)
-                        send_otp.delay(
-                            "",
-                            lease_id,
-                            contact_detail,
-                            lease.lease_giver,
-                            lease.reg_ID_Number,
-                            requested_user_ob,
-                            settings.LEASE_STATUS,
-                            registration_message,
-                        )
-                        if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
-                            if rent_guarantor_mobile := Individual.objects.filter(
-                                identification_number=lease.rent_guarantor_id
-                            ).first():
-                                send_otp.delay(
-                                    "",
-                                    lease_id,
-                                    rent_guarantor_mobile.mobile,
-                                    lease.lease_giver,
-                                    lease.reg_ID_Number,
-                                    "individual",
-                                    settings.LEASE_STATUS,
-                                    registration_message,
-                                )
-                    else:
-                        ...
-            else:
-                print('skipping lease...',lease.lease_id)
     return JsonResponse(
         {"status": "success", "message": "Lease status updated successfully."},
         safe=False,
@@ -6135,6 +5995,10 @@ def accounts_list(request):
 
     return render(request, "Client/Accounting/AccountsList")
 
+@login_required
+@clients_required
+def sales_accounts(request):
+    return render(request, "Client/Accounting/Sales/SalesAccounts")
 
 
 

@@ -461,6 +461,7 @@ class Invoicing(models.Model):
     is_invoiced = models.BooleanField(default=False)
     account_number = models.CharField(max_length=255, null=True, blank=True)
     invoice_number = models.CharField(max_length=255, null=True, blank=True, default="0")
+    invoice_date = models.DateField(null=True, blank=True)
     #history = HistoricalRecords()
 
 class PaymentPlan(models.Model):

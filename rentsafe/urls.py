@@ -29,9 +29,8 @@ from .rent_views import agents, clients, company,creditors
 from .rent_views.templates import download_template
 
 urlpatterns = [
-    path("", views.index, name="home"),
+    path("dashboard/", views.index, name="home"),
     path("in-development/", views.in_development, name="in_development"),
-    # templates download url
     path(
         "download_template/<template_name>", download_template, name="download_template"
     ),
@@ -235,7 +234,8 @@ urlpatterns = [
         include(
             [
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
-                path("manual-colors/", clients.manual_color_update, name="cash_sales"),
+                path("sales-accounts/", clients.cash_sales, name="sales_accounts"),
+                path("manual-colors/", clients.manual_color_update, name="manual_colors"),
                 path("sales-reports", clients.sales_reports, name="sales_reports"),
                 path("sales-categories", clients.sales_categories, name="sales_categories"),
                 path("products-and-services", clients.products_and_services, name="products_and_services"),

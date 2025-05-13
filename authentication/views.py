@@ -3,7 +3,7 @@ import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from inertia import inertia, render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.core.mail import send_mail
 from smtplib import SMTPRecipientsRefused
 from django.shortcuts import redirect
@@ -16,6 +16,7 @@ from django.contrib.auth.hashers import make_password
 from rentsafe.helper import *
 from rentsafe.rent_views.company import generate_otp
 from django.contrib import messages
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def login_view(request):
@@ -42,6 +43,13 @@ def login_view(request):
 
             if user != None:
                 login(request, user)
+                if data.get("request_client") == "postman":
+                    print(user)
+                    refresh = RefreshToken.for_user(user)
+                    return JsonResponse({
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh),
+                    })
                 return redirect("home")
             else:
                 props = {

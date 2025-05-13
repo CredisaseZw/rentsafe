@@ -22,6 +22,7 @@ class RegisterSchema(Schema):
 class LoginSchema(Schema):
     email = fields.Str(required=True)
     password = fields.Str(required=True)
+    request_client = fields.Str(required=False)
 
 
 # class EmailVerificationSchema(Schema):
