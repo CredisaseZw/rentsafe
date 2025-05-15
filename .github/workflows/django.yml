@@ -54,3 +54,18 @@ jobs:
         python manage.py migrate
         
         python manage.py test
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Node dependencies
+      run: npm install --legacy-peer-deps
+
+    - name: Building Frontend
+      run: npm run vite-build
+
+    - name: Collect Static Files
+      run: python manage.py collectstatic --no-input
+
