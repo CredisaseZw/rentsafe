@@ -40,5 +40,5 @@ jobs:
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git add static/
-        git diff --cached --quiet || git commit -m "chore: update static files after build"
+        git diff --cached --quiet || git commit -m "chore: Auto update static files after build"
         git push origin testing
