@@ -61,7 +61,7 @@ jobs:
         node-version: '18'
 
     - name: Install Node dependencies
-      run: npm install
+      run:  npm install --legacy-peer-deps
 
     - name: Building Frontend
       run: npm run vite-build
