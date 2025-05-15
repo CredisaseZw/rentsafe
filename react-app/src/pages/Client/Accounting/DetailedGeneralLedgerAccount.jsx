@@ -22,9 +22,9 @@ export default function DetailedGeneralLedgerAccount() {
       </h5>
 
       <form onSubmit={handleSubmit} className="mb-3">
-        <div className="d-flex gap-5 justify-content-between align-items-end">
-          <div className="d-flex gap-3 border border-3">
-            <div className="c-bg-light d-flex align-items-center p-1">Account:</div>
+        <div className="d-flex gap-2 justify-content-between align-items-end">
+          <fieldset className="d-flex flex-fill custom-rounded-1 gap-3 border border-3">
+            <legend>Account</legend>
 
             <div>
               <label className="form-label d-block">From</label>
@@ -65,10 +65,10 @@ export default function DetailedGeneralLedgerAccount() {
                 ))}
               </select>
             </div>
-          </div>
+          </fieldset>
 
-          <div className="d-flex gap-3 border border-3 text-nowrap">
-            <div className="c-bg-light d-flex align-items-center p-1">Period Selection:</div>
+          <fieldset className="d-flex flex-fill custom-rounded-1 gap-3 border border-3">
+            <legend>Period Selection</legend>
 
             <div className="d-flex align-items-end gap-3">
               <div className="form-check">
@@ -146,13 +146,13 @@ export default function DetailedGeneralLedgerAccount() {
                 />
               </div>
             </div>
-          </div>
-        </div>
+          </fieldset>
 
-        <div className="text-end p-3">
-          <button disabled={loading} type="submit" className="btn btn-primary text-white">
-            fetch
-          </button>
+          <div className="p-2">
+            <button disabled={loading} type="submit" className="btn btn-primary text-white">
+              fetch
+            </button>
+          </div>
         </div>
       </form>
 
