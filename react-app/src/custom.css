@@ -652,6 +652,8 @@
 }
 .c-form-select:disabled {
   opacity: 0.6;
+<<<<<<< HEAD
+=======
 }
 .c-hover-fade {
   transition: all 0.1s linear;
@@ -692,7 +694,5 @@
 }
 .c-fs-06 {
   font-size: 60% !important;
-}
-.btn:disabled {
-  opacity: 0.3;
+>>>>>>> 0d4f2053942a3e4743d9fcff78bbd15f59c18a7a
 }

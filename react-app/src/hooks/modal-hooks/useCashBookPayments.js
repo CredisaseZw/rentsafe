@@ -1,6 +1,5 @@
 import { useForm } from "@inertiajs/inertia-react";
 import { useEffect, useState } from "react";
-import { defaultRowCount } from "../../constants";
 
 const rowTemp = {
   id: 1,
@@ -28,10 +27,7 @@ export default function useCashBookPayments() {
   const [selectedCashBookId, setSelectedCashBookId] = useState("");
   const { data, setData, post, reset, processing } = useForm({
     myKey: "",
-    rows: new Array(defaultRowCount).fill(rowTemp).map((row, index) => ({
-      ...row,
-      id: index + 1 + "-" + new Date().getTime(),
-    })),
+    rows: [rowTemp],
   });
 
   const shouldInputRate = false;
