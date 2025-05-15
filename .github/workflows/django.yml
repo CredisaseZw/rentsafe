@@ -61,7 +61,7 @@ jobs:
         node-version: '18'
 
     - name: Install Node dependencies
-      run: npm install
+      run: pm install --legacy-peer-deps
 
     - name: Building Frontend
       run: npm run vite-build
@@ -69,16 +69,3 @@ jobs:
     - name: Collect Static Files
       run: python manage.py collectstatic --no-input
 
-    - name: Commit and Push Static Files to Testing Branch
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/testing'
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-
-        git fetch origin
-        git checkout testing
-
-        git merge --no-ff $GITHUB_SHA -m "Merge build from $GITHUB_REF"
-        git add static/
-        git diff --cached --quiet || git commit -m "chore: update static files after build"
-        git push origin testing
