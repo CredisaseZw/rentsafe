@@ -98,91 +98,71 @@ export default function Index() {
           className="d-flex justify-content-center align-items-center"
         >
           <div className="w-100">
-            <h2 className="fs-4 text-center mb-5">Secure Your Money & Investments With Us</h2>
+            <h2 className="fs-4 text-center border-bottom border-3 border-info  c-w-fit mx-auto  mb-5">
+              Secure Your Money & Investments With Us
+            </h2>
 
             <form
               onSubmit={(e) => e.preventDefault()}
-              className="row justify-content-around align-items-start"
+              className="row justify-content-center gap-5 align-items-start pt-5"
             >
               <div className="col col-12 col-md-4">
-                <fieldset className="bg-white p-4 custom-rounded-1">
-                  <legend>Call or WhatsApp</legend>
+                <div>
+                  <p className="fw-bold">Call or WhatsApp</p>
+
                   <div className="d-flex align-items-center gap-3">
-                    <i className="material-icons fs-5">phone</i>
+                    <i className="material-icons border border-3 border-info text-info rounded-circle p-1 fs-5">
+                      phone
+                    </i>
                     <p className="m-0">+263-772219151</p>
                   </div>
-                </fieldset>
+                </div>
               </div>
 
-              <div className="col col-12 col-md-6">
-                <fieldset className="bg-white p-4 custom-rounded-1">
-                  <legend>Email us</legend>
+              <div className="col col-12 col-md-4">
+                <div>
+                  <p className="fw-bold">Email us</p>
 
                   <div className="d-flex gap-3 mb-3">
-                    <div className="flex-fill">
-                      <label htmlFor="name" className="form-label">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control bg-light"
-                        id="name"
-                        placeholder="Your name"
-                        required
-                      />
-                    </div>
-
-                    <div className="flex-fill">
-                      <label htmlFor="email" className="form-label">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        className="form-control bg-light"
-                        id="email"
-                        placeholder="Your email"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="subject" className="form-label">
-                      Subject
-                    </label>
                     <input
-                      className="form-control bg-light"
-                      id="subject"
-                      placeholder="Subject of your message"
+                      type="text"
+                      className="form-control flex-fill bg-white border-light shadow-sm  rounded-pill"
+                      id="name"
+                      placeholder="Name"
+                      required
+                    />
+
+                    <input
+                      type="email"
+                      className="form-control flex-fill bg-white border-light shadow-sm  rounded-pill"
+                      id="email"
+                      placeholder="Email"
                       required
                     />
                   </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="message" className="form-label">
-                      Message
-                    </label>
-                    <textarea
-                      className="form-control bg-light"
-                      id="message"
-                      rows="3"
-                      required
-                      placeholder="Your message"
-                    ></textarea>
-                  </div>
+                  <input
+                    className="form-control bg-white border-light shadow-sm  rounded-pill mb-3"
+                    id="subject"
+                    placeholder="Subject"
+                    required
+                  />
 
-                  <div className="text-end pt-3 px-3">
-                    <span style={{ cursor: "not-allowed" }}>
-                      <button
-                        disabled
-                        type="submit"
-                        className="btn  text-capitalize btn-info border border-dark text-white"
-                      >
-                        Send
-                      </button>
-                    </span>
-                  </div>
-                </fieldset>
+                  <textarea
+                    className="form-control bg-white border-light shadow-sm  custom-rounded-1 py-4 mb-3"
+                    id="message"
+                    rows="3"
+                    required
+                    placeholder="Message..."
+                  ></textarea>
+
+                  <button
+                    type="button"
+                    className="btn fw-bold w-100 mt-4 justify-content-center rounded-pill  text-capitalize btn-info border text-white"
+                  >
+                    Send
+                  </button>
+                </div>
               </div>
             </form>
           </div>
