@@ -189,12 +189,12 @@ export default function Index() {
         </div>
       </div>
 
-      <footer className="bg-white border-top border-5 mt-5 py-4">
+      <footer className="bg-black text-light border-top border-5 mt-5 py-4">
         <div className="container">
           <div className="row row-cols-1 row-cols-md-3 g-4 mb-4">
             <div className="col order-last order-md-0">
               <div>
-                <h6 className="border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
+                <h6 className="text-light border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
                   Address
                 </h6>
 
@@ -223,7 +223,7 @@ export default function Index() {
 
             <div className="col">
               <div>
-                <h6 className="border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
+                <h6 className="text-light border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
                   Mobile
                 </h6>
 
@@ -235,7 +235,7 @@ export default function Index() {
 
             <div className="col">
               <div>
-                <h6 className="border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
+                <h6 className="text-light border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
                   Email
                 </h6>
 
@@ -246,12 +246,13 @@ export default function Index() {
             </div>
           </div>
 
-          <div className="d-flex justify-content-between gap-3 align-items-center my-3">
-            <p className="m-0 small fst-italic text-muted">
-              © {new Date().getFullYear()} CrediSafe
-            </p>
+          <div
+            style={{ color: "rgb(170,170,170)" }}
+            className="d-flex justify-content-between gap-3 align-items-center my-3"
+          >
+            <p className="m-0 small fst-italic ">© {new Date().getFullYear()} CrediSafe</p>
 
-            <div className="small fst-italic text-muted">All rights reserved.</div>
+            <div className="small fst-italic ">All rights reserved.</div>
           </div>
         </div>
       </footer>
