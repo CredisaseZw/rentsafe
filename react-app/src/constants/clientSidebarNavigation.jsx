@@ -210,7 +210,7 @@ export const clientSidebarNavigation = [
             navLink: "General Journal",
             color: "steelblue",
             type: "link",
-            href: reverseUrl("in_development"),
+            href: reverseUrl("general_journal"),
           },
           {
             navLink: "Reports",

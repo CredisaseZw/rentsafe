@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { defaultRowCount } from "../../constants";
 
 export default function useCreditNoteForm(creditNote) {
   const [creditNoteData, setCreditNoteData] = useState(null);
@@ -12,8 +13,8 @@ export default function useCreditNoteForm(creditNote) {
   const [key, setKey] = useState(0);
   const [discount, setDiscount] = useState(0);
 
-  const [items, setItems] = useState([
-    {
+  const [items, setItems] = useState(
+    new Array(defaultRowCount).fill({
       static: false,
       sales_code: "",
       sales_item: "",
@@ -21,8 +22,8 @@ export default function useCreditNoteForm(creditNote) {
       qty: "",
       vat: "",
       total: "",
-    },
-  ]);
+    })
+  );
 
   useEffect(() => {
     if (creditNote) {
