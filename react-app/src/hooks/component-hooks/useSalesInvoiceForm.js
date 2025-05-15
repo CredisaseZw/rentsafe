@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
+import { defaultRowCount } from "../../constants";
 
 export default function useSalesInvoiceForm(invoice, isProforma) {
   const [invoiceData, setInvoiceData] = useState(null);
@@ -13,8 +14,8 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
   const [key, setKey] = useState(0);
   const [discount, setDiscount] = useState(0);
 
-  const [items, setItems] = useState([
-    {
+  const [items, setItems] = useState(() =>
+    new Array(defaultRowCount).fill({
       static: false,
       sales_code: "",
       sales_item: "",
@@ -22,8 +23,8 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       qty: "",
       vat: "",
       total: "",
-    },
-  ]);
+    })
+  );
 
   useEffect(() => {
     if (invoice) {

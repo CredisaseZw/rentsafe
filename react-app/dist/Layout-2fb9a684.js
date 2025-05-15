@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:react-app/dist/Layout-b77bd4ce.js
-import{j as s,H as n,C as a}from"./media/main-05399e1a.js";function i({children:e,title:t}){return s.jsxs(s.Fragment,{children:[s.jsx(n,{title:t}),s.jsx(a,{}),s.jsx("div",{style:{minHeight:"100vh",backgroundColor:"rgb(230, 230, 230)"},className:"d-flex align-items-center justify-content-center ",children:s.jsx("div",{className:"custom-mn-w-5 c-w-fit shadow-lg bg-white custom-rounded-2",children:s.jsx("div",{className:"container-xl",children:e})})})]})}export{i as L};
-========
-import{j as s,H as n,C as a}from"./media/main-925d7cc6.js";function i({children:e,title:t}){return s.jsxs(s.Fragment,{children:[s.jsx(n,{title:t}),s.jsx(a,{}),s.jsx("div",{style:{minHeight:"100vh",backgroundColor:"rgb(230, 230, 230)"},className:"d-flex align-items-center justify-content-center ",children:s.jsx("div",{className:"custom-mn-w-5 c-w-fit shadow-lg bg-white custom-rounded-2",children:s.jsx("div",{className:"container-xl",children:e})})})]})}export{i as L};
->>>>>>>> 0d4f2053942a3e4743d9fcff78bbd15f59c18a7a:react-app/dist/Layout-2fb9a684.js

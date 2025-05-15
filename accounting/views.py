@@ -164,3 +164,6 @@ def creditor_invoice(request):
 
 def rate_audit_trail(request):
     return inertia_render(request, "Client/Accounting/RateAuditTrail")
+
+def general_journal(request):
+    return inertia_render(request, "Client/Accounting/GeneralJournal")

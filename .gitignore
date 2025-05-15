@@ -6,11 +6,10 @@ __pycache__/
 *.py[cod]
 *.pyo
 node_modules/
-*node_*
+dist/
 *.log
 *.pot
 *.mo
 *.pyc
-*7May
 *db.sqlite3*
 .vscode
