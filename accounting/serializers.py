@@ -95,3 +95,7 @@ class ProformaInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProformaInvoice
         fields = "__all__"
+
+class CurrencyRateSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = CurrencyRate

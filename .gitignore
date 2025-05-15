@@ -12,5 +12,6 @@ node_modules/
 *.mo
 *.pyc
 *7May
+*9May
 *db.sqlite3*
 .vscode

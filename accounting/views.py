@@ -23,7 +23,6 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Automatically assign the user's company when creating objects."""
-        print("--------Testing--------")
         serializer.save(user=self.request.user)
 
 class ItemViewSet(BaseCompanyViewSet):
@@ -149,7 +148,64 @@ class ProformaInvoiceViewSet(viewsets.ModelViewSet):
         invoice = proforma_invoice.convert_to_invoice()
         return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
     
+class CurrencyRateViewSet(BaseCompanyViewSet):
+    queryset = CurrencyRate.objects.all()
+    serializer_class = CurrencyRateSerializer
+    
+    @action(detail=False, methods=["PUT","PATCH", "POST"],url_path="update-rate")
+    def update_rate(self, request, pk=None):
+        """Updates the currency rate for a specific currency."""
+        currency= request.data.get("currency")
+        base_currency = request.data.get("base_currency")
+        new_rate = request.data.get("current_rate")
 
+        if currency == base_currency:
+            return Response({"error": "Base currency and Target currency can not be the same"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            exchange_rate, created = CurrencyRate.objects.update_or_create(user=self.request.user,currency=currency, base_currency=base_currency, current_rate= new_rate)
+            exchange_rate.save()
+            return Response({"success": True, "message": "Currency rate updated successfully."}, status=status.HTTP_200_OK)
+        except CurrencyRate.DoesNotExist:
+            return Response({"error": "Currency rate not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+    @action(detail=False, methods=["GET"], url_path="exchange-rate")
+    def exchange_rate(self, request, pk=None):
+        # Get the latest updated_at for each currency/base_currency pair
+        from django.db.models import Max
+        latest_rates = (
+            CurrencyRate.objects
+            .values("currency", "base_currency")
+            .annotate(latest_updated=Max("updated_at"))
+        )
+
+        # Fetch the actual CurrencyRate objects for those latest rates
+        rates = []
+        for entry in latest_rates:
+            rate = CurrencyRate.objects.filter(
+                currency=entry["currency"],
+                base_currency=entry["base_currency"],
+                updated_at=entry["latest_updated"]
+            ).first()
+            if rate:
+                rates.append({
+                    "currency": rate.currency,
+                    "base_currency": rate.base_currency,
+                    "current_rate": rate.current_rate,
+                    "updated_at": rate.updated_at,
+                })
+
+        if not rates:
+            return Response({
+                "success": False,
+                "message": "No exchange rates found.",
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            "success": True,
+            "message": "Latest exchange rates fetched successfully.",
+            "rates": rates,
+        })
+    
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
 
