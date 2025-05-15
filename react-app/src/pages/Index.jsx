@@ -5,16 +5,32 @@ import LandingPageFeature from "../components/LandingPageFeature.jsx";
 export default function Index() {
   return (
     <div className="c-bg-whitesmoke">
-      <LandingPageHeader />
-
-      <div className="container">
-        <div className="mb-3 px-3 d-flex align-items-center" style={{ minHeight: "20vh" }}>
-          <h1 className="fs-2 w-100 text-center">
-            Growing the <span className="text-info">African</span> credit & financial{" "}
-            <br className="d-none d-md-inline" /> <span className="text-info"> ecosystem</span>.
-          </h1>
+      <div
+        id="hero-section"
+        className="d-flex flex-column text-light border-info border-bottom border-5"
+      >
+        <div>
+          <LandingPageHeader />
         </div>
 
+        <div style={{ paddingBottom: "5%" }} className="hero-raise my-auto px-2 text-center">
+          <h1 className=" fs-1 fw-bold text-light">
+            Growing the <span className="text-info border-text">African</span> credit & financial{" "}
+            <br className="d-none d-md-inline" />{" "}
+            <span className="text-info border-text"> ecosystem</span>.
+          </h1>
+          <p className="custom-mx-w-5 mx-auto">
+            CrediSafe provides fintech solutions tailored <br /> to the African market.
+          </p>
+        </div>
+
+        <div className="hero-raise text-center d-flex flex-column align-self-center justify-content-center ">
+          <i className="material-icons text-info fw-bolder">keyboard_arrow_down</i>
+          <i className="material-icons fs-1">keyboard_double_arrow_down</i>
+        </div>
+      </div>
+
+      <div className="container">
         <div id="credit-scoring">
           <LandingPageFeature
             title="Credit & Capacity Scoring"
