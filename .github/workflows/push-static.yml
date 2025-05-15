@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-push-static:
     runs-on: ubuntu-latest
+
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       EMAIL_BACKEND: ${{ secrets.EMAIL_BACKEND }}
@@ -30,15 +31,20 @@ jobs:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_PORT: ${{ secrets.DB_PORT }}
+
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        fetch-depth: 0
 
     - name: Set up Node
       uses: actions/setup-node@v4
       with:
         node-version: 18
 
-    - name: Install Dependencies
+    - name: Install Frontend Dependencies
       run: npm install --legacy-peer-deps
 
     - name: Build Frontend
@@ -54,14 +60,31 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Collect Static Files
+    - name: Collect Django Static Files
       run: python manage.py collectstatic --no-input
 
-    - name: Commit and Push Static Files
+    - name: Commit and Push Built Static Files with Debugging
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add static/
-        git diff --cached --quiet || git commit -m "chore: Auto update static files after build"
-        git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/CredisaseZw/rentsafe.git testing
+        echo "🔧 Configuring Git user"
+        git config --global user.name "credisafe"
+        git config --global user.email "credisafezw@gmail.com"
+        git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/CredisaseZw/rentsafe.git
 
+        echo "📂 Checking current git status..."
+        git status
+
+        echo "➕ Staging changes in 'static/'"
+        git add static/
+
+        echo "🔍 Checking for staged changes..."
+        git diff --cached
+
+        if git diff --cached --quiet; then
+          echo "✅ No changes to commit. Skipping push."
+        else
+          echo "✅ Changes detected. Committing..."
+          git commit -m "chore: Auto update static files after build"
+
+          echo "🚀 Pushing to testing branch..."
+          git push origin testing
+        fi
