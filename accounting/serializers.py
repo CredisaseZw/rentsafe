@@ -1,3 +1,4 @@
+from marshmallow import EXCLUDE, Schema, fields
 from rest_framework import serializers
 from accounting.models import *
 
@@ -5,7 +6,7 @@ class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         try:
-            read_only_fields = ['user']  # Prevent user from setting them
+            read_only_fields = ['user', 'date_created']  # Prevent user from setting them
         except AttributeError:
             read_only_fields = []
 
@@ -99,3 +100,13 @@ class ProformaInvoiceSerializer(serializers.ModelSerializer):
 class CurrencyRateSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CurrencyRate
+
+class RateSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    current_rate = fields.Float(data_key="current_rate", required=True)
+    base_currency = fields.Str(data_key="base_currency", required=True)
+    currency = fields.Str(data_key="currency", required=True)
+    date_created = fields.Str(data_key="date_created", required=False)
+    

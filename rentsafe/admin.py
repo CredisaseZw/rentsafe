@@ -174,14 +174,6 @@ class LeaseReceiptBreakdownAdmin(admin.ModelAdmin):
     list_filter = ("date_received",)
     ordering = ("-created_at",)
 
-@admin.register(LeaseCurrencyRate)
-class LeaseCurrencyRateAdmin(admin.ModelAdmin):
-    list_display = ("company_id", "currency", "date_created", "current_rate", "base_currency" )
-    list_display_links = ("company_id",)
-    search_fields = ("company_id",)
-    list_filter = ("currency",)
-    ordering = ("-updated_at",)
-
 @admin.register(WorkSchedule)
 class WorkScheduleAdmin(admin.ModelAdmin):
     list_display = ("id", "lease_id", "title", "created_at")

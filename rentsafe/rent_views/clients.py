@@ -22,6 +22,7 @@ from inertia import render
 from inertia.share import share
 from marshmallow import ValidationError
 
+from accounting.models import CurrencyRate
 from rentsafe.decorators import clients_required
 from rentsafe.helper import *
 from rentsafe.models import *
@@ -48,7 +49,7 @@ def clients_credit_dashboard(id):
     taken_credits_color_totals = {}
 
     rate_ = 1
-    if rate_obj := LeaseCurrencyRate.objects.filter(company_id= client_id).first():
+    if rate_obj := CurrencyRate.objects.filter(user = client_id).first():
         rate_ = float(rate_obj.current_rate)
     def get_credit_color(credit_status):
         """Maps credit status to a color."""
@@ -144,7 +145,7 @@ def clients_credit_dashboard(id):
                     )
                 else:
                     rate = 1
-                    if rate_ob := LeaseCurrencyRate.objects.filter(company_id= client_id).first():
+                    if rate_ob := CurrencyRate.objects.filter(user = client_id).first():
                         rate = float(rate_ob.current_rate)
                     amount_owing =float(opening_balance_record.outstanding_balance) if opening_balance_record else 0
                     client_credits = {
@@ -236,49 +237,50 @@ def worst_credit_check_helper(leases_taken, taken_credits_ratings):
     ]
     return dict(zip(keys, credit_and_score))
 
-def rate_setup(request):
-    if request.method == "GET" :
-        currency_settings_objects = LeaseCurrencyRate.objects.filter(company_id=request.user.company)
-        if currency_settings_objects.exists():         
-            currency_settings = currency_settings_objects.last()   
-            currency_settings = {
-                "company_id": currency_settings.company_id,
-                "current_rate": currency_settings.current_rate,
-                "base_currency": currency_settings.base_currency,
-                "currency": currency_settings.currency,
-                "date_created": currency_settings.date_created,
-                "updated_at": currency_settings.updated_at,
-            }
-            return JsonResponse({"currency_settings" : currency_settings})
-        props = {"errors": "no currency settings found"}
-        return JsonResponse(props)
+# def rate_setup(request):
+#     if request.method == "GET" :
+#         currency_settings_objects = CurrencyRate.objects.filter(user=request.user)
+#         if currency_settings_objects.exists():         
+#             currency_settings = currency_settings_objects.last()   
+#             currency_settings = {
+#                 "user": currency_settings.user,
+#                 "current_rate": currency_settings.current_rate,
+#                 "base_currency": currency_settings.base_currency,
+#                 "currency": currency_settings.currency,
+#                 "date_created": currency_settings.date_created,
+#                 "updated_at": currency_settings.updated_at,
+#             }
+#             return JsonResponse({"currency_settings" : currency_settings})
+#         props = {"errors": "no currency settings found"}
+#         return JsonResponse(props)
 
-    if request.method == "POST" :
-        rate_schema = RateSchema()
-        try:
-            data = rate_schema.loads(request.body)
-        except ValidationError as err:
-            props = {"errors": err.messages}
-            return JsonResponse(props, status=400)
-        else:
-            rates = LeaseCurrencyRate.objects.filter(company_id=request.user.company)
-            if rates.exists():
-                rate = rates.last()
-                rate.base_currency=data.get("base_currency")
-                rate.currency=data.get("currency")
-                rate.current_rate=data.get("rate")
-                rate.save()
-                props = {"success": "Rate changed successfully!"}
-                return JsonResponse(props)
-            else:
-                LeaseCurrencyRate.objects.create(
-                    company_id=request.user.company,
-                    base_currency=data.get("base_currency"),
-                    currency=data.get("currency"),
-                    current_rate=data.get("rate")
-                )
-                props = {"success": "Rate configured successfully!"}
-                return JsonResponse(props)
+#     if request.method == "POST" :
+#         rate_schema = RateSchema()
+#         try:
+#             data = rate_schema.loads(request.body)
+#         except ValidationError as err:
+#             props = {"errors": err.messages}
+#             return JsonResponse(props, status=400)
+#         else:
+#             rates = CurrencyRate.objects.filter(user=request.user)
+#             if rates.exists():
+#                 rate = rates.last()
+#                 rate.base_currency=data.get("base_currency")
+#                 rate.currency=data.get("currency")
+#                 rate.current_rate=data.get("rate")
+#                 rate.save()
+#                 props = {"success": "Rate changed successfully!"}
+#                 return JsonResponse(props)
+#             else:
+#                 CurrencyRate.objects.create(
+#                     user=request.user.company,
+#                     base_currency=data.get("base_currency"),
+#                     currency=data.get("currency"),
+#                     current_rate=data.get("rate")
+#                 )
+#                 props = {"success": "Rate configured successfully!"}
+#                 return JsonResponse(props)
+
 
 @login_required
 @clients_required

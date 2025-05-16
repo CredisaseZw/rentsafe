@@ -1,3 +1,5 @@
+from django.http import JsonResponse
+from marshmallow import ValidationError
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import *
@@ -152,59 +154,56 @@ class CurrencyRateViewSet(BaseCompanyViewSet):
     queryset = CurrencyRate.objects.all()
     serializer_class = CurrencyRateSerializer
     
-    @action(detail=False, methods=["PUT","PATCH", "POST"],url_path="update-rate")
-    def update_rate(self, request, pk=None):
-        """Updates the currency rate for a specific currency."""
-        currency= request.data.get("currency")
-        base_currency = request.data.get("base_currency")
-        new_rate = request.data.get("current_rate")
-
-        if currency == base_currency:
-            return Response({"error": "Base currency and Target currency can not be the same"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            exchange_rate, created = CurrencyRate.objects.update_or_create(user=self.request.user,currency=currency, base_currency=base_currency, current_rate= new_rate)
-            exchange_rate.save()
-            return Response({"success": True, "message": "Currency rate updated successfully."}, status=status.HTTP_200_OK)
-        except CurrencyRate.DoesNotExist:
-            return Response({"error": "Currency rate not found"}, status=status.HTTP_404_NOT_FOUND)
+    @action(detail=False, methods=["GET", "POST", "PUT", "PATCH"], url_path="rate-setup")
+    def rate_setup(self, request, pk=None):
+        if request.method == "GET":
+            currency_settings_objects = CurrencyRate.objects.filter(user=self.request.user)
+            if currency_settings_objects.exists():
+                currency_settings = currency_settings_objects.last()
+                serializer = CurrencyRateSerializer(currency_settings)
+                
+                # currency_settings={
+                #     "user": currency_settings.user,
+                #     "current_rate": currency_settings.current_rate,
+                #     "base_currency": currency_settings.base_currency,
+                #     "currency": currency_settings.currency,
+                #     "date_created": currency_settings.date_created,
+                #     "updated_at": currency_settings.updated_at,
+                # }
+                return JsonResponse({"currency_settings": serializer.data})
+            props =  {"errors": "No currency settings found"}
+            return JsonResponse(props)
         
-    @action(detail=False, methods=["GET"], url_path="exchange-rate")
-    def exchange_rate(self, request, pk=None):
-        # Get the latest updated_at for each currency/base_currency pair
-        from django.db.models import Max
-        latest_rates = (
-            CurrencyRate.objects
-            .values("currency", "base_currency")
-            .annotate(latest_updated=Max("updated_at"))
-        )
+        if request.method == "POST" or request.method == "PUT":
+            rate_schema = RateSchema()
+            try:
+                data= rate_schema.load(request.data)
+            except ValidationError as err:
+                props = {"errors": err.messages}
+                return JsonResponse(props, status=400)
+            else:
+                rates = CurrencyRate.objects.filter(user=self.request.user)
+                if rates.exists():
+                    rate= rates.last()
+                    rate.base_currency= data.get("base_currency")
+                    rate.currency= data.get("currency")
+                    rate.current_rate= data.get("current_rate")
+                    rate.updated_at= now()
+                    rate.save()
+                    props = {"success": "Rate updated successfully"}
+                    return JsonResponse(props)
+                else:
+                    CurrencyRate.objects.create(
+                        user= request.user,
+                        base_currency= data.get("base_currency"),
+                        currency= data.get("currency"),
+                        current_rate= data.get("current_rate"),
+                        updated_at= now(),
+                        date_created= now(),
+                    )
+                    props = {"success": "Rate created successfully"}
+                    return JsonResponse(props)
 
-        # Fetch the actual CurrencyRate objects for those latest rates
-        rates = []
-        for entry in latest_rates:
-            rate = CurrencyRate.objects.filter(
-                currency=entry["currency"],
-                base_currency=entry["base_currency"],
-                updated_at=entry["latest_updated"]
-            ).first()
-            if rate:
-                rates.append({
-                    "currency": rate.currency,
-                    "base_currency": rate.base_currency,
-                    "current_rate": rate.current_rate,
-                    "updated_at": rate.updated_at,
-                })
-
-        if not rates:
-            return Response({
-                "success": False,
-                "message": "No exchange rates found.",
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        return Response({
-            "success": True,
-            "message": "Latest exchange rates fetched successfully.",
-            "rates": rates,
-        })
     
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
