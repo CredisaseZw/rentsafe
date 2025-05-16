@@ -13,3 +13,5 @@ dist/
 *.pyc
 *db.sqlite3*
 .vscode
+node_modules
+__pycache__/
