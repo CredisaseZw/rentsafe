@@ -5,10 +5,7 @@ import LandingPageFeature from "../components/LandingPageFeature.jsx";
 export default function Index() {
   return (
     <div className="c-bg-whitesmoke">
-      <div
-        id="hero-section"
-        className="d-flex flex-column text-light border-info border-bottom border-5"
-      >
+      <div id="hero-section" className="d-flex flex-column text-light">
         <div>
           <LandingPageHeader />
         </div>
@@ -28,6 +25,19 @@ export default function Index() {
           <i className="material-icons text-info fw-bolder">keyboard_arrow_down</i>
           <i className="material-icons fs-1">keyboard_double_arrow_down</i>
         </div>
+      </div>
+
+      <div
+        style={{ minHeight: "30vh" }}
+        className="d-flex border-dark border-bottom border-top border-5 justify-content-center text-center align-items-center flex-column gap-3 mission-statement"
+      >
+        <h2 className="text-light">Our Mission</h2>
+
+        <p className="custom-mx-w-6 text-light">
+          Our mission is to empower individuals and businesses across Africa by enhancing access to
+          credit and financial services. We aim to create a more inclusive financial system that
+          supports growth and development for all.
+        </p>
       </div>
 
       <div className="container">
@@ -76,18 +86,6 @@ export default function Index() {
             recovery system exponentially improves efficiency all with less effort through our
             automated system.
           </LandingPageFeature>
-        </div>
-      </div>
-
-      <div className="py-5 my-5">
-        <div className="px-3 py-5 border-top border-bottom text-center border-4 bg-white">
-          <h2 className="mb-4">Our Mission</h2>
-
-          <p className="custom-mx-w-6 mx-auto">
-            Our mission is to empower individuals and businesses across Africa by enhancing access
-            to credit and financial services. We aim to create a more inclusive financial system
-            that supports growth and development for all.
-          </p>
         </div>
       </div>
 
