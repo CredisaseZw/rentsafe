@@ -10,7 +10,7 @@ export default function Index() {
           <LandingPageHeader />
         </div>
 
-        <div style={{ paddingBottom: "5%" }} className="hero-raise my-auto px-2 text-center">
+        <div style={{ paddingBottom: "5%" }} className="hero-raise my-auto px-3 text-center">
           <h1 className=" fs-1 fw-bold text-light">
             Growing the <span className="text-info border-text">African</span> credit & financial{" "}
             <br className="d-none d-md-inline" />{" "}
@@ -29,7 +29,7 @@ export default function Index() {
 
       <div
         style={{ minHeight: "30vh" }}
-        className="d-flex border-dark border-bottom border-top border-5 justify-content-center text-center align-items-center flex-column gap-3 mission-statement"
+        className="d-flex border-dark border-bottom border-top border-5 justify-content-center text-center align-items-center flex-column gap-3 mission-statement px-3 py-4"
       >
         <h2 className="text-light fw-bold">Our Mission</h2>
 
@@ -93,7 +93,7 @@ export default function Index() {
         <div
           id="contact"
           style={{ minHeight: "70vh" }}
-          className="d-flex justify-content-center align-items-center"
+          className="d-flex justify-content-center align-items-center px-3"
         >
           <div className="w-100">
             <h2 className="fs-4 text-center fw-bold mb-5">
@@ -169,7 +169,7 @@ export default function Index() {
 
       <footer className="bg-black text-light border-top border-5 mt-5 py-4">
         <div className="container">
-          <div className="row row-cols-1 row-cols-md-3 g-4 mb-4">
+          <div className="row row-cols-1  row-cols-md-3 g-4 mb-4">
             <div className="col order-last order-md-0">
               <div>
                 <h6 className="text-light border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
@@ -200,8 +200,8 @@ export default function Index() {
             </div>
 
             <div className="col">
-              <div>
-                <h6 className="text-light border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
+              <div className="text-md-center">
+                <h6 className="text-light border-bottom pb-1 fst-italic mx-md-auto c-w-fit border-3 border-info mb-3">
                   Mobile
                 </h6>
 
@@ -212,8 +212,8 @@ export default function Index() {
             </div>
 
             <div className="col">
-              <div>
-                <h6 className="text-light border-bottom pb-1 fst-italic c-w-fit border-3 border-info mb-3">
+              <div className="text-md-end">
+                <h6 className="text-light border-bottom pb-1 fst-italic ms-md-auto c-w-fit border-3 border-info mb-3">
                   Email
                 </h6>
 
