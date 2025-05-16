@@ -31,7 +31,7 @@ export default function Index() {
         style={{ minHeight: "30vh" }}
         className="d-flex border-dark border-bottom border-top border-5 justify-content-center text-center align-items-center flex-column gap-3 mission-statement"
       >
-        <h2 className="text-light">Our Mission</h2>
+        <h2 className="text-light fw-bold">Our Mission</h2>
 
         <p className="custom-mx-w-6 text-light">
           Our mission is to empower individuals and businesses across Africa by enhancing access to
@@ -96,7 +96,7 @@ export default function Index() {
           className="d-flex justify-content-center align-items-center"
         >
           <div className="w-100">
-            <h2 className="fs-4 text-center border-bottom border-3 border-info  c-w-fit mx-auto  mb-5">
+            <h2 className="fs-4 text-center fw-bold mb-5">
               Secure Your Money & Investments With Us
             </h2>
 
