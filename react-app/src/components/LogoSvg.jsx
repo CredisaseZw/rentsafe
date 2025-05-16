@@ -13,7 +13,7 @@ export default function LogoSvg() {
       xmlSpace="preserve"
     >
       <path
-        fill="#FEFFFF"
+        fill="transparent"
         opacity="1.000000"
         stroke="none"
         d="
