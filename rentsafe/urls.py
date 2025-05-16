@@ -519,11 +519,11 @@ urlpatterns = [
                     clients.get_invoicing_details,
                     name="customer_invoice_details",
                 ),
-                # path(
-                #     "settings/rate-setup/",
-                #     clients.rate_setup,
-                #     name="rate_setup",
-                # ),
+                path(
+                    "settings/rate-setup/",
+                    clients.rate_setup,
+                    name="rate_setup",
+                ),
                 path(
                     "write-off/",
                     clients.write_off,
