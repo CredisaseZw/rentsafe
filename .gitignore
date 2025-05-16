@@ -15,4 +15,5 @@ node_modules/
 *9May
 *db.sqlite3*
 .vscode
-.venv
+node_modules
+__pycache__/

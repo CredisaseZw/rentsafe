@@ -15,10 +15,13 @@ class CustomUserManager(BaseUserManager):
                 raise ValueError('The {} value must be set'.format(field_name))
 
         email = self.normalize_email(email)
+        
         user = self.model(
             email=email,
             individual=individual,
             company=company,
+            user_id=email,
+            
             **extra_fields
         )
         user.set_password(password)

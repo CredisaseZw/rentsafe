@@ -11,7 +11,6 @@ export default function Logo() {
       <div
         style={{
           width: "1.2em",
-          backgroundColor: "white",
           borderRadius: "50%",
           overflow: "hidden",
         }}

@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()  # take environment variables from .env.
+load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -110,24 +110,24 @@ DB_HOST     = os.getenv('DB_HOST'     , None)
 DB_PORT     = os.getenv('DB_PORT'     , None)
 DB_NAME     = os.getenv('DB_NAME'     , None)
 
-# if DB_ENGINE and DB_NAME and DB_USERNAME:
-# DATABASES = { 
-#     'default': {
-#     'ENGINE'  : 'django.db.backends.mysql', 
-#     'NAME'    : 'finchec1_rentsafe',
-#     'USER'    : 'finchec1_admin',
-#     'PASSWORD': 'n2(&lJweshvu',
-#     'HOST'    : '129.232.213.107',
-#     'PORT'    : '3306',
-#     }, 
-# }
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if DEBUG:
+    DATABASES = { 
+        'default': {
+        'ENGINE'  : DB_ENGINE,
+        'NAME'    : DB_NAME,
+        'USER'    : DB_USERNAME,
+        'PASSWORD': DB_PASS,
+        'HOST'    : DB_HOST,
+        'PORT'    : DB_PORT,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "9May.sqlite3",
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

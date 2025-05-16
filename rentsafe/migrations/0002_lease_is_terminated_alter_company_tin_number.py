@@ -10,11 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='lease',
-            name='is_terminated',
-            field=models.BooleanField(default=False),
-        ),
         migrations.AlterField(
             model_name='company',
             name='tin_number',
