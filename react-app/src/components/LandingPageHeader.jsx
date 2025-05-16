@@ -9,7 +9,7 @@ export default function LandingPageHeader() {
   React.useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
-        setStyles("bg-black shadow-lg");
+        setStyles("bg-black shadow");
       } else {
         setStyles("");
       }
