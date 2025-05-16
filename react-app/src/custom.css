@@ -693,9 +693,6 @@
 .c-fs-06 {
   font-size: 60% !important;
 }
-.btn:disabled {
-  opacity: 0.3;
-}
 
 /* landing page */
 #hero-section {

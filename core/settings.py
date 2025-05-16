@@ -203,7 +203,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
 
 # If we should use HMR or not.
-# DJANGO_VITE_DEV_MODE = DEBUG
+DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
 DJANGO_VITE_DEV_SERVER_HOST = "localhost"                                                           
@@ -405,7 +405,6 @@ JS_ROUTES_INCLUSION_LIST = [
     "creditor_invoice",
     "sales_reports",
     "rate_audit_trail",
-    "general_journal",
 ]
 
 LOGIN_URL = "login"

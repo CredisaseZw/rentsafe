@@ -57,3 +57,11 @@ class CashbookEntryAdmin(admin.ModelAdmin):
     search_fields = ("transaction_date",)
     list_filter = ("transaction_type",)
     ordering = ("-transaction_date",)
+
+@admin.register(CurrencyRate)
+class CurrencyRate(admin.ModelAdmin):
+    list_display = ("user", "currency", "date_created", "current_rate", "base_currency" )
+    list_display_links = ("user",)
+    search_fields = ("user",)
+    list_filter = ("currency",)
+    ordering = ("-updated_at",)

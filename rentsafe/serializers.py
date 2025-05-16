@@ -1111,7 +1111,7 @@ class RateSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    rate = fields.Float(data_key="rate", required=True)
+    current_rate = fields.Float(data_key="current_rate", required=True)
     base_currency = fields.Str(data_key="base_currency", required=True)
     currency = fields.Str(data_key="currency", required=True)
     date = fields.Str(data_key="date", required=False)
