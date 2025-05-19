@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Q, CharField
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -27,6 +27,7 @@ from rentsafe.helper import *
 from rentsafe.models import *
 from rentsafe.rent_views.company import generate_otp
 from rentsafe.serializers import *
+from django.db.models.functions import Cast
 
 # Create your views here. views
 @login_required
@@ -3591,6 +3592,7 @@ def write_off(request):
     return credit_journal(request,lease_id) if lease_id else JsonResponse({'error':'lease not found'},status=400)
 
 def client_leases_new(request,leases_type=None):
+    
     # get query parameters
     search_value = request.GET.get("name", "").lower()
     page_number = int(request.GET.get("page", 1))
@@ -3608,13 +3610,21 @@ def client_leases_new(request,leases_type=None):
     fname = names_list[0] if len(names_list) > 0 else ""
     sname = names_list[1] if len(names_list) > 1 else fname
     # get individual and company ids
+    # individual_ids = Individual.objects.filter(
+    #     Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
+    # ).values("identification_number")
+
+    # company_ids = Company.objects.filter(
+    #     Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
+    # ).values("id")
     individual_ids = Individual.objects.filter(
         Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
-    ).values("identification_number")
+        ).annotate(id_str=Cast('identification_number', output_field=CharField())).values_list('id_str', flat=True)
 
     company_ids = Company.objects.filter(
-        Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
-    ).values("id")
+            Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
+        ).annotate(id_str=Cast('id', output_field=CharField())).values_list('id_str', flat=True)
+
 
     query_ids = individual_ids.union(company_ids)
 
