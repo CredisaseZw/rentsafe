@@ -2701,23 +2701,20 @@ def individuals(request):
             searchValue = data.get("searchValue", "").strip().upper()
             if searchParam == "fullname" and len(searchValue) > 0:
                 searchWords = searchValue.split(" ")
-
-                if len(searchWords) >= 1:
-                    firstname = " ".join(searchWords[:-1]) if len(searchWords) > 1 else searchWords[0]
-                    surname = searchWords[-1] if len(searchWords) >= 2 else firstname
-                    result = Individual.objects.filter(
-                        Q(firstname__icontains=firstname) | Q(surname__icontains=surname)
-                    )
-                    if len(result) == 0:
-                        result = Individual.objects.filter(
-                            firstname__icontains=searchWords[0]
-                        )
-                    
-                    individuals_list.extend(iter(result))
-                    result = individuals_list
-
+                firstname = " ".join(searchWords[:-1]) if len(searchWords) > 1 else searchWords[0]
+                surname = searchWords[-1] if len(searchWords) >= 2 else ""
+                if surname:
+                    print('surname',surname)
+                    result = Individual.objects.filter(firstname__iexact=firstname ,surname__iexact=surname)
                 else:
-                    result = ""
+                    result = Individual.objects.filter(
+                        Q(firstname__iexact=firstname) | Q(surname__iexact=firstname)
+                    )
+        
+                    
+                for i in result:
+                    individuals_list.append(i)
+                result = individuals_list
 
             elif searchParam:
                 # #"search with natinalid")

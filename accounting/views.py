@@ -73,85 +73,85 @@ class VATSettingViewSet(BaseCompanyViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class ProductServiceViewSet(BaseCompanyViewSet):
-    queryset = ProductService.objects.all()
-    serializer_class = ProductServiceSerializer
+# class ProductServiceViewSet(BaseCompanyViewSet):
+#     queryset = ProductService.objects.all()
+#     serializer_class = ProductServiceSerializer
 
-class SalesCategoryViewSet(BaseCompanyViewSet):
-    queryset = SalesCategory.objects.all()
-    serializer_class = SalesCategorySerializer
+# class SalesCategoryViewSet(BaseCompanyViewSet):
+#     queryset = SalesCategory.objects.all()
+#     serializer_class = SalesCategorySerializer
 
-class SalesAccountViewSet(BaseCompanyViewSet):
-    queryset = SalesAccount.objects.all()
-    serializer_class = SalesAccountSerializer
+# class SalesAccountViewSet(BaseCompanyViewSet):
+#     queryset = SalesAccount.objects.all()
+#     serializer_class = SalesAccountSerializer
 
-class CashSaleViewSet(BaseCompanyViewSet):
-    queryset = CashSale.objects.all()
-    serializer_class = CashSaleSerializer
+# class CashSaleViewSet(BaseCompanyViewSet):
+#     queryset = CashSale.objects.all()
+#     serializer_class = CashSaleSerializer
 
-class CashbookEntryViewSet(BaseCompanyViewSet):
-    queryset = CashbookEntry.objects.all()
-    serializer_class = CashbookEntrySerializer
+# class CashbookEntryViewSet(BaseCompanyViewSet):
+#     queryset = CashbookEntry.objects.all()
+#     serializer_class = CashbookEntrySerializer
 
-class GeneralLedgerAccountViewSet(BaseCompanyViewSet):
-    queryset = GeneralLedgerAccount.objects.all()
-    serializer_class = GeneralLedgerAccountSerializer
+# class GeneralLedgerAccountViewSet(BaseCompanyViewSet):
+#     queryset = GeneralLedgerAccount.objects.all()
+#     serializer_class = GeneralLedgerAccountSerializer
 
-class JournalEntryViewSet(BaseCompanyViewSet):
-    queryset = JournalEntry.objects.all()
-    serializer_class = JournalEntrySerializer
+# class JournalEntryViewSet(BaseCompanyViewSet):
+#     queryset = JournalEntry.objects.all()
+#     serializer_class = JournalEntrySerializer
 
-class LedgerTransactionViewSet(BaseCompanyViewSet):
-    queryset = LedgerTransaction.objects.all()
-    serializer_class = LedgerTransactionSerializer
+# class LedgerTransactionViewSet(BaseCompanyViewSet):
+#     queryset = LedgerTransaction.objects.all()
+#     serializer_class = LedgerTransactionSerializer
 
 
-class AccountSectorViewSet(BaseCompanyViewSet):
-    queryset = AccountSector.objects.all()
-    serializer_class = AccountSectorSerializer
+# class AccountSectorViewSet(BaseCompanyViewSet):
+#     queryset = AccountSector.objects.all()
+#     serializer_class = AccountSectorSerializer
     
-class InvoiceViewSet(viewsets.ModelViewSet):
-    queryset = Invoice.objects.all()
-    serializer_class = InvoiceSerializer
+# class InvoiceViewSet(viewsets.ModelViewSet):
+#     queryset = Invoice.objects.all()
+#     serializer_class = InvoiceSerializer
 
-    @action(detail=True, methods=["POST"])
-    def mark_paid(self, request, pk=None):
-        """Mark an invoice as paid."""
-        invoice = self.get_object()
-        invoice.status = "paid"
-        invoice.save()
-        return Response({"success": True, "message": "Invoice marked as paid."})
+#     @action(detail=True, methods=["POST"])
+#     def mark_paid(self, request, pk=None):
+#         """Mark an invoice as paid."""
+#         invoice = self.get_object()
+#         invoice.status = "paid"
+#         invoice.save()
+#         return Response({"success": True, "message": "Invoice marked as paid."})
 
 
-class InvoiceItemViewSet(viewsets.ModelViewSet):
-    queryset = InvoiceItem.objects.all()
-    serializer_class = InvoiceItemSerializer
+# class InvoiceItemViewSet(viewsets.ModelViewSet):
+#     queryset = InvoiceItem.objects.all()
+#     serializer_class = InvoiceItemSerializer
 
-class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer
+# class PaymentViewSet(viewsets.ModelViewSet):
+#     queryset = Payment.objects.all()
+#     serializer_class = PaymentSerializer
 
-class RecurringInvoiceViewSet(viewsets.ModelViewSet):
-    queryset = RecurringInvoice.objects.all()
-    serializer_class = RecurringInvoiceSerializer
+# class RecurringInvoiceViewSet(viewsets.ModelViewSet):
+#     queryset = RecurringInvoice.objects.all()
+#     serializer_class = RecurringInvoiceSerializer
 
-    @action(detail=True, methods=["POST"])
-    def generate_invoice(self, request, pk=None):
-        """Manually triggers the next invoice generation."""
-        recurring_invoice = self.get_object()
-        invoice = recurring_invoice.generate_next_invoice()
-        return Response({"success": True, "message": "New invoice created.", "invoice_id": invoice.id})
+#     @action(detail=True, methods=["POST"])
+#     def generate_invoice(self, request, pk=None):
+#         """Manually triggers the next invoice generation."""
+#         recurring_invoice = self.get_object()
+#         invoice = recurring_invoice.generate_next_invoice()
+#         return Response({"success": True, "message": "New invoice created.", "invoice_id": invoice.id})
 
-class ProformaInvoiceViewSet(viewsets.ModelViewSet):
-    queryset = ProformaInvoice.objects.all()
-    serializer_class = ProformaInvoiceSerializer
+# class ProformaInvoiceViewSet(viewsets.ModelViewSet):
+#     queryset = ProformaInvoice.objects.all()
+#     serializer_class = ProformaInvoiceSerializer
 
-    @action(detail=True, methods=["POST"])
-    def convert_to_invoice(self, request, pk=None):
-        """Converts a proforma invoice into a finalized invoice."""
-        proforma_invoice = self.get_object()
-        invoice = proforma_invoice.convert_to_invoice()
-        return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
+#     @action(detail=True, methods=["POST"])
+#     def convert_to_invoice(self, request, pk=None):
+#         """Converts a proforma invoice into a finalized invoice."""
+#         proforma_invoice = self.get_object()
+#         invoice = proforma_invoice.convert_to_invoice()
+#         return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
     
 
 def detailed_general_ledger(request):
