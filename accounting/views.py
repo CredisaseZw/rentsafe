@@ -1,8 +1,7 @@
 from django.http import JsonResponse
-from marshmallow import ValidationError
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
-from .models import *
+from .models import Item, VATSetting, ProductService, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, RecurringInvoice, ProformaInvoice, CurrencyRate
 from .serializers import *
 from django.shortcuts import render
 from rest_framework import status
@@ -155,54 +154,23 @@ class CurrencyRateViewSet(BaseCompanyViewSet):
     serializer_class = CurrencyRateSerializer
     
     @action(detail=False, methods=["GET", "POST", "PUT", "PATCH"], url_path="rate-setup")
-    def rate_setup(self, request, pk=None):
-        if request.method == "GET":
-            currency_settings_objects = CurrencyRate.objects.filter(user__company=self.request.user.company)
-            if currency_settings_objects.exists():
-                currency_settings = currency_settings_objects.last()
-                serializer = CurrencyRateSerializer(currency_settings)
-                
-                # currency_settings={
-                #     "user": currency_settings.user,
-                #     "current_rate": currency_settings.current_rate,
-                #     "base_currency": currency_settings.base_currency,
-                #     "currency": currency_settings.currency,
-                #     "date_created": currency_settings.date_created,
-                #     "updated_at": currency_settings.updated_at,
-                # }
-                return JsonResponse({"currency_settings": serializer.data})
-            props =  {"errors": "No currency settings found"}
-            return JsonResponse(props)
-        
-        if request.method == "POST" or request.method == "PUT":
-            rate_schema = RateSchema()
-            try:
-                data= rate_schema.load(request.data)
-            except ValidationError as err:
-                props = {"errors": err.messages}
-                return JsonResponse(props, status=400)
-            else:
-                rates = CurrencyRate.objects.filter(user__company=self.request.user.company)
-                if rates.exists():
-                    rate= rates.last()
-                    rate.base_currency= data.get("base_currency")
-                    rate.currency= data.get("currency")
-                    rate.current_rate= data.get("current_rate")
-                    rate.updated_at= now()
-                    rate.save()
-                    props = {"success": "Rate updated successfully"}
-                    return JsonResponse(props)
-                else:
-                    CurrencyRate.objects.create(
-                        user= request.user,
-                        base_currency= data.get("base_currency"),
-                        currency= data.get("currency"),
-                        current_rate= data.get("current_rate"),
-                        updated_at= now(),
-                        date_created= now(),
-                    )
-                    props = {"success": "Rate created successfully"}
-                    return JsonResponse(props)
+    def rate_setup(self, request, pk=None):  
+        currency_object = CurrencyRate.objects.filter(user__company=request.user.company)  
+        instance = currency_object.last() if currency_object.exists() else None  
+
+        if request.method == "GET":  
+            if instance:  
+                serializer = self.get_serializer(instance)  
+                return Response({"currency_rate_settings": serializer.data})  
+            return Response({"errors": "No currency settings found"}, status=status.HTTP_404_NOT_FOUND)  
+
+        if request.method in ["POST", "PUT", "PATCH"]:  
+            serializer = self.get_serializer(instance, data=request.data, partial=True)  
+            if serializer.is_valid():  
+                serializer.save(user=request.user)  
+                message = "Rate updated successfully" if instance else "Rate created successfully"  
+                return Response({"success": message})  
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)  
 
     
 def detailed_general_ledger(request):

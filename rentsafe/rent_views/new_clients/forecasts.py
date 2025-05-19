@@ -8,7 +8,7 @@ from datetime import timedelta
 def get_forecast_inflows(request):
     current_date = datetime.now().date()
     forecast_inflows_list = []
-    current_rate = CurrencyRate.objects.filter(user=request.user).first()
+    current_rate = CurrencyRate.objects.filter(user__company=request.user.company).first()
 
     payment_plans = PaymentPlan.objects.filter(expected_pay_date__gte=current_date)
     if payment_plans:

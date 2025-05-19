@@ -49,7 +49,7 @@ def clients_credit_dashboard(id):
     taken_credits_color_totals = {}
 
     rate_ = 1
-    if rate_obj := CurrencyRate.objects.filter(user = client_id).first():
+    if rate_obj := CurrencyRate.objects.filter(user__company = request.user.company).first():
         rate_ = float(rate_obj.current_rate)
     def get_credit_color(credit_status):
         """Maps credit status to a color."""
