@@ -62,8 +62,6 @@ jobs:
 
     - name: Collect Django Static Files
       run: |
-        echo "🧹 Removing old static files..."
-        rm -rf static/
         echo "📦 Collecting new static files..."
         python manage.py collectstatic --no-input
 
