@@ -5,8 +5,8 @@ export default function LandingPageFeature({ title, children, image, reversed })
         className={`row ${reversed ? "flex-row-reverse" : ""} landing-feature align-items-center justify-content-around mb-5 py-5 py-md-0`}
       >
         <div className="col col-12 col-md-5 order-3 order-md-1">
-          <div className="p-3">
-            <h2 className="fs-5 fw-bold">{title}</h2>
+          <div className="py-3 md:px-3">
+            <h2 className="fs-5 fw-bold text-center text-md-start">{title}</h2>
             <div className="bg-dark custom-rounded-1 p-3 text-light">{children}</div>
           </div>
         </div>
