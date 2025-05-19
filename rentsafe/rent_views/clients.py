@@ -145,7 +145,7 @@ def clients_credit_dashboard(id):
                     )
                 else:
                     rate = 1
-                    if rate_ob := CurrencyRate.objects.filter(user = client_id).first():
+                    if rate_ob := CurrencyRate.objects.filter(user__company = request.user.company).first():
                         rate = float(rate_ob.current_rate)
                     amount_owing =float(opening_balance_record.outstanding_balance) if opening_balance_record else 0
                     client_credits = {
