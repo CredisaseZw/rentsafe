@@ -61,7 +61,11 @@ jobs:
         pip install -r requirements.txt
 
     - name: Collect Django Static Files
-      run: python manage.py collectstatic --no-input
+      run: |
+        echo "🧹 Removing old static files..."
+        rm -rf static/
+        echo "📦 Collecting new static files..."
+        python manage.py collectstatic --no-input
 
     - name: Commit and Push Built Static Files with Debugging
       run: |
@@ -87,4 +91,3 @@ jobs:
 
           echo "🚀 Pushing to testing branch..."
           git push origin testing
-        fi
