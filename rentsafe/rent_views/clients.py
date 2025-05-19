@@ -778,7 +778,32 @@ def edit_lease(request):
                 )
         if agent_details:
             agent_details.agent_commission = data.get("commission")
+            agent_details.landlord_id = data.get("landlordId")
+            agent_details.reg_ID_Number = data.get("regIdNumber")
+            agent_details.opening_balance = data.get("openingBalance")
+            agent_details.landlord_name = data.get("landlordName")
+            agent_details.is_individual = (
+                data.get("landlordType").upper() == LandLordType.INDIVIDUAL
+            )
+            agent_details.is_company = (
+                data.get("landlordType").upper() == LandLordType.COMPANY
+            )
+            
             agent_details.save()
+        else:
+            landlord = Landlord(
+                user_id=request.user.id,
+                lease_id=lease_id,
+                landlord_id=data.get("landlordId"),
+                reg_ID_Number=data.get("regIdNumber"),
+                opening_balance=data.get('openingBalance'),
+                landlord_name=data.get("landlordName"),
+                is_individual=data.get("landlordType").upper()
+                == LandLordType.INDIVIDUAL,
+                is_company=data.get("landlordType").upper() == LandLordType.COMPANY,
+                agent_commission=float(data.get("commission")),
+            )
+            landlord.save()
 
         if lease:
             if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
@@ -820,7 +845,7 @@ def edit_lease(request):
                     ).first()
                     contact_detail = company_email.email if company_email else None
                 else:
-                    contact_detail = "gtkandeya@gmail.com"
+                    contact_detail = "info@credi-safe.com"
             else:
                 requested_user_ob = "individual"
                 lease_receiver = Individual.objects.filter(
