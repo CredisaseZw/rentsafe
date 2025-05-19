@@ -43,14 +43,11 @@ export default function Index() {
       <div className="container">
         <div id="credit-scoring">
           <LandingPageFeature
-            title="Credit & Capacity Scoring"
+            title="Credit Bureau - Credit Scoring"
             image="https://github.com/credisafe/media-files/blob/main/risk-review-plan.png?raw=true"
           >
-            With the informal sector being over 80% in some parts of Africa, how do you bridge the
-            divide so that everyone is financially included? CrediSafe has innovated to be able to
-            credit score both the formal and informal sector so that all can be included. We are
-            also innovating in providing Capacity Score to gauge what kind of credit capacity an
-            informal player can handle.
+            We credit score the formal and informal sectors making sure everyone is financially
+            included and bridging the divide.
           </LandingPageFeature>
         </div>
 
@@ -68,23 +65,21 @@ export default function Index() {
 
         <div id="countsafe">
           <LandingPageFeature
-            title="CountSafe"
+            title="CountSafe - Accounting"
             image="https://github.com/credisafe/media-files/blob/main/analysis.png?raw=true"
           >
-            An accounting system made for the African environment. Businesses can run multicurrency
-            accounts, manage cashflows and make automated account collections.
+            An accounting app made for the African environment. Performs multicurrency calculations
+            and cashflow management.
           </LandingPageFeature>
         </div>
 
         <div id="debt-collection">
           <LandingPageFeature
-            title="DebtSafe - Debt Collection"
+            title="CollectaSafe - Debt Collection"
             image="https://github.com/credisafe/media-files/blob/main/debt.png?raw=true"
             reversed
           >
-            Experience higher recovery rates and reduced operational costs with DebtSafe. Our
-            recovery system exponentially improves efficiency all with less effort through our
-            automated system.
+            Be able to follow up on invoices automatically at scale but at a fraction of the cost.
           </LandingPageFeature>
         </div>
       </div>
