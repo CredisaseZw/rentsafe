@@ -157,7 +157,7 @@ class CurrencyRateViewSet(BaseCompanyViewSet):
     @action(detail=False, methods=["GET", "POST", "PUT", "PATCH"], url_path="rate-setup")
     def rate_setup(self, request, pk=None):
         if request.method == "GET":
-            currency_settings_objects = CurrencyRate.objects.filter(user=self.request.user)
+            currency_settings_objects = CurrencyRate.objects.filter(user__company=self.request.user.company)
             if currency_settings_objects.exists():
                 currency_settings = currency_settings_objects.last()
                 serializer = CurrencyRateSerializer(currency_settings)
@@ -182,7 +182,7 @@ class CurrencyRateViewSet(BaseCompanyViewSet):
                 props = {"errors": err.messages}
                 return JsonResponse(props, status=400)
             else:
-                rates = CurrencyRate.objects.filter(user=self.request.user)
+                rates = CurrencyRate.objects.filter(user__company=self.request.user.company)
                 if rates.exists():
                     rate= rates.last()
                     rate.base_currency= data.get("base_currency")
