@@ -776,9 +776,57 @@ def edit_lease(request):
                 switch_colors(
                     lease, old_payment_end, new_payment_end, today, lease_status
                 )
+        if data.get('landlordType').lower() == "company":
+            if not data.get("regIdNumber") == "":
+                landlord_ob = Company.objects.filter(registration_number=data.get("regIdNumber")).first()
+            else:
+                landlord_ob = Company.objects.filter(registration_name__iexact=data.get("landlordName")).first()
+        else:
+            if not data.get("regIdNumber") == "":
+                landlord_ob = Individual.objects.filter(identification_number=data.get("regIdNumber")).first()
+            else:
+                landlord_ob = None
         if agent_details:
             agent_details.agent_commission = data.get("commission")
+            agent_details.landlord_id = landlord_ob.id if landlord_ob else None
+            agent_details.reg_ID_Number = data.get("regIdNumber")
+            agent_details.opening_balance = data.get("openingBalance")
+            agent_details.landlord_name = data.get("landlordName")
+            agent_details.is_individual = (
+                data.get("landlordType").upper() == LandLordType.INDIVIDUAL
+            )
+            agent_details.is_company = (
+                data.get("landlordType").upper() == LandLordType.COMPANY
+            )
             agent_details.save()
+            opening_balance_ob = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).first()
+            if opening_balance_ob:
+                opening_balance_ob.total_amount = data.get("openingBalance")
+                opening_balance_ob.base_amount = data.get("openingBalance")
+                opening_balance_ob.receipt_number = "Opening Balance"
+                opening_balance_ob.save()
+        else:
+            landlord = Landlord(
+                user_id=request.user.id,
+                lease_id=lease_id,
+                landlord_id=landlord_ob.id if landlord_ob else None,
+                reg_ID_Number=data.get("regIdNumber"),
+                opening_balance=data.get('openingBalance'),
+                landlord_name=data.get("landlordName"),
+                is_individual=data.get("landlordType").upper()
+                == LandLordType.INDIVIDUAL,
+                is_company=data.get("landlordType").upper() == LandLordType.COMPANY,
+                agent_commission=float(data.get("commission")),
+            )
+            landlord.save()
+            
+            LeaseReceiptBreakdown.objects.create(
+                lease_id=lease_id,
+                landlord_id=landlord.id,
+                total_amount=data.get('openingBalance'),
+                base_amount=data.get('openingBalance'),
+                receipt_number='Opening Balance',
+            )
 
         if lease:
             if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
@@ -820,7 +868,7 @@ def edit_lease(request):
                     ).first()
                     contact_detail = company_email.email if company_email else None
                 else:
-                    contact_detail = "gtkandeya@gmail.com"
+                    contact_detail = "info@credi-safe.com"
             else:
                 requested_user_ob = "individual"
                 lease_receiver = Individual.objects.filter(
