@@ -5,7 +5,7 @@ class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         try:
-            read_only_fields = ['user']  # Prevent user from setting them
+            read_only_fields = ['user', 'date_created']  # Prevent user from setting them
         except AttributeError:
             read_only_fields = []
 
@@ -95,3 +95,7 @@ class ProformaInvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProformaInvoice
         fields = "__all__"
+
+class CurrencyRateSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = CurrencyRate

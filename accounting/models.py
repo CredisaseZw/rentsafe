@@ -250,3 +250,19 @@ class ProformaInvoice(models.Model):
 
     def __str__(self):
         return f"Proforma {self.invoice.document_number}"
+
+class CurrencyRate(models.Model):
+    CURRENCY_CHOICES = [
+        ("USD", "US Dollar"),
+        ("ZIG", "Zimbabwen Dollar"),
+    ]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    current_rate = models.FloatField(max_length=255, default=0)
+    base_currency = models.CharField(max_length=255,default="USD")
+    currency = models.CharField(max_length=255)
+    date_created = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"User {self.user} Latest Rate {self.current_rate}"
+

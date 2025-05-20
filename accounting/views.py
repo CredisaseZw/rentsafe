@@ -1,6 +1,7 @@
-from rest_framework import viewsets
+from django.http import JsonResponse
+from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
-from .models import *
+from .models import Item, VATSetting, ProductService, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, RecurringInvoice, ProformaInvoice, CurrencyRate
 from .serializers import *
 from django.shortcuts import render
 from rest_framework import status
@@ -23,7 +24,6 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Automatically assign the user's company when creating objects."""
-        print("--------Testing--------")
         serializer.save(user=self.request.user)
 
 class ItemViewSet(BaseCompanyViewSet):
@@ -149,7 +149,30 @@ class ProformaInvoiceViewSet(viewsets.ModelViewSet):
         invoice = proforma_invoice.convert_to_invoice()
         return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
     
+class CurrencyRateViewSet(BaseCompanyViewSet):
+    queryset = CurrencyRate.objects.all()
+    serializer_class = CurrencyRateSerializer
+    
+    @action(detail=False, methods=["GET", "POST", "PUT", "PATCH"], url_path="rate-setup")
+    def rate_setup(self, request, pk=None):  
+        currency_object = CurrencyRate.objects.filter(user__company=request.user.company)  
+        instance = currency_object.last() if currency_object.exists() else None  
 
+        if request.method == "GET":  
+            if instance:  
+                serializer = self.get_serializer(instance)  
+                return Response({"currency_rate_settings": serializer.data})  
+            return Response({"errors": "No currency settings found"}, status=status.HTTP_404_NOT_FOUND)  
+
+        if request.method in ["POST", "PUT", "PATCH"]:  
+            serializer = self.get_serializer(instance, data=request.data, partial=True)  
+            if serializer.is_valid():  
+                serializer.save(user=request.user)  
+                message = "Rate updated successfully" if instance else "Rate created successfully"  
+                return Response({"success": message})  
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)  
+
+    
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
 

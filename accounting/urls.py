@@ -23,7 +23,7 @@ router.register(r'invoices', InvoiceViewSet, basename="invoices")
 router.register(r'payments', PaymentViewSet, basename="payments")
 router.register(r'recurring-invoices', RecurringInvoiceViewSet, basename="recurring_invoices")
 router.register(r'proforma-invoices', ProformaInvoiceViewSet, basename="proforma_invoices")
-
+router.register(r'currency-settings', CurrencyRateViewSet, basename="currency")
 urlpatterns = [
     path("", include(router.urls)),
     path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),
@@ -31,5 +31,4 @@ urlpatterns = [
     path("credit-note/", credit_note ,name="credit_note"),
     path("creditor-invoice/", creditor_invoice ,name="creditor_invoice"),
     path("rate-audit-trail/", rate_audit_trail ,name="rate_audit_trail"),
-    path("general-journal/", general_journal ,name="general_journal"),
 ]

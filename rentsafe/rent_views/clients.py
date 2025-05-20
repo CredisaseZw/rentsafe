@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import Q, CharField
@@ -22,6 +22,7 @@ from inertia import render
 from inertia.share import share
 from marshmallow import ValidationError
 
+from accounting.models import CurrencyRate
 from rentsafe.decorators import clients_required
 from rentsafe.helper import *
 from rentsafe.models import *
@@ -49,7 +50,7 @@ def clients_credit_dashboard(id):
     taken_credits_color_totals = {}
 
     rate_ = 1
-    if rate_obj := LeaseCurrencyRate.objects.filter(company_id= client_id).first():
+    if rate_obj := CurrencyRate.objects.filter(user__company = request.user.company).first():
         rate_ = float(rate_obj.current_rate)
     def get_credit_color(credit_status):
         """Maps credit status to a color."""
@@ -145,7 +146,7 @@ def clients_credit_dashboard(id):
                     )
                 else:
                     rate = 1
-                    if rate_ob := LeaseCurrencyRate.objects.filter(company_id= client_id).first():
+                    if rate_ob := CurrencyRate.objects.filter(user__company = request.user.company).first():
                         rate = float(rate_ob.current_rate)
                     amount_owing =float(opening_balance_record.outstanding_balance) if opening_balance_record else 0
                     client_credits = {
@@ -239,11 +240,11 @@ def worst_credit_check_helper(leases_taken, taken_credits_ratings):
 
 def rate_setup(request):
     if request.method == "GET" :
-        currency_settings_objects = LeaseCurrencyRate.objects.filter(company_id=request.user.company)
+        currency_settings_objects = CurrencyRate.objects.filter(company_id=request.user.company)
         if currency_settings_objects.exists():         
             currency_settings = currency_settings_objects.last()   
             currency_settings = {
-                "company_id": currency_settings.company_id,
+                "company_id": currency_settings.user.company,
                 "current_rate": currency_settings.current_rate,
                 "base_currency": currency_settings.base_currency,
                 "currency": currency_settings.currency,
@@ -262,7 +263,7 @@ def rate_setup(request):
             props = {"errors": err.messages}
             return JsonResponse(props, status=400)
         else:
-            rates = LeaseCurrencyRate.objects.filter(company_id=request.user.company)
+            rates = CurrencyRate.objects.filter(user=request.user)
             if rates.exists():
                 rate = rates.last()
                 rate.base_currency=data.get("base_currency")
@@ -272,7 +273,7 @@ def rate_setup(request):
                 props = {"success": "Rate changed successfully!"}
                 return JsonResponse(props)
             else:
-                LeaseCurrencyRate.objects.create(
+                CurrencyRate.objects.create(
                     company_id=request.user.company,
                     base_currency=data.get("base_currency"),
                     currency=data.get("currency"),
@@ -280,6 +281,7 @@ def rate_setup(request):
                 )
                 props = {"success": "Rate configured successfully!"}
                 return JsonResponse(props)
+
 
 @login_required
 @clients_required
@@ -3699,9 +3701,7 @@ def client_leases_new(request,leases_type=None):
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount > 0 and is_100_days_ago)  else False
-        if float(owing_amount) <= 0 and i.is_terminated == True:
-            is_terminated_lease_eligible = True
+        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
@@ -5901,12 +5901,14 @@ def manual_send_otp(request):
     return HttpResponse("otps were resend!")
 
 def manual_color_update(request):
-
+    
+   
     leases = Lease.objects.filter(is_active=True).all()
    
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
+           
             if opening_balance_object := Opening_balance.objects.filter(
                 lease_id=lease_id
             ).last():
@@ -6058,6 +6060,8 @@ def accounts_list(request):
 def sales_accounts(request):
     return render(request, "Client/Accounting/Sales/SalesAccounts")
 
+def rate_setup(request):
+    return JsonResponse ({"status": "success"}, safe=False)
 
 
 

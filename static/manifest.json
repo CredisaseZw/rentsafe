@@ -287,23 +287,19 @@
       "src/pages/Client/Accounting/AccountsListPage.jsx",
       "src/pages/Client/Accounting/CashBooksList.jsx",
       "src/pages/Client/Accounting/CommissionStatement.jsx",
-      "src/pages/Client/Accounting/CreditNote.jsx",
-      "src/pages/Client/Accounting/CreditorInvoice.jsx",
       "src/pages/Client/Accounting/CreditorStatements.jsx",
       "src/pages/Client/Accounting/DebtCall.jsx",
       "src/pages/Client/Accounting/DetailedCreditorStatement.jsx",
       "src/pages/Client/Accounting/DetailedGeneralLedgerAccount.jsx",
       "src/pages/Client/Accounting/DetailedStatement.jsx",
       "src/pages/Client/Accounting/Forecasts.jsx",
-      "src/pages/Client/Accounting/GeneralJournal.jsx",
       "src/pages/Client/Accounting/Invoicing.jsx",
-      "src/pages/Client/Accounting/RateAuditTrail.jsx",
       "src/pages/Client/Accounting/Sales/CashBooks.jsx",
       "src/pages/Client/Accounting/Sales/CashSales.jsx",
       "src/pages/Client/Accounting/Sales/ProductsAndServices.jsx",
+      "src/pages/Client/Accounting/Sales/SalesAccounts.jsx",
       "src/pages/Client/Accounting/Sales/SalesCategories.jsx",
       "src/pages/Client/Accounting/Sales/SalesInvoicing.jsx",
-      "src/pages/Client/Accounting/Sales/SalesReports.jsx",
       "src/pages/Client/Accounting/Sales/VatSettings.jsx",
       "src/pages/Client/Accounting/Statements.jsx",
       "src/pages/Client/Dashboard.jsx",
@@ -939,7 +935,7 @@
       "_search-af72f12f.js"
     ],
     "isDynamicEntry": true,
-    "src": "src/pages/Client/Accounting/RateAuditTrail.jsx"
+    "src": "src/pages/Client/Accounting/Sales/CashBooks.jsx"
   },
   "src/pages/Client/Accounting/Sales/CashBooks.jsx": {
     "file": "media/CashBooks-ad043335.js",
@@ -959,7 +955,7 @@
       "_search-af72f12f.js"
     ],
     "isDynamicEntry": true,
-    "src": "src/pages/Client/Accounting/Sales/CashBooks.jsx"
+    "src": "src/pages/Client/Accounting/Sales/CashSales.jsx"
   },
   "src/pages/Client/Accounting/Sales/CashSales.jsx": {
     "file": "media/CashSales-7d4031f3.js",
@@ -979,7 +975,7 @@
       "_search-af72f12f.js"
     ],
     "isDynamicEntry": true,
-    "src": "src/pages/Client/Accounting/Sales/CashSales.jsx"
+    "src": "src/pages/Client/Accounting/Sales/ProductsAndServices.jsx"
   },
   "src/pages/Client/Accounting/Sales/ProductsAndServices.jsx": {
     "file": "media/ProductsAndServices-dc39f39f.js",
@@ -999,7 +995,7 @@
       "_search-af72f12f.js"
     ],
     "isDynamicEntry": true,
-    "src": "src/pages/Client/Accounting/Sales/ProductsAndServices.jsx"
+    "src": "src/pages/Client/Accounting/Sales/SalesAccounts.jsx"
   },
   "src/pages/Client/Accounting/Sales/SalesCategories.jsx": {
     "file": "media/SalesCategories-578ae2ec.js",

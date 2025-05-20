@@ -6,11 +6,13 @@ __pycache__/
 *.py[cod]
 *.pyo
 node_modules/
-dist/
+*node_*
 *.log
 *.pot
 *.mo
 *.pyc
+*7May
+*9May
 *db.sqlite3*
 .vscode
 node_modules/
@@ -18,3 +20,4 @@ react-app/dist/
 
 __pycache__/
 *__pycache__/
+.venv
