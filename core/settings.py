@@ -36,7 +36,7 @@ WHATSAPP_API_URL = os.environ["WHATSAPP_API_URL"]
 WHATSAPP_ACCESS_TOKEN = os.environ["WHATSAPP_ACCESS_TOKEN"]
 WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
 
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ["*"]
 AUTH_USER_MODEL = "authentication.CustomUser"
 
@@ -110,7 +110,9 @@ DB_HOST     = os.getenv('DB_HOST'     , None)
 DB_PORT     = os.getenv('DB_PORT'     , None)
 DB_NAME     = os.getenv('DB_NAME'     , None)
 
-if DEBUG:
+
+if DEVELOPMENT:= os.getenv('DEVELOPMENT' , False):
+    print("Development mode")
     DATABASES = { 
         'default': {
         'ENGINE'  : DB_ENGINE,

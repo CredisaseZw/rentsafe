@@ -15,6 +15,9 @@ node_modules/
 *9May
 *db.sqlite3*
 .vscode
-node_modules
+node_modules/
+react-app/dist/
+
 __pycache__/
+*__pycache__/
 .venv
