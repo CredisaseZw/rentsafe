@@ -99,3 +99,7 @@ class ProformaInvoiceSerializer(serializers.ModelSerializer):
 class CurrencyRateSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CurrencyRate
+
+class CashBookSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = CashBook

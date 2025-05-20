@@ -46,7 +46,7 @@ class Item(models.Model):
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
-    unit_price_currency = models.CharField(max_length=10, choices=[('USD', 'USD'), ('ZIG', 'ZIG')])
+    unit_price_currency = models.CharField(max_length=10, choices=[('USD', 'USD'), ('ZWG', 'ZWG')])
     price = models.DecimalField(max_digits=10, decimal_places=2)
     unit_name = models.CharField(max_length=255, blank=True, null=True)
     tax_configuration = models.ForeignKey('VATSetting', on_delete=models.CASCADE, related_name='items')
@@ -254,7 +254,7 @@ class ProformaInvoice(models.Model):
 class CurrencyRate(models.Model):
     CURRENCY_CHOICES = [
         ("USD", "US Dollar"),
-        ("ZIG", "Zimbabwen Dollar"),
+        ("ZWG", "Zimbabwen Dollar"),
     ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     current_rate = models.FloatField(max_length=255, default=0)
@@ -266,3 +266,18 @@ class CurrencyRate(models.Model):
     def __str__(self):
         return f"User {self.user} Latest Rate {self.current_rate}"
 
+class CashBook(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    cashbook_id = models.CharField(max_length=255, unique=True)
+    cashbook_name = models.CharField(max_length=255)
+    currency = models.CharField(max_length=10, choices=[('USD', 'USD'), ('ZWG', 'ZwG')])
+    reqiusition_status = models.BooleanField(default=False)
+    account_type = models.CharField(max_length=50)
+    bank_account_number = models.CharField(max_length=30)
+    branch_name = models.CharField(max_length=255)
+    general_ledger_account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE, related_name='general_ledger_account')
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.cashbook_id} - {self.cashbook_name}"
