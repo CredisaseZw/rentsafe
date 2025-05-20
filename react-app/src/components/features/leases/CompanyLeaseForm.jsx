@@ -543,7 +543,7 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                         name="landlordType"
                         id="landlordType"
                         value={data.landlordType}
-                        disabled={action === "view" || action === "edit"}
+                        disabled={action === "view"}
                         onChange={(e) => changeLandlordType(e.target.value)}
                       >
                         <option value="INDIVIDUAL">Individual</option>
@@ -573,9 +573,7 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                               : "",
                         }}
                         defaultValue={data.regIdNumber ? data.regIdNumber : ""}
-                        isDisabled={
-                          action === "view" || action === "edit" || data.landlordType === ""
-                        }
+                        isDisabled={action === "view" || data.landlordType === ""}
                         useAlternateFetchOptions={{
                           type: data.landlordType.toLowerCase(),
                         }}
@@ -628,7 +626,7 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                         name="openingBalance"
                         id="openingBalance"
                         className="form-control form-control-sm"
-                        disabled={action === "view" || action === "edit"}
+                        disabled={action === "view"}
                       />
 
                       {errors && <div className="text-danger mt-1">{errors.openingBalance}</div>}
