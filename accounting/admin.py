@@ -65,3 +65,10 @@ class CurrencyRate(admin.ModelAdmin):
     search_fields = ("user",)
     list_filter = ("currency",)
     ordering = ("-updated_at",)
+
+@admin.register(Currency)
+class Currency(admin.ModelAdmin):
+    list_display=("currency_name","currency_code")
+    list_display_links = ("currency_name",)
+    search_fields = ('currency_code',)
+    

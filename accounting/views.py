@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
-from .models import Item, VATSetting, ProductService, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, RecurringInvoice, ProformaInvoice, CurrencyRate
+from .models import Item, VATSetting, ProductService, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, RecurringInvoice, ProformaInvoice, CurrencyRate, CashBook, Currency
 from .serializers import *
 from django.shortcuts import render
 from rest_framework import status
@@ -172,7 +172,14 @@ class CurrencyRateViewSet(BaseCompanyViewSet):
                 return Response({"success": message})  
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)  
 
-    
+class CashBookViewSet(BaseCompanyViewSet):
+    queryset = CashBook.objects.all()
+    serializer_class = CashBookSerializer
+
+class CurrencyViewSet(viewsets.ModelViewSet):
+    queryset = Currency.objects.all()
+    serializer_class = CurrencyRateSerializer
+
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
 
