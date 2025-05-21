@@ -40,13 +40,23 @@ class SalesAccount(models.Model):
 
     def __str__(self):
         return f"{self.account_number} - {self.account_name}"
-    
+
+class Currency(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    currency_code = models.CharField(max_length=3, unique=True)
+    currency_name = models.CharField(max_length=50)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.currency_code
+  
 class Item(models.Model):
       
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
-    unit_price_currency = models.CharField(max_length=10, choices=[('USD', 'USD'), ('ZWG', 'ZWG')])
+    unit_price_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='items_currency',null= True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     unit_name = models.CharField(max_length=255, blank=True, null=True)
     tax_configuration = models.ForeignKey('VATSetting', on_delete=models.CASCADE, related_name='items')
@@ -250,16 +260,12 @@ class ProformaInvoice(models.Model):
 
     def __str__(self):
         return f"Proforma {self.invoice.document_number}"
-
+  
 class CurrencyRate(models.Model):
-    CURRENCY_CHOICES = [
-        ("USD", "US Dollar"),
-        ("ZWG", "Zimbabwen Dollar"),
-    ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     current_rate = models.FloatField(max_length=255, default=0)
-    base_currency = models.CharField(max_length=255,default="USD")
-    currency = models.CharField(max_length=255)
+    base_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='base_currency',null= True, blank=True)
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='target_currency',null= True, blank=True)
     date_created = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -270,7 +276,7 @@ class CashBook(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     cashbook_id = models.CharField(max_length=255, unique=True)
     cashbook_name = models.CharField(max_length=255)
-    currency = models.CharField(max_length=10, choices=[('USD', 'USD'), ('ZWG', 'ZwG')])
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='cashbook_currency', null= True, blank=True)
     requisition_status = models.BooleanField(default=False)
     account_type = models.CharField(max_length=50)
     bank_account_number = models.CharField(max_length=30, blank=True)
@@ -280,4 +286,4 @@ class CashBook(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.cashbook_id} - {self.cashbook_name}"
+        return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"

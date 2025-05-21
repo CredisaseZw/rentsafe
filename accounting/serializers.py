@@ -15,13 +15,22 @@ class ProductServiceSerializer(BaseCompanySerializer):
         
 class ItemSerializer(BaseCompanySerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=SalesCategory.objects.all())
+    unit_price_currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all())
     tax_configuration = serializers.PrimaryKeyRelatedField(queryset=VATSetting.objects.all())
-    category_name = serializers.CharField(source='category.name', read_only=True) 
+    category_name = serializers.CharField(source='category.name', read_only=True)
     # sales_account = serializers.PrimaryKeyRelatedField(queryset=SalesAccount.objects.all())
 
     class Meta(BaseCompanySerializer.Meta):
         model = Item
-        
+
+    def create(self, validated_data):
+        try:
+            currency= Currency.objects.get(currency_code=validated_data['unit_price_currency'])
+        except Currency.DoesNotExist:
+            raise serializers.ValidationError("Currency does not exist.")
+        validated_data['unit_price_currency'] = currency  
+        return super().create(validated_data)
+     
 class VATSettingSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = VATSetting
@@ -129,4 +138,7 @@ class CashBookSerializer(BaseCompanySerializer):
             raise serializers.ValidationError("These details already exist in another account.")
         
         return data
-    
+
+class CurrencySerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = Currency
