@@ -23,8 +23,9 @@ router.register(r'invoices', InvoiceViewSet, basename="invoices")
 router.register(r'payments', PaymentViewSet, basename="payments")
 router.register(r'recurring-invoices', RecurringInvoiceViewSet, basename="recurring_invoices")
 router.register(r'proforma-invoices', ProformaInvoiceViewSet, basename="proforma_invoices")
-router.register(r'currency-settings', CurrencyRateViewSet, basename="currency")
+router.register(r'currency-settings', CurrencyRateViewSet, basename="currency_rate")
 router.register(r'cash-books', CashBookViewSet, basename="cash_books")
+router.register(r'currency', CurrencyViewSet, basename="currency")
 urlpatterns = [
     path("", include(router.urls)),
     path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),
