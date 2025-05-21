@@ -15,13 +15,22 @@ class ProductServiceSerializer(BaseCompanySerializer):
         
 class ItemSerializer(BaseCompanySerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=SalesCategory.objects.all())
+    unit_price_currency = serializers.PrimaryKeyRelatedField(queryset=Currency.objects.all())
     tax_configuration = serializers.PrimaryKeyRelatedField(queryset=VATSetting.objects.all())
-    category_name = serializers.CharField(source='category.name', read_only=True) 
+    category_name = serializers.CharField(source='category.name', read_only=True)
     # sales_account = serializers.PrimaryKeyRelatedField(queryset=SalesAccount.objects.all())
 
     class Meta(BaseCompanySerializer.Meta):
         model = Item
-        
+
+    def create(self, validated_data):
+        try:
+            currency= Currency.objects.get(currency_code=validated_data['unit_price_currency'])
+        except Currency.DoesNotExist:
+            raise serializers.ValidationError("Currency does not exist.")
+        validated_data['unit_price_currency'] = currency  
+        return super().create(validated_data)
+     
 class VATSettingSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = VATSetting
@@ -99,3 +108,37 @@ class ProformaInvoiceSerializer(serializers.ModelSerializer):
 class CurrencyRateSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CurrencyRate
+
+class CashBookSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = CashBook
+
+    def validate(self, data):
+
+        request = self.context.get('request')
+        # company = request.user.company
+        bank_account = data.get('bank_account_number')
+        branch = data.get('branch_name')
+
+        if bank_account and not branch:
+            raise serializers.ValidationError({"branch_name": "This field is required if bank account number is provided."})
+
+        company_cashbooks = CashBook.objects.filter(user__company = request.user.company)
+        cashbook_data = company_cashbooks.filter(
+            cashbook_name = data.get('cashbook_name'),
+            currency = data.get('currency'),
+            requisition_status = data.get('requisition_status'),
+            account_type = data.get('account_type'),
+            bank_account_number = data.get('bank_account_number'),
+            branch_name = data.get('branch_name'),
+            general_ledger_account = data.get('general_ledger_account'),
+        )
+        
+        if cashbook_data.exists():
+            raise serializers.ValidationError("These details already exist in another account.")
+        
+        return data
+
+class CurrencySerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = Currency
