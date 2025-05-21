@@ -103,3 +103,30 @@ class CurrencyRateSerializer(BaseCompanySerializer):
 class CashBookSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashBook
+
+    def validate(self, data):
+
+        request = self.context.get('request')
+        # company = request.user.company
+        bank_account = data.get('bank_account_number')
+        branch = data.get('branch_name')
+
+        if bank_account and not branch:
+            raise serializers.ValidationError({"branch_name": "This field is required if bank account number is provided."})
+
+        company_cashbooks = CashBook.objects.filter(user__company = request.user.company)
+        cashbook_data = company_cashbooks.filter(
+            cashbook_name = data.get('cashbook_name'),
+            currency = data.get('currency'),
+            requisition_status = data.get('requisition_status'),
+            account_type = data.get('account_type'),
+            bank_account_number = data.get('bank_account_number'),
+            branch_name = data.get('branch_name'),
+            general_ledger_account = data.get('general_ledger_account'),
+        )
+        
+        if cashbook_data.exists():
+            raise serializers.ValidationError("These details already exist in another account.")
+        
+        return data
+    
