@@ -5,6 +5,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now, timedelta
 import uuid
+from django.db import models
+from django.core.exceptions import ValidationError
+from rentsafe.models import Individual, Company, Lease
 # Create your models here.
 
 class ProductService(models.Model):
@@ -150,36 +153,122 @@ class LedgerTransaction(models.Model):
     def __str__(self):
         return f"{self.account.account_name} - Debit: {self.debit} Credit: {self.credit}"
 
-
 class Invoice(models.Model):
-    """Stores invoice details."""
+    INVOICE_TYPE_CHOICES = [
+        ("fiscal", "Fiscal"),
+        ("proforma", "Proforma"),
+        ("recurring", "Recurring"),
+    ]
+
     STATUS_CHOICES = [
         ("pending", "Pending"),
         ("draft", "Draft"),
         ("paid", "Paid"),
         ("cancelled", "Cancelled"),
     ]
-    
-    document_number = models.CharField(max_length=10, unique=True)
-    customer_id = models.CharField(max_length=255)  
-     # User Company Relation
+
+    invoice_type = models.CharField(max_length=20, choices=INVOICE_TYPE_CHOICES, default="fiscal")
+    document_number = models.CharField(max_length=6, unique=True, editable=False)
     is_individual = models.BooleanField(default=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Creator of the invoice
+
+    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    lease = models.ForeignKey(Lease, null=True, blank=True, on_delete=models.SET_NULL, related_name="invoices")
+
+    description = models.CharField(max_length=255, blank=True)
+    ref = models.CharField(max_length=255, default="INV-0000")
+    account_number = models.CharField(max_length=255, null=True, blank=True)
+    currency = models.CharField(max_length=10, default="USD")
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sale_date = models.DateTimeField(default=now)
+    invoice_date = models.DateField(null=True, blank=True)
+
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     total_excluding_vat = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
     vat_total = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
     total_inclusive = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
 
+    # Recurring invoice-specific fields
+    is_recurring = models.BooleanField(default=False)
+    frequency = models.CharField(max_length=20, blank=True, null=True, choices=[
+        ("monthly", "Monthly"),
+        ("quarterly", "Quarterly"),
+        ("yearly", "Yearly"),
+    ])
+    next_invoice_date = models.DateField(null=True, blank=True)
+
+    def clean(self):
+        if self.is_individual and not self.individual:
+            raise ValidationError("Invoice marked as individual must have an individual assigned.")
+        if not self.is_individual and not self.company:
+            raise ValidationError("Invoice marked as company must have a company assigned.")
+        if self.is_individual and self.company:
+            raise ValidationError("Cannot set both company and individual.")
+        if not self.is_individual and self.individual:
+            raise ValidationError("Cannot set both company and individual.")
+
+    def save(self, *args, **kwargs):
+        if not self.document_number:
+            last_invoice = Invoice.objects.order_by('-id').first()
+            next_number = int(last_invoice.document_number) + 1 if last_invoice else 1
+            self.document_number = f"{next_number:06d}"
+
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Invoice {self.document_number} - {self.customer_id} ({self.is_individual})"
+        customer = self.individual if self.is_individual else self.company
+        return f"{self.get_invoice_type_display()} Invoice {self.document_number} - {customer}"
+    def generate_next_invoice(self):
+        """Creates a new invoice when the recurrence is due."""
+        if not self.is_recurring or not self.frequency or not self.next_invoice_date:
+            raise ValidationError("Recurring info incomplete.")
+
+        # Advance the next invoice date
+        if self.frequency == "monthly":
+            self.next_invoice_date += timedelta(days=30)
+        elif self.frequency == "quarterly":
+            self.next_invoice_date += timedelta(days=90)
+        elif self.frequency == "yearly":
+            self.next_invoice_date += timedelta(days=365)
+
+        self.save()
+
+        new_invoice = Invoice.objects.create(
+            document_number=None,  # Will be generated in save()
+            is_individual=self.is_individual,
+            individual=self.individual if self.is_individual else None,
+            company=None if self.is_individual else self.company,
+            user=self.user,
+            sale_date=now(),
+            status="draft",
+            total_excluding_vat=self.total_excluding_vat,
+            vat_total=self.vat_total,
+            total_inclusive=self.total_inclusive,
+            is_recurring=self.is_recurring,
+            frequency=self.frequency,
+            next_invoice_date=self.next_invoice_date,
+        )
+
+        for item in self.items.all():
+            InvoiceItem.objects.create(
+                invoice=new_invoice,
+                product=item.product,
+                user=self.user,
+                quantity=item.quantity,
+                unit_price=item.unit_price,
+                vat_amount=item.vat_amount,
+                total_price=item.total_price,
+            )
+
+        return new_invoice
 
 class InvoiceItem(models.Model):
     """Stores products or services added to an invoice."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey('ProductService', on_delete=models.CASCADE) 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Creator of the invoice
-      # User Company Relation
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     vat_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -193,7 +282,6 @@ class Payment(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Processed by
     payment_date = models.DateTimeField(default=now)
-      # User Company Relation
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     method = models.CharField(
         max_length=50,

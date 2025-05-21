@@ -109,24 +109,35 @@ class InvoiceViewSet(BaseCompanyViewSet):
 
     @action(detail=True, methods=["POST"])
     def mark_paid(self, request, pk=None):
-        """Mark an invoice as paid."""
         invoice = self.get_object()
         invoice.status = "paid"
         invoice.save()
-        return Response({"success": True, "message": "Invoice marked as paid."})
+        return Response({"success": True, "message": "Invoice marked as paid."}, status=status.HTTP_200_OK)
 
-# class InvoiceItemViewSet(viewsets.ModelViewSet):
-#     queryset = InvoiceItem.objects.all()
-#     serializer_class = InvoiceItemSerializer
+    @action(detail=True, methods=["POST"])
+    def convert_to_invoice(self, request, pk=None):
+        invoice = self.get_object()
+        if invoice.invoice_type != "proforma":
+            return Response({"success": False, "message": "Not a proforma invoice."}, status=status.HTTP_400_BAD_REQUEST)
+        invoice.status = "pending"
+        invoice.invoice_type = "fiscal"
+        invoice.save()
+        return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["POST"])
+    def generate_next(self, request, pk=None):
+        invoice = self.get_object()
+        if not invoice.is_recurring:
+            return Response({"success": False, "message": "Not a recurring invoice."}, status=status.HTTP_400_BAD_REQUEST)
+        new_invoice = invoice.generate_next_invoice()
+        return Response({"success": True, "message": "Recurring invoice generated.", "invoice_id": new_invoice.id}, status=status.HTTP_201_CREATED)
+
 
 class PaymentViewSet(BaseCompanyViewSet):
-    """Handles payments related to invoices."""
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
     def perform_create(self, serializer):
-        """Automatically assign the user's company when creating objects."""
-        print("--------Testing--------")
         serializer.save(user=self.request.user)
 
 class RecurringInvoiceViewSet(viewsets.ModelViewSet):
