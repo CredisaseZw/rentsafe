@@ -1,7 +1,9 @@
 from django.http import JsonResponse
 from rest_framework import viewsets,status
+from django.http import JsonResponse
+from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
-from .models import Item, VATSetting, ProductService, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, RecurringInvoice, ProformaInvoice, CurrencyRate, CashBook, Currency
+from accounting.models import SalesItem, VATSetting, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, CurrencyRate
 from .serializers import *
 from django.shortcuts import render
 from rest_framework import status
@@ -27,7 +29,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 class ItemViewSet(BaseCompanyViewSet):
-    queryset = Item.objects.all()
+    queryset = SalesItem.objects.all()
     serializer_class = ItemSerializer
 
 class VATSettingViewSet(BaseCompanyViewSet):
@@ -65,10 +67,6 @@ class VATSettingViewSet(BaseCompanyViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class ProductServiceViewSet(BaseCompanyViewSet):
-    queryset = ProductService.objects.all()
-    serializer_class = ProductServiceSerializer
-
 class SalesCategoryViewSet(BaseCompanyViewSet):
     queryset = SalesCategory.objects.all()
     serializer_class = SalesCategorySerializer
@@ -104,50 +102,113 @@ class AccountSectorViewSet(BaseCompanyViewSet):
 class InvoiceViewSet(BaseCompanyViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
-
-    @action(detail=True, methods=["POST"])
+    
+    @action(detail=True, methods=['post'], url_path='mark-paid')
     def mark_paid(self, request, pk=None):
-        """Mark an invoice as paid."""
         invoice = self.get_object()
-        invoice.status = "paid"
+        invoice.status = 'paid'
         invoice.save()
-        return Response({"success": True, "message": "Invoice marked as paid."})
+        return Response(self.get_serializer(invoice).data)
+    @action(detail=True, methods=['post'], url_path='convert-to-fiscal')
+    def convert_to_fiscal(self, request, pk=None):
+        """Convert proforma to fiscal invoice"""
+        invoice = self.get_object()
+        try:
+            invoice.convert_to_fiscal()
+            return Response(self.get_serializer(invoice).data)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-# class InvoiceItemViewSet(viewsets.ModelViewSet):
-#     queryset = InvoiceItem.objects.all()
-#     serializer_class = InvoiceItemSerializer
+    @action(detail=True, methods=['post'], url_path='generate-recurring')
+    def generate_recurring(self, request, pk=None):
+        """Generate next recurring invoice"""
+        invoice = self.get_object()
+        try:
+            new_invoice = invoice.generate_recurring_invoice()
+            serializer = self.get_serializer(new_invoice)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['post'], url_path='generate-credit-note')
+    def generate_credit_note(self, request, pk=None):
+        """Generate credit note from invoice"""
+        invoice = self.get_object()
+        try:
+            credit_note = invoice.generate_credit_note()
+            serializer = self.get_serializer(credit_note)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['post'], url_path='generate-debit-note')
+    def generate_debit_note(self, request, pk=None):
+        """Generate debit note from invoice"""
+        invoice = self.get_object()
+        try:
+            debit_note = invoice.generate_debit_note()
+            serializer = self.get_serializer(debit_note)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['post'], url_path='get-pending-invoices')
+    def get_pending_invoices(self, request, pk=None):
+        """Get all pending invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status='pending')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    @action(detail=True, methods=['post'], url_path='get-paid-invoices')
+    def get_paid_invoices(self, request, pk=None):
+        """Get all paid invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status='paid')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    @action(detail=False, methods=['get'], url_path='get-cancelled-invoices')
+    def get_cancelled_invoices(self, request, pk=None):
+        """Get all cancelled invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status='cancelled')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'], url_path='cancel-invoice')
+    def cancel_invoice(self, request, pk=None):
+        """Cancel an invoice"""
+        invoice = self.get_object()
+        invoice.status = 'cancelled'
+        invoice.save()
+        return Response(self.get_serializer(invoice).data)
+
+    @action(detail=False, methods=['get'],url_path="proforma-invoices")
+    def proforma_invoices(self, request):
+        """Get all proforma invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(invoice_type='proforma')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'],url_path="fiscal-invoices")
+    def fiscal_invoices(self, request):
+        """Get all fiscal invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(invoice_type='fiscal')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'],url_path="recurring-invoices")
+    def recurring(self, request):
+        """Get all recurring templates"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(invoice_type='recurring')
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class PaymentViewSet(BaseCompanyViewSet):
-    """Handles payments related to invoices."""
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
     def perform_create(self, serializer):
-        """Automatically assign the user's company when creating objects."""
-        print("--------Testing--------")
         serializer.save(user=self.request.user)
-
-class RecurringInvoiceViewSet(viewsets.ModelViewSet):
-    queryset = RecurringInvoice.objects.all()
-    serializer_class = RecurringInvoiceSerializer
-
-    @action(detail=True, methods=["POST"])
-    def generate_invoice(self, request, pk=None):
-        """Manually triggers the next invoice generation."""
-        recurring_invoice = self.get_object()
-        invoice = recurring_invoice.generate_next_invoice()
-        return Response({"success": True, "message": "New invoice created.", "invoice_id": invoice.id})
-
-class ProformaInvoiceViewSet(viewsets.ModelViewSet):
-    queryset = ProformaInvoice.objects.all()
-    serializer_class = ProformaInvoiceSerializer
-
-    @action(detail=True, methods=["POST"])
-    def convert_to_invoice(self, request, pk=None):
-        """Converts a proforma invoice into a finalized invoice."""
-        proforma_invoice = self.get_object()
-        invoice = proforma_invoice.convert_to_invoice()
-        return Response({"success": True, "message": "Proforma invoice converted.", "invoice_id": invoice.id})
     
 class CurrencyRateViewSet(BaseCompanyViewSet):
     queryset = CurrencyRate.objects.all()
