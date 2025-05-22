@@ -4,12 +4,13 @@ import MessageModal from "../../../../components/MessageModal.jsx";
 import useProductsAndServices from "../../../../hooks/page-hooks/useProductsAndServices.js";
 import { friendlyDate } from "../../../../utils/index.js";
 
-export default function ProductsAndServices({ currencies = [] }) {
+export default function ProductsAndServices() {
   const {
     items,
     loading,
     showAdd,
     categories,
+    currencies,
     taxOptions,
     itemToEdit,
     itemToDelete,
@@ -126,18 +127,11 @@ export default function ProductsAndServices({ currencies = [] }) {
                   <option value="" disabled>
                     Select one
                   </option>
-                  {currencies?.length ? (
-                    currencies.map((currency, index) => (
-                      <option key={index} value={currency}>
-                        {currency}
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="USD">USD</option>
-                      <option value="ZIG">ZIG</option>
-                    </>
-                  )}
+                  {currencies?.map((currency, index) => (
+                    <option key={index} value={currency.id}>
+                      {currency.currency_code} - {currency.currency_name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
