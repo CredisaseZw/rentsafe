@@ -176,9 +176,9 @@ class CashBookViewSet(BaseCompanyViewSet):
     queryset = CashBook.objects.all()
     serializer_class = CashBookSerializer
 
-class CurrencyViewSet(viewsets.ModelViewSet):
+class CurrencyViewSet(BaseCompanyViewSet):
     queryset = Currency.objects.all()
-    serializer_class = CurrencyRateSerializer
+    serializer_class = CurrencySerializer
 
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
