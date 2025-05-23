@@ -111,7 +111,7 @@ DB_PORT     = os.getenv('DB_PORT'     , None)
 DB_NAME     = os.getenv('DB_NAME'     , None)
 
 
-if DEVELOPMENT:= os.getenv('DEVELOPMENT' , False).lower() == "true":
+if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
     print("Development mode")
     DATABASES = { 
         'default': {
