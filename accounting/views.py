@@ -3,7 +3,25 @@ from rest_framework import viewsets,status
 from django.http import JsonResponse
 from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
-from accounting.models import SalesItem, VATSetting, SalesCategory, SalesAccount, CashSale, CashbookEntry, GeneralLedgerAccount, JournalEntry, LedgerTransaction, AccountSector, Invoice, Payment, CurrencyRate
+from accounting.models import (
+    SalesItem, 
+    VATSetting, 
+    SalesCategory, 
+    SalesAccount, 
+    CashSale, 
+    CashbookEntry, 
+    GeneralLedgerAccount, 
+    JournalEntry, 
+    LedgerTransaction, 
+    AccountSector, 
+    Invoice, 
+    Payment, 
+    CurrencyRate, 
+    PaymentMethod, 
+    TransactionType, 
+    CashBook, 
+    Currency,
+    )
 from .serializers import *
 from django.shortcuts import render
 from rest_framework import status
@@ -240,6 +258,13 @@ class CashBookViewSet(BaseCompanyViewSet):
 class CurrencyViewSet(BaseCompanyViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
+class PaymentMethodViewSet(BaseCompanyViewSet):
+    queryset = PaymentMethod.objects.all()
+    serializer_class = PaymentMethodSerializer
+
+class TransactionTypeViewSet(BaseCompanyViewSet):
+    queryset = TransactionType.objects.all()
+    serializer_class = TransactionTypeSerializer
 
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")

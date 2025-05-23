@@ -11,10 +11,6 @@ class BaseCompanySerializer(serializers.ModelSerializer):
         except AttributeError:
             read_only_fields = []
 
-class ProductServiceSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
-        model = ProductService
-
 class SalesCategorySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = SalesCategory
@@ -325,3 +321,13 @@ class CashBookSerializer(BaseCompanySerializer):
 class CurrencySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = Currency
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = ['payment_method_name','payment_method_code']   
+
+class TransactionTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransactionType
+        fields = ['transaction_type', 'description']
