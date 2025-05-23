@@ -1,10 +1,9 @@
 import os
-
 from dotenv import load_dotenv
+from pathlib import Path
+from urllib.parse import urlparse
 
 load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
-from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TIME_ZONE = "Africa/Harare"
@@ -124,12 +123,24 @@ if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
         }
     }
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "9May.sqlite3",
+    tmpPostgres = urlparse(os.getenv("PROD_DATABASE_URL", None))
+    if tmpPostgres is not None:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': tmpPostgres.path.replace('/', ''),
+                'USER': tmpPostgres.username,
+                'PASSWORD': tmpPostgres.password,
+                'HOST': tmpPostgres.hostname,
+                'PORT': 5432,
+            }
         }
-    }
+    else:
+        print("\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m")
+        DATABASES = {}
+        
+
+        
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
