@@ -71,29 +71,29 @@ class SalesCategoryViewSet(BaseCompanyViewSet):
     queryset = SalesCategory.objects.all()
     serializer_class = SalesCategorySerializer
 
-# class SalesAccountViewSet(BaseCompanyViewSet):
-#     queryset = SalesAccount.objects.all()
-#     serializer_class = SalesAccountSerializer
+class SalesAccountViewSet(BaseCompanyViewSet):
+    queryset = SalesAccount.objects.all()
+    serializer_class = SalesAccountSerializer
 
-# class CashSaleViewSet(BaseCompanyViewSet):
-#     queryset = CashSale.objects.all()
-#     serializer_class = CashSaleSerializer
+class CashSaleViewSet(BaseCompanyViewSet):
+    queryset = CashSale.objects.all()
+    serializer_class = CashSaleSerializer
 
-# class CashbookEntryViewSet(BaseCompanyViewSet):
-#     queryset = CashbookEntry.objects.all()
-#     serializer_class = CashbookEntrySerializer
+class CashbookEntryViewSet(BaseCompanyViewSet):
+    queryset = CashbookEntry.objects.all()
+    serializer_class = CashbookEntrySerializer
 
-# class GeneralLedgerAccountViewSet(BaseCompanyViewSet):
-#     queryset = GeneralLedgerAccount.objects.all()
-#     serializer_class = GeneralLedgerAccountSerializer
+class GeneralLedgerAccountViewSet(BaseCompanyViewSet):
+    queryset = GeneralLedgerAccount.objects.all()
+    serializer_class = GeneralLedgerAccountSerializer
 
-# class JournalEntryViewSet(BaseCompanyViewSet):
-#     queryset = JournalEntry.objects.all()
-#     serializer_class = JournalEntrySerializer
+class JournalEntryViewSet(BaseCompanyViewSet):
+    queryset = JournalEntry.objects.all()
+    serializer_class = JournalEntrySerializer
 
-# class LedgerTransactionViewSet(BaseCompanyViewSet):
-#     queryset = LedgerTransaction.objects.all()
-#     serializer_class = LedgerTransactionSerializer
+class LedgerTransactionViewSet(BaseCompanyViewSet):
+    queryset = LedgerTransaction.objects.all()
+    serializer_class = LedgerTransactionSerializer
 
 class AccountSectorViewSet(BaseCompanyViewSet):
     queryset = AccountSector.objects.all()
