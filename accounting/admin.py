@@ -11,7 +11,9 @@ from accounting.models import (
     Currency,
     VATSetting,
     Invoice,
-    InvoiceItem
+    InvoiceItem,
+    PaymentMethod,
+    TransactionType,
 )
 # from simple_history.admin import SimpleHistoryAdmin
 
@@ -97,3 +99,16 @@ class InvoiceItemAdmin(admin.ModelAdmin):
     search_fields = ("invoice__invoice_number", "product_service__name")
     list_filter = ("sales_item",)
     ordering = ("-invoice",)
+
+@admin.register(PaymentMethod)
+class PaymentMethodAdmin(admin.ModelAdmin):
+    list_display = ("payment_method_name", "payment_method_code")
+    list_display_links = ("payment_method_name",)
+    search_fields = ("payment_method_name",)
+    ordering = ("payment_method_name",)
+
+@admin.register(TransactionType)
+class TransactionTypeadmin(admin.ModelAdmin):
+    list_display = ("transaction_type", "description")
+    search_fields = ("transaction_type",)
+    ordering = ("id",)

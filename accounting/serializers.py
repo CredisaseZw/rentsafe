@@ -325,3 +325,11 @@ class CashBookSerializer(BaseCompanySerializer):
 class CurrencySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = Currency
+
+class PaymentMethodSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = PaymentMethod
+
+class TransactionTypeSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = TransactionType
