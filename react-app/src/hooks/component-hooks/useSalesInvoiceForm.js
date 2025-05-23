@@ -2,16 +2,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
+import useCurrencies from "../general-hooks/useCurrencies";
 
 export default function useSalesInvoiceForm(invoice, isProforma) {
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("");
   const [salesItems, setSalesItems] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [key, setKey] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const { currencies, loading: currenciesLoading } = useCurrencies();
 
   const [items, setItems] = useState([
     {
@@ -216,9 +218,11 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     items,
     totals,
     discount,
+    currencies,
     currency,
     isLoading,
     salesItems,
+    currenciesLoading,
     taxConfigs,
     invoiceData,
     addRow,
