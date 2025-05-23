@@ -276,15 +276,14 @@ export default function ProductsAndServices() {
 
           {items?.map((item, index) => (
             <tr key={index}>
-              <td className="ps-3">{item.category_name}</td>
+              <td className="ps-3">{item.category_object.name}</td>
 
               <td className="ps-3">{item.id}</td>
 
               <td className="ps-3">{item.name}</td>
 
               <td className="ps-3">
-                {" "}
-                {`${item.unit_price_currency} ${item.price} / ${item.unit_name}`}
+                {`${item.currency_object?.currency_code || ""} ${item.price} / ${item.unit_name}`}
               </td>
 
               <td className="ps-3">{item.date_created && friendlyDate(item.date_created)}</td>
