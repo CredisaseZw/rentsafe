@@ -2,7 +2,6 @@ from django.contrib import admin
 # Register your models here.
 from accounting.models import (
     SalesItem,
-    ProductService,
     SalesCategory,
     SalesAccount,
     CashSale,
@@ -24,14 +23,6 @@ class ProductServiceAdmin(admin.ModelAdmin):
     list_display_links = ("name",)
     search_fields = ("name",)
     list_filter = ("name",)
-    ordering = ("name",)
-
-@admin.register(ProductService)
-class ProductServiceAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "price", "vat_applicable")
-    list_display_links = ("name",)
-    search_fields = ("name",)
-    list_filter = ("vat_applicable",)
     ordering = ("name",)
 
 @admin.register(SalesCategory)
@@ -96,7 +87,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 class InvoiceItemAdmin(admin.ModelAdmin):
     list_display = ("invoice", "id", "sales_item", "quantity", "unit_price", "total_price")
     list_display_links = ("id",)
-    search_fields = ("invoice__invoice_number", "product_service__name")
+    search_fields = ("invoice__invoice_number", )
     list_filter = ("sales_item",)
     ordering = ("-invoice",)
 
