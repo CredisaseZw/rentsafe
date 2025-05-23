@@ -105,11 +105,15 @@ export default function SalesInvoicingInvoiceTab() {
                     {invoice.date_created && friendlyDate(invoice.date_created)}
                   </td>
 
-                  <td className="ps-3">{invoice.customer}</td>
+                  <td className="ps-3">{invoice.customer_details.full_name}</td>
 
-                  <td className="ps-3">{invoice.currency}</td>
+                  <td className="ps-3">{invoice.currency.currency_code}</td>
 
-                  <td className="ps-3 text-end">{invoice.total.toFixed(2)}</td>
+                  <td className="ps-3 text-end">
+                    {invoice.total_inclusive && !Number.isNaN(Number(invoice.total_inclusive))
+                      ? Number(invoice.total_inclusive).toFixed(2)
+                      : ""}
+                  </td>
 
                   <td className="d-flex justify-content-center align-items-center p-1">
                     <button className="btn btn-sm w-100 justify-content-center btn-info text-white">
@@ -125,3 +129,49 @@ export default function SalesInvoicingInvoiceTab() {
     </div>
   );
 }
+
+const d = {
+  id: 7,
+  document_number: "000001",
+  invoice_type: "fiscal",
+  currency: {
+    id: 2,
+    currency_code: "USD",
+    currency_name: "United States Dollar",
+  },
+  items: [
+    {
+      sales_item: {
+        id: 2,
+        item_id: "2",
+        name: "Keyboard",
+        price: "22.00",
+        unit_name: "piece",
+        unit_price_currency: {
+          id: 2,
+          currency_code: "USD",
+          currency_name: "United States Dollar",
+        },
+      },
+      qty: "8.00",
+      price: "10.00",
+      vat_amount: "0.01",
+      total_price: "80.01",
+    },
+  ],
+  discount: "2.50",
+  date_created: "2025-05-22T15:26:19.426902+02:00",
+  status: "pending",
+  total_excluding_vat: "77.50",
+  vat_total: "0.01",
+  total_inclusive: "77.51",
+  customer_details: {
+    id: 200,
+    full_name: "TAVONGA (PVT)  HARARE",
+    identification_number: "N/A",
+    vat_number: "N/A",
+    email: "N/A",
+    mobile: "N/A",
+    address: "N/A",
+  },
+};
