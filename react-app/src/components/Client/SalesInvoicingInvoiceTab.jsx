@@ -105,11 +105,15 @@ export default function SalesInvoicingInvoiceTab() {
                     {invoice.date_created && friendlyDate(invoice.date_created)}
                   </td>
 
-                  <td className="ps-3">{invoice.customer}</td>
+                  <td className="ps-3">{invoice.customer_details.full_name}</td>
 
-                  <td className="ps-3">{invoice.currency}</td>
+                  <td className="ps-3">{invoice.currency.currency_code}</td>
 
-                  <td className="ps-3 text-end">{invoice.total.toFixed(2)}</td>
+                  <td className="ps-3 text-end">
+                    {invoice.total_inclusive && !Number.isNaN(Number(invoice.total_inclusive))
+                      ? Number(invoice.total_inclusive).toFixed(2)
+                      : ""}
+                  </td>
 
                   <td className="d-flex justify-content-center align-items-center p-1">
                     <button className="btn btn-sm w-100 justify-content-center btn-info text-white">

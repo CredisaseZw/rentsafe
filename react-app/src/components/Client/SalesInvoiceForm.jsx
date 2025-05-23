@@ -13,6 +13,8 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
     currency,
     isLoading,
     salesItems,
+    currencies,
+    currenciesLoading,
     taxConfigs,
     invoiceData,
     addRow,
@@ -196,8 +198,16 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                           <option value={invoiceData.currency}>{invoiceData.currency}</option>
                         ) : (
                           <>
-                            <option value="USD">United States Dollar (USD)</option>
-                            <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
+                            <option disabled value="">
+                              Select Currency
+                            </option>
+                            {currenciesLoading
+                              ? "Loading..."
+                              : currencies?.map((currency, index) => (
+                                  <option key={index} value={currency.id}>
+                                    {currency.currency_code} ({currency.currency_name})
+                                  </option>
+                                ))}
                           </>
                         )}
                       </select>
@@ -224,6 +234,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                       item,
                       index,
                       currency,
+                      currencies,
                       setItems,
                       removeRow,
                       isLoading,

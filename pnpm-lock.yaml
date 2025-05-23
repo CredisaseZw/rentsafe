@@ -29,6 +29,9 @@ importers:
       chart.js:
         specifier: ^4.4.2
         version: 4.4.2
+      es-errors:
+        specifier: ^1.3.0
+        version: 1.3.0
       html-to-image:
         specifier: ^1.11.11
         version: 1.11.11
