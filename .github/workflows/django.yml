@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main","testing" ]
   pull_request:
-    branches: [ "main","testing" ]
+    branches: [ "main","testing","staging","dev" ]
 
 jobs:
   build:
@@ -33,6 +33,7 @@ jobs:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_PORT: ${{ secrets.DB_PORT }}
+      PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
       
     strategy:
       max-parallel: 4
@@ -54,18 +55,3 @@ jobs:
         python manage.py migrate
         
         python manage.py test
-
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install Node dependencies
-      run: npm install --legacy-peer-deps
-
-    - name: Building Frontend
-      run: npm run vite-build
-
-    - name: Collect Static Files
-      run: python manage.py collectstatic --no-input
-

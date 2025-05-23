@@ -1,4 +1,5 @@
 from rentsafe.models import *
+from accounting.models import CurrencyRate
 from authentication.models import CustomUser
 from django.http import JsonResponse
 from inertia import render
@@ -7,7 +8,7 @@ from datetime import timedelta
 def get_forecast_inflows(request):
     current_date = datetime.now().date()
     forecast_inflows_list = []
-    current_rate = LeaseCurrencyRate.objects.filter(company_id=request.user.company).first()
+    current_rate = CurrencyRate.objects.filter(user__company=request.user.company).first()
 
     payment_plans = PaymentPlan.objects.filter(expected_pay_date__gte=current_date)
     if payment_plans:

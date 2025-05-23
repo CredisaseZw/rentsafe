@@ -161,7 +161,7 @@ def detailed_creditor_statement(request, creditor_id):
     lease = Lease.objects.filter(lease_id=lease_id).first()
     all_creditor_statements = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).all().order_by("date_received")
     creditor_name = ""
-    creditor_name = Landlord.objects.filter(lease_id=lease_id).first()
+    creditor_name = Landlord.objects.filter(lease_id=lease_id).last()
     statement_rows = [
         {
             "date": creditor_name.created_at,

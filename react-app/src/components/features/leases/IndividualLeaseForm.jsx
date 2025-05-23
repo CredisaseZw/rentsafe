@@ -515,7 +515,7 @@ export default function IndividualLeaseForm({
                         name="landlordType"
                         id="landlordType"
                         value={data.landlordType}
-                        disabled={action === "view" || action === "edit"}
+                        disabled={action === "view"}
                         onChange={(e) => changeLandlordType(e.target.value)}
                       >
                         <option value="INDIVIDUAL">Individual</option>
@@ -545,9 +545,7 @@ export default function IndividualLeaseForm({
                               : "",
                         }}
                         defaultValue={data.regIdNumber ? data.regIdNumber : ""}
-                        isDisabled={
-                          action === "view" || action === "edit" || data.landlordType === ""
-                        }
+                        isDisabled={action === "view" || data.landlordType === ""}
                         useAlternateFetchOptions={{
                           type: data.landlordType.toLowerCase(),
                         }}
@@ -600,7 +598,7 @@ export default function IndividualLeaseForm({
                         name="openingBalance"
                         id="openingBalance"
                         className="form-control form-control-sm"
-                        disabled={action === "view" || action === "edit"}
+                        disabled={action === "view"}
                       />
 
                       {errors && <div className="text-danger mt-1">{errors.openingBalance}</div>}

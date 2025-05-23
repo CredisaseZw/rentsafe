@@ -1,1 +1,0 @@
-import{j as e}from"./media/main-603c3784.js";function n(){return e.jsx("div",{className:"w-100 custom-h-4 d-flex justify-content-center align-items-center p-4",children:e.jsx("p",{className:"text-center",children:"This page is still in development"})})}export{n as I};

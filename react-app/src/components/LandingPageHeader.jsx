@@ -1,10 +1,29 @@
 import { Link } from "@inertiajs/inertia-react";
 import HoverDropdown from "./HoverDropdown.jsx";
 import Logo from "./Logo.jsx";
+import React from "react";
 
 export default function LandingPageHeader() {
+  const [styles, setStyles] = React.useState("");
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setStyles("bg-black shadow");
+      } else {
+        setStyles("");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <header className="bg-white p-2 mb-4 sticky-top shadow-md border-bottom border-2">
+    <header className={"py-2 c-z-max fixed-top transition-all " + styles}>
       <div className="container">
         <div className="d-flex justify-content-between align-items-center gap-3">
           <Logo />
@@ -26,13 +45,13 @@ export default function LandingPageHeader() {
           <nav className="d-flex align-items-center gap-3">
             <Link
               href="#contact"
-              className="btn btn-sm btn-light border border-dark text-capitalize "
+              className="btn btn-sm rounded-pill fw-bold py-2 px-3  btn-light border border-dark text-capitalize "
             >
               Contact
             </Link>
             <Link
               href={reverseUrl("login")}
-              className="btn btn-sm btn-info text-white border border-dark text-capitalize"
+              className="btn btn-sm rounded-pill fw-bold py-2 px-3  btn-info text-white border border-dark text-capitalize"
             >
               Login
             </Link>

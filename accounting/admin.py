@@ -1,12 +1,22 @@
 from django.contrib import admin
-
 # Register your models here.
-from django.contrib import admin
-from .models import *
+from accounting.models import (
+    SalesItem,
+    ProductService,
+    SalesCategory,
+    SalesAccount,
+    CashSale,
+    CashbookEntry,
+    CurrencyRate,
+    Currency,
+    VATSetting,
+    Invoice,
+    InvoiceItem
+)
 # from simple_history.admin import SimpleHistoryAdmin
 
 
-@admin.register(Item)
+@admin.register(SalesItem)
 class ProductServiceAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "price",)
     list_display_links = ("name",)
@@ -57,3 +67,33 @@ class CashbookEntryAdmin(admin.ModelAdmin):
     search_fields = ("transaction_date",)
     list_filter = ("transaction_type",)
     ordering = ("-transaction_date",)
+
+@admin.register(CurrencyRate)
+class CurrencyRate(admin.ModelAdmin):
+    list_display = ("user", "currency", "date_created", "current_rate", "base_currency" )
+    list_display_links = ("user",)
+    search_fields = ("user",)
+    list_filter = ("currency",)
+    ordering = ("-updated_at",)
+
+@admin.register(Currency)
+class Currency(admin.ModelAdmin):
+    list_display=("currency_name","currency_code")
+    list_display_links = ("currency_name",)
+    search_fields = ('currency_code',)
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ("user", "id", "document_number", "is_individual", "sale_date")
+    list_display_links = ("document_number",)
+    search_fields = ("document_number", "is_individual", "user__username")
+    list_filter = ("sale_date", "is_individual")
+    ordering = ("-sale_date",)
+
+@admin.register(InvoiceItem)
+class InvoiceItemAdmin(admin.ModelAdmin):
+    list_display = ("invoice", "id", "sales_item", "quantity", "unit_price", "total_price")
+    list_display_links = ("id",)
+    search_fields = ("invoice__invoice_number", "product_service__name")
+    list_filter = ("sales_item",)
+    ordering = ("-invoice",)

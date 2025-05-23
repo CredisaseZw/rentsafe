@@ -31,6 +31,7 @@ jobs:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_PORT: ${{ secrets.DB_PORT }}
+      PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
 
     steps:
     - name: Checkout code
@@ -61,7 +62,9 @@ jobs:
         pip install -r requirements.txt
 
     - name: Collect Django Static Files
-      run: python manage.py collectstatic --no-input
+      run: |
+        echo "📦 Collecting new static files..."
+        python manage.py collectstatic --no-input
 
     - name: Commit and Push Built Static Files with Debugging
       run: |
@@ -87,4 +90,3 @@ jobs:
 
           echo "🚀 Pushing to testing branch..."
           git push origin testing
-        fi
