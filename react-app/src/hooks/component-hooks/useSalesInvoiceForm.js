@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
 import useCurrencies from "../general-hooks/useCurrencies";
@@ -26,6 +26,13 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
       total: "",
     },
   ]);
+
+  // set currency to first currency if currencies change
+  useEffect(() => {
+    if (currencies.length > 0 && !selectedCurrencyId) {
+      setSelectedCurrencyId(currencies[0].id);
+    }
+  }, [currencies.length]);
 
   useEffect(() => {
     if (invoice) {
