@@ -1,17 +1,8 @@
-import ProformaInvoicingInvoiceTab from "../../../../components/Client/ProformaInvoicingInvoiceTab.jsx";
-import RecurringInvoicingInvoiceTab from "../../../../components/Client/RecurringInvoicingInvoiceTab.jsx";
-import SalesInvoicingInvoiceTab from "../../../../components/Client/SalesInvoicingInvoiceTab.jsx";
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
-import { useState } from "react";
-
-const tabs = [
-  { key: "Invoice", Content: SalesInvoicingInvoiceTab },
-  { key: "Recurring", Content: RecurringInvoicingInvoiceTab },
-  { key: "Proforma", Content: ProformaInvoicingInvoiceTab },
-];
+import useSalesInvoicing from "../../../../hooks/page-hooks/useSalesInvoicing.js";
 
 export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
-  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const { tabs, activeTab, setActiveTab } = useSalesInvoicing();
 
   return (
     <div>
