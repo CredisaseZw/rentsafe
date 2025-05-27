@@ -245,6 +245,8 @@ export function SalesInvoiceForm({
                       removeRow,
                       salesItems,
                       taxConfigs,
+                      currencies,
+                      selectedCurrencyId,
                       itemsLength: items.length,
                     }}
                   />

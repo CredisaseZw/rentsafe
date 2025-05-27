@@ -3,16 +3,16 @@ import useInvoiceFormRow from "../../hooks/component-hooks/useInvoiceFormRow.js"
 
 export default function InvoiceFormRow({
   item,
-  itemName,
-  currencies,
   index,
   setItems,
-  currency,
+  itemName,
   isLoading,
   removeRow,
   salesItems,
-  itemsLength,
   taxConfigs,
+  currencies,
+  itemsLength,
+  selectedCurrencyId,
 }) {
   const {
     vatDisplay,
@@ -24,7 +24,7 @@ export default function InvoiceFormRow({
     handleSalesItemSelect,
     setPromptedCurrencyRate,
     proceedToHandleSalesItemSelect,
-  } = useInvoiceFormRow(item, index, setItems, currency, salesItems, taxConfigs);
+  } = useInvoiceFormRow(item, index, setItems, selectedCurrencyId, salesItems, taxConfigs);
 
   return (
     <>
@@ -43,13 +43,13 @@ export default function InvoiceFormRow({
             <div className="alert alert-danger">
               The item you have selected is listed in{" "}
               {preSelectedSalesItem.currency_object.currency_code} but your {itemName || "invoice"}{" "}
-              is to be in {currencies.find((cur) => cur.id == currency) || "_"}, please input below
-              the rate to be used
+              is to be in {currencies.find((cur) => cur.id == selectedCurrencyId) || "_"}, please
+              input below the rate to be used
             </div>
 
             <div className="d-flex gap-3 align-items-center">
               <label className="form-label text-nowrap px-3">
-                {`${preSelectedSalesItem.unit_price_currency} to ${currency}`}
+                {`${preSelectedSalesItem.unit_price_currency} to ${selectedCurrencyId}`}
               </label>
               <input
                 type="number"

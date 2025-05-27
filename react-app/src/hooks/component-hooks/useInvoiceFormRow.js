@@ -1,6 +1,13 @@
 import { useState } from "react";
 
-export default function useInvoiceFormRow(item, index, setItems, currency, salesItems, taxConfigs) {
+export default function useInvoiceFormRow(
+  item,
+  index,
+  setItems,
+  selectedCurrencyId,
+  salesItems,
+  taxConfigs
+) {
   const [selectedSalesItem, setSelectedSalesItem] = useState(null);
   const [preSelectedSalesItem, setPreSelectedSalesItem] = useState(null);
   const [selectedTaxConfig, setSelectedTaxConfig] = useState(null);
@@ -10,7 +17,7 @@ export default function useInvoiceFormRow(item, index, setItems, currency, sales
   function handleSalesItemSelect(e) {
     const salesItem = salesItems.find((code) => code.item_id === e.target.value);
 
-    if (salesItem.currency_object.id != currency) {
+    if (salesItem.currency_object.id != selectedCurrencyId) {
       setShowCurrencyPrompt(true);
       setPreSelectedSalesItem(salesItem);
       return;
@@ -46,7 +53,7 @@ export default function useInvoiceFormRow(item, index, setItems, currency, sales
     const salesItem = { ...preSelectedSalesItem };
     salesItem.price = parseFloat(propmtedCurrencyRate) * (parseFloat(salesItem.price) || 0);
 
-    salesItem.unit_price_currency = currency;
+    salesItem.unit_price_currency = selectedCurrencyId;
 
     const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
 
