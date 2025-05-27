@@ -193,9 +193,10 @@ export function SalesInvoiceForm({
                   <th colSpan={2} className="text-danger">
                     Currency
                   </th>
-                  <th colSpan={2} className="bg-danger text-white">
+                  <th colSpan={2} className="">
                     <div>
                       <select
+                        className="bg-danger text-white py-2 px-4 rounded-3"
                         value={selectedCurrencyId}
                         name="currency_id"
                         id="currency_id"
