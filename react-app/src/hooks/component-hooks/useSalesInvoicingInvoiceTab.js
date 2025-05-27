@@ -1,12 +1,39 @@
+import axios from "axios";
 import { Inertia } from "@inertiajs/inertia";
 import { usePage } from "@inertiajs/inertia-react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function useSalesInvoicingInvoiceTab() {
   const [invoiceList, setInvoiceList] = useState([]);
+  const [filteredInvoiceList, setFilteredInvoiceList] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { url } = usePage();
+  const searchParams = new URL(url).searchParams;
+  const year = searchParams.get("year");
+  const month = searchParams.get("month");
+  const q = searchParams.get("invoice");
+
+  useEffect(() => {
+    if (!invoiceList.length) return;
+    const filteredInvoiceList = invoiceList
+      .map((i) => ({
+        date: i.date_created ? new Date(i.date_created) : null,
+        invoice: i,
+      }))
+      .filter((i) =>
+        q
+          ? `${i.invoice.customer_details?.full_name}###${i.invoice.id}###${i.invoice.currency?.currency_code}`
+              .toLowerCase()
+              .includes(q.toLowerCase())
+          : true
+      )
+      .filter((i) => (i.date && year ? i.date.getFullYear() === Number(year) : true))
+      .filter((i) => (i.date && month ? i.date.getMonth() + 1 === Number(month) : true))
+      .map((i) => i.invoice);
+
+    setFilteredInvoiceList(filteredInvoiceList);
+  }, [year, month, q, invoiceList.length]);
 
   function fetchInvoiceList() {
     setLoading(true);
@@ -24,9 +51,9 @@ export default function useSalesInvoicingInvoiceTab() {
 
   useEffect(() => {
     fetchInvoiceList();
-  }, [url]);
+  }, []);
 
-  function handleFilters(e) {
+  function applyFilters(e) {
     e.preventDefault();
     const year = e.target.year.value;
     const month = e.target.month.value;
@@ -38,5 +65,5 @@ export default function useSalesInvoicingInvoiceTab() {
     Inertia.replace(updatesdUrl.href, { preserveState: true });
   }
 
-  return { loading, invoiceList, handleFilters };
+  return { loading, invoiceList: filteredInvoiceList, applyFilters };
 }
