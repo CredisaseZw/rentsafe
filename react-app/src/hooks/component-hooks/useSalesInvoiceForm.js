@@ -42,7 +42,7 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
       };
 
       setInvoiceData(newInvoiceData);
-      setCurrency(newInvoiceData.currency);
+      setSelectedCurrencyId(newInvoiceData.currency);
       setItems([newInvoiceData.monthly_rental]);
     }
   }, [invoice]);
