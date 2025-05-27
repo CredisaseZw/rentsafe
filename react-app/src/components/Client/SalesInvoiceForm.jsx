@@ -15,7 +15,6 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
     isLoading,
     salesItems,
     currencies,
-    currenciesLoading,
     taxConfigs,
     invoiceData,
     addRow,
@@ -202,13 +201,11 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                             <option disabled value="">
                               Select Currency
                             </option>
-                            {currenciesLoading
-                              ? "Loading..."
-                              : currencies?.map((currency, index) => (
-                                  <option key={index} value={currency.id}>
-                                    {currency.currency_code} ({currency.currency_name})
-                                  </option>
-                                ))}
+                            {currencies?.map((currency, index) => (
+                              <option key={index} value={currency.id}>
+                                {currency.currency_code} ({currency.currency_name})
+                              </option>
+                            ))}
                           </>
                         )}
                       </select>
