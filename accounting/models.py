@@ -73,6 +73,7 @@ class CashSale(BaseModel):
 class VATSetting(BaseModel):
     rate = models.DecimalField(max_digits=5, decimal_places=2)
     description = models.CharField(max_length=255)
+    vat_applicable = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.rate}% - {self.description}"
