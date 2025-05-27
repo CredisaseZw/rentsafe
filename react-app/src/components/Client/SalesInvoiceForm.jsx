@@ -32,7 +32,7 @@ export function SalesInvoiceForm({
     changeCurrency,
     handleDiscount,
     handleUserSelected,
-  } = useSalesInvoiceForm(invoice, isProforma);
+  } = useSalesInvoiceForm(invoice, isProforma, onClose);
 
   return (
     <>

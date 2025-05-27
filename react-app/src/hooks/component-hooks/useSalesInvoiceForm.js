@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
 import useCurrencies from "../general-hooks/useCurrencies";
 
-export default function useSalesInvoiceForm(invoice, isProforma) {
+export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
