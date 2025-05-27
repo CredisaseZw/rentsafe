@@ -110,18 +110,19 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
     }
     const data = Object.fromEntries(new FormData(e.target).entries());
     data.items = items.map((item) => {
-      const newItem = { ...item };
-      newItem.vat =
-        ((parseFloat(newItem.vat) || 0) / 100) *
-        (parseFloat(newItem.price) || 0) *
-        (parseFloat(newItem.qty) || 0);
-      delete newItem.static;
+      const newItem = {
+        sales_item_id: salesItems.find((i) => (i.name = item.sales_item))?.id || "",
+        qty: item.qty || 1,
+        price: item.price,
+      };
       return newItem;
     });
 
     Object.keys(totals).forEach((key) => (data[key] = totals[key]));
     data.invoiceTotal += Number(discount);
     data.discount = Number(discount);
+    data.invoice_type = isProforma ? "proforma" : invoice ? "recurring" : "fiscal";
+    data.is_individual = data.customer_type === "INDIVIDUAL";
 
     if (isProforma) {
       console.log("Proforma Invoice Data: ", data);
