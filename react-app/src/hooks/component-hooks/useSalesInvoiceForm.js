@@ -8,7 +8,7 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [currency, setCurrency] = useState("");
+  const [selectedCurrencyId, setSelectedCurrencyId] = useState("");
   const [salesItems, setSalesItems] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [key, setKey] = useState(0);
@@ -171,7 +171,7 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
         total: "",
       },
     ]);
-    setCurrency(e.target.value);
+    setSelectedCurrencyId(e.target.value);
     setKey((prev) => prev + 1);
   }
 
@@ -221,7 +221,8 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
     totals,
     discount,
     currencies,
-    currency,
+    selectedCurrencyId,
+    selectedCurrencyName: currencies.find((c) => c.id == selectedCurrencyId)?.currency_code || "",
     isLoading: isLoading || currenciesLoading,
     salesItems,
     taxConfigs,
