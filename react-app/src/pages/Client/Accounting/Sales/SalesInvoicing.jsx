@@ -34,4 +34,4 @@ export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
   );
 }
 
-SalesInvoicing.layout = (page) => <Layout children={page} title={"Sales Categories"} />;
+SalesInvoicing.layout = (page) => <Layout children={page} title={"Sales Invoicing"} />;
