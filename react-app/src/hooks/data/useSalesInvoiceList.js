@@ -23,5 +23,5 @@ export default function useSalesInvoiceList() {
     fetchInvoiceList();
   }, []);
 
-  return { loading, invoiceList };
+  return { loading, invoiceList, reloadInvoices: fetchInvoiceList };
 }

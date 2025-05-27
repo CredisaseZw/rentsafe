@@ -134,7 +134,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       .then((res) => {
         console.log(res);
         if (res.status === 201) {
-          toast.success(userFriendlyErrorOrResponse(res));
+          toast.success(userFriendlyErrorOrResponse("Invoice created successfully"));
           setItems([
             {
               static: false,
@@ -148,6 +148,8 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
           ]);
           setDiscount(0);
           setKey((prev) => prev + 1);
+          setShow(false);
+          if (onClose) onClose();
         } else {
           toast.error(userFriendlyErrorOrResponse(res));
         }

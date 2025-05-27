@@ -4,7 +4,13 @@ import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
 import { Spinner } from "react-bootstrap";
 
-export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, isProforma }) {
+export function SalesInvoiceForm({
+  invoice,
+  triggerClassname,
+  triggerChildren,
+  isProforma,
+  onClose,
+}) {
   const {
     key,
     show,

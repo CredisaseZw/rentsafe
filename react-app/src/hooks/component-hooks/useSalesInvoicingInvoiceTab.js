@@ -5,7 +5,7 @@ import useSalesInvoiceList from "../data/useSalesInvoiceList";
 
 export default function useSalesInvoicingInvoiceTab() {
   const [filteredInvoiceList, setFilteredInvoiceList] = useState([]);
-  const { loading, invoiceList } = useSalesInvoiceList();
+  const { loading, invoiceList, reloadInvoices } = useSalesInvoiceList();
 
   const { url } = usePage();
   const searchParams = new URL(url).searchParams;
@@ -46,5 +46,5 @@ export default function useSalesInvoicingInvoiceTab() {
     Inertia.replace(updatesdUrl.href, { preserveState: true });
   }
 
-  return { loading, invoiceList: filteredInvoiceList, applyFilters };
+  return { loading, invoiceList: filteredInvoiceList, applyFilters, reloadInvoices };
 }
