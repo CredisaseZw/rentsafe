@@ -18,7 +18,7 @@ export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
         ))}
       </div>
 
-      <div className="p-3">
+      <div>
         {<activeTab.Content {...(activeTab.key === "Recurring" ? { recurringInvoices } : {})} />}
       </div>
     </div>
