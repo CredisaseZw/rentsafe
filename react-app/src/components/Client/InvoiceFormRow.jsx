@@ -19,6 +19,7 @@ export default function InvoiceFormRow({
     showCurrencyPrompt,
     propmtedCurrencyRate,
     preSelectedSalesItem,
+    setPreSelectedSalesItem,
     setShowCurrencyPrompt,
     handleSalesItemSelect,
     setPromptedCurrencyRate,
