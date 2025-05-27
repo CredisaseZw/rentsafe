@@ -116,7 +116,10 @@ export default function SalesInvoicingInvoiceTab() {
                   </td>
 
                   <td className="d-flex justify-content-center align-items-center p-1">
-                    <button className="btn btn-sm w-100 justify-content-center btn-info text-white">
+                    <button
+                      disabled
+                      className="btn btn-sm w-100 justify-content-center btn-info text-white"
+                    >
                       View
                     </button>
                   </td>
