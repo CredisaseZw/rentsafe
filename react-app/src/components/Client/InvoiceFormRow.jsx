@@ -16,6 +16,7 @@ export default function InvoiceFormRow({
 }) {
   const {
     vatDisplay,
+    handleQtyChange,
     showCurrencyPrompt,
     propmtedCurrencyRate,
     preSelectedSalesItem,
@@ -48,7 +49,7 @@ export default function InvoiceFormRow({
       <tr>
         <td>
           <button
-            disabled={item.static || isLoading || itemsLength === 1}
+            disabled={item.static || itemsLength === 1}
             type="button"
             onClick={() => removeRow(index)}
             className="btn btn-sm btn-danger p-0"
@@ -102,24 +103,7 @@ export default function InvoiceFormRow({
               disabled={isLoading}
               value={item.qty}
               required
-              onChange={(e) =>
-                setItems((prev) =>
-                  prev.map((prevItem, prevIndex) => {
-                    if (prevIndex === index) {
-                      const qty = parseFloat(e.target.value) || 0;
-                      const unitPrice = parseFloat(item.price) || 0;
-                      const totalCost = unitPrice * qty;
-                      const totalVat = (totalCost * item.vat) / 100;
-
-                      return {
-                        ...prevItem,
-                        qty: e.target.value,
-                        total: totalCost + totalVat,
-                      };
-                    } else return prevItem;
-                  })
-                )
-              }
+              onChange={handleQtyChange}
             />
           )}
         </td>

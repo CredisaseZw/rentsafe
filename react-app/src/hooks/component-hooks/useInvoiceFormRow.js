@@ -83,12 +83,32 @@ export default function useInvoiceFormRow(
     setPromptedCurrencyRate(1);
   }
 
+  function handleQtyChange(e) {
+    setItems((prev) =>
+      prev.map((prevItem, prevIndex) => {
+        if (prevIndex === index) {
+          const qty = parseFloat(e.target.value) || 0;
+          const unitPrice = parseFloat(item.price) || 0;
+          const totalCost = unitPrice * qty;
+          const totalVat = (totalCost * item.vat) / 100;
+
+          return {
+            ...prevItem,
+            qty: e.target.value,
+            total: totalCost + totalVat,
+          };
+        } else return prevItem;
+      })
+    );
+  }
+
   const vatDisplay = selectedTaxConfig?.rate
     ? `${(((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesItem?.price || 0) * parseFloat(item.qty || 0)).toFixed(2)} (${selectedTaxConfig.rate}%)`
     : "";
 
   return {
     vatDisplay,
+    handleQtyChange,
     showCurrencyPrompt,
     propmtedCurrencyRate,
     preSelectedSalesItem,
