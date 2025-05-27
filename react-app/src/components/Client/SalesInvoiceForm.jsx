@@ -2,6 +2,7 @@ import ContentModal from "../ContentModal.jsx";
 import useSalesInvoiceForm from "../../hooks/component-hooks/useSalesInvoiceForm.js";
 import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
+import { Spinner } from "react-bootstrap";
 
 export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, isProforma }) {
   const {
@@ -45,7 +46,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
         handleClose={handleClose}
         title={isProforma ? "PROFORMA" : "FISCAL TAX INVOICE"}
       >
-        <form className="py-3" onSubmit={onSubmit}>
+        <form className="py-3 position-relative" onSubmit={onSubmit}>
           <div className="p-4">
             <div className="row row-cols-2 pb-3 text-nowrap">
               <div className="col">
@@ -314,6 +315,12 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
               )}
             </button>
           </div>
+
+          {isLoading && (
+            <div className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center text-center bg-white bg-opacity-75">
+              <Spinner className="mb-5" />
+            </div>
+          )}
         </form>
       </ContentModal>
     </>
