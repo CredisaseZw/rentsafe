@@ -1,12 +1,11 @@
-import axios from "axios";
 import { Inertia } from "@inertiajs/inertia";
 import { usePage } from "@inertiajs/inertia-react";
 import { useEffect, useState } from "react";
+import useSalesInvoiceList from "../data/useSalesInvoiceList";
 
 export default function useSalesInvoicingInvoiceTab() {
-  const [invoiceList, setInvoiceList] = useState([]);
   const [filteredInvoiceList, setFilteredInvoiceList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { loading, invoiceList } = useSalesInvoiceList();
 
   const { url } = usePage();
   const searchParams = new URL(url).searchParams;
@@ -34,24 +33,6 @@ export default function useSalesInvoicingInvoiceTab() {
 
     setFilteredInvoiceList(filteredInvoiceList);
   }, [year, month, q, invoiceList.length]);
-
-  function fetchInvoiceList() {
-    setLoading(true);
-    axios
-      .get("/accounting/invoices/")
-      .then((res) => {
-        setInvoiceList(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  }
-
-  useEffect(() => {
-    fetchInvoiceList();
-  }, []);
 
   function applyFilters(e) {
     e.preventDefault();
