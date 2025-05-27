@@ -29,46 +29,20 @@ export default function InvoiceFormRow({
   return (
     <>
       {showCurrencyPrompt && (
-        <ContentModal
-          title="Currency Mismatch"
-          show={showCurrencyPrompt}
-          handleClose={() => {
-            setShowCurrencyPrompt(false);
-            setPreSelectedSalesItem(null);
-            setPromptedCurrencyRate(1);
+        <CurrencyPrompt
+          {...{
+            itemName,
+            currencies,
+            showCurrencyPrompt,
+            selectedCurrencyId,
+            propmtedCurrencyRate,
+            preSelectedSalesItem,
+            setShowCurrencyPrompt,
+            setPromptedCurrencyRate,
+            setPreSelectedSalesItem,
+            proceedToHandleSalesItemSelect,
           }}
-          size="md"
-        >
-          <div>
-            <div className="alert alert-danger">
-              The item you have selected is listed in{" "}
-              {preSelectedSalesItem.currency_object.currency_code} but your {itemName || "invoice"}{" "}
-              is to be in {currencies.find((cur) => cur.id == selectedCurrencyId) || "_"}, please
-              input below the rate to be used
-            </div>
-
-            <div className="d-flex gap-3 align-items-center">
-              <label className="form-label text-nowrap px-3">
-                {`${preSelectedSalesItem.unit_price_currency} to ${selectedCurrencyId}`}
-              </label>
-              <input
-                type="number"
-                className="form-control"
-                value={propmtedCurrencyRate}
-                onChange={(e) => setPromptedCurrencyRate(e.target.value)}
-              />
-            </div>
-            <div className="mt-3 text-end">
-              <button
-                onClick={proceedToHandleSalesItemSelect}
-                type="button"
-                className="btn btn-info text-white"
-              >
-                Proceed
-              </button>
-            </div>
-          </div>
-        </ContentModal>
+        />
       )}
 
       <tr>
@@ -161,5 +135,61 @@ export default function InvoiceFormRow({
         </td>
       </tr>
     </>
+  );
+}
+
+function CurrencyPrompt({
+  itemName,
+  currencies,
+  showCurrencyPrompt,
+  selectedCurrencyId,
+  propmtedCurrencyRate,
+  preSelectedSalesItem,
+  setShowCurrencyPrompt,
+  setPromptedCurrencyRate,
+  setPreSelectedSalesItem,
+  proceedToHandleSalesItemSelect,
+}) {
+  return (
+    <ContentModal
+      title="Currency Mismatch"
+      show={showCurrencyPrompt}
+      handleClose={() => {
+        setShowCurrencyPrompt(false);
+        setPreSelectedSalesItem(null);
+        setPromptedCurrencyRate(1);
+      }}
+      size="md"
+    >
+      <div>
+        <div className="alert alert-danger">
+          The item you have selected is listed in{" "}
+          {preSelectedSalesItem.currency_object.currency_code} but your {itemName || "invoice"} is
+          to be in {currencies.find((cur) => cur.id == selectedCurrencyId) || "_"}, please input
+          below the rate to be used
+        </div>
+
+        <div className="d-flex gap-3 align-items-center">
+          <label className="form-label text-nowrap px-3">
+            {`${preSelectedSalesItem.unit_price_currency} to ${selectedCurrencyId}`}
+          </label>
+          <input
+            type="number"
+            className="form-control"
+            value={propmtedCurrencyRate}
+            onChange={(e) => setPromptedCurrencyRate(e.target.value)}
+          />
+        </div>
+        <div className="mt-3 text-end">
+          <button
+            onClick={proceedToHandleSalesItemSelect}
+            type="button"
+            className="btn btn-info text-white"
+          >
+            Proceed
+          </button>
+        </div>
+      </div>
+    </ContentModal>
   );
 }
