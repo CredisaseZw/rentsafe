@@ -235,7 +235,6 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                       currencies,
                       setItems,
                       removeRow,
-                      isLoading,
                       salesItems,
                       taxConfigs,
                       itemsLength: items.length,
@@ -250,7 +249,6 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                   <td colSpan={5}>
                     <div className="w-100 gap-3 align-items-center d-flex justify-content-between">
                       <button
-                        disabled={isLoading}
                         type="button"
                         className="btn btn-sm btn-outline-info"
                         onClick={addRow}
@@ -280,7 +278,6 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                       max={0}
                       step={0.001}
                       onChange={handleDiscount}
-                      readOnly={isLoading}
                     />
                   </td>
                 </tr>
@@ -301,16 +298,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
           </div>
 
           <div className="text-end">
-            <button disabled={isLoading} className="btn btn-info text-white">
-              {isLoading ? (
-                <>
-                  <span className="spinner-grow spinner-grow-sm"></span>
-                  <span className="ms-2">Submitting..</span>
-                </>
-              ) : (
-                "Submit"
-              )}
-            </button>
+            <button className="btn btn-info text-white">Submit</button>
           </div>
 
           {isLoading && (
