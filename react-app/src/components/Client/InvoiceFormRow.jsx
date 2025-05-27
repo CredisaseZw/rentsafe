@@ -6,7 +6,6 @@ export default function InvoiceFormRow({
   index,
   setItems,
   itemName,
-  isLoading,
   removeRow,
   salesItems,
   taxConfigs,
@@ -64,7 +63,6 @@ export default function InvoiceFormRow({
           ) : (
             <select
               required
-              disabled={isLoading}
               value={item.sales_code}
               onChange={handleSalesItemSelect}
               className="form-select form-select-sm custom-w-2"
@@ -100,7 +98,6 @@ export default function InvoiceFormRow({
               name="quantity"
               id="quantity"
               className="form-control form-control-sm custom-w-1"
-              disabled={isLoading}
               value={item.qty}
               required
               onChange={handleQtyChange}
