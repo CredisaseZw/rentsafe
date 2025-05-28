@@ -1,60 +1,41 @@
-import { usePage } from "@inertiajs/inertia-react";
 import axios from "axios";
-import { capitalize } from "lodash";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { userFriendlyErrorOrResponse } from "../../utils/index.js";
 import { Inertia } from "@inertiajs/inertia";
+import { usePage } from "@inertiajs/inertia-react";
+import { useState } from "react";
+import { capitalize } from "lodash";
+import { userFriendlyErrorOrResponse } from "../../utils/index.js";
 
-export default function useToDoList(makeActive) {
+export default function useToDoList(works, reminders, maintenance) {
   const auth = usePage().props.Auth;
-  const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [lease, setLease] = useState({});
-  const [todos, setTodos] = useState([]);
+  const todos = [
+    ...[...(works || []), ...(maintenance || [])].map((item) => {
+      let details = `${item?.title?.toUpperCase()}: ${item.details}`;
+      return {
+        lease: {},
+        date: item.scheduled_date,
+        details: details,
+
+        function: capitalize(item.function),
+        balance_owing: item.current_balance,
+        color: item.color,
+        ...item,
+      };
+    }),
+    ...reminders?.map((item) => ({
+      lease: {},
+      date: item.created_at,
+      details: item.details,
+
+      function: capitalize(item.function),
+      balance_owing: item.current_balance,
+      color: item.color,
+      ...item,
+    })),
+  ];
+
   const [viewDefaults, setViewDefaults] = useState(undefined);
-
-  function fetchAndSetTodos() {
-    axios(reverseUrl("todo_list"))
-      .then((res) => {
-        const worksAndMaintenanceData = [...res.data.works, ...res.data.maintenance].map((item) => {
-          let details = `${item.title.toUpperCase()}: ${item.details}`;
-          return {
-            lease: {},
-            date: item.scheduled_date,
-            details: details,
-
-            function: capitalize(item.function),
-            balance_owing: item.current_balance,
-            color: item.color,
-            ...item,
-          };
-        });
-
-        const remindersData = res.data.reminders.map((item) => ({
-          lease: {},
-          date: item.created_at,
-          details: item.details,
-
-          function: capitalize(item.function),
-          balance_owing: item.current_balance,
-          color: item.color,
-          ...item,
-        }));
-
-        setTodos([...worksAndMaintenanceData, ...remindersData]);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  useEffect(() => fetchAndSetTodos(), []);
-
-  const openModal = () => setShow(true);
-
-  function closeModal() {
-    makeActive("use-last-last");
-    setShow(false);
-  }
 
   const username = `${auth.user_profile.first_name} ${auth.user_profile.last_name} - ${auth.user_profile.individual_id}`;
 
@@ -137,13 +118,10 @@ export default function useToDoList(makeActive) {
         },
       });
     }
-
-    closeModal();
   }
 
   return {
     error,
-    show,
     todos,
     lease,
     username,
@@ -151,10 +129,7 @@ export default function useToDoList(makeActive) {
     done,
     dismiss,
     setError,
-    openModal,
-    closeModal,
     goToOrigin,
-    fetchAndSetTodos,
     openScheduledWorks,
     closeWorks: () => setViewDefaults(undefined),
   };
