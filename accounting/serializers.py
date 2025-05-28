@@ -132,6 +132,7 @@ class LedgerTransactionSerializer(BaseCompanySerializer):
 class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = AccountSector
+        fields = ['id', 'name', 'code']
 
 class SalesItemSerializer(BaseCompanySerializer):
     unit_price_currency = CurrencySerializer(read_only=True)
