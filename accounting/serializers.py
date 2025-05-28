@@ -7,14 +7,14 @@ class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         try:
-            read_only_fields = ['user', 'date_created']  # Prevent user from setting them
+            read_only_fields = ['user', 'date_created', 'date_updated']  # Prevent user from setting them
         except AttributeError:
             read_only_fields = []
 
 class SalesCategorySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = SalesCategory
-        fields = ['id', 'name', 'code']
+        fields = ['id', 'name', 'code', 'date_created']
 class VATSettingSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = VATSetting
@@ -280,17 +280,21 @@ class PaymentSerializer(BaseCompanySerializer):
         model = Payment
         fields = "__all__"
 
-class PaymentSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
-        model = Payment
-
 class CurrencyRateSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CurrencyRate
 
 class CashBookSerializer(BaseCompanySerializer):
+    currency = CurrencySerializer(read_only=True)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='currency',
+        write_only=True
+    )
+
     class Meta(BaseCompanySerializer.Meta):
         model = CashBook
+        fields= ['id', 'cashbook_id', 'cashbook_name', 'requisition_status','account_type', 'currency','currency_id', 'bank_account_number', 'branch_name', 'general_ledger_account']
 
     def validate(self, data):
 
