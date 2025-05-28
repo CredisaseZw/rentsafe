@@ -38,7 +38,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
 
       <h5 className="text-center bg-danger p-2 m-0 text-white custom-rounded-1">To Do List</h5>
 
-      <div className="p-3 fw-bold d-flex justify-content-between align-items-center">
+      <div className="p-2 fw-semibold d-flex justify-content-between align-items-center">
         <div>{friendlyDate(new Date())}</div>
         <div>{username}</div>
       </div>
@@ -60,7 +60,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
             <tr key={index} className={todo.status === "DONE" ? "c-done-block" : ""}>
               <th className="text-nowrap ps-3">{index + 1}</th>
 
-              <td className="ps-3">
+              <td className="ps-3 text-nowrap">
                 {todo.date ? new Date(todo.date).toISOString().split("T")[0] : "N/A"}
               </td>
 
@@ -75,7 +75,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
                 <th className="text-nowrap text-center bg-light">{todo.function}</th>
               )}
 
-              <th className="custom-w-5  px-3">
+              <th className="custom-mn-w-4  px-2">
                 <p className={"m-0 c-line-clamp-1" + (todo.status === "DONE" ? "c-done" : "")}>
                   <span className="text-capitalize">{todo?.title}</span>
                   {todo?.title && todo?.details ? " - " : ""}
@@ -83,14 +83,15 @@ export default function TodoList({ status, message, works, reminders, maintenanc
                 </p>
               </th>
 
-              <td
-                style={{
-                  backgroundColor: todo.color ? todo.color : "inherit",
-                  color: todo.color ? "white" : "inherit",
-                }}
-                className="text-center d-block"
-              >
-                <div>
+              <td>
+                <div
+                  className="text-center btn btn-sm w-100 d-block"
+                  style={{
+                    cursor: "default",
+                    backgroundColor: todo.color ? todo.color : "inherit",
+                    color: todo.color ? "white" : "inherit",
+                  }}
+                >
                   {todo.balance_owing
                     ? todo.balance_owing < 0
                       ? `(${formatCurrency(todo.balance_owing * -1)})`
@@ -103,21 +104,21 @@ export default function TodoList({ status, message, works, reminders, maintenanc
                 <div className="d-flex justify-content-center align-items-center gap-2">
                   <button
                     onClick={() => goToOrigin(todo)}
-                    className="btn flex-fill justify-content-center btn-info text-white"
+                    className="btn btn-sm flex-fill justify-content-center btn-info text-white"
                   >
                     View
                   </button>
 
                   <button
                     disabled={todo.status === "DONE"}
-                    className={"btn btn-success flex-fill justify-content-center "}
+                    className={"btn btn-sm btn-success flex-fill justify-content-center "}
                     onClick={() => done(todo)}
                   >
                     Done
                   </button>
 
                   <button
-                    className="btn btn-danger flex-fill justify-content-center"
+                    className="btn btn-sm btn-danger flex-fill justify-content-center"
                     onClick={() => dismiss(todo)}
                   >
                     Dismiss
