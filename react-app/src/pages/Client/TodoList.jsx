@@ -6,14 +6,12 @@ import { truncate } from "lodash";
 
 export default function TodoList({ status, message, works, reminders, maintenance }) {
   const {
-    error,
     todos,
     lease,
     username,
     viewDefaults,
     done,
     dismiss,
-    setError,
     closeWorks,
     goToOrigin,
     openScheduledWorks,
@@ -40,13 +38,6 @@ export default function TodoList({ status, message, works, reminders, maintenanc
 
       <div>
         <h5 className="text-center bg-danger p-3 mb-0 text-white bg-info">To Do List</h5>
-
-        {error && (
-          <div className="alert alert-danger d-flex gap-2 align-items-center" role="alert">
-            <button type="button" className="btn-close" onClick={() => setError("")} />
-            {truncate(error, { length: 200 })}
-          </div>
-        )}
 
         <div className="custom-bg-grey-2 text-white text-center px-3 py-2 d-flex justify-content-between align-items-center">
           <div>{new Date().toDateString()}</div>
