@@ -4,10 +4,10 @@ import { usePage } from "@inertiajs/inertia-react";
 import { useState } from "react";
 import { capitalize } from "lodash";
 import { userFriendlyErrorOrResponse } from "../../utils/index.js";
+import toast from "react-hot-toast";
 
 export default function useToDoList(works, reminders, maintenance) {
   const auth = usePage().props.Auth;
-  const [error, setError] = useState("");
   const [lease, setLease] = useState({});
   const todos = [
     ...[...(works || []), ...(maintenance || [])].map((item) => {
@@ -83,7 +83,7 @@ export default function useToDoList(works, reminders, maintenance) {
         fetchAndSetTodos();
       })
       .catch((err) => {
-        setError(userFriendlyErrorOrResponse(err));
+        toast.error(userFriendlyErrorOrResponse(err));
         console.log(err);
       });
   }
@@ -98,7 +98,7 @@ export default function useToDoList(works, reminders, maintenance) {
         fetchAndSetTodos();
       })
       .catch((err) => {
-        setError(userFriendlyErrorOrResponse(err));
+        toast.error(userFriendlyErrorOrResponse(err));
         console.log(err);
       });
   }
@@ -121,14 +121,12 @@ export default function useToDoList(works, reminders, maintenance) {
   }
 
   return {
-    error,
     todos,
     lease,
     username,
     viewDefaults,
     done,
     dismiss,
-    setError,
     goToOrigin,
     openScheduledWorks,
     closeWorks: () => setViewDefaults(undefined),
