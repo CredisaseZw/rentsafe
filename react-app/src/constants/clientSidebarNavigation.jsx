@@ -9,7 +9,6 @@ import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import CashSalesModal from "../components/modals/CashSalesModal.jsx";
 import PaymentTypes from "../components/modals/PaymentTypes.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
-import ToDoList from "../components/modals/sidebar/ToDoList.jsx";
 
 export const clientSidebarNavigation = [
   {
@@ -19,8 +18,8 @@ export const clientSidebarNavigation = [
   },
   {
     navLink: "To Do List",
-    type: "modal",
-    component: <ToDoList />,
+    type: "link",
+    href: reverseUrl("todo_list"),
   },
   {
     navLink: "Services",
