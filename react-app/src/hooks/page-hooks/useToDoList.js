@@ -76,8 +76,9 @@ export default function useToDoList(works, reminders, maintenance, auth) {
             : "reminder",
       })
       .then((res) => {
-        console.log(res);
-        fetchAndSetTodos();
+        Inertia.reload({
+          only: ["works", "reminders", "maintenance"],
+        });
       })
       .catch((err) => {
         toast.error(userFriendlyErrorOrResponse(err));
