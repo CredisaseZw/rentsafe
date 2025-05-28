@@ -4,7 +4,7 @@ import WorksAndMaintenance from "../../components/Client/ClientView/WorksAndMain
 import { formatCurrency } from "../../utils/formatting.js";
 import { truncate } from "lodash";
 
-export default function TodoList({ status, message, works, reminders, maintenance }) {
+export default function TodoList({ status, message, works, reminders, maintenance, Auth }) {
   const {
     todos,
     username,
@@ -14,7 +14,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
     closeWorks,
     goToOrigin,
     openScheduledWorks,
-  } = useToDoList(works, reminders, maintenance);
+  } = useToDoList(works, reminders, maintenance, Auth);
 
   if (status === "error") {
     return (

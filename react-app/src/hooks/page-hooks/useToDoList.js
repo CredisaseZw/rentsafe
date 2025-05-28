@@ -1,13 +1,11 @@
 import axios from "axios";
 import { Inertia } from "@inertiajs/inertia";
-import { usePage } from "@inertiajs/inertia-react";
 import { useState } from "react";
 import { capitalize } from "lodash";
 import { userFriendlyErrorOrResponse } from "../../utils/index.js";
 import toast from "react-hot-toast";
 
-export default function useToDoList(works, reminders, maintenance) {
-  const auth = usePage().props.Auth;
+export default function useToDoList(works, reminders, maintenance, auth) {
   const todos = [
     ...[...(works || []), ...(maintenance || [])].map((item) => {
       let details = `${item?.title?.toUpperCase()}: ${item.details}`;
