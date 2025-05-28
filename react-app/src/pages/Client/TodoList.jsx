@@ -36,9 +36,9 @@ export default function TodoList({ status, message, works, reminders, maintenanc
         />
       )}
 
-      <h5 className="text-center bg-danger p-2 m-0 text-white custom-rounded-1">To Do List</h5>
+      <h6 className="text-center bg-danger p-1 m-0 text-white rounded-3">To Do List</h6>
 
-      <div className="p-2 fw-semibold d-flex justify-content-between align-items-center">
+      <div className="p-2 fw-bold d-flex justify-content-between align-items-center">
         <div>{friendlyDate(new Date())}</div>
         <div>{username}</div>
       </div>
