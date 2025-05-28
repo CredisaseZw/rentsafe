@@ -7,7 +7,6 @@ import { truncate } from "lodash";
 export default function TodoList({ status, message, works, reminders, maintenance }) {
   const {
     todos,
-    lease,
     username,
     viewDefaults,
     done,
@@ -31,7 +30,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
         <WorksAndMaintenance
           isOpen={Boolean(viewDefaults)}
           close={closeWorks}
-          lease={lease}
+          lease={{}}
           viewDefaults={viewDefaults}
         />
       )}

@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 
 export default function useToDoList(works, reminders, maintenance) {
   const auth = usePage().props.Auth;
-  const [lease, setLease] = useState({});
   const todos = [
     ...[...(works || []), ...(maintenance || [])].map((item) => {
       let details = `${item?.title?.toUpperCase()}: ${item.details}`;
@@ -122,7 +121,6 @@ export default function useToDoList(works, reminders, maintenance) {
 
   return {
     todos,
-    lease,
     username,
     viewDefaults,
     done,
