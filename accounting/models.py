@@ -12,51 +12,37 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.db.models import F
 # Create your models here.
 
-class ProductService(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, unique=True)
-    description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    vat_applicable = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+class BaseModel(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True , blank=True, null=True)
+    date_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        abstract = True
 
-class AccountSector(models.Model):
+class AccountSector(BaseModel):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=1)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
 
-class SalesAccount(models.Model):
+class SalesAccount(BaseModel):
     """Stores different sales accounts and links them to sectors."""
     account_name = models.CharField(max_length=255, unique=True)
-      # User Company Relation
     account_number = models.CharField(max_length=15, default="")  # Numeric Account Code
     account_sector = models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name="accounts")
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.account_number} - {self.account_name}"
 
-class Currency(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class Currency(BaseModel):
     currency_code = models.CharField(max_length=3, unique=True)
     currency_name = models.CharField(max_length=50)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.currency_code
   
-class SalesItem(models.Model):
+class SalesItem(BaseModel):
       
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
@@ -66,96 +52,65 @@ class SalesItem(models.Model):
     unit_name = models.CharField(max_length=255, blank=True, null=True)
     tax_configuration = models.ForeignKey('VATSetting', on_delete=models.CASCADE, related_name='items')
     sales_account = models.ForeignKey('SalesAccount', on_delete=models.CASCADE, related_name='items')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} ({self.category.name})"
 
-class SalesCategory(models.Model):
+class SalesCategory(BaseModel):
       
     name = models.CharField(max_length=255, unique=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE) 
     code = models.CharField(max_length=255, blank=True, null=True) 
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-class CashSale(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
-      
+class CashSale(BaseModel):
     sale_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Cash Sale {self.id} - {self.user.user_id}"
 
-class VATSetting(models.Model):
-      # User Company Relation
+class VATSetting(BaseModel):
     rate = models.DecimalField(max_digits=5, decimal_places=2)
     description = models.CharField(max_length=255)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    vat_applicable = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.rate}% - {self.description}"
 
-class CashbookEntry(models.Model):
-    TRANSACTION_TYPES = (
-        ("payment", "Payment"),
-        ("receipt", "Receipt"),
-    )
+class TransactionType(BaseModel):
+    transaction_type = models.CharField(max_length=30, unique=True)
+    description = models.TextField(blank=True, null=True)
 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
-      # User Company Relation
+class CashbookEntry(BaseModel):
     transaction_date = models.DateTimeField(auto_now_add=True)
-    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, blank=True, null=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     description = models.TextField(blank=True, null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.transaction_type} - {self.amount}"
 
-class GeneralLedgerAccount(models.Model):
- 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  
-      # User Company Relation
+class GeneralLedgerAccount(BaseModel):
     account_name = models.ForeignKey(SalesAccount, on_delete=models.CASCADE, related_name='account')
     account_sector =   models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name='sector')
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.account_name} - {self.account_name}"
 
-class JournalEntry(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
-      # User Company Relation
+class JournalEntry(BaseModel):
     date = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"Journal Entry {self.id} - {self.date}"
 
-class LedgerTransaction(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None)  # User Relation
-      # User Company Relation
+class LedgerTransaction(BaseModel):
     entry = models.ForeignKey(JournalEntry, on_delete=models.CASCADE)
     account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE)
     debit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     credit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f"{self.account.account_name} - Debit: {self.debit} Credit: {self.credit}"
 
-class Invoice(models.Model):
+class Invoice(BaseModel):
     INVOICE_TYPE_CHOICES = [
         ("fiscal", "Fiscal"),
         ("proforma", "Proforma"),
@@ -200,10 +155,7 @@ class Invoice(models.Model):
     original_invoice = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,related_name='child_invoices')
 
     # Timestamps
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     sale_date = models.DateTimeField(default=now)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def convert_to_fiscal(self):
         """Convert proforma to fiscal invoice"""
@@ -275,47 +227,46 @@ class Invoice(models.Model):
             return self.next_invoice_date + relativedelta(years=+1)
         return None
 
-class InvoiceItem(models.Model):
+class InvoiceItem(BaseModel):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
     sales_item = models.ForeignKey(SalesItem, on_delete=models.PROTECT)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     vat_amount = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
-    date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         self.total_price = (self.quantity * self.unit_price) + self.vat_amount
         super().save(*args, **kwargs)
 
-class Payment(models.Model):
+class PaymentMethod(BaseModel):
+    payment_method_name = models.CharField(max_length=255, unique=True)
+    payment_method_code = models.CharField(max_length=15, unique=True)
+    
+    def __str__(self):
+        return self.payment_method_name
+    
+class Payment(BaseModel):
     """Stores payments made against invoices."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Processed by
     payment_date = models.DateTimeField(default=now)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    method = models.CharField(
-        max_length=50,
-        choices=[("cash", "Cash"), ("bank_transfer", "Bank Transfer"), ("swipe", "Swipe")],
-    )
+    method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name="payments")
     reference = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"Payment {self.invoice.document_number} - {self.amount}"
 
-class CurrencyRate(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class CurrencyRate(BaseModel):
     current_rate = models.FloatField(max_length=255, default=0)
     base_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='base_currency',null= True, blank=True)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='target_currency',null= True, blank=True)
-    date_created = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"User {self.user} Latest Rate {self.current_rate}"
 
-class CashBook(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class CashBook(BaseModel):
     cashbook_id = models.CharField(max_length=255, unique=True)
     cashbook_name = models.CharField(max_length=255)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='cashbook_currency', null= True, blank=True)
@@ -324,8 +275,6 @@ class CashBook(models.Model):
     bank_account_number = models.CharField(max_length=30, blank=True)
     branch_name = models.CharField(max_length=255, blank=True)
     general_ledger_account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE, related_name='general_ledger_account')
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
