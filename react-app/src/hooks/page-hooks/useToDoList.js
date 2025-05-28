@@ -6,6 +6,8 @@ import { userFriendlyErrorOrResponse } from "../../utils/index.js";
 import toast from "react-hot-toast";
 
 export default function useToDoList(works, reminders, maintenance, auth) {
+  const [viewDefaults, setViewDefaults] = useState(undefined);
+  const username = `${auth.user_profile.first_name} ${auth.user_profile.last_name} - ${auth.user_profile.individual_id}`;
   const todos = [
     ...[...(works || []), ...(maintenance || [])].map((item) => {
       let details = `${item?.title?.toUpperCase()}: ${item.details}`;
@@ -32,10 +34,6 @@ export default function useToDoList(works, reminders, maintenance, auth) {
     })),
   ];
 
-  const [viewDefaults, setViewDefaults] = useState(undefined);
-
-  const username = `${auth.user_profile.first_name} ${auth.user_profile.last_name} - ${auth.user_profile.individual_id}`;
-
   function openScheduledWorks(todo) {
     const newViewDefaults = {
       tenant_landlord: todo.tenant_landlord,
@@ -54,14 +52,7 @@ export default function useToDoList(works, reminders, maintenance, auth) {
       frequency: undefined,
       month_frequency: undefined,
       day_date: undefined,
-
-      // isWorks: todo.isWorks,
-      // frequency: todo.frequency,
-      // month_frequency: todo.month_frequency,
-      // day_date: todo.day_date,
     };
-
-    console.log({ todo, newViewDefaults });
 
     setViewDefaults(newViewDefaults);
   }
@@ -75,7 +66,7 @@ export default function useToDoList(works, reminders, maintenance, auth) {
             ? "works"
             : "reminder",
       })
-      .then((res) => {
+      .then(() => {
         Inertia.reload({
           only: ["works", "reminders", "maintenance"],
         });
@@ -91,7 +82,7 @@ export default function useToDoList(works, reminders, maintenance, auth) {
       .post(reverseUrl("delete_work_schedule", todo.id), {
         type: todo.scheduled_day ? "maintenance" : todo.function === "works" ? "works" : "reminder",
       })
-      .then((res) => {
+      .then(() => {
         Inertia.reload({
           only: ["works", "reminders", "maintenance"],
         });
@@ -103,7 +94,6 @@ export default function useToDoList(works, reminders, maintenance, auth) {
   }
 
   function goToOrigin(todo) {
-    console.log(todo);
     if (todo.is_creditor) {
       Inertia.visit(reverseUrl("creditor_statements"), {
         data: {
