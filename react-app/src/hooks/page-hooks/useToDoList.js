@@ -91,8 +91,9 @@ export default function useToDoList(works, reminders, maintenance, auth) {
         type: todo.scheduled_day ? "maintenance" : todo.function === "works" ? "works" : "reminder",
       })
       .then((res) => {
-        console.log(res);
-        fetchAndSetTodos();
+        Inertia.reload({
+          only: ["works", "reminders", "maintenance"],
+        });
       })
       .catch((err) => {
         toast.error(userFriendlyErrorOrResponse(err));
