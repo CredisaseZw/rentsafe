@@ -6029,6 +6029,10 @@ def cash_sales(request):
     return render(request, "Client/Accounting/Sales/CashSales")
 
 @login_required
+def adverse_data(request):
+    return render(request, "Client/AdverseData")
+
+@login_required
 @clients_required
 def sales_reports(request):
     return render(request, "Client/Accounting/Sales/SalesReports")

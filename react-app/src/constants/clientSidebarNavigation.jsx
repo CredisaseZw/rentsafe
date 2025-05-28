@@ -1,4 +1,3 @@
-import AdverseData from "../components/AdverseData.jsx";
 import CashBookPayments from "../components/CashBookPayments.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
@@ -36,8 +35,8 @@ export const clientSidebarNavigation = [
     subNavLinks: [
       {
         navLink: "Claim",
-        type: "modal",
-        component: <AdverseData />,
+        type: "link",
+        href: reverseUrl("adverse_data"),
       },
     ],
   },
