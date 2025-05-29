@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='generalledgeraccount',
             name='account_number',
-            field=models.ImageField(blank=True, max_length=5, unique=True, upload_to=''),
+            field=models.CharField(blank=True, max_length=10, unique=True),
         ),
         migrations.AddField(
             model_name='generalledgeraccount',
