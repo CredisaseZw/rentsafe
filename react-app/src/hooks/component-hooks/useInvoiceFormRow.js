@@ -1,16 +1,7 @@
 import { useState } from "react";
 
-export default function useInvoiceFormRow(
-  item,
-  index,
-  setItems,
-  selectedCurrencyId,
-  salesItems,
-  taxConfigs
-) {
-  const [selectedSalesItem, setSelectedSalesItem] = useState(null);
+export default function useInvoiceFormRow(item, index, setItems, selectedCurrencyId, salesItems) {
   const [preSelectedSalesItem, setPreSelectedSalesItem] = useState(null);
-  const [selectedTaxConfig, setSelectedTaxConfig] = useState(null);
   const [showCurrencyPrompt, setShowCurrencyPrompt] = useState(false);
   const [promptedCurrencyRate, setPromptedCurrencyRate] = useState(1);
 
@@ -23,10 +14,8 @@ export default function useInvoiceFormRow(
       return;
     }
 
-    console.log(taxConfigs);
-    const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
-
-    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
+    const taxConf = salesItem.tax_configuration_object;
+    const unitVat = ((taxConf?.rate || 0) / 100) * (salesItem?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
     const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
 
@@ -38,15 +27,12 @@ export default function useInvoiceFormRow(
             sales_code: salesItem?.item_id || "",
             sales_item: salesItem?.name || "",
             price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
-            vat: taxConfig?.rate || 0,
+            vat: taxConf?.rate || 0,
             total: vatIncTotal.toFixed(2),
           };
         } else return prevItem;
       })
     );
-
-    setSelectedSalesItem(salesItem);
-    setSelectedTaxConfig(taxConfig);
   }
 
   function proceedToHandleSalesItemSelect() {
@@ -55,9 +41,8 @@ export default function useInvoiceFormRow(
 
     salesItem.unit_price_currency = selectedCurrencyId;
 
-    const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
-
-    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
+    const taxConf = salesItem.tax_configuration_object;
+    const unitVat = (taxConf.rate / 100) * (salesItem?.price || 0);
     const totalVat = unitVat * (item.qty || 0);
     const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
 
@@ -69,15 +54,13 @@ export default function useInvoiceFormRow(
             sales_code: salesItem?.item_id || "",
             sales_item: salesItem?.name || "",
             price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
-            vat: taxConfig?.rate || 0,
+            vat: taxConf?.rate || 0,
             total: vatIncTotal.toFixed(2),
           };
         } else return prevItem;
       })
     );
 
-    setSelectedSalesItem(salesItem);
-    setSelectedTaxConfig(taxConfig);
     setPreSelectedSalesItem(null);
     setShowCurrencyPrompt(false);
     setPromptedCurrencyRate(1);
@@ -102,12 +85,7 @@ export default function useInvoiceFormRow(
     );
   }
 
-  const vatDisplay = selectedTaxConfig?.rate
-    ? `${(((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesItem?.price || 0) * parseFloat(item.qty || 0)).toFixed(2)} (${selectedTaxConfig.rate}%)`
-    : "";
-
   return {
-    vatDisplay,
     handleQtyChange,
     showCurrencyPrompt,
     propmtedCurrencyRate: promptedCurrencyRate,

@@ -23,17 +23,16 @@ export default function InvoiceFormRow({
   }
 
   const {
-    vatDisplay,
-    handleQtyChange,
     showCurrencyPrompt,
     propmtedCurrencyRate,
     preSelectedSalesItem,
-    setPreSelectedSalesItem,
+    handleQtyChange,
     setShowCurrencyPrompt,
     handleSalesItemSelect,
     setPromptedCurrencyRate,
+    setPreSelectedSalesItem,
     proceedToHandleSalesItemSelect,
-  } = useInvoiceFormRow(item, index, setItems, selectedCurrency.id, salesItems, taxConfigs);
+  } = useInvoiceFormRow(item, index, setItems, selectedCurrency.id, salesItems);
 
   return (
     <>
@@ -114,7 +113,9 @@ export default function InvoiceFormRow({
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">{vatDisplay}</div>
+          <div className="text-center text-nowrap custom-mn-w-1">
+            {item.vat ? item.vat + "%" : ""}
+          </div>
         </td>
 
         <td>
