@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='invoicing',
-            name='invoice_date',
-            field=models.DateField(blank=True, null=True),
-        ),
+        # migrations.AddField(
+        #     model_name='invoicing',
+        #     name='invoice_date',
+        #     field=models.DateField(blank=True, null=True),
+        # ),
     ]

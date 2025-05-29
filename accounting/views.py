@@ -65,7 +65,7 @@ class VATSettingViewSet(BaseCompanyViewSet):
         company = request.user.company
 
         existing_descriptions = set(
-            VATSetting.objects.filter(company=company).values_list("description", flat=True)
+            VATSetting.objects.filter(user__company=company).values_list("description", flat=True)
         )
 
         valid_data = [
@@ -76,7 +76,7 @@ class VATSettingViewSet(BaseCompanyViewSet):
             return Response({"error": "All VAT settings already exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         for item in valid_data:
-            item["company"] = company
+            # item["company"] = user_company
             item["user"] = request.user.id
 
         serializer = self.get_serializer(data=valid_data, many=True)

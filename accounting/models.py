@@ -91,10 +91,12 @@ class CashbookEntry(BaseModel):
         return f"{self.transaction_type} - {self.amount}"
 
 class GeneralLedgerAccount(BaseModel):
-    account_name = models.ForeignKey(SalesAccount, on_delete=models.CASCADE, related_name='account')
-    account_sector =   models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name='sector')
+    account_name = models.CharField(max_length=255, unique=True, blank=True)
+    account_number = models.CharField(max_length=10, unique=True, blank=True)
+    account_sector =   models.ForeignKey(AccountSector, on_delete=models.PROTECT, related_name='sector', default=None)
+
     def __str__(self):
-        return f"{self.account_name} - {self.account_name}"
+        return f"{self.account_name} - {self.account_number}"
 
 class JournalEntry(BaseModel):
     date = models.DateTimeField(auto_now_add=True)
