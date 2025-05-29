@@ -4704,7 +4704,6 @@ def get_invoicing_details(request):
         "Client/Accounting/Invoicing",
         props={"tenant_list": tenant_list},
     )
-
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
     claims_list = []
