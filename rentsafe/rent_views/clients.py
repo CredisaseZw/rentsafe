@@ -4471,7 +4471,6 @@ def client_invoicing(request):
                 lease_id=lease_id,
                 amount=invoice_amount,
                 operation_costs=operation_costs,
-                invoice_date=formatted_date,
                 description="terminated variable rental invoice" if invoice_data.get("terminated") else "variable rental invoice",
                 invoice_number = invoice_code,
                 account_number = invoice_data.get("tenantAccNumber"),
