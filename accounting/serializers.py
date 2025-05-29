@@ -299,6 +299,7 @@ class CashBookSerializer(BaseCompanySerializer):
         source='currency',
         write_only=True
     )
+    general_ledger_account = GeneralLedgerAccountSerializer(read_only=True)
 
     class Meta(BaseCompanySerializer.Meta):
         model = CashBook
