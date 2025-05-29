@@ -4476,6 +4476,7 @@ def client_invoicing(request):
                 invoice_number = invoice_code,
                 account_number = invoice_data.get("tenantAccNumber"),
                 is_invoiced=False if invoice_data.get("terminated") else True,
+                invoice_date= formatted_date,
             )
             invoice.save()
             if invoice_data.get("terminated"):
@@ -4609,13 +4610,12 @@ def get_invoicing_details(request):
 
         if (today >= custom_day) or (today < next_month_end_day):  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
-                invoiced_month = invoice_status.invoice_date.strftime("%B") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%B")
-                invoice_year = invoice_status.invoice_date.strftime("%Y") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%Y")
-                invoice_month = f"{invoiced_month} {invoice_year}"
-                current_month = datetime.now().strftime("%B")
-                current_year = datetime.now().strftime("%Y")
-                current_year_month = f"{current_month} {current_year}"
-                if str(invoice_month) != str(current_year_month):  # FIXME: remove comment
+                invoiced_date = invoice_status.invoice_date or today
+
+                # Check if the last invoice date is not one month old or less than 30 days
+               
+                if invoiced_date.month == today.month and invoiced_date.day < current_day:
+
                     if i.is_individual:
                         try:
                             if individual_ob := Individual.objects.filter(
@@ -4704,7 +4704,6 @@ def get_invoicing_details(request):
         "Client/Accounting/Invoicing",
         props={"tenant_list": tenant_list},
     )
-
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
     claims_list = []
