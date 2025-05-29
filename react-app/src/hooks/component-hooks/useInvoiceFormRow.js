@@ -12,7 +12,7 @@ export default function useInvoiceFormRow(
   const [preSelectedSalesItem, setPreSelectedSalesItem] = useState(null);
   const [selectedTaxConfig, setSelectedTaxConfig] = useState(null);
   const [showCurrencyPrompt, setShowCurrencyPrompt] = useState(false);
-  const [propmtedCurrencyRate, setPromptedCurrencyRate] = useState(1);
+  const [promptedCurrencyRate, setPromptedCurrencyRate] = useState(1);
 
   function handleSalesItemSelect(e) {
     const salesItem = salesItems.find((code) => code.item_id === e.target.value);
@@ -51,7 +51,7 @@ export default function useInvoiceFormRow(
 
   function proceedToHandleSalesItemSelect() {
     const salesItem = { ...preSelectedSalesItem };
-    salesItem.price = parseFloat(propmtedCurrencyRate) * (parseFloat(salesItem.price) || 0);
+    salesItem.price = parseFloat(promptedCurrencyRate) * (parseFloat(salesItem.price) || 0);
 
     salesItem.unit_price_currency = selectedCurrencyId;
 
@@ -110,7 +110,7 @@ export default function useInvoiceFormRow(
     vatDisplay,
     handleQtyChange,
     showCurrencyPrompt,
-    propmtedCurrencyRate,
+    propmtedCurrencyRate: promptedCurrencyRate,
     preSelectedSalesItem,
     setPreSelectedSalesItem,
     setShowCurrencyPrompt,
