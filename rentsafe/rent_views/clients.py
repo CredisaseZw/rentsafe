@@ -4574,7 +4574,7 @@ def get_invoicing_details(request):
             is_active=True,
             lease_giver=request.user.company,
             rent_variables=True,
-            lease_activator=request.user.id,
+            # lease_activator=request.user.id,
         )
     )
     tenant_individual_details = {}
@@ -4586,6 +4586,7 @@ def get_invoicing_details(request):
     custom_day = datetime(current_year, current_month, current_day).date()
     tenant_list = []
     today_date_check = timezone.now().date()
+    count = 0
     for i in tenant:
         difference = relativedelta(today_date_check, i.created_date)
         try:
@@ -4593,12 +4594,10 @@ def get_invoicing_details(request):
         except:
             next_month_end_day = today.replace(day=8)
 
-        if (
-            (today >= custom_day) or (today < next_month_end_day)
-        ) and difference.days >= 20:  # FIXME: SWITCH DATES comment
+        if (today >= custom_day) or (today < next_month_end_day):  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
-                invoiced_month = invoice_status.date_updated.strftime("%B")
-                invoice_year = invoice_status.date_updated.strftime("%Y")
+                invoiced_month = invoice_status.invoice_date.strftime("%B") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%B")
+                invoice_year = invoice_status.invoice_date.strftime("%Y") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%Y")
                 invoice_month = f"{invoiced_month} {invoice_year}"
                 current_month = datetime.now().strftime("%B")
                 current_year = datetime.now().strftime("%Y")
@@ -4692,7 +4691,6 @@ def get_invoicing_details(request):
         "Client/Accounting/Invoicing",
         props={"tenant_list": tenant_list},
     )
-
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
     claims_list = []
