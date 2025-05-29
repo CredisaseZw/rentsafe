@@ -20,7 +20,6 @@ EMAIL_PORT = os.environ["EMAIL_PORT"]
 EMAIL_USE_SSL = os.environ["EMAIL_USE_SSL"]
 EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
-
 SMS_USERNAME = os.environ["SMS_USERNAME"]
 SMS_PASSWORD = os.environ["SMS_PASSWORD"]
 SMS_API_KEY = os.environ["SMS_API_KEY"]
