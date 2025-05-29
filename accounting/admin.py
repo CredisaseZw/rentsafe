@@ -1,6 +1,7 @@
 from django.contrib import admin
 # Register your models here.
 from accounting.models import (
+    AccountSector,
     SalesItem,
     SalesCategory,
     SalesAccount,
@@ -13,6 +14,7 @@ from accounting.models import (
     InvoiceItem,
     PaymentMethod,
     TransactionType,
+    GeneralLedgerAccount
 )
 # from simple_history.admin import SimpleHistoryAdmin
 
@@ -103,3 +105,26 @@ class TransactionTypeadmin(admin.ModelAdmin):
     list_display = ("transaction_type", "description")
     search_fields = ("transaction_type",)
     ordering = ("id",)
+
+@admin.register(AccountSector)
+class AccountSectorAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "code")
+    list_display_links = ("name",)
+    search_fields = ("name", "code")
+    ordering = ("code",)
+
+@admin.register(GeneralLedgerAccount)
+class GeneralLedgerAdmin(admin.ModelAdmin):
+    list_display = ("id","account_name", "account_number", "account_sector_code", "account_sector_name" )
+    list_display_links = ("account_name",)
+    search_fields = ("account_name",)
+    list_filter = ("account_sector__code",)
+    ordering = ("account_number",)
+
+    def account_sector_code(self, obj):
+        return obj.account_sector.code if obj.account_sector else None
+    account_sector_code.short_description = "Sector Code"
+
+    def account_sector_name(self, obj):
+        return obj.account_sector.name if obj.account_sector else None
+    account_sector_name.short_description = "Sector Name"

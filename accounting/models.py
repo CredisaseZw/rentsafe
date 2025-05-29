@@ -93,7 +93,7 @@ class CashbookEntry(BaseModel):
 class GeneralLedgerAccount(BaseModel):
     account_name = models.CharField(max_length=255, unique=True, blank=True)
     account_number = models.CharField(max_length=10, unique=True, blank=True)
-    account_sector =   models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name='sector', default=1)
+    account_sector =   models.ForeignKey(AccountSector, on_delete=models.PROTECT, related_name='sector', default=None)
 
     def __str__(self):
         return f"{self.account_name} - {self.account_number}"

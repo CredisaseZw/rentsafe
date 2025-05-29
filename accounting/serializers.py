@@ -80,11 +80,22 @@ class CashbookEntrySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashbookEntry
 
+class AccountSectorSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = AccountSector
+        fields = ['id', 'code', 'name']
+
 class GeneralLedgerAccountSerializer(BaseCompanySerializer):
-    account_sector = serializers.PrimaryKeyRelatedField(queryset=AccountSector.objects.all())
-    
+    account_sector = AccountSectorSerializer(read_only=True)
+    account_sector_id = serializers.PrimaryKeyRelatedField(
+        queryset=AccountSector.objects.all(),
+        source='account_sector',
+        write_only=True
+    )
     class Meta(BaseCompanySerializer.Meta):
         model = GeneralLedgerAccount
+        fields = ['id', 'account_name', 'account_number', 'account_sector','account_sector_id', 'date_created']
+
 class IndividualCustomerSerializer(BaseCompanySerializer):
     vat_number = serializers.CharField(required=False)
     tin_number = serializers.CharField(required=False)
@@ -129,10 +140,6 @@ class LedgerTransactionSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = LedgerTransaction
    
-class AccountSectorSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
-        model = AccountSector
-        fields = ['id', 'name', 'code']
 
 class SalesItemSerializer(BaseCompanySerializer):
     unit_price_currency = CurrencySerializer(read_only=True)
