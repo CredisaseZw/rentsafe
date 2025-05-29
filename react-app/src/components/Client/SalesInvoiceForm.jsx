@@ -17,13 +17,12 @@ export function SalesInvoiceForm({
     items,
     totals,
     discount,
-    selectedCurrencyId,
-    selectedCurrencyName,
     isLoading,
     salesItems,
     currencies,
     taxConfigs,
     invoiceData,
+    selectedCurrency,
     addRow,
     setItems,
     onSubmit,
@@ -197,7 +196,7 @@ export function SalesInvoiceForm({
                     <div>
                       <select
                         className="bg-danger text-white py-2 px-4 rounded-3"
-                        value={selectedCurrencyId}
+                        value={selectedCurrency?.id || ""}
                         name="currency_id"
                         id="currency_id"
                         onChange={changeCurrency}
@@ -239,14 +238,11 @@ export function SalesInvoiceForm({
                     {...{
                       item,
                       index,
-                      currency: selectedCurrencyId,
-                      currencies,
                       setItems,
                       removeRow,
                       salesItems,
                       taxConfigs,
-                      currencies,
-                      selectedCurrencyId,
+                      selectedCurrency,
                       itemsLength: items.length,
                     }}
                   />
@@ -300,7 +296,7 @@ export function SalesInvoiceForm({
 
                 <tr>
                   <td></td>
-                  <td colSpan={5}>Invoice Total {selectedCurrencyName}</td>
+                  <td colSpan={5}>Invoice Total {selectedCurrency?.currency_code || ""}</td>
                   <td>{(totals.invoiceTotal + discount).toFixed(2)}</td>
                 </tr>
               </tfoot>

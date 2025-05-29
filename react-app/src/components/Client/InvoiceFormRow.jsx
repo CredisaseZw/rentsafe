@@ -9,10 +9,19 @@ export default function InvoiceFormRow({
   removeRow,
   salesItems,
   taxConfigs,
-  currencies,
   itemsLength,
-  selectedCurrencyId,
+  selectedCurrency,
 }) {
+  if (!selectedCurrency) {
+    return (
+      <tr>
+        <td colSpan={7} className="text-center text-danger p-3">
+          Please set a currency for this {itemName || "invoice"}
+        </td>
+      </tr>
+    );
+  }
+
   const {
     vatDisplay,
     handleQtyChange,
@@ -24,7 +33,7 @@ export default function InvoiceFormRow({
     handleSalesItemSelect,
     setPromptedCurrencyRate,
     proceedToHandleSalesItemSelect,
-  } = useInvoiceFormRow(item, index, setItems, selectedCurrencyId, salesItems, taxConfigs);
+  } = useInvoiceFormRow(item, index, setItems, selectedCurrency.id, salesItems, taxConfigs);
 
   return (
     <>
@@ -32,9 +41,8 @@ export default function InvoiceFormRow({
         <CurrencyPrompt
           {...{
             itemName,
-            currencies,
+            selectedCurrency,
             showCurrencyPrompt,
-            selectedCurrencyId,
             propmtedCurrencyRate,
             preSelectedSalesItem,
             setShowCurrencyPrompt,
@@ -121,9 +129,8 @@ export default function InvoiceFormRow({
 
 function CurrencyPrompt({
   itemName,
-  currencies,
+  selectedCurrency,
   showCurrencyPrompt,
-  selectedCurrencyId,
   propmtedCurrencyRate,
   preSelectedSalesItem,
   setShowCurrencyPrompt,
@@ -146,13 +153,12 @@ function CurrencyPrompt({
         <div className="alert alert-danger">
           The item you have selected is listed in{" "}
           {preSelectedSalesItem.currency_object.currency_code} but your {itemName || "invoice"} is
-          to be in {currencies.find((cur) => cur.id == selectedCurrencyId) || "_"}, please input
-          below the rate to be used
+          to be in {selectedCurrency.currency_code}, please input below the rate to be used
         </div>
 
         <div className="d-flex gap-3 align-items-center">
           <label className="form-label text-nowrap px-3">
-            {`${preSelectedSalesItem.unit_price_currency} to ${selectedCurrencyId}`}
+            {`${preSelectedSalesItem.unit_price_currency} to ${selectedCurrency.currency_code}`}
           </label>
           <input
             type="number"

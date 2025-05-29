@@ -10,11 +10,11 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
     items,
     totals,
     discount,
-    currency,
     isLoading,
     salesItems,
     taxConfigs,
     creditNoteData,
+    selectedCurrency,
     addRow,
     setItems,
     onSubmit,
@@ -190,7 +190,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                   <th colSpan={2} className="bg-danger text-white">
                     <div>
                       <select
-                        value={currency}
+                        value={selectedCurrency?.id || ""}
                         name="invoice_currency"
                         id="invoice_currency"
                         onChange={changeCurrency}
@@ -199,8 +199,9 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                           <option value={creditNoteData.currency}>{creditNoteData.currency}</option>
                         ) : (
                           <>
-                            <option value="USD">United States Dollar (USD)</option>
-                            <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
+                            <option disabled value="">
+                              Select Currency
+                            </option>
                           </>
                         )}
                       </select>
@@ -226,13 +227,12 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
                     {...{
                       item,
                       index,
-                      itemName: "credit note",
-                      currency,
                       setItems,
                       removeRow,
-                      isLoading,
                       salesItems,
                       taxConfigs,
+                      selectedCurrency,
+                      itemName: "credit note",
                       itemsLength: items.length,
                     }}
                   />
@@ -288,7 +288,7 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
 
                 <tr>
                   <td></td>
-                  <td colSpan={5}>Credit Note Total {currency}</td>
+                  <td colSpan={5}>Credit Note Total {selectedCurrency?.currency_code || ""}</td>
                   <td>{(totals.creditNoteTotal + discount).toFixed(2)}</td>
                 </tr>
               </tfoot>

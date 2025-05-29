@@ -1,5 +1,5 @@
 import axios from "axios";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
 import useCurrencies from "../general-hooks/useCurrencies";
@@ -8,11 +8,11 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [selectedCurrencyId, setSelectedCurrencyId] = useState("");
   const [salesItems, setSalesItems] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [key, setKey] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
   const { currencies, loading: currenciesLoading } = useCurrencies();
 
   const [items, setItems] = useState([
@@ -29,9 +29,7 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
 
   // set currency to first currency if currencies change
   useEffect(() => {
-    if (currencies.length > 0 && !selectedCurrencyId) {
-      setSelectedCurrencyId(currencies[0].id);
-    }
+    if (currencies.length > 0 && !selectedCurrency) setSelectedCurrency(currencies[0]);
   }, [currencies.length]);
 
   useEffect(() => {
@@ -49,7 +47,17 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
       };
 
       setInvoiceData(newInvoiceData);
-      setSelectedCurrencyId(newInvoiceData.currency);
+
+      const invCurrency = currencies.find(
+        (c) =>
+          c.id == newInvoiceData.currency ||
+          String(c.currency_code)
+            .toLowerCase()
+            .includes(String(newInvoiceData.currency).toLowerCase())
+      );
+      if (invCurrency) setSelectedCurrency(invCurrency);
+      else toast.error("could not auto-set invoice currency");
+
       setItems([newInvoiceData.monthly_rental]);
     }
   }, [invoice]);
@@ -179,8 +187,11 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
         total: "",
       },
     ]);
-    setSelectedCurrencyId(e.target.value);
-    setKey((prev) => prev + 1);
+    const newCurrency = currencies.find((c) => c.id == e.target.value);
+    if (newCurrency) {
+      setSelectedCurrency(newCurrency);
+      setKey((prev) => prev + 1);
+    } else toast.error("error selecting currency");
   }
 
   const totals = items?.reduce(
@@ -228,20 +239,18 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
     items,
     totals,
     discount,
-    currencies,
-    selectedCurrencyId,
-    selectedCurrencyName: currencies.find((c) => c.id == selectedCurrencyId)?.currency_code || "",
-    isLoading: isLoading || currenciesLoading,
     salesItems,
+    currencies,
     taxConfigs,
     invoiceData,
+    selectedCurrency,
+    isLoading: isLoading || currenciesLoading,
     addRow,
     setItems,
     onSubmit,
     removeRow,
     handleShow,
     handleClose,
-    setDiscount,
     changeCurrency,
     handleDiscount,
     handleUserSelected,
