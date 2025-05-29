@@ -24,6 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='generalledgeraccount',
             name='account_sector',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='sector', to='accounting.accountsector'),
+            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.PROTECT, related_name='sector', to='accounting.accountsector'),
+            
         ),
     ]
