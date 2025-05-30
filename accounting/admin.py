@@ -57,11 +57,11 @@ class CashSaleAdmin(admin.ModelAdmin):
     
 @admin.register(CashbookEntry)
 class CashbookEntryAdmin(admin.ModelAdmin):
-    list_display = ("user", "id", "transaction_date", "transaction_type", "amount")
-    list_display_links = ("transaction_date",)
-    search_fields = ("transaction_date",)
-    list_filter = ("transaction_type",)
-    ordering = ("-transaction_date",)
+    list_display = ("user", "id", "payment_reference", "type", "total_including_vat","vat","matching_invoice","rate" )
+    list_display_links = ("payment_reference",)
+    search_fields = ("payment_reference",)
+    list_filter = ("type",)
+    ordering = ("-payment_reference",)
 
 @admin.register(CurrencyRate)
 class CurrencyRate(admin.ModelAdmin):

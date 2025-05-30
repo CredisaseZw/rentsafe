@@ -82,14 +82,45 @@ class TransactionType(BaseModel):
     transaction_type = models.CharField(max_length=30, unique=True)
     description = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return F"{self.transaction_type}"
+
 class CashbookEntry(BaseModel):
-    transaction_date = models.DateTimeField(auto_now_add=True)
-    transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, blank=True, null=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    description = models.TextField(blank=True, null=True)
+    date = models.DateField(default=now)
+    payment_reference = models.CharField(max_length=255, unique=True, blank=True)
+    type = models.ForeignKey('CashBookEntryType', on_delete=models.PROTECT, related_name='entries')
+    total_including_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    matching_invoice = models.ForeignKey('Invoice', on_delete=models.SET_NULL, related_name='cashbook_entries', null=True)
+    rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
+    
+    def save(self, *args, **kwargs):
+        if not self.payment_reference:
+            # Generate a unique payment reference number
+            # Use a transaction to ensure atomicity and prevent race conditions
+            with transaction.atomic():
+                last_entry = (CashbookEntry.objects.select_for_update().order_by('-payment_reference').first())
+                if last_entry:
+                    next_ref = int(last_entry.payment_reference) + 1
+                else:
+                    next_ref = 1
+                self.payment_reference = f"{next_ref:06d}"
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.transaction_type} - {self.amount}"
 
+class CashBookEntryType(BaseModel):
+    type = models.CharField(max_length=50, choices=[
+        ("GL", "General Ledger"),
+        ("CR", "Creditor")
+    ])
+    account = models.IntegerField()
+    details = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.type} - {self.account}"
+    
 class GeneralLedgerAccount(BaseModel):
     account_name = models.CharField(max_length=255, unique=True, blank=True)
     account_number = models.CharField(max_length=10, unique=True, blank=True)

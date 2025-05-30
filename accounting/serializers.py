@@ -79,6 +79,11 @@ class CashSaleSerializer(BaseCompanySerializer):
 class CashbookEntrySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashbookEntry
+    
+class CashBookEntryTypeSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = CashBookEntryType
+        fields = ['id', 'type', 'account']
 
 class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):

@@ -21,6 +21,7 @@ from accounting.models import (
     TransactionType, 
     CashBook, 
     Currency,
+    CashBookEntryType
     )
 from .serializers import *
 from django.shortcuts import render
@@ -99,6 +100,10 @@ class CashSaleViewSet(BaseCompanyViewSet):
 
 class CashbookEntryViewSet(BaseCompanyViewSet):
     queryset = CashbookEntry.objects.all()
+    serializer_class = CashbookEntrySerializer
+
+class CashbookEntryTypeVIewSet(BaseCompanyViewSet):
+    queryset = CashBookEntryType.objects.all()
     serializer_class = CashbookEntrySerializer
 
 class GeneralLedgerAccountViewSet(BaseCompanyViewSet):
