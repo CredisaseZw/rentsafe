@@ -420,6 +420,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "adverse_data",
     "cash_sales",
     "cashbook_receipts",
+    "cashbook_payments",
 ]
 
 LOGIN_URL = "login"

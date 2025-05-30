@@ -1,4 +1,3 @@
-import CashBookPayments from "../components/CashBookPayments.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
 import Disbursements from "../components/Disbursements.jsx";
@@ -102,8 +101,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Payments",
             color: "#00823d",
-            type: "modal",
-            component: <CashBookPayments />,
+            type: "link",
+            href: reverseUrl("cashbook_payments"),
           },
           {
             navLink: "Bank Reconciliations",
