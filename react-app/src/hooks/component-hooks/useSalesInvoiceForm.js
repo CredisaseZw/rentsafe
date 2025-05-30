@@ -2,20 +2,21 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { userFriendlyErrorOrResponse } from "../../utils";
-import { defaultRowCount } from "../../constants";
+import useCurrencies from "../general-hooks/useCurrencies";
 
-export default function useSalesInvoiceForm(invoice, isProforma) {
+export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [currency, setCurrency] = useState("USD");
   const [salesItems, setSalesItems] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [key, setKey] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
+  const { currencies, loading: currenciesLoading } = useCurrencies();
 
-  const [items, setItems] = useState(() =>
-    new Array(defaultRowCount).fill({
+  const [items, setItems] = useState([
+    {
       static: false,
       sales_code: "",
       sales_item: "",
@@ -23,8 +24,13 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       qty: "",
       vat: "",
       total: "",
-    })
-  );
+    },
+  ]);
+
+  // set currency to first currency if currencies change
+  useEffect(() => {
+    if (currencies.length > 0 && !selectedCurrency) setSelectedCurrency(currencies[0]);
+  }, [currencies.length]);
 
   useEffect(() => {
     if (invoice) {
@@ -41,7 +47,17 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       };
 
       setInvoiceData(newInvoiceData);
-      setCurrency(newInvoiceData.currency);
+
+      const invCurrency = currencies.find(
+        (c) =>
+          c.id == newInvoiceData.currency ||
+          String(c.currency_code)
+            .toLowerCase()
+            .includes(String(newInvoiceData.currency).toLowerCase())
+      );
+      if (invCurrency) setSelectedCurrency(invCurrency);
+      else toast.error("could not auto-set invoice currency");
+
       setItems([newInvoiceData.monthly_rental]);
     }
   }, [invoice]);
@@ -109,31 +125,26 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     }
     const data = Object.fromEntries(new FormData(e.target).entries());
     data.items = items.map((item) => {
-      const newItem = { ...item };
-      newItem.vat =
-        ((parseFloat(newItem.vat) || 0) / 100) *
-        (parseFloat(newItem.price) || 0) *
-        (parseFloat(newItem.qty) || 0);
-      delete newItem.static;
+      const newItem = {
+        sales_item_id: salesItems.find((i) => (i.name = item.sales_item))?.id || "",
+        qty: item.qty || 1,
+        price: item.price,
+      };
       return newItem;
     });
 
     Object.keys(totals).forEach((key) => (data[key] = totals[key]));
     data.invoiceTotal += Number(discount);
     data.discount = Number(discount);
-
-    if (isProforma) {
-      console.log("Proforma Invoice Data: ", data);
-    } else console.log(data);
-
-    const url = isProforma ? "/accounting/proforma-invoices/" : "/accounting/invoices/";
+    data.invoice_type = isProforma ? "proforma" : invoice ? "recurring" : "fiscal";
+    data.is_individual = data.customer_type === "INDIVIDUAL";
 
     axios
-      .post(url, data)
+      .post("/accounting/invoices/", data)
       .then((res) => {
         console.log(res);
         if (res.status === 201) {
-          toast.success(userFriendlyErrorOrResponse(res));
+          toast.success(userFriendlyErrorOrResponse("Invoice created successfully"));
           setItems([
             {
               static: false,
@@ -147,6 +158,8 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
           ]);
           setDiscount(0);
           setKey((prev) => prev + 1);
+          setShow(false);
+          if (onClose) onClose();
         } else {
           toast.error(userFriendlyErrorOrResponse(res));
         }
@@ -168,8 +181,11 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
         total: "",
       },
     ]);
-    setCurrency(e.target.value);
-    setKey((prev) => prev + 1);
+    const newCurrency = currencies.find((c) => c.id == e.target.value);
+    if (newCurrency) {
+      setSelectedCurrency(newCurrency);
+      setKey((prev) => prev + 1);
+    } else toast.error("error selecting currency");
   }
 
   const totals = items?.reduce(
@@ -217,18 +233,18 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     items,
     totals,
     discount,
-    currency,
-    isLoading,
     salesItems,
+    currencies,
     taxConfigs,
     invoiceData,
+    selectedCurrency,
+    isLoading: isLoading || currenciesLoading,
     addRow,
     setItems,
     onSubmit,
     removeRow,
     handleShow,
     handleClose,
-    setDiscount,
     changeCurrency,
     handleDiscount,
     handleUserSelected,

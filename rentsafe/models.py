@@ -388,7 +388,6 @@ class Standard_pricing(models.Model):
 
     def __str__(self):
         return self.service_name
-
 class LeaseCurrencyRate(models.Model):
     company_id = models.CharField(max_length=255)  # FK to company table
     current_rate = models.FloatField(max_length=255, default=0)
@@ -399,6 +398,7 @@ class LeaseCurrencyRate(models.Model):
 
     def __str__(self):
         return f"Company {self.company_id} Latest Rate {self.current_rate}"
+
 class Subscription_charge_pricing(models.Model):
 
     individual_monthly_charge = models.CharField(max_length=255)

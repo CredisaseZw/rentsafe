@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { usePage } from "@inertiajs/inertia-react";
 import html2pdf from "html2pdf.js";
-import { defaultRowCount } from "../../constants";
 
 export default function useSalesInvoiceForm(invoice, isProforma) {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,8 +24,8 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     Auth?.company?.company_name ||
     "N/A";
 
-  const [items, setItems] = useState(
-    new Array(defaultRowCount).fill({
+  const [items, setItems] = useState([
+    {
       static: false,
       sales_code: "",
       sales_item: "",
@@ -34,18 +33,25 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
       qty: "",
       vat: "",
       total: "",
-    })
-  );
+    },
+  ]);
 
-  const [paymentItems, setPaymentItems] = useState(
-    new Array(defaultRowCount).fill({
+  const [paymentItems, setPaymentItems] = useState([
+    {
       paymentType: "",
       cashBook: "",
       detail: "",
       ref: "",
       amountReceived: 0,
-    })
-  );
+    },
+    {
+      paymentType: "",
+      cashBook: "",
+      detail: "",
+      ref: "",
+      amountReceived: 0,
+    },
+  ]);
 
   useEffect(() => {
     fetchSalesItems();
@@ -260,6 +266,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     contentRef,
     paymentItems,
     paymentTypes,
+    selectedCurrency: null,
     shouldShowSuccessModal,
     addRow,
     setItems,

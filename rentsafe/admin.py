@@ -181,7 +181,7 @@ class LeaseCurrencyRateAdmin(admin.ModelAdmin):
     search_fields = ("company_id",)
     list_filter = ("currency",)
     ordering = ("-updated_at",)
-
+    
 @admin.register(WorkSchedule)
 class WorkScheduleAdmin(admin.ModelAdmin):
     list_display = ("id", "lease_id", "title", "created_at")
