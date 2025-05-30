@@ -6031,6 +6031,10 @@ def adverse_data(request):
     return render(request, "Client/AdverseData")
 
 @login_required
+def commission_statements(request):
+    return render(request, "Client/CommissionStatementsSelection")
+
+@login_required
 @clients_required
 def sales_reports(request):
     return render(request, "Client/Accounting/Sales/SalesReports")

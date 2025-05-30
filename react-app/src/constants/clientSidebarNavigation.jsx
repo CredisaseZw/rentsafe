@@ -1,5 +1,4 @@
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
-import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
 import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import PaymentTypes from "../components/modals/PaymentTypes.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
@@ -237,8 +236,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Commission Statements",
             color: "red",
-            type: "modal",
-            component: <CommissionStatementsSelection />,
+            type: "link",
+            href: reverseUrl("commission_statements"),
           },
           {
             navLink: "Cashflow Forecasts",

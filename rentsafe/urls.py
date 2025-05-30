@@ -233,6 +233,7 @@ urlpatterns = [
         "clients/",
         include(
             [
+                path("commission-statements", clients.commission_statements, name="commission_statements"),
                 path("adverse-data", clients.adverse_data, name="adverse_data"),
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
                 path("sales-accounts/", clients.cash_sales, name="sales_accounts"),
