@@ -110,8 +110,8 @@ class CashbookEntry(BaseModel):
     def __str__(self):
         return f"{self.transaction_type} - {self.amount}"
 
-class CashBookEntryType(BaseModel):
-    type = models.CharField(max_length=50, choices=[
+class CashbookEntryType(BaseModel):
+    cashbook_entry_type = models.CharField(max_length=50, choices=[
         ("GL", "General Ledger"),
         ("CR", "Creditor")
     ])

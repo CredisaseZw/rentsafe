@@ -103,7 +103,7 @@ class CashbookEntryViewSet(BaseCompanyViewSet):
     serializer_class = CashbookEntrySerializer
 
 class CashbookEntryTypeVIewSet(BaseCompanyViewSet):
-    queryset = CashBookEntryType.objects.all()
+    queryset = CashbookEntryType.objects.all()
     serializer_class = CashbookEntrySerializer
 
 class GeneralLedgerAccountViewSet(BaseCompanyViewSet):

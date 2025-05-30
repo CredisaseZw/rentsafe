@@ -80,9 +80,9 @@ class CashbookEntrySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashbookEntry
     
-class CashBookEntryTypeSerializer(BaseCompanySerializer):
+class CashbookEntryTypeSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
-        model = CashBookEntryType
+        model = CashbookEntryType
         fields = ['id', 'type', 'account']
 
 class AccountSectorSerializer(BaseCompanySerializer):
