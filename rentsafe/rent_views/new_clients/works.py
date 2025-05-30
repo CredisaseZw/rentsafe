@@ -5,7 +5,7 @@ from rentsafe.serializers import CreateMaintenanceScheduleSchema
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from marshmallow import ValidationError
-
+from inertia import render
 
 def create_maintenance_schedule(request):
     schema = CreateMaintenanceScheduleSchema()
@@ -184,28 +184,25 @@ def todo_list(request):
             else:
                 ...
 
-        return JsonResponse(
+        return render(request, "Client/TodoList", 
             {
                 "status": "success",
                 "message": "Work schedules fetched successfully",
                 "works": tasks,
                 "reminders": reminders_list,
                 "maintenance": maintenance_list
-            },
-            status=200
-        )
+            })
+
     except Exception as e:
         print('error',e)
         import traceback
         error_trace = traceback.format_exc()
-        return JsonResponse(
+        return render(request, "Client/TodoList", 
             {
                 "status": "error",
                 "message": str(e),
                 "traceback": error_trace
-            },
-            status=500
-        )
+            })
     
 
 def delete_work_schedule(request, work_schedule_id):

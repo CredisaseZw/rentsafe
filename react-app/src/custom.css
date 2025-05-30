@@ -383,6 +383,9 @@
 .custom-mn-w-5 {
   min-width: 500px;
 }
+.custom-mn-w-6 {
+  min-width: 600px;
+}
 
 /* max width */
 

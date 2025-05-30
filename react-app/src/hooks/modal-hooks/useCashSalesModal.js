@@ -266,6 +266,7 @@ export default function useSalesInvoiceForm(invoice, isProforma) {
     contentRef,
     paymentItems,
     paymentTypes,
+    selectedCurrency: null,
     shouldShowSuccessModal,
     addRow,
     setItems,
