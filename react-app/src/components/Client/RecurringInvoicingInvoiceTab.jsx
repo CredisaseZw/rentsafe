@@ -2,8 +2,8 @@ import useRecurringInvoicingInvoiceTab from "../../hooks/component-hooks/useRecu
 import { friendlyDate } from "../../utils/index.js";
 import { SalesInvoiceForm } from "./SalesInvoiceForm.jsx";
 
-export default function RecurringInvoicingInvoiceTab({ recurringInvoices }) {
-  const { loading, invoiceList } = useRecurringInvoicingInvoiceTab(recurringInvoices);
+export default function RecurringInvoicingInvoiceTab() {
+  const { loading, invoiceList } = useRecurringInvoicingInvoiceTab();
 
   return (
     <div>

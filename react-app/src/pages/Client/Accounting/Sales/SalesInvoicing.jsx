@@ -1,7 +1,7 @@
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
 import useSalesInvoicing from "../../../../hooks/page-hooks/useSalesInvoicing.js";
 
-export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
+export default function SalesInvoicing() {
   const { tabs, activeTab, setActiveTab } = useSalesInvoicing();
 
   return (
@@ -18,9 +18,7 @@ export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
         ))}
       </div>
 
-      <div>
-        {<activeTab.Content {...(activeTab.key === "Recurring" ? { recurringInvoices } : {})} />}
-      </div>
+      <div>{<activeTab.Content />}</div>
     </div>
   );
 }
