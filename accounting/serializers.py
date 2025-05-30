@@ -75,16 +75,7 @@ class ItemSerializer(serializers.ModelSerializer):
 class CashSaleSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashSale
-
-class CashbookEntrySerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
-        model = CashbookEntry
-    
-class CashbookEntryTypeSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
-        model = CashbookEntryType
-        fields = ['id', 'type', 'account']
-
+  
 class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = AccountSector
@@ -349,3 +340,21 @@ class TransactionTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionType
         fields = ['transaction_type', 'description']
+
+class CashbookEntryTypeSerializer(BaseCompanySerializer):
+    class Meta(BaseCompanySerializer.Meta):
+        model = CashbookEntryType
+        fields = ['id', 'cashbook_entry_type', 'account', 'details']
+
+class CashbookEntrySerializer(BaseCompanySerializer):
+    type = CashbookEntryTypeSerializer(read_only=True)
+    cashbook_account = CashBookSerializer(read_only=True)
+    type_id = serializers.PrimaryKeyRelatedField(
+        queryset=CashbookEntryType.objects.all(),
+        source='type',
+        write_only=True
+    )
+    class Meta(BaseCompanySerializer.Meta):
+        model = CashbookEntry
+        fields = ['id', 'date','cashbook_account', 'type', 'type_id','matching_invoice','rate','vat',  'date_created']
+  

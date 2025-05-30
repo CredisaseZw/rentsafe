@@ -58,10 +58,10 @@ class CashSaleAdmin(admin.ModelAdmin):
     
 @admin.register(CashbookEntry)
 class CashbookEntryAdmin(admin.ModelAdmin):
-    list_display = ("user", "id", "payment_reference", "type", "total_including_vat","vat","matching_invoice","rate" )
+    list_display = ("user", "id", "cashbook_account","payment_reference", "type", "total_including_vat","vat","matching_invoice","rate" )
     list_display_links = ("payment_reference",)
     search_fields = ("payment_reference",)
-    list_filter = ("type",)
+    list_filter = ("cashbook_account","type")
     ordering = ("-payment_reference",)
 
     def type(self, obj):

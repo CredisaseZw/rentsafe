@@ -86,21 +86,30 @@ class TransactionType(BaseModel):
         return F"{self.transaction_type}"
 
 class CashbookEntry(BaseModel):
+    """Cash Book Payments"""
     date = models.DateField(default=now)
+    cashbook_account = models.ForeignKey('CashBook', on_delete=models.PROTECT, related_name='entries', blank=True, null=True)
     payment_reference = models.CharField(max_length=255, unique=True, blank=True)
-    type = models.ForeignKey('CashBookEntryType', on_delete=models.PROTECT, related_name='entries')
+    type = models.ForeignKey('CashBookEntryType', on_delete=models.PROTECT, related_name='entries', blank=True, null=True)
     total_including_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    matching_invoice = models.ForeignKey('Invoice', on_delete=models.SET_NULL, related_name='cashbook_entries', null=True)
+    matching_invoice = models.ForeignKey('Invoice', on_delete=models.SET_NULL, related_name='cashbook_entries', blank=True, null=True)
     rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
     
     def save(self, *args, **kwargs):
         if not self.payment_reference:
             # Generate a unique payment reference number
-            # Use a transaction to ensure atomicity and prevent race conditions
             with transaction.atomic():
-                last_entry = (CashbookEntry.objects.select_for_update().order_by('-payment_reference').first())
-                if last_entry:
+                last_entry = (
+                    CashbookEntry.objects.select_for_update()
+                    .order_by('-payment_reference')
+                    .first()
+                )
+                if (
+                    last_entry
+                    and last_entry.payment_reference
+                    and str(last_entry.payment_reference).isdigit()
+                ):
                     next_ref = int(last_entry.payment_reference) + 1
                 else:
                     next_ref = 1
@@ -108,7 +117,7 @@ class CashbookEntry(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.transaction_type} - {self.amount}"
+        return f"{self.type} - {self.total_including_vat}"
 
 class CashbookEntryType(BaseModel):
     cashbook_entry_type = models.CharField(max_length=50, choices=[
