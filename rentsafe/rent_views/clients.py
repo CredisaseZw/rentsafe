@@ -6051,7 +6051,6 @@ def sales_invoicing(request):
     return render(request, "Client/Accounting/Sales/SalesInvoicing")
 
 def accounts_list(request):
-
     return render(request, "Client/Accounting/AccountsList")
 
 @login_required
