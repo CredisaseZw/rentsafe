@@ -25,7 +25,8 @@ from accounting.views import (
     rate_audit_trail,
     cash_sales,
     cashbook_receipts,
-    cashbook_payments
+    cashbook_payments,
+    accounts_sectors,
 )
 
 router = DefaultRouter()
@@ -57,4 +58,5 @@ urlpatterns = [
     path("cash-sales/", cash_sales ,name="cash_sales"),
     path("cashbook-receipts/", cashbook_receipts ,name="cashbook_receipts"),
     path("cashbook-payments/", cashbook_payments ,name="cashbook_payments"),
+    path("accounts-sectors/", accounts_sectors ,name="accounts_sectors"),
 ]

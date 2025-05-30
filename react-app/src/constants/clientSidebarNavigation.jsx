@@ -1,5 +1,4 @@
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
-import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import PaymentTypes from "../components/modals/PaymentTypes.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 
@@ -282,8 +281,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Accounts Sectors",
                 color: "purple",
-                type: "modal",
-                component: <AccountsSectors />,
+                type: "link",
+                href: reverseUrl("accounts_sectors"),
               },
             ],
           },
