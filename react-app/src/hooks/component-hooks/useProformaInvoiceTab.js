@@ -11,14 +11,9 @@ export default function useProformaInvoiceTab() {
   function fetchInvoiceList() {
     setLoading(true);
     axios
-      .get("/accounting/proforma-invoices/")
-      .then((res) => {
-        console.log(res);
-        setInvoiceList(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+      .get("/accounting/invoices/proforma-invoices/")
+      .then((res) => setInvoiceList(res.data))
+      .catch(console.log)
       .finally(() => setLoading(false));
   }
 

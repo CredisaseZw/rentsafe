@@ -105,14 +105,19 @@ export default function ProformaInvoicingInvoiceTab() {
                     {invoice.date_created && friendlyDate(invoice.date_created)}
                   </td>
 
-                  <td className="ps-3">{invoice.customer}</td>
+                  <td className="ps-3">{invoice.customer_details.full_name}</td>
 
-                  <td className="ps-3">{invoice.currency}</td>
+                  <td className="ps-3">{invoice.currency.currency_code}</td>
 
-                  <td className="ps-3 text-end">{invoice.total.toFixed(2)}</td>
+                  <td className="ps-3 text-end">
+                    {parseFloat(invoice.total_inclusive || 0).toFixed(2)}
+                  </td>
 
                   <td className="d-flex justify-content-center align-items-center p-1">
-                    <button className="btn btn-sm w-100 justify-content-center btn-info text-white">
+                    <button
+                      disabled
+                      className="btn btn-sm w-100 justify-content-center btn-info text-white"
+                    >
                       View
                     </button>
                   </td>
