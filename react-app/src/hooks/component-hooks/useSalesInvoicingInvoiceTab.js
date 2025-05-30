@@ -3,9 +3,9 @@ import { usePage } from "@inertiajs/inertia-react";
 import { useEffect, useState } from "react";
 import useSalesInvoiceList from "../data/useSalesInvoiceList";
 
-export default function useSalesInvoicingInvoiceTab() {
+export default function useSalesInvoicingInvoiceTab(isProforma) {
   const [filteredInvoiceList, setFilteredInvoiceList] = useState([]);
-  const { loading, invoiceList, reloadInvoices } = useSalesInvoiceList();
+  const { loading, invoiceList, reloadInvoices } = useSalesInvoiceList(isProforma);
 
   const { url } = usePage();
   const searchParams = new URL(url).searchParams;

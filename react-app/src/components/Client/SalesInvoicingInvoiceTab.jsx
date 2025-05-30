@@ -3,8 +3,9 @@ import { friendlyDate } from "../../utils/index.js";
 import { SalesInvoiceForm } from "./SalesInvoiceForm.jsx";
 import useSalesInvoicingInvoiceTab from "../../hooks/component-hooks/useSalesInvoicingInvoiceTab.js";
 
-export default function SalesInvoicingInvoiceTab() {
-  const { loading, invoiceList, applyFilters, reloadInvoices } = useSalesInvoicingInvoiceTab();
+export default function SalesInvoicingInvoiceTab({ isProforma = false }) {
+  const { loading, invoiceList, applyFilters, reloadInvoices } =
+    useSalesInvoicingInvoiceTab(isProforma);
 
   return (
     <div>
@@ -59,9 +60,9 @@ export default function SalesInvoicingInvoiceTab() {
 
       <div>
         <h5 className="position-relative text-center mb-2 p-2 mb-0">
-          Invoice List
+          {isProforma ? "Proforma" : ""} Invoice List
           <div className="position-absolute top-0 end-0">
-            <SalesInvoiceForm onClose={reloadInvoices} />
+            <SalesInvoiceForm isProforma={isProforma} onClose={reloadInvoices} />
           </div>
         </h5>
 

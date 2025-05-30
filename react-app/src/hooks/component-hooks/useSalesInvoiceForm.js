@@ -139,14 +139,8 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
     data.invoice_type = isProforma ? "proforma" : invoice ? "recurring" : "fiscal";
     data.is_individual = data.customer_type === "INDIVIDUAL";
 
-    if (isProforma) {
-      console.log("Proforma Invoice Data: ", data);
-    } else console.log(data);
-
-    const url = isProforma ? "/accounting/proforma-invoices/" : "/accounting/invoices/";
-
     axios
-      .post(url, data)
+      .post("/accounting/invoices/", data)
       .then((res) => {
         console.log(res);
         if (res.status === 201) {
