@@ -216,6 +216,7 @@ export default function useCreditNoteForm(creditNote) {
     salesItems,
     taxConfigs,
     creditNoteData,
+    selectedCurrency: null,
     addRow,
     setItems,
     onSubmit,

@@ -4,12 +4,13 @@ import MessageModal from "../../../../components/MessageModal.jsx";
 import useProductsAndServices from "../../../../hooks/page-hooks/useProductsAndServices.js";
 import { friendlyDate } from "../../../../utils/index.js";
 
-export default function ProductsAndServices({ currencies = [] }) {
+export default function ProductsAndServices() {
   const {
     items,
     loading,
     showAdd,
     categories,
+    currencies,
     taxOptions,
     itemToEdit,
     itemToDelete,
@@ -126,18 +127,11 @@ export default function ProductsAndServices({ currencies = [] }) {
                   <option value="" disabled>
                     Select one
                   </option>
-                  {currencies?.length ? (
-                    currencies.map((currency, index) => (
-                      <option key={index} value={currency}>
-                        {currency}
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="USD">USD</option>
-                      <option value="ZIG">ZIG</option>
-                    </>
-                  )}
+                  {currencies?.map((currency, index) => (
+                    <option key={index} value={currency.id}>
+                      {currency.currency_code} - {currency.currency_name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -282,15 +276,14 @@ export default function ProductsAndServices({ currencies = [] }) {
 
           {items?.map((item, index) => (
             <tr key={index}>
-              <td className="ps-3">{item.category_name}</td>
+              <td className="ps-3">{item.category_object.name}</td>
 
               <td className="ps-3">{item.id}</td>
 
               <td className="ps-3">{item.name}</td>
 
               <td className="ps-3">
-                {" "}
-                {`${item.unit_price_currency} ${item.price} / ${item.unit_name}`}
+                {`${item.currency_object?.currency_code || ""} ${item.price} / ${item.unit_name}`}
               </td>
 
               <td className="ps-3">{item.date_created && friendlyDate(item.date_created)}</td>

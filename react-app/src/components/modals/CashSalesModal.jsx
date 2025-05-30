@@ -11,7 +11,6 @@ export default function CashSalesModal(props) {
     items,
     totals,
     discount,
-    currency,
     cashBooks,
     isLoading,
     salesItems,
@@ -19,6 +18,7 @@ export default function CashSalesModal(props) {
     contentRef,
     paymentItems,
     paymentTypes,
+    selectedCurrency,
     shouldShowSuccessModal,
     addRow,
     setItems,
@@ -179,15 +179,14 @@ export default function CashSalesModal(props) {
                       <th colSpan={2} className="bg-danger text-white">
                         <div>
                           <select
-                            value={currency}
+                            value={selectedCurrency?.id || ""}
                             name="invoice_currency"
                             id="invoice_currency"
                             onChange={changeCurrency}
                           >
-                            <>
-                              <option value="USD">United States Dollar (USD)</option>
-                              <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
-                            </>
+                            <option disabled value="">
+                              Select Currency
+                            </option>
                           </select>
                         </div>
                       </th>
@@ -211,12 +210,11 @@ export default function CashSalesModal(props) {
                         {...{
                           item,
                           index,
-                          currency,
                           setItems,
                           removeRow,
-                          isLoading,
                           salesItems,
                           taxConfigs,
+                          selectedCurrency,
                           itemsLength: items.length,
                         }}
                       />
@@ -275,7 +273,7 @@ export default function CashSalesModal(props) {
                     <tr>
                       <th></th>
                       <th className="text-end" colSpan={5}>
-                        Invoice Total {currency}
+                        Invoice Total {selectedCurrency?.currency_code || ""}
                       </th>
                       <th>{(totals.invoiceTotal + discount).toFixed(2)}</th>
                     </tr>

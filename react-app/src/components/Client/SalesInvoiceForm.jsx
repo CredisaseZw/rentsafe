@@ -2,19 +2,27 @@ import ContentModal from "../ContentModal.jsx";
 import useSalesInvoiceForm from "../../hooks/component-hooks/useSalesInvoiceForm.js";
 import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
+import { Spinner } from "react-bootstrap";
 
-export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, isProforma }) {
+export function SalesInvoiceForm({
+  invoice,
+  triggerClassname,
+  triggerChildren,
+  isProforma,
+  onClose,
+}) {
   const {
     key,
     show,
     items,
     totals,
     discount,
-    currency,
     isLoading,
     salesItems,
+    currencies,
     taxConfigs,
     invoiceData,
+    selectedCurrency,
     addRow,
     setItems,
     onSubmit,
@@ -24,7 +32,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
     changeCurrency,
     handleDiscount,
     handleUserSelected,
-  } = useSalesInvoiceForm(invoice, isProforma);
+  } = useSalesInvoiceForm(invoice, isProforma, onClose);
 
   return (
     <>
@@ -43,7 +51,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
         handleClose={handleClose}
         title={isProforma ? "PROFORMA" : "FISCAL TAX INVOICE"}
       >
-        <form className="py-3" onSubmit={onSubmit}>
+        <form className="py-3 position-relative" onSubmit={onSubmit}>
           <div className="p-4">
             <div className="row row-cols-2 pb-3 text-nowrap">
               <div className="col">
@@ -184,20 +192,27 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                   <th colSpan={2} className="text-danger">
                     Currency
                   </th>
-                  <th colSpan={2} className="bg-danger text-white">
+                  <th colSpan={2} className="">
                     <div>
                       <select
-                        value={currency}
-                        name="invoice_currency"
-                        id="invoice_currency"
+                        className="bg-danger text-white py-2 px-4 rounded-3"
+                        value={selectedCurrency?.id || ""}
+                        name="currency_id"
+                        id="currency_id"
                         onChange={changeCurrency}
                       >
                         {invoiceData?.currency ? (
                           <option value={invoiceData.currency}>{invoiceData.currency}</option>
                         ) : (
                           <>
-                            <option value="USD">United States Dollar (USD)</option>
-                            <option value="ZIG">Zimbabwean Dollar (ZIG)</option>
+                            <option disabled value="">
+                              Select Currency
+                            </option>
+                            {currencies?.map((currency, index) => (
+                              <option key={index} value={currency.id}>
+                                {currency.currency_code} ({currency.currency_name})
+                              </option>
+                            ))}
                           </>
                         )}
                       </select>
@@ -223,12 +238,11 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                     {...{
                       item,
                       index,
-                      currency,
                       setItems,
                       removeRow,
-                      isLoading,
                       salesItems,
                       taxConfigs,
+                      selectedCurrency,
                       itemsLength: items.length,
                     }}
                   />
@@ -241,7 +255,6 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                   <td colSpan={5}>
                     <div className="w-100 gap-3 align-items-center d-flex justify-content-between">
                       <button
-                        disabled={isLoading}
                         type="button"
                         className="btn btn-sm btn-outline-info"
                         onClick={addRow}
@@ -271,7 +284,6 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
                       max={0}
                       step={0.001}
                       onChange={handleDiscount}
-                      readOnly={isLoading}
                     />
                   </td>
                 </tr>
@@ -284,7 +296,7 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
 
                 <tr>
                   <td></td>
-                  <td colSpan={5}>Invoice Total {currency}</td>
+                  <td colSpan={5}>Invoice Total {selectedCurrency?.currency_code || ""}</td>
                   <td>{(totals.invoiceTotal + discount).toFixed(2)}</td>
                 </tr>
               </tfoot>
@@ -292,17 +304,14 @@ export function SalesInvoiceForm({ invoice, triggerClassname, triggerChildren, i
           </div>
 
           <div className="text-end">
-            <button disabled={isLoading} className="btn btn-info text-white">
-              {isLoading ? (
-                <>
-                  <span className="spinner-grow spinner-grow-sm"></span>
-                  <span className="ms-2">Submitting..</span>
-                </>
-              ) : (
-                "Submit"
-              )}
-            </button>
+            <button className="btn btn-info text-white">Submit</button>
           </div>
+
+          {isLoading && (
+            <div className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center text-center bg-white bg-opacity-75">
+              <Spinner className="mb-5" />
+            </div>
+          )}
         </form>
       </ContentModal>
     </>

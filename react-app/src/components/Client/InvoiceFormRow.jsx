@@ -1,144 +1,61 @@
-import { useState } from "react";
 import ContentModal from "../ContentModal.jsx";
+import useInvoiceFormRow from "../../hooks/component-hooks/useInvoiceFormRow.js";
 
 export default function InvoiceFormRow({
   item,
-  itemName,
   index,
   setItems,
-  currency,
-  isLoading,
+  itemName,
   removeRow,
   salesItems,
-  itemsLength,
   taxConfigs,
+  itemsLength,
+  selectedCurrency,
 }) {
-  const [selectedSalesItem, setSelectedSalesItem] = useState(null);
-  const [preSelectedSalesItem, setPreSelectedSalesItem] = useState(null);
-  const [selectedTaxConfig, setSelectedTaxConfig] = useState(null);
-  const [showCurrencyPrompt, setShowCurrencyPrompt] = useState(false);
-  const [propmtedCurrencyRate, setPromptedCurrencyRate] = useState(1);
-
-  function handleSalesItemSelect(e) {
-    const salesItem = salesItems.find((code) => code.item_id === e.target.value);
-
-    if (salesItem.unit_price_currency !== currency) {
-      setShowCurrencyPrompt(true);
-      setPreSelectedSalesItem(salesItem);
-      return;
-    }
-
-    const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
-
-    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
-    const totalVat = unitVat * (item.qty || 0);
-    const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
-
-    setItems((prev) =>
-      prev.map((prevItem, prevIndex) => {
-        if (prevIndex === index) {
-          return {
-            ...prevItem,
-            sales_code: salesItem?.item_id || "",
-            sales_item: salesItem?.name || "",
-            price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
-            vat: taxConfig?.rate || 0,
-            total: vatIncTotal.toFixed(2),
-          };
-        } else return prevItem;
-      })
+  if (!selectedCurrency) {
+    return (
+      <tr>
+        <td colSpan={7} className="text-center text-danger p-3">
+          Please set a currency for this {itemName || "invoice"}
+        </td>
+      </tr>
     );
-
-    setSelectedSalesItem(salesItem);
-    setSelectedTaxConfig(taxConfig);
   }
 
-  function proceedToHandleSalesItemSelect() {
-    const salesItem = { ...preSelectedSalesItem };
-    salesItem.price = parseFloat(propmtedCurrencyRate) * (parseFloat(salesItem.price) || 0);
-
-    salesItem.unit_price_currency = currency;
-
-    const taxConfig = taxConfigs.find((config) => config.id === salesItem.tax_configuration);
-
-    const unitVat = ((taxConfig?.rate || 0) / 100) * (salesItem?.price || 0);
-    const totalVat = unitVat * (item.qty || 0);
-    const vatIncTotal = (salesItem?.price || 0) * (item.qty || 0) + totalVat;
-
-    setItems((prev) =>
-      prev.map((prevItem, prevIndex) => {
-        if (prevIndex === index) {
-          return {
-            ...prevItem,
-            sales_code: salesItem?.item_id || "",
-            sales_item: salesItem?.name || "",
-            price: (Number(salesItem?.price || 0) + unitVat).toFixed(2) || "",
-            vat: taxConfig?.rate || 0,
-            total: vatIncTotal.toFixed(2),
-          };
-        } else return prevItem;
-      })
-    );
-
-    setSelectedSalesItem(salesItem);
-    setSelectedTaxConfig(taxConfig);
-    setPreSelectedSalesItem(null);
-    setShowCurrencyPrompt(false);
-    setPromptedCurrencyRate(1);
-  }
-
-  const vatDisplay = selectedTaxConfig?.rate
-    ? `${(((selectedTaxConfig?.rate || 0) / 100) * (selectedSalesItem?.price || 0) * parseFloat(item.qty || 0)).toFixed(2)} (${selectedTaxConfig.rate}%)`
-    : "";
+  const {
+    showCurrencyPrompt,
+    propmtedCurrencyRate,
+    preSelectedSalesItem,
+    handleQtyChange,
+    setShowCurrencyPrompt,
+    handleSalesItemSelect,
+    setPromptedCurrencyRate,
+    setPreSelectedSalesItem,
+    proceedToHandleSalesItemSelect,
+  } = useInvoiceFormRow(item, index, setItems, selectedCurrency.id, salesItems);
 
   return (
     <>
       {showCurrencyPrompt && (
-        <ContentModal
-          title="Currency Mismatch"
-          show={showCurrencyPrompt}
-          handleClose={() => {
-            setShowCurrencyPrompt(false);
-            setPreSelectedSalesItem(null);
-            setPromptedCurrencyRate(1);
+        <CurrencyPrompt
+          {...{
+            itemName,
+            selectedCurrency,
+            showCurrencyPrompt,
+            propmtedCurrencyRate,
+            preSelectedSalesItem,
+            setShowCurrencyPrompt,
+            setPromptedCurrencyRate,
+            setPreSelectedSalesItem,
+            proceedToHandleSalesItemSelect,
           }}
-          size="md"
-        >
-          <div>
-            <div className="alert alert-danger">
-              The item you have selected is listed in {preSelectedSalesItem.unit_price_currency} but
-              your {itemName || "invoice"} is to be in {currency}, please input below the rate to be
-              used
-            </div>
-
-            <div className="d-flex gap-3 align-items-center">
-              <label className="form-label text-nowrap px-3">
-                {`${preSelectedSalesItem.unit_price_currency} to ${currency}`}
-              </label>
-              <input
-                type="number"
-                className="form-control"
-                value={propmtedCurrencyRate}
-                onChange={(e) => setPromptedCurrencyRate(e.target.value)}
-              />
-            </div>
-            <div className="mt-3 text-end">
-              <button
-                onClick={proceedToHandleSalesItemSelect}
-                type="button"
-                className="btn btn-info text-white"
-              >
-                Proceed
-              </button>
-            </div>
-          </div>
-        </ContentModal>
+        />
       )}
 
       <tr>
         <td>
           <button
-            disabled={item.static || isLoading || itemsLength === 1}
+            disabled={item.static || itemsLength === 1}
             type="button"
             onClick={() => removeRow(index)}
             className="btn btn-sm btn-danger p-0"
@@ -153,7 +70,6 @@ export default function InvoiceFormRow({
           ) : (
             <select
               required
-              disabled={isLoading}
               value={item.sales_code}
               onChange={handleSalesItemSelect}
               className="form-select form-select-sm custom-w-2"
@@ -189,33 +105,17 @@ export default function InvoiceFormRow({
               name="quantity"
               id="quantity"
               className="form-control form-control-sm custom-w-1"
-              disabled={isLoading}
               value={item.qty}
               required
-              onChange={(e) =>
-                setItems((prev) =>
-                  prev.map((prevItem, prevIndex) => {
-                    if (prevIndex === index) {
-                      const qty = parseFloat(e.target.value) || 0;
-                      const unitPrice = parseFloat(item.price) || 0;
-                      const totalCost = unitPrice * qty;
-                      const totalVat = (totalCost * item.vat) / 100;
-
-                      return {
-                        ...prevItem,
-                        qty: e.target.value,
-                        total: totalCost + totalVat,
-                      };
-                    } else return prevItem;
-                  })
-                )
-              }
+              onChange={handleQtyChange}
             />
           )}
         </td>
 
         <td>
-          <div className="text-center text-nowrap custom-mn-w-1">{vatDisplay}</div>
+          <div className="text-center text-nowrap custom-mn-w-1">
+            {item.vat ? item.vat + "%" : ""}
+          </div>
         </td>
 
         <td>
@@ -225,5 +125,59 @@ export default function InvoiceFormRow({
         </td>
       </tr>
     </>
+  );
+}
+
+function CurrencyPrompt({
+  itemName,
+  selectedCurrency,
+  showCurrencyPrompt,
+  propmtedCurrencyRate,
+  preSelectedSalesItem,
+  setShowCurrencyPrompt,
+  setPromptedCurrencyRate,
+  setPreSelectedSalesItem,
+  proceedToHandleSalesItemSelect,
+}) {
+  return (
+    <ContentModal
+      title="Currency Mismatch"
+      show={showCurrencyPrompt}
+      handleClose={() => {
+        setShowCurrencyPrompt(false);
+        setPreSelectedSalesItem(null);
+        setPromptedCurrencyRate(1);
+      }}
+      size="md"
+    >
+      <div>
+        <div className="alert alert-danger">
+          The item you have selected is listed in{" "}
+          {preSelectedSalesItem.currency_object.currency_code} but your {itemName || "invoice"} is
+          to be in {selectedCurrency.currency_code}, please input below the rate to be used
+        </div>
+
+        <div className="d-flex gap-3 align-items-center">
+          <label className="form-label text-nowrap px-3">
+            {`${preSelectedSalesItem.unit_price_currency} to ${selectedCurrency.currency_code}`}
+          </label>
+          <input
+            type="number"
+            className="form-control"
+            value={propmtedCurrencyRate}
+            onChange={(e) => setPromptedCurrencyRate(e.target.value)}
+          />
+        </div>
+        <div className="mt-3 text-end">
+          <button
+            onClick={proceedToHandleSalesItemSelect}
+            type="button"
+            className="btn btn-info text-white"
+          >
+            Proceed
+          </button>
+        </div>
+      </div>
+    </ContentModal>
   );
 }
