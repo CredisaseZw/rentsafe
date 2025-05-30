@@ -283,3 +283,6 @@ def rate_audit_trail(request):
 
 def general_journal(request):
     return inertia_render(request, "Client/Accounting/GeneralJournal")
+
+def cash_sales(request):
+    return inertia_render(request, "Client/Accounting/Sales/CashSales")
