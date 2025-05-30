@@ -1,6 +1,5 @@
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
-import Disbursements from "../components/Disbursements.jsx";
 import AccountsList from "../components/modals/AccountsList.jsx";
 import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import PaymentTypes from "../components/modals/PaymentTypes.jsx";
@@ -167,8 +166,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Disbursements",
             color: "#11158f",
-            type: "modal",
-            component: <Disbursements />,
+            type: "link",
+            href: reverseUrl("disbursements_page"),
           },
           {
             navLink: "Creditor Statements",

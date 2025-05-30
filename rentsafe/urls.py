@@ -506,6 +506,11 @@ urlpatterns = [
                     name="disbursements",
                 ),
                 path(
+                    "accounting/disbursements-page/",
+                    statements.disbursements_page,
+                    name="disbursements_page",
+                ),
+                path(
                     "accounting/disbursements/create",
                     statements.create_disbursement,
                     name="create_disbursement",

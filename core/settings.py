@@ -421,6 +421,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "cash_sales",
     "cashbook_receipts",
     "cashbook_payments",
+    "disbursements_page",
 ]
 
 LOGIN_URL = "login"
