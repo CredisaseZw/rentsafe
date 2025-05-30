@@ -388,7 +388,6 @@ class Standard_pricing(models.Model):
 
     def __str__(self):
         return self.service_name
-
 class LeaseCurrencyRate(models.Model):
     company_id = models.CharField(max_length=255)  # FK to company table
     current_rate = models.FloatField(max_length=255, default=0)
@@ -399,6 +398,7 @@ class LeaseCurrencyRate(models.Model):
 
     def __str__(self):
         return f"Company {self.company_id} Latest Rate {self.current_rate}"
+
 class Subscription_charge_pricing(models.Model):
 
     individual_monthly_charge = models.CharField(max_length=255)
@@ -565,12 +565,12 @@ class LandLordType(str, Enum):
 class Landlord(models.Model):
     user_id = models.CharField(max_length=255)
     lease_id = models.CharField(max_length=255)
-    landlord_id = models.CharField(max_length=255)
+    landlord_id = models.CharField(max_length=255,blank=True, null=True)
     is_individual = models.BooleanField(default=False)
     is_company = models.BooleanField(default=False)
-    landlord_name = models.CharField(max_length=255)
+    landlord_name = models.CharField(max_length=255, blank=True, null=True)
     opening_balance = models.FloatField(null=True, blank=True,default=0)
-    reg_ID_Number = models.CharField(max_length=255)
+    reg_ID_Number = models.CharField(max_length=255, blank=True, null=True)
     agent_commission = models.FloatField(null=True, blank=True,default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

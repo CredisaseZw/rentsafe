@@ -10,10 +10,10 @@ from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Q, CharField
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -22,11 +22,13 @@ from inertia import render
 from inertia.share import share
 from marshmallow import ValidationError
 
+from accounting.models import CurrencyRate
 from rentsafe.decorators import clients_required
 from rentsafe.helper import *
 from rentsafe.models import *
 from rentsafe.rent_views.company import generate_otp
 from rentsafe.serializers import *
+from django.db.models.functions import Cast
 
 # Create your views here. views
 @login_required
@@ -48,7 +50,7 @@ def clients_credit_dashboard(id):
     taken_credits_color_totals = {}
 
     rate_ = 1
-    if rate_obj := LeaseCurrencyRate.objects.filter(company_id= client_id).first():
+    if rate_obj := CurrencyRate.objects.filter(user__company = client_id).first():
         rate_ = float(rate_obj.current_rate)
     def get_credit_color(credit_status):
         """Maps credit status to a color."""
@@ -144,7 +146,7 @@ def clients_credit_dashboard(id):
                     )
                 else:
                     rate = 1
-                    if rate_ob := LeaseCurrencyRate.objects.filter(company_id= client_id).first():
+                    if rate_ob := CurrencyRate.objects.filter(user__company = client_id).first():
                         rate = float(rate_ob.current_rate)
                     amount_owing =float(opening_balance_record.outstanding_balance) if opening_balance_record else 0
                     client_credits = {
@@ -238,11 +240,11 @@ def worst_credit_check_helper(leases_taken, taken_credits_ratings):
 
 def rate_setup(request):
     if request.method == "GET" :
-        currency_settings_objects = LeaseCurrencyRate.objects.filter(company_id=request.user.company)
+        currency_settings_objects = CurrencyRate.objects.filter(company_id=request.user.company)
         if currency_settings_objects.exists():         
             currency_settings = currency_settings_objects.last()   
             currency_settings = {
-                "company_id": currency_settings.company_id,
+                "company_id": currency_settings.user.company,
                 "current_rate": currency_settings.current_rate,
                 "base_currency": currency_settings.base_currency,
                 "currency": currency_settings.currency,
@@ -261,7 +263,7 @@ def rate_setup(request):
             props = {"errors": err.messages}
             return JsonResponse(props, status=400)
         else:
-            rates = LeaseCurrencyRate.objects.filter(company_id=request.user.company)
+            rates = CurrencyRate.objects.filter(user=request.user)
             if rates.exists():
                 rate = rates.last()
                 rate.base_currency=data.get("base_currency")
@@ -271,7 +273,7 @@ def rate_setup(request):
                 props = {"success": "Rate changed successfully!"}
                 return JsonResponse(props)
             else:
-                LeaseCurrencyRate.objects.create(
+                CurrencyRate.objects.create(
                     company_id=request.user.company,
                     base_currency=data.get("base_currency"),
                     currency=data.get("currency"),
@@ -279,6 +281,7 @@ def rate_setup(request):
                 )
                 props = {"success": "Rate configured successfully!"}
                 return JsonResponse(props)
+
 
 @login_required
 @clients_required
@@ -776,9 +779,57 @@ def edit_lease(request):
                 switch_colors(
                     lease, old_payment_end, new_payment_end, today, lease_status
                 )
+        if data.get('landlordType').lower() == "company":
+            if not data.get("regIdNumber") == "":
+                landlord_ob = Company.objects.filter(registration_number=data.get("regIdNumber")).first()
+            else:
+                landlord_ob = Company.objects.filter(registration_name__iexact=data.get("landlordName")).first()
+        else:
+            if not data.get("regIdNumber") == "":
+                landlord_ob = Individual.objects.filter(identification_number=data.get("regIdNumber")).first()
+            else:
+                landlord_ob = None
         if agent_details:
             agent_details.agent_commission = data.get("commission")
+            agent_details.landlord_id = landlord_ob.id if landlord_ob else None
+            agent_details.reg_ID_Number = data.get("regIdNumber")
+            agent_details.opening_balance = data.get("openingBalance")
+            agent_details.landlord_name = data.get("landlordName")
+            agent_details.is_individual = (
+                data.get("landlordType").upper() == LandLordType.INDIVIDUAL
+            )
+            agent_details.is_company = (
+                data.get("landlordType").upper() == LandLordType.COMPANY
+            )
             agent_details.save()
+            opening_balance_ob = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).first()
+            if opening_balance_ob:
+                opening_balance_ob.total_amount = data.get("openingBalance")
+                opening_balance_ob.base_amount = data.get("openingBalance")
+                opening_balance_ob.receipt_number = "Opening Balance"
+                opening_balance_ob.save()
+        else:
+            landlord = Landlord(
+                user_id=request.user.id,
+                lease_id=lease_id,
+                landlord_id=landlord_ob.id if landlord_ob else None,
+                reg_ID_Number=data.get("regIdNumber"),
+                opening_balance=data.get('openingBalance'),
+                landlord_name=data.get("landlordName"),
+                is_individual=data.get("landlordType").upper()
+                == LandLordType.INDIVIDUAL,
+                is_company=data.get("landlordType").upper() == LandLordType.COMPANY,
+                agent_commission=float(data.get("commission")),
+            )
+            landlord.save()
+            
+            LeaseReceiptBreakdown.objects.create(
+                lease_id=lease_id,
+                landlord_id=landlord.id,
+                total_amount=data.get('openingBalance'),
+                base_amount=data.get('openingBalance'),
+                receipt_number='Opening Balance',
+            )
 
         if lease:
             if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
@@ -820,7 +871,7 @@ def edit_lease(request):
                     ).first()
                     contact_detail = company_email.email if company_email else None
                 else:
-                    contact_detail = "gtkandeya@gmail.com"
+                    contact_detail = "info@credi-safe.com"
             else:
                 requested_user_ob = "individual"
                 lease_receiver = Individual.objects.filter(
@@ -2653,23 +2704,20 @@ def individuals(request):
             searchValue = data.get("searchValue", "").strip().upper()
             if searchParam == "fullname" and len(searchValue) > 0:
                 searchWords = searchValue.split(" ")
-
-                if len(searchWords) >= 1:
-                    firstname = " ".join(searchWords[:-1]) if len(searchWords) > 1 else searchWords[0]
-                    surname = searchWords[-1] if len(searchWords) >= 2 else firstname
-                    result = Individual.objects.filter(
-                        Q(firstname__icontains=firstname) | Q(surname__icontains=surname)
-                    )
-                    if len(result) == 0:
-                        result = Individual.objects.filter(
-                            firstname__icontains=searchWords[0]
-                        )
-                    
-                    individuals_list.extend(iter(result))
-                    result = individuals_list
-
+                firstname = " ".join(searchWords[:-1]) if len(searchWords) > 1 else searchWords[0]
+                surname = searchWords[-1] if len(searchWords) >= 2 else ""
+                if surname:
+                    print('surname',surname)
+                    result = Individual.objects.filter(firstname__iexact=firstname ,surname__iexact=surname)
                 else:
-                    result = ""
+                    result = Individual.objects.filter(
+                        Q(firstname__iexact=firstname) | Q(surname__iexact=firstname)
+                    )
+        
+                    
+                for i in result:
+                    individuals_list.append(i)
+                result = individuals_list
 
             elif searchParam:
                 # #"search with natinalid")
@@ -3543,6 +3591,7 @@ def write_off(request):
     return credit_journal(request,lease_id) if lease_id else JsonResponse({'error':'lease not found'},status=400)
 
 def client_leases_new(request,leases_type=None):
+    
     # get query parameters
     search_value = request.GET.get("name", "").lower()
     page_number = int(request.GET.get("page", 1))
@@ -3560,13 +3609,21 @@ def client_leases_new(request,leases_type=None):
     fname = names_list[0] if len(names_list) > 0 else ""
     sname = names_list[1] if len(names_list) > 1 else fname
     # get individual and company ids
+    # individual_ids = Individual.objects.filter(
+    #     Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
+    # ).values("identification_number")
+
+    # company_ids = Company.objects.filter(
+    #     Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
+    # ).values("id")
     individual_ids = Individual.objects.filter(
         Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
-    ).values("identification_number")
+        ).annotate(id_str=Cast('identification_number', output_field=CharField())).values_list('id_str', flat=True)
 
     company_ids = Company.objects.filter(
-        Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
-    ).values("id")
+            Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
+        ).annotate(id_str=Cast('id', output_field=CharField())).values_list('id_str', flat=True)
+
 
     query_ids = individual_ids.union(company_ids)
 
@@ -3641,9 +3698,7 @@ def client_leases_new(request,leases_type=None):
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=100)
         is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount > 0 and is_100_days_ago)  else False
-        if float(owing_amount) <= 0 and i.is_terminated == True:
-            is_terminated_lease_eligible = True
+        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
         if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
@@ -4416,11 +4471,11 @@ def client_invoicing(request):
                 lease_id=lease_id,
                 amount=invoice_amount,
                 operation_costs=operation_costs,
-                invoice_date=formatted_date,
                 description="terminated variable rental invoice" if invoice_data.get("terminated") else "variable rental invoice",
                 invoice_number = invoice_code,
                 account_number = invoice_data.get("tenantAccNumber"),
                 is_invoiced=False if invoice_data.get("terminated") else True,
+                invoice_date= formatted_date,
             )
             invoice.save()
             if invoice_data.get("terminated"):
@@ -4554,13 +4609,12 @@ def get_invoicing_details(request):
 
         if (today >= custom_day) or (today < next_month_end_day):  # FIXME: SWITCH DATES comment
             if invoice_status := Invoicing.objects.filter(lease_id=i.lease_id).last():
-                invoiced_month = invoice_status.invoice_date.strftime("%B") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%B")
-                invoice_year = invoice_status.invoice_date.strftime("%Y") if invoice_status.invoice_date else invoice_status.date_updated.strftime("%Y")
-                invoice_month = f"{invoiced_month} {invoice_year}"
-                current_month = datetime.now().strftime("%B")
-                current_year = datetime.now().strftime("%Y")
-                current_year_month = f"{current_month} {current_year}"
-                if str(invoice_month) != str(current_year_month):  # FIXME: remove comment
+                invoiced_date = invoice_status.invoice_date or today
+
+                # Check if the last invoice date is not one month old or less than 30 days
+               
+                if invoiced_date.month == today.month and invoiced_date.day < current_day:
+
                     if i.is_individual:
                         try:
                             if individual_ob := Individual.objects.filter(
@@ -4649,7 +4703,6 @@ def get_invoicing_details(request):
         "Client/Accounting/Invoicing",
         props={"tenant_list": tenant_list},
     )
-
 def tenant_claims(tenant_id):
     tenant_leases = Lease.objects.filter(reg_ID_Number=tenant_id, status="NON-PAYER",is_active=False)
     claims_list = []
@@ -5843,12 +5896,14 @@ def manual_send_otp(request):
     return HttpResponse("otps were resend!")
 
 def manual_color_update(request):
-
+    
+   
     leases = Lease.objects.filter(is_active=True).all()
    
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
+           
             if opening_balance_object := Opening_balance.objects.filter(
                 lease_id=lease_id
             ).last():
@@ -5972,6 +6027,10 @@ def cash_sales(request):
     return render(request, "Client/Accounting/Sales/CashSales")
 
 @login_required
+def adverse_data(request):
+    return render(request, "Client/AdverseData")
+
+@login_required
 @clients_required
 def sales_reports(request):
     return render(request, "Client/Accounting/Sales/SalesReports")
@@ -6000,6 +6059,8 @@ def accounts_list(request):
 def sales_accounts(request):
     return render(request, "Client/Accounting/Sales/SalesAccounts")
 
+def rate_setup(request):
+    return JsonResponse ({"status": "success"}, safe=False)
 
 
 

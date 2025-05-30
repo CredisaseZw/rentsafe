@@ -1,4 +1,3 @@
-import AdverseData from "../components/AdverseData.jsx";
 import CashBookPayments from "../components/CashBookPayments.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
@@ -9,7 +8,6 @@ import AccountsSectors from "../components/modals/AccountsSectors.jsx";
 import CashSalesModal from "../components/modals/CashSalesModal.jsx";
 import PaymentTypes from "../components/modals/PaymentTypes.jsx";
 import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
-import ToDoList from "../components/modals/sidebar/ToDoList.jsx";
 
 export const clientSidebarNavigation = [
   {
@@ -19,8 +17,8 @@ export const clientSidebarNavigation = [
   },
   {
     navLink: "To Do List",
-    type: "modal",
-    component: <ToDoList />,
+    type: "link",
+    href: reverseUrl("todo_list"),
   },
   {
     navLink: "Services",
@@ -37,8 +35,8 @@ export const clientSidebarNavigation = [
     subNavLinks: [
       {
         navLink: "Claim",
-        type: "modal",
-        component: <AdverseData />,
+        type: "link",
+        href: reverseUrl("adverse_data"),
       },
     ],
   },
@@ -210,7 +208,7 @@ export const clientSidebarNavigation = [
             navLink: "General Journal",
             color: "steelblue",
             type: "link",
-            href: reverseUrl("general_journal"),
+            href: reverseUrl("in_development"),
           },
           {
             navLink: "Reports",

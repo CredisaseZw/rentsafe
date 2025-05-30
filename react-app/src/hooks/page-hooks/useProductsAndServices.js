@@ -12,6 +12,7 @@ export default function useProductsAndServices() {
   const [categories, setCategories] = React.useState([]);
   const [taxOptions, setTaxOptions] = React.useState([]);
   const [salesAccounts, setSalesAccounts] = React.useState([]);
+  const [currencies, setCurrencies] = React.useState([]);
 
   function fetchTaxOptions() {
     axios
@@ -29,6 +30,17 @@ export default function useProductsAndServices() {
       .get("/accounting/sales-accounts/")
       .then((res) => {
         setSalesAccounts(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function fetchCurrencies() {
+    axios
+      .get("/accounting/currency")
+      .then((res) => {
+        setCurrencies(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -62,6 +74,7 @@ export default function useProductsAndServices() {
     fetchSalesAccounts();
     fetchCategories();
     fetchTaxOptions();
+    fetchCurrencies();
   }, []);
 
   function handleClose() {
@@ -128,6 +141,7 @@ export default function useProductsAndServices() {
     items,
     loading,
     showAdd,
+    currencies,
     categories,
     taxOptions,
     itemToEdit,

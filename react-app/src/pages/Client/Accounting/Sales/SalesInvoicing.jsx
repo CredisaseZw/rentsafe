@@ -1,17 +1,8 @@
-import ProformaInvoicingInvoiceTab from "../../../../components/Client/ProformaInvoicingInvoiceTab.jsx";
-import RecurringInvoicingInvoiceTab from "../../../../components/Client/RecurringInvoicingInvoiceTab.jsx";
-import SalesInvoicingInvoiceTab from "../../../../components/Client/SalesInvoicingInvoiceTab.jsx";
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
-import { useState } from "react";
+import useSalesInvoicing from "../../../../hooks/page-hooks/useSalesInvoicing.js";
 
-const tabs = [
-  { key: "Invoice", Content: SalesInvoicingInvoiceTab },
-  { key: "Recurring", Content: RecurringInvoicingInvoiceTab },
-  { key: "Proforma", Content: ProformaInvoicingInvoiceTab },
-];
-
-export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
-  const [activeTab, setActiveTab] = useState(tabs[0]);
+export default function SalesInvoicing() {
+  const { tabs, activeTab, setActiveTab } = useSalesInvoicing();
 
   return (
     <div>
@@ -27,11 +18,9 @@ export default function SalesInvoicing({ invoice_list: recurringInvoices }) {
         ))}
       </div>
 
-      <div className="p-3">
-        {<activeTab.Content {...(activeTab.key === "Recurring" ? { recurringInvoices } : {})} />}
-      </div>
+      <div>{<activeTab.Content />}</div>
     </div>
   );
 }
 
-SalesInvoicing.layout = (page) => <Layout children={page} title={"Sales Categories"} />;
+SalesInvoicing.layout = (page) => <Layout children={page} title={"Sales Invoicing"} />;

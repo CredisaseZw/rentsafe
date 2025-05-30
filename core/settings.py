@@ -1,10 +1,9 @@
 import os
-
 from dotenv import load_dotenv
-
-load_dotenv()  # take environment variables from .env.
 from pathlib import Path
+from urllib.parse import urlparse
 
+load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TIME_ZONE = "Africa/Harare"
@@ -21,7 +20,6 @@ EMAIL_PORT = os.environ["EMAIL_PORT"]
 EMAIL_USE_SSL = os.environ["EMAIL_USE_SSL"]
 EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
-
 SMS_USERNAME = os.environ["SMS_USERNAME"]
 SMS_PASSWORD = os.environ["SMS_PASSWORD"]
 SMS_API_KEY = os.environ["SMS_API_KEY"]
@@ -110,24 +108,38 @@ DB_HOST     = os.getenv('DB_HOST'     , None)
 DB_PORT     = os.getenv('DB_PORT'     , None)
 DB_NAME     = os.getenv('DB_NAME'     , None)
 
-# if DB_ENGINE and DB_NAME and DB_USERNAME:
-# DATABASES = { 
-#     'default': {
-#     'ENGINE'  : 'django.db.backends.mysql', 
-#     'NAME'    : 'finchec1_rentsafe',
-#     'USER'    : 'finchec1_admin',
-#     'PASSWORD': 'n2(&lJweshvu',
-#     'HOST'    : '129.232.213.107',
-#     'PORT'    : '3306',
-#     }, 
-# }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "9May.sqlite3",
+if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
+    print("Development mode")
+    DATABASES = { 
+        'default': {
+        'ENGINE'  : DB_ENGINE,
+        'NAME'    : DB_NAME,
+        'USER'    : DB_USERNAME,
+        'PASSWORD': DB_PASS,
+        'HOST'    : DB_HOST,
+        'PORT'    : DB_PORT,
+        }
     }
-}
+else:
+    tmpPostgres = urlparse(os.getenv("PROD_DATABASE_URL", None))
+    if tmpPostgres is not None:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': tmpPostgres.path.replace('/', ''),
+                'USER': tmpPostgres.username,
+                'PASSWORD': tmpPostgres.password,
+                'HOST': tmpPostgres.hostname,
+                'PORT': 5432,
+            }
+        }
+    else:
+        print("\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m")
+        DATABASES = {}
+        
+
+        
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -203,7 +215,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
 
 # If we should use HMR or not.
-# DJANGO_VITE_DEV_MODE = DEBUG
+DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
 DJANGO_VITE_DEV_SERVER_HOST = "localhost"                                                           
@@ -405,7 +417,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "creditor_invoice",
     "sales_reports",
     "rate_audit_trail",
-    "general_journal",
+    "adverse_data",
 ]
 
 LOGIN_URL = "login"

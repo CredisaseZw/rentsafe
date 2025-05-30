@@ -1,15 +1,16 @@
-import useSalesInvoicingInvoiceTab from "../../hooks/component-hooks/useSalesInvoicingInvoiceTab.js";
-import { friendlyDate } from "../../utils/index.js";
 import SearchBar from "../SearchBar.jsx";
+import { friendlyDate } from "../../utils/index.js";
 import { SalesInvoiceForm } from "./SalesInvoiceForm.jsx";
+import useSalesInvoicingInvoiceTab from "../../hooks/component-hooks/useSalesInvoicingInvoiceTab.js";
 
-export default function SalesInvoicingInvoiceTab() {
-  const { loading, invoiceList, handleFilters } = useSalesInvoicingInvoiceTab();
+export default function SalesInvoicingInvoiceTab({ isProforma = false }) {
+  const { loading, invoiceList, applyFilters, reloadInvoices } =
+    useSalesInvoicingInvoiceTab(isProforma);
 
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center gap-4 mb-5">
-        <form onSubmit={handleFilters} className="d-flex border  gap-2 align-items-center">
+        <form onSubmit={applyFilters} className="d-flex border  gap-2 align-items-center">
           <select
             className="form-select"
             name="year"
@@ -46,8 +47,8 @@ export default function SalesInvoicingInvoiceTab() {
           </select>
 
           <div>
-            <button type="submit" className="btn btn-success ">
-              Submit
+            <button type="submit" className="btn btn-success text-nowrap">
+              Apply Filter
             </button>
           </div>
         </form>
@@ -59,9 +60,9 @@ export default function SalesInvoicingInvoiceTab() {
 
       <div>
         <h5 className="position-relative text-center mb-2 p-2 mb-0">
-          Invoice List
+          {isProforma ? "Proforma" : ""} Invoice List
           <div className="position-absolute top-0 end-0">
-            <SalesInvoiceForm />
+            <SalesInvoiceForm isProforma={isProforma} onClose={reloadInvoices} />
           </div>
         </h5>
 
@@ -105,14 +106,21 @@ export default function SalesInvoicingInvoiceTab() {
                     {invoice.date_created && friendlyDate(invoice.date_created)}
                   </td>
 
-                  <td className="ps-3">{invoice.customer}</td>
+                  <td className="ps-3">{invoice.customer_details.full_name}</td>
 
-                  <td className="ps-3">{invoice.currency}</td>
+                  <td className="ps-3">{invoice.currency.currency_code}</td>
 
-                  <td className="ps-3 text-end">{invoice.total.toFixed(2)}</td>
+                  <td className="ps-3 text-end">
+                    {invoice.total_inclusive && !Number.isNaN(Number(invoice.total_inclusive))
+                      ? Number(invoice.total_inclusive).toFixed(2)
+                      : ""}
+                  </td>
 
                   <td className="d-flex justify-content-center align-items-center p-1">
-                    <button className="btn btn-sm w-100 justify-content-center btn-info text-white">
+                    <button
+                      disabled
+                      className="btn btn-sm w-100 justify-content-center btn-info text-white"
+                    >
                       View
                     </button>
                   </td>
