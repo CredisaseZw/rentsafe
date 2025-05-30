@@ -23,7 +23,8 @@ from accounting.views import (
     credit_note,
     creditor_invoice,
     rate_audit_trail,
-    cash_sales
+    cash_sales,
+    cashbook_receipts
 )
 
 router = DefaultRouter()
@@ -53,4 +54,5 @@ urlpatterns = [
     path("creditor-invoice/", creditor_invoice ,name="creditor_invoice"),
     path("rate-audit-trail/", rate_audit_trail ,name="rate_audit_trail"),
     path("cash-sales/", cash_sales ,name="cash_sales"),
+    path("cashbook-receipts/", cashbook_receipts ,name="cashbook_receipts"),
 ]

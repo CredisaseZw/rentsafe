@@ -286,3 +286,6 @@ def general_journal(request):
 
 def cash_sales(request):
     return inertia_render(request, "Client/Accounting/Sales/CashSales")
+
+def cashbook_receipts(request):
+    return inertia_render(request, "Client/Accounting/CashbookReceipts")

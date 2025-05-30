@@ -419,6 +419,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "rate_audit_trail",
     "adverse_data",
     "cash_sales",
+    "cashbook_receipts",
 ]
 
 LOGIN_URL = "login"

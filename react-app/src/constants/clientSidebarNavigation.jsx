@@ -1,6 +1,5 @@
 import CashBookPayments from "../components/CashBookPayments.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
-import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
 import Disbursements from "../components/Disbursements.jsx";
 import AccountsList from "../components/modals/AccountsList.jsx";
@@ -91,8 +90,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Receipts",
             color: "#00823d",
-            type: "modal",
-            component: <ClientSidebarReceipts />,
+            type: "link",
+            href: reverseUrl("cashbook_receipts"),
           },
           {
             navLink: "Requisitions",
@@ -106,7 +105,6 @@ export const clientSidebarNavigation = [
             type: "modal",
             component: <CashBookPayments />,
           },
-
           {
             navLink: "Bank Reconciliations",
             color: "#00823d",
