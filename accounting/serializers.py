@@ -349,6 +349,11 @@ class CashbookEntryTypeSerializer(BaseCompanySerializer):
 class CashbookEntrySerializer(BaseCompanySerializer):
     type = CashbookEntryTypeSerializer(read_only=True)
     cashbook_account = CashBookSerializer(read_only=True)
+    cashbook_account_id = serializers.PrimaryKeyRelatedField(
+        queryset=CashBook.objects.all(),
+        source='cashbook_account',
+        write_only=True
+    )
     type_id = serializers.PrimaryKeyRelatedField(
         queryset=CashbookEntryType.objects.all(),
         source='type',
@@ -356,5 +361,5 @@ class CashbookEntrySerializer(BaseCompanySerializer):
     )
     class Meta(BaseCompanySerializer.Meta):
         model = CashbookEntry
-        fields = ['id', 'date','cashbook_account', 'type', 'type_id','matching_invoice','rate','vat',  'date_created']
+        fields = ['id', 'date','payment_reference','cashbook_account', 'cashbook_account_id','type', 'type_id','matching_invoice','rate','vat',  'date_created']
   

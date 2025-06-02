@@ -114,6 +114,7 @@ class CashbookEntry(BaseModel):
                 else:
                     next_ref = 1
                 self.payment_reference = f"{next_ref:06d}"
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
