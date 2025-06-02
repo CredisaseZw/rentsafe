@@ -83,7 +83,7 @@ class TransactionType(BaseModel):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return F"{self.transaction_type}"
+        return f"{self.transaction_type}"
 
 class CashbookEntry(BaseModel):
     """Cash Book Payments"""
@@ -99,22 +99,9 @@ class CashbookEntry(BaseModel):
     def save(self, *args, **kwargs):
         if not self.payment_reference:
             # Generate a unique payment reference number
-            with transaction.atomic():
-                last_entry = (
-                    CashbookEntry.objects.select_for_update()
-                    .order_by('-payment_reference')
-                    .first()
-                )
-                if (
-                    last_entry
-                    and last_entry.payment_reference
-                    and str(last_entry.payment_reference).isdigit()
-                ):
-                    next_ref = int(last_entry.payment_reference) + 1
-                else:
-                    next_ref = 1
-                self.payment_reference = f"{next_ref:06d}"
-        self.full_clean()
+            last_entry = CashbookEntry.objects.order_by('-id').first()
+            next_ref = last_entry.id + 1 if last_entry else 1
+            self.payment_reference = f"{next_ref:06d}"
         super().save(*args, **kwargs)
 
     def __str__(self):
