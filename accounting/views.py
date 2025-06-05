@@ -21,7 +21,8 @@ from accounting.models import (
     TransactionType, 
     CashBook, 
     Currency,
-    CashbookEntryType
+    CashbookEntryType,
+    CreditNote
     )
 from .serializers import *
 from django.shortcuts import render
@@ -270,6 +271,10 @@ class PaymentMethodViewSet(BaseCompanyViewSet):
 class TransactionTypeViewSet(BaseCompanyViewSet):
     queryset = TransactionType.objects.all()
     serializer_class = TransactionTypeSerializer
+
+class CreditNoteViewSet(BaseCompanyViewSet):
+    queryset = CreditNote.objects.all()
+    serializer_class = CreditNoteSerializer
 
 def detailed_general_ledger(request):
     return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")

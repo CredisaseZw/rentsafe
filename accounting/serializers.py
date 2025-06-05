@@ -79,7 +79,7 @@ class CashSaleSerializer(BaseCompanySerializer):
 class AccountSectorSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = AccountSector
-        fields = ['id', 'code', 'name']
+        fields = ['id', 'code', 'name','user']
 
 class GeneralLedgerAccountSerializer(BaseCompanySerializer):
     account_sector = AccountSectorSerializer(read_only=True)
@@ -90,7 +90,7 @@ class GeneralLedgerAccountSerializer(BaseCompanySerializer):
     )
     class Meta(BaseCompanySerializer.Meta):
         model = GeneralLedgerAccount
-        fields = ['id', 'account_name', 'account_number', 'account_sector','account_sector_id', 'date_created']
+        fields = ['id', 'account_name', 'account_number', 'account_sector','account_sector_id', 'date_created', 'user']
 
 class IndividualCustomerSerializer(BaseCompanySerializer):
     vat_number = serializers.CharField(required=False)
@@ -299,7 +299,9 @@ class CashBookSerializer(BaseCompanySerializer):
 
     class Meta(BaseCompanySerializer.Meta):
         model = CashBook
-        fields= ['id', 'cashbook_id', 'cashbook_name', 'requisition_status','account_type', 'currency','currency_id', 'bank_account_number', 'branch_name', 'general_ledger_account']
+        fields= ['id', 'cashbook_id', 'cashbook_name', 'requisition_status',
+                 'account_type', 'currency','currency_id', 'bank_account_number', 
+                 'branch_name', 'general_ledger_account', 'user']
 
     def validate(self, data):
 
@@ -344,7 +346,7 @@ class TransactionTypeSerializer(serializers.ModelSerializer):
 class CashbookEntryTypeSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashbookEntryType
-        fields = ['id', 'cashbook_entry_type', 'account', 'details']
+        fields = ['id', 'cashbook_entry_type', 'account', 'details', 'user']
 
 class CashbookEntrySerializer(BaseCompanySerializer):
     type = CashbookEntryTypeSerializer(read_only=True)
@@ -361,5 +363,53 @@ class CashbookEntrySerializer(BaseCompanySerializer):
     )
     class Meta(BaseCompanySerializer.Meta):
         model = CashbookEntry
-        fields = ['id', 'date','payment_reference','cashbook_account', 'cashbook_account_id','type', 'type_id','matching_invoice','rate','vat',  'date_created']
-  
+        fields = ['id', 'date','payment_reference','cashbook_account', 
+                  'cashbook_account_id','type', 'type_id','matching_invoice',
+                  'rate','vat',  'date_created', 'user']
+        
+class CreditNoteItemSerializer(serializers.ModelSerializer):
+    sales_item = SalesItemSerializer(read_only=True)
+    sales_item_id = serializers.PrimaryKeyRelatedField(
+        queryset=SalesItem.objects.all(),
+        source='sales_item',
+        write_only=True
+    )
+    qty = serializers.DecimalField(source='quantity', max_digits=10, decimal_places=2)
+    price = serializers.DecimalField(source='unit_price', max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = CreditNoteItem
+        fields = [
+            'sales_item', 'sales_item_id', 'qty', 'price',
+            'vat_amount', 'total_price'
+        ]
+        read_only_fields = ['vat_amount', 'total_price']
+
+class CreditNoteSerializer(BaseCompanySerializer):
+    currency = CurrencySerializer(read_only= True)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='currency',
+        write_only=True
+    )
+    customer_details = serializers.SerializerMethodField()
+    customer_id  = serializers.IntegerField(write_only=True)
+    items = InvoiceItemSerializer(many=True,required = False)
+
+    class Meta(BaseCompanySerializer.Meta):
+        model = CreditNote
+        fields = ['id','document_number','customer_id','customer_details', 'currency', 'currency_id',
+                  'discount','total_exluding_vat', 'total_including_vat', 'vat_total', 
+                  'discount' ]
+        read_only_fields = ['user', 'date_created', 'date_updated','total_including_vat', 
+                            'total_excluding_vat','vat_total', 'currency', 'company', 'individual']
+
+    def get_customer_details(self, obj):
+        if obj.individual:
+            return IndividualCustomerSerializer(obj.individual).data
+        elif obj.company:
+            return CompanyCustomerSerializer(obj.company).data
+        return None
+    
+    def create(self, validated_data):
+        ...

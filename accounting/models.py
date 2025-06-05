@@ -266,7 +266,7 @@ class InvoiceItem(BaseModel):
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
 
     def save(self, *args, **kwargs):
-        self.total_price = (self.quantity * self.unit_price) + self.vat_amount
+        self.total_price = (self.unit_price + self.vat_amount) * self.quantity
         super().save(*args, **kwargs)
 
 class PaymentMethod(BaseModel):
@@ -308,3 +308,45 @@ class CashBook(BaseModel):
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
+    
+class CreditNote(BaseModel):
+    # core fields
+    document_number = models.CharField(max_length=20, unique=True, editable=False)
+    date = models.DateField(default=now)
+
+    # Customer Relationship
+    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Financial Details
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    total_excluding_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    vat_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    total_including_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+
+    def save(self, *args, **kwargs):
+        if not self.document_number:
+            last_note = CreditNote.objects.order_by('-id').last()
+            next_note_id = last_note.id +1 if last_note else 1
+            self.document_number= f"C{next_note_id:06d}"
+
+        # roundup all decimal places before saving
+        self.total_excluding_vat = self.total_excluding_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        self.vat_total = self.vat_total.quantsize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        self.total_including_vat = self.total_including_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+       
+        self.full_clean()
+        super.save(*args,**kwargs)
+
+class CreditNoteItem(BaseModel):
+    credit_note = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="credit_note_items")
+    sales_item = models.ForeignKey(SalesItem, on_delete=models.PROTECT)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    vat_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        self.total_price = (self.unit_price + self.vat_amount) * self.quantity
+        super().save(*args, **kwargs)   
