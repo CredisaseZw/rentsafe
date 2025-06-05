@@ -156,74 +156,83 @@ export default function Index({ leases, total_pages, current_page }) {
               <tbody>
                 {leases
                   ? sortFunc(leases).map((lease, index) => (
-                      <tr
-                        className={lease.terminated ? "c-terminated" : ""}
-                        key={lease.lease_id + "-" + index}
+                    <tr
+                      className={lease.terminated ? "c-terminated" : ""}
+                      key={lease.lease_id + "-" + index}
+                    >
+                      <th className="ps-3">{lease.lease_id || ""}</th>
+
+                      <td>
+                        <button
+                          title="double click to view client"
+                          type="button"
+                          onDoubleClick={() => clientViewProps.openClientView(lease)}
+                          className={`custom-btn text-decoration-underline ${lease.terminated ? "c-terminated" : ""}`}
+                        >
+                          {lease.name}
+                        </button>
+                      </td>
+
+                      <td>{lease.customer_number}</td>
+
+                      <td
+                        className={`bg-${lease.color} text-white text-end`}
+                        style={{
+                          backgroundColor: lease.color == "light-red" ? "#f87171" : "",
+                        }}
                       >
-                        <th className="ps-3">{lease.lease_id || ""}</th>
+                        {`${lease.currency} ${formatCurrency(lease.owing_amount).replace(
+                          "$",
+                          ""
+                        )}`}
+                      </td>
 
-                        <td>
-                          <button
-                            title="double click to view client"
-                            type="button"
-                            onDoubleClick={() => clientViewProps.openClientView(lease)}
-                            className={`custom-btn text-decoration-underline ${lease.terminated ? "c-terminated" : ""}`}
+                      <td
+                        className="bg-info text-white text-center c-pointer"
+                        onClick={() => openReciptFor(lease)}
+                      >
+                        Receipt
+                      </td>
+
+                      {lease.terminated ? (
+                        <>
+                          <td className="c-terminated text-center">Terminated</td>
+
+                          <td
+                            className="bg-danger text-white text-center c-pointer"
+                            onClick={() => writeOff(lease)}
                           >
-                            {lease.name}
-                          </button>
-                        </td>
-
-                        <td>{lease.customer_number}</td>
-
-                        <td
-                          className={`bg-${lease.color} text-white text-end`}
-                          style={{
-                            backgroundColor: lease.color == "light-red" ? "#f87171" : "",
-                          }}
-                        >
-                          {`${lease.currency} ${formatCurrency(lease.owing_amount).replace(
-                            "$",
-                            ""
-                          )}`}
-                        </td>
-
-                        <td
-                          className="bg-info text-white text-center c-pointer"
-                          onClick={() => openReciptFor(lease)}
-                        >
-                          Receipt
-                        </td>
-
-                        {lease.terminated ? (
-                          <>
-                            <td className="c-terminated text-center">Terminated</td>
-
+                            Write off
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          {lease.expired ? (
                             <td
-                              className="bg-danger text-white text-center c-pointer"
-                              onClick={() => writeOff(lease)}
+                              className="bg-gold text-center c-pointer"
+                              onClick={() => showLeaseFormFor(lease)}
                             >
-                              Write off
+                              Renew
                             </td>
-                          </>
-                        ) : (
-                          <>
+                          ) : (
                             <td
                               className="bg-primary text-white text-center c-pointer"
                               onClick={() => showLeaseFormFor(lease)}
                             >
-                              Adjust
+                              Lease
                             </td>
+                          )}
 
-                            <td
-                              className="bg-danger text-white text-center c-pointer"
-                              onClick={() => terminateLease(lease)}
-                            >
-                              Terminate
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    ))
+                          <td
+                            className="bg-danger text-white text-center c-pointer"
+                            onClick={() => terminateLease(lease)}
+                          >
+                            Terminate
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))
                   : ""}
               </tbody>
 
