@@ -221,7 +221,7 @@ export default function Index({ leases, total_pages, current_page }) {
                                 className="bg-primary text-white text-center c-pointer"
                                 onClick={() => showLeaseFormFor(lease)}
                               >
-                                Adjust
+                                Lease
                               </td>
                             )}
 
