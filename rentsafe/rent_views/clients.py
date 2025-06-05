@@ -4179,15 +4179,19 @@ def client_statements_new(request):
         Q(firstname__icontains=fname)
         | Q(surname__icontains=sname)
         | Q(identification_number__icontains=search_value)
-    ).values("identification_number")
+    ).values_list("identification_number", flat=True)
 
     company_ids = Company.objects.filter(
         Q(registration_name__icontains=search_value)
         | Q(trading_name__icontains=search_value)
         | Q(registration_number__icontains=search_value)
-    ).values("id")
+    ).values_list("id", flat=True)
 
-    query_ids = individual_ids.union(company_ids)
+    # Convert company IDs to strings
+    company_ids = [str(i) for i in company_ids]
+
+    # Combine both as a list
+    query_ids = list(individual_ids) + company_ids
 
     # get active leases for the superuser
     if request.user.is_superuser:
