@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { usePage } from "@inertiajs/inertia-react";
 import html2pdf from "html2pdf.js";
 
-export default function useSalesInvoiceForm(invoice, isProforma) {
+export default function useCashSales(invoice, isProforma) {
   const [isLoading, setIsLoading] = useState(false);
   const [currency, setCurrency] = useState("USD");
   const [salesItems, setSalesItems] = useState([]);

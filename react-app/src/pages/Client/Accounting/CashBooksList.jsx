@@ -1,6 +1,7 @@
 import ContentModal from "../../../components/ContentModal.jsx";
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import MessageModal from "../../../components/MessageModal.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useCashBooksList from "../../../hooks/page-hooks/useCashBooksList.js";
 
 export default function CashBooksList() {
@@ -376,7 +377,7 @@ export default function CashBooksList() {
         </ContentModal>
       )}
 
-      <h5 className="bg-info text-white rounded-3 text-center p-2 mb-0">Cash Books</h5>
+      <NewPageHeader title="Cash Books" noMargin />
 
       <div className="text-end my-2">
         <button className="btn btn-success" onClick={openCashbookForm}>

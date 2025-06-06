@@ -5,6 +5,7 @@ import BulkUploadModal from "../BulkUploadModal.jsx";
 import IndividualReport from "./Report/IndividualReport.jsx";
 import useIndividualSearch from "../../hooks/component-hooks/useIndividualSearch.js";
 import { Head } from "@inertiajs/inertia-react";
+import NewPageHeader from "../NewPageHeader.jsx";
 
 export default function IndividualSearch({ url }) {
   const {
@@ -68,9 +69,7 @@ export default function IndividualSearch({ url }) {
       </>
 
       <div className="container-xl">
-        <h4 className="bg-info text-white p-2 rounded rounded-5 text-center mb-4">
-          Search Individual
-        </h4>
+        <NewPageHeader title="Search Individual" />
 
         <table className="table table-sm table-bordered border-2 bg-white">
           <thead className="position-sticky c-table-top bg-white c-z-5">

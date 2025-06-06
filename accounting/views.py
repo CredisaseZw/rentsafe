@@ -288,3 +288,18 @@ def rate_audit_trail(request):
 
 def general_journal(request):
     return inertia_render(request, "Client/Accounting/GeneralJournal")
+
+def cash_sales(request):
+    return inertia_render(request, "Client/Accounting/Sales/CashSales")
+
+def cashbook_receipts(request):
+    return inertia_render(request, "Client/Accounting/CashbookReceipts")
+
+def cashbook_payments(request):
+    return inertia_render(request, "Client/Accounting/CashBookPayments")
+
+def accounts_sectors(request):
+    return inertia_render(request, "Client/Accounting/AccountsSectors")
+
+def payment_types(request):
+    return inertia_render(request, "Client/Accounting/PaymentTypes")

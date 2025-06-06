@@ -233,6 +233,7 @@ urlpatterns = [
         "clients/",
         include(
             [
+                path("commission-statements", clients.commission_statements, name="commission_statements"),
                 path("adverse-data", clients.adverse_data, name="adverse_data"),
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
                 path("sales-accounts/", clients.cash_sales, name="sales_accounts"),
@@ -506,6 +507,11 @@ urlpatterns = [
                     name="disbursements",
                 ),
                 path(
+                    "accounting/disbursements-page/",
+                    statements.disbursements_page,
+                    name="disbursements_page",
+                ),
+                path(
                     "accounting/disbursements/create",
                     statements.create_disbursement,
                     name="create_disbursement",
@@ -524,6 +530,11 @@ urlpatterns = [
                     "settings/rate-setup/",
                     clients.rate_setup,
                     name="rate_setup",
+                ),
+                path(
+                    "settings/currency-settings/",
+                    clients.currency_settings,
+                    name="currency_settings",
                 ),
                 path(
                     "write-off/",

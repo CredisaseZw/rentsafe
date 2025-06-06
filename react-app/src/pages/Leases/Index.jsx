@@ -11,6 +11,7 @@ import ClientView from "../../components/Client/ClientView/ClientView.jsx";
 import useLeaseManagement from "../../hooks/page-hooks/useLeaseManagement.js";
 import { formatCurrency } from "../../utils/formatting.js";
 import { DrawerContent } from "../../components/DrawerContent.jsx";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
 
 export default function Index({ leases, total_pages, current_page }) {
   const {
@@ -87,68 +88,54 @@ export default function Index({ leases, total_pages, current_page }) {
 
       <main id="hide-footer">
         <div className="container-xl p-0 mb-5">
-          <h5 className="bg-info text-center text-white p-2 rounded-2">Lease Management</h5>
+          <NewPageHeader title={`Lease Management (${activeLeaseCount} active)`} noMargin />
 
           <div className="position-relative bg-white rounded-2 border">
             <table className="table table-sm table-responsive table-bordered ">
               <thead className="position-sticky bg-white shadow-sm c-table-top">
                 <tr>
-                  <td colSpan={7}>
-                    <div className="row justify-content-between align-items-center my-1">
-                      <div className="col-5">
+                  <th colSpan={7}>
+                    <div className="d-flex gap-1 justify-content-between align-items-center">
+                      <div className="col-5 ">
                         <SearchBar searchBy="name" />
                       </div>
 
-                      <div className="col-auto">
-                        <div className="d-flex border c-bg-light align-items-center">
-                          <label
-                            htmlFor="sort"
-                            className="form-label bg-white c-bg-light d-block my-0 text-nowrap p-1"
-                          >
-                            Sort By:
+                      <div className="col-auto ">
+                        <div className="d-flex  border border-3 overflow-hidden rounded-pill bg-light align-items-center">
+                          <label htmlFor="sort" className="form-label border-end border-3  px-3">
+                            Sort
                           </label>
+
                           <select
-                            className="form-select c-select rounded-0 border"
+                            className="shadow-none  form-select py-1 c-select border-0 rounded-0"
                             name="sort"
                             id="sort"
                             value={sort}
                             onChange={changeSort}
                           >
-                            <option value="default">default</option>
+                            <option value="default">Default</option>
                             <option value="rent-owing-asc">Rent Owing asc</option>
                             <option value="rent-owing-des">Rent Owing des</option>
-                            <option value="color-asc">color (rent asc)</option>
-                            <option value="color-des">color (rent des)</option>
+                            <option value="color-asc">Color (rent asc)</option>
+                            <option value="color-des">Color (rent des)</option>
                           </select>
                         </div>
                       </div>
                     </div>
-
-                    <h5 className="text-center py-2 mb-0 text-white border bg-info">
-                      Active Leases - {activeLeaseCount}
-                    </h5>
-                  </td>
+                  </th>
                 </tr>
 
-                <tr className="c-force-borders">
-                  <th className="ps-3">
-                    <div>Lease ID</div>
-                  </th>
+                <tr className="m-0">
+                  <th>Lease ID</th>
 
-                  <th>
-                    <div>Tenant</div>
-                  </th>
+                  <th>Tenant</th>
 
-                  <th>
-                    <div>Customer Number</div>
-                  </th>
+                  <th>Customer Number</th>
 
-                  <th className="text-end">
-                    <div>Rent Owing</div>
-                  </th>
+                  <th className="text-end">Rent Owing</th>
 
                   <th className="text-center" colSpan={3}>
-                    <div>Actions</div>
+                    Actions
                   </th>
                 </tr>
               </thead>

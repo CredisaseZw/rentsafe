@@ -4,6 +4,7 @@ import WorksAndMaintenance from "../../components/Client/ClientView/WorksAndMain
 import { formatCurrency } from "../../utils/formatting.js";
 import { truncate } from "lodash";
 import { friendlyDate } from "../../utils/index.js";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
 
 export default function TodoList({ status, message, works, reminders, maintenance, Auth }) {
   const {
@@ -36,7 +37,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
         />
       )}
 
-      <h6 className="text-center bg-danger p-1 m-0 text-white rounded-3">To Do List</h6>
+      <NewPageHeader title="To Do List" color="danger" />
 
       <div className="p-2 fw-bold d-flex justify-content-between align-items-center">
         <div>{friendlyDate(new Date())}</div>

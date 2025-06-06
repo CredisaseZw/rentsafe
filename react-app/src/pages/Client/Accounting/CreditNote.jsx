@@ -3,13 +3,14 @@ import SearchBar from "../../../components/SearchBar.jsx";
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import useCreditNote from "../../../hooks/page-hooks/useCreditNote.js";
 import { CreditNoteForm } from "../../../components/Client/CreditNoteForm.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function CreditNote() {
   const { loading, creditNotes, handleFilters } = useCreditNote();
 
   return (
     <div>
-      <h5 className="mb-4 bg-danger text-center p-2 rounded-2 text-white">Credit Note</h5>
+      <NewPageHeader title="Credit Note" color="danger" />
 
       <div className="d-flex justify-content-between align-items-center gap-4 mb-5">
         <form onSubmit={handleFilters} className="d-flex border  gap-2 align-items-center">
