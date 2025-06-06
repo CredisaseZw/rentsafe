@@ -4,6 +4,7 @@ import Layout from "../../../components/Layouts/client/Layout.jsx";
 import useCreditorInvoice from "../../../hooks/page-hooks/useCreditorInvoice.js";
 import ContentModal from "../../../components/ContentModal.jsx";
 import DisbursementsAsyncSelect from "../../../components/DisbursementsAsyncSelect.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function CreditorInvoice() {
   const {
@@ -212,7 +213,7 @@ export default function CreditorInvoice() {
         </form>
       </ContentModal>
 
-      <h5 className="mb-4 bg-danger text-center p-2 rounded-2 text-white">Creditor Invoice</h5>
+      <NewPageHeader title="Creditor Invoice" color="danger" />
 
       <div className="d-flex justify-content-between align-items-center gap-4 mb-5">
         <form onSubmit={handleFilters} className="d-flex border  gap-2 align-items-center">

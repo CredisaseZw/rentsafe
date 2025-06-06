@@ -3,6 +3,7 @@ import PieChart from "../../components/PieChart.jsx";
 import useClientDashboard from "../../hooks/page-hooks/useClientDashboard.js";
 import { formatCurrency } from "../../utils/formatting.js";
 import { Link } from "@inertiajs/inertia-react";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
 
 export default function Dashboard() {
   const {
@@ -18,7 +19,7 @@ export default function Dashboard() {
 
   return (
     <main className="container-xl">
-      <h5 className="bg-info text-center rounded-3 p-3 text-white mb-5">Dashboard</h5>
+      <NewPageHeader title="Dashboard" />
 
       <div className="row row-cols-2 mb-5">
         <div>

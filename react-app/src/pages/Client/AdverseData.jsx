@@ -1,6 +1,7 @@
 import useAdverseDataVersion2 from "../../hooks/modal-hooks/useAdverseDataVersion2.js";
 import CustomAsyncSelect from "../../components/CustomAsyncSelect.jsx";
 import Layout from "../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
 
 export default function AdverseData({ Auth }) {
   const { processing, creditor, tenantType, setTenantType, handleSingleSubmit } =
@@ -8,7 +9,7 @@ export default function AdverseData({ Auth }) {
 
   return (
     <div>
-      <h6 className="text-center bg-info text-white rounded-3 p-2">Adverse Data - Single Claim</h6>
+      <NewPageHeader title="Adverse Data" />
 
       <form onSubmit={handleSingleSubmit}>
         <div className="p-2 mb-3">

@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useDebtCall from "../../../hooks/page-hooks/useDebtCall.js";
 import { fmtAmount } from "../../../utils/index.js";
 
@@ -7,7 +8,7 @@ export default function DebtCall() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h5 className="text-center p-2 mb-4 text-white custom-bg-grey-2 rounded">DEBT CALL</h5>
+      <NewPageHeader title="Debt Call" color="dark" />
 
       <div className="row align-items-start g-4">
         <div className="col-6">

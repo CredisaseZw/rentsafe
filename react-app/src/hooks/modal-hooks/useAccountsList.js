@@ -19,12 +19,9 @@ export default function useAccountsList() {
         }));
 
         setAccountsList(newAccountsList);
-        setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {

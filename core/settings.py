@@ -418,6 +418,14 @@ JS_ROUTES_INCLUSION_LIST = [
     "sales_reports",
     "rate_audit_trail",
     "adverse_data",
+    "cash_sales",
+    "cashbook_receipts",
+    "cashbook_payments",
+    "disbursements_page",
+    "commission_statements",
+    "accounts_sectors",
+    "currency_settings",
+    "payment_types",
 ]
 
 LOGIN_URL = "login"

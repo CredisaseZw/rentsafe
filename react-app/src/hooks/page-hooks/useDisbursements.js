@@ -5,21 +5,10 @@ import { useForm } from "@inertiajs/inertia-react";
 import { isNumeric, userFriendlyErrorOrResponse } from "../../utils";
 
 export default function useDisbursements() {
-  const [show, setShow] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState("");
-
   const { data, setData, reset } = useForm({
     rows: [{ ...sampleRow }],
   });
-
-  const openModal = () => setShow(true);
-  const closeModal = () => {
-    setProcessing(false);
-    setError("");
-    reset();
-    setShow(false);
-  };
 
   function addRow() {
     const newRow = { ...sampleRow, id: data.rows.length + 1 };
@@ -56,7 +45,6 @@ export default function useDisbursements() {
   function handleSubmit(e) {
     e.preventDefault();
     setProcessing(true);
-    setError("");
 
     const payload = {
       disbursements: data.rows.map((row) => ({
@@ -80,14 +68,13 @@ export default function useDisbursements() {
         if (res.status === 200 || res.status === 201) {
           toast.success(userFriendlyErrorOrResponse(res));
           setProcessing(false);
-          closeModal();
           reset();
         }
       })
       .catch((err) => {
         console.log(err);
         setProcessing(false);
-        setError(userFriendlyErrorOrResponse(err));
+        toast.error(userFriendlyErrorOrResponse(err));
       });
   }
 
@@ -113,15 +100,10 @@ export default function useDisbursements() {
   }
 
   return {
-    show,
     data,
-    error,
     processing,
     addRow,
-    setError,
-    openModal,
     removeRow,
-    closeModal,
     handleSubmit,
     handleInputChange,
     handleCreditorSelect,

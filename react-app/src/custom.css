@@ -775,3 +775,27 @@
     min-height: 80vh;
   }
 }
+
+.c-rounded-pill {
+  border-radius: 50rem !important;
+}
+.c-rounded-s-pill {
+  border-radius: 50rem 0 0 50rem !important;
+}
+.c-rounded-e-pill {
+  border-radius: 0 50rem 50rem 0 !important;
+}
+.c-rounded-t-pill {
+  border-radius: 50rem 50rem 0 0 !important;
+}
+.c-rounded-b-pill {
+  border-radius: 0 0 50rem 50rem !important;
+}
+.btn,
+.form-control,
+.form-select {
+  box-shadow: none !important;
+}
+.c-scale-down {
+  transform: scale(0.8);
+}

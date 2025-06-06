@@ -6,6 +6,7 @@ import { CompanyVerify } from "./OTP/CompanyVerify.jsx";
 import { CompanyAdd } from "./CompanyAdd.jsx";
 import { NotFound } from "../NotFound.jsx";
 import { Head } from "@inertiajs/inertia-react";
+import NewPageHeader from "../NewPageHeader.jsx";
 
 export default function CompanySearch({ url }) {
   const {
@@ -81,9 +82,7 @@ export default function CompanySearch({ url }) {
       </>
 
       <div className="container-xl">
-        <h4 className="bg-info text-white p-2 rounded rounded-5 text-center mb-4">
-          Search Company
-        </h4>
+        <NewPageHeader title="Search Company" />
 
         <table className="table table-sm table-bordered border-2 bg-white">
           <thead className="position-sticky c-table-top bg-white c-z-5">

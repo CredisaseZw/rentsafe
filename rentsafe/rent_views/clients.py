@@ -282,6 +282,50 @@ def rate_setup(request):
                 props = {"success": "Rate configured successfully!"}
                 return JsonResponse(props)
 
+def currency_settings(request):
+    if request.method == "GET" :
+        currency_settings_objects = CurrencyRate.objects.filter(user_id=request.user.company)
+        props = {"errors": "no currency settings found"}
+        if currency_settings_objects.exists():         
+            currency_settings = currency_settings_objects.last()   
+            currency_settings = {
+                "company_id": currency_settings.user.company,
+                "current_rate": currency_settings.current_rate,
+                "base_currency": currency_settings.base_currency,
+                "currency": currency_settings.currency,
+                "date_created": currency_settings.date_created,
+                "updated_at": currency_settings.updated_at,
+            }
+            props = {"currency_settings" : currency_settings}
+        return render(request, "Client/Accounting/CurrencySettings", props)
+
+    if request.method == "POST" :
+        rate_schema = RateSchema()
+        try:
+            data = rate_schema.loads(request.body)
+        except ValidationError as err:
+            props = {"errors": err.messages}
+            return render(request, "Client/Accounting/CurrencySettings", props)
+        else:
+            props = {}
+            rates = CurrencyRate.objects.filter(user=request.user)
+            if rates.exists():
+                rate = rates.last()
+                rate.base_currency=data.get("base_currency")
+                rate.currency=data.get("currency")
+                rate.current_rate=data.get("rate")
+                rate.save()
+                props = {"success": "Rate changed successfully!"}
+            else:
+                CurrencyRate.objects.create(
+                    company_id=request.user.company,
+                    base_currency=data.get("base_currency"),
+                    currency=data.get("currency"),
+                    current_rate=data.get("rate")
+                )
+                props = {"success": "Rate configured successfully!"}
+            return render(request, "Client/Accounting/CurrencySettings", props)
+
 
 @login_required
 @clients_required
@@ -3617,15 +3661,22 @@ def client_leases_new(request,leases_type=None):
     #     Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
     # ).values("id")
     individual_ids = Individual.objects.filter(
-        Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
-        ).annotate(id_str=Cast('identification_number', output_field=CharField())).values_list('id_str', flat=True)
+        Q(firstname__icontains=fname)
+        | Q(surname__icontains=sname)
+        | Q(identification_number__icontains=search_value)
+    ).values_list("identification_number", flat=True)
 
     company_ids = Company.objects.filter(
-            Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
-        ).annotate(id_str=Cast('id', output_field=CharField())).values_list('id_str', flat=True)
+        Q(registration_name__icontains=search_value)
+        | Q(trading_name__icontains=search_value)
+        | Q(registration_number__icontains=search_value)
+    ).values_list("id", flat=True)
 
+    # Convert company IDs to strings
+    company_ids = [str(i) for i in company_ids]
 
-    query_ids = individual_ids.union(company_ids)
+    # Combine both as a list
+    query_ids = list(individual_ids) + company_ids
 
     # get active leases for the superuser
     if leases_type == "individuals":
@@ -5455,6 +5506,7 @@ def create_receipt_and_payments(request):
         new_base_amount = base_amount
         total_amount_paid = base_amount
         if landlord:
+            
             if lease_exists:= LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).last():
                 new_base_amount = lease_exists.base_amount+float(base_amount)
                 total_amount_paid = lease_exists.total_amount+float(base_amount)
@@ -6035,6 +6087,10 @@ def adverse_data(request):
     return render(request, "Client/AdverseData")
 
 @login_required
+def commission_statements(request):
+    return render(request, "Client/CommissionStatementsSelection")
+
+@login_required
 @clients_required
 def sales_reports(request):
     return render(request, "Client/Accounting/Sales/SalesReports")
@@ -6055,7 +6111,6 @@ def sales_invoicing(request):
     return render(request, "Client/Accounting/Sales/SalesInvoicing")
 
 def accounts_list(request):
-
     return render(request, "Client/Accounting/AccountsList")
 
 @login_required

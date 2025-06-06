@@ -18,7 +18,7 @@ const rowTemp = {
   paymentDate: new Date().toISOString().split("T")[0],
 };
 
-export default function useClientSidebarReceipts() {
+export default function useCashbookReceipts() {
   const [rate, setRate] = useState(0);
   const [cashBooks, setCashBooks] = useState([]);
   const [glAccounts, setGlAccounts] = useState([]);
