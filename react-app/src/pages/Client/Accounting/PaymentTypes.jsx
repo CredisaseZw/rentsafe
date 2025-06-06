@@ -1,6 +1,7 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import usePaymentTypes from "../../../hooks/page-hooks/usePaymentTypes.js";
 import ContentModal from "../../../components/ContentModal.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function PaymentTypes() {
   const {
@@ -15,7 +16,7 @@ export default function PaymentTypes() {
 
   return (
     <div>
-      <h6 className="text-center bg-info text-white p-2 rounded-3">Payment Types</h6>
+      <NewPageHeader title="Payment Types" />
 
       <ContentModal show={showAdd} handleClose={closeAddModal} title="New Payment Type" size="sm">
         <form className="p-4" onSubmit={handleAddType}>

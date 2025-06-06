@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useDetailedGeneralLedgerAccount from "../../../hooks/modal-hooks/useDetailedGeneralLedgerAccount";
 
 export default function DetailedGeneralLedgerAccount() {
@@ -17,9 +18,7 @@ export default function DetailedGeneralLedgerAccount() {
 
   return (
     <div>
-      <h5 className="bg-dark text-white p-2 text-center rounded-1 mb-3 ">
-        Detailed General Ledger
-      </h5>
+      <NewPageHeader title="Detailed General Ledger" color="dark" />
 
       <form onSubmit={handleSubmit} className="mb-3">
         <div className="d-flex gap-2 justify-content-between align-items-end">

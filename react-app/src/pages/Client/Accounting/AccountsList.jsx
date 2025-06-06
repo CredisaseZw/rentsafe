@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useAccountsList from "../../../hooks/modal-hooks/useAccountsList.js";
 
 export default function AccountsList(props) {
@@ -6,7 +7,7 @@ export default function AccountsList(props) {
 
   return (
     <div>
-      <h6 className="text-white p-2 rounded-3 bg-info">Accounts List</h6>
+      <NewPageHeader title="Accounts List" />
 
       <table className="bg-white table table-responsive table-sm table-bordered">
         <thead className="sticky-top bg-white shadow-sm">

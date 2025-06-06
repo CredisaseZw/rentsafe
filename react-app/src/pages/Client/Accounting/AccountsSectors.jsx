@@ -1,13 +1,14 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import ClientSidebarNavItemModal from "../../../components/ClientSidebarNavItemModal.jsx";
 import useAccountsSectors from "../../../hooks/page-hooks/useAccountsSectors.js";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function AccountsSectors() {
   const { accountsSectors } = useAccountsSectors();
 
   return (
     <div>
-      <h6 className="text-white p-2 rounded-3 bg-info">Accounts Sectors</h6>
+      <NewPageHeader title="Accounts Sectors" />
 
       <table className="table bg-white table-responsive table-sm table-bordered">
         <thead className="sticky-top bg-white shadow-sm">

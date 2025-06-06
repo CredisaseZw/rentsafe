@@ -1,6 +1,7 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import useDisbursements from "../../../hooks/page-hooks/useDisbursements.js";
 import DisbursementsAsyncSelect from "../../../components/DisbursementsAsyncSelect.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function DisbursementsPage() {
   const {
@@ -15,7 +16,7 @@ export default function DisbursementsPage() {
 
   return (
     <div>
-      <h6 className="text-white bg-info p-2 rounded-3 text-center">Disbursements</h6>
+      <NewPageHeader title="Disbursements" noMargin />
 
       <div>
         <form onSubmit={handleSubmit}>

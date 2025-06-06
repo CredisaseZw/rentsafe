@@ -1,6 +1,7 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import useCashbookReceipts from "../../../hooks/page-hooks/useCashbookReceipts.js";
 import CustomAsyncSelect from "../../../components/CustomAsyncSelect.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function CashbookReceipts() {
   const {
@@ -23,7 +24,7 @@ export default function CashbookReceipts() {
 
   return (
     <>
-      <h5 className="text-center bg-dark text-white rounded-2 p-1 m-0 mb-4">Receipts</h5>
+      <NewPageHeader title="Receipts" color="dark" />
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3 d-flex gap-4 justify-content-center align-items-center">

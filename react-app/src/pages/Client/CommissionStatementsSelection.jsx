@@ -1,4 +1,5 @@
 import Layout from "../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
 import useCommissionStatementsSelection from "../../hooks/page-hooks/useCommissionStatementsSelection.js";
 
 export default function CommissionStatementsSelection() {
@@ -6,9 +7,7 @@ export default function CommissionStatementsSelection() {
 
   return (
     <div>
-      <h6 className="text-center text-white bg-info rounded-3 p-2">
-        Commission Statement Selection
-      </h6>
+      <NewPageHeader title="Commission Statement Selection" noMargin />
 
       <div className="bg-white p-3">
         <form

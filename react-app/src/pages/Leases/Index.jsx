@@ -11,6 +11,7 @@ import ClientView from "../../components/Client/ClientView/ClientView.jsx";
 import useLeaseManagement from "../../hooks/page-hooks/useLeaseManagement.js";
 import { formatCurrency } from "../../utils/formatting.js";
 import { DrawerContent } from "../../components/DrawerContent.jsx";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
 
 export default function Index({ leases, total_pages, current_page }) {
   const {
@@ -87,7 +88,7 @@ export default function Index({ leases, total_pages, current_page }) {
 
       <main id="hide-footer">
         <div className="container-xl p-0 mb-5">
-          <h5 className="bg-info text-center text-white p-2 rounded-2">Lease Management</h5>
+          <NewPageHeader title="Lease Management" noMargin />
 
           <div className="position-relative bg-white rounded-2 border">
             <table className="table table-sm table-responsive table-bordered ">

@@ -3,6 +3,7 @@ import InvoiceFormRow from "../../../../components/Client/InvoiceFormRow.jsx";
 import CashSalesPaymentRow from "../../../../components/Client/CashSalesPaymentRow.jsx";
 import ContentModal from "../../../../components/ContentModal.jsx";
 import useCashSales from "../../../../hooks/page-hooks/useCashSales.js";
+import NewPageHeader from "../../../../components/NewPageHeader.jsx";
 
 export default function CashSales() {
   const {
@@ -60,7 +61,7 @@ export default function CashSales() {
         </ContentModal>
       )}
 
-      <h6 className="text-center p-2 rounded-3 bg-info text-white">FISCAL TAX INVOICE</h6>
+      <NewPageHeader title="Fiscal Tax Invoice" noMargin />
 
       <form className="py-3" onSubmit={onSubmit}>
         <div className="p-4" ref={contentRef}>

@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useCurrencySettings from "../../../hooks/page-hooks/useCurrencySettings";
 
 export default function CurrencySettings({ currency_settings, errors, success }) {
@@ -7,7 +8,7 @@ export default function CurrencySettings({ currency_settings, errors, success })
 
   return (
     <div>
-      <h6 className="text-center bg-info text-white p-2 rounded-3">Currency Settings</h6>
+      <NewPageHeader title="Currency Settings" noMargin />
 
       <form
         className="custom-mn-h-5 justify-content-center w-75  mx-auto d-flex flex-column"
