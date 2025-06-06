@@ -14,7 +14,8 @@ from accounting.models import (
     InvoiceItem,
     PaymentMethod,
     TransactionType,
-    GeneralLedgerAccount
+    GeneralLedgerAccount,
+    CashbookEntryType,
 )
 # from simple_history.admin import SimpleHistoryAdmin
 
@@ -57,11 +58,21 @@ class CashSaleAdmin(admin.ModelAdmin):
     
 @admin.register(CashbookEntry)
 class CashbookEntryAdmin(admin.ModelAdmin):
-    list_display = ("user", "id", "transaction_date", "transaction_type", "amount")
-    list_display_links = ("transaction_date",)
-    search_fields = ("transaction_date",)
-    list_filter = ("transaction_type",)
-    ordering = ("-transaction_date",)
+    list_display = ("user", "id", "cashbook_account","payment_reference", "type", "total_including_vat","vat","matching_invoice","rate" )
+    list_display_links = ("payment_reference",)
+    search_fields = ("payment_reference",)
+    list_filter = ("cashbook_account","type")
+    ordering = ("-payment_reference",)
+
+    def type(self, obj):
+        return obj.type.cashbook_entry_type if obj.type else None
+
+@admin.register(CashbookEntryType)
+class CashbookEntryTypeAdmin(admin.ModelAdmin):
+    list_display = ("id", "cashbook_entry_type", "account", "details")
+    list_display_links = ("cashbook_entry_type",)
+    search_fields = ("account",)
+    ordering = ("id",)
 
 @admin.register(CurrencyRate)
 class CurrencyRate(admin.ModelAdmin):
