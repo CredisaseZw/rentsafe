@@ -796,3 +796,6 @@
 .form-select {
   box-shadow: none !important;
 }
+.c-scale-down {
+  transform: scale(0.8);
+}
