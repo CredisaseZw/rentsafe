@@ -3661,15 +3661,22 @@ def client_leases_new(request,leases_type=None):
     #     Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
     # ).values("id")
     individual_ids = Individual.objects.filter(
-        Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
-        ).annotate(id_str=Cast('identification_number', output_field=CharField())).values_list('id_str', flat=True)
+        Q(firstname__icontains=fname)
+        | Q(surname__icontains=sname)
+        | Q(identification_number__icontains=search_value)
+    ).values_list("identification_number", flat=True)
 
     company_ids = Company.objects.filter(
-            Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
-        ).annotate(id_str=Cast('id', output_field=CharField())).values_list('id_str', flat=True)
+        Q(registration_name__icontains=search_value)
+        | Q(trading_name__icontains=search_value)
+        | Q(registration_number__icontains=search_value)
+    ).values_list("id", flat=True)
 
+    # Convert company IDs to strings
+    company_ids = [str(i) for i in company_ids]
 
-    query_ids = individual_ids.union(company_ids)
+    # Combine both as a list
+    query_ids = list(individual_ids) + company_ids
 
     # get active leases for the superuser
     if leases_type == "individuals":
@@ -4223,15 +4230,19 @@ def client_statements_new(request):
         Q(firstname__icontains=fname)
         | Q(surname__icontains=sname)
         | Q(identification_number__icontains=search_value)
-    ).values("identification_number")
+    ).values_list("identification_number", flat=True)
 
     company_ids = Company.objects.filter(
         Q(registration_name__icontains=search_value)
         | Q(trading_name__icontains=search_value)
         | Q(registration_number__icontains=search_value)
-    ).values("id")
+    ).values_list("id", flat=True)
 
-    query_ids = individual_ids.union(company_ids)
+    # Convert company IDs to strings
+    company_ids = [str(i) for i in company_ids]
+
+    # Combine both as a list
+    query_ids = list(individual_ids) + company_ids
 
     # get active leases for the superuser
     if request.user.is_superuser:
@@ -5495,6 +5506,7 @@ def create_receipt_and_payments(request):
         new_base_amount = base_amount
         total_amount_paid = base_amount
         if landlord:
+            
             if lease_exists:= LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).last():
                 new_base_amount = lease_exists.base_amount+float(base_amount)
                 total_amount_paid = lease_exists.total_amount+float(base_amount)
