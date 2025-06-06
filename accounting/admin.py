@@ -16,6 +16,8 @@ from accounting.models import (
     TransactionType,
     GeneralLedgerAccount,
     CashbookEntryType,
+    CreditNote,
+    CreditNoteItem
 )
 # from simple_history.admin import SimpleHistoryAdmin
 
@@ -139,3 +141,19 @@ class GeneralLedgerAdmin(admin.ModelAdmin):
     def account_sector_name(self, obj):
         return obj.account_sector.name if obj.account_sector else None
     account_sector_name.short_description = "Sector Name"
+
+@admin.register(CreditNote)
+class CreditNoteAdmin(admin.ModelAdmin):
+    list_display =  ('id', 'document_number', 'date', 'is_individual')
+    list_display_links = ('document_number',)
+    search_fields = ('document_number',)
+    list_filter = ('date', 'is_individual')
+    ordering = ('-date',)
+
+@admin.register(CreditNoteItem)
+class CreditNoteItemItemAdmin(admin.ModelAdmin):
+    list_display = ("credit_note", "id", "sales_item", "quantity", "unit_price", "total_price")
+    list_display_links = ("id",)
+    search_fields = ("credit_note__document_number", )
+    list_filter = ("sales_item",)
+    ordering = ("-credit_note",)
