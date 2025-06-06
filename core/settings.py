@@ -425,6 +425,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "commission_statements",
     "accounts_sectors",
     "currency_settings",
+    "payment_types",
 ]
 
 LOGIN_URL = "login"

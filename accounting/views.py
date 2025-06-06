@@ -295,3 +295,6 @@ def cashbook_payments(request):
 
 def accounts_sectors(request):
     return inertia_render(request, "Client/Accounting/AccountsSectors")
+
+def payment_types(request):
+    return inertia_render(request, "Client/Accounting/PaymentTypes")

@@ -1,5 +1,4 @@
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
-import PaymentTypes from "../components/modals/PaymentTypes.jsx";
 
 export const clientSidebarNavigation = [
   {
@@ -292,8 +291,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Payment Types",
                 color: "purple",
-                type: "modal",
-                component: <PaymentTypes />,
+                type: "link",
+                href: reverseUrl("payment_types"),
               },
               {
                 navLink: "List",
