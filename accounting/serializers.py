@@ -252,7 +252,7 @@ class InvoiceSerializer(BaseCompanySerializer):
             vat_rate = sales_item.tax_configuration.rate / Decimal('100')
             
             quantity = Decimal(str(item_data['quantity']))
-            unit_price = Decimal(str(item_data['unit_price']))
+            unit_price = sales_item.price
             
             item_vat = (unit_price * vat_rate).quantize(Decimal('0.00'))
             item_total = (unit_price * quantity * (1 + vat_rate)).quantize(Decimal('0.00'))
@@ -375,12 +375,12 @@ class CreditNoteItemSerializer(serializers.ModelSerializer):
         write_only=True
     )
     qty = serializers.DecimalField(source='quantity', max_digits=10, decimal_places=2)
-    price = serializers.DecimalField(source='unit_price', max_digits=10, decimal_places=2)
+    # price = serializers.DecimalField(source='unit_price', max_digits=10, decimal_places=2)
 
     class Meta:
         model = CreditNoteItem
         fields = [
-            'sales_item', 'sales_item_id', 'qty', 'price',
+            'sales_item', 'sales_item_id', 'qty',
             'vat_amount', 'total_price'
         ]
         read_only_fields = ['vat_amount', 'total_price']
@@ -399,9 +399,23 @@ class CreditNoteSerializer(BaseCompanySerializer):
 
     class Meta(BaseCompanySerializer.Meta):
         model = CreditNote
-        fields = ['id','document_number','date','customer_id','customer_details', 'currency', 'currency_id',
-                  'discount','total_exluding_vat', 'total_including_vat', 'vat_total', 
-                  'discount', 'customer_details', 'date_created', 'user' ]
+        fields = [
+            'id',
+            'document_number',
+            'date',
+            'date_created',
+            'is_individual',
+            'customer_id',
+            'customer_details',
+            'currency',
+            'currency_id',
+            'items',
+            'discount',
+            'vat_total',
+            'total_excluding_vat',
+            'total_including_vat',
+            'user'
+        ]
         read_only_fields = ['user', 'date_created', 'date_updated','total_including_vat', 
                             'total_excluding_vat','vat_total', 'currency', 'company', 'individual']
 
@@ -440,7 +454,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
         return data
 
     def create(self, validated_data):
-        items_data = validated_data.pop('sales_item')
+        items_data = validated_data.pop('items',[])
         validated_data["discount"] = abs(validated_data.get("discount", Decimal('0')))
         credit_note = CreditNote.objects.create(**validated_data)
 
@@ -452,7 +466,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
             vat_rate = sales_item.tax_configuration.rate / Decimal('100')
 
             quantity = Decimal(str(item_data['quantity']))
-            unit_price = Decimal(str(item_data['unit_price']))
+            unit_price = sales_item.price
             
             item_vat = (unit_price* vat_rate).quantize(Decimal('0.00'))
             item_total = (unit_price* quantity)
@@ -477,4 +491,4 @@ class CreditNoteSerializer(BaseCompanySerializer):
         credit_note.save()
 
         return credit_note
-    
+        

@@ -328,20 +328,20 @@ class CreditNote(BaseModel):
 
     def save(self, *args, **kwargs):
         if not self.document_number:
-            last_note = CreditNote.objects.order_by('-id').last()
+            last_note = CreditNote.objects.order_by('-id').first()
             next_note_id = last_note.id +1 if last_note else 1
             self.document_number= f"C{next_note_id:06d}"
 
         # roundup all decimal places before saving
         self.total_excluding_vat = self.total_excluding_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        self.vat_total = self.vat_total.quantsize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        self.vat_total = self.vat_total.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
         self.total_including_vat = self.total_including_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
        
         self.full_clean()
-        super.save(*args,**kwargs)
+        super().save(*args,**kwargs)
 
 class CreditNoteItem(BaseModel):
-    credit_note = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="credit_note_items")
+    credit_note = models.ForeignKey(CreditNote, on_delete=models.CASCADE, related_name="items")
     sales_item = models.ForeignKey(SalesItem, on_delete=models.PROTECT)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -349,5 +349,7 @@ class CreditNoteItem(BaseModel):
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
 
     def save(self, *args, **kwargs):
+        if not self.unit_price:
+            self.unit_price = self.sales_item.price
         self.total_price = (self.unit_price + self.vat_amount) * self.quantity
         super().save(*args, **kwargs)   
