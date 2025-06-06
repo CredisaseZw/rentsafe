@@ -315,6 +315,7 @@ class CreditNote(BaseModel):
     date = models.DateField(default=now)
 
     # Customer Relationship
+    is_individual = models.BooleanField(default=True)
     individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
     
