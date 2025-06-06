@@ -69,7 +69,7 @@ export default function Layout({ children, title }) {
               id="footer"
               className="p-4 border-top d-flex justify-content-between align-items-center"
             >
-              <p className="text-muted small m-0">© Credit Safe {new Date().getFullYear()}</p>
+              <p className="text-muted small m-0">© Credi-Safe {new Date().getFullYear()}</p>
 
               <button
                 onClick={() => window.scrollTo(0, 0)}
