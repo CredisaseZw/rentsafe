@@ -532,6 +532,11 @@ urlpatterns = [
                     name="rate_setup",
                 ),
                 path(
+                    "settings/currency-settings/",
+                    clients.currency_settings,
+                    name="currency_settings",
+                ),
+                path(
                     "write-off/",
                     clients.write_off,
                     name="write-off",

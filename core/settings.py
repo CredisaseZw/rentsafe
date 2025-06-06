@@ -424,6 +424,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "disbursements_page",
     "commission_statements",
     "accounts_sectors",
+    "currency_settings",
 ]
 
 LOGIN_URL = "login"

@@ -1,6 +1,5 @@
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import PaymentTypes from "../components/modals/PaymentTypes.jsx";
-import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 
 export const clientSidebarNavigation = [
   {
@@ -259,8 +258,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Currency",
             color: "purple",
-            type: "modal",
-            component: <CurrencySettings />,
+            type: "link",
+            href: reverseUrl("currency_settings"),
           },
           {
             navLink: "V.A.T Settings",
