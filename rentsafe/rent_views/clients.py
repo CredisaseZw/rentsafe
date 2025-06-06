@@ -283,49 +283,7 @@ def rate_setup(request):
                 return JsonResponse(props)
 
 def currency_settings(request):
-    if request.method == "GET" :
-        currency_settings_objects = CurrencyRate.objects.filter(user_id=request.user.company)
-        props = {"errors": "no currency settings found"}
-        if currency_settings_objects.exists():         
-            currency_settings = currency_settings_objects.last()   
-            currency_settings = {
-                "company_id": currency_settings.user.company,
-                "current_rate": currency_settings.current_rate,
-                "base_currency": currency_settings.base_currency,
-                "currency": currency_settings.currency,
-                "date_created": currency_settings.date_created,
-                "updated_at": currency_settings.updated_at,
-            }
-            props = {"currency_settings" : currency_settings}
-        return render(request, "Client/Accounting/CurrencySettings", props)
-
-    if request.method == "POST" :
-        rate_schema = RateSchema()
-        try:
-            data = rate_schema.loads(request.body)
-        except ValidationError as err:
-            props = {"errors": err.messages}
-            return render(request, "Client/Accounting/CurrencySettings", props)
-        else:
-            props = {}
-            rates = CurrencyRate.objects.filter(user=request.user)
-            if rates.exists():
-                rate = rates.last()
-                rate.base_currency=data.get("base_currency")
-                rate.currency=data.get("currency")
-                rate.current_rate=data.get("rate")
-                rate.save()
-                props = {"success": "Rate changed successfully!"}
-            else:
-                CurrencyRate.objects.create(
-                    company_id=request.user.company,
-                    base_currency=data.get("base_currency"),
-                    currency=data.get("currency"),
-                    current_rate=data.get("rate")
-                )
-                props = {"success": "Rate configured successfully!"}
-            return render(request, "Client/Accounting/CurrencySettings", props)
-
+    return render(request, "Client/Accounting/CurrencySettings")
 
 @login_required
 @clients_required
