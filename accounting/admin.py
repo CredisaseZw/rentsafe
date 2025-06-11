@@ -151,7 +151,7 @@ class CreditNoteAdmin(admin.ModelAdmin):
     ordering = ('-date',)
 
 @admin.register(CreditNoteItem)
-class CreditNoteItemItemAdmin(admin.ModelAdmin):
+class CreditNoteItemAdmin(admin.ModelAdmin):
     list_display = ("credit_note", "id", "sales_item", "quantity", "unit_price", "total_price")
     list_display_links = ("id",)
     search_fields = ("credit_note__document_number", )
