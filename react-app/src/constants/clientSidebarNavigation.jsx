@@ -1,12 +1,4 @@
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
-import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
-import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
-import Disbursements from "../components/Disbursements.jsx";
-import AccountsList from "../components/modals/AccountsList.jsx";
-import AccountsSectors from "../components/modals/AccountsSectors.jsx";
-import CashSalesModal from "../components/modals/CashSalesModal.jsx";
-import PaymentTypes from "../components/modals/PaymentTypes.jsx";
-import CurrencySettings from "../components/modals/sidebar/CurrencySettings.jsx";
 
 export const clientSidebarNavigation = [
   {
