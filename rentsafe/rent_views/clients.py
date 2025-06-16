@@ -22,7 +22,7 @@ from inertia import render
 from inertia.share import share
 from marshmallow import ValidationError
 
-from accounting.models import CurrencyRate
+from accounting.models.models import CurrencyRate
 from rentsafe.decorators import clients_required
 from rentsafe.helper import *
 from rentsafe.models import *

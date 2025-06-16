@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from accounting.views import (
+from accounting.api.views import (
     SalesCategoryViewSet,
     SalesAccountViewSet,
     CashSaleViewSet,
@@ -18,17 +18,11 @@ from accounting.views import (
     CurrencyViewSet,
     PaymentMethodViewSet,
     TransactionTypeViewSet,
-    CashbookEntryTypeViewSet,
     cash_books_list,
     detailed_general_ledger,
     credit_note,
     creditor_invoice,
     rate_audit_trail,
-    cash_sales,
-    cashbook_receipts,
-    cashbook_payments,
-    accounts_sectors,
-    payment_types,
 )
 
 router = DefaultRouter()
@@ -36,7 +30,6 @@ router.register(r'sales-categories', SalesCategoryViewSet, basename="sales_categ
 router.register(r'sales-accounts', SalesAccountViewSet, basename="sales_accounts")
 router.register(r'cash-sales', CashSaleViewSet, basename="cash_sales")
 router.register(r'cashbook-entries', CashbookEntryViewSet, basename="cashbook_entries")
-router.register(r'cashbook-entry-type', CashbookEntryTypeViewSet, basename="cashbook_entry_type")
 router.register(r'ledger-accounts', GeneralLedgerAccountViewSet, basename="ledger_accounts")
 router.register(r'journal-entries', JournalEntryViewSet, basename="journal_entries")
 router.register(r'ledger-transactions', LedgerTransactionViewSet, basename="ledger_transactions")
@@ -58,9 +51,4 @@ urlpatterns = [
     path("credit-note/", credit_note ,name="credit_note"),
     path("creditor-invoice/", creditor_invoice ,name="creditor_invoice"),
     path("rate-audit-trail/", rate_audit_trail ,name="rate_audit_trail"),
-    path("cash-sales/", cash_sales ,name="cash_sales"),
-    path("cashbook-receipts/", cashbook_receipts ,name="cashbook_receipts"),
-    path("cashbook-payments/", cashbook_payments ,name="cashbook_payments"),
-    path("accounts-sectors/", accounts_sectors ,name="accounts_sectors"),
-    path("payment-types/", payment_types ,name="payment_types"),
 ]
