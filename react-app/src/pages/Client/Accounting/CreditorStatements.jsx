@@ -6,6 +6,7 @@ import { Inertia } from "@inertiajs/inertia";
 import { formatCurrency } from "../../../utils/formatting.js";
 import CreditorView from "../../../components/Client/ClientView/CreditorView.jsx";
 import useCreditorStatements from "../../../hooks/modal-hooks/useCreditorStatements.js";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function CreditorStatements({ creditors, current_page, total_pages, total_items }) {
   const { balanceTotal, creditorViewProps } = useCreditorStatements(
@@ -19,7 +20,7 @@ export default function CreditorStatements({ creditors, current_page, total_page
     <div>
       <CreditorView creditorViewProps={creditorViewProps} />
 
-      <h5 className="bg-danger text-center text-white p-2 mb-4 rounded-2">CREDITOR SUMMARY</h5>
+      <NewPageHeader title="Creditor Summary" color="danger" />
 
       <table className="table table-bordered table-responsive table-sm c-fs-small">
         <thead className="position-sticky c-table-top c-bg-whitesmoke">

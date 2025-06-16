@@ -1,4 +1,3 @@
-import CashBookPayments from "../components/CashBookPayments.jsx";
 import SubscriptionsManagement from "../components/Client/SubscriptionsManagement.jsx";
 import ClientSidebarReceipts from "../components/ClientSidebarReceipts.jsx";
 import CommissionStatementsSelection from "../components/CommissionStatementsSelection.jsx";
@@ -56,8 +55,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Cash Sales",
             color: "firebrick",
-            type: "modal",
-            component: <CashSalesModal />,
+            type: "link",
+            href: reverseUrl("cash_sales"),
           },
           {
             navLink: "Credit Note",
@@ -92,8 +91,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Receipts",
             color: "#00823d",
-            type: "modal",
-            component: <ClientSidebarReceipts />,
+            type: "link",
+            href: reverseUrl("cashbook_receipts"),
           },
           {
             navLink: "Requisitions",
@@ -104,10 +103,9 @@ export const clientSidebarNavigation = [
           {
             navLink: "Payments",
             color: "#00823d",
-            type: "modal",
-            component: <CashBookPayments />,
+            type: "link",
+            href: reverseUrl("cashbook_payments"),
           },
-
           {
             navLink: "Bank Reconciliations",
             color: "#00823d",
@@ -171,8 +169,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Disbursements",
             color: "#11158f",
-            type: "modal",
-            component: <Disbursements />,
+            type: "link",
+            href: reverseUrl("disbursements_page"),
           },
           {
             navLink: "Creditor Statements",
@@ -223,8 +221,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Accounts List",
                 color: "steelblue",
-                type: "modal",
-                component: <AccountsList />,
+                type: "link",
+                href: reverseUrl("accounts_list"),
               },
             ],
           },
@@ -243,8 +241,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Commission Statements",
             color: "red",
-            type: "modal",
-            component: <CommissionStatementsSelection />,
+            type: "link",
+            href: reverseUrl("commission_statements"),
           },
           {
             navLink: "Cashflow Forecasts",
@@ -267,8 +265,8 @@ export const clientSidebarNavigation = [
           {
             navLink: "Currency",
             color: "purple",
-            type: "modal",
-            component: <CurrencySettings />,
+            type: "link",
+            href: reverseUrl("currency_settings"),
           },
           {
             navLink: "V.A.T Settings",
@@ -289,8 +287,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Accounts Sectors",
                 color: "purple",
-                type: "modal",
-                component: <AccountsSectors />,
+                type: "link",
+                href: reverseUrl("accounts_sectors"),
               },
             ],
           },
@@ -301,8 +299,8 @@ export const clientSidebarNavigation = [
               {
                 navLink: "Payment Types",
                 color: "purple",
-                type: "modal",
-                component: <PaymentTypes />,
+                type: "link",
+                href: reverseUrl("payment_types"),
               },
               {
                 navLink: "List",

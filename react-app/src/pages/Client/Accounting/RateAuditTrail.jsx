@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useRateAuditTrail from "../../../hooks/page-hooks/useRateAuditTrail.js";
 import { friendlyDate } from "../../../utils/index.js";
 
@@ -7,7 +8,7 @@ export default function RateAuditTrail() {
 
   return (
     <div>
-      <h5 className="bg-danger text-white p-2 text-center rounded-1">Rate Audit Trail</h5>
+      <NewPageHeader title="Rate Audit Trail" color="danger" />
 
       <div className="d-flex gap-2 my-4 text-nowrap">
         <fieldset className="d-flex justify-content-around align-items-end flex-fill gap-3 border custom-rounded-1 border-3">

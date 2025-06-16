@@ -3,6 +3,7 @@ import SearchBar from "../../../components/SearchBar.jsx";
 import PaginationControls from "../../../components/PaginationControls.jsx";
 import useClientStatements from "../../../hooks/page-hooks/useClientStatements.js";
 import { formatCurrency } from "../../../utils/formatting.js";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function Statements() {
   const {
@@ -17,7 +18,7 @@ export default function Statements() {
 
   return (
     <div>
-      <h5 className="bg-info text-center text-white p-2 mb-4 rounded-2">CUSTOMER SUMMARY</h5>
+      <NewPageHeader title="Customer Summary" />
 
       <div className="p-2 fw-bold d-flex justify-content-between align-items-center">
         <div>USD</div>

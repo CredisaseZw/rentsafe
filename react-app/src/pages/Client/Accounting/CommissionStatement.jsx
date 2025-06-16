@@ -1,5 +1,4 @@
 import moment from "moment";
-import CommissionStatementsSelection from "../../../components/CommissionStatementsSelection.jsx";
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import useCommissionStatement from "../../../hooks/page-hooks/useCommissionStatement.js";
 import { formatCurrency } from "../../../utils/formatting.js";
@@ -66,15 +65,13 @@ export default function CommissionStatement({ statement }) {
         </table>
 
         {!Boolean(statement.rows.length) && (
-          <div className="custom-h-4 d-flex justify-content-center align-items-center border border-2">
+          <div className="custom-h-4 bg-white d-flex justify-content-center align-items-center border border-2">
             Nothing to show
           </div>
         )}
       </div>
 
       <div className="d-flex justify-content-end align-items-center gap-3 p-4">
-        <CommissionStatementsSelection btnClass="btn btn-primary" btnText="Period request" />
-
         <button onClick={handlePrintToPdf} className="btn btn-info text-white">
           Print
         </button>

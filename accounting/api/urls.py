@@ -30,6 +30,7 @@ router.register(r'sales-categories', SalesCategoryViewSet, basename="sales_categ
 router.register(r'sales-accounts', SalesAccountViewSet, basename="sales_accounts")
 router.register(r'cash-sales', CashSaleViewSet, basename="cash_sales")
 router.register(r'cashbook-entries', CashbookEntryViewSet, basename="cashbook_entries")
+router.register(r'cashbook-entry-type', CashbookEntryTypeViewSet, basename="cashbook_entry_type")
 router.register(r'ledger-accounts', GeneralLedgerAccountViewSet, basename="ledger_accounts")
 router.register(r'journal-entries', JournalEntryViewSet, basename="journal_entries")
 router.register(r'ledger-transactions', LedgerTransactionViewSet, basename="ledger_transactions")

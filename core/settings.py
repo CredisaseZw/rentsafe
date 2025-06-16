@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.parse import urlparse
 
+load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -418,6 +420,14 @@ JS_ROUTES_INCLUSION_LIST = [
     "sales_reports",
     "rate_audit_trail",
     "adverse_data",
+    "cash_sales",
+    "cashbook_receipts",
+    "cashbook_payments",
+    "disbursements_page",
+    "commission_statements",
+    "accounts_sectors",
+    "currency_settings",
+    "payment_types",
 ]
 
 LOGIN_URL = "login"

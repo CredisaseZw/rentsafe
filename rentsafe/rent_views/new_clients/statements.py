@@ -250,7 +250,10 @@ def disbursements(request):
 
     return JsonResponse(props, status=200, safe=False)
         # return render(request, "Client/Accounting/Disbursements", props)
-        
+
+def disbursements_page(request):
+    return render(request, "Client/Accounting/DisbursementsPage")
+               
 
 @login_required
 def create_disbursement(request):
