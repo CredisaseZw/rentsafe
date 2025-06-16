@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline # For generic relations
 from django.utils.html import format_html
+from django.contrib.contenttypes.models import ContentType
 from accounting.models.models import (
     AccountSector,
     SalesItem,
@@ -19,6 +20,7 @@ from accounting.models.models import (
     GeneralLedgerAccount,
 )
 
+admin.site.register(ContentType)
 admin.site.site_header = "CountSafe Admin"
 admin.site.site_title = "CountSafe Administration Portal"
 admin.site.index_title = "Welcome to CountSafe Admin"
@@ -117,11 +119,11 @@ class CashbookEntryAdmin(admin.ModelAdmin):
 
 @admin.register(CurrencyRate)
 class CurrencyRateAdmin(admin.ModelAdmin): # Corrected class name
-    list_display = ("id", "user", "base_currency", "currency", "current_rate", "updated_at")
+    list_display = ("id", "user", "base_currency", "currency", "current_rate", "date_updated")
     list_display_links = ("id", "user")
     search_fields = ("user__username", "base_currency__currency_code", "currency__currency_code")
     list_filter = ("base_currency", "currency")
-    ordering = ("-updated_at",)
+    ordering = ("-date_created",)
     raw_id_fields = ('user', 'base_currency', 'currency')
     list_per_page = 25
 
@@ -139,7 +141,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     list_display = ("id", "document_number", "invoice_type", "status", "sale_date",
                     "customer_display", "total_inclusive", "currency", "is_recurring", "user")
     list_display_links = ("document_number",)
-    search_fields = ("document_number", "individual__first_name", "individual__surname", "company__name", "reference_number")
+    search_fields = ("document_number", "individual__firstname", "individual__surname", "company__name", "reference_number")
     list_filter = ("invoice_type", "status", "sale_date", "is_individual", "currency", "is_recurring")
     ordering = ("-sale_date", "document_number")
     inlines = [TransactionLineItemInline] # Add inline for line items
@@ -171,7 +173,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 
     def customer_display(self, obj):
         if obj.is_individual and obj.individual:
-            return f"{obj.individual.first_name} {obj.individual.surname}"
+            return f"{obj.individual.firstname} {obj.individual.surname}"
         elif not obj.is_individual and obj.company:
             return obj.company.name
         return "N/A"
@@ -181,7 +183,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 class CreditNoteAdmin(admin.ModelAdmin):
     list_display = ("id", "document_number", "credit_date", "total_amount", "customer_display", "currency", "user")
     list_display_links = ("document_number",)
-    search_fields = ("document_number", "individual__first_name", "individual__surname", "company__name")
+    search_fields = ("document_number", "individual__firstname", "individual__surname", "company__name")
     list_filter = ("credit_date", "is_individual", "currency")
     ordering = ("-credit_date", "document_number")
     inlines = [TransactionLineItemInline] # Add inline for line items
@@ -209,7 +211,7 @@ class CreditNoteAdmin(admin.ModelAdmin):
 
     def customer_display(self, obj):
         if obj.is_individual and obj.individual:
-            return f"{obj.individual.first_name} {obj.individual.surname}"
+            return f"{obj.individual.firstname} {obj.individual.surname}"
         elif not obj.is_individual and obj.company:
             return obj.company.name
         return "N/A"
