@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.parse import urlparse
 
+load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from accounting.models import SalesAccount, AccountSector
+from accounting.models.models import SalesAccount, AccountSector
 from authentication.models import CustomUser
 
 class Command(BaseCommand):

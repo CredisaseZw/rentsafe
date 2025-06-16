@@ -1,3 +1,4 @@
+from django.db import models, transaction
 from authentication.models import CustomUser
 from datetime import datetime
 from django.utils import timezone
@@ -5,16 +6,20 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now, timedelta
 from dateutil.relativedelta import relativedelta
 import uuid
-from django.db import models,transaction
 from django.core.exceptions import ValidationError
-from rentsafe.models import Individual, Company, Lease
+from rentsafe.models import Individual, Company, Lease # Assuming these are correctly imported
 from decimal import Decimal, ROUND_HALF_UP
 from django.db.models import F
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
+# Helper functions for default document numbers - these can be serialized by Django
+
 # Create your models here.
 
 class BaseModel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, default=None, blank=True, null=True)
-    date_created = models.DateTimeField(auto_now_add=True , blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     date_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
@@ -29,7 +34,7 @@ class AccountSector(BaseModel):
 class SalesAccount(BaseModel):
     """Stores different sales accounts and links them to sectors."""
     account_name = models.CharField(max_length=255, unique=True)
-    account_number = models.CharField(max_length=15, default="")  # Numeric Account Code
+    account_number = models.CharField(max_length=15, default="") 
     account_sector = models.ForeignKey(AccountSector, on_delete=models.CASCADE, related_name="accounts")
 
     def __str__(self):
@@ -41,9 +46,8 @@ class Currency(BaseModel):
 
     def __str__(self):
         return self.currency_code
-  
+
 class SalesItem(BaseModel):
-      
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -57,18 +61,11 @@ class SalesItem(BaseModel):
         return f"{self.name} ({self.category.name})"
 
 class SalesCategory(BaseModel):
-      
     name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=255, blank=True, null=True) 
+    code = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name
-
-class CashSale(BaseModel):
-    sale_date = models.DateTimeField(auto_now_add=True)
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    def __str__(self):
-        return f"Cash Sale {self.id} - {self.user.user_id}"
 
 class VATSetting(BaseModel):
     rate = models.DecimalField(max_digits=5, decimal_places=2)
@@ -82,46 +79,18 @@ class TransactionType(BaseModel):
     transaction_type = models.CharField(max_length=30, unique=True)
     description = models.TextField(blank=True, null=True)
 
-    def __str__(self):
-        return f"{self.transaction_type}"
-
 class CashbookEntry(BaseModel):
-    """Cash Book Payments"""
-    date = models.DateField(default=now)
-    cashbook_account = models.ForeignKey('CashBook', on_delete=models.PROTECT, related_name='entries', blank=True, null=True)
-    payment_reference = models.CharField(max_length=255, unique=True, blank=True)
-    type = models.ForeignKey('CashBookEntryType', on_delete=models.PROTECT, related_name='entries', blank=True, null=True)
-    total_including_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    matching_invoice = models.ForeignKey('Invoice', on_delete=models.SET_NULL, related_name='cashbook_entries', blank=True, null=True)
-    rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
-    
-    def save(self, *args, **kwargs):
-        if not self.payment_reference:
-            # Generate a unique payment reference number
-            last_entry = CashbookEntry.objects.order_by('-id').first()
-            next_ref = last_entry.id + 1 if last_entry else 1
-            self.payment_reference = f"{next_ref:06d}"
-        super().save(*args, **kwargs)
-
+    transaction_date = models.DateTimeField(auto_now_add=True)
+    transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
     def __str__(self):
-        return f"{self.type} - {self.total_including_vat}"
+        return f"{self.transaction_type} - {self.amount}"
 
-class CashbookEntryType(BaseModel):
-    cashbook_entry_type = models.CharField(max_length=50, choices=[
-        ("GL", "General Ledger"),
-        ("CR", "Creditor")
-    ])
-    account = models.IntegerField()
-    details = models.TextField(blank=True, null=True)
-    
-    def __str__(self):
-        return f"{self.type} - {self.account}"
-    
 class GeneralLedgerAccount(BaseModel):
     account_name = models.CharField(max_length=255, unique=True, blank=True)
     account_number = models.CharField(max_length=10, unique=True, blank=True)
-    account_sector =   models.ForeignKey(AccountSector, on_delete=models.PROTECT, related_name='sector', default=None)
+    account_sector = models.ForeignKey(AccountSector, on_delete=models.PROTECT, related_name='sector', default=None)
 
     def __str__(self):
         return f"{self.account_name} - {self.account_number}"
@@ -139,6 +108,7 @@ class LedgerTransaction(BaseModel):
     credit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     def __str__(self):
         return f"{self.account.account_name} - Debit: {self.debit} Credit: {self.credit}"
+
 
 class Invoice(BaseModel):
     INVOICE_TYPE_CHOICES = [
@@ -162,30 +132,30 @@ class Invoice(BaseModel):
 
     # Core Fields
     invoice_type = models.CharField(max_length=20, choices=INVOICE_TYPE_CHOICES, default="fiscal")
-    document_number = models.CharField(max_length=20, unique=True, editable=False)
-    is_individual = models.BooleanField(default=True)
+    document_number = models.CharField(max_length=20, unique=True, editable=False, default=generate_invoice_document_number)
+    is_individual = models.BooleanField(default=True) 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     lease = models.ForeignKey(Lease, on_delete=models.CASCADE, null=True, blank=True)
-    reference_number = models.CharField(max_length=20, blank=True, null=True)
-    # Customer Relationship
+    reference_number = models.CharField(max_length=20, blank=True, null=True) # e.g., PO number
+
+    # Customer Relationship - ForeignKeys to rentsafe app Individual/Company models
     individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
-    
+
     # Financial Details
-    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT) 
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     total_excluding_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     vat_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     total_inclusive = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-
-    # Recurring Fields
     is_recurring = models.BooleanField(default=False)
-    frequency = models.CharField(max_length=20,choices=FREQUENCY_CHOICES,default="monthly")
-    next_invoice_date = models.DateField(null=True, blank=True)
+    frequency = models.CharField(max_length=20,choices=FREQUENCY_CHOICES,default="monthly", blank=True, null=True)
+    next_invoice_date = models.DateField(null=True, blank=True) 
     original_invoice = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,related_name='child_invoices')
 
     # Timestamps
-    sale_date = models.DateTimeField(default=now)
+    sale_date = models.DateTimeField(default=now) # Date the sale occurred or invoice was generated
+    line_items = GenericRelation('TransactionLineItem', related_query_name='invoices')
 
     def convert_to_fiscal(self):
         """Convert proforma to fiscal invoice"""
@@ -194,24 +164,17 @@ class Invoice(BaseModel):
             self.status = "pending"
             self.save()
             return self
-        raise ValidationError("Only proforma invoices can be converted")
+        raise ValidationError("Only proforma invoices can be converted to fiscal.")
+
     def save(self, *args, **kwargs):
-        if not self.document_number:
-            with transaction.atomic():
-                # Lock the latest invoice to prevent race conditions
-                if last_invoice:= Invoice.objects.select_for_update().order_by('-document_number').first():
-        
-                    try:
-                        last_num = int(last_invoice.document_number)
-                        new_num = last_num + 1
-                    except ValueError:
-                        # Handle existing invalid document numbers
-                        new_num = 0
-                else:
-                    new_num = 0  # Start from 000000
-                self.document_number = f"{new_num:06d}"
-            
-        # Round all monetary values before saving
+        if not self.pk and not self.document_number: 
+            self.document_number = generate_invoice_document_number() 
+        if self.individual and self.company:
+            raise ValidationError("An invoice cannot be linked to both an individual and a company.")
+        elif self.individual:
+            self.is_individual = True
+        elif self.company:
+            self.is_individual = False
         self.total_excluding_vat = self.total_excluding_vat.quantize(
             Decimal('0.00'), rounding=ROUND_HALF_UP
         )
@@ -225,57 +188,166 @@ class Invoice(BaseModel):
         self.full_clean()
         super().save(*args, **kwargs)
 
-
     def generate_recurring_invoice(self):
-        """Create next invoice in recurring series"""
+        """
+        Creates the next invoice in a recurring series based on the template (self).
+        This method should be called on the *template* invoice (invoice_type="recurring").
+        """
         if self.invoice_type != "recurring":
-            raise ValidationError("Only recurring invoices can generate children")
+            raise ValidationError("This method can only be called on an invoice with type 'recurring' (template).")
+        if not self.next_invoice_date:
+            raise ValidationError("next_invoice_date must be set for recurring invoice templates.")
 
-        return Invoice.objects.create(
+        new_invoice_date = self._next_recurrence_date()
+        if not new_invoice_date:
+            raise ValidationError(f"Invalid frequency '{self.frequency}' for recurring invoice.")
+
+        # Create a new fiscal invoice
+        new_invoice = Invoice.objects.create(
             invoice_type="fiscal",
             is_individual=self.is_individual,
             individual=self.individual,
             company=self.company,
             currency=self.currency,
             user=self.user,
-            original_invoice=self,
-            next_invoice_date=self._next_recurrence_date(),
-            frequency=self.frequency,
+            sale_date=new_invoice_date, 
+            status="pending",
+            discount=self.discount,
             total_excluding_vat=self.total_excluding_vat,
             vat_total=self.vat_total,
             total_inclusive=self.total_inclusive,
             is_recurring=True,
+            original_invoice=self, 
         )
-        
+
+        for line_item_template in self.line_items.all():
+            TransactionLineItem.objects.create(
+                parent_document=new_invoice,
+                sales_item=line_item_template.sales_item,
+                user=new_invoice.user, 
+                quantity=line_item_template.quantity,
+                unit_price=line_item_template.unit_price,
+                vat_amount=line_item_template.vat_amount,
+                total_price=line_item_template.total_price,
+            )
+        self.next_invoice_date = new_invoice_date
+        self.save() 
+
+        return new_invoice
 
     def _next_recurrence_date(self):
+        if not self.next_invoice_date:
+            return None 
+
         if self.frequency == "monthly":
             return self.next_invoice_date + relativedelta(months=+1)
         if self.frequency == "quarterly":
             return self.next_invoice_date + relativedelta(months=+3)
         if self.frequency == "yearly":
             return self.next_invoice_date + relativedelta(years=+1)
-        return None
+        return None 
 
-class InvoiceItem(BaseModel):
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
-    sales_item = models.ForeignKey(SalesItem, on_delete=models.PROTECT)
+    def __str__(self):
+        customer_id_str = ""
+        if self.is_individual and self.individual:
+            customer_id_str = f"Individual: {self.individual.first_name} {self.individual.last_name}"
+        elif not self.is_individual and self.company:
+            customer_id_str = f"Company: {self.company.name}"
+        else:
+            customer_id_str = "No Customer"
+        return f"{self.invoice_type.title()} {self.document_number} - {customer_id_str}"
+
+
+class CashSale(BaseModel):
+    sale_date = models.DateTimeField(auto_now_add=True)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    line_items = GenericRelation('TransactionLineItem', related_query_name='cashsales')
+
+    def __str__(self):
+        user_display = self.user.user_id if self.user else "N/A"
+        return f"Cash Sale {self.id} - User: {user_display}"
+
+
+class CreditNote(BaseModel):
+    credit_date = models.DateField(default=now)
+    document_number = models.CharField(max_length=20, unique=True, default=generate_credit_note_document_number)
+    is_individual = models.BooleanField(default=True)
+    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    description = models.TextField(blank=True, null=True)
+    line_items = GenericRelation('TransactionLineItem', related_query_name='creditnotes')
+
+    def save(self, *args, **kwargs):
+        # Ensure document_number is generated only once if not set already
+        if not self.pk and not self.document_number: 
+            self.document_number = generate_credit_note_document_number() 
+
+        # Ensure that only one of individual or company is set
+        if self.individual and self.company:
+            raise ValidationError("A credit note cannot be linked to both an individual and a company.")
+        elif self.individual:
+            self.is_individual = True
+        elif self.company:
+            self.is_individual = False
+        self.total_amount = self.total_amount.quantize(
+            Decimal('0.00'), rounding=ROUND_HALF_UP
+        )
+
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        customer_id_str = ""
+        if self.is_individual and self.individual:
+            customer_id_str = f"Individual: {self.individual.first_name} {self.individual.last_name}"
+        elif not self.is_individual and self.company:
+            customer_id_str = f"Company: {self.company.name}"
+        else:
+            customer_id_str = "N/A" # Changed to N/A for consistency
+        return f"Credit Note {self.document_number} for {customer_id_str}"
+
+
+# The old InvoiceItem is now TransactionLineItem
+class TransactionLineItem(BaseModel):
+    """
+    Stores products or services added to various financial documents
+    (Invoice, CashSale, CreditNote, etc.) using Generic Foreign Keys.
+    """
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    parent_document = GenericForeignKey('content_type', 'object_id')
+    sales_item = models.ForeignKey('SalesItem', on_delete=models.PROTECT)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     vat_amount = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
 
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'sales_item')
+        verbose_name = "Transaction Line Item"
+        verbose_name_plural = "Transaction Line Items"
+
     def save(self, *args, **kwargs):
-        self.total_price = (self.unit_price + self.vat_amount) * self.quantity
+        calculated_total_price = (self.quantity * self.unit_price) + self.vat_amount
+        self.total_price = calculated_total_price.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        # Dynamically get the parent document type for a clearer representation to our django admin and logs
+        parent_type_name = self.content_type.model.replace('_', ' ').title()
+        parent_display_id = getattr(self.parent_document, 'document_number', str(self.object_id))
+        return f"{parent_type_name} {parent_display_id} - {self.sales_item.name} (Qty: {self.quantity})"
+
 
 class PaymentMethod(BaseModel):
     payment_method_name = models.CharField(max_length=255, unique=True)
     payment_method_code = models.CharField(max_length=15, unique=True)
-    
+
     def __str__(self):
         return self.payment_method_name
-    
+
 class Payment(BaseModel):
     """Stores payments made against invoices."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
@@ -288,68 +360,24 @@ class Payment(BaseModel):
         return f"Payment {self.invoice.document_number} - {self.amount}"
 
 class CurrencyRate(BaseModel):
-    current_rate = models.FloatField(max_length=255, default=0)
+    current_rate = models.FloatField(default=0) 
     base_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='base_currency',null= True, blank=True)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='target_currency',null= True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"User {self.user} Latest Rate {self.current_rate}"
+        user_display = self.user.user_id if self.user else "N/A"
+        return f"User {user_display} Latest Rate {self.current_rate}"
 
 class CashBook(BaseModel):
     cashbook_id = models.CharField(max_length=255, unique=True)
     cashbook_name = models.CharField(max_length=255)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='cashbook_currency', null= True, blank=True)
     requisition_status = models.BooleanField(default=False)
-    account_type = models.CharField(max_length=50)
+    account_type = models.CharField(max_length=50) # e.g., 'Bank Account', 'Cash Drawer'
     bank_account_number = models.CharField(max_length=30, blank=True)
     branch_name = models.CharField(max_length=255, blank=True)
     general_ledger_account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE, related_name='general_ledger_account')
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
-    
-class CreditNote(BaseModel):
-    # core fields
-    document_number = models.CharField(max_length=20, unique=True, editable=False)
-    date = models.DateField(default=now)
-
-    # Customer Relationship
-    is_individual = models.BooleanField(default=True)
-    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
-    
-    # Financial Details
-    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    total_excluding_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    vat_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    total_including_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-
-    def save(self, *args, **kwargs):
-        if not self.document_number:
-            last_note = CreditNote.objects.order_by('-id').first()
-            next_note_id = last_note.id +1 if last_note else 1
-            self.document_number= f"C{next_note_id:06d}"
-
-        # roundup all decimal places before saving
-        self.total_excluding_vat = self.total_excluding_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        self.vat_total = self.vat_total.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        self.total_including_vat = self.total_including_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-       
-        self.full_clean()
-        super().save(*args,**kwargs)
-
-class CreditNoteItem(BaseModel):
-    credit_note = models.ForeignKey(CreditNote, on_delete=models.CASCADE, related_name="items")
-    sales_item = models.ForeignKey(SalesItem, on_delete=models.PROTECT)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-    vat_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    total_price = models.DecimalField(max_digits=12, decimal_places=2)
-
-    def save(self, *args, **kwargs):
-        if not self.unit_price:
-            self.unit_price = self.sales_item.price
-        self.total_price = (self.unit_price + self.vat_amount) * self.quantity
-        super().save(*args, **kwargs)   

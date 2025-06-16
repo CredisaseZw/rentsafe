@@ -1,81 +1,66 @@
+import axios from "axios";
+import React from "react";
+import useCurrencies from "../general-hooks/useCurrencies";
 import toast from "react-hot-toast";
-import { useForm } from "@inertiajs/inertia-react";
-import { useEffect, useRef } from "react";
 import { userFriendlyErrorOrResponse } from "../../utils";
-import { Inertia } from "@inertiajs/inertia";
 
-export default function useCurrencySettings(currency_settings, errors, success) {
-  const { data, setData, post } = useForm({
-    current_rate: currency_settings?.current_rate || 0,
-    base_currency: currency_settings?.base_currency || "",
-    currency: currency_settings?.currency || "",
-    date:
-      currency_settings?.updated_at || currency_settings?.date_created
-        ? new Date(currency_settings?.updated_at || currency_settings?.date_created)
-            .toISOString()
-            .split("T")[0]
-        : new Date().toISOString().split("T")[0],
+export default function useCurrencySettings() {
+  const [loading, setLoading] = React.useState(true);
+  const { currencies, loading: currenciesLoading } = useCurrencies();
+  const [currentSettings, setCurrentSettings] = React.useState({
+    id: undefined,
+    date_created: undefined,
+    date_updated: undefined,
+    current_rate: undefined,
+    updated_at: undefined,
+    user: undefined,
+    base_currency: undefined,
+    currency: undefined,
   });
 
-  useEffect(() => {
-    if (errors) toast.error(userFriendlyErrorOrResponse(errors));
-    if (success) toast.success(userFriendlyErrorOrResponse(success));
-  }, [errors, success]);
+  function fetchAndSetCurrentSettings() {
+    setLoading(true);
+    axios
+      .get("/accounting/currency-settings/rate-setup/")
+      .then((res) => {
+        setCurrentSettings(res.data.currency_rate_settings);
+      })
+      .catch(console.log)
+      .finally(() => setLoading(false));
+  }
 
-  const initialDataRef = useRef(currency_settings);
-  // useEffect(() => {
-  //   initialDataRef.current = res;
-  // }, []);
+  React.useEffect(() => {
+    fetchAndSetCurrentSettings();
+  }, []);
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log({ initialDataRef, data });
-    if (
-      initialDataRef.current?.data &&
-      data.base_currency == initialDataRef.current.data.currency_settings?.base_currency &&
-      data.currency == initialDataRef.current.data.currency_settings?.currency &&
-      data.current_rate == initialDataRef.current.data.currency_settings?.current_rate
-    ) {
-      toast.error("no changes were made");
-      return;
-    }
+    setLoading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
 
-    post(reverseUrl("currency_settings"), {
-      onError: (err) => {
-        console.log(err);
-        // toast.error(userFriendlyErrorOrResponse(err));
-      },
-      onSuccess: Inertia.reload,
-    });
+    axios
+      .post("/accounting/currency-settings/rate-setup/", data)
+      .then((res) => {
+        toast.success(userFriendlyErrorOrResponse(res));
+        fetchAndSetCurrentSettings();
+      })
+      .catch(console.log)
+      .finally(() => setLoading(false));
   }
 
-  function setBaseCurrency(val) {
-    // if (val === data.conversionCurrency)
-    //   toast.error('Cannot have the same base and conversion currency');
-    // else setData((prev) => ({ ...prev, baseCurrency: val }));
-    setData((prev) => ({
+  function changeHandler(e) {
+    const { name, value } = e.target;
+    setCurrentSettings((prev) => ({
       ...prev,
-      base_currency: val,
-      currency: prev.currency === val ? "" : prev.currency,
-    }));
-  }
-
-  function setConversionCurrency(val) {
-    // if (val === data.baseCurrency)
-    //   toast.error('Cannot have the same base and conversion currency');
-    // else setData((prev) => ({ ...prev, conversionCurrency: val }));
-    setData((prev) => ({
-      ...prev,
-      currency: val,
-      base_currency: prev.base_currency === val ? "" : prev.base_currency,
+      [name]: value,
     }));
   }
 
   return {
-    data,
-    setData,
+    loading: loading || currenciesLoading,
+    currencies,
+    currentSettings,
+    changeHandler,
     handleSubmit,
-    setBaseCurrency,
-    setConversionCurrency,
   };
 }
