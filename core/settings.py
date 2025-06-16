@@ -428,6 +428,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "accounts_sectors",
     "currency_settings",
     "payment_types",
+    "sandbox",
 ]
 
 LOGIN_URL = "login"
