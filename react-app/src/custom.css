@@ -799,3 +799,6 @@
 .c-scale-down {
   transform: scale(0.8);
 }
+.bg-gold {
+  background-color: goldenrod !important;
+}
