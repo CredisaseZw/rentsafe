@@ -27,7 +27,7 @@ export const CompanyAdd = ({
   return (
     <ContentModal
       size="lg"
-      show={!show}
+      show={show}
       handleClose={handleClose}
       titleOverideContent={
         <div className="d-flex gap-2">
