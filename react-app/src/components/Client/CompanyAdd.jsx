@@ -72,7 +72,7 @@ export const CompanyAdd = ({
                     className="form-control"
                   />
 
-                  {!errors?.registeredName && (
+                  {errors?.registeredName && (
                     <div className="small px-2 text-danger mt-1">{errors.registeredName}</div>
                   )}
                 </div>

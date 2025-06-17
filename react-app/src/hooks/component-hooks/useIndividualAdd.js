@@ -6,8 +6,7 @@ import { userFriendlyErrorOrResponse, validateZimbabweanID } from "../../utils";
 
 export default function useIndividualAdd(handleClose, url, action, userDetails, setFetchedData) {
   const [isLoading, setIsLoading] = React.useState(false);
-  const [errors, setErrors] = React.useState("");
-  const { data, setData, post, reset } = useForm({
+  const { data, setData, post, reset, errors } = useForm({
     firstName: userDetails?.firstname || "",
     lastName: userDetails?.surname || "",
     identificationNumber: userDetails?.identification_number || "",
@@ -27,19 +26,17 @@ export default function useIndividualAdd(handleClose, url, action, userDetails, 
 
   const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
 
-  function handleSubmitIndividual(e) {
+  function submitSingle(e) {
     e.preventDefault();
+    setIsLoading(true);
+    let shouldProceed = true;
+
     if (
       data.identificationType === "nationalid" &&
       !validateZimbabweanID(data.identificationNumber)
     ) {
-      setIsLoading(false);
       toast.error("Invalid national id number");
-      return;
-    }
-    if (data.identificationType === "servicesid") {
-      toast.error("Service ID not supported yet. Please use passport or national ID");
-      return;
+      shouldProceed = false;
     }
     if (
       data.mobileNumber.length < 10 ||
@@ -47,81 +44,73 @@ export default function useIndividualAdd(handleClose, url, action, userDetails, 
       /\D/.test(data.mobileNumber)
     ) {
       toast.error("Mobile number must be between 10 and 13 digits");
+      shouldProceed = false;
+    }
+
+    if (!shouldProceed) {
+      setIsLoading(false);
       return;
     }
-    if (
-      data.emailAddress !== "" &&
-      !/^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/.test(data.emailAddress)
-    ) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
+
     post(reverseUrl(url), {
-      onStart: () => {
-        setIsLoading(true);
-      },
-      onSuccess: (response) => {
+      onError: () => toast.error("Error adding individual!"),
+      onFinish: () => setIsLoading(false),
+      onSuccess: () => {
         reset();
-        // toast.success('OTP has been sent to user');
-        toast.success("individual created!");
-        setIsLoading(false);
+        toast.success("Individual added!");
         handleClose();
-      },
-      onError: (e) => {
-        toast.error("Something went wrong! Please try again");
-        setErrors(e);
-        setIsLoading(false);
       },
     });
   }
 
-  function handleUpdateIndividual(e) {
+  function handleEdit(e) {
     e.preventDefault();
-    let uri = reverseUrl("edit_individual_user");
-    if (action === "edit-agent") uri = reverseUrl("edit-agent");
-    axios.post(uri, data).then((response) => {
-      if (response.data.status === "success") {
-        toast.success(response.data.message);
-        setFetchedData((prev) => {
-          const oldData = prev.filter((item) => item.id !== data.individualId);
-          return [
-            ...oldData,
-            {
-              id: data.individualId,
-              firstname: data.firstName,
-              surname: data.lastName,
-              identification_number: data.identificationNumber,
-              identification_type: data.identificationType,
-              gender: data.gender,
-              dob: data.dob,
-              marital_status: data.maritalStatus,
-              address: data.address,
-              mobile: data.mobileNumber,
-              land_line: data.landLine,
-              email_address: data.emailAddress,
-              employer_name: data.currentEmployer,
-              job_title: data.jobTitle,
-              date_of_employment: data.dateOfemployment,
-            },
-          ];
-        });
-        handleClose();
-      } else if (response.data.errors) {
-        toast.error(userFriendlyErrorOrResponse(response));
-        return;
-      } else {
-        toast.error("Something went wrong! Please try again");
-        handleClose();
-      }
-    });
+    setIsLoading(true);
+
+    const uri =
+      action === "edit-agent" ? reverseUrl("edit-agent") : reverseUrl("edit_individual_user");
+
+    axios
+      .post(uri, data)
+      .then((res) => {
+        if (res.data.status === "success") {
+          toast.success(res.data.message);
+          setFetchedData((prev) => {
+            const oldData = prev.filter((item) => item.id !== data.individualId);
+            return [
+              ...oldData,
+              {
+                id: data.individualId,
+                firstname: data.firstName,
+                surname: data.lastName,
+                identification_number: data.identificationNumber,
+                identification_type: data.identificationType,
+                gender: data.gender,
+                dob: data.dob,
+                marital_status: data.maritalStatus,
+                address: data.address,
+                mobile: data.mobileNumber,
+                land_line: data.landLine,
+                email_address: data.emailAddress,
+                employer_name: data.currentEmployer,
+                job_title: data.jobTitle,
+                date_of_employment: data.dateOfemployment,
+              },
+            ];
+          });
+          handleClose();
+        } else toast(userFriendlyErrorOrResponse(res.data));
+      })
+      .catch((error) => toast.error("An error occurred: " + userFriendlyErrorOrResponse(error)))
+      .finally(() => setIsLoading(false));
   }
 
   return {
     data,
     errors,
     isLoading,
+    handleEdit,
+    submitSingle,
     changeHandler,
-    handleSubmitIndividual,
-    handleUpdateIndividual,
   };
 }
