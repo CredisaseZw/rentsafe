@@ -16,9 +16,19 @@ export default function useCompanyLeaseForm(
   const [errors, setErrors] = useState("");
   const [showReceipt, setShowReceipt] = useState(false);
   const { data, setData, post, reset } = useForm({
+    lesseeAddress: lesseeDetails?.address || "",
+    unitNumber: lesseeDetails?.unit_number || "",
+    buildingName: lesseeDetails?.building_name || "",
+    streetNumber: lesseeDetails?.street_number || "",
+    streetName: lesseeDetails?.street_name || "",
+    suburb: lesseeDetails?.suburb || "",
+    city: lesseeDetails?.city || "",
+    province: lesseeDetails?.province || "",
+    country: lesseeDetails?.country || "",
+    areaCode: lesseeDetails?.area_code || "",
+
     identificationNumber: lesseeDetails?.reg_ID_Number || "",
     lesseeName: lesseeDetails?.name || "",
-    lesseeAddress: lesseeDetails?.address || "",
     mobile: lesseeDetails?.mobile || "",
     email: lesseeDetails?.email || "",
     rentGuarantorId: lesseeDetails?.rent_guarantor_id || "",
