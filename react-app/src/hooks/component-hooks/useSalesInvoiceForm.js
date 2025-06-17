@@ -127,8 +127,8 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
     data.items = items.map((item) => {
       const newItem = {
         sales_item_id: salesItems.find((i) => (i.name = item.sales_item))?.id || "",
-        qty: item.qty || 1,
-        price: item.price,
+        quantity: item.qty || 1,
+        unit_price: item.price,
       };
       return newItem;
     });
