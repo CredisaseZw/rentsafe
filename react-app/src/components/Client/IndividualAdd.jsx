@@ -27,7 +27,7 @@ export default function IndividualAdd({
   return (
     <ContentModal
       size="lg"
-      show={show}
+      show={!show}
       handleClose={handleClose}
       titleOverideContent={
         <div className="d-flex gap-2">
@@ -68,7 +68,7 @@ export default function IndividualAdd({
                     name="lastName"
                     required
                     id="lastName"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.lastName && (
@@ -87,7 +87,7 @@ export default function IndividualAdd({
                     name="firstName"
                     required
                     id="firstName"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.firstName && (
@@ -101,7 +101,7 @@ export default function IndividualAdd({
                   </label>
 
                   <select
-                    className="form-select"
+                    className="form-select form-select-sm "
                     name="identificationType"
                     id="identificationType"
                     required
@@ -138,7 +138,7 @@ export default function IndividualAdd({
                     name="identificationNumber"
                     id="identificationNumber"
                     placeholder="eg. 12345678K29"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.identificationNumber && (
@@ -150,7 +150,7 @@ export default function IndividualAdd({
                   <label className="form-label">Gender</label>
 
                   <select
-                    className="form-select"
+                    className="form-select form-select-sm "
                     onChange={changeHandler}
                     id="gender"
                     name="gender"
@@ -178,7 +178,7 @@ export default function IndividualAdd({
                     type="date"
                     name="dob"
                     id="dob"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors.dob && <div className="small px-2 text-danger mt-1">{errors.dob}</div>}
@@ -190,7 +190,7 @@ export default function IndividualAdd({
                   <label className="form-label">Marital Status</label>
 
                   <select
-                    className="form-select"
+                    className="form-select form-select-sm "
                     name="maritalStatus"
                     onChange={changeHandler}
                     id="maritalStatus"
@@ -211,25 +211,6 @@ export default function IndividualAdd({
 
                 <div>
                   <label className="form-label">
-                    Address <span className="text-danger">*</span>
-                  </label>
-
-                  <input
-                    value={data.address}
-                    onChange={changeHandler}
-                    id="address"
-                    required
-                    name="address"
-                    className="form-control"
-                  />
-
-                  {errors?.address && (
-                    <div className="small px-2 text-danger mt-1">{errors.address}</div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="form-label">
                     Mobile Number <span className="text-danger">*</span>
                   </label>
 
@@ -241,31 +222,11 @@ export default function IndividualAdd({
                     id="mobileNumber"
                     required
                     placeholder="eg. 263777123456"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.mobileNumber && (
                     <div className="small px-2 text-danger mt-1">{errors.mobileNumber}</div>
-                  )}
-                </div>
-              </div>
-
-              <div className="row row-cols-3">
-                <div>
-                  <label className="form-label">Landline</label>
-
-                  <input
-                    value={data.landLine}
-                    onChange={changeHandler}
-                    type="tel"
-                    id="landLine"
-                    name="landLine"
-                    placeholder="eg. 263 123 4567"
-                    className="form-control"
-                  />
-
-                  {errors?.landLine && (
-                    <div className="small px-2 text-danger mt-1">{errors.landLine}</div>
                   )}
                 </div>
 
@@ -278,11 +239,190 @@ export default function IndividualAdd({
                     type="email"
                     id="emailAddress"
                     name="emailAddress"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.emailAddress && (
                     <div className="small px-2 text-danger mt-1">{errors.emailAddress}</div>
+                  )}
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset className="p-4 mb-3">
+              <legend>Address</legend>
+              {/* // Unit Number Building / Complex Name Street Number *
+                  // Street Name* Suburb / Area* City / Town*
+                  // Province Country* Area Code */}
+
+              <div className="row row-cols-3">
+                <div>
+                  <label className="form-label">Unit Number</label>
+
+                  <input
+                    value={data.unitNumber}
+                    onChange={changeHandler}
+                    id="unitNumber"
+                    name="unitNumber"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.unitNumber && (
+                    <div className="small px-2 text-danger mt-1">{errors.unitNumber}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">Building / Complex Name</label>
+
+                  <input
+                    value={data.buildingName}
+                    onChange={changeHandler}
+                    id="buildingName"
+                    name="buildingName"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.buildingName && (
+                    <div className="small px-2 text-danger mt-1">{errors.buildingName}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Street Number
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.streetNumber}
+                    onChange={changeHandler}
+                    id="streetNumber"
+                    required
+                    name="streetNumber"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.streetNumber && (
+                    <div className="small px-2 text-danger mt-1">{errors.streetNumber}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="row row-cols-3">
+                <div>
+                  <label className="form-label">
+                    Street Name
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.streetName}
+                    onChange={changeHandler}
+                    id="streetName"
+                    required
+                    name="streetName"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.streetName && (
+                    <div className="small px-2 text-danger mt-1">{errors.streetName}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Suburb / Area
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.suburb}
+                    onChange={changeHandler}
+                    id="suburb"
+                    required
+                    name="suburb"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.suburb && (
+                    <div className="small px-2 text-danger mt-1">{errors.suburb}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    City / Town
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.city}
+                    onChange={changeHandler}
+                    id="city"
+                    required
+                    name="city"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.city && <div className="small px-2 text-danger mt-1">{errors.city}</div>}
+                </div>
+              </div>
+
+              <div className="row row-cols-3">
+                <div>
+                  <label className="form-label">Province</label>
+
+                  <input
+                    value={data.province}
+                    onChange={changeHandler}
+                    id="province"
+                    name="province"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.province && (
+                    <div className="small px-2 text-danger mt-1">{errors.province}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Country
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.country}
+                    onChange={changeHandler}
+                    id="country"
+                    required
+                    name="country"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.country && (
+                    <div className="small px-2 text-danger mt-1">{errors.country}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Area Code
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.areaCode}
+                    onChange={changeHandler}
+                    id="areaCode"
+                    required
+                    name="areaCode"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.areaCode && (
+                    <div className="small px-2 text-danger mt-1">{errors.areaCode}</div>
                   )}
                 </div>
               </div>
@@ -300,7 +440,7 @@ export default function IndividualAdd({
                     onChange={changeHandler}
                     id="currentEmployer"
                     name="currentEmployer"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.currentEmployer && (
@@ -316,7 +456,7 @@ export default function IndividualAdd({
                     onChange={changeHandler}
                     name="jobTitle"
                     id="jobTitle"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.jobTitle && (
@@ -333,7 +473,7 @@ export default function IndividualAdd({
                     type="date"
                     id="dateOfemployment"
                     name="dateOfemployment"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.dateOfemployment && (

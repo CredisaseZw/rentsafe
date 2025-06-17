@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useForm } from "@inertiajs/inertia-react";
 import { userFriendlyErrorOrResponse, validateZimbabweanID } from "../../utils";
+import { truncate } from "lodash";
 
 export default function useIndividualAdd(handleClose, url, action, userDetails, setFetchedData) {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -14,7 +15,6 @@ export default function useIndividualAdd(handleClose, url, action, userDetails, 
     gender: userDetails?.gender || "",
     dob: userDetails?.dob || "",
     maritalStatus: userDetails?.marital_status || "",
-    address: userDetails?.address || "",
     mobileNumber: userDetails?.mobile || "",
     landLine: userDetails?.landline || "",
     emailAddress: userDetails?.email || "",
@@ -22,6 +22,17 @@ export default function useIndividualAdd(handleClose, url, action, userDetails, 
     jobTitle: userDetails?.job_title || "",
     dateOfemployment: userDetails?.date_of_employment || "",
     individualId: userDetails?.id || -1,
+
+    address: userDetails?.address || "",
+    unitNumber: userDetails?.unit_number || "",
+    buildingName: userDetails?.building_name || "",
+    streetNumber: userDetails?.street_number || "",
+    streetName: userDetails?.street_name || "",
+    suburb: userDetails?.suburb || "",
+    city: userDetails?.city || "",
+    province: userDetails?.province || "",
+    country: userDetails?.country || "",
+    areaCode: userDetails?.area_code || "",
   });
 
   const changeHandler = (e) => setData({ ...data, [e.target.id]: e.target.value });
@@ -53,7 +64,10 @@ export default function useIndividualAdd(handleClose, url, action, userDetails, 
     }
 
     post(reverseUrl(url), {
-      onError: () => toast.error("Error adding individual!"),
+      onError: (e) =>
+        toast.error(
+          "Error adding individual! " + truncate(userFriendlyErrorOrResponse(e), { length: 40 })
+        ),
       onFinish: () => setIsLoading(false),
       onSuccess: () => {
         reset();
