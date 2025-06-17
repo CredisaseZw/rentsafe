@@ -18,6 +18,7 @@ from accounting.api.views import (
     CurrencyViewSet,
     PaymentMethodViewSet,
     TransactionTypeViewSet,
+    CreditNoteViewSet,
     cash_books_list,
     detailed_general_ledger,
     credit_note,
@@ -47,7 +48,8 @@ router.register(r'currency-settings', CurrencyRateViewSet, basename="currency_ra
 router.register(r'cash-books', CashBookViewSet, basename="cash_books")
 router.register(r'currency', CurrencyViewSet, basename="currency")
 router.register(r'payment-methods', PaymentMethodViewSet, basename="payment_methods")
-router.register(r'transaction-types', TransactionTypeViewSet, basename="credit_note")
+router.register(r'transaction-types', TransactionTypeViewSet, basename="transaction_type")
+router.register(r'credit-notes', CreditNoteViewSet, basename="credit_notes")
 urlpatterns = [
     path("", include(router.urls)),
     path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),

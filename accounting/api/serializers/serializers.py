@@ -35,7 +35,7 @@ class VATSettingSerializer(BaseCompanySerializer):
 class SalesAccountSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = SalesAccount
-        fields = ['id', 'account_name', 'account_number', 'account_sector']
+        fields = ['id', 'account_name', 'account_number', 'account_sector', 'account_sector_details']
         extra_kwargs = {
             'account_sector': {'write_only': True} 
         }
@@ -520,7 +520,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
         items_data = data.get('items', [])
         for item_data in items_data:
             sales_item = item_data.get('sales_item')
-
+    
             if not sales_item:
                 raise serializers.ValidationError("Invalid sales item provided in line items.")
 
@@ -616,6 +616,8 @@ class PaymentSerializer(BaseCompanySerializer):
         fields = "__all__"
 
 class CurrencyRateSerializer(BaseCompanySerializer):
+    currency = CurrencySerializer(read_only=True)
+    base_currency = CurrencySerializer(read_only=True)
     class Meta(BaseCompanySerializer.Meta):
         model = CurrencyRate
 

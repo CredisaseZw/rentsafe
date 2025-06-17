@@ -250,7 +250,7 @@ class Invoice(BaseModel):
     def __str__(self):
         customer_id_str = ""
         if self.is_individual and self.individual:
-            customer_id_str = f"Individual: {self.individual.first_name} {self.individual.last_name}"
+            customer_id_str = f"Individual: {self.individual.firstname} {self.individual.surname}"
         elif not self.is_individual and self.company:
             customer_id_str = f"Company: {self.company.name}"
         else:
@@ -301,9 +301,9 @@ class CreditNote(BaseModel):
     def __str__(self):
         customer_id_str = ""
         if self.is_individual and self.individual:
-            customer_id_str = f"Individual: {self.individual.first_name} {self.individual.last_name}"
+            customer_id_str = f"Individual: {self.individual.firstname} {self.individual.surname}"
         elif not self.is_individual and self.company:
-            customer_id_str = f"Company: {self.company.name}"
+            customer_id_str = f"Company: {self.company.registration_name}"
         else:
             customer_id_str = "N/A" # Changed to N/A for consistency
         return f"Credit Note {self.document_number} for {customer_id_str}"
@@ -363,7 +363,7 @@ class CurrencyRate(BaseModel):
     current_rate = models.FloatField(default=0) 
     base_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='base_currency',null= True, blank=True)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='target_currency',null= True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    # updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         user_display = self.user.user_id if self.user else "N/A"
@@ -381,4 +381,3 @@ class CashBook(BaseModel):
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
-
