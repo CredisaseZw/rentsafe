@@ -56,7 +56,7 @@ export default function IndividualAdd({
                 All fields marked with a star (<span className="text-danger">*</span>) are required.
               </p>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">
                     Surname <span className="text-danger">*</span>
@@ -124,7 +124,7 @@ export default function IndividualAdd({
                 </div>
               </div>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">
                     Identification Number
@@ -185,7 +185,7 @@ export default function IndividualAdd({
                 </div>
               </div>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3">
                 <div>
                   <label className="form-label">Marital Status</label>
 
@@ -251,11 +251,8 @@ export default function IndividualAdd({
 
             <fieldset className="p-4 mb-3">
               <legend>Address</legend>
-              {/* // Unit Number Building / Complex Name Street Number *
-                  // Street Name* Suburb / Area* City / Town*
-                  // Province Country* Area Code */}
 
-              <div className="row row-cols-3">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">Unit Number</label>
 
@@ -309,7 +306,7 @@ export default function IndividualAdd({
                 </div>
               </div>
 
-              <div className="row row-cols-3">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">
                     Street Name

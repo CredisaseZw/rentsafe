@@ -56,7 +56,7 @@ export const CompanyAdd = ({
                 All fields marked with a star (<span className="text-danger">*</span>) are required.
               </p>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">
                     Registered Name
@@ -113,7 +113,7 @@ export const CompanyAdd = ({
                 </div>
               </div>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">Registration Number</label>
 
@@ -168,7 +168,7 @@ export const CompanyAdd = ({
                 </div>
               </div>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">TIN Number</label>
 
@@ -226,7 +226,7 @@ export const CompanyAdd = ({
                 </div>
               </div>
 
-              <div className="row row-cols-3 mb-4">
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">Mobile Number</label>
 
