@@ -291,7 +291,7 @@ export const CompanyAdd = ({
                   <label className="form-label">Industry</label>
 
                   <select
-                    className="form-select form-control-sm "
+                    className="form-select form-select-sm "
                     name="industry"
                     id="industry"
                     value={data.industry}
