@@ -69,7 +69,7 @@ export const CompanyAdd = ({
                     onChange={changeHandler}
                     name="registeredName"
                     id="registeredName"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.registeredName && (
@@ -89,7 +89,7 @@ export const CompanyAdd = ({
                     onChange={changeHandler}
                     name="tradingName"
                     id="tradingName"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
                   {errors?.tradingName && (
                     <div className="small px-2 text-danger mt-1">{errors.tradingName}</div>
@@ -104,7 +104,7 @@ export const CompanyAdd = ({
                     onChange={changeHandler}
                     id="branch"
                     name="branch"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.branch && (
@@ -123,7 +123,7 @@ export const CompanyAdd = ({
                     name="companyRegistrationNumber"
                     id="companyRegistrationNumber"
                     placeholder="eg. 000/984/2020"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.companyRegistrationNumber && (
@@ -142,7 +142,7 @@ export const CompanyAdd = ({
                     type="date"
                     name="registrationDate"
                     id="registrationDate"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors.registrationDate && (
@@ -159,7 +159,7 @@ export const CompanyAdd = ({
                     name="vatNumber"
                     id="vatNumber"
                     placeholder="eg. 1123456789"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.vatNumber && (
@@ -178,7 +178,7 @@ export const CompanyAdd = ({
                     type="text"
                     name="tinNumber"
                     id="tinNumber"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.tinNumber && (
@@ -199,7 +199,7 @@ export const CompanyAdd = ({
                     name="currentAddress"
                     placeholder="eg. 1234 Main St"
                     id="currentAddress"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.currentAddress && (
@@ -217,7 +217,7 @@ export const CompanyAdd = ({
                     placeholder="123-456-7890"
                     name="landLine"
                     id="landLine"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.landLine && (
@@ -237,7 +237,7 @@ export const CompanyAdd = ({
                     placeholder='eg. "263712345612"'
                     id="mobileNumber"
                     name="mobileNumber"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.mobileNumber && (
@@ -259,7 +259,7 @@ export const CompanyAdd = ({
                     name="emailAddress"
                     id="emailAddress"
                     placeholder="example@company.com"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.emailAddress && (
@@ -277,7 +277,7 @@ export const CompanyAdd = ({
                     id="website"
                     name="website"
                     placeholder="https://your-website.com"
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.website && (
@@ -291,7 +291,7 @@ export const CompanyAdd = ({
                   <label className="form-label">Industry</label>
 
                   <select
-                    className="form-select"
+                    className="form-select form-control-sm "
                     name="industry"
                     id="industry"
                     value={data.industry}
@@ -336,7 +336,7 @@ export const CompanyAdd = ({
                     id="note"
                     name="note"
                     placeholder="additional notes..."
-                    className="form-control"
+                    className="form-control form-control-sm "
                   />
 
                   {errors?.note && <div className="px-2 small text-danger mt-1">{errors.note}</div>}
