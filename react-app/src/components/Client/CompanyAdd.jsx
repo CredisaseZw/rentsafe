@@ -27,7 +27,7 @@ export const CompanyAdd = ({
   return (
     <ContentModal
       size="lg"
-      show={show}
+      show={!show}
       handleClose={handleClose}
       titleOverideContent={
         <div className="d-flex gap-2">
@@ -187,27 +187,6 @@ export const CompanyAdd = ({
                 </div>
 
                 <div>
-                  <label className="form-label">
-                    Current Address
-                    <span className="text-danger">*</span>
-                  </label>
-
-                  <input
-                    required
-                    value={data.currentAddress}
-                    onChange={changeHandler}
-                    name="currentAddress"
-                    placeholder="eg. 1234 Main St"
-                    id="currentAddress"
-                    className="form-control form-control-sm "
-                  />
-
-                  {errors?.currentAddress && (
-                    <div className="small px-2 text-danger mt-1">{errors.currentAddress}</div>
-                  )}
-                </div>
-
-                <div>
                   <label className="form-label">Telephone Number</label>
 
                   <input
@@ -224,9 +203,7 @@ export const CompanyAdd = ({
                     <div className="small px-2 text-danger mt-1">{errors.landLine}</div>
                   )}
                 </div>
-              </div>
 
-              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">Mobile Number</label>
 
@@ -244,7 +221,9 @@ export const CompanyAdd = ({
                     <div className="px-2 small text-danger mt-1">{errors.mobileNumber}</div>
                   )}
                 </div>
+              </div>
 
+              <div className="row row-cols-3 mb-2">
                 <div>
                   <label className="form-label">
                     Email Address
@@ -284,9 +263,7 @@ export const CompanyAdd = ({
                     <div className="small px-2 text-danger mt-1">{errors.website}</div>
                   )}
                 </div>
-              </div>
 
-              <div className="row row-cols-3">
                 <div>
                   <label className="form-label">Industry</label>
 
@@ -310,7 +287,9 @@ export const CompanyAdd = ({
                     <div className="small px-2 text-danger mt-1">{errors.industry}</div>
                   )}
                 </div>
+              </div>
 
+              <div className="row row-cols-3">
                 <div>
                   <label className="form-label"></label>
 
@@ -340,6 +319,182 @@ export const CompanyAdd = ({
                   />
 
                   {errors?.note && <div className="px-2 small text-danger mt-1">{errors.note}</div>}
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset className="p-4 mb-3">
+              <legend>Address</legend>
+
+              <div className="row row-cols-3 mb-2">
+                <div>
+                  <label className="form-label">Unit Number</label>
+
+                  <input
+                    value={data.unitNumber}
+                    onChange={changeHandler}
+                    id="unitNumber"
+                    name="unitNumber"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.unitNumber && (
+                    <div className="small px-2 text-danger mt-1">{errors.unitNumber}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">Building / Complex Name</label>
+
+                  <input
+                    value={data.buildingName}
+                    onChange={changeHandler}
+                    id="buildingName"
+                    name="buildingName"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.buildingName && (
+                    <div className="small px-2 text-danger mt-1">{errors.buildingName}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Street Number
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.streetNumber}
+                    onChange={changeHandler}
+                    id="streetNumber"
+                    required
+                    name="streetNumber"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.streetNumber && (
+                    <div className="small px-2 text-danger mt-1">{errors.streetNumber}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="row row-cols-3 mb-2">
+                <div>
+                  <label className="form-label">
+                    Street Name
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.streetName}
+                    onChange={changeHandler}
+                    id="streetName"
+                    required
+                    name="streetName"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.streetName && (
+                    <div className="small px-2 text-danger mt-1">{errors.streetName}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Suburb / Area
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.suburb}
+                    onChange={changeHandler}
+                    id="suburb"
+                    required
+                    name="suburb"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.suburb && (
+                    <div className="small px-2 text-danger mt-1">{errors.suburb}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    City / Town
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.city}
+                    onChange={changeHandler}
+                    id="city"
+                    required
+                    name="city"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.city && <div className="small px-2 text-danger mt-1">{errors.city}</div>}
+                </div>
+              </div>
+
+              <div className="row row-cols-3">
+                <div>
+                  <label className="form-label">Province</label>
+
+                  <input
+                    value={data.province}
+                    onChange={changeHandler}
+                    id="province"
+                    name="province"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.province && (
+                    <div className="small px-2 text-danger mt-1">{errors.province}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Country
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.country}
+                    onChange={changeHandler}
+                    id="country"
+                    required
+                    name="country"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.country && (
+                    <div className="small px-2 text-danger mt-1">{errors.country}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="form-label">
+                    Area Code
+                    <span className="text-danger">*</span>
+                  </label>
+
+                  <input
+                    value={data.areaCode}
+                    onChange={changeHandler}
+                    id="areaCode"
+                    required
+                    name="areaCode"
+                    className="form-control form-control-sm "
+                  />
+
+                  {errors?.areaCode && (
+                    <div className="small px-2 text-danger mt-1">{errors.areaCode}</div>
+                  )}
                 </div>
               </div>
             </fieldset>

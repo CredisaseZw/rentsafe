@@ -64,10 +64,7 @@ export default function useIndividualAdd(handleClose, url, action, userDetails, 
     }
 
     post(reverseUrl(url), {
-      onError: (e) =>
-        toast.error(
-          "Error adding individual! " + truncate(userFriendlyErrorOrResponse(e), { length: 40 })
-        ),
+      onError: (e) => toast.error("Error adding individual! " + userFriendlyErrorOrResponse(e)),
       onFinish: () => setIsLoading(false),
       onSuccess: () => {
         reset();
