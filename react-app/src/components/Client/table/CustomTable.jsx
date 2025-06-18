@@ -3,7 +3,7 @@ import { capitalizeAllWords } from "../../../utils";
 export const STICKY_TABLE_HEADER_CLASS = "sticky-top c-table-top bg-white shadow-sm";
 
 /**
- * DONT FORGET TO ADD `<colgroup>` TO TABLE
+ * DONT FORGET TO USE `ColGroup`
  * @param {React.HTMLAttributes<HTMLDivElement> & {
  * children: React.ReactNode,
  * tabletitle: string,
@@ -173,5 +173,18 @@ export function NothingToShow() {
     <div className="text-center text-muted p-4">
       <p className="m-0">Nothing to show</p>
     </div>
+  );
+}
+
+/**
+ * @param {{ ratios?: (1 | null)[] }} props
+ */
+export function ColGroup({ ratios = [] }) {
+  return (
+    <colgroup>
+      {ratios.map((ratio, index) => (
+        <col key={index} style={ratio ? { width: "1%" } : undefined} />
+      ))}
+    </colgroup>
   );
 }
