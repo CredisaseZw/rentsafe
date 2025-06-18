@@ -2,6 +2,8 @@ import useSubscriptionsManagement from "../../hooks/component-hooks/useSubscript
 import IndividualLeaseForm from "../../components/features/leases/IndividualLeaseForm.jsx";
 import CompanyLeaseForm from "../../components/features/leases/CompanyLeaseForm.jsx";
 import ContentModal from "../../components/ContentModal.jsx";
+import CustomTable from "../../components/Client/table/CustomTable.jsx";
+import { friendlyDate } from "../../utils/index.js";
 
 export default function SubscriptionsManagement({
   className,
@@ -50,14 +52,10 @@ export default function SubscriptionsManagement({
         )}
       </>
 
-      <ContentModal
-        show={show}
-        handleClose={closeModal}
-        size="xl"
-        title="Available Subscriptions"
-        centerTitle
-      >
-        <table className="table table-responsive table-bordered">
+      <ContentModal show={show} handleClose={closeModal} size="lg" title="Available Subscriptions">
+        <CustomTable.Table>
+          <CustomTable.ColGroup ratios={[1, 1, 1, 1, 1, 1]} />
+
           <thead>
             <tr>
               <th>No</th>
@@ -73,28 +71,29 @@ export default function SubscriptionsManagement({
             {subscriptions
               ?.filter((sub) => sub.open_slots > 0)
               .map((sub, i) => (
-                <tr key={i}>
+                <tr key={i} className="text-nowrap">
                   <th>{i + 1}</th>
                   <td>{sub.open_slots}</td>
                   <td>{sub.period_length}</td>
-                  <td>{sub.start_date}</td>
-                  <td>{sub.end_date}</td>
-                  <td
-                    className="bg-success text-white text-center c-pointer"
-                    onClick={() => activateSub(sub, "individual")}
-                  >
-                    Activate Individual
-                  </td>
-                  <td
-                    className="bg-info text-white text-center c-pointer"
-                    onClick={() => activateSub(sub, "company")}
-                  >
-                    Activate Company
+                  <td>{friendlyDate(sub.start_date)}</td>
+                  <td>{friendlyDate(sub.end_date)}</td>
+                  <td>
+                    <CustomTable.ActionButtonsContainer>
+                      <CustomTable.ActionButtonTemplate
+                        variant="success"
+                        onClick={() => activateSub(sub, "individual")}
+                      >
+                        Activate Individual
+                      </CustomTable.ActionButtonTemplate>
+                      <CustomTable.ActionButtonTemplate onClick={() => activateSub(sub, "company")}>
+                        Activate Company
+                      </CustomTable.ActionButtonTemplate>
+                    </CustomTable.ActionButtonsContainer>
                   </td>
                 </tr>
               ))}
           </tbody>
-        </table>
+        </CustomTable.Table>
       </ContentModal>
     </>
   );
