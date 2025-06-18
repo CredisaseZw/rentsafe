@@ -215,3 +215,12 @@ export function areMonthlyBalancesAllDefinedInOrder(balancesFromLatestToOldest =
 
   return true;
 }
+
+export function capitalizeAllWords(str) {
+  if (typeof str !== "string") return str;
+
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
