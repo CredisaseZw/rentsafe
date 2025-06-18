@@ -802,3 +802,14 @@
 .bg-gold {
   background-color: goldenrod !important;
 }
+
+.c-table th,
+.c-table td {
+  padding: 0.3rem 0.5rem !important;
+}
+.c-table th {
+  text-wrap: nowrap !important;
+}
+.c-table thead {
+  border-top-color: inherit !important;
+}
