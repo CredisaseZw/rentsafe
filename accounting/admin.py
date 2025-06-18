@@ -98,7 +98,7 @@ class VATSettingAdmin(admin.ModelAdmin):
 
 @admin.register(CashSale)
 class CashSaleAdmin(admin.ModelAdmin):
-    list_display = ("id", "sale_date", "total_amount", "user")
+    list_display = ("id", "sale_date", "user","currency", "total_excluding_vat", "discount", "vat_total", "invoice_total", "amount_received")
     list_display_links = ("id",)
     search_fields = ("user__username",)
     list_filter = ("sale_date",)

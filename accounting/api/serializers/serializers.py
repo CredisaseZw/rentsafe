@@ -173,12 +173,12 @@ class TransactionLineItemSerializer(serializers.ModelSerializer):
         write_only=True
     )
     quantity = serializers.DecimalField(max_digits=10, decimal_places=2)
-    unit_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    # unit_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         model = TransactionLineItem
         fields = [
-            'sales_item', 'sales_item_id', 'quantity', 'unit_price',
+            'sales_item', 'sales_item_id', 'quantity',
             'vat_amount', 'total_price', 'date_created', 'date_updated' 
         ]
         read_only_fields = ['vat_amount', 'total_price', 'date_created', 'date_updated'] 
@@ -373,21 +373,39 @@ class CashSaleSerializer(BaseCompanySerializer):
         source='currency',
         write_only=True
     )
+    cashbook_id = serializers.PrimaryKeyRelatedField(
+        queryset= CashBook.objects.all(),
+        source='cashbook',
+        write_only=True
+    )
+    payment_type_id = serializers.PrimaryKeyRelatedField(
+        queryset = PaymentMethod.objects.all(),
+        source = 'payment_type',
+        write_only=True
+    )
+    customer_details = serializers.SerializerMethodField()
+    customer_id = serializers.IntegerField(write_only=True)
+    is_individual = serializers.BooleanField(write_only=True)
+    # Further implementation of the customer information to be implemented later
 
     class Meta(BaseCompanySerializer.Meta):
         model = CashSale
-        fields = ['id', 'sale_date', 'total_amount', 'currency', 'currency_id', 'items']
+        fields = ['id', 'document_number','is_individual','customer_details','customer_id','sale_date', 'currency', 'currency_id', 'items',
+                  'total_excluding_vat','discount','vat_total','invoice_total','payment_type','payment_type_id',
+                  'cashbook','cashbook_id','details', 'reference', 'amount_received']
         read_only_fields = ['sale_date', 'total_amount'] 
 
     def validate(self, data):
         total_amount = Decimal('0')
+        total_exluding_vat = Decimal('0')
+        vat_total = Decimal('0')
+        invoice_total = Decimal('0')
         items_data = data.get('items', [])
         request_user = self.context['request'].user
         user_company = request_user.company
 
         if not data.get('currency'):
             raise serializers.ValidationError({"currency_id": "Currency is required for Cash Sale."})
-
         for item_data in items_data:
             sales_item = item_data.get('sales_item') 
 
@@ -403,7 +421,7 @@ class CashSaleSerializer(BaseCompanySerializer):
             vat_rate = vat_setting.rate / Decimal('100') if vat_setting and vat_setting.vat_applicable else Decimal('0')
 
             quantity = item_data.get('quantity')
-            unit_price = item_data.get('unit_price')
+            unit_price = sales_item.price
 
             if quantity is None or unit_price is None:
                 raise serializers.ValidationError({"items": "Quantity and unit price are required for all line items."})
@@ -415,23 +433,37 @@ class CashSaleSerializer(BaseCompanySerializer):
             item_data['total_price'] = (item_total_excl_vat + item_vat_amount).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
 
             total_amount += item_data['total_price']
-
-        data['total_amount'] = total_amount.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+            total_exluding_vat += unit_price * quantity
+            vat_total += item_vat_amount 
+            invoice_total += data.get('invoice_total')
+        
+        discount = data.get('discount', Decimal('0.00'))
+        data['invoice_total'] = (total_amount- discount).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        data['total_excluding_vat'] = total_exluding_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        data['vat_total'] = vat_total.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        
         return data
+    
+    def get_customer_details(self, obj):
+        if obj.individual:
+            return IndividualCustomerSerializer(obj.individual).data
+        elif obj.company:
+            return CompanyCustomerSerializer(obj.company).data
+        return None
 
     @transaction.atomic
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
 
         cash_sale = CashSale.objects.create(**validated_data)
-
         for item_data in items_data:
+            sales_item = item_data['sales_item']
             TransactionLineItem.objects.create(
                 parent_document=cash_sale,
                 sales_item=item_data['sales_item'],
                 user=cash_sale.user,
                 quantity=item_data['quantity'],
-                unit_price=item_data['unit_price'],
+                unit_price=sales_item.price,
                 vat_amount=item_data['vat_amount'],
                 total_price=item_data['total_price']
             )
@@ -450,12 +482,13 @@ class CashSaleSerializer(BaseCompanySerializer):
         instance.line_items.all().delete() # Clear existing and recreate
         total_amount = Decimal('0')
         for item_data in items_data:
+            sales_item = item_data['sales_item']
             line_item = TransactionLineItem.objects.create(
                 parent_document=instance,
                 sales_item=item_data['sales_item'],
                 user=instance.user,
                 quantity=item_data['quantity'],
-                unit_price=item_data['unit_price'],
+                unit_price=sales_item.price,
                 vat_amount=item_data['vat_amount'],
                 total_price=item_data['total_price']
             )
@@ -532,9 +565,9 @@ class CreditNoteSerializer(BaseCompanySerializer):
             vat_rate = vat_setting.rate / Decimal('100') if vat_setting and vat_setting.vat_applicable else Decimal('0')
 
             quantity = item_data.get('quantity')
-            unit_price = item_data.get('unit_price')
+            unit_price = sales_item.price
 
-            if quantity is None or unit_price is None:
+            if quantity is None:
                 raise serializers.ValidationError({"items": "Quantity and unit price are required for all line items."})
 
             item_total_excl_vat = (quantity * unit_price).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
@@ -565,12 +598,13 @@ class CreditNoteSerializer(BaseCompanySerializer):
         credit_note = CreditNote.objects.create(**validated_data)
 
         for item_data in items_data:
+            sales_item = item_data['sales_item']
             TransactionLineItem.objects.create(
                 parent_document=credit_note,
-                sales_item=item_data['sales_item'],
+                sales_item=sales_item,
                 user=credit_note.user,
                 quantity=item_data['quantity'],
-                unit_price=item_data['unit_price'],
+                unit_price=sales_item.price,
                 vat_amount=item_data['vat_amount'],
                 total_price=item_data['total_price']
             )

@@ -259,14 +259,52 @@ class Invoice(BaseModel):
 
 
 class CashSale(BaseModel):
+    # core fieldds
+    document_number = models.IntegerField(unique=True, blank=True, null=True)
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT, default=1)
     sale_date = models.DateTimeField(auto_now_add=True)
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    # customer details
+    is_individual = models.BooleanField(default=True)
+    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Items details
+    quantity = models.IntegerField(default=1)
     line_items = GenericRelation('TransactionLineItem', related_query_name='cashsales')
-
+    
+    # Financial details
+    total_excluding_vat = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    vat_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    invoice_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    
+    # Payment details
+    payment_type = models.ForeignKey('PaymentMethod', on_delete=models.PROTECT,default = None)
+    cashbook = models.ForeignKey('CashBook',on_delete=models.PROTECT, related_name= 'cashsales_cashbook', default=None)
+    details = models.TextField(blank=True, null=True)
+    reference = models.CharField(max_length=255, blank=True, null=True)
+    amount_received = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    
     def __str__(self):
         user_display = self.user.user_id if self.user else "N/A"
         return f"Cash Sale {self.id} - User: {user_display}"
 
+    def save(self, *args, **kwargs):
+        if self.document_number is None:
+            last_sale = CashSale.objects.order_by('-document_number').first()
+            self.document_number = 0 if not last_sale else last_sale.document_number + 1
+        
+        self.total_excluding_vat = self.total_excluding_vat.quantize(
+            Decimal('0.00'), rounding=ROUND_HALF_UP
+        )
+        self.invoice_total = self.invoice_total.quantize(
+            Decimal('0.00'), rounding=ROUND_HALF_UP
+        )
+        self.vat_total = self.vat_total.quantize(
+            Decimal('0.00'), rounding=ROUND_HALF_UP
+        )
+        super().save(*args, **kwargs)
 
 class CreditNote(BaseModel):
     credit_date = models.DateField(default=now)
