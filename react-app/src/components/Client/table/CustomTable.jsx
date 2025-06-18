@@ -4,13 +4,26 @@ export const STICKY_TABLE_HEADER_CLASS = "sticky-top c-table-top bg-white shadow
 
 /**
  * DONT FORGET TO ADD `<colgroup>` TO TABLE
- * @param {React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode, tabletitle: string }} props
+ * @param {React.HTMLAttributes<HTMLDivElement> & {
+ * children: React.ReactNode,
+ * tabletitle: string,
+ * tabletitleBg?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light"
+ * tabletitleColor?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "white" | ""
+ * }} props
  */
-export function Table({ children, className = "bg-white", ...props }) {
+export function Table({
+  children,
+  className = "bg-white",
+  tabletitleBg = "light",
+  tabletitleColor = "",
+  ...props
+}) {
   return (
     <div {...props} className={className}>
       {props.tabletitle && (
-        <div className="p-1 fw-semibold rounded-top-3 rounded-top border text-center bg-light">
+        <div
+          className={`p-1 fw-semibold rounded-top-3 rounded-top border text-center bg-${tabletitleBg} text-${tabletitleColor}`}
+        >
           {capitalizeAllWords(props.tabletitle)}
         </div>
       )}
@@ -92,7 +105,7 @@ export function AddRowButtonTemplate({ label = "Add", ...props }) {
     <button
       {...props}
       type={props.type || "button"}
-      className="btn btn-sm btn-light border border-dark text-capitalize rounded-pill py-1 px-2"
+      className="btn btn-sm btn-light border border-dark text-capitalize py-1 px-2"
     >
       {label}
       <i className="material-icons trailing-icon">add</i>
@@ -129,7 +142,10 @@ export function ActionButtonTemplate(props) {
     <button
       {...props}
       type={props.type || "button"}
-      className={`btn btn-${variant} text-white btn-sm text-capitalize rounded-pill text-nowrap py-1 px-2`}
+      className={
+        `btn btn-${variant} text-white btn-sm text-capitalize text-nowrap py-1 px-2` +
+        (props.className || "")
+      }
     >
       {children}
       {icon ? <i className="material-icons trailing-icon">{icon}</i> : ""}
@@ -148,6 +164,14 @@ export function ActionButtonsContainer({
   return (
     <div className={className} {...props}>
       {props.children}
+    </div>
+  );
+}
+
+export function NothingToShow() {
+  return (
+    <div className="text-center text-muted p-4">
+      <p className="m-0">Nothing to show</p>
     </div>
   );
 }
