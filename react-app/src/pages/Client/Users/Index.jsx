@@ -3,6 +3,8 @@ import DeleteUser from "../../../components/modals/Client/DeleteUser.jsx";
 import UserForm from "../../../components/modals/Client/UserForm.jsx";
 import UserSearchModal from "../../../components/modals/Client/UserSearchModal.jsx";
 import useInternalUsers from "../../../hooks/page-hooks/useInternalUsers.js";
+import * as CustomTable from "../../../components/Client/table/CustomTable.jsx";
+import { capitalize } from "lodash";
 
 export default function Index({ users }) {
   const { searchValue, filteredUsers, userModalOptions, setUserModalOptions, handleSearch } =
@@ -41,11 +43,11 @@ export default function Index({ users }) {
         </>
       )}
 
-      <h5 className="text-center p-2 mb-0 text-white bg-info">Internal Users</h5>
+      <CustomTable.Table tabletitle="Internal Users" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[null, null, 1, null, 1, 1]} />
 
-      <table className="table table-sm table-striped border bg-white ">
-        <thead className="position-sticky c-table-top bg-white shadow-sm c-z-5">
-          <tr className="c-bg-whitesmoke">
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+          <tr>
             <td colSpan={7}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="col-5 d-flex">
@@ -54,96 +56,72 @@ export default function Index({ users }) {
                     value={searchValue}
                     onChange={handleSearch}
                     placeholder="Full name or email..."
-                    className="form-control custom-mx-w-4 rounded-0 rounded-start"
+                    className="form-control form-control-sm custom-mx-w-3 rounded-0 border-dark"
                   />
-                  <div className="text-white custom-bg-grey rounded-end d-flex align-items-center px-2">
-                    <i className="material-icons">search</i>
+                  <div className="border border-dark border-start-0 bg-light rounded-end d-flex align-items-center px-2">
+                    <i className="material-icons small">search</i>
                   </div>
                 </div>
 
-                <button
-                  className="btn btn-info text-white rounded-0 rounded-top rounded-top-5"
+                <CustomTable.ActionButtonTemplate
+                  icon="add"
                   onClick={() =>
-                    setUserModalOptions({
-                      type: "add-internal-user",
-                      action: "",
-                      userToActOn: {},
-                    })
+                    setUserModalOptions({ type: "add-internal-user", action: "", userToActOn: {} })
                   }
                 >
-                  <i className="leading-icon material-icons">add</i>
                   Add User
-                </button>
+                </CustomTable.ActionButtonTemplate>
               </div>
             </td>
           </tr>
 
-          <tr className="c-force-borders">
-            <th className="ps-3">
-              <div> Surname</div>
-            </th>
-            <th>
-              <div>First Name </div>
-            </th>
-            <th>
-              <div>Level </div>
-            </th>
-            <th>
-              <div>Email </div>
-            </th>
-            <th>
-              <div>Mobile Number </div>
-            </th>
-            <th className="text-end pe-3">
-              <div>Actions </div>
-            </th>
+          <tr>
+            <th>Surname</th>
+            <th>First Name</th>
+            <th>Level</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th></th>
           </tr>
         </thead>
 
         <tbody>
           {filteredUsers?.map((user) => (
             <tr key={user.userId}>
-              <td className="text-capitalize ps-3">{user.lastName}</td>
+              <td>{capitalize(user.lastName)}</td>
 
-              <td className="text-capitalize">{user.firstName}</td>
+              <td>{capitalize(user.firstName)}</td>
 
-              <td className="text-capitalize">{user.access_level}</td>
+              <td className="text-lowercase">{user.access_level}</td>
 
               <td className="text-lowercase">{user.email}</td>
 
               <td>{user.mobile}</td>
 
-              <td className="d-flex gap-2 justify-content-end pe-3">
-                <button
-                  className="btn btn-sm btn-info text-white"
-                  onClick={() => {
-                    setUserModalOptions({
-                      type: "user",
-                      action: "edit",
-                      userToActOn: user,
-                    });
-                  }}
-                >
-                  Edit
-                </button>
+              <td>
+                <CustomTable.ActionButtonsContainer>
+                  <CustomTable.ActionButtonTemplate
+                    onClick={() => {
+                      setUserModalOptions({ type: "user", action: "edit", userToActOn: user });
+                    }}
+                  >
+                    Edit
+                  </CustomTable.ActionButtonTemplate>
 
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => {
-                    setUserModalOptions({
-                      type: "delete",
-                      action: "",
-                      userToActOn: user,
-                    });
-                  }}
-                >
-                  Delete
-                </button>
+                  <CustomTable.ActionButtonTemplate
+                    variant="danger"
+                    onClick={() => {
+                      setUserModalOptions({ type: "delete", action: "", userToActOn: user });
+                    }}
+                  >
+                    Delete
+                  </CustomTable.ActionButtonTemplate>
+                </CustomTable.ActionButtonsContainer>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </CustomTable.Table>
 
       {filteredUsers?.length === 0 && searchValue ? (
         <p className="custom-mx-w-4 mx-auto p-4 border border-2 text-center border-info">
