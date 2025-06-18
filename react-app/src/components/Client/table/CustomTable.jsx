@@ -132,7 +132,7 @@ export function RemoveRowButtonTemplate(props) {
  * @param {React.ButtonHTMLAttributes<HTMLButtonElement> & {
  *   children: React.ReactNode;
  *   icon?: string;
- *   variant?: "primary" | "secondary" | "success" | "danger" | "warning" | "info";
+ *   variant?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "dark";
  * }} props
  */
 export function ActionButtonTemplate(props) {
@@ -148,7 +148,7 @@ export function ActionButtonTemplate(props) {
       }
     >
       {children}
-      {icon ? <i className="material-icons trailing-icon">{icon}</i> : ""}
+      {icon ? <i className={`material-icons ${children ? "trailing-icon" : ""}`}>{icon}</i> : ""}
     </button>
   );
 }
@@ -168,11 +168,18 @@ export function ActionButtonsContainer({
   );
 }
 
-export function NothingToShow() {
+/**
+ * @param {{ colSpan: number }} props
+ */
+export function NothingToShow({ colSpan }) {
   return (
-    <div className="text-center text-muted p-4">
-      <p className="m-0">Nothing to show</p>
-    </div>
+    <tr>
+      <td colSpan={colSpan}>
+        <div className="text-center text-muted p-4">
+          <p className="m-0">Nothing to show</p>
+        </div>
+      </td>
+    </tr>
   );
 }
 
@@ -189,13 +196,24 @@ export function ColGroup({ ratios = [] }) {
   );
 }
 
+export function DevOnlyTallRow() {
+  return (
+    <tr>
+      <td>
+        <div className="h100" />
+      </td>
+    </tr>
+  );
+}
+
 export default {
   Table,
-  AddRowButtonTemplate,
-  RemoveRowButtonTemplate,
-  ActionButtonTemplate,
-  ActionButtonsContainer,
-  NothingToShow,
   ColGroup,
+  NothingToShow,
+  DevOnlyTallRow,
+  ActionButtonTemplate,
+  AddRowButtonTemplate,
+  ActionButtonsContainer,
+  RemoveRowButtonTemplate,
   STICKY_TABLE_HEADER_CLASS,
 };
