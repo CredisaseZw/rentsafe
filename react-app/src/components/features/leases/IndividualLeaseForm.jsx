@@ -75,94 +75,77 @@ export default function IndividualLeaseForm({
 
               <form className="p-5 border border-2 border-info" onSubmit={handleSubmit}>
                 <div className="row mb-4">
-                  <div className="row">
-                    <div className="mt-1 col-lg-4">
-                      <label className="form-label">National ID/Passport:</label>
+                  <div className="mt-1 col-lg-4">
+                    <label className="form-label">National ID/Passport:</label>
 
-                      <div className="d-flex align-items-center justify-content-between">
-                        <select
-                          className="p-1 w-auto rounded-end-0"
-                          name="identificationType"
-                          id="identificationType"
-                          value={idSelectValue}
-                          // leave event listeners in this exact format, otherwise weird things happen
-                          onFocus={() => setIsIdSelectExpanded(() => true)}
-                          onMouseDown={() => setIsIdSelectExpanded(() => true)}
-                          onBlur={() => setIsIdSelectExpanded(() => false)}
-                          onChange={(e) => {
-                            setIdSelectValue(e.target.value);
-                            setIsIdSelectExpanded(() => false);
-                          }}
-                        >
-                          <option value="id">ID</option>
-                          <option value="passport">
-                            {idSelectValue === "passport" || isIdSelectExpanded ? "Passport" : ""}
-                          </option>
-                        </select>
-                        <input
-                          value={data.identificationNumber}
-                          onChange={changeHandler}
-                          type="text"
-                          required
-                          name="identificationNumber"
-                          id="identificationNumber"
-                          className="form-control form-control-sm flex-grow-1 rounded-start-0 border-start-0"
-                        />
-                      </div>
-
-                      {errors && (
-                        <div className="text-danger mt-1">{errors.identificationNumber}</div>
-                      )}
-                    </div>
-
-                    <div className="mt-1 col-lg-4">
-                      <label className="form-label">Lessee Name:</label>
+                    <div className="d-flex align-items-center justify-content-between">
+                      <select
+                        className="p-1 w-auto rounded-end-0"
+                        name="identificationType"
+                        id="identificationType"
+                        value={idSelectValue}
+                        // leave event listeners in this exact format, otherwise weird things happen
+                        onFocus={() => setIsIdSelectExpanded(() => true)}
+                        onMouseDown={() => setIsIdSelectExpanded(() => true)}
+                        onBlur={() => setIsIdSelectExpanded(() => false)}
+                        onChange={(e) => {
+                          setIdSelectValue(e.target.value);
+                          setIsIdSelectExpanded(() => false);
+                        }}
+                      >
+                        <option value="id">ID</option>
+                        <option value="passport">
+                          {idSelectValue === "passport" || isIdSelectExpanded ? "Passport" : ""}
+                        </option>
+                      </select>
                       <input
-                        value={data.lesseeName}
+                        value={data.identificationNumber}
                         onChange={changeHandler}
                         type="text"
-                        name="lesseeName"
                         required
-                        id="lesseeName"
-                        className="form-control form-control-sm"
-                        readOnly
+                        name="identificationNumber"
+                        id="identificationNumber"
+                        className="form-control form-control-sm flex-grow-1 rounded-start-0 border-start-0"
                       />
-                      {errors && <div className="text-danger mt-1">{errors.lesseeName}</div>}
                     </div>
 
-                    <div className="mt-1 col-lg-4">
-                      <label className="form-label">Lessee Mobile Number</label>
-                      <input
-                        value={data.lesseePhone}
-                        onChange={changeHandler}
-                        type="text"
-                        name="lesseePhone"
-                        id="lesseePhone"
-                        required
-                        className="form-control form-control-sm"
-                        readOnly={action === "view"}
-                      />
-                      {errors && <div className="text-danger mt-1">{errors.lesseePhone}</div>}
-                    </div>
+                    {errors && (
+                      <div className="text-danger mt-1">{errors.identificationNumber}</div>
+                    )}
+                  </div>
+
+                  <div className="mt-1 col-lg-4">
+                    <label className="form-label">Lessee Name:</label>
+                    <input
+                      value={data.lesseeName}
+                      onChange={changeHandler}
+                      type="text"
+                      name="lesseeName"
+                      required
+                      id="lesseeName"
+                      className="form-control form-control-sm"
+                      readOnly
+                    />
+                    {errors && <div className="text-danger mt-1">{errors.lesseeName}</div>}
+                  </div>
+
+                  <div className="mt-1 col-lg-4">
+                    <label className="form-label">Lessee Mobile Number</label>
+                    <input
+                      value={data.lesseePhone}
+                      onChange={changeHandler}
+                      type="text"
+                      name="lesseePhone"
+                      id="lesseePhone"
+                      required
+                      className="form-control form-control-sm"
+                      readOnly={action === "view"}
+                    />
+                    {errors && <div className="text-danger mt-1">{errors.lesseePhone}</div>}
                   </div>
                 </div>
 
                 <div className="row mb-4">
-                  <div className="mt-1 col-lg-4">
-                    <label className="form-label">Lease Address:</label>
-                    <textarea
-                      value={data.lesseeAddress}
-                      onChange={changeHandler}
-                      type="text"
-                      required={data.lesseeName ? true : false}
-                      name="lesseeAddress"
-                      id="lesseeAddress"
-                      className="form-control form-control-sm"
-                      readOnly={action === "view"}
-                    />
-                    {errors && <div className="text-danger mt-1">{errors.lesseeAddress}</div>}
-                  </div>
-
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Rent Guarantor ID:</label>
 
@@ -199,6 +182,197 @@ export default function IndividualLeaseForm({
                     {errors && <div className="text-danger mt-1">{errors.rentGuarantorName}</div>}
                   </div>
                 </div>
+
+                <>
+                  <div className="mb-2 c-bg-light text-center p-1">Lease Address</div>
+
+                  <div className="row mb-4">
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">Unit Number</label>
+
+                      <input
+                        value={data.unitNumber}
+                        onChange={changeHandler}
+                        id="unitNumber"
+                        name="unitNumber"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.unitNumber && (
+                        <div className="small px-2 text-danger mt-1">{errors.unitNumber}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">Building / Complex Name</label>
+
+                      <input
+                        value={data.buildingName}
+                        onChange={changeHandler}
+                        id="buildingName"
+                        name="buildingName"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.buildingName && (
+                        <div className="small px-2 text-danger mt-1">{errors.buildingName}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Street Number
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.streetNumber}
+                        onChange={changeHandler}
+                        id="streetNumber"
+                        required
+                        name="streetNumber"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.streetNumber && (
+                        <div className="small px-2 text-danger mt-1">{errors.streetNumber}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="row mb-4">
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Street Name
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.streetName}
+                        onChange={changeHandler}
+                        id="streetName"
+                        required
+                        name="streetName"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.streetName && (
+                        <div className="small px-2 text-danger mt-1">{errors.streetName}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Suburb / Area
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.suburb}
+                        onChange={changeHandler}
+                        id="suburb"
+                        required
+                        name="suburb"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.suburb && (
+                        <div className="small px-2 text-danger mt-1">{errors.suburb}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        City / Town
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.city}
+                        onChange={changeHandler}
+                        id="city"
+                        required
+                        name="city"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.city && (
+                        <div className="small px-2 text-danger mt-1">{errors.city}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="row mb-2">
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">Province</label>
+
+                      <input
+                        value={data.province}
+                        onChange={changeHandler}
+                        id="province"
+                        name="province"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.province && (
+                        <div className="small px-2 text-danger mt-1">{errors.province}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Country
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.country}
+                        onChange={changeHandler}
+                        id="country"
+                        required
+                        name="country"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.country && (
+                        <div className="small px-2 text-danger mt-1">{errors.country}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Area Code
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.areaCode}
+                        onChange={changeHandler}
+                        id="areaCode"
+                        required
+                        name="areaCode"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.areaCode && (
+                        <div className="small px-2 text-danger mt-1">{errors.areaCode}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <small className="d-block small mb-4 text-danger c-bg-light text-center p-1">
+                    *Please make sure the above is the correct lease address
+                  </small>
+                </>
 
                 <div className="row mb-4">
                   <div className="mt-1 col-lg-4">

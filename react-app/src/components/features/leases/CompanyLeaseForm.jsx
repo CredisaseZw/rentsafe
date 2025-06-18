@@ -211,22 +211,198 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                   </div>
                 </div>
 
-                <div className="row mb-4">
-                  <div className="mt-1 col-lg-4">
-                    <label className="form-label">Lease Address:</label>
-                    <textarea
-                      value={data.lesseeAddress}
-                      onChange={changeHandler}
-                      type="text"
-                      required={data.lesseeName ? true : false}
-                      name="lesseeAddress"
-                      id="lesseeAddress"
-                      className="form-control form-control-sm"
-                      readOnly={action === "view"}
-                    />
-                    {errors && <div className="text-danger mt-1">{errors.lesseeAddress}</div>}
+                <>
+                  <div className="mb-2 c-bg-light text-center p-1">Lease Address</div>
+
+                  <div className="row mb-4">
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">Unit Number</label>
+
+                      <input
+                        value={data.unitNumber}
+                        onChange={changeHandler}
+                        id="unitNumber"
+                        name="unitNumber"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.unitNumber && (
+                        <div className="small px-2 text-danger mt-1">{errors.unitNumber}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">Building / Complex Name</label>
+
+                      <input
+                        value={data.buildingName}
+                        onChange={changeHandler}
+                        id="buildingName"
+                        name="buildingName"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.buildingName && (
+                        <div className="small px-2 text-danger mt-1">{errors.buildingName}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Street Number
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.streetNumber}
+                        onChange={changeHandler}
+                        id="streetNumber"
+                        required
+                        name="streetNumber"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.streetNumber && (
+                        <div className="small px-2 text-danger mt-1">{errors.streetNumber}</div>
+                      )}
+                    </div>
                   </div>
 
+                  <div className="row mb-4">
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Street Name
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.streetName}
+                        onChange={changeHandler}
+                        id="streetName"
+                        required
+                        name="streetName"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.streetName && (
+                        <div className="small px-2 text-danger mt-1">{errors.streetName}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Suburb / Area
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.suburb}
+                        onChange={changeHandler}
+                        id="suburb"
+                        required
+                        name="suburb"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.suburb && (
+                        <div className="small px-2 text-danger mt-1">{errors.suburb}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        City / Town
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.city}
+                        onChange={changeHandler}
+                        id="city"
+                        required
+                        name="city"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.city && (
+                        <div className="small px-2 text-danger mt-1">{errors.city}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="row mb-2">
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">Province</label>
+
+                      <input
+                        value={data.province}
+                        onChange={changeHandler}
+                        id="province"
+                        name="province"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.province && (
+                        <div className="small px-2 text-danger mt-1">{errors.province}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Country
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.country}
+                        onChange={changeHandler}
+                        id="country"
+                        required
+                        name="country"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.country && (
+                        <div className="small px-2 text-danger mt-1">{errors.country}</div>
+                      )}
+                    </div>
+
+                    <div className="mt-1 col-lg-4">
+                      <label className="form-label">
+                        Area Code
+                        <span className="text-danger">*</span>
+                      </label>
+
+                      <input
+                        value={data.areaCode}
+                        onChange={changeHandler}
+                        id="areaCode"
+                        required
+                        name="areaCode"
+                        className="form-control form-control-sm "
+                        readOnly={action === "view"}
+                      />
+
+                      {errors?.areaCode && (
+                        <div className="small px-2 text-danger mt-1">{errors.areaCode}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <small className="d-block small mb-4 text-danger c-bg-light text-center p-1">
+                    *Please make sure the above is the correct lease address
+                  </small>
+                </>
+
+                <div className="row mb-4">
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Lease Details:</label>
                     <textarea
@@ -257,9 +433,7 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                     </select>
                     {errors && <div className="text-danger mt-1">{errors.leaseCurrency}</div>}
                   </div>
-                </div>
 
-                <div className="row mb-4">
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Monthly Rental:</label>
                     <input
@@ -275,7 +449,9 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                     />
                     {errors && <div className="text-danger mt-1">{errors.monthlyRental}</div>}
                   </div>
+                </div>
 
+                <div className="row mb-4">
                   <div className="mt-1 col-lg-4 d-flex flex-column">
                     <label className="form-label">Variable Rent:</label>
                     <input
@@ -304,9 +480,7 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                     />
                     {errors && <div className="text-danger mt-1">{errors.depositPeriod}</div>}
                   </div>
-                </div>
 
-                <div className="row mb-4">
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Deposit Amount:</label>
                     <input
@@ -321,7 +495,9 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                     />
                     {errors && <div className="text-danger mt-1">{errors.depositAmount}</div>}
                   </div>
+                </div>
 
+                <div className="row mb-4">
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Subscription period left (months):</label>
                     <input
@@ -351,9 +527,7 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
                     />
                     {errors && <div className="text-danger mt-1">{errors.leaseStartDate}</div>}
                   </div>
-                </div>
 
-                <div className="row mb-4">
                   <div className="mt-1 col-lg-4">
                     <label className="form-label">Lease End Date:</label>
 
@@ -370,7 +544,9 @@ const CompanyLeaseForm = ({ show, handleClose, action, lesseeDetails, subscripti
 
                     {errors && <div className="text-danger mt-1">{errors.leaseEndDate}</div>}
                   </div>
+                </div>
 
+                <div className="row mb-4">
                   <div className="col-lg-4 mt-1">
                     <label className="form-label">Payment Period Start Date:</label>
                     <input
