@@ -1,7 +1,7 @@
-import Layout from "../../../components/Layouts/client/Layout.jsx";
 import usePaymentTypes from "../../../hooks/page-hooks/usePaymentTypes.js";
 import ContentModal from "../../../components/ContentModal.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
+import Layout from "../../../components/Layouts/client/Layout.jsx";
 
 export default function PaymentTypes() {
   const {
@@ -16,8 +16,6 @@ export default function PaymentTypes() {
 
   return (
     <div>
-      <NewPageHeader title="Payment Types" />
-
       <ContentModal show={showAdd} handleClose={closeAddModal} title="New Payment Type" size="sm">
         <form className="p-4" onSubmit={handleAddType}>
           <div>
@@ -42,45 +40,37 @@ export default function PaymentTypes() {
         </form>
       </ContentModal>
 
-      <table className="w-100">
+      <CustomTable.Table tabletitle="Payment Types" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[null, 1]} />
+
         <tbody>
           {paymentTypes.map((type, index) => (
             <tr key={index}>
-              <td className="p-2 ">{type.type}</td>
-              <td className="p-2 text-end ">
-                <button
+              <td>{type.type}</td>
+              <td className="text-end ">
+                <CustomTable.ActionButtonTemplate
                   onClick={() => handleDeleteType(type.type)}
                   disabled={loading}
-                  type="button"
                   title="Delete"
-                  className="btn btn-sm btn-dark justify-content-center"
-                >
-                  <i className="material-icons"> remove</i>
-                </button>
+                  children="—"
+                  variant="dark"
+                />
               </td>
             </tr>
           ))}
 
-          {paymentTypes.length === 0 && (
-            <tr>
-              <td colSpan={2} className="text-center p-5">
-                Nothing to show
-              </td>
-            </tr>
-          )}
+          {paymentTypes.length === 0 && <CustomTable.NothingToShow colSpan={2} />}
         </tbody>
-      </table>
+      </CustomTable.Table>
 
       <div className="text-end mt-4">
-        <button
+        <CustomTable.ActionButtonTemplate
           onClick={openAddModal}
           disabled={loading}
           type="button"
-          className="btn justify-content-center btn-info text-white"
-        >
-          <i className="material-icons me-2">add</i>
-          Add Type
-        </button>
+          icon="add"
+          children="Add Type"
+        ></CustomTable.ActionButtonTemplate>
       </div>
     </div>
   );
