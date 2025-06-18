@@ -38,14 +38,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
       )}
 
       <CustomTable.Table tabletitle="To Do List" tabletitleBg="danger" tabletitleColor="white">
-        <colgroup>
-          <col style={{ width: "1%" }} />
-          <col style={{ width: "1%" }} />
-          <col style={{ width: "1%" }} />
-          <col />
-          <col style={{ width: "1%" }} />
-          <col style={{ width: "1%" }} />
-        </colgroup>
+        <CustomTable.ColGroup ratios={[1, 1, 1, null, 1, 1]} />
 
         <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
           <tr>
