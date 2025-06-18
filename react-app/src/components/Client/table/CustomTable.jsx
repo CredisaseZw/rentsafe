@@ -188,3 +188,14 @@ export function ColGroup({ ratios = [] }) {
     </colgroup>
   );
 }
+
+export default {
+  Table,
+  AddRowButtonTemplate,
+  RemoveRowButtonTemplate,
+  ActionButtonTemplate,
+  ActionButtonsContainer,
+  NothingToShow,
+  ColGroup,
+  STICKY_TABLE_HEADER_CLASS,
+};

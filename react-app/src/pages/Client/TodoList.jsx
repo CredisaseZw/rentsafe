@@ -4,7 +4,7 @@ import WorksAndMaintenance from "../../components/Client/ClientView/WorksAndMain
 import { formatCurrency } from "../../utils/formatting.js";
 import { truncate } from "lodash";
 import { friendlyDate } from "../../utils/index.js";
-import * as CustomTable from "../../components/Client/table/CustomTable.jsx";
+import CustomTable from "../../components/Client/table/CustomTable.jsx";
 
 export default function TodoList({ status, message, works, reminders, maintenance, Auth }) {
   const {

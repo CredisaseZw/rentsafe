@@ -3,7 +3,7 @@ import DeleteUser from "../../../components/modals/Client/DeleteUser.jsx";
 import UserForm from "../../../components/modals/Client/UserForm.jsx";
 import UserSearchModal from "../../../components/modals/Client/UserSearchModal.jsx";
 import useInternalUsers from "../../../hooks/page-hooks/useInternalUsers.js";
-import * as CustomTable from "../../../components/Client/table/CustomTable.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import { capitalize } from "lodash";
 
 export default function Index({ users }) {
