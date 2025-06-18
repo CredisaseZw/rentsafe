@@ -21,13 +21,23 @@ export default function useCompanyAdd(url, companyData, handleClose, setFetchedD
     is_gvt: companyData?.is_government || false,
     vatNumber: companyData?.vat_number || "",
     tinNumber: companyData?.tin_number || "",
-    currentAddress: companyData?.address || "",
     tradingName: companyData?.trading_name || "",
     mobileNumber: companyData?.mobile_phone || "",
     is_contracted: companyData?.is_contracted || false,
     registeredName: companyData?.registration_name || "",
     registrationDate: companyData?.registration_date || "",
     companyRegistrationNumber: companyData?.registration_number || "",
+
+    currentAddress: companyData?.address || "",
+    unitNumber: companyData?.unit_number || "",
+    buildingName: companyData?.building_name || "",
+    streetNumber: companyData?.street_number || "",
+    streetName: companyData?.street_name || "",
+    suburb: companyData?.suburb || "",
+    city: companyData?.city || "",
+    province: companyData?.province || "",
+    country: companyData?.country || "",
+    areaCode: companyData?.area_code || "",
   });
 
   function changeHandler(e) {
