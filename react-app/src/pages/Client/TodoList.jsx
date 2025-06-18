@@ -126,13 +126,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
             </tr>
           ))}
 
-          {!Boolean(todos.length) && (
-            <tr>
-              <td colSpan={6}>
-                <CustomTable.NothingToShow />
-              </td>
-            </tr>
-          )}
+          {!Boolean(todos.length) && <CustomTable.NothingToShow colSpan={6} />}
         </tbody>
       </CustomTable.Table>
     </div>
