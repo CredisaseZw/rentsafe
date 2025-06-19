@@ -371,6 +371,9 @@
 .custom-mn-w-1 {
   min-width: 100px;
 }
+.custom-mn-w-15 {
+  min-width: 150px;
+}
 .custom-mn-w-2 {
   min-width: 200px;
 }
