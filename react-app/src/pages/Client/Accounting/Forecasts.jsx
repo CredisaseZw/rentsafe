@@ -1,13 +1,12 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import useForecasts from "../../../hooks/page-hooks/useForecasts.js";
 import { fmtAmount } from "../../../utils/index.js";
 
 export default function Forecasts({
   forecast_inflows: inflows_statement = [],
   forecast_outflows: outflows_statement = [],
-  Auth: {
-    company: { company_name },
-  },
+  Auth,
 }) {
   const { netFlows, inflows_totals, outflows_totals } = useForecasts(
     inflows_statement,
@@ -15,165 +14,152 @@ export default function Forecasts({
   );
 
   return (
-    <div className="bg-white border rounded-3">
-      <h5 className="text-center p-2 mb-0 text-white bg-info">{company_name}</h5>
+    <CustomTable.Table
+      tabletitle={Auth?.company?.company_name || "Cashflow Forecasts"}
+      tabletitleBg="info"
+      tabletitleColor="white"
+    >
+      <CustomTable.ColGroup ratios={[null, null, null, null, null, null]} />
 
-      <div className="custom-bg-grey-2 text-white text-center p-1">Cashflow Forecast (USD)</div>
+      <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+        <tr>
+          <td colSpan={6} className="c-p-0">
+            <div className="custom-bg-grey-2 text-white text-center p-1">
+              <small>Cashflow Forecast (USD)</small>
+            </div>
+          </td>
+        </tr>
 
-      <table
-        style={{ lineHeight: "5px", fontSize: "12px" }}
-        className="table table-bordered table-responsive mb-0"
-      >
-        <thead className="position-sticky c-table-top bg-white shadow-sm">
+        <tr>
+          <th>Customer</th>
+          <th className="text-end">0-7 Days</th>
+          <th className="text-end">8-14 Days</th>
+          <th className="text-end">15-21 Days</th>
+          <th className="text-end">21+ Days</th>
+          <th className="text-end">total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <>
           <tr>
-            <th>Customer</th>
-            <th>0-7 Days</th>
-            <th>8-14 Days</th>
-            <th>15-21 Days</th>
-            <th>21+ Days</th>
-            <th>total</th>
+            <td className="bg-success text-white">inflows</td>
+            <td />
+            <td />
+            <td />
+            <td />
+            <td />
           </tr>
-        </thead>
 
-        <tbody>
-          <>
-            <tr>
-              <td className="fs-larger bg-success text-white fw-bolder">inflows</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
+          {inflows_statement?.map((row, index) => (
+            <tr key={index}>
+              <td>{row.tenant}</td>
+              <td className="text-end">{fmtAmount(row["0-7"])}</td>
+              <td className="text-end">{fmtAmount(row["8-14"])}</td>
+              <td className="text-end">{fmtAmount(row["14-21"])}</td>
+              <td className="text-end">{fmtAmount(row["21+"])}</td>
+              <td className="text-end">${fmtAmount(row.total)}</td>
             </tr>
+          ))}
 
-            {inflows_statement?.map((row, index) => (
-              <tr key={index}>
-                <td>{row.tenant}</td>
-                <td className="text-end">{fmtAmount(row["0-7"])}</td>
-                <td className="text-end">{fmtAmount(row["8-14"])}</td>
-                <td className="text-end">{fmtAmount(row["14-21"])}</td>
-                <td className="text-end">{fmtAmount(row["21+"])}</td>
-                <td className="text-end">${fmtAmount(row.total)}</td>
-              </tr>
-            ))}
+          {!Boolean(inflows_statement?.length) && <CustomTable.NothingToShow colSpan={6} />}
 
-            {!Boolean(inflows_statement?.length) && (
-              <tr>
-                <td colSpan={6}>
-                  <div className="custom-h-1 d-flex justify-content-center align-items-center ">
-                    Nothing to show
-                  </div>
-                </td>
-              </tr>
-            )}
-
-            {inflows_totals && (
-              <tr>
-                <th className="fs-larger">Total</th>
-                <th className="c-border-y-dark text-end">
-                  {fmtAmount(inflows_totals.zero_to_seven_days)}
-                </th>
-
-                <th className="c-border-y-dark text-end">
-                  {fmtAmount(inflows_totals.eight_to_fourteen_days)}
-                </th>
-
-                <th className="c-border-y-dark text-end">
-                  {fmtAmount(inflows_totals.fifteen_to_twenty_one_days)}
-                </th>
-
-                <th className="c-border-y-dark text-end">
-                  {fmtAmount(inflows_totals.twenty_one_plus_days)}
-                </th>
-
-                <th className="c-border-y-dark text-end">${fmtAmount(inflows_totals.total)}</th>
-              </tr>
-            )}
-          </>
-
-          <tr className="py-3 d-block"></tr>
-
-          <>
+          {inflows_totals && (
             <tr>
-              <td className="fs-larger bg-danger text-white fw-bolder">outflows</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-
-            {outflows_statement?.map((row, index) => (
-              <tr key={index}>
-                <td>{row.tenant}</td>
-                <td className="text-end">({fmtAmount(row["0-7"])})</td>
-                <td className="text-end">({fmtAmount(row["8-14"])})</td>
-                <td className="text-end">({fmtAmount(row["14-21"])})</td>
-                <td className="text-end">({fmtAmount(row["21+"])})</td>
-                <td className="text-end">(${fmtAmount(row.total)})</td>
-              </tr>
-            ))}
-
-            {!Boolean(outflows_statement?.length) && (
-              <tr>
-                <td colSpan={6}>
-                  <div className="custom-h-1 d-flex justify-content-center align-items-center ">
-                    Nothing to show
-                  </div>
-                </td>
-              </tr>
-            )}
-
-            {outflows_totals && (
-              <tr>
-                <th className="fs-larger">Total</th>
-                <th className="c-border-y-dark text-end">
-                  ( {fmtAmount(outflows_totals.zero_to_seven_days)})
-                </th>
-
-                <th className="c-border-y-dark text-end">
-                  ( {fmtAmount(outflows_totals.eight_to_fourteen_days)})
-                </th>
-
-                <th className="c-border-y-dark text-end">
-                  ( {fmtAmount(outflows_totals.fifteen_to_twenty_one_days)})
-                </th>
-
-                <th className="c-border-y-dark text-end">
-                  ( {fmtAmount(outflows_totals.twenty_one_plus_days)})
-                </th>
-
-                <th className="c-border-y-dark text-end">( ${fmtAmount(outflows_totals.total)})</th>
-              </tr>
-            )}
-          </>
-
-          <tr className="py-3 d-block"></tr>
-
-          {netFlows && (
-            <tr>
-              <th className="fs-larger">Net Flows</th>
-              <th className="text-end c-border-y-dark">{fmtAmount(netFlows.zero_to_seven_days)}</th>
-
-              <th className="text-end c-border-y-dark">
-                {fmtAmount(netFlows.eight_to_fourteen_days)}
+              <th>Total</th>
+              <th className="c-border-y-dark text-end">
+                {fmtAmount(inflows_totals.zero_to_seven_days)}
               </th>
 
-              <th className="text-end c-border-y-dark">
-                {fmtAmount(netFlows.fifteen_to_twenty_one_days)}
+              <th className="c-border-y-dark text-end">
+                {fmtAmount(inflows_totals.eight_to_fourteen_days)}
               </th>
 
-              <th className="text-end c-border-y-dark">
-                {fmtAmount(netFlows.twenty_one_plus_days)}
+              <th className="c-border-y-dark text-end">
+                {fmtAmount(inflows_totals.fifteen_to_twenty_one_days)}
               </th>
 
-              <th className="text-end c-border-y-dark">${fmtAmount(netFlows.total)}</th>
+              <th className="c-border-y-dark text-end">
+                {fmtAmount(inflows_totals.twenty_one_plus_days)}
+              </th>
+
+              <th className="c-border-y-dark text-end">${fmtAmount(inflows_totals.total)}</th>
             </tr>
           )}
-        </tbody>
-      </table>
-    </div>
+        </>
+
+        <tr className="py-3 d-block"></tr>
+
+        <>
+          <tr>
+            <td className="bg-danger text-white">outflows</td>
+            <td />
+            <td />
+            <td />
+            <td />
+            <td />
+          </tr>
+
+          {outflows_statement?.map((row, index) => (
+            <tr key={index}>
+              <td>{row.tenant}</td>
+              <td className="text-end">({fmtAmount(row["0-7"])})</td>
+              <td className="text-end">({fmtAmount(row["8-14"])})</td>
+              <td className="text-end">({fmtAmount(row["14-21"])})</td>
+              <td className="text-end">({fmtAmount(row["21+"])})</td>
+              <td className="text-end">(${fmtAmount(row.total)})</td>
+            </tr>
+          ))}
+
+          {!Boolean(outflows_statement?.length) && <CustomTable.NothingToShow colSpan={6} />}
+
+          {outflows_totals && (
+            <tr>
+              <th>Total</th>
+              <th className="c-border-y-dark text-end">
+                ( {fmtAmount(outflows_totals.zero_to_seven_days)})
+              </th>
+
+              <th className="c-border-y-dark text-end">
+                ( {fmtAmount(outflows_totals.eight_to_fourteen_days)})
+              </th>
+
+              <th className="c-border-y-dark text-end">
+                ( {fmtAmount(outflows_totals.fifteen_to_twenty_one_days)})
+              </th>
+
+              <th className="c-border-y-dark text-end">
+                ( {fmtAmount(outflows_totals.twenty_one_plus_days)})
+              </th>
+
+              <th className="c-border-y-dark text-end">( ${fmtAmount(outflows_totals.total)})</th>
+            </tr>
+          )}
+        </>
+      </tbody>
+
+      {netFlows && (
+        <tfoot>
+          <tr>
+            <th>Net Flows</th>
+            <th className="text-end c-border-y-dark">{fmtAmount(netFlows.zero_to_seven_days)}</th>
+
+            <th className="text-end c-border-y-dark">
+              {fmtAmount(netFlows.eight_to_fourteen_days)}
+            </th>
+
+            <th className="text-end c-border-y-dark">
+              {fmtAmount(netFlows.fifteen_to_twenty_one_days)}
+            </th>
+
+            <th className="text-end c-border-y-dark">{fmtAmount(netFlows.twenty_one_plus_days)}</th>
+
+            <th className="text-end c-border-y-dark">${fmtAmount(netFlows.total)}</th>
+          </tr>
+        </tfoot>
+      )}
+    </CustomTable.Table>
   );
 }
 
-Forecasts.layout = (page) => <Layout children={page} title={"forecasts"} />;
+Forecasts.layout = (page) => <Layout children={page} title={"Forecasts"} />;

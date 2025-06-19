@@ -807,6 +807,10 @@
 .c-table td {
   padding: 0.3rem 0.5rem !important;
 }
+.c-table th.c-p-0,
+.c-table td.c-p-0 {
+  padding: 0 !important;
+}
 .c-table th {
   text-wrap: nowrap !important;
 }
