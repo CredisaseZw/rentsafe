@@ -184,6 +184,21 @@ export function NothingToShow({ colSpan }) {
 }
 
 /**
+ * @param {{ colSpan: number }} props
+ */
+export function LoadingIndicator({ colSpan }) {
+  return (
+    <tr>
+      <td colSpan={colSpan} className="text-center p-4">
+        <div className="spinner-border text-muted" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+/**
  * @param {{ ratios?: (1 | null)[] }} props
  */
 export function ColGroup({ ratios = [] }) {
@@ -211,6 +226,7 @@ export default {
   ColGroup,
   NothingToShow,
   DevOnlyTallRow,
+  LoadingIndicator,
   ActionButtonTemplate,
   AddRowButtonTemplate,
   ActionButtonsContainer,
