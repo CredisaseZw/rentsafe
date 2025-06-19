@@ -141,14 +141,12 @@ export default function CreditJournal() {
               </td>
             </tr>
           ))}
-
-          <tr>
-            <td colSpan={8} className="text-end">
-              <CustomTable.AddRowButtonTemplate onClick={addRow} />
-            </td>
-          </tr>
         </tbody>
       </CustomTable.Table>
+
+      <div className="text-end">
+        <CustomTable.AddRowButtonTemplate onClick={addRow} />
+      </div>
 
       <div className="text-center mt-3">
         <CustomTable.ActionButtonTemplate type="submit">
