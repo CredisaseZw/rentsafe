@@ -190,7 +190,7 @@ export function LoadingIndicator({ colSpan }) {
   return (
     <tr>
       <td colSpan={colSpan} className="text-center p-4">
-        <div className="spinner-border text-muted" role="status">
+        <div className="spinner-border spinner-border-sm text-muted" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       </td>
