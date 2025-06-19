@@ -2518,6 +2518,7 @@ def create_user(request):
                 # create user
                 user = CustomUser(
                     email=data.get("userEmail"),
+                    user_id=data.get("userEmail"),
                     is_superuser=data.get("accessLevel") == "admin",
                     individual=int(check_individual.id),
                     company=request.user.company,
@@ -2526,13 +2527,12 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email with logins details
-                if request.user.id ==11:
-                    send_auth_email.delay(
-                        user_id,
-                        user_password,
-                        data.get("userEmail"),
-                        check_individual.firstname,
-                    )
+                send_auth_email.delay(
+                    user_id,
+                    user_password,
+                    data.get("userEmail"),
+                    check_individual.firstname,
+                )
             else:
                 # create individual and user
                 individual = Individual(
@@ -2554,21 +2554,20 @@ def create_user(request):
                 # create user
                 user = CustomUser(
                     email=data.get("userEmail"),
+                    user_id=data.get("userEmail"),
                     is_superuser=data.get("accessLevel") == "admin",
                     individual=int(individual.id),
                     company=request.user.company,
                     password=hash_password,
                 )
                 user.save()
-                user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email
-                if request.user.id ==11:
-                    send_auth_email.delay(
-                        user_id,
-                        user_password,
-                        data.get("userEmail"),
-                        data.get("firstName"),
-                    )
+                send_auth_email.delay(
+                    data.get("userEmail"),
+                    user_password,
+                    data.get("userEmail"),
+                    data.get("firstName"),
+                )
 
             props = {
                 "success": "success",
