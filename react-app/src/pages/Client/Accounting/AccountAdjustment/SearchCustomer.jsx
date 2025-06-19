@@ -109,17 +109,17 @@ export default function SearchCustomerComponent({
         onBlur={() => {
           setTimeout(() => setShowDropdown(false), 200);
         }}
-        className="form-control c-bg-light"
+        className="form-control form-control-sm bg-light"
       />
       {showDropdown && value && (
         <div
           style={{ overflowY: "auto" }}
-          className="border border-dark rounded-1 c-bg-light custom-h-2 w-100 position-absolute mt-1 top-100 start-0 z-1"
+          className="border border-dark rounded-1 bg-light custom-h-2 w-100 position-absolute mt-1 top-100 start-0 z-1"
         >
           {!isLoading && error ? (
             <div className="text-danger p-2">{error}</div>
           ) : isLoading && clients.length === 0 ? (
-            <div className="p-2">Loading...</div>
+            <small className="d-block p-1">Loading...</small>
           ) : (
             clients.map((client, index) => (
               <div
