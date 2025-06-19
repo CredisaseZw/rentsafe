@@ -49,12 +49,15 @@ export default function LandingPageHeader() {
             >
               Contact
             </Link>
-            <Link
-              href={reverseUrl("login")}
-              className="btn btn-sm rounded-pill fw-bold py-2 px-3  btn-info text-white border border-dark text-capitalize"
-            >
-              Login
-            </Link>
+
+            <div className="d-none d-md-block">
+              <Link
+                href={reverseUrl("login")}
+                className="btn btn-sm rounded-pill fw-bold py-2 px-3  btn-info text-white border border-dark text-capitalize"
+              >
+                Login
+              </Link>
+            </div>
           </nav>
         </div>
       </div>
