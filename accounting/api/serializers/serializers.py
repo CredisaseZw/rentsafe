@@ -467,33 +467,6 @@ class CashSaleSerializer(BaseCompanySerializer):
             )
         return cash_sale
 
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        items_data = validated_data.pop('items', [])
-
-        # Update CashSale fields
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        # Update or create line items
-        instance.line_items.all().delete() # Clear existing and recreate
-        total_amount = Decimal('0')
-        for item_data in items_data:
-            sales_item = item_data['sales_item']
-            line_item = TransactionLineItem.objects.create(
-                parent_document=instance,
-                sales_item=item_data['sales_item'],
-                user=instance.user,
-                quantity=item_data['quantity'],
-                vat_amount=item_data['vat_amount'],
-                total_price=item_data['total_price']
-            )
-            total_amount += line_item.total_price
-
-        instance.total_amount = total_amount.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        instance.save()
-        return instance
 
 
 class CreditNoteSerializer(BaseCompanySerializer):
