@@ -17,7 +17,7 @@ export default function DisbursementsPage() {
   return (
     <form onSubmit={handleSubmit}>
       <CustomTable.Table tabletitle="Disbursements" tabletitleBg="info" tabletitleColor="white">
-        <CustomTable.ColGroup ratios={[1, 1, null, 1, null, 1, 1, 1, 1]} />
+        <CustomTable.ColGroup ratios={[1, 1, 1, 1, null, 1, 1, 1, 1]} />
 
         <thead>
           <tr>
