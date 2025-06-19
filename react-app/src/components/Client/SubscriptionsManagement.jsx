@@ -52,7 +52,13 @@ export default function SubscriptionsManagement({
         )}
       </>
 
-      <ContentModal show={show} handleClose={closeModal} size="lg" title="Available Subscriptions">
+      <ContentModal
+        show={show}
+        handleClose={closeModal}
+        size="lg"
+        title="Available Subscriptions"
+        centerTitle
+      >
         <CustomTable.Table>
           <CustomTable.ColGroup ratios={[1, 1, 1, 1, 1, 1]} />
 
