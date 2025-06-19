@@ -1,7 +1,7 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import useDisbursements from "../../../hooks/page-hooks/useDisbursements.js";
 import DisbursementsAsyncSelect from "../../../components/DisbursementsAsyncSelect.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function DisbursementsPage() {
   const {
@@ -15,126 +15,122 @@ export default function DisbursementsPage() {
   } = useDisbursements();
 
   return (
-    <div>
-      <NewPageHeader title="Disbursements" noMargin />
+    <form onSubmit={handleSubmit}>
+      <CustomTable.Table tabletitle="Disbursements" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, 1, null, 1, null, 1, 1, 1, 1]} />
 
-      <div>
-        <form onSubmit={handleSubmit}>
-          <table className="bg-white table table-responsive table-bordered table-sm">
-            <thead>
-              <tr>
-                <th className="text-nowrap"></th>
-                <th className="text-nowrap">Date</th>
-                <th className="text-nowrap">Creditor</th>
-                <th className="text-nowrap">Ref</th>
-                <th className="text-nowrap">Details</th>
-                <th className="text-nowrap">Currency</th>
-                <th className="text-nowrap">Amount Owing</th>
-                <th className="text-nowrap">Paid Amount</th>
-                <th className="text-nowrap">Net Balance</th>
-              </tr>
-            </thead>
+        <thead>
+          <tr>
+            <th />
+            <th>Date</th>
+            <th>Creditor</th>
+            <th>Ref</th>
+            <th>Details</th>
+            <th>Currency</th>
+            <th>Amount Owing</th>
+            <th>Paid Amount</th>
+            <th>Net Balance</th>
+          </tr>
+        </thead>
 
-            <tbody>
-              {data.rows.map((row, index) => (
-                <tr key={row.id}>
-                  <td className="px-1 py-0 border-end-0">
-                    {data.rows.length > 1 && (
-                      <button
-                        className="btn btn-close btn-sm mt-3"
-                        onClick={() => removeRow(index)}
-                      />
-                    )}
-                  </td>
+        <tbody>
+          {data.rows.map((row, index) => (
+            <tr key={row.id}>
+              <td>
+                <CustomTable.RemoveRowButtonTemplate
+                  disabled={data.rows.length === 1 || processing}
+                  onClick={() => removeRow(index)}
+                />
+              </td>
 
-                  <td>
-                    <input
-                      className="form-control custom-w-fit"
-                      type="date"
-                      name="date"
-                      value={row.date}
-                      onChange={(e) => handleInputChange(e, index)}
-                      required
-                    />
-                  </td>
+              <td>
+                <input
+                  required
+                  type="date"
+                  name="date"
+                  value={row.date}
+                  className="form-control"
+                  onChange={(e) => handleInputChange(e, index)}
+                />
+              </td>
 
-                  <td className="custom-w-2">
-                    <DisbursementsAsyncSelect
-                      handleCreditorSelect={handleCreditorSelect}
-                      index={index}
-                    />
-                  </td>
+              <td>
+                <DisbursementsAsyncSelect
+                  handleCreditorSelect={handleCreditorSelect}
+                  index={index}
+                />
+              </td>
 
-                  <td>
-                    <input
-                      onChange={(e) => handleInputChange(e, index)}
-                      value={row.ref}
-                      className="form-control"
-                      name="ref"
-                      id="ref"
-                    />
-                  </td>
+              <td>
+                <input
+                  onChange={(e) => handleInputChange(e, index)}
+                  value={row.ref}
+                  className="form-control custom-mn-w-05"
+                  name="ref"
+                  id="ref"
+                />
+              </td>
 
-                  <td className="custom-w-170">
-                    <input
-                      className="form-control"
-                      id="details"
-                      name="details"
-                      value={row.details}
-                      onChange={(e) => handleInputChange(e, index)}
-                    />
-                  </td>
+              <td>
+                <input
+                  className="form-control"
+                  id="details"
+                  name="details"
+                  value={row.details}
+                  onChange={(e) => handleInputChange(e, index)}
+                />
+              </td>
 
-                  <td className="text-center">
-                    <div className="mt-2">{row.currency || ""}</div>
-                  </td>
+              <td className="text-center">
+                <div className="mt-2">{row.currency || ""}</div>
+              </td>
 
-                  <td className="text-center">
-                    <div className="mt-2">{row.amountOwing || ""}</div>
-                  </td>
+              <td className="text-center">
+                <div className="mt-2">{row.amountOwing || ""}</div>
+              </td>
 
-                  <td>
-                    <input
-                      required
-                      name="paidAmount"
-                      value={row.paidAmount}
-                      onChange={(e) => handleInputChange(e, index)}
-                      className="form-control"
-                    />
-                  </td>
+              <td>
+                <input
+                  required
+                  name="paidAmount"
+                  value={row.paidAmount}
+                  onChange={(e) => handleInputChange(e, index)}
+                  className="form-control"
+                />
+              </td>
 
-                  <td>
-                    <input
-                      name="netBalance"
-                      value={Number(row.netBalance).toFixed(2)}
-                      readOnly
-                      className="form-control custom-no-pointer-events"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <td>
+                <input
+                  name="netBalance"
+                  value={Number(row.netBalance).toFixed(2)}
+                  readOnly
+                  className="form-control custom-no-pointer-events"
+                />
+              </td>
+            </tr>
+          ))}
 
-          <div className="p-2 d-flex justify-content-between align-items-center">
-            <button type="button" className="btn btn-sm btn-success" onClick={addRow}>
-              <i className="material-icons">add</i>
-            </button>
+          <tr>
+            <td colSpan={9}>
+              <div className="d-flex justify-content-between align-items-center">
+                <CustomTable.AddRowButtonTemplate onClick={addRow} />
 
-            <button type="submit" className="btn btn-info text-white gap-2">
-              {processing ? (
-                <>
-                  <span className="spinner-grow spinner-grow-sm" />
-                  <span>Processing..</span>
-                </>
-              ) : (
-                "Submit"
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+                <CustomTable.ActionButtonTemplate type="submit" variant="info">
+                  {processing ? (
+                    <>
+                      <span className="spinner-grow spinner-grow-sm me-2" />
+                      <span>Processing..</span>
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </CustomTable.ActionButtonTemplate>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </CustomTable.Table>
+    </form>
   );
 }
 

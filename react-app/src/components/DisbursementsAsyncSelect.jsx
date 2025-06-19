@@ -26,7 +26,7 @@ export default function DisbursementsAsyncSelect({ handleCreditorSelect, index }
   return (
     <AsyncSelect
       handleCreditorSelect={handleCreditorSelect}
-      className="custom-mn-w-15"
+      className="custom-mn-w-1"
       name="creditor"
       id="creditor"
       required
