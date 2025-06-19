@@ -457,13 +457,11 @@ class CashSaleSerializer(BaseCompanySerializer):
 
         cash_sale = CashSale.objects.create(**validated_data)
         for item_data in items_data:
-            sales_item = item_data['sales_item']
             TransactionLineItem.objects.create(
                 parent_document=cash_sale,
                 sales_item=item_data['sales_item'],
                 user=cash_sale.user,
                 quantity=item_data['quantity'],
-                unit_price=sales_item.price,
                 vat_amount=item_data['vat_amount'],
                 total_price=item_data['total_price']
             )
@@ -488,7 +486,6 @@ class CashSaleSerializer(BaseCompanySerializer):
                 sales_item=item_data['sales_item'],
                 user=instance.user,
                 quantity=item_data['quantity'],
-                unit_price=sales_item.price,
                 vat_amount=item_data['vat_amount'],
                 total_price=item_data['total_price']
             )
@@ -650,10 +647,9 @@ class PaymentSerializer(BaseCompanySerializer):
         fields = "__all__"
 
 class CurrencyRateSerializer(BaseCompanySerializer):
-    currency = CurrencySerializer(read_only=True)
-    base_currency = CurrencySerializer(read_only=True)
     class Meta(BaseCompanySerializer.Meta):
         model = CurrencyRate
+        fields= ['id', 'currency', 'base_currency', 'current_rate']
 
 class CashBookSerializer(BaseCompanySerializer):
     currency = CurrencySerializer(read_only=True)
