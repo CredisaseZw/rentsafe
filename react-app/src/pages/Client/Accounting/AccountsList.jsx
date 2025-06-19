@@ -1,6 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import CustomTable from "../../../components/Client/table/CustomTable.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useAccountsList from "../../../hooks/modal-hooks/useAccountsList.js";
 
 export default function AccountsList(props) {
@@ -8,9 +7,7 @@ export default function AccountsList(props) {
 
   return (
     <div>
-      <NewPageHeader title="Accounts List" />
-
-      <CustomTable.Table>
+      <CustomTable.Table tabletitle="Accounts List" tabletitleBg="info" tabletitleColor="white">
         <CustomTable.ColGroup ratios={[1, 1, 1, 1]} />
 
         <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
