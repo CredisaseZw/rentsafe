@@ -3656,7 +3656,6 @@ def client_leases_new(request,leases_type=None):
     lease_dict = {}
     
     for i in leases:
-       
         opening_balance_date = Opening_balance.objects.filter(lease_id=i.lease_id).first()
         remaining_period = subscription_period_remaining(request, "company" if i.is_company else "individual")
         rent_guarantor = Individual.objects.filter(national_id=i.rent_guarantor_id).first() if i.is_company else None
@@ -3692,10 +3691,12 @@ def client_leases_new(request,leases_type=None):
         owing_amount = float(opening_balance_amount.outstanding_balance) if opening_balance_amount else 0
 
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
-        hundred_days_ago = date.today() - timedelta(days=100)
-        is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
-        if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
+        hundred_days_ago = date.today() - timedelta(days=90)
+
+        is_3_months_ago = check_lease_termination_eligibility(i, hundred_days_ago)
+        if i.is_terminated and (is_3_months_ago or owing_amount <= 0):
+            continue
+        if i.lease_id not in lease_dict:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
                 "name": name,
@@ -3724,7 +3725,7 @@ def client_leases_new(request,leases_type=None):
                 "agent_opening_balance": agent_info.opening_balance if agent_info else "N/A",
                 "rent_variable": i.rent_variables,
                 "status": i.status,
-                "terminated": True if i.is_active == False else False,
+                "terminated": True if i.is_terminated else False,
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
