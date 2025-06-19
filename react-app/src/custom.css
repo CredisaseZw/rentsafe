@@ -817,7 +817,22 @@
 .c-table thead {
   border-top-color: inherit !important;
 }
-
+.c-border-semi-dark {
+  border-color: rgb(168, 168, 168) !important;
+}
 .c-i-small i {
   font-size: 1rem !important;
+}
+.page-item.active .page-link {
+  background-color: rgb(203, 203, 203) !important;
+  color: rgb(28, 28, 28) !important;
+  border-radius: 5px !important;
+  padding: 0.1rem 0.3rem;
+  border-color: rgb(168, 168, 168) !important;
+}
+.page-link {
+  color: rgb(28, 28, 28) !important;
+  border-radius: 5px !important;
+  padding: 0.1rem 0.3rem;
+  border-color: rgb(168, 168, 168) !important;
 }
