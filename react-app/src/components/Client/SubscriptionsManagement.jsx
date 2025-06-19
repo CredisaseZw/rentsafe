@@ -74,6 +74,8 @@ export default function SubscriptionsManagement({
           </thead>
 
           <tbody>
+            {subscriptions?.length === 0 && <CustomTable.NothingToShow colSpan={6} />}
+
             {subscriptions
               ?.filter((sub) => sub.open_slots > 0)
               .map((sub, i) => (

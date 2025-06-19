@@ -121,6 +121,8 @@ export default function Index({ users }) {
               </td>
             </tr>
           ))}
+
+          {filteredUsers?.length === 0 && <CustomTable.NothingToShow colSpan={6} />}
         </tbody>
       </CustomTable.Table>
 
