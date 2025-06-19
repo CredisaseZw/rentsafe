@@ -1,6 +1,7 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useDebtCall from "../../../hooks/page-hooks/useDebtCall.js";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
+import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import { fmtAmount } from "../../../utils/index.js";
 
 export default function DebtCall() {
@@ -13,10 +14,10 @@ export default function DebtCall() {
       <div className="row align-items-start g-4">
         <div className="col-6">
           <div>
-            <div className="mb-3 bg-white border">
-              <p className="text-center p-1 mb-0 text-white bg-info">Contact Method</p>
+            <fieldset className="mb-2 bg-light border custom-rounded-1 border-2 c-border-semi-dark">
+              <legend className="px-1">Contact Method</legend>
 
-              <div className="p-2 d-flex gap-2">
+              <div className="d-flex gap-2 small">
                 <div className="form-check">
                   <input
                     className="form-check-input"
@@ -43,13 +44,13 @@ export default function DebtCall() {
                   </label>
                 </div>
               </div>
-            </div>
+            </fieldset>
 
-            <div className="mb-3 bg-white border">
-              <p className="text-center p-1 mb-0 text-white bg-info">Filter By Ageing</p>
+            <fieldset className="mb-2 bg-light border custom-rounded-1 border-2 c-border-semi-dark">
+              <legend className="px-1">Filter By Ageing</legend>
 
-              <div className="p-2 d-flex gap-2 justify-content-around">
-                <div className="form-check">
+              <div className="d-flex flex-wrap small">
+                <div className="form-check mx-2">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -62,7 +63,7 @@ export default function DebtCall() {
                   </label>
                 </div>
 
-                <div className="form-check">
+                <div className="form-check mx-2">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -75,7 +76,7 @@ export default function DebtCall() {
                   </label>
                 </div>
 
-                <div className="form-check">
+                <div className="form-check mx-2">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -88,7 +89,7 @@ export default function DebtCall() {
                   </label>
                 </div>
 
-                <div className="form-check">
+                <div className="form-check mx-2">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -101,7 +102,7 @@ export default function DebtCall() {
                   </label>
                 </div>
 
-                <div className="form-check">
+                <div className="form-check mx-2">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -114,12 +115,12 @@ export default function DebtCall() {
                   </label>
                 </div>
               </div>
-            </div>
+            </fieldset>
 
-            <div className="mb-3 bg-white border">
-              <p className="text-center p-1 mb-0 text-white bg-info">Filter By Balance</p>
+            <fieldset className="mb-2 bg-light border custom-rounded-1 border-2 c-border-semi-dark">
+              <legend className="px-1">Filter By Balance</legend>
 
-              <div className="p-2 d-flex gap-3 align-items-center justify-content-around">
+              <div className="d-flex gap-3 align-items-center justify-content-around">
                 <label className="form-label text-nowrap" htmlFor="balance_filter">
                   Contact all debtors with balances above
                 </label>
@@ -127,119 +128,117 @@ export default function DebtCall() {
                   className="form-control form-control-sm c-w-fit"
                   type="number"
                   name="balance_filter"
-                  // placeholder="0.00"
+                  placeholder="0.00"
                   id="balance_filter"
                 />
               </div>
-            </div>
+            </fieldset>
 
-            <div className="mb-3 bg-white border">
-              <p className="text-center p-1 mb-0 text-white bg-info">SMS Message</p>
+            <fieldset className="mb-2 bg-light border custom-rounded-1 border-2 c-border-semi-dark">
+              <legend className="px-1">SMS Message</legend>
 
-              <div className="p-2 d-flex gap-3 align-items-center">
+              <div className="d-flex gap-3 align-items-center">
                 <textarea
                   className="form-control"
                   name="sms_message"
                   id="sms_message"
-                  rows="3"
+                  rows={2}
                   placeholder="Enter message here..."
                 />
               </div>
-            </div>
+            </fieldset>
 
-            <div className="mb-3 bg-white border">
-              <p className="text-center p-1 mb-0 text-white bg-info">Email Message</p>
+            <fieldset className="mb-2 bg-light border custom-rounded-1 border-2 c-border-semi-dark">
+              <legend className="px-1">Email Message</legend>
 
-              <div className="p-2 d-flex gap-3 align-items-center">
+              <div className="d-flex gap-3 align-items-center">
                 <textarea
                   className="form-control"
                   name="email_message"
                   id="email_message"
-                  rows="3"
+                  rows={2}
                   placeholder="Enter message here..."
                 />
               </div>
-            </div>
+            </fieldset>
           </div>
         </div>
 
         <div className="col-6">
           <div>
-            <div className="bg-white">
-              <div id="debt-call-table">
-                <table className="table table-sm table-bordered table-responsive mb-0 position-relative">
-                  <thead className="sticky-top bg-white shadow-sm">
-                    <tr>
-                      <th>Lease ID </th>
-                      <th>Customer Name </th>
-                      <th className="text-end">Balance Owing </th>
-                      <th>Sms </th>
-                      <th>Email</th>
-                    </tr>
-                  </thead>
+            <div id="debt-call-table" className="position-relative">
+              <CustomTable.Table>
+                <CustomTable.ColGroup ratios={[1, null, 1, 1, 1]} />
 
-                  <tbody>
-                    {customers?.map((customer, index) => (
-                      <tr key={index}>
-                        <td>{customer.lease_id}</td>
+                <thead className="sticky-top bg-white shadow-sm">
+                  <tr>
+                    <th>Lease</th>
+                    <th>Customer Name </th>
+                    <th className="text-end">Balance Owing </th>
+                    <th>Sms </th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
 
-                        <td>{customer.customer_name}</td>
+                <tbody>
+                  {customers?.length === 0 && <CustomTable.NothingToShow colSpan={5} />}
 
-                        <td className="text-end">
+                  {customers?.map((customer, index) => (
+                    <tr key={index}>
+                      <td>
+                        <small>{customer.lease_id}</small>
+                      </td>
+
+                      <td>
+                        <small>{customer.customer_name}</small>
+                      </td>
+
+                      <td className="text-end">
+                        <small>
                           {`${customer.currency.trim().toUpperCase()} ${fmtAmount(customer.balance_owing).replace("$", "")}`}
-                        </td>
+                        </small>
+                      </td>
 
-                        <td>
-                          <div className="form-check d-flex justify-content-center">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              name="leases_to_sms"
-                              value={customer.lease_id}
-                              defaultChecked={!customer.is_company}
-                            />
-                          </div>
-                        </td>
+                      <td>
+                        <div className="form-check d-flex justify-content-center">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            name="leases_to_sms"
+                            value={customer.lease_id}
+                            defaultChecked={!customer.is_company}
+                          />
+                        </div>
+                      </td>
 
-                        <td>
-                          <div className="form-check d-flex justify-content-center">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              name="leases_to_email"
-                              value={customer.lease_id}
-                              defaultChecked={customer.is_company}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {customers?.length === 0 && (
-                <div className="custom-h-4 d-flex justify-content-center align-items-center border border-2">
-                  Nothing to show
-                </div>
-              )}
+                      <td>
+                        <div className="form-check d-flex justify-content-center">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            name="leases_to_email"
+                            value={customer.lease_id}
+                            defaultChecked={customer.is_company}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </CustomTable.Table>
             </div>
 
             <div className="text-end p-4">
-              <button
-                disabled={customers?.length === 0}
-                type="submit"
-                className="btn btn-info text-white gap-2"
-              >
+              <CustomTable.ActionButtonTemplate disabled={customers?.length === 0} type="submit">
                 {processing ? (
                   <>
-                    <span className="spinner-grow spinner-grow-sm" />
+                    <span className="spinner-grow spinner-grow-sm me-2" />
                     <span>Processing..</span>
                   </>
                 ) : (
                   "Send"
                 )}
-              </button>
+              </CustomTable.ActionButtonTemplate>
             </div>
           </div>
         </div>
