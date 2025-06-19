@@ -5,6 +5,8 @@ import UserSearchModal from "../../../components/modals/Client/UserSearchModal.j
 import useInternalUsers from "../../../hooks/page-hooks/useInternalUsers.js";
 import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import { capitalize } from "lodash";
+import { SearchBarStyles } from "../../../constants/index.js";
+import SearchBar from "../../../components/SearchBar.jsx";
 
 export default function Index({ users }) {
   const { searchValue, filteredUsers, userModalOptions, setUserModalOptions, handleSearch } =
@@ -50,16 +52,16 @@ export default function Index({ users }) {
           <tr>
             <td colSpan={7}>
               <div className="d-flex justify-content-between align-items-center">
-                <div className="col-5 d-flex">
+                <div className={SearchBarStyles.containerClassname}>
                   <input
                     type="search"
                     value={searchValue}
                     onChange={handleSearch}
                     placeholder="Full name or email..."
-                    className="form-control form-control-sm custom-mx-w-3 rounded-0 border-dark"
+                    className={SearchBarStyles.inputClassname}
                   />
-                  <div className="border border-dark border-start-0 bg-light rounded-end d-flex align-items-center px-2">
-                    <i className="material-icons small">search</i>
+                  <div className={SearchBarStyles.rightButtonClassname}>
+                    <i className="material-icons">search</i>
                   </div>
                 </div>
 

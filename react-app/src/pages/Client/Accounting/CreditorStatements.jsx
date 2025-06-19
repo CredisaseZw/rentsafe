@@ -26,7 +26,7 @@ export default function CreditorStatements({ creditors, current_page, total_page
         <thead className="position-sticky c-table-top c-bg-whitesmoke">
           <tr>
             <td colSpan={7}>
-              <div className="col-4 p-0 pt-1">
+              <div className="c-w-fit p-0 pt-1">
                 <SearchBar searchBy="search" placeholder="Search..." />
               </div>
             </td>
