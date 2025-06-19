@@ -189,9 +189,11 @@ export function NothingToShow({ colSpan }) {
 export function LoadingIndicator({ colSpan }) {
   return (
     <tr>
-      <td colSpan={colSpan} className="text-center p-4">
-        <div className="spinner-border spinner-border-sm text-muted" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <td colSpan={colSpan}>
+        <div className="p-4 text-center">
+          <div className="spinner-border spinner-border-sm text-muted" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         </div>
       </td>
     </tr>
