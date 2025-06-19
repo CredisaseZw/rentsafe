@@ -6,7 +6,6 @@ import useInternalUsers from "../../../hooks/page-hooks/useInternalUsers.js";
 import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import { capitalize } from "lodash";
 import { SearchBarStyles } from "../../../constants/index.js";
-import SearchBar from "../../../components/SearchBar.jsx";
 
 export default function Index({ users }) {
   const { searchValue, filteredUsers, userModalOptions, setUserModalOptions, handleSearch } =

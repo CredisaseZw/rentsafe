@@ -43,6 +43,13 @@ export default function PaymentTypes() {
       <CustomTable.Table tabletitle="Payment Types" tabletitleBg="info" tabletitleColor="white">
         <CustomTable.ColGroup ratios={[null, 1]} />
 
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
         <tbody>
           {paymentTypes.map((type, index) => (
             <tr key={index}>
