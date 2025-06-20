@@ -6,6 +6,7 @@ export const STICKY_TABLE_HEADER_CLASS = "sticky-top c-table-top bg-white shadow
  * DONT FORGET TO USE `ColGroup`
  * @param {React.HTMLAttributes<HTMLDivElement> & {
  * children: React.ReactNode,
+ * tabletitleOverideContent?: React.ReactNode,
  * tabletitle: string,
  * size?: "lg"
  * tabletitleBg?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light"
@@ -18,15 +19,18 @@ export function Table({
   className = "bg-white",
   tabletitleBg = "light",
   tabletitleColor = "",
+  tabletitleOverideContent,
   ...props
 }) {
   return (
     <div {...props} className={className}>
-      {props.tabletitle && (
+      {(props.tabletitle || tabletitleOverideContent) && (
         <div
           className={`p-1 fw-semibold rounded-top-3 rounded-top border text-center bg-${tabletitleBg} text-${tabletitleColor}`}
         >
-          {capitalizeAllWords(props.tabletitle)}
+          {tabletitleOverideContent
+            ? tabletitleOverideContent
+            : capitalizeAllWords(props.tabletitle)}
         </div>
       )}
 
