@@ -5,13 +5,7 @@ import InvoiceFormRow from "./InvoiceFormRow.jsx";
 import { Spinner } from "react-bootstrap";
 import CustomTable from "./table/CustomTable.jsx";
 
-export function SalesInvoiceForm({
-  invoice,
-  triggerClassname,
-  triggerChildren,
-  isProforma,
-  onClose,
-}) {
+export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProforma, onClose }) {
   const {
     key,
     show,
@@ -37,8 +31,12 @@ export function SalesInvoiceForm({
 
   return (
     <>
-      <CustomTable.ActionButtonTemplate onClick={handleShow} icon="add">
-        New
+      <CustomTable.ActionButtonTemplate
+        onClick={handleShow}
+        icon="add"
+        variant={triggerVariant || "info"}
+      >
+        {triggerLabel || "New"}
       </CustomTable.ActionButtonTemplate>
 
       <ContentModal
