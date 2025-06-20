@@ -830,12 +830,12 @@
   background-color: rgb(203, 203, 203) !important;
   color: rgb(28, 28, 28) !important;
   border-radius: 5px !important;
-  padding: 0.1rem 0.3rem;
+  padding: 0.1rem 0.3rem !important;
   border-color: rgb(168, 168, 168) !important;
 }
 .page-link {
   color: rgb(28, 28, 28) !important;
   border-radius: 5px !important;
-  padding: 0.1rem 0.3rem;
+  padding: 0.1rem 0.3rem !important;
   border-color: rgb(168, 168, 168) !important;
 }
