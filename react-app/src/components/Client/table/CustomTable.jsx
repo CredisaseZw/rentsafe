@@ -136,6 +136,7 @@ export function RemoveRowButtonTemplate(props) {
  * @param {React.ButtonHTMLAttributes<HTMLButtonElement> & {
  *   children: React.ReactNode;
  *   icon?: string;
+ *   size?: "lg";
  *   variant?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "dark";
  * }} props
  */
@@ -147,7 +148,7 @@ export function ActionButtonTemplate(props) {
       {...props}
       type={props.type || "button"}
       className={
-        `btn btn-${variant} text-white btn-sm text-capitalize text-nowrap py-1 px-2` +
+        `btn btn-${variant} text-white btn-sm text-capitalize text-nowrap ${props.size == "lg" ? "c-fs-09" : ""} py-1 px-2` +
         (props.className || "")
       }
     >
