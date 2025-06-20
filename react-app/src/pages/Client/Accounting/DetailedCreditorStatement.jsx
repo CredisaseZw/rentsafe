@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
 import Layout from "../../../components/Layouts/client/Layout.jsx";
-import { capitalize } from "lodash";
-import moment from "moment";
-import { formatCurrency } from "../../../utils/formatting.js";
 import html2pdf from "html2pdf.js";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
+import { useRef } from "react";
+import { capitalize } from "lodash";
+import { friendlyDate } from "../../../utils/index.js";
+import { formatCurrency } from "../../../utils/formatting.js";
 
 export default function DetailedCreditorStatement({ statement }) {
   const contentRef = useRef();
@@ -25,32 +26,32 @@ export default function DetailedCreditorStatement({ statement }) {
   return (
     <div>
       <div ref={contentRef}>
-        <div
-          style={{
-            lineHeight: "5px",
-            fontSize: "18px",
-          }}
-          className="bg-danger d-flex justify-content-between align-items-center text-white p-3"
-        >
-          <h4 className="fw-bold text-white mb-4">
-            {capitalize(statement.creditor_name ? statement.creditor_name : "Creditor")} Statement -
-            USD
-          </h4>
+        <CustomTable.Table
+          tabletitleOverideContent={
+            <div className="d-flex text-start justify-content-between align-items-center p-3">
+              <div>
+                <h4 className="text-white fw-bold">
+                  {capitalize(statement.creditor_name ? statement.creditor_name : "Creditor")}{" "}
+                  Statement - USD
+                </h4>
+              </div>
 
-          <div>
-            {new Date().toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </div>
-        </div>
-
-        <table
-          style={{ lineHeight: "5px", fontSize: "12px" }}
-          className="table table-bordered table-responsive"
+              <div>
+                {new Date().toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+            </div>
+          }
+          tabletitleBg="danger"
+          tabletitleColor="white"
+          size="lg"
         >
-          <thead className="position-sticky c-table-top">
+          <CustomTable.ColGroup ratios={[1, null, 1, 1, 1]} />
+
+          <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
             <tr className="c-thead-bg">
               <th>Date</th>
               <td>Description</td>
@@ -61,46 +62,39 @@ export default function DetailedCreditorStatement({ statement }) {
           </thead>
 
           <tbody>
-            {Boolean(statement.rows?.length) &&
+            {statement?.rows?.length ? (
               statement.rows.map((row, index) => (
                 <tr key={index}>
-                  <th>{moment(row.date).format("YYYY-MM-DD")}</th>
-
-                  <td>{row.description} </td>
-
-                  <td>{row.ref}</td>
-
+                  <td className="text-nowrap">{friendlyDate(row.date)}</td>
+                  <td>{row.description}</td>
+                  <td className="text-nowrap">{row.ref}</td>
                   <td className="text-end">
                     {row.amount < 0
                       ? `(${formatCurrency(row.amount * -1)})`
                       : formatCurrency(row.amount)}
                   </td>
-
                   <td className="text-end">
                     {row.balance < 0
                       ? `(${formatCurrency(row.balance * -1)})`
                       : formatCurrency(row.balance)}
                   </td>
                 </tr>
-              ))}
+              ))
+            ) : (
+              <CustomTable.NothingToShow colSpan={5} />
+            )}
           </tbody>
-        </table>
-
-        {!Boolean(statement.rows?.length) && (
-          <div className="custom-h-4 d-flex justify-content-center align-items-center border border-2">
-            Nothing to show
-          </div>
-        )}
+        </CustomTable.Table>
       </div>
 
       <div className="d-flex justify-content-end align-items-center gap-3 p-4">
-        <button className="btn btn-primary" disabled>
+        <CustomTable.ActionButtonTemplate size="lg" variant="primary" disabled>
           Period request
-        </button>
+        </CustomTable.ActionButtonTemplate>
 
-        <button onClick={handlePrintToPdf} className="btn btn-info text-white">
+        <CustomTable.ActionButtonTemplate size="lg" onClick={handlePrintToPdf}>
           Print
-        </button>
+        </CustomTable.ActionButtonTemplate>
       </div>
     </div>
   );
