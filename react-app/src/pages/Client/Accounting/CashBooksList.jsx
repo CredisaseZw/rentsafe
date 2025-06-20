@@ -405,7 +405,7 @@ export default function CashBooksList() {
             <tr key={index}>
               <td>{book.bookId}</td>
               <td>{book.cashBookName}</td>
-              <td className="text-center">{book.cashBookCurrency}</td>
+              <td className="text-nowrap text-center">{book.cashBookCurrency}</td>
 
               <td className="text-center">
                 {book.activeRequisition}

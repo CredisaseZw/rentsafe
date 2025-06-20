@@ -123,7 +123,7 @@ export default function RateAuditTrail() {
                   <td className="text-nowrap">{row.source}</td>
                   <td>{row.user}</td>
                   <td className="text-end">{row.baseUsd}</td>
-                  <td className="text-center">{row.convertCurrency}</td>
+                  <td className="text-center text-nowrap">{row.convertCurrency}</td>
                   <td className="text-end">{row.rate}</td>
                 </tr>
               ))

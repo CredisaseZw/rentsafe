@@ -18,7 +18,7 @@ export default function AccountsSectors() {
         <tbody>
           {accountsSectors.map((sector, index) => (
             <tr key={index}>
-              <td>{sector.code}</td>
+              <td className="text-nowrap">{sector.code}</td>
               <td>{sector.name}</td>
             </tr>
           ))}

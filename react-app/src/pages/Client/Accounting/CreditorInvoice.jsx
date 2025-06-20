@@ -301,11 +301,11 @@ export default function CreditorInvoice() {
 
                 <td>{invoice.details}</td>
 
-                <td>{invoice.currency}</td>
+                <td className="text-nowrap">{invoice.currency}</td>
 
                 <td className="text-end">{invoice.net_amount}</td>
 
-                <td className="text-end">{invoice.vat}</td>
+                <td className="text-end text-nowrap">{invoice.vat}</td>
 
                 <td className="text-end">{invoice.total_amount}</td>
               </tr>

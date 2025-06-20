@@ -67,7 +67,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
               <td className="ps-3 text-nowrap">{todo.date ? friendlyDate(todo.date) : "N/A"}</td>
 
               {todo.function.toLowerCase() === "works" ? (
-                <td>
+                <td className="text-nowrap">
                   <CustomTable.ActionButtonTemplate
                     onClick={() => openScheduledWorks(todo)}
                     variant="primary"

@@ -193,7 +193,7 @@ export default function DebtCall() {
                         <small>{customer.customer_name}</small>
                       </td>
 
-                      <td className="text-end">
+                      <td className="text-end text-nowrap">
                         <small>
                           {`${customer.currency.trim().toUpperCase()} ${fmtAmount(customer.balance_owing).replace("$", "")}`}
                         </small>

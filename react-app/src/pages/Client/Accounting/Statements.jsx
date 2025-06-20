@@ -122,7 +122,7 @@ export default function Statements() {
                 <td>{tenant.address}</td>
 
                 <td
-                  className={`text-end bg-${tenant.color}  ${tenant.color === "warning" || tenant.color === "light-red" ? "fw-bold" : "text-white"} `}
+                  className={`text-nowrap text-end bg-${tenant.color}  ${tenant.color === "warning" || tenant.color === "light-red" ? "fw-bold" : "text-white"} `}
                   style={{ backgroundColor: tenant.color == "light-red" ? "#f87171" : "" }}
                 >
                   {Number(tenant.owing_amount) >= 0

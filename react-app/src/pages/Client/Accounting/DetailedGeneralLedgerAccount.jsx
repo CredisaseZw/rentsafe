@@ -185,9 +185,9 @@ export default function DetailedGeneralLedgerAccount() {
             ) : (
               rows.map((row) => (
                 <tr key={row.id}>
-                  <td>{row.date}</td>
+                  <td className="text-nowrap">{row.date}</td>
                   <td>{row.description}</td>
-                  <td>{row.ref}</td>
+                  <td className="text-nowrap">{row.ref}</td>
                   <td className="text-end">{row.debit}</td>
                   <td className="text-end">{row.credit}</td>
                   <td className="text-end">{row.balance}</td>

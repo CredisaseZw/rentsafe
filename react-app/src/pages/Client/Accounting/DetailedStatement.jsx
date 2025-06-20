@@ -100,7 +100,7 @@ export default function DetailedStatement({ message }) {
               <tr key={index}>
                 <td className="text-nowrap">{friendlyDate(payment.date)}</td>
                 <td>{payment.description}</td>
-                <td>{payment.reference}</td>
+                <td className="text-nowrap">{payment.reference}</td>
                 <td className="text-end">
                   {payment.owing_amount < 0
                     ? `(${formatCurrency(payment.owing_amount * -1)})`

@@ -93,11 +93,11 @@ export default function Index({ users }) {
 
               <td>{capitalize(user.firstName)}</td>
 
-              <td className="text-lowercase">{user.access_level}</td>
+              <td className="text-nowrap text-lowercase">{user.access_level}</td>
 
               <td className="text-lowercase">{user.email}</td>
 
-              <td>{user.mobile}</td>
+              <td className="text-nowrap">{user.mobile}</td>
 
               <td>
                 <CustomTable.ActionButtonsContainer>
