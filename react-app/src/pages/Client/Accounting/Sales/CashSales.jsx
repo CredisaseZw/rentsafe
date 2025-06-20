@@ -68,7 +68,7 @@ export default function CashSales() {
         <div ref={contentRef}>
           <div className="row row-cols-2 pb-3 text-nowrap">
             <div className="col">
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="bill_to" className="form-label">
                   Bill To:
                 </label>
@@ -82,7 +82,7 @@ export default function CashSales() {
                 />
               </div>
 
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="address" className="form-label">
                   Address:
                 </label>
@@ -94,7 +94,7 @@ export default function CashSales() {
                 />
               </div>
 
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="phone" className="form-label">
                   Phone:
                 </label>
@@ -106,7 +106,7 @@ export default function CashSales() {
                 />
               </div>
 
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="email" className="form-label">
                   Email:
                 </label>
@@ -120,7 +120,7 @@ export default function CashSales() {
             </div>
 
             <div className="col">
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="vat_no" className="form-label">
                   VAT No.:
                 </label>
@@ -132,7 +132,7 @@ export default function CashSales() {
                 />
               </div>
 
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="tin" className="form-label">
                   TIN:
                 </label>
@@ -144,7 +144,7 @@ export default function CashSales() {
                 />
               </div>
 
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="rep" className="form-label">
                   Rep:
                 </label>
@@ -157,7 +157,7 @@ export default function CashSales() {
                 />
               </div>
 
-              <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="mb-2 d-flex gap-4 align-items-center">
                 <label htmlFor="date" className="form-label">
                   Date:
                 </label>
