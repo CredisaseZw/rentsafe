@@ -260,10 +260,26 @@ class CurrencyRateViewSet(BaseCompanyViewSet):
 
         if request.method in ["POST", "PUT", "PATCH"]:
             serializer = self.get_serializer(instance, data=request.data, partial=True)
+                
+            base_currency = request.data.get('base_currency')
+            target_currency = request.data.get('currency')
+            
+            current_rate = request.data.get('current_rate')
+            try:
+                current_rate = float(current_rate)
+            except (TypeError, ValueError):
+                return Response({"error": "Current rate must be a valid number"},status=status.HTTP_400_BAD_REQUEST)
+
+            if current_rate <= 0:
+                return Response({"error": "Current rate must be greater than zero"},status=status.HTTP_400_BAD_REQUEST)
+            
             if serializer.is_valid(raise_exception=True): # raise_exception=True handles errors automatically
+                if base_currency == target_currency:
+                    return Response({"error": "Base currency and Target currency cannot be the same"}, status=status.HTTP_400_BAD_REQUEST)
+                
                 serializer.save(user=request.user) # Assign user during save via perform_create/update
                 message = "Rate updated successfully" if instance else "Rate created successfully"
-                return Response({"success": message, "data": serializer.data}, status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED)
+                return Response({"Success ": message,}, status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED)
             # If serializer.is_valid() was False, errors would be raised by raise_exception=True
             # and handled by DRF's exception handler.
 
@@ -274,6 +290,10 @@ class CashBookViewSet(BaseCompanyViewSet):
 class CurrencyViewSet(BaseCompanyViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
+    
+    # overide the base get queryset
+    def get_queryset(self):
+        return self.queryset.all()
 
 class PaymentMethodViewSet(BaseCompanyViewSet):
     queryset = PaymentMethod.objects.all()
