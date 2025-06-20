@@ -1,27 +1,12 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
-import html2pdf from "html2pdf.js";
 import CustomTable from "../../../components/Client/table/CustomTable.jsx";
-import { useRef } from "react";
 import { capitalize } from "lodash";
 import { friendlyDate } from "../../../utils/index.js";
 import { formatCurrency } from "../../../utils/formatting.js";
+import useDetailedCreditorStatement from "../../../hooks/page-hooks/useDetailedCreditorStatement.js";
 
 export default function DetailedCreditorStatement({ statement }) {
-  const contentRef = useRef();
-  console.log({ statement });
-
-  const handlePrintToPdf = () => {
-    const element = contentRef.current;
-    html2pdf()
-      .from(element)
-      .set({
-        margin: 1,
-        filename: "modal-content.pdf",
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: "portrait" },
-      })
-      .save();
-  };
+  const { contentRef, handlePrintToPdf } = useDetailedCreditorStatement();
 
   return (
     <div>
