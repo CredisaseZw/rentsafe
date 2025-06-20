@@ -1,9 +1,10 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import SearchBar from "../../../components/SearchBar.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import PaginationControls from "../../../components/PaginationControls.jsx";
 import useClientStatements from "../../../hooks/page-hooks/useClientStatements.js";
 import { formatCurrency } from "../../../utils/formatting.js";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
+import { friendlyDate } from "../../../utils/index.js";
 
 export default function Statements() {
   const {
@@ -18,157 +19,141 @@ export default function Statements() {
 
   return (
     <div>
-      <NewPageHeader title="Customer Summary" />
+      <CustomTable.Table tabletitle="Customer Summary" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, null, null, 1, 1]} />
 
-      <div className="p-2 fw-bold d-flex justify-content-between align-items-center">
-        <div>USD</div>
-        <div>Date: {new Date().toLocaleDateString()}</div>
-      </div>
-
-      <table className="table table-bordered table-responsive table-sm c-fs-small">
-        <thead className="position-sticky c-table-top c-bg-whitesmoke">
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
           <tr>
-            <td colSpan={7}>
-              <div className="c-w-fit p-0 pt-1">
-                <SearchBar searchBy="search" placeholder="Search..." />
+            <td colSpan={5}>
+              <div className="d-flex gap-2 align-items-center justify-content-between">
+                <div className="fw-bold">USD - {friendlyDate(new Date())}</div>
+
+                <div className="c-w-fit pt-1">
+                  <SearchBar searchBy="search" placeholder="Search..." />
+                </div>
               </div>
             </td>
           </tr>
 
-          <tr className="c-thead-bg rounded-2 c-force-borders">
-            <th>
-              <div> Customer # </div>
-            </th>
-            <th>
-              <div> Customer Name </div>
-            </th>
-            <th>
-              <div> Address </div>
-            </th>
-            <th className="text-end">
-              <div> Rent Owing</div>
-            </th>
-            <th className="bg-white">
-              <div></div>
-            </th>
+          <tr className="c-thead-bg">
+            <th>Customer #</th>
+            <th>Customer Name</th>
+            <th>Address</th>
+            <th className="text-end">Rent Owing</th>
+            <th></th>
           </tr>
         </thead>
 
         <tbody>
-          {usdStatements?.length > 0 &&
+          {usdStatements?.length > 0 ? (
             usdStatements.map((tenant) => (
               <tr key={tenant.id}>
                 <th>{tenant.id}</th>
                 <td>{tenant.tenant_name} </td>
                 <td>{tenant.address}</td>
+
                 <td
-                  className={`text-end bg-${tenant.color} text-white`}
-                  style={{
-                    backgroundColor: tenant.color == "light-red" ? "#f87171" : "",
-                  }}
+                  className={`text-end bg-${tenant.color}  ${tenant.color === "warning" || tenant.color === "light-red" ? "fw-bold" : "text-white"} `}
+                  style={{ backgroundColor: tenant.color == "light-red" ? "#f87171" : "" }}
                 >
                   {Number(tenant.owing_amount) >= 0
                     ? formatCurrency(Number(tenant.owing_amount))
                     : `(${formatCurrency(Number(tenant.owing_amount) * -1)})`}
                 </td>
-                <td
-                  className="bg-info text-center"
-                  style={{
-                    fontWeight: "500",
-                    fontSize: "16px",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => onOpenStatement(tenant.id)}
-                >
-                  View
+
+                <td>
+                  <CustomTable.ActionButtonTemplate onClick={() => onOpenStatement(tenant.id)}>
+                    View
+                  </CustomTable.ActionButtonTemplate>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <CustomTable.NothingToShow colSpan={5} />
+          )}
         </tbody>
 
-        <tfoot className="fw-bold c-fs-18">
+        <tfoot>
           <tr>
-            <th>Total</th>
-            <td></td>
-            <td></td>
-            <td className="text-end">
+            <th className="fw-bolder c-fs-11">Total</th>
+            <td />
+            <td />
+            <td className="fw-bolder c-fs-11 text-end">
               {usdTotal >= 0 ? formatCurrency(usdTotal) : `(${formatCurrency(usdTotal * -1)})`}
             </td>
-            <td></td>
+            <td />
           </tr>
         </tfoot>
-      </table>
+      </CustomTable.Table>
 
-      <div className="mt-5 p-2 fw-bold d-flex justify-content-between align-items-center">
-        <div>ZWG</div>
-        <div>Date: {new Date().toLocaleDateString()}</div>
-      </div>
+      <div className="mt-5" />
 
-      <table className="table table-bordered table-responsive table-sm c-fs-small">
-        <thead className="position-sticky c-table-top c-bg-whitesmoke">
+      <CustomTable.Table>
+        <CustomTable.ColGroup ratios={[1, null, null, 1, 1]} />
+
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
           <tr>
-            <td colSpan={7}>
-              <div className="c-w-fit p-0 pt-1">
-                <SearchBar searchBy="search" placeholder="Search..." />
+            <td colSpan={5}>
+              <div className="d-flex gap-2 align-items-center justify-content-between">
+                <div className="fw-bold">ZWG - {friendlyDate(new Date())}</div>
+
+                <div className="c-w-fit pt-1">
+                  <SearchBar searchBy="search" placeholder="Search..." />
+                </div>
               </div>
             </td>
           </tr>
 
-          <tr className="c-thead-bg rounded-2">
+          <tr className="c-thead-bg">
             <th>Tenant #</th>
-            <td>Tenant Name</td>
-            <td>Address</td>
-            <td className="text-end">Rent Owing</td>
-            <td className="bg-white"></td>
+            <th>Tenant Name</th>
+            <th>Address</th>
+            <th className="text-end">Rent Owing</th>
+            <th />
           </tr>
         </thead>
 
         <tbody>
-          {zwlStatements?.length > 0 &&
+          {zwlStatements?.length > 0 ? (
             zwlStatements.map((tenant) => (
               <tr key={tenant.id}>
                 <th>{tenant.id}</th>
-                <td>{tenant.tenant_name} </td>
+                <td>{tenant.tenant_name}</td>
                 <td>{tenant.address}</td>
+
                 <td
-                  className={`text-end bg-${tenant.color} text-white`}
-                  style={{
-                    backgroundColor: tenant.color == "light-red" ? "#f87171" : "",
-                  }}
+                  className={`text-end bg-${tenant.color}  ${tenant.color === "warning" || tenant.color === "light-red" ? "fw-bold" : "text-white"} `}
+                  style={{ backgroundColor: tenant.color == "light-red" ? "#f87171" : "" }}
                 >
                   {Number(tenant.owing_amount) >= 0
                     ? formatCurrency(Number(tenant.owing_amount))
                     : `(${formatCurrency(Number(tenant.owing_amount) * -1)})`}
                 </td>
-                <td
-                  className="bg-info text-center"
-                  style={{
-                    fontWeight: "500",
-                    fontSize: "16px",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => onOpenStatement(tenant.id)}
-                >
-                  View
+
+                <td>
+                  <CustomTable.ActionButtonTemplate onClick={() => onOpenStatement(tenant.id)}>
+                    View
+                  </CustomTable.ActionButtonTemplate>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <CustomTable.NothingToShow colSpan={5} />
+          )}
         </tbody>
 
-        <tfoot className="fw-bold c-fs-18">
+        <tfoot>
           <tr>
-            <th>Total</th>
-            <td></td>
-            <td></td>
-            <td className="text-end">
+            <th className="fw-bolder c-fs-11">Total</th>
+            <td />
+            <td />
+            <td className="fw-bolder c-fs-11 text-end">
               {zwlTotal >= 0 ? formatCurrency(zwlTotal) : `(${formatCurrency(zwlTotal * -1)})`}
             </td>
-            <td></td>
+            <td />
           </tr>
         </tfoot>
-      </table>
+      </CustomTable.Table>
 
       <div className="px-3">
         <PaginationControls currentPage={current_page} totalPages={total_pages} />
