@@ -306,7 +306,7 @@ def cashbook_receipts(request):
     return inertia_render(request, "Client/Accounting/CashbookReceipts")
 
 def cashbook_payments(request):
-    return inertia_render(request, "Client/Accounting/CashbookPayments")
+    return inertia_render(request, "Client/Accounting/CashBookPayments")
 
 def accounts_sectors(request):
     return inertia_render(request, "Client/Accounting/AccountsSectors")

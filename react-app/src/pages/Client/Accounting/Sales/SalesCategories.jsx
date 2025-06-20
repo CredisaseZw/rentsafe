@@ -1,5 +1,6 @@
-import ContentModal from "../../../../components/ContentModal.jsx";
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../../components/Client/table/CustomTable.jsx";
+import ContentModal from "../../../../components/ContentModal.jsx";
 import MessageModal from "../../../../components/MessageModal.jsx";
 import useSalesCategories from "../../../../hooks/page-hooks/useSalesCategories.js";
 import { friendlyDate } from "../../../../utils/index.js";
@@ -74,67 +75,45 @@ export default function SalesCategories() {
         </form>
       </ContentModal>
 
-      <h5 className="position-relative text-center mb-2 p-2 mb-0">
-        Sales Categories
-        <div className="position-absolute top-0 end-0">
-          <button className="btn btn-info text-white" onClick={openShowAdd}>
-            <i className="leading-icon material-icons">add</i>
-            New
-          </button>
-        </div>
-      </h5>
+      <CustomTable.Table tabletitle="Sales Categories" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, null, null, 1]} />
 
-      <table className="table table-sm table-striped border bg-white">
-        <thead className="position-sticky c-table-top text-white bg-info shadow-sm c-z-5">
-          <tr className="c-force-borders c-force-borders-white">
-            <th className="ps-3">
-              <div> Code</div>
-            </th>
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+          <tr>
+            <th>Code</th>
+            <th>Category</th>
+            <th>Date Created</th>
             <th>
-              <div>Category </div>
-            </th>
-            <th>
-              <div>Date Created </div>
-            </th>
-            <th>
-              <div> </div>
+              <CustomTable.ActionButtonTemplate variant="info" onClick={openShowAdd} icon="add">
+                New
+              </CustomTable.ActionButtonTemplate>
             </th>
           </tr>
         </thead>
 
         <tbody>
-          {!Boolean(categories?.length) && (
-            <tr>
-              <td colSpan={4}>
-                <div className="custom-h-3 bg-white d-flex justify-content-center align-items-center">
-                  Nothing to show
-                </div>
-              </td>
-            </tr>
-          )}
+          {!Boolean(categories?.length) && <CustomTable.NothingToShow colSpan={4} />}
 
           {categories?.map((category, index) => (
             <tr key={index}>
-              <td className="ps-3">{category.code}</td>
+              <td>{category.code}</td>
 
-              <td className="custom-mn-w-2 ps-3">{category.name}</td>
+              <td>{category.name}</td>
 
-              <td className="ps-3">
-                {category.date_created && friendlyDate(category.date_created)}
-              </td>
+              <td>{category.date_created && friendlyDate(category.date_created)}</td>
 
-              <td className="pe-3 custom-mx-w-05 text-end">
-                <button
+              <td>
+                <CustomTable.ActionButtonTemplate
+                  variant="danger"
                   onClick={() => setCategoryToDelete(category)}
-                  className="btn btn-sm btn-danger"
                 >
                   Delete
-                </button>
+                </CustomTable.ActionButtonTemplate>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </CustomTable.Table>
     </main>
   );
 }

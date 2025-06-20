@@ -6,7 +6,7 @@ export default function PaginationControls({ currentPage, totalPages }) {
 
   return (
     <div className="my-5 small">
-      <Pagination className="justify-content-center align-items-center gap-2 mb-2 mt-3">
+      <Pagination size="sm" className="justify-content-center align-items-center gap-2 mb-2 mt-3">
         <Pagination.First
           disabled={currentPage === 1}
           onClick={() => changePage(1)}
@@ -47,7 +47,7 @@ export default function PaginationControls({ currentPage, totalPages }) {
         </Pagination.Last>
       </Pagination>
 
-      <div className="text-center small text-muted">
+      <div className="text-center smallest text-muted">
         {currentPage}/{totalPages}
       </div>
     </div>

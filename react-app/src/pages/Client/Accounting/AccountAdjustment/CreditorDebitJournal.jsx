@@ -1,160 +1,145 @@
-import React from "react";
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../../components/Client/table/CustomTable.jsx";
 import SearchCreditorComponent from "./SearchCreditor.jsx";
-import { formatCurrency } from "../../../../utils/formatting.js";
 import useCreditorDebitJournal from "../../../../hooks/page-hooks/useCreditorDebitJournal.js";
+import { formatCurrency } from "../../../../utils/formatting.js";
 
 export default function CreditorDebitJournal() {
   const { rows, isLoading, addRow, setRows, removeRow, handleSubmit, handleInputChange } =
     useCreditorDebitJournal();
 
   return (
-    <>
-      <div className="bg-white border rounded-3">
-        <h5 className="text-center p-2 mb-0 text-white bg-info">Debit Journal</h5>
+    <form onSubmit={handleSubmit}>
+      <CustomTable.Table tabletitle="Debit Journal" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, null, null, 1, 1, 1, 1]} />
 
-        <form className="p-2" onSubmit={handleSubmit}>
-          <table className="table table-responsive table-bordered table-sm">
-            <thead className="position-sticky c-table-top bg-white shadow-sm c-z-5">
-              <tr>
-                <th className="text-nowrap">Date</th>
-                <th className="text-nowrap">Creditor</th>
-                <th className="text-nowrap">Details</th>
-                <th className="text-nowrap">Account Balance</th>
-                <th className="text-nowrap">Debit Amount</th>
-                <th className="text-nowrap">End Balance</th>
-                <th className="text-nowrap">Action</th>
-              </tr>
-            </thead>
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+          <tr>
+            <th>Date</th>
+            <th>Creditor</th>
+            <th>Details</th>
+            <th>Account Balance</th>
+            <th>Debit Amount</th>
+            <th>End Balance</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={row.id}>
-                  <td className="custom-w-170">
-                    <input
-                      className="form-control custom-w-fit"
-                      type="date"
-                      name="date"
-                      required
-                      max={new Date().toISOString().split("T")[0]}
-                      min={
-                        row.endDate ? new Date(row.endDate).toISOString().split("T")[0] : undefined
-                      }
-                      value={row.date}
-                      onChange={(e) => handleInputChange(e, index)}
-                    />
-                  </td>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={row.id}>
+              <td>
+                <input
+                  required
+                  type="date"
+                  name="date"
+                  value={row.date}
+                  className="form-control form-control-sm"
+                  max={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => handleInputChange(e, index)}
+                  min={row.endDate ? new Date(row.endDate).toISOString().split("T")[0] : undefined}
+                />
+              </td>
 
-                  <td
-                    className="custom-w-170 position-relative"
-                    style={{ zIndex: rows.length - index }}
-                  >
-                    <SearchCreditorComponent
-                      value={row.creditorName}
-                      setValue={(val) => {
-                        const newRows = [...rows];
-                        newRows[index].creditorName = val;
-                        setRows(newRows);
-                      }}
-                      // url={reverseUrl('get_client_individual_journals')}
-                      url={reverseUrl("get_creditor_journals")}
-                      placeholder="Start typing"
-                      delay={500}
-                      setCreditorName={(val) => {
-                        const newRows = [...rows];
-                        newRows[index].creditorName = val;
-                        setRows(newRows);
-                      }}
-                      setLeaseId={(val) => {
-                        const newRows = [...rows];
-                        newRows[index].leaseId = val;
-                        setRows(newRows);
-                      }}
-                      setOpeningBalance={(val) => {
-                        const newRows = [...rows];
-                        newRows[index].accountBalance = val;
-                        setRows(newRows);
-                      }}
-                      setEndDate={(val) => {
-                        const newRows = [...rows];
-                        newRows[index].endDate = val;
-                        setRows(newRows);
-                      }}
-                    />
-                  </td>
+              <td className="position-relative" style={{ zIndex: rows.length - index }}>
+                <SearchCreditorComponent
+                  value={row.creditorName}
+                  setValue={(val) => {
+                    const newRows = [...rows];
+                    newRows[index].creditorName = val;
+                    setRows(newRows);
+                  }}
+                  // url={reverseUrl('get_client_individual_journals')}
+                  url={reverseUrl("get_creditor_journals")}
+                  placeholder="Start typing"
+                  delay={500}
+                  setCreditorName={(val) => {
+                    const newRows = [...rows];
+                    newRows[index].creditorName = val;
+                    setRows(newRows);
+                  }}
+                  setLeaseId={(val) => {
+                    const newRows = [...rows];
+                    newRows[index].leaseId = val;
+                    setRows(newRows);
+                  }}
+                  setOpeningBalance={(val) => {
+                    const newRows = [...rows];
+                    newRows[index].accountBalance = val;
+                    setRows(newRows);
+                  }}
+                  setEndDate={(val) => {
+                    const newRows = [...rows];
+                    newRows[index].endDate = val;
+                    setRows(newRows);
+                  }}
+                />
+              </td>
 
-                  <td className="custom-w-3">
-                    <textarea
-                      name="details"
-                      className="form-control"
-                      rows={2}
-                      id="details"
-                      value={row.details}
-                      onChange={(e) => handleInputChange(e, index)}
-                    />
-                  </td>
+              <td>
+                <input
+                  id="details"
+                  name="details"
+                  value={row.details}
+                  className="form-control form-control-sm"
+                  onChange={(e) => handleInputChange(e, index)}
+                />
+              </td>
 
-                  <td className="text-end">
-                    {row.accountBalance ? formatCurrency(row.accountBalance) : ""}
-                  </td>
+              <td className="text-end">
+                {row.accountBalance ? formatCurrency(row.accountBalance) : ""}
+              </td>
 
-                  <td className="custom-w-150">
-                    <input
-                      onChange={(e) => handleInputChange(e, index)}
-                      className="form-control"
-                      type="number"
-                      id="debitAmount"
-                      name="debitAmount"
-                      value={row.debitAmount}
-                      required
-                    />
-                  </td>
+              <td>
+                <input
+                  required
+                  type="number"
+                  id="debitAmount"
+                  name="debitAmount"
+                  value={row.debitAmount}
+                  className="form-control form-control-sm"
+                  onChange={(e) => handleInputChange(e, index)}
+                />
+              </td>
 
-                  <td className="text-end">
-                    {row.debitAmount
-                      ? formatCurrency(Number(row.accountBalance) - Number(row.debitAmount))
-                      : row.accountBalance
-                        ? formatCurrency(Number(row.accountBalance))
-                        : ""}
-                  </td>
+              <td className="text-end">
+                {row.debitAmount
+                  ? formatCurrency(Number(row.accountBalance) - Number(row.debitAmount))
+                  : row.accountBalance
+                    ? formatCurrency(Number(row.accountBalance))
+                    : ""}
+              </td>
 
-                  <td className="text-center">
-                    <button
-                      type="button"
-                      className="btn btn-danger btn-sm"
-                      onClick={() => removeRow(index)}
-                      disabled={rows.length === 1}
-                    >
-                      -
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <td>
+                <CustomTable.RemoveRowButtonTemplate
+                  onClick={() => removeRow(index)}
+                  disabled={rows.length === 1}
+                />
+              </td>
+            </tr>
+          ))}
 
-          <div className="text-end p-2">
-            <button type="button" className="btn btn-success" onClick={addRow}>
-              <i className="leading-icon material-icons">add</i>
-              Add Row
-            </button>
-          </div>
+          <tr className="text-end">
+            <td colSpan={7}>
+              <CustomTable.AddRowButtonTemplate label="add row" onClick={addRow} />
+            </td>
+          </tr>
+        </tbody>
+      </CustomTable.Table>
 
-          <div className="text-center mb-3">
-            <button type="submit" className="btn btn-info text-white">
-              {isLoading ? (
-                <>
-                  <span className="spinner-grow spinner-grow-sm"></span>
-                  <span className="ms-2">processing..</span>
-                </>
-              ) : (
-                "Submit"
-              )}
-            </button>
-          </div>
-        </form>
+      <div className="text-center mt-3">
+        <CustomTable.ActionButtonTemplate type="submit">
+          {isLoading ? (
+            <>
+              <span className="spinner-grow spinner-grow-sm"></span>
+              <span className="ms-2">processing..</span>
+            </>
+          ) : (
+            "Submit"
+          )}
+        </CustomTable.ActionButtonTemplate>
       </div>
-    </>
+    </form>
   );
 }
 

@@ -11,7 +11,7 @@ export default function SalesInvoicing() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab)}
-            className={`btn ${activeTab === tab ? "btn-info text-white" : "border border-2"}`}
+            className={`btn btn-sm ${activeTab === tab ? "btn-info text-white" : "border border-2"}`}
           >
             {tab.key}
           </button>

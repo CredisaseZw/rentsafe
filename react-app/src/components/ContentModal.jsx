@@ -20,7 +20,7 @@ export default function ContentModal({
     >
       <Modal.Header closeButton onHide={handleClose}>
         <div className="w-100 pt-4">
-          {titleOverideContent || <h4 className={centerTitle ? "text-center" : ""}>{title}</h4>}
+          {titleOverideContent || <h5 className={centerTitle ? "text-center" : ""}>{title}</h5>}
         </div>
       </Modal.Header>
 

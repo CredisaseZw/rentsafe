@@ -1,3 +1,5 @@
+import CustomTable from "./table/CustomTable.jsx";
+
 export default function CashSalesPaymentRow({
   index,
   cashBooks,
@@ -11,14 +13,10 @@ export default function CashSalesPaymentRow({
   return (
     <tr>
       <td>
-        <button
+        <CustomTable.RemoveRowButtonTemplate
           disabled={isLoading || itemsLength === 1}
-          type="button"
           onClick={() => removePaymentItemRow(index)}
-          className="btn btn-sm btn-danger p-0"
-        >
-          <i className="material-icons">close</i>
-        </button>
+        />
       </td>
 
       <td>

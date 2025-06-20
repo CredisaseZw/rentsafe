@@ -2,8 +2,9 @@ import ContentModal from "../ContentModal.jsx";
 import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
 import useCreditNoteForm from "../../hooks/component-hooks/useCreditNoteForm.js";
+import CustomTable from "./table/CustomTable.jsx";
 
-export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }) {
+export function CreditNoteForm({ creditNote }) {
   const {
     key,
     show,
@@ -28,14 +29,9 @@ export function CreditNoteForm({ creditNote, triggerClassname, triggerChildren }
 
   return (
     <>
-      <button className={triggerClassname || "btn btn-info text-white"} onClick={handleShow}>
-        {triggerChildren || (
-          <>
-            <i className="leading-icon material-icons">add</i>
-            New
-          </>
-        )}
-      </button>
+      <CustomTable.ActionButtonTemplate variant="danger" icon="add" onClick={handleShow}>
+        New
+      </CustomTable.ActionButtonTemplate>
 
       <ContentModal size="xl" show={show} handleClose={handleClose} title="Credit Note">
         <form className="py-3" onSubmit={onSubmit}>

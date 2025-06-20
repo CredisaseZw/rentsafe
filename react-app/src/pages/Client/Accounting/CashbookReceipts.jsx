@@ -1,7 +1,8 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
-import useCashbookReceipts from "../../../hooks/page-hooks/useCashbookReceipts.js";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import CustomAsyncSelect from "../../../components/CustomAsyncSelect.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
+import useCashbookReceipts from "../../../hooks/page-hooks/useCashbookReceipts.js";
+import { SearchBarStyles } from "../../../constants/index.js";
 
 export default function CashbookReceipts() {
   const {
@@ -23,98 +24,108 @@ export default function CashbookReceipts() {
   } = useCashbookReceipts();
 
   return (
-    <>
-      <NewPageHeader title="Receipts" color="dark" />
+    <form onSubmit={handleSubmit}>
+      <CustomTable.Table tabletitle="Receipts" tabletitleColor="white" tabletitleBg="dark">
+        <CustomTable.ColGroup ratios={[1, 1, 1, 1, 1, 1, 1, 1, 1]} />
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3 d-flex gap-4 justify-content-center align-items-center">
-          <div className="mb-3 d-flex justify-content-center align-items-center gap-3 text-nowrap">
-            <label htmlFor="cash_book" className="form-label">
-              Cash book:
-            </label>
+        <thead>
+          <tr>
+            <td colSpan={10}>
+              <div className="d-flex gap-5 py-3 justify-content-center align-items-center">
+                <div className="col-auto ">
+                  <div className={SearchBarStyles.containerClassname}>
+                    <label
+                      htmlFor="sort"
+                      className={SearchBarStyles.leftButtonClassname + " text-nowrap"}
+                    >
+                      Cash Book
+                    </label>
 
-            <select
-              className="c-form-select"
-              name="cash_book"
-              id="cash_book"
-              value={selectedCashBookId}
-              onChange={(e) => setSelectedCashBookId(e.target.value)}
-            >
-              <option value="" disabled>
-                Select one
-              </option>
+                    <select
+                      className="shadow-none form-select py-1 c-select border-0 rounded-0"
+                      name="cash_book"
+                      id="cash_book"
+                      value={selectedCashBookId}
+                      onChange={(e) => setSelectedCashBookId(e.target.value)}
+                    >
+                      <option value="" disabled>
+                        Select one
+                      </option>
+                      {cashBooks.map((book) => (
+                        <option key={book.id} value={book.id}>
+                          {book.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-              {cashBooks.map((book) => (
-                <option key={book.id} value={book.id}>
-                  {book.name}
-                </option>
-              ))}
-            </select>
-          </div>
+                <div className="d-flex justify-content-center align-items-center gap-3 text-nowrap">
+                  <label htmlFor="currency" className="form-label">
+                    Currency:
+                  </label>
+                  <div>
+                    {cashBooks.find((book) => book.id == selectedCashBookId)?.currency || "N/A"}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
 
-          <div className="mb-3 d-flex justify-content-center align-items-center gap-3 text-nowrap">
-            <label htmlFor="currency" className="form-label">
-              Currency:
-            </label>
-            <div>{cashBooks.find((book) => book.id == selectedCashBookId)?.currency}</div>
-          </div>
-        </div>
+          <tr>
+            <th>Date</th>
+            <th>Receipt Number</th>
+            <th>Type</th>
+            <th>Account</th>
+            <th>Details</th>
+            <th>Amount</th>
+            <th>Matching Invoice</th>
+            <th>Rate</th>
+            <th />
+          </tr>
+        </thead>
 
-        <table className="bg-white table table-responsive table-bordered table-sm">
-          <thead>
-            <tr>
-              <th className="text-nowrap">Date</th>
-              <th className="text-nowrap">Receipt Number</th>
-              <th className="text-nowrap">Type (GL/C)</th>
-              <th className="text-nowrap">Account</th>
-              <th className="text-nowrap">Details</th>
-              <th className="text-nowrap">Amount</th>
-              <th className="text-nowrap">Matching Invoice</th>
-              <th className="text-nowrap">Rate</th>
-              <th></th>
-            </tr>
-          </thead>
+        <tbody>
+          {data.rows.map((row, index) => (
+            <tr key={index}>
+              <td>
+                <input
+                  className="form-control"
+                  name="paymentDate"
+                  type="date"
+                  required
+                  value={row.paymentDate}
+                  onChange={(e) => handleInputChange(e, row.id)}
+                  max={new Date().toISOString().split("T")[0]}
+                  min={row.minDate}
+                />
+              </td>
 
-          <tbody>
-            {data.rows.map((row, index) => (
-              <tr key={row.id}>
-                <td>
-                  <input
-                    className="form-control custom-w-fit"
-                    name="paymentDate"
-                    type="date"
-                    required
-                    value={row.paymentDate}
-                    onChange={(e) => handleInputChange(e, row.id)}
-                    max={new Date().toISOString().split("T")[0]}
-                    min={row.minDate}
-                  />
-                </td>
+              <td>
+                <input
+                  readOnly
+                  value={row.receiptNumber}
+                  className="form-control"
+                  // name="receiptNumber"
+                  // id="receiptNumber"
+                />
+              </td>
 
-                <td>
-                  <input
-                    readOnly
-                    value={row.receiptNumber}
-                    className="form-control"
-                    // name="receiptNumber"
-                    // id="receiptNumber"
-                  />
-                </td>
+              <td>
+                <select
+                  className="c-form-select py-2"
+                  name="type"
+                  // id="type"
+                  value={row.type}
+                  onChange={(e) => handleInputChange(e, row.id)}
+                >
+                  <option value="gl">GL</option>
+                  <option value="customer">Customer</option>
+                </select>
+              </td>
 
-                <td>
-                  <select
-                    className="c-form-select py-2"
-                    name="type"
-                    // id="type"
-                    value={row.type}
-                    onChange={(e) => handleInputChange(e, row.id)}
-                  >
-                    <option value="gl">GL</option>
-                    <option value="customer">Customer</option>
-                  </select>
-                </td>
-
-                <td className="custom-w-2">
+              <td>
+                <div className="custom-mn-w-15">
                   {row.type === "customer" ? (
                     <CustomAsyncSelect
                       extraProps={{ className: "w-100", required: true }}
@@ -145,117 +156,112 @@ export default function CashbookReceipts() {
                   ) : (
                     ""
                   )}
-                </td>
+                </div>
+              </td>
 
-                <td className="custom-w-170">
-                  <input
-                    placeholder="..."
-                    className="form-control"
-                    // id="details"
-                    name="details"
-                    value={row.details}
-                    onChange={(e) => handleInputChange(e, row.id)}
-                  />
-                </td>
+              <td>
+                <input
+                  placeholder="..."
+                  className="form-control"
+                  // id="details"
+                  name="details"
+                  value={row.details}
+                  onChange={(e) => handleInputChange(e, row.id)}
+                />
+              </td>
 
-                <td>
-                  <input
-                    required
-                    name="paymentAmount"
-                    placeholder="0.00"
-                    type="number"
-                    value={row.paymentAmount}
-                    onChange={(e) => handleInputChange(e, row.id)}
-                    className={
-                      row.isVariable
-                        ? "form-control border-2 custom-no-pointer-events"
-                        : "form-control custom-mn-w-1"
-                    }
-                    readOnly={row.isVariable}
-                  />
+              <td>
+                <input
+                  required
+                  name="paymentAmount"
+                  placeholder="0.00"
+                  type="number"
+                  value={row.paymentAmount}
+                  onChange={(e) => handleInputChange(e, row.id)}
+                  className={
+                    row.isVariable
+                      ? "form-control border-2 custom-no-pointer-events"
+                      : "form-control custom-mn-w-1"
+                  }
+                  readOnly={row.isVariable}
+                />
 
-                  {row.isVariable && (
-                    <div className="mt-1">
-                      <div className="mb-1">
-                        <label className="small form-label">Rent</label>
-                        <input
-                          name="baseAmount"
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={row.baseAmount}
-                          onChange={(e) => handlePaymentAmount(e, row.id)}
-                        />
-                      </div>
-
-                      <div className="mb-1">
-                        <label className="small form-label">OPC</label>
-                        <input
-                          name="operatingCost"
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={row.operatingCost}
-                          onChange={(e) => handlePaymentAmount(e, row.id)}
-                        />
-                      </div>
+                {row.isVariable && (
+                  <div className="mt-1">
+                    <div className="mb-1">
+                      <label className="small form-label">Rent</label>
+                      <input
+                        name="baseAmount"
+                        type="number"
+                        className="form-control form-control-sm"
+                        value={row.baseAmount}
+                        onChange={(e) => handlePaymentAmount(e, row.id)}
+                      />
                     </div>
-                  )}
-                </td>
 
-                <td
-                // style={{
-                //   backgroundColor: row.color == "light-red" ? "#f87171" : "",
-                // }}
-                // className={`bg-${
-                //   row.color || ""
-                // } text-white text-center d-block rounded border border-white border-3`}
-                >
-                  {/* <div className="mt-2">{row.rent_owing}</div> */}
-                </td>
+                    <div className="mb-1">
+                      <label className="small form-label">OPC</label>
+                      <input
+                        name="operatingCost"
+                        type="number"
+                        className="form-control form-control-sm"
+                        value={row.operatingCost}
+                        onChange={(e) => handlePaymentAmount(e, row.id)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </td>
 
-                <td>
-                  <input
-                    type="number"
-                    name="rate"
-                    className="form-control custom-mn-w-07"
-                    value={rate}
-                    onChange={(e) => setRate(e.target.value)}
-                    placeholder="0"
-                    disabled={!shouldInputRate}
-                  />
-                </td>
+              <td
+              // style={{
+              //   backgroundColor: row.color == "light-red" ? "#f87171" : "",
+              // }}
+              // className={`bg-${
+              //   row.color || ""
+              // } text-white text-center d-block rounded border border-white border-3`}
+              >
+                {/* <div className="mt-2">{row.rent_owing}</div> */}
+              </td>
 
-                <td>
-                  <button
-                    disabled={data.rows.length === 1}
-                    className="btn btn-danger btn-sm"
-                    onClick={() => removeRow(row.id)}
-                  >
-                    <i className="material-icons">close</i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              <td>
+                <input
+                  type="number"
+                  name="rate"
+                  className="form-control custom-mn-w-07"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
+                  placeholder="0"
+                  disabled={!shouldInputRate}
+                />
+              </td>
 
-        <div className="p-2 d-flex justify-content-between align-items-center">
-          <button type="button" className="btn btn-sm btn-success" onClick={addRow}>
-            <i className="material-icons">add</i>
-          </button>
+              <td>
+                <CustomTable.RemoveRowButtonTemplate
+                  disabled={data.rows.length === 1}
+                  onClick={() => removeRow(row.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </CustomTable.Table>
 
-          <button type="submit" className="btn btn-info text-white gap-2">
-            {processing ? (
-              <>
-                <span className="spinner-grow spinner-grow-sm" />
-                <span>Processing..</span>
-              </>
-            ) : (
-              "Submit"
-            )}
-          </button>
-        </div>
-      </form>
-    </>
+      <div className="px-2 d-flex justify-content-between align-items-center">
+        <CustomTable.AddRowButtonTemplate onClick={addRow} />
+
+        <CustomTable.ActionButtonTemplate type="submit">
+          {processing ? (
+            <>
+              <span className="spinner-grow spinner-grow-sm d-inline-block me-2" />
+              <span>Processing..</span>
+            </>
+          ) : (
+            "Submit"
+          )}
+        </CustomTable.ActionButtonTemplate>
+      </div>
+    </form>
   );
 }
 

@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useDetailedGeneralLedgerAccount from "../../../hooks/modal-hooks/useDetailedGeneralLedgerAccount";
 
@@ -148,7 +149,7 @@ export default function DetailedGeneralLedgerAccount() {
           </fieldset>
 
           <div className="p-2">
-            <button disabled={loading} type="submit" className="btn btn-primary text-white">
+            <button disabled={loading} type="submit" className="btn btn-sm btn-primary text-white">
               fetch
             </button>
           </div>
@@ -156,51 +157,37 @@ export default function DetailedGeneralLedgerAccount() {
       </form>
 
       <div ref={contentRef}>
-        <p className="bg-info text-white p-1 text-center rounded-1 m-0">{tableTitle}</p>
+        <CustomTable.Table tabletitle={tableTitle} tabletitleBg="info" tabletitleColor="white">
+          <CustomTable.ColGroup ratios={[1, null, 1, 1, 1, 1]} />
 
-        <table className="table table-bordered table-responsive table-sm bg-white">
-          <thead className="shadow-sm sticky-top c-table-top bg-white c-force-borders">
+          <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
             <tr>
-              <th>
-                <div> Date</div>
-              </th>
-              <th>
-                <div> Details</div>
-              </th>
-              <th>
-                <div> Ref.</div>
+              <th>Date</th>
+              <th>Details</th>
+              <th>Ref</th>
+              <th className="text-end">
+                <div className="custom-mn-w-05"> DR</div>
               </th>
               <th className="text-end">
-                <div>DR</div>
+                <div className="custom-mn-w-05"> CR</div>
               </th>
               <th className="text-end">
-                <div>CR</div>
-              </th>
-              <th className="text-end">
-                <div>Balance</div>
+                <div className="custom-mn-w-05"> Balance</div>
               </th>
             </tr>
           </thead>
 
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center p-5">
-                  Loading...
-                </td>
-              </tr>
+              <CustomTable.LoadingIndicator colSpan={6} />
             ) : rows.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="text-center p-5">
-                  Nothing to show
-                </td>
-              </tr>
+              <CustomTable.NothingToShow colSpan={6} />
             ) : (
               rows.map((row) => (
                 <tr key={row.id}>
-                  <td>{row.date}</td>
+                  <td className="text-nowrap">{row.date}</td>
                   <td>{row.description}</td>
-                  <td>{row.ref}</td>
+                  <td className="text-nowrap">{row.ref}</td>
                   <td className="text-end">{row.debit}</td>
                   <td className="text-end">{row.credit}</td>
                   <td className="text-end">{row.balance}</td>
@@ -219,11 +206,11 @@ export default function DetailedGeneralLedgerAccount() {
               <th className="text-end">{transactionTotals.balance}</th>
             </tr>
           </tfoot>
-        </table>
+        </CustomTable.Table>
       </div>
 
-      <div className="text-end p-3">
-        <button onClick={printContent} type="button" className="btn btn-info text-white">
+      <div className="text-end mt-4">
+        <button onClick={printContent} type="button" className="btn btn-sm btn-info text-white">
           Print
         </button>
       </div>

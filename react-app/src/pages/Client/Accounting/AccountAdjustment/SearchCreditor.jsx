@@ -85,26 +85,26 @@ export default function SearchCreditor({
   return (
     <div className="position-relative">
       <input
-        type="text"
-        placeholder={placeholder}
         required
+        placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onFocus={() => setShowDropdown(true)}
         onBlur={() => {
           setTimeout(() => setShowDropdown(false), 200);
         }}
-        className="form-control c-bg-light"
+        className="form-control form-control-sm bg-light"
       />
+
       {showDropdown && value && (
         <div
           style={{ overflowY: "auto" }}
-          className="border border-dark rounded-1 c-bg-light custom-h-2 w-100 position-absolute mt-1 top-100 start-0 z-1"
+          className="border border-dark rounded-1 bg-light custom-h-2 w-100 position-absolute mt-1 top-100 start-0 z-1 small"
         >
           {!isLoading && error ? (
             <div className="text-danger p-2">{error}</div>
           ) : isLoading && clients.length === 0 ? (
-            <div className="p-2">Loading...</div>
+            <small className="d-block p-2">Loading...</small>
           ) : (
             clients.map((client, index) => (
               <div
@@ -112,7 +112,7 @@ export default function SearchCreditor({
                 onClick={() => handleSelect(client)}
                 className="c-pointer p-1 small border-bottom border-dark"
               >
-                {client.label}
+                <small>{client.label}</small>
               </div>
             ))
           )}
