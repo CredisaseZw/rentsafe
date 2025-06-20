@@ -1,9 +1,10 @@
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
-import InvoiceFormRow from "../../../../components/Client/InvoiceFormRow.jsx";
-import CashSalesPaymentRow from "../../../../components/Client/CashSalesPaymentRow.jsx";
+import CustomTable from "../../../../components/Client/table/CustomTable.jsx";
 import ContentModal from "../../../../components/ContentModal.jsx";
 import useCashSales from "../../../../hooks/page-hooks/useCashSales.js";
 import NewPageHeader from "../../../../components/NewPageHeader.jsx";
+import InvoiceFormRow from "../../../../components/Client/InvoiceFormRow.jsx";
+import CashSalesPaymentRow from "../../../../components/Client/CashSalesPaymentRow.jsx";
 
 export default function CashSales() {
   const {
@@ -63,23 +64,10 @@ export default function CashSales() {
 
       <NewPageHeader title="Fiscal Tax Invoice" noMargin />
 
-      <form className="py-3" onSubmit={onSubmit}>
-        <div className="p-4" ref={contentRef}>
+      <form className="p-3 pb-0" onSubmit={onSubmit}>
+        <div ref={contentRef}>
           <div className="row row-cols-2 pb-3 text-nowrap">
             <div className="col">
-              <div className="mb-3 d-flex gap-4 align-items-center">
-                <label htmlFor="document_number" className="form-label">
-                  Document Number:
-                </label>
-                <input
-                  className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
-                  name="document_number"
-                  id="document_number"
-                  placeholder="e.g 112108"
-                />
-              </div>
-
               <div className="mb-3 d-flex gap-4 align-items-center">
                 <label htmlFor="bill_to" className="form-label">
                   Bill To:
@@ -87,7 +75,6 @@ export default function CashSales() {
 
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="bill_to"
                   id="bill_to"
                   placeholder="CASH SALE -"
@@ -118,9 +105,7 @@ export default function CashSales() {
                   placeholder="Phone..."
                 />
               </div>
-            </div>
 
-            <div className="col">
               <div className="mb-3 d-flex gap-4 align-items-center">
                 <label htmlFor="email" className="form-label">
                   Email:
@@ -132,7 +117,9 @@ export default function CashSales() {
                   placeholder="Email..."
                 />
               </div>
+            </div>
 
+            <div className="col">
               <div className="mb-3 d-flex gap-4 align-items-center">
                 <label htmlFor="vat_no" className="form-label">
                   VAT No.:
@@ -176,7 +163,6 @@ export default function CashSales() {
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="date"
                   value={new Date().toISOString().split("T")[0]}
                   id="date"
@@ -187,12 +173,14 @@ export default function CashSales() {
             </div>
           </div>
 
-          <table className="table table-sm table-bordered bg-white table-responsive m-0">
-            <thead className="text-center text-nowrap">
+          <CustomTable.Table>
+            {/* no colgroup looks better */}
+
+            <thead className="text-center">
               <tr>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th />
+                <th />
+                <th />
                 <th colSpan={2} className="text-danger">
                   Currency
                 </th>
@@ -213,7 +201,7 @@ export default function CashSales() {
               </tr>
 
               <tr>
-                <th></th>
+                <th />
                 <th>Sales Item</th>
                 <th>Sales Code</th>
                 <th>Price (Vat Inc)</th>
@@ -240,36 +228,32 @@ export default function CashSales() {
                 />
               ))}
 
-              <tr className="border-top-3">
-                <th></th>
-                <th colSpan={5}>
-                  <div className="w-100 gap-3 align-items-center d-flex justify-content-between">
-                    <button
-                      disabled={isLoading}
-                      type="button"
-                      className="btn btn-sm btn-outline-info"
-                      onClick={addRow}
-                    >
-                      <i className="leading-icon material-icons">add</i>
-                      Add Row
-                    </button>
-                    Total (Excluding VAT)
-                  </div>
-                </th>
+              <tr>
+                <th />
+
                 <th>
-                  <span>{totals.totalExcludingVat.toFixed(2)}</span>
+                  <CustomTable.AddRowButtonTemplate
+                    label="add row"
+                    disabled={isLoading}
+                    onClick={addRow}
+                  />
                 </th>
+
+                <th colSpan={4} className="text-end">
+                  Total (Excluding VAT)
+                </th>
+
+                <th className="text-center">{totals.totalExcludingVat.toFixed(2)}</th>
               </tr>
 
               <tr>
-                <th></th>
+                <th />
                 <th className="text-end" colSpan={5}>
                   Discount
                 </th>
                 <th>
                   <input
-                    style={{ width: "150px" }}
-                    className="form-control form-control-sm d-inline-block text-end"
+                    className="form-control custom-w-1 form-control-sm d-inline-block text-center"
                     type="number"
                     name="discount"
                     id="discount"
@@ -283,31 +267,31 @@ export default function CashSales() {
               </tr>
 
               <tr>
-                <th></th>
+                <th />
                 <th className="text-end" colSpan={5}>
                   VAT Total
                 </th>
-                <th>{totals.vatTotal.toFixed(2)}</th>
+                <th className="text-center">{totals.vatTotal.toFixed(2)}</th>
               </tr>
 
               <tr>
-                <th></th>
+                <th />
                 <th className="text-end" colSpan={5}>
                   Invoice Total {selectedCurrency?.currency_code || ""}
                 </th>
-                <th>{(totals.invoiceTotal + discount).toFixed(2)}</th>
+                <th className="text-center">{(totals.invoiceTotal + discount).toFixed(2)}</th>
               </tr>
             </tbody>
 
-            <thead className="text-center text-nowrap">
+            <thead className="text-center">
               <tr>
-                <th></th>
+                <th />
                 <th>Payment Type</th>
                 <th>Cash Book</th>
                 <th>Detail</th>
                 <th>Ref.</th>
                 <th>Amount Received</th>
-                <th></th>
+                <th />
               </tr>
             </thead>
 
@@ -330,23 +314,19 @@ export default function CashSales() {
 
               <tr className="border-top-3">
                 <td colSpan={7}>
-                  <button
+                  <CustomTable.AddRowButtonTemplate
+                    label="Add Row"
                     disabled={isLoading}
-                    type="button"
-                    className="btn btn-sm btn-outline-info"
                     onClick={addPaymentItemRow}
-                  >
-                    <i className="leading-icon material-icons">add</i>
-                    Add Row
-                  </button>
+                  />
                 </td>
               </tr>
             </tbody>
-          </table>
+          </CustomTable.Table>
         </div>
 
-        <div className="text-end">
-          <button disabled={isLoading} className="btn btn-info text-white">
+        <div className="text-end p-3">
+          <CustomTable.ActionButtonTemplate disabled={isLoading}>
             {isLoading ? (
               <>
                 <span className="spinner-grow spinner-grow-sm"></span>
@@ -355,7 +335,7 @@ export default function CashSales() {
             ) : (
               "Submit"
             )}
-          </button>
+          </CustomTable.ActionButtonTemplate>
         </div>
       </form>
     </>
