@@ -1,76 +1,68 @@
-import { friendlyDate } from "../../../utils/index.js";
-import SearchBar from "../../../components/SearchBar.jsx";
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import SearchBar from "../../../components/SearchBar.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import useCreditNote from "../../../hooks/page-hooks/useCreditNote.js";
+import { friendlyDate } from "../../../utils/index.js";
 import { CreditNoteForm } from "../../../components/Client/CreditNoteForm.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
 
 export default function CreditNote() {
   const { loading, creditNotes, handleFilters } = useCreditNote();
 
   return (
     <div>
-      <NewPageHeader title="Credit Note" color="danger" />
-
-      <div className="d-flex justify-content-between align-items-center gap-4 mb-5">
-        <form onSubmit={handleFilters} className="d-flex border  gap-2 align-items-center">
-          <select
-            className="form-select"
-            name="year"
-            id="year"
-            required
-            defaultValue={new Date().getFullYear()}
-          >
-            {new Array(new Date().getFullYear() - 2020).fill(0).map((_, i) => (
-              <option key={i} value={new Date().getFullYear() - i}>
-                {new Date().getFullYear() - i}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className="form-select"
-            name="month"
-            id="month"
-            required
-            defaultValue={(new Date().getMonth() + 1).toString()}
-          >
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-
-          <div>
-            <button type="submit" className="btn btn-success ">
-              Submit
-            </button>
-          </div>
-        </form>
-
-        <div className="custom-mx-w-4">
-          <SearchBar placeholder="Search..." searchBy="q" />
-        </div>
-      </div>
-
       <div>
-        <h5 className="position-relative text-center mb-2 p-2 mb-0">
-          Credit Note List
-          <div className="position-absolute top-0 end-0">
-            <CreditNoteForm triggerClassname="btn btn-danger" />
-          </div>
-        </h5>
+        <CustomTable.Table tabletitle="Credit Note" tabletitleBg="danger" tabletitleColor="white">
+          <CustomTable.ColGroup ratios={[1, 1, null, 1, 1, 1]} />
 
-        <table className="table table-sm table-bordered table-responsive bg-white">
-          <thead className="position-sticky c-table-top text-white bg-danger shadow-sm c-z-5">
+          <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+            <tr>
+              <td colSpan={7}>
+                <div className="d-flex justify-content-between align-items-center gap-4">
+                  <form onSubmit={handleFilters} className="d-flex gap-2 align-items-center">
+                    <select
+                      className="form-select form-select-sm custom-mn-w-1"
+                      name="year"
+                      id="year"
+                      required
+                      defaultValue={new Date().getFullYear()}
+                    >
+                      {new Array(new Date().getFullYear() - 2020).fill(0).map((_, i) => (
+                        <option key={i} value={new Date().getFullYear() - i}>
+                          {new Date().getFullYear() - i}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      className="form-select form-select-sm custom-mn-w-1"
+                      name="month"
+                      id="month"
+                      required
+                      defaultValue={(new Date().getMonth() + 1).toString()}
+                    >
+                      <option value="1">January</option>
+                      <option value="2">February</option>
+                      <option value="3">March</option>
+                      <option value="4">April</option>
+                      <option value="5">May</option>
+                      <option value="6">June</option>
+                      <option value="7">July</option>
+                      <option value="8">August</option>
+                      <option value="9">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                  </form>
+
+                  <div className="d-flex align-items-center gap-2 pt-1">
+                    <SearchBar placeholder="Search..." searchBy="q" />
+                    <CreditNoteForm triggerClassname="btn btn-danger" />
+                  </div>
+                </div>
+              </td>
+            </tr>
+
             <tr>
               <th className="ps-3">Cr Note. #</th>
               <th>Date Created</th>
@@ -83,46 +75,34 @@ export default function CreditNote() {
 
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan={6}>
-                  <div className="custom-h-3 bg-white d-flex justify-content-center align-items-center">
-                    <div className="spinner-border text-info" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                </td>
-              </tr>
+              <CustomTable.LoadingIndicator colSpan={6} />
             ) : !Boolean(creditNotes?.length) ? (
-              <tr>
-                <td colSpan={6}>
-                  <div className="custom-h-2 bg-white d-flex justify-content-center align-items-center">
-                    Nothing to show
-                  </div>
-                </td>
-              </tr>
+              <CustomTable.NothingToShow colSpan={6} />
             ) : (
               creditNotes?.map((note, index) => (
                 <tr key={index}>
-                  <td className="ps-3">{note.id}</td>
+                  <td>{note.id}</td>
 
-                  <td className="ps-3">{note.date_created && friendlyDate(note.date_created)}</td>
+                  <td className="text-nowrap">
+                    {note.date_created && friendlyDate(note.date_created)}
+                  </td>
 
-                  <td className="ps-3">{note.customer}</td>
+                  <td>{note.customer}</td>
 
-                  <td className="ps-3">{note.currency}</td>
+                  <td className="text-nowrap">{note.currency}</td>
 
                   <td className="ps-3 text-end">{note.amount.toFixed(2)}</td>
 
-                  <td className="d-flex justify-content-center align-items-center p-1">
-                    <button className="btn btn-sm w-100 justify-content-center btn-danger">
+                  <td>
+                    <CustomTable.ActionButtonTemplate variant="danger">
                       View
-                    </button>
+                    </CustomTable.ActionButtonTemplate>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
-        </table>
+        </CustomTable.Table>
       </div>
     </div>
   );
