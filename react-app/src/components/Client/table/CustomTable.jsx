@@ -145,14 +145,14 @@ export function RemoveRowButtonTemplate(props) {
  * }} props
  */
 export function ActionButtonTemplate(props) {
-  const { children, icon, variant = "info" } = props;
+  const { size = "lg", children, icon, variant = "info" } = props;
 
   return (
     <button
       {...props}
       type={props.type || "button"}
       className={
-        `btn btn-${variant} text-white btn-sm text-capitalize text-nowrap ${props.size == "lg" ? "c-fs-09" : ""} py-1 px-2` +
+        `btn btn-${variant} text-white btn-sm text-capitalize text-nowrap ${size == "lg" ? "c-fs-09" : ""} py-1 px-2` +
         (props.className || "")
       }
     >
