@@ -242,9 +242,9 @@ class TransactionLineItemAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentMethod)
 class PaymentMethodAdmin(admin.ModelAdmin):
-    list_display = ("id", "payment_method_name", "payment_method_code", "user")
+    list_display = ("id", "payment_method_name", "user")
     list_display_links = ("payment_method_name",)
-    search_fields = ("payment_method_name", "payment_method_code")
+    search_fields = ("payment_method_name",)
     ordering = ("payment_method_name",)
     raw_id_fields = ('user',)
     list_per_page = 25

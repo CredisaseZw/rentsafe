@@ -709,7 +709,7 @@ class CashBookSerializer(BaseCompanySerializer):
 class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentMethod
-        fields = ['payment_method_name','payment_method_code']
+        fields = ['id','payment_method_name']
 
 class TransactionTypeSerializer(serializers.ModelSerializer):
     class Meta:

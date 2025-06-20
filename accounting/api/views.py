@@ -1,3 +1,4 @@
+from urllib import request
 from django.http import JsonResponse
 from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
@@ -298,7 +299,19 @@ class CurrencyViewSet(BaseCompanyViewSet):
 class PaymentMethodViewSet(BaseCompanyViewSet):
     queryset = PaymentMethod.objects.all()
     serializer_class = PaymentMethodSerializer
+    
+    def create(self, request,*args,**kwargs):
+        company = request.user.company
+        name = request.data.get('payment_method_name')
 
+        if PaymentMethod.objects.filter(user__company=company, payment_method_name=name).exists():
+            return Response({"error!": "This Payment Method Already Exists."}, status=status.HTTP_400_BAD_REQUEST)
+    
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
 class TransactionTypeViewSet(BaseCompanyViewSet):
     queryset = TransactionType.objects.all()
     serializer_class = TransactionTypeSerializer

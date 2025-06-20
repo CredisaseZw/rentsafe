@@ -380,8 +380,7 @@ class TransactionLineItem(BaseModel):
 
 
 class PaymentMethod(BaseModel):
-    payment_method_name = models.CharField(max_length=255, unique=True)
-    payment_method_code = models.CharField(max_length=15, unique=True)
+    payment_method_name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.payment_method_name
