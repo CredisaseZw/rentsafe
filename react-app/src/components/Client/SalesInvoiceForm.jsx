@@ -3,6 +3,7 @@ import useSalesInvoiceForm from "../../hooks/component-hooks/useSalesInvoiceForm
 import UserSelector from "../UserSelector.jsx";
 import InvoiceFormRow from "./InvoiceFormRow.jsx";
 import { Spinner } from "react-bootstrap";
+import CustomTable from "./table/CustomTable.jsx";
 
 export function SalesInvoiceForm({
   invoice,
@@ -36,14 +37,9 @@ export function SalesInvoiceForm({
 
   return (
     <>
-      <button className={triggerClassname || "btn btn-info text-white"} onClick={handleShow}>
-        {triggerChildren || (
-          <>
-            <i className="leading-icon material-icons">add</i>
-            New
-          </>
-        )}
-      </button>
+      <CustomTable.ActionButtonTemplate onClick={handleShow} icon="add">
+        New
+      </CustomTable.ActionButtonTemplate>
 
       <ContentModal
         size="xl"
