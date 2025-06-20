@@ -7,11 +7,13 @@ export const STICKY_TABLE_HEADER_CLASS = "sticky-top c-table-top bg-white shadow
  * @param {React.HTMLAttributes<HTMLDivElement> & {
  * children: React.ReactNode,
  * tabletitle: string,
+ * size?: "lg"
  * tabletitleBg?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light"
  * tabletitleColor?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "white" | ""
  * }} props
  */
 export function Table({
+  size,
   children,
   className = "bg-white",
   tabletitleBg = "light",
@@ -28,7 +30,9 @@ export function Table({
         </div>
       )}
 
-      <table className="table c-table table-sm table-responsive table-bordered">
+      <table
+        className={`table c-table table-sm table-responsive table-bordered ${size ? "c-table-" + size : ""}`}
+      >
         {children ? (
           children
         ) : (
