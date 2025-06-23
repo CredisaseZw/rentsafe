@@ -198,8 +198,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True)),
                 ('date_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('payment_method_name', models.CharField(max_length=255, unique=True)),
-                ('payment_method_code', models.CharField(max_length=15, unique=True)),
+                ('payment_method_name', models.CharField(max_length=255)),
                 ('user', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
