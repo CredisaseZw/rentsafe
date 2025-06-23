@@ -22,11 +22,7 @@ from inertia import render
 from inertia.share import share
 from marshmallow import ValidationError
 
-<<<<<<< HEAD
-from accounting.models import CurrencyRate
-=======
 from accounting.models.models import CurrencyRate
->>>>>>> dev
 from rentsafe.decorators import clients_required
 from rentsafe.helper import *
 from rentsafe.models import *
@@ -286,11 +282,9 @@ def rate_setup(request):
                 props = {"success": "Rate configured successfully!"}
                 return JsonResponse(props)
 
-<<<<<<< HEAD
-=======
+
 def currency_settings(request):
     return render(request, "Client/Accounting/CurrencySettings")
->>>>>>> dev
 
 @login_required
 @clients_required
@@ -3625,15 +3619,7 @@ def client_leases_new(request,leases_type=None):
     #     Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
     # ).values("id")
     individual_ids = Individual.objects.filter(
-<<<<<<< HEAD
-        Q(firstname__icontains=fname) | Q(surname__icontains=sname) | Q(identification_number__icontains=search_value)
-        ).annotate(id_str=Cast('identification_number', output_field=CharField())).values_list('id_str', flat=True)
 
-    company_ids = Company.objects.filter(
-            Q(registration_name__icontains=search_value) | Q(trading_name__icontains=search_value) | Q(registration_number__icontains=search_value)
-        ).annotate(id_str=Cast('id', output_field=CharField())).values_list('id_str', flat=True)
-
-=======
         Q(firstname__icontains=fname)
         | Q(surname__icontains=sname)
         | Q(identification_number__icontains=search_value)
@@ -3644,7 +3630,6 @@ def client_leases_new(request,leases_type=None):
         | Q(trading_name__icontains=search_value)
         | Q(registration_number__icontains=search_value)
     ).values_list("id", flat=True)
->>>>>>> dev
 
     # Convert company IDs to strings
     company_ids = [str(i) for i in company_ids]
@@ -3720,19 +3705,13 @@ def client_leases_new(request,leases_type=None):
         owing_amount = float(opening_balance_amount.outstanding_balance) if opening_balance_amount else 0
 
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
-<<<<<<< HEAD
-        hundred_days_ago = date.today() - timedelta(days=100)
-        is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
-        if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
-=======
+
         hundred_days_ago = date.today() - timedelta(days=90)
 
         is_3_months_ago = check_lease_termination_eligibility(i, hundred_days_ago)
         if i.is_terminated and (is_3_months_ago or owing_amount <= 0):
             continue
         if i.lease_id not in lease_dict:
->>>>>>> dev
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
                 "name": name,
@@ -6111,13 +6090,11 @@ def adverse_data(request):
     return render(request, "Client/AdverseData")
 
 @login_required
-<<<<<<< HEAD
-=======
+
 def commission_statements(request):
     return render(request, "Client/CommissionStatementsSelection")
 
 @login_required
->>>>>>> dev
 @clients_required
 def sales_reports(request):
     return render(request, "Client/Accounting/Sales/SalesReports")
