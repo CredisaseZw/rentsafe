@@ -1,0 +1,1 @@
+import{j as i}from"./main-5c37eb2a.js";function s({title:e,color:t="info",className:r="",noMargin:a=!1}){return i.jsx("h6",{className:`text-capitalize ${a?"":"mb-4"} text-center bg-${t} text-white p-2 rounded-3 ${r}`,children:e})}export{s as N};

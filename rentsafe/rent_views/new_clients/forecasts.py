@@ -1,5 +1,5 @@
 from rentsafe.models import *
-from accounting.models import CurrencyRate
+from accounting.models.models import CurrencyRate
 from authentication.models import CustomUser
 from django.http import JsonResponse
 from inertia import render

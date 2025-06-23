@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.parse import urlparse
 
+load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 load_dotenv(override=True)  # take environment variables from .env, always reload with new data.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,7 +124,7 @@ if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
         }
     }
 else:
-    tmpPostgres = urlparse(os.getenv("PROD_DATABASE_URL", None))
+    tmpPostgres =urlparse(os.getenv("PROD_DATABASE_URL", None))
     if tmpPostgres is not None:
         DATABASES = {
             'default': {
@@ -136,7 +138,12 @@ else:
         }
     else:
         print("\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m")
-        DATABASES = {}
+        DATABASES = {
+            'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / '20June',
+            }
+        }
         
 
         
@@ -215,7 +222,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 
 
 # If we should use HMR or not.
-# DJANGO_VITE_DEV_MODE = DEBUG
+DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
 DJANGO_VITE_DEV_SERVER_HOST = "localhost"                                                           
@@ -418,6 +425,14 @@ JS_ROUTES_INCLUSION_LIST = [
     "sales_reports",
     "rate_audit_trail",
     "adverse_data",
+    "cash_sales",
+    "cashbook_receipts",
+    "cashbook_payments",
+    "disbursements_page",
+    "commission_statements",
+    "accounts_sectors",
+    "currency_settings",
+    "payment_types",
 ]
 
 LOGIN_URL = "login"
