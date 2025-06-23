@@ -239,6 +239,19 @@ def generate_random_password(length=10):
     password = "".join(random.choice(characters) for _ in range(length))
     return password
 
+def check_lease_termination_eligibility(i, hundred_days_ago):
+    """
+    Check if a lease is eligible for termination based on the owing amount and termination date.
+    """
+    is_3_months_ago = False
+    if i.is_terminated:
+        if i.termination_date:
+            is_3_months_ago = i.termination_date < hundred_days_ago
+        else:
+            is_3_months_ago = True
+
+    return is_3_months_ago
+
 
 @shared_task
 def send_auth_email(username, password, email, firstname):

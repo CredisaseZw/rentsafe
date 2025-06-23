@@ -124,7 +124,7 @@ if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
         }
     }
 else:
-    tmpPostgres = urlparse(os.getenv("PROD_DATABASE_URL", None))
+    tmpPostgres =urlparse(os.getenv("PROD_DATABASE_URL", None))
     if tmpPostgres is not None:
         DATABASES = {
             'default': {
@@ -138,7 +138,12 @@ else:
         }
     else:
         print("\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m")
-        DATABASES = {}
+        DATABASES = {
+            'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / '20June',
+            }
+        }
         
 
         

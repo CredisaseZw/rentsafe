@@ -2523,6 +2523,7 @@ def create_user(request):
                 # create user
                 user = CustomUser(
                     email=data.get("userEmail"),
+                    user_id=data.get("userEmail"),
                     is_superuser=data.get("accessLevel") == "admin",
                     individual=int(check_individual.id),
                     company=request.user.company,
@@ -2531,13 +2532,12 @@ def create_user(request):
                 user.save()
                 user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email with logins details
-                if request.user.id ==11:
-                    send_auth_email.delay(
-                        user_id,
-                        user_password,
-                        data.get("userEmail"),
-                        check_individual.firstname,
-                    )
+                send_auth_email.delay(
+                    user_id,
+                    user_password,
+                    data.get("userEmail"),
+                    check_individual.firstname,
+                )
             else:
                 # create individual and user
                 individual = Individual(
@@ -2559,21 +2559,20 @@ def create_user(request):
                 # create user
                 user = CustomUser(
                     email=data.get("userEmail"),
+                    user_id=data.get("userEmail"),
                     is_superuser=data.get("accessLevel") == "admin",
                     individual=int(individual.id),
                     company=request.user.company,
                     password=hash_password,
                 )
                 user.save()
-                user_id =CustomUser.objects.get(email=data.get("userEmail")).user_id
                 # send email
-                if request.user.id ==11:
-                    send_auth_email.delay(
-                        user_id,
-                        user_password,
-                        data.get("userEmail"),
-                        data.get("firstName"),
-                    )
+                send_auth_email.delay(
+                    data.get("userEmail"),
+                    user_password,
+                    data.get("userEmail"),
+                    data.get("firstName"),
+                )
 
             props = {
                 "success": "success",
@@ -3669,7 +3668,6 @@ def client_leases_new(request,leases_type=None):
     lease_dict = {}
     
     for i in leases:
-       
         opening_balance_date = Opening_balance.objects.filter(lease_id=i.lease_id).first()
         remaining_period = subscription_period_remaining(request, "company" if i.is_company else "individual")
         rent_guarantor = Individual.objects.filter(national_id=i.rent_guarantor_id).first() if i.is_company else None
@@ -3705,10 +3703,12 @@ def client_leases_new(request,leases_type=None):
         owing_amount = float(opening_balance_amount.outstanding_balance) if opening_balance_amount else 0
 
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
-        hundred_days_ago = date.today() - timedelta(days=100)
-        is_100_days_ago = True if i.termination_date and i.termination_date < hundred_days_ago else False
-        is_terminated_lease_eligible = True if (i.is_terminated == True and owing_amount >= 0 and is_100_days_ago)  else False
-        if i.lease_id not in lease_dict and not is_terminated_lease_eligible:
+        hundred_days_ago = date.today() - timedelta(days=90)
+
+        is_3_months_ago = check_lease_termination_eligibility(i, hundred_days_ago)
+        if i.is_terminated and (is_3_months_ago or owing_amount <= 0):
+            continue
+        if i.lease_id not in lease_dict:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
                 "name": name,
@@ -3737,7 +3737,7 @@ def client_leases_new(request,leases_type=None):
                 "agent_opening_balance": agent_info.opening_balance if agent_info else "N/A",
                 "rent_variable": i.rent_variables,
                 "status": i.status,
-                "terminated": True if i.is_active == False else False,
+                "terminated": True if i.is_terminated else False,
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
@@ -3877,6 +3877,48 @@ def receipt_leases(request):
     # else:
     #     data = []
     # return JsonResponse(data, safe=False)
+        
+@shared_task
+def broadcast():
+    url = "http://sms.vas.co.zw/client/api/sendmessage?"
+    registration_message = 'Please be advised, CrediSafe has merged with Fincheck and all future communication will come under the name Fincheck.'
+    notified_recepients = []
+    contact_detail=None
+    all_recepients = Lease.objects.filter(is_active=True).exclude(lease_giver='152')
+    for recipient in all_recepients:
+        if recipient.is_individual:
+            individual= Individual.objects.filter(identification_number=recipient.reg_ID_Number).first()
+            contact_detail = individual.mobile if individual else '263779586059'
+
+            params = {
+                    "apikey": settings.SMS_API_KEY,
+                    "mobiles":contact_detail,
+                    "sms": registration_message,
+                }
+            try:
+                if contact_detail not in notified_recepients:
+                    notified_recepients.append(contact_detail)
+                    print('sms sent...')
+                    response = request.get(url, params=params)
+                else:
+                    pass
+            except Exception:
+                ...
+        else:
+            company=Company.objects.filter(id=int(recipient.reg_ID_Number)).first()
+            comp_prof =CompanyProfile.objects.filter(company=int(company.id)).first()
+            contact_detail = comp_prof.email if comp_prof else 'gtkandeya@gmail.com'
+            subject = "Change Of Communication Channel - Credisafe."
+            mail = EmailMessage(subject, registration_message, EMAIL_HOST_USER, [contact_detail])
+            # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
+            # creating a pdf reader object
+            # mail.attach('manual.pdf', pdf, 'application/pdf')
+            if contact_detail not in notified_recepients:
+                notified_recepients.append(contact_detail)
+                print('email send',contact_detail)
+                mail.send(fail_silently=False)
+            else:
+                pass
 
 def update_lease_status(lease_id):
     lease = Lease.objects.filter(lease_id=lease_id).first()
