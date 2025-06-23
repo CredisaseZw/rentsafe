@@ -669,3 +669,12 @@ export const accountsList = [
     sectorName: "Current Liabilities",
   },
 ];
+
+export const SearchBarStyles = {
+  inputClassname: "form-control form-control-sm custom-w-2 rounded-0 border-0",
+  rightButtonClassname:
+    "border-0 border-start c-border-semi-dark bg-light text-muted c-i-small rounded-end d-flex align-items-center px-2",
+  leftButtonClassname:
+    "border-0 border-end c-border-semi-dark bg-light text-muted c-i-small rounded-start d-flex align-items-center px-2",
+  containerClassname: "d-flex rounded border c-border-semi-dark overflow-hidden",
+};

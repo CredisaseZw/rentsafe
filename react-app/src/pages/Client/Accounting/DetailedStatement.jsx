@@ -1,12 +1,12 @@
-import moment from "moment";
 import Layout from "../../../components/Layouts/client/Layout.jsx";
 import Receipt from "../../../components/features/leases/Receipt.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import PeriodRequest from "../../../components/Client/PeriodRequest.jsx";
 import useDetailedStatement from "../../../hooks/page-hooks/useDetailedStatement.js";
 import { formatCurrency } from "../../../utils/formatting.js";
-import { usePage } from "@inertiajs/inertia-react";
+import { friendlyDate } from "../../../utils/index.js";
 
-export default function DetailedStatement() {
+export default function DetailedStatement({ message }) {
   const {
     show,
     tenant,
@@ -22,87 +22,85 @@ export default function DetailedStatement() {
     handlePrintToPdf,
   } = useDetailedStatement();
 
-  if (!statement) {
-    return (
-      <div>
-        <h1>{usePage().props.message}</h1>
-      </div>
-    );
-  }
+  if (!statement) return <h1>{message}</h1>;
 
   return (
     <div>
-      <PeriodRequest
-        show={show}
-        handleClose={handleClose}
-        tenantData={{
-          tenantNumber: tenant.lease_receiver_id,
-          name: tenant.lease_receiver_name,
-          adress: tenant.lease_receiver_address,
-        }}
-      />
+      <>
+        <PeriodRequest
+          show={show}
+          handleClose={handleClose}
+          tenantData={{
+            tenantNumber: tenant.lease_receiver_id,
+            name: tenant.lease_receiver_name,
+            adress: tenant.lease_receiver_address,
+          }}
+        />
+
+        {showReceipt && (
+          <Receipt
+            show={showReceipt}
+            handleClose={async (message) => {
+              setShowReceipt(false);
+              setDetails({});
+            }}
+            leaseDetails={details}
+            myKey={"statements"}
+          />
+        )}
+      </>
 
       <div ref={modalContentRef}>
-        <div
-          style={{
-            lineHeight: "5px",
-            fontSize: "18px",
-          }}
-          className="bg-info"
-        >
-          <div
-            scope="row"
-            colSpan={5}
-            className="d-flex justify-content-between align-items-center text-white p-3"
-            style={{ width: "100%" }}
-          >
-            <div className="d-flex flex-column gap-2">
-              <h4 className="fw-bold text-white">
-                {tenant.lease_receiver_name} - {tenant?.currency}
-              </h4>
-              <p>{tenant.lease_receiver_address} </p>
-            </div>
-            <p>
-              {new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          </div>
-        </div>
+        <CustomTable.Table
+          tabletitleOverideContent={
+            <div className="d-flex text-start justify-content-between align-items-center p-3">
+              <div>
+                <h4 className="text-white mb-1 fw-bold">
+                  {tenant.lease_receiver_name} - {tenant?.currency}
+                </h4>
 
-        <table className="table table-bordered">
-          <thead className="position-sticky c-table-top">
-            <tr
-              style={{
-                lineHeight: "5px",
-                fontSize: "12px",
-                backgroundColor: "#a0a0af",
-              }}
-            >
-              <th scope="">Date</th>
+                <div>{tenant.lease_receiver_address} </div>
+              </div>
+
+              <div>
+                {new Date().toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+            </div>
+          }
+          tabletitleBg="info"
+          tabletitleColor="white"
+          size="lg"
+        >
+          <CustomTable.ColGroup ratios={[1, null, 1, 1, 1]} />
+
+          <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+            <tr className="c-thead-bg">
+              <th>Date</th>
               <td>Description</td>
-              <td> Ref</td>
+              <td>Ref</td>
               <td>Amount</td>
               <td>Balance</td>
             </tr>
           </thead>
 
           <tbody>
-            <tr style={{ lineHeight: "5px", fontSize: "12px" }}>
-              <th scope="row">{statement.date}</th>
+            <tr>
+              <td className="text-nowrap">{friendlyDate(statement.date)}</td>
               <td>{statement.description}</td>
-              <td></td>
-              <td className="text-end"></td>
+              <td />
+              <td />
               <td className="text-end">{formatCurrency(statement.balance_amount)}</td>
             </tr>
 
             {cleanedData.map((payment, index) => (
-              <tr style={{ lineHeight: "5px", fontSize: "12px" }} key={index}>
-                <th scope="row">{moment(payment.date).format("YYYY-MM-DD")}</th>
-                <td>{payment.description} </td>
-                <td>{payment.reference}</td>
+              <tr key={index}>
+                <td className="text-nowrap">{friendlyDate(payment.date)}</td>
+                <td>{payment.description}</td>
+                <td className="text-nowrap">{payment.reference}</td>
                 <td className="text-end">
                   {payment.owing_amount < 0
                     ? `(${formatCurrency(payment.owing_amount * -1)})`
@@ -116,42 +114,31 @@ export default function DetailedStatement() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </CustomTable.Table>
       </div>
 
-      <div className="d-flex justify-content-end align-items-center gap-4 p-4">
-        <button
-          className="btn btn-secondary"
+      <div className="d-flex justify-content-end align-items-center gap-3 p-4">
+        <CustomTable.ActionButtonTemplate
+          size="lg"
+          variant="secondary"
           onClick={() => {
             setShowReceipt(true);
-            setDetails({
-              lease_id: tenant.lease_id,
-            });
+            setDetails({ lease_id: tenant.lease_id });
           }}
         >
           Receipt
-        </button>
-        <button className="btn btn-primary" onClick={() => setShow(true)}>
-          Period request
-        </button>
-        <button className="btn btn-info text-white" onClick={handlePrintToPdf}>
-          Print
-        </button>
-      </div>
+        </CustomTable.ActionButtonTemplate>
 
-      {/* {showReceipt && ( */}
-      <Receipt
-        show={showReceipt}
-        handleClose={async (message) => {
-          setShowReceipt(false);
-          setDetails({});
-        }}
-        leaseDetails={details}
-        myKey={"statements"}
-      />
-      {/* )} */}
+        <CustomTable.ActionButtonTemplate size="lg" variant="primary" onClick={() => setShow(true)}>
+          Period request
+        </CustomTable.ActionButtonTemplate>
+
+        <CustomTable.ActionButtonTemplate size="lg" onClick={handlePrintToPdf}>
+          Print
+        </CustomTable.ActionButtonTemplate>
+      </div>
     </div>
   );
 }
 
-DetailedStatement.layout = (page) => <Layout children={page} title={"Tenant Detailed Statement"} />;
+DetailedStatement.layout = (page) => <Layout children={page} title={"Detailed Tenant Statement"} />;

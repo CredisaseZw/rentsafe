@@ -1,5 +1,6 @@
 import ContentModal from "../ContentModal.jsx";
 import useInvoiceFormRow from "../../hooks/component-hooks/useInvoiceFormRow.js";
+import CustomTable from "./table/CustomTable.jsx";
 
 export default function InvoiceFormRow({
   item,
@@ -54,14 +55,10 @@ export default function InvoiceFormRow({
 
       <tr>
         <td>
-          <button
+          <CustomTable.RemoveRowButtonTemplate
             disabled={item.static || itemsLength === 1}
-            type="button"
             onClick={() => removeRow(index)}
-            className="btn btn-sm btn-danger p-0"
-          >
-            <i className="material-icons">close</i>
-          </button>
+          />
         </td>
 
         <td>

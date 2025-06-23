@@ -6090,6 +6090,9 @@ def adverse_data(request):
 def commission_statements(request):
     return render(request, "Client/CommissionStatementsSelection")
 
+def sandbox(request):
+    return render(request, "Client/Sandbox")
+
 @login_required
 @clients_required
 def sales_reports(request):

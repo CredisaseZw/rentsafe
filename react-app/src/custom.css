@@ -371,6 +371,9 @@
 .custom-mn-w-1 {
   min-width: 100px;
 }
+.custom-mn-w-15 {
+  min-width: 150px;
+}
 .custom-mn-w-2 {
   min-width: 200px;
 }
@@ -418,7 +421,7 @@
 }
 
 .c-thead-bg {
-  background-color: #a0a0af !important;
+  background-color: #c8c8cb !important;
 }
 .c-fs-small {
   font-size: small !important;
@@ -801,4 +804,75 @@
 }
 .bg-gold {
   background-color: goldenrod !important;
+}
+
+.c-table th,
+.c-table td {
+  padding: 0.3rem 0.5rem !important;
+}
+.c-table.c-table-lg th,
+.c-table.c-table-lg td {
+  padding: 0.45rem 0.7rem !important;
+}
+.c-table th.c-p-0,
+.c-table td.c-p-0 {
+  padding: 0 !important;
+}
+.c-table th {
+  text-wrap: nowrap !important;
+}
+.c-table thead {
+  border-top-color: inherit !important;
+}
+.c-border-semi-dark {
+  border-color: rgb(168, 168, 168) !important;
+}
+.c-i-small i {
+  font-size: 1rem !important;
+}
+.page-item.active .page-link {
+  background-color: rgb(203, 203, 203) !important;
+  color: rgb(28, 28, 28) !important;
+  border-radius: 5px !important;
+  padding: 0.1rem 0.3rem !important;
+  border-color: rgb(168, 168, 168) !important;
+}
+.page-link {
+  color: rgb(28, 28, 28) !important;
+  border-radius: 5px !important;
+  padding: 0.1rem 0.3rem !important;
+  border-color: rgb(168, 168, 168) !important;
+}
+.c-fs-12 {
+  font-size: 120% !important;
+}
+.c-fs-11 {
+  font-size: 110% !important;
+}
+.c-fs-09 {
+  font-size: 90% !important;
+}
+.c-fs-08 {
+  font-size: 80% !important;
+}
+.c-fs-07 {
+  font-size: 70% !important;
+}
+.c-fs-06 {
+  font-size: 60% !important;
+}
+.c-fs-05 {
+  font-size: 50% !important;
+}
+.c-fs-04 {
+  font-size: 40% !important;
+}
+.c-fs-03 {
+  font-size: 30% !important;
+}
+.c-fs-02 {
+  font-size: 20% !important;
+}
+.c-fs-01 {
+  font-size: 10% !important;
 }

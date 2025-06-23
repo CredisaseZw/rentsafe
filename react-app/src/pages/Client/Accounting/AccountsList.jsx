@@ -1,5 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
-import NewPageHeader from "../../../components/NewPageHeader.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import useAccountsList from "../../../hooks/modal-hooks/useAccountsList.js";
 
 export default function AccountsList(props) {
@@ -7,10 +7,10 @@ export default function AccountsList(props) {
 
   return (
     <div>
-      <NewPageHeader title="Accounts List" />
+      <CustomTable.Table tabletitle="Accounts List" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, 1, 1, 1]} />
 
-      <table className="bg-white table table-responsive table-sm table-bordered">
-        <thead className="sticky-top bg-white shadow-sm">
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
           <tr>
             <th>Account Name</th>
             <th>Account Number</th>
@@ -21,19 +21,9 @@ export default function AccountsList(props) {
 
         <tbody>
           {loading ? (
-            <tr>
-              <td colSpan={4} className="text-center p-4">
-                <div className="spinner-border text-success" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </td>
-            </tr>
+            <CustomTable.LoadingIndicator colSpan={4} />
           ) : mappableAccountsList.length === 0 ? (
-            <tr>
-              <td colSpan={4} className="text-center p-4">
-                Nothing to show
-              </td>
-            </tr>
+            <CustomTable.NothingToShow colSpan={4} />
           ) : (
             mappableAccountsList.map((account, index) => (
               <tr key={index}>
@@ -45,7 +35,7 @@ export default function AccountsList(props) {
             ))
           )}
         </tbody>
-      </table>
+      </CustomTable.Table>
     </div>
   );
 }

@@ -1,17 +1,18 @@
-import React from "react";
 import Layout from "../../components/Layouts/client/Layout.jsx";
-import IndividualLeaseForm from "../../components/features/leases/IndividualLeaseForm.jsx";
-import CompanyLeaseForm from "../../components/features/leases/CompanyLeaseForm.jsx";
-import TerminateLease from "../../components/modals/Client/TerminateLease.jsx";
 import Receipt from "../../components/features/leases/Receipt.jsx";
-import BottomDrawer from "../../components/Drawer.jsx";
-import PaginationControls from "../../components/PaginationControls.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import ClientView from "../../components/Client/ClientView/ClientView.jsx";
+import CustomTable from "../../components/Client/table/CustomTable.jsx";
+import BottomDrawer from "../../components/Drawer.jsx";
+import NewPageHeader from "../../components/NewPageHeader.jsx";
+import TerminateLease from "../../components/modals/Client/TerminateLease.jsx";
+import CompanyLeaseForm from "../../components/features/leases/CompanyLeaseForm.jsx";
+import PaginationControls from "../../components/PaginationControls.jsx";
 import useLeaseManagement from "../../hooks/page-hooks/useLeaseManagement.js";
+import IndividualLeaseForm from "../../components/features/leases/IndividualLeaseForm.jsx";
+import { SearchBarStyles } from "../../constants/index.js";
 import { formatCurrency } from "../../utils/formatting.js";
 import { DrawerContent } from "../../components/DrawerContent.jsx";
-import NewPageHeader from "../../components/NewPageHeader.jsx";
 
 export default function Index({ leases, total_pages, current_page }) {
   const {
@@ -91,23 +92,22 @@ export default function Index({ leases, total_pages, current_page }) {
           <NewPageHeader title={`Lease Management (${activeLeaseCount} active)`} noMargin />
 
           <div className="position-relative bg-white rounded-2 border">
-            <table className="table table-sm table-responsive table-bordered ">
-              <thead className="position-sticky bg-white shadow-sm c-table-top">
+            <CustomTable.Table size="lg">
+              <CustomTable.ColGroup ratios={[1, null, 1, 1, 1, 1, 1]} />
+              <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
                 <tr>
                   <th colSpan={7}>
-                    <div className="d-flex gap-1 justify-content-between align-items-center">
-                      <div className="col-5 ">
-                        <SearchBar searchBy="name" />
-                      </div>
+                    <div className="d-flex gap-1 pt-1 justify-content-between align-items-center">
+                      <SearchBar searchBy="name" />
 
-                      <div className="col-auto ">
-                        <div className="d-flex  border border-3 overflow-hidden rounded-pill bg-light align-items-center">
-                          <label htmlFor="sort" className="form-label border-end border-3  px-3">
+                      <div className="col-auto">
+                        <div className={SearchBarStyles.containerClassname}>
+                          <label htmlFor="sort" className={SearchBarStyles.leftButtonClassname}>
                             Sort
                           </label>
 
                           <select
-                            className="shadow-none  form-select py-1 c-select border-0 rounded-0"
+                            className="shadow-none form-select form-select-sm c-select border-0 rounded-0"
                             name="sort"
                             id="sort"
                             value={sort}
@@ -125,15 +125,11 @@ export default function Index({ leases, total_pages, current_page }) {
                   </th>
                 </tr>
 
-                <tr className="m-0">
+                <tr>
                   <th>Lease ID</th>
-
                   <th>Tenant</th>
-
                   <th>Customer Number</th>
-
                   <th className="text-end">Rent Owing</th>
-
                   <th className="text-center" colSpan={3}>
                     Actions
                   </th>
@@ -143,83 +139,80 @@ export default function Index({ leases, total_pages, current_page }) {
               <tbody>
                 {leases
                   ? sortFunc(leases).map((lease, index) => (
-                    <tr
-                      className={lease.terminated ? "c-terminated" : ""}
-                      key={lease.lease_id + "-" + index}
-                    >
-                      <th className="ps-3">{lease.lease_id || ""}</th>
+                      <tr className={lease.terminated ? "c-terminated" : ""} key={index}>
+                        <th>{lease.lease_id || ""}</th>
 
-                      <td>
-                        <button
-                          title="double click to view client"
-                          type="button"
-                          onDoubleClick={() => clientViewProps.openClientView(lease)}
-                          className={`custom-btn text-decoration-underline ${lease.terminated ? "c-terminated" : ""}`}
+                        <td>
+                          <button
+                            title="double click to view client"
+                            type="button"
+                            onDoubleClick={() => clientViewProps.openClientView(lease)}
+                            className={`custom-btn text-decoration-underline ${lease.terminated ? "c-terminated" : ""}`}
+                          >
+                            {lease.name}
+                          </button>
+                        </td>
+
+                        <td className="text-nowrap">{lease.customer_number}</td>
+
+                        <td
+                          className={`text-nowrap bg-${lease.color} text-white text-end`}
+                          style={{ backgroundColor: lease.color == "light-red" ? "#f87171" : "" }}
                         >
-                          {lease.name}
-                        </button>
-                      </td>
+                          <div className="px-2">
+                            {`${lease.currency} ${formatCurrency(lease.owing_amount).replace(
+                              "$",
+                              ""
+                            )}`}
+                          </div>
+                        </td>
 
-                      <td>{lease.customer_number}</td>
+                        <td
+                          className="bg-info text-white text-center c-pointer"
+                          onClick={() => openReciptFor(lease)}
+                        >
+                          Receipt
+                        </td>
 
-                      <td
-                        className={`bg-${lease.color} text-white text-end`}
-                        style={{
-                          backgroundColor: lease.color == "light-red" ? "#f87171" : "",
-                        }}
-                      >
-                        {`${lease.currency} ${formatCurrency(lease.owing_amount).replace(
-                          "$",
-                          ""
-                        )}`}
-                      </td>
+                        {lease.terminated ? (
+                          <>
+                            <td className="c-terminated text-center">Terminated</td>
 
-                      <td
-                        className="bg-info text-white text-center c-pointer"
-                        onClick={() => openReciptFor(lease)}
-                      >
-                        Receipt
-                      </td>
-
-                      {lease.terminated ? (
-                        <>
-                          <td className="c-terminated text-center">Terminated</td>
-
-                          <td
-                            className="bg-danger text-white text-center c-pointer"
-                            onClick={() => writeOff(lease)}
-                          >
-                            Write off
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          {lease.expired ? (
                             <td
-                              className="bg-gold text-center c-pointer"
-                              onClick={() => showLeaseFormFor(lease)}
+                              className="bg-danger text-white text-center c-pointer"
+                              onClick={() => writeOff(lease)}
                             >
-                              Renew
+                              Write off
                             </td>
-                          ) : (
-                            <td
-                              className="bg-primary text-white text-center c-pointer"
-                              onClick={() => showLeaseFormFor(lease)}
-                            >
-                              Lease
-                            </td>
-                          )}
+                          </>
+                        ) : (
+                          <>
+                            {lease.expired ? (
+                              <td
+                                className="bg-gold text-center c-pointer"
+                                onClick={() => showLeaseFormFor(lease)}
+                              >
+                                Renew
+                              </td>
+                            ) : (
+                              <td
+                                className="bg-primary text-white text-center c-pointer"
+                                onClick={() => showLeaseFormFor(lease)}
+                              >
+                                Lease
+                              </td>
+                            )}
 
-                          <td
-                            className="bg-danger text-white text-center c-pointer"
-                            onClick={() => terminateLease(lease)}
-                          >
-                            Terminate
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))
+                            <td
+                              className="bg-danger text-white text-center c-pointer"
+                              onClick={() => terminateLease(lease)}
+                            >
+                              Terminate
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))
                   : ""}
               </tbody>
 
@@ -256,7 +249,7 @@ export default function Index({ leases, total_pages, current_page }) {
               ) : (
                 ""
               )}
-            </table>
+            </CustomTable.Table>
 
             <PaginationControls currentPage={current_page} totalPages={total_pages} />
           </div>
