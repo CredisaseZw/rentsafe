@@ -1,0 +1,1 @@
+import{R as t,b as u}from"./main-5c37eb2a.js";function i(){const[n,s]=t.useState([]),[a,c]=t.useState(!1);function r(){c(!0),u.get("/accounting/currency").then(e=>{s(e.data)}).catch(e=>{console.log(e)}).finally(()=>{c(!1)})}return t.useEffect(()=>{r()},[]),{loading:a,currencies:n}}export{i as u};
