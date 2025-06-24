@@ -255,7 +255,7 @@ class CreateIndividualSchema(Schema):
     date_of_employment = fields.Str(data_key="dateOfemployment", required=False)
     individual_id = fields.Int(data_key="individualId", required=False)
 
-
+    
 class IndividualSchema(Schema):
     """
     A schema definition using the Marshmallow library in Python.
@@ -303,6 +303,17 @@ class AgentSchema(Schema):
     employer_name = fields.Str(required=True)
     job_title = fields.Str(required=True)
     is_agent = fields.Bool(required=True)
+    
+    # Address validation
+    unit_number = fields.Str(data_key="unit_number",required=False)
+    building_name = fields.Str(data_key="building_name",required=False)
+    street_number = fields.Str(data_key="street_number",required=True)
+    street_name = fields.Str(data_key="street_name",required=True)
+    surbub = fields.Str(data_key="suburb",required=True)
+    city = fields.Str(data_key="city",required=True)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=True)
+    area_code = fields.Str(data_key="area_code",required=True, validate=validate.Length(max=15))
 
     def __init__(self, *args, **kwargs):
         """
@@ -395,9 +406,7 @@ class CreateCompanySchema(Schema):
 
     registrationDate = fields.Str(data_key="registrationDate", required=False)
     vatNumber = fields.Str(data_key="vatNumber", required=False)
-    currentAddress = fields.Str(
-        data_key="currentAddress", required=True, validate=validate.Length(min=3)
-    )
+    currentAddress = fields.Str(data_key="currentAddress", required=False)
     landLine = fields.Str(data_key="landLine", required=False)
     mobileNumber = fields.Str(
         data_key="mobileNumber", required=False, validate=validate.Length(max=15)
@@ -413,6 +422,17 @@ class CreateCompanySchema(Schema):
     companyId = fields.Str(data_key="company_id", required=False)
     pageType = fields.Str(data_key="pageType", required=False)
     tin_number = fields.Str(data_key="tinNumber", required=False)
+    
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=True)
+    streetName = fields.Str(data_key="streetName",required=True)
+    suburb = fields.Str(data_key="suburb",required=True)
+    city = fields.Str(data_key="city",required=True)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=True)
+    areaCode = fields.Str(data_key="areaCode",required=True, validate=validate.Length(max=15))
 
 
 # Add-Lease
@@ -814,6 +834,16 @@ class GetCompanySchema(Schema):
     currentBalance = fields.Str(data_key="currentBalance", required=False)
     outStandingBalance = fields.Int(data_key="outStandingBalance", required=False)
 
+    #Address infor
+    unitNumber = fields.Str(data_key="unit_number",required=False)
+    buildingName = fields.Str(data_key="building_name",required=False)
+    streetNumber = fields.Str(data_key="street_number",required=True)
+    streetName = fields.Str(data_key="street_name",required=True)
+    surbub = fields.Str(data_key="suburb",required=True)
+    city = fields.Str(data_key="city",required=True)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=True)
+    areaCode = fields.Str(data_key="area_code",required=True, validate=validate.Length(max=15))
 
 class CreateSubscriptionSchema(Schema):
     subscriberName = fields.Str(

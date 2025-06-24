@@ -478,7 +478,7 @@ def get_company(request):
                     "status": "success",
                     "name": company.registration_name,
                     "mobile": company_profile.mobile_phone,
-                    "address": company_profile.current_address,
+                    "address": [company_profile.current_address],
                     "email": company_profile.email,
                     "contact_name": company_profile.contact_person,
                 },
@@ -2274,7 +2274,7 @@ def create_company_helper(request):
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),
                 company_uploader=request.user.company,
-                is_government=data.get("is_gvt"),
+                is_government=data.get("is_gvt"),   
             )
             company_ob.save()
 
@@ -2283,13 +2283,22 @@ def create_company_helper(request):
                 company=company_ob.id,
                 registration_date=(data.get("registrationDate") or None),
                 vat_number=data.get("vatNumber"),
-                current_address=data.get("currentAddress"),
+                current_address=data.get("currentAddress", None),
                 mobile_phone=data.get("mobileNumber"),
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 note=data.get("note"),
                 landline_phone=data.get("landLine"),
                 branch=data.get("branch"),
+                unit_number=data.get("unitNumber"),  # Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             # send email
@@ -2790,10 +2799,16 @@ def company_report(request):
             trading_status = company_profile.trading_status or "N/A"
             website = company_profile.website or "N/A"
             telephone = company_profile.landline_phone or "N/A" ""
-            current_address = company_profile.current_address
-            mobile_phone = company_profile.mobile_phone
-            email = company_profile.email
-            current_address = company_profile.current_address or "N/A"
+            current_address = (
+                f"unit {company_profile.unit_number or ''} "
+                f"{company_profile.building_name or ''}, "
+                f"{company_profile.street_name or ''} street, "
+                f"{company_profile.suburb or ''}, "
+                f"{company_profile.city or ''}, "
+                f"{company_profile.province or ''}, "
+                f"{company_profile.country or ''}"
+                f"  code : {company_profile.area_code or ''}, "
+            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
             mobile_phone = company_profile.mobile_phone or "N/A"
             email = company_profile.email or "N/A"
             if request.user.user_type == 1:
@@ -3124,6 +3139,7 @@ def store_individual(request):
             land_line=data.get("land_line"),
             address=data.get("address"),
             identification_type=data.get("identification_type"),
+            
             identification_number=data.get("identificationNumber").upper(),
         )
         individual.save()
@@ -3349,11 +3365,20 @@ def store_company(request):
                 company=company_ob.id,
                 registration_date=data.get("registrationDate"),
                 vat_number=data.get("vatNumber"),
-                current_address=data.get("currentAddress"),
+                current_address=data.get("currentAddress", None),
                 mobile_phone=data.get("mobileNumber"),
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 branch=data.get("branch"),
+                unit_number=data.get("unitNumber"),  ## Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             user_password = generate_random_password(8)

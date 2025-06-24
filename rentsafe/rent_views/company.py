@@ -584,7 +584,7 @@ def create_company(request):
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),is_client = True if data.get("is_contracted") else False,
                 company_uploader=request.user.company,
-                is_government=data.get("is_gvt"),
+                is_government=data.get("is_gvt"),    
             )
             company_ob.save()
             # Create the company profile
@@ -592,13 +592,22 @@ def create_company(request):
                 company=company_ob.id,
                 registration_date=data.get("registrationDate") if data.get("registrationDate") else None,
                 vat_number=data.get("vatNumber"),
-                current_address=data.get("currentAddress"),
+                current_address=data.get("currentAddress", None),
                 mobile_phone=data.get("mobileNumber"),
                 email=data.get("emailAddress"),
                 website=data.get("website") ,
                 note=data.get("note"),
                 landline_phone=data.get("landLine"),
                 branch=data.get("branch"),
+                unit_number=data.get("unitNumber"),
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
             )
             email_ob = data.get("emailAddress")
             # send email
@@ -1908,7 +1917,7 @@ def edit_company_user(request):
     if comp_profile:
         comp_profile.registration_date = json_data.get("registrationDate")
         comp_profile.vat_number = json_data.get("vatNumber")
-        comp_profile.current_address = json_data.get("currentAddress")
+        comp_profile.current_address = json_data.get("currentAddress",None)
         comp_profile.mobile_phone = json_data.get("mobileNumber")
         comp_profile.landline_phone = json_data.get("landLine")
         comp_profile.email = json_data.get("emailAddress")

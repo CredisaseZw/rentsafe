@@ -19,17 +19,6 @@ class Company(models.Model):
     is_suspended = models.BooleanField(default=False)
     industry = models.CharField(max_length=255, blank=True, null=True)
     
-    # Address information
-    unit_number = models.CharField(max_length=255, blank=True, null=True)
-    building_name = models.CharField(max_length=255, blank=True, null=True)
-    street_number = models.CharField(max_length=255)
-    street_name = models.CharField(max_length=255)
-    suburb = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    province = models.CharField(max_length=255, blank=True, null=True)
-    country = models.CharField(max_length=255)
-    area_code = models.CharField(max_length=15)
-    
     is_verified = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_client = models.BooleanField(default=False)
@@ -96,6 +85,17 @@ class CompanyProfile(models.Model):
     note = models.TextField(blank=True, null=True)
     #history = HistoricalRecords()
     
+    # Address information
+    unit_number = models.CharField(max_length=255, blank=True, null=True)
+    building_name = models.CharField(max_length=255, blank=True, null=True)
+    street_number = models.CharField(max_length=255)
+    street_name = models.CharField(max_length=255)
+    suburb = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    province = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255)
+    area_code = models.CharField(max_length=15)
+    
 
     class Meta:
         db_table = "company_profile"
@@ -118,6 +118,7 @@ class Individual(models.Model):
     mobile = models.CharField(max_length=255, blank=True, null=True)
     land_line = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
     identification_type = models.CharField(
         default="nationalid", choices=IDENTIFICATION_TYPE_CHOICE, max_length=128
     )
