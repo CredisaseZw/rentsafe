@@ -53,7 +53,7 @@ class CompanyProfile(models.Model):
     trading_status = models.CharField(max_length=255, blank=True, null=True)
     parent_company = models.CharField(max_length=255, blank=True, null=True)
     fomer_address = models.TextField(blank=True, null=True)
-    current_address = models.TextField(blank=True, null=True)
+    # current_address = models.TextField(blank=True, null=True)
     postal_address = models.CharField(max_length=255, blank=True, null=True)
     mobile_phone = models.CharField(max_length=255, blank=True, null=True)
     landline_phone = models.CharField(max_length=255, blank=True, null=True)
@@ -88,13 +88,13 @@ class CompanyProfile(models.Model):
     # Address information
     unit_number = models.CharField(max_length=255, blank=True, null=True)
     building_name = models.CharField(max_length=255, blank=True, null=True)
-    street_number = models.CharField(max_length=255)
-    street_name = models.CharField(max_length=255)
-    suburb = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
+    street_number = models.CharField(max_length=255, blank=True, null=True)
+    street_name = models.CharField(max_length=255, blank=True, null=True)
+    suburb = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
     province = models.CharField(max_length=255, blank=True, null=True)
-    country = models.CharField(max_length=255)
-    area_code = models.CharField(max_length=15)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    area_code = models.CharField(max_length=15, blank=True, null=True)
     
 
     class Meta:
@@ -118,7 +118,7 @@ class Individual(models.Model):
     mobile = models.CharField(max_length=255, blank=True, null=True)
     land_line = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
-    address = models.TextField(blank=True, null=True)
+    # address = models.TextField(blank=True, null=True)
     identification_type = models.CharField(
         default="nationalid", choices=IDENTIFICATION_TYPE_CHOICE, max_length=128
     )
@@ -127,13 +127,13 @@ class Individual(models.Model):
     # Address information
     unit_number = models.CharField(max_length=255, blank=True, null=True)
     building_name = models.CharField(max_length=255, blank=True, null=True)
-    street_number = models.CharField(max_length=255)
-    street_name = models.CharField(max_length=255)
-    suburb = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
+    street_number = models.CharField(max_length=255, blank=True, null=True)
+    street_name = models.CharField(max_length=255, blank=True, null=True)
+    suburb = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
     province = models.CharField(max_length=255, blank=True, null=True)
-    country = models.CharField(max_length=255)
-    area_code = models.CharField(max_length=15)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    area_code = models.CharField(max_length=15, blank=True, null=True)
     
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -227,7 +227,7 @@ class Lease(models.Model):
         max_length=255, default="SAFE", choices=STATUS_CHOICES
     )
     account_number = models.CharField(max_length=255, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
+    # address = models.TextField(null=True, blank=True)
     start_date = models.DateField(max_length=255, null=True, blank=True)
     end_date = models.DateField(max_length=255, null=True, blank=True)
     created_date = models.DateField(auto_now_add=True)
@@ -248,6 +248,17 @@ class Lease(models.Model):
     def __str__(self) -> str:
         return str(self.lease_id)
 
+class LeaseAddress(models.Model):
+    lease_id = models.ForeignKey(Lease, on_delete=models.PROTECT, max_length=255)
+    unit_number = models.CharField(max_length=255, blank=True, null=True)
+    building_name = models.CharField(max_length=255, blank=True, null=True)
+    street_number = models.CharField(max_length=255)
+    street_name = models.CharField(max_length=255)
+    suburb = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    province = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255)
+    area_code = models.CharField(max_length=15)
 
 class Services(models.Model):
     SERVICE_NAMES = [
