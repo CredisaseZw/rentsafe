@@ -2979,7 +2979,16 @@ def individual_report(request):
             landline=individual_ob.land_line
             dob = individual_ob.dob
             gender = individual_ob.gender
-            address = individual_ob.address
+            address =  (
+                f"unit {individual_ob.unit_number or ''} "
+                f"{individual_ob.building_name or ''}, "
+                f"{individual_ob.street_name or ''} street, "
+                f"{individual_ob.suburb or ''}, "
+                f"{individual_ob.city or ''}, "
+                f"{individual_ob.province or ''}, "
+                f"{individual_ob.country or ''}"
+                f"  code : {individual_ob.area_code or ''}, "
+            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
             email = individual_ob.email
             individual_details = {
                 "national_id": national_id,
@@ -3056,7 +3065,16 @@ def individual_report(request):
             landline=individual_ob.land_line
             dob = individual_ob.dob
             gender = individual_ob.gender
-            address = individual_ob.address
+            address =  (
+                f"unit {individual_ob.unit_number or ''} "
+                f"{individual_ob.building_name or ''}, "
+                f"{individual_ob.street_name or ''} street, "
+                f"{individual_ob.suburb or ''}, "
+                f"{individual_ob.city or ''}, "
+                f"{individual_ob.province or ''}, "
+                f"{individual_ob.country or ''}"
+                f"  code : {individual_ob.area_code or ''}, "
+            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
             email = individual_ob.email
             individual_details = {
                 "national_id": national_id,
