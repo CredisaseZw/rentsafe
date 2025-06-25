@@ -387,6 +387,15 @@ def create_individual(request):
                 identification_type=data.get("identification_type"),
                 identification_number=data.get("identificationNumber").upper(),
                 is_verified=True,
+                unit_number=data.get("unitNumber"),  # Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"),
             )
             individual.save()
             # send OTP
@@ -1701,6 +1710,15 @@ def search_individual_users(request):
                                     "job_tittle": employment_details.job_title if employment_details else None,
                                     "is_verified": individual_ob.is_verified,
                                     "created_at": individual_ob.created_at,
+                                    "unit_number": individual_ob.unit_number,
+                                    "building_name": individual_ob.building_name,
+                                    "street_number": individual_ob.street_number,
+                                    "street_name": individual_ob.street_name,
+                                    "suburb": individual_ob.suburb,
+                                    "city": individual_ob.city,
+                                    "province": individual_ob.province,
+                                    "country": individual_ob.country,
+                                    "area_code": individual_ob.area_code,
                                 }
                             }
                         )
@@ -1785,7 +1803,16 @@ def search_company_users(request):
                                         "note": com_profile.note,
                                         "vat_number": com_profile.vat_number,
                                         "is_government": company_ob.is_government,
-                                    }
+                                        "unit_number": com_profile.unit_number,
+                                        "building_name": com_profile.building_name,
+                                        "street_number": com_profile.street_number,
+                                        "street_name": com_profile.street_name,
+                                        "suburb": com_profile.suburb,
+                                        "city": com_profile.city,
+                                        "province": com_profile.province,
+                                        "country": com_profile.country,
+                                        "area_code": com_profile.area_code,
+                                        }
                                 }
                             )
                 for key, value in comp_dic.items():  # pylint: disable=unused-variable
@@ -1881,6 +1908,15 @@ def edit_individual_user(request):
         individual_obj.email = json_data.get("emailAddress") if json_data.get("emailAddress") else None
         individual_obj.dob = json_data.get("dob") if json_data.get("dob") else None
         individual_obj.gender = json_data.get("gender") if json_data.get("gender") else None
+        individual_obj.unit_number = json_data.get("unitNumber")
+        individual_obj.building_name = json_data.get("buildingName")
+        individual_obj.street_number = json_data.get("streetNumber")
+        individual_obj.street_name = json_data.get("streetName")
+        individual_obj.suburb = json_data.get("suburb")
+        individual_obj.city = json_data.get("city")
+        individual_obj.province = json_data.get("province")
+        individual_obj.country = json_data.get("country")
+        individual_obj.area_code = json_data.get("areaCode")
         individual_obj.save()
         if employment_details:
             employment_details.job_title = json_data.get("jobTitle") if json_data.get("jobTitle") else None
@@ -1924,6 +1960,15 @@ def edit_company_user(request):
         comp_profile.website = json_data.get("website")
         comp_profile.note = json_data.get("note")
         comp_profile.branch=json_data.get("branch") if json_data.get("branch") != comp_profile.branch else comp_profile.branch
+        comp_profile.unit_number = json_data.get("unitNumber")
+        comp_profile.building_name = json_data.get("buldingName")
+        comp_profile.street_number = json_data.get("streetNumber")
+        comp_profile.street_name = json_data.get("streetName")
+        comp_profile.suburb = json_data.get("suburb")
+        comp_profile.city = json_data.get("city")
+        comp_profile.province = json_data.get("province")
+        comp_profile.country = json_data.get("country")
+        comp_profile.area_code = json_data.get("areaCode")
         comp_profile.save()
     is_client = company_obj.is_client
     return JsonResponse(
