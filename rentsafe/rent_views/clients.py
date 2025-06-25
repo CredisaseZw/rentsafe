@@ -4608,8 +4608,7 @@ def get_invoicing_details(request):
                 invoiced_date = invoice_status.invoice_date or today
 
                 # Check if the last invoice date is not one month old or less than 30 days
-               
-                if invoiced_date.month == today.month and invoiced_date.day < current_day:
+                if (today - invoiced_date).days >= 15:
 
                     if i.is_individual:
                         try:
@@ -4653,6 +4652,8 @@ def get_invoicing_details(request):
                         except Exception:
                             pass
                     props = {"tenant_list": tenant_list}
+                else:
+                    print('Invoice already created for this month')
             else:
                 if i.is_individual:
                     try:
