@@ -2884,6 +2884,7 @@ def company_report(request):
                 f"{company_profile.city or ''}, "
                 f"{company_profile.province + ' Province' if company_profile.province else ''}, "
                 f"{company_profile.country or ''}"
+                f"  code : {company_profile.area_code or ''}, "
             ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
             mobile_phone = company_profile.mobile_phone or "N/A"
             email = company_profile.email or "N/A"
