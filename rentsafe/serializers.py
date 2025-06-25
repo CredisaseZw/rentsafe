@@ -240,7 +240,7 @@ class CreateIndividualSchema(Schema):
         data_key="mobileNumber", required=True, validate=validate_mobile_number
     )
     address = fields.Str(
-        data_key="address", required=False
+        data_key="address", required=True, validate=validate.Length(min=3)
     )
     identification_type = fields.Str(
         data_key="identificationType", required=True, validate=validate.Length(min=5)
@@ -254,17 +254,6 @@ class CreateIndividualSchema(Schema):
     land_line = fields.Str(data_key="landLine", required=False)
     date_of_employment = fields.Str(data_key="dateOfemployment", required=False)
     individual_id = fields.Int(data_key="individualId", required=False)
-    # Address validation
-    unitNumber = fields.Str(data_key="unitNumber",required=False)
-    buildingName = fields.Str(data_key="buildingName",required=False)
-    streetNumber = fields.Str(data_key="streetNumber",required=False)
-    streetName = fields.Str(data_key="streetName",required=False)
-    suburb = fields.Str(data_key="suburb",required=False)
-    city = fields.Str(data_key="city",required=False)
-    province = fields.Str(data_key="province",required=False)
-    country = fields.Str(data_key="country",required=False)
-    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
-
 
     
 class IndividualSchema(Schema):
@@ -437,13 +426,13 @@ class CreateCompanySchema(Schema):
     # Address validation
     unitNumber = fields.Str(data_key="unitNumber",required=False)
     buildingName = fields.Str(data_key="buildingName",required=False)
-    streetNumber = fields.Str(data_key="streetNumber",required=False)
-    streetName = fields.Str(data_key="streetName",required=False)
-    suburb = fields.Str(data_key="suburb",required=False)
-    city = fields.Str(data_key="city",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=True)
+    streetName = fields.Str(data_key="streetName",required=True)
+    suburb = fields.Str(data_key="suburb",required=True)
+    city = fields.Str(data_key="city",required=True)
     province = fields.Str(data_key="province",required=False)
-    country = fields.Str(data_key="country",required=False)
-    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
+    country = fields.Str(data_key="country",required=True)
+    areaCode = fields.Str(data_key="areaCode",required=True, validate=validate.Length(max=15))
 
 
 # Add-Lease

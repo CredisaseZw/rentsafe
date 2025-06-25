@@ -2804,6 +2804,7 @@ def company_report(request):
                 f"{company_profile.building_name or ''} Building, "
                 f"{company_profile.street_name or ''} street, "
                 f"{company_profile.city or ''}, "
+                f"{company_profile.province or ''}, "
                 f"{company_profile.country or ''}"
             ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
             mobile_phone = company_profile.mobile_phone or "N/A"
@@ -2976,13 +2977,7 @@ def individual_report(request):
             landline=individual_ob.land_line
             dob = individual_ob.dob
             gender = individual_ob.gender
-            address = (
-                f"Unit {individual_ob.unit_number or ''} "
-                f"{individual_ob.building_name or ''} Building, "
-                f"{individual_ob.street_name or ''} street, "
-                f"{individual_ob.city or ''}, "
-                f"{individual_ob.country or ''}"
-            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
+            address = individual_ob.address
             email = individual_ob.email
             individual_details = {
                 "national_id": national_id,
@@ -2994,7 +2989,7 @@ def individual_report(request):
                 "gender": gender,
                 "marital_status": marital_status,
                 "email": email,
-                "address": "hellooo",
+                "address": address,
                 "job_title": job_title,
                 "employer_name": employer_name,
                 "date_of_employment": date_of_employment,
@@ -3059,13 +3054,7 @@ def individual_report(request):
             landline=individual_ob.land_line
             dob = individual_ob.dob
             gender = individual_ob.gender
-            address = (
-                f"Unit {individual_ob.unit_number or ''} "
-                f"{individual_ob.building_name or ''} Building, "
-                f"{individual_ob.street_name or ''} street, "
-                f"{individual_ob.city or ''}, "
-                f"{individual_ob.country or ''}"
-            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
+            address = individual_ob.address
             email = individual_ob.email
             individual_details = {
                 "national_id": national_id,
@@ -3148,15 +3137,7 @@ def store_individual(request):
             land_line=data.get("land_line"),
             address=data.get("address"),
             identification_type=data.get("identification_type"),
-            unit_number=data.get("unitNumber"),  # Address Fields
-            building_name=data.get("buildingName"),
-            street_number=data.get("streetNumber"),
-            street_name=data.get("streetName"),
-            suburb=data.get("suburb"),
-            city= data.get("city"),
-            province=data.get("province"),
-            country= data.get("country"),
-            area_code=data.get("areaCode"),
+            
             identification_number=data.get("identificationNumber").upper(),
         )
         individual.save()
@@ -3237,15 +3218,6 @@ def store_individual_user(request):
                 identification_type=data.get("identification_type"),
                 identification_number=data.get("identificationNumber").upper(),
                 is_user=True,
-                unit_number=data.get("unitNumber"),  # Address Fields
-                building_name=data.get("buildingName"),
-                street_number=data.get("streetNumber"),
-                street_name=data.get("streetName"),
-                suburb=data.get("suburb"),
-                city= data.get("city"),
-                province=data.get("province"),
-                country= data.get("country"),
-                area_code=data.get("areaCode"),
             )
             individual.save()
 
