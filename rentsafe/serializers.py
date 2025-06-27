@@ -427,13 +427,13 @@ class CreateCompanySchema(Schema):
     # Address validation
     unitNumber = fields.Str(data_key="unitNumber",required=False)
     buildingName = fields.Str(data_key="buildingName",required=False)
-    streetNumber = fields.Str(data_key="streetNumber",required=True)
-    streetName = fields.Str(data_key="streetName",required=True)
-    suburb = fields.Str(data_key="suburb",required=True)
-    city = fields.Str(data_key="city",required=True)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
     province = fields.Str(data_key="province",required=False)
-    country = fields.Str(data_key="country",required=True)
-    areaCode = fields.Str(data_key="areaCode",required=True, validate=validate.Length(max=15))
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
 
 # Add-Lease
@@ -455,9 +455,9 @@ class CreateIndividualLeaseSchema(Schema):
     )
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=True)
 
-    lesseeAddress = fields.Str(
-        data_key="lesseeAddress", required=False, validate=validate.Length(min=0)
-    )
+    # lesseeAddress = fields.Str(
+    #     data_key="lesseeAddress", required=False, validate=validate.Length(min=0)
+    # )
     leaseEndDate = fields.Str(data_key="leaseEndDate", required=True, validate=validated_date)
     lesseePhone = fields.Str(
         data_key="lesseePhone",
@@ -515,13 +515,13 @@ class CreateIndividualLeaseSchema(Schema):
     # Address validation
     unitNumber = fields.Str(data_key="unitNumber",required=False)
     buildingName = fields.Str(data_key="buildingName",required=False)
-    streetNumber = fields.Str(data_key="streetNumber",required=True)
-    streetName = fields.Str(data_key="streetName",required=True)
-    suburb = fields.Str(data_key="suburb",required=True)
-    city = fields.Str(data_key="city",required=True)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
     province = fields.Str(data_key="province",required=False)
-    country = fields.Str(data_key="country",required=True)
-    areaCode = fields.Str(data_key="areaCode",required=True, validate=validate.Length(max=15))
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
 
 class CreateCompanyLeaseSchema(Schema):
@@ -540,9 +540,9 @@ class CreateCompanyLeaseSchema(Schema):
     )
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=True)
 
-    lesseeAddress = fields.Str(
-        data_key="lesseeAddress", required=False, validate=validate.Length(min=0)
-    )
+    # lesseeAddress = fields.Str(
+    #     data_key="lesseeAddress", required=False
+    # )
     leaseEndDate = fields.Str(data_key="leaseEndDate", required=True,validate=validated_date)
     mobile = fields.Str(data_key="mobile", required=False)
     email = fields.Email(
@@ -602,13 +602,13 @@ class CreateCompanyLeaseSchema(Schema):
     # Address validation
     unitNumber = fields.Str(data_key="unitNumber",required=False)
     buildingName = fields.Str(data_key="buildingName",required=False)
-    streetNumber = fields.Str(data_key="streetNumber",required=True)
-    streetName = fields.Str(data_key="streetName",required=True)
-    suburb = fields.Str(data_key="suburb",required=True)
-    city = fields.Str(data_key="city",required=True)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
     province = fields.Str(data_key="province",required=False)
-    country = fields.Str(data_key="country",required=True)
-    areaCode = fields.Str(data_key="areaCode",required=True, validate=validate.Length(max=15))
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
 
 def validate_email(value):
@@ -712,6 +712,18 @@ class CreateAgentSchema(Schema):
     dateOfEmployment = fields.Str(data_key="dateOfemployment", required=False)
     individualId = fields.Int(data_key="individualId", required=False)
     isAgent = fields.Boolean(data_key="isAgent", required=False)
+    
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
+
 
 
 class UpdateAgentSchema(Schema):
@@ -757,7 +769,7 @@ class CheckUserSchema(Schema):
 class GetUserSchema(Schema):
     identificationNumber = fields.Str(data_key="identificationNumber", required=True)
     lesseeName = fields.Str(data_key="lesseeName", required=False)
-    lesseeAddress = fields.Str(data_key="lesseeAddress", required=False)
+    # lesseeAddress = fields.Str(data_key="lesseeAddress", required=False)
     lesseePhone = fields.Str(data_key="lesseePhone", required=False)
     leaseDetails = fields.Str(data_key="leaseDetails", required=False)
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=False)
@@ -805,10 +817,10 @@ class GetCompanySchema(Schema):
     )
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=False)
 
-    lesseeAddress = fields.Str(
-        data_key="lesseeAddress",
-        required=False,
-    )
+    # lesseeAddress = fields.Str(
+    #     data_key="lesseeAddress",
+    #     required=False,
+    # )
     leaseEndDate = fields.Str(data_key="leaseEndDate", required=False)
     mobile = fields.Str(
         data_key="mobile",
