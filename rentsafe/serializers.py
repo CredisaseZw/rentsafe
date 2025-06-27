@@ -239,9 +239,9 @@ class CreateIndividualSchema(Schema):
     mobile = fields.Str(
         data_key="mobileNumber", required=True, validate=validate_mobile_number
     )
-    address = fields.Str(
-        data_key="address", required=False, validate=validate.Length(min=0)
-    )
+    # address = fields.Str(
+    #     data_key="address", required=False, validate=validate.Length(min=0)
+    # )
     identification_type = fields.Str(
         data_key="identificationType", required=True, validate=validate.Length(min=5)
     )
@@ -407,7 +407,7 @@ class CreateCompanySchema(Schema):
 
     registrationDate = fields.Str(data_key="registrationDate", required=False)
     vatNumber = fields.Str(data_key="vatNumber", required=False)
-    currentAddress = fields.Str(data_key="currentAddress", required=False)
+    # currentAddress = fields.Str(data_key="currentAddress", required=False)
     landLine = fields.Str(data_key="landLine", required=False)
     mobileNumber = fields.Str(
         data_key="mobileNumber", required=False, validate=validate.Length(max=15)
@@ -522,6 +522,8 @@ class CreateIndividualLeaseSchema(Schema):
     province = fields.Str(data_key="province",required=False)
     country = fields.Str(data_key="country",required=False)
     areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
+    class Meta:
+        unknown = EXCLUDE
 
 
 class CreateCompanyLeaseSchema(Schema):
@@ -610,6 +612,8 @@ class CreateCompanyLeaseSchema(Schema):
     country = fields.Str(data_key="country",required=False)
     areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
+    class Meta:
+        unknown = EXCLUDE
 
 def validate_email(value):
     # Check if the email already exists in the database
