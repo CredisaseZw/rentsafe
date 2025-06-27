@@ -147,6 +147,13 @@ def search_individuals_or_companies(request):
                     "email": individual.email if individual.email else "",
                     "VAT_number":  "",
                     "tin_number":"",
+                    "unit_number": individual.unit_number,
+                    "building_name": individual.building_name,
+                    "street_number": individual.street_number,
+                    "street_name": individual.street_name,
+                    "suburb": individual.suburb,
+                    "city":individual.city,
+                    "province": individual.province
                 }
             )
 
@@ -169,6 +176,13 @@ def search_individuals_or_companies(request):
                     "email": company_profile.email if company_profile.email else "",
                     "VAT_number": company_profile.vat_number if company_profile.vat_number else "",
                     "tin_number": "",
+                    "unit_number": company_profile.unit_number if company_profile.unit_number else '',
+                    "building_name": company_profile.building_name if company_profile.building_name else '',
+                    "street_number": company_profile.street_number if company_profile.street_number else '',
+                    "street_name": company_profile.street_name if company_profile.street_name else '',
+                    "suburb": company_profile.company_profile.suburb if company_profile.suburb else '',
+                    "city":company_profile. city if company_profile.city else '',
+                    "province": company_profile.proivince if company_profile.province else ''
                 }
             )
 

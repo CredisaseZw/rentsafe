@@ -1926,7 +1926,16 @@ def edit_individual_user(request):
         individual_obj.email = json_data.get("emailAddress") if json_data.get("emailAddress") else None
         individual_obj.dob = json_data.get("dob") if json_data.get("dob") else None
         individual_obj.gender = json_data.get("gender") if json_data.get("gender") else None
-        individual_obj.gender = json_data.get("unit_number")
+        individual_obj.unit_number = json_data.get("unitNumber")
+        individual_obj.street_number =json_data.get("streetNumber")
+        individual_obj.street_name =json_data.get("streetName")
+        individual_obj.building_name =json_data.get("buildingName")
+        individual_obj.suburb = json_data.get("suburb")
+        individual_obj.city = json_data.get("city")
+        individual_obj.province = json_data.get("province")
+        individual_obj.country = json_data.get("country")
+        individual_obj.area_code = json_data.get("areaCode")
+        
         individual_obj.save()
         if employment_details:
             employment_details.job_title = json_data.get("jobTitle") if json_data.get("jobTitle") else None
@@ -1971,6 +1980,15 @@ def edit_company_user(request):
         comp_profile.website = json_data.get("website")
         comp_profile.note = json_data.get("note")
         comp_profile.branch=json_data.get("branch") if json_data.get("branch") != comp_profile.branch else comp_profile.branch
+        comp_profile.unit_number = json_data.get("unitNumber")
+        comp_profile.street_number =json_data.get("streetNumber")
+        comp_profile.street_name =json_data.get("streetName")
+        comp_profile.building_nameuilding_name =json_data.get("buildingName")
+        comp_profile.suburb = json_data.get("suburb")
+        comp_profile.city = json_data.get("city")
+        comp_profile.province = json_data.get("province")
+        comp_profile.country = json_data.get("country")
+        comp_profile.area_code = json_data.get("areaCode")
         comp_profile.save()
     is_client = company_obj.is_client
     return JsonResponse(
