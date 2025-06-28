@@ -3835,15 +3835,15 @@ def client_leases_new(request,leases_type=None):
             continue
         lease_address = LeaseAddress.objects.filter(lease_id=i.lease_id).first()
         
-        unit_number =lease_address.unit_number if lease_address.unit_number else ""
-        building_name= lease_address.building_name if lease_address.building_name else ""
-        street_number= lease_address.street_number if lease_address.street_number else ""
-        street_name= lease_address.street_name if lease_address.street_name else ""
-        suburb= lease_address.suburb if lease_address.suburb else ""
-        city= lease_address.city if lease_address.city else ""
-        province= lease_address.province if lease_address.province else ""
-        country = lease_address.country if lease_address.country else ""
-        area_code = lease_address.area_code if lease_address.area_code else ""
+        unit_number =lease_address.unit_number if lease_address else ""
+        building_name= lease_address.building_name if lease_address else ""
+        street_number= lease_address.street_number if lease_address else ""
+        street_name= lease_address.street_name if lease_address else ""
+        suburb= lease_address.suburb if lease_address else ""
+        city= lease_address.city if lease_address else ""
+        province= lease_address.province if lease_address else ""
+        country = lease_address.country if lease_address else ""
+        area_code = lease_address.area_code if lease_address else ""
 
         if i.lease_id not in lease_dict:
             lease_dict[i.lease_id] = {
