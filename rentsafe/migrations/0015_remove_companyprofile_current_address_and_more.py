@@ -115,6 +115,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         max_length=255,
                         on_delete=django.db.models.deletion.PROTECT,
+                        related_name="lease_address",
                         to="rentsafe.lease",
                     ),
                 ),

@@ -107,7 +107,7 @@ def agents(request):
                             "landline": user.land_line,
                             "is_agent": True if agent.user_type == 3 else False,
                             "email": user.email,
-                            "address": user.address,
+                            "address": user.unit_number if user.unit_number else "N/A",
                             "identification_type": user.identification_type,
                             "identification_number": user.identification_number,
                             "dob": user.dob,
@@ -1983,7 +1983,7 @@ def edit_company_user(request):
         comp_profile.unit_number = json_data.get("unitNumber")
         comp_profile.street_number =json_data.get("streetNumber")
         comp_profile.street_name =json_data.get("streetName")
-        comp_profile.building_nameuilding_name =json_data.get("buildingName")
+        comp_profile.building_name =json_data.get("buildingName")
         comp_profile.suburb = json_data.get("suburb")
         comp_profile.city = json_data.get("city")
         comp_profile.province = json_data.get("province")
@@ -2234,28 +2234,32 @@ def get_all_companies(request):
             company_profiles = CompanyProfile.objects.filter(company__in=[c.id for c in result])
             email_map = {cp.company: cp.email for cp in company_profiles}
             mobile_map = {cp.company: cp.mobile_phone for cp in company_profiles}
-            address_map = {
-                cp.company: {
-                    "unit_number": cp.unit_number,
-                    "building_name": cp.building_name,
-                    "street_number": cp.street_number,
-                    "street_name": cp.street_name,
-                    "suburb": cp.suburb,
-                    "city": cp.city,
-                    "province": cp.province,
-                    "country": cp.country,
-                    "area_code": cp.area_code,
-                }
-                for cp in company_profiles
-            }            
+            unit_map = {cp.company: cp.unit_number for cp in company_profiles}
+            building_map = {cp.company: cp.building_name for cp in company_profiles}
+            street_number_map = {cp.company: cp.street_number for cp in company_profiles}
+            street_name_map = {cp.company: cp.street_name for cp in company_profiles}
+            suburb_map = {cp.company: cp.suburb for cp in company_profiles}
+            city_map = {cp.company: cp.city for cp in company_profiles}
+            province_map = {cp.company: cp.province for cp in company_profiles}
+            country_map = {cp.company: cp.country for cp in company_profiles}
+            area_code_map = {cp.company: cp.area_code for cp in company_profiles}
+                       
 
             company_schema = CompanySchema(many=True)
             companies_data = company_schema.dump(list(result))
             for company_data in companies_data:
                 company_data['email'] = email_map.get(str(company_data['id']), '')
                 company_data['mobile'] = mobile_map.get(str(company_data['id']), '')
-                company_data['address'] = address_map.get(str(company_data['id']), '')
-            
+                company_data['unit_number'] = unit_map.get(str(company_data['id']), '')
+                company_data['building_name'] = building_map.get(str(company_data['id']), '')
+                company_data['street_number'] = street_number_map.get(str(company_data['id']), '')
+                company_data['street_name'] = street_name_map.get(str(company_data['id']), '')
+                company_data['suburb'] = suburb_map.get(str(company_data['id']), '')
+                company_data['city'] = city_map.get(str(company_data['id']), '')
+                company_data['province'] = province_map.get(str(company_data['id']), '')
+                company_data['country'] = country_map.get(str(company_data['id']), '')
+                company_data['area_code'] = area_code_map.get(str(company_data['id']), '')
+
             return JsonResponse(companies_data, safe=False)
     else:
         return JsonResponse({"result": "No companies found.", "status": "failed"})

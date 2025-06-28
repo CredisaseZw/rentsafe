@@ -864,7 +864,7 @@ def edit_lease(request):
             lease.rent_variables = data.get("rentVariable")
             lease.save()
             
-            lease_address.lease_id= lease,  ### Lease ID
+            # lease_address.lease_id= lease,  ### Lease ID
             lease_address.unit_number=data.get("unitNumber") ## Address Fields
             lease_address.building_name=data.get("buildingName")
             lease_address.street_number=data.get("streetNumber")
@@ -954,7 +954,7 @@ def edit_lease(request):
                 email = company_profile.email
                 # address = company_profile.current_address
                 unit_number = company_profile.unit_number
-                building_name = company_profile.building
+                building_name = company_profile.building_name
                 street_number = company_profile.street_number
                 street_name = company_profile.street_name
                 suburb = company_profile.suburb
@@ -3833,12 +3833,32 @@ def client_leases_new(request,leases_type=None):
         is_3_months_ago = check_lease_termination_eligibility(i, hundred_days_ago)
         if i.is_terminated and (is_3_months_ago or owing_amount <= 0):
             continue
+        lease_address = LeaseAddress.objects.filter(lease_id=i.lease_id).first()
+        
+        unit_number =lease_address.unit_number if lease_address.unit_number else ""
+        building_name= lease_address.building_name if lease_address.building_name else ""
+        street_number= lease_address.street_number if lease_address.street_number else ""
+        street_name= lease_address.street_name if lease_address.street_name else ""
+        suburb= lease_address.suburb if lease_address.suburb else ""
+        city= lease_address.city if lease_address.city else ""
+        province= lease_address.province if lease_address.province else ""
+        country = lease_address.country if lease_address.country else ""
+        area_code = lease_address.area_code if lease_address.area_code else ""
+
         if i.lease_id not in lease_dict:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
                 "name": name,
                 "trading_name": trading_name,
-                # "address": i.address,
+                "unit_number": unit_number,
+                "building_name": building_name,
+                "street_number": street_number,
+                "street_name": street_name,
+                "suburb": suburb,
+                "city": city,
+                "province": province,
+                "country": country,
+                "area_code": area_code,
                 "email": email,
                 "mobile": mobile,
                 "rent_guarantor_name": f"{rent_guarantor.firstname} {rent_guarantor.surname}" if rent_guarantor else "N/A",
