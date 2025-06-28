@@ -6315,6 +6315,35 @@ def sales_accounts(request):
 def rate_setup(request):
     return JsonResponse ({"status": "success"}, safe=False)
 
+@login_required
+@clients_required
+def search_lease_address(request):
+    search_term = request.GET.get("q", "").strip()
+
+    query = Q()
+    if search_term:
+        query |= Q(unit_number__icontains=search_term)
+        query |= Q(building_name__icontains=search_term)
+        query |= Q(street_name__icontains=search_term)
 
 
 
+    results = LeaseAddress.objects.filter(query)
+
+    data = [
+        {
+            "lease_id": addr.lease_id.lease_id if addr.lease_id else None,
+            "unit_number": addr.unit_number,
+            "building_name": addr.building_name,
+            "street_number": addr.street_number,
+            "street_name": addr.street_name,
+            "suburb": addr.suburb,
+            "city": addr.city,
+            "province": addr.province,
+            "country": addr.country,
+            "area_code": addr.area_code,
+        }
+        for addr in results
+    ]
+
+    return JsonResponse({"results": data}, safe=False)
