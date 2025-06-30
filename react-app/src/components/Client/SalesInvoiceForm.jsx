@@ -275,7 +275,9 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
           </CustomTable.Table>
 
           <div className="text-end">
-            <CustomTable.ActionButtonTemplate>Submit</CustomTable.ActionButtonTemplate>
+            <CustomTable.ActionButtonTemplate type="submit">
+              Submit
+            </CustomTable.ActionButtonTemplate>
           </div>
 
           {isLoading && (
