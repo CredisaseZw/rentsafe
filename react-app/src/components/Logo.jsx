@@ -19,7 +19,7 @@ export default function Logo() {
       </div>
 
       <div style={{ marginBottom: "-5px" }} className="fs-5 text-capitalize fw-bold">
-        CrediSafe
+        Fincheck
       </div>
     </Link>
   );

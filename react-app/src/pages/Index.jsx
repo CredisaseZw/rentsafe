@@ -223,7 +223,7 @@ export default function Index() {
             style={{ color: "rgb(170,170,170)" }}
             className="d-flex justify-content-between gap-3 align-items-center my-3"
           >
-            <p className="m-0 small fst-italic ">© {new Date().getFullYear()} CrediSafe</p>
+            <p className="m-0 small fst-italic ">© {new Date().getFullYear()} Fincheck</p>
 
             <div className="small fst-italic ">All rights reserved.</div>
           </div>
