@@ -93,7 +93,7 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 />
               </div>
 
-              <div className="mb-2 d-flex gap-4 align-items-center">
+              <div className="d-flex gap-4 align-items-center">
                 <label htmlFor="email" className="form-label">
                   Email:
                 </label>
@@ -137,7 +137,7 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 />
               </div>
 
-              <div className="mb-2 d-flex gap-4 align-items-center">
+              <div className="d-flex gap-4 align-items-center">
                 <label htmlFor="date" className="form-label">
                   Date:
                 </label>

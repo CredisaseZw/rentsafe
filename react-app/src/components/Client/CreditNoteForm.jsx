@@ -38,7 +38,7 @@ export function CreditNoteForm({ creditNote }) {
           <div className="p-4">
             <div className="row row-cols-2 pb-3 text-nowrap">
               <div className="col">
-                <div className="mb-3 d-flex gap-4 align-items-center justify-content-between">
+                <div className="mb-2 d-flex gap-4 align-items-center justify-content-between">
                   <label htmlFor="credit_to" className="form-label">
                     Credit To:
                   </label>
@@ -55,7 +55,7 @@ export function CreditNoteForm({ creditNote }) {
                   )}
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="address" className="form-label">
                     Address:
                   </label>
@@ -69,7 +69,7 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="phone" className="form-label">
                     Phone:
                   </label>
@@ -83,7 +83,7 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="d-flex gap-4 align-items-center">
                   <label htmlFor="email" className="form-label">
                     Email:
                   </label>
@@ -99,7 +99,7 @@ export function CreditNoteForm({ creditNote }) {
               </div>
 
               <div className="col">
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="vat_no" className="form-label">
                     VAT No.:
                   </label>
@@ -113,7 +113,7 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="tin" className="form-label">
                     TIN:
                   </label>
@@ -127,7 +127,7 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="d-flex gap-4 align-items-center">
                   <label htmlFor="date" className="form-label">
                     Date:
                   </label>
