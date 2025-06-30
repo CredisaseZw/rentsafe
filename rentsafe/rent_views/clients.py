@@ -6320,15 +6320,15 @@ def rate_setup(request):
 def search_lease_address(request):
     search_term = request.GET.get("q", "").strip()
 
-    query = Q()
     if search_term:
+        query = Q()
         query |= Q(unit_number__icontains=search_term)
         query |= Q(building_name__icontains=search_term)
         query |= Q(street_name__icontains=search_term)
 
-
-
-    results = LeaseAddress.objects.filter(query)
+        results = LeaseAddress.objects.filter(query)
+    else:
+        results = LeaseAddress.objects.all().order_by("id")
 
     data = [
         {
@@ -6347,3 +6347,19 @@ def search_lease_address(request):
     ]
 
     return JsonResponse({"results": data}, safe=False)
+
+@login_required
+@clients_required
+def create_lease_address(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+    try:
+        schema= LeaseAddressSchema()
+        data = schema.loads(request.body)
+        LeaseAddress.objects.create(**data)
+        return JsonResponse({
+            "message": "Lease address created successfully"
+        }, status=201)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)

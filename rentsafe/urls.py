@@ -256,6 +256,9 @@ urlpatterns = [
                     "search-lease-address/",   ### search lease addresses
                     clients.search_lease_address,
                     name="search_lease_address"),
+                path("create-lease-address/",
+                    clients.create_lease_address, 
+                    name="create_lease_address"),
                 path(
                     "claims/search/",
                     claims.search_individuals_or_companies,
