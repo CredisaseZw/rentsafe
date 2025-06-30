@@ -249,7 +249,7 @@ class Lease(models.Model):
         return str(self.lease_id)
 
 class LeaseAddress(models.Model):
-    lease_id = models.ForeignKey(Lease, on_delete=models.PROTECT, max_length=255, related_name="lease_address", blank=True, null=True)
+    lease_id = models.ForeignKey(Lease, on_delete=models.SET_NULL, max_length=255, related_name="lease_address", blank=True, null=True)
     unit_number = models.CharField(max_length=255, blank=True, null=True)
     building_name = models.CharField(max_length=255, blank=True, null=True)
     street_number = models.CharField(max_length=255)
