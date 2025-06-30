@@ -71,7 +71,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="address"
                   id="address"
                   placeholder="Address..."
@@ -86,7 +85,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="phone"
                   id="phone"
                   placeholder="Phone..."
@@ -101,7 +99,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="email"
                   id="email"
                   placeholder="Email..."
@@ -118,7 +115,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="vat_no"
                   id="vat_no"
                   placeholder="VAT No...."
@@ -133,7 +129,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="tin"
                   id="tin"
                   placeholder="TIN..."
@@ -148,7 +143,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="date"
                   defaultValue={new Date().toISOString().split("T")[0]}
                   max={new Date().toISOString().split("T")[0]}
