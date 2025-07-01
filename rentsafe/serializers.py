@@ -265,8 +265,9 @@ class CreateIndividualSchema(Schema):
     province = fields.Str(data_key="province",required=False)
     country = fields.Str(data_key="country",required=False)
     areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
-    
 
+    class Meta:
+        unknown = EXCLUDE
     
 class IndividualSchema(Schema):
     """
@@ -435,6 +436,8 @@ class CreateCompanySchema(Schema):
     country = fields.Str(data_key="country",required=False)
     areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
+    class Meta:
+        unknown = EXCLUDE
 
 # Add-Lease
 class CreateIndividualLeaseSchema(Schema):
@@ -1226,4 +1229,14 @@ class DebtCallFilterDataSchema(Schema):
     sms_message = fields.Str(data_key="sms_message", required=False)
     email_message = fields.Str(data_key="email_message", required=False)
     
-    
+class LeaseAddressSchema(Schema):
+    lease_id = fields.Str(required=False)
+    unit_number = fields.Str(required=False)
+    building_name = fields.Str(required=False)
+    street_number = fields.Str(required=False)
+    street_name = fields.Str(required=False)
+    suburb = fields.Str(required=False)
+    city = fields.Str(required=False)
+    province = fields.Str(required=False)
+    country = fields.Str(required=False)
+    area_code = fields.Str(required=False)

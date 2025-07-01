@@ -17,7 +17,6 @@ export default function useRecurringInvoicingInvoiceTab() {
           date_created: friendlyDate(new Date()),
           customer_acc: "",
           customer: invoice.tenant_name,
-          document_number: "",
           bill_to: invoice.tenant_name,
           address: invoice.address,
           phone: "",

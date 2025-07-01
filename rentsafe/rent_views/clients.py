@@ -864,17 +864,32 @@ def edit_lease(request):
             lease.rent_variables = data.get("rentVariable")
             lease.save()
             
-            # lease_address.lease_id= lease,  ### Lease ID
-            lease_address.unit_number=data.get("unitNumber") ## Address Fields
-            lease_address.building_name=data.get("buildingName")
-            lease_address.street_number=data.get("streetNumber")
-            lease_address.street_name=data.get("streetName")
-            lease_address.suburb=data.get("suburb")
-            lease_address.city= data.get("city")
-            lease_address.province=data.get("province")
-            lease_address.country= data.get("country")
-            lease_address.area_code=data.get("areaCode")
-            lease_address.save()
+            if lease_address:
+                lease_address.lease_id = lease
+                lease_address.unit_number = data.get("unitNumber")
+                lease_address.building_name = data.get("buildingName")
+                lease_address.street_number = data.get("streetNumber")
+                lease_address.street_name = data.get("streetName")
+                lease_address.suburb = data.get("suburb")
+                lease_address.city = data.get("city")
+                lease_address.province = data.get("province")
+                lease_address.country = data.get("country")
+                lease_address.area_code = data.get("areaCode")
+                lease_address.save()
+            else:
+                lease_address = LeaseAddress(
+                    lease_id=lease,
+                    unit_number=data.get("unitNumber"),
+                    building_name=data.get("buildingName"),
+                    street_number=data.get("streetNumber"),
+                    street_name=data.get("streetName"),
+                    suburb=data.get("suburb"),
+                    city=data.get("city"),
+                    province=data.get("province"),
+                    country=data.get("country"),
+                    area_code=data.get("areaCode"),
+                )
+                lease_address.save()
             
             messages.success(request, "successfully updated lease")
             share(request, messages=messages)
@@ -6317,33 +6332,47 @@ def rate_setup(request):
 
 @login_required
 @clients_required
-def search_lease_address(request):
-    search_term = request.GET.get("q", "").strip()
+def lease_address(request):
+    
+    if request.method == "GET":
+        search_term = request.GET.get("q", "").strip()
 
-    query = Q()
-    if search_term:
-        query |= Q(unit_number__icontains=search_term)
-        query |= Q(building_name__icontains=search_term)
-        query |= Q(street_name__icontains=search_term)
+        if search_term:
+            query = Q()
+            query |= Q(unit_number__icontains=search_term)
+            query |= Q(building_name__icontains=search_term)
+            query |= Q(street_name__icontains=search_term)
 
+            results = LeaseAddress.objects.filter(query)
+        else:
+            results = LeaseAddress.objects.all().order_by("id")
 
+        data = [
+            {
+                "lease_id": addr.lease_id.lease_id if addr.lease_id else None,
+                "unit_number": addr.unit_number,
+                "building_name": addr.building_name,
+                "street_number": addr.street_number,
+                "street_name": addr.street_name,
+                "suburb": addr.suburb,
+                "city": addr.city,
+                "province": addr.province,
+                "country": addr.country,
+                "area_code": addr.area_code,
+            }
+            for addr in results
+        ]
 
-    results = LeaseAddress.objects.filter(query)
+        return JsonResponse({"results": data}, safe=False,)
 
-    data = [
-        {
-            "lease_id": addr.lease_id.lease_id if addr.lease_id else None,
-            "unit_number": addr.unit_number,
-            "building_name": addr.building_name,
-            "street_number": addr.street_number,
-            "street_name": addr.street_name,
-            "suburb": addr.suburb,
-            "city": addr.city,
-            "province": addr.province,
-            "country": addr.country,
-            "area_code": addr.area_code,
-        }
-        for addr in results
-    ]
-
-    return JsonResponse({"results": data}, safe=False)
+    else:
+        try:
+            schema= LeaseAddressSchema()
+            data = schema.loads(request.body)
+            LeaseAddress.objects.create(**data)
+            return JsonResponse({
+                "message": "Lease address created successfully",
+                "Address": data,
+            }, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
