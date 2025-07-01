@@ -117,7 +117,7 @@ export default function InvoiceFormRow({
 
         <td>
           <div className="text-center text-nowrap custom-mn-w-1">
-            {(parseFloat(item.total) || 0).toFixed(2)}
+            {(parseFloat((item.qty || 0) * (item.price || 0)) || 0).toFixed(2)}
           </div>
         </td>
       </tr>
