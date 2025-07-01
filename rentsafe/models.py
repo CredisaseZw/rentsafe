@@ -261,7 +261,7 @@ class LeaseAddress(models.Model):
     area_code = models.CharField(max_length=15)
     
     def __str__(self):
-        return f"{self.unit_number} ' '  {self.building_name} , {self.street_name}"
+        return f"{self.unit_number}  {self.building_name} , {self.street_name}, {self.city}"
 
 class Services(models.Model):
     SERVICE_NAMES = [
