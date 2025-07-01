@@ -131,7 +131,6 @@ export default function ProductsAndServices() {
                 </label>
 
                 <input
-                  type="number"
                   className="form-control rounded-0"
                   id="price"
                   name="price"
