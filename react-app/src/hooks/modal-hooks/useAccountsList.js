@@ -86,12 +86,33 @@ export default function useAccountsList() {
       .finally(() => setLoading(false));
   }
 
+  function seedAccounts() {
+    // setLoading(true);
+    // axios
+    //   .get(``)
+    //   .then((res) => {
+    //     console.log(res);
+    //     const newAccountsList = res.data.map((acc) => ({
+    //       accountName: acc.account_name,
+    //       accountNumber: acc.account_number,
+    //       accountsSector: acc.account_sector_details.name,
+    //       isEditable: false,
+    //     }));
+    //     setAccountsList(newAccountsList);
+    //   })
+    //   .catch((error) => {
+    //     toast.error("Error fetching accounts. " + userFriendlyErrorOrResponse(error));
+    //   })
+    //   .finally(() => setLoading(false));
+  }
+
   return {
     loading,
     showAdd,
     accountsSectors,
     mappableAccountsList,
     openAddForm,
+    seedAccounts,
     handleSubmit,
     closeAddForm,
     deleteAccount,

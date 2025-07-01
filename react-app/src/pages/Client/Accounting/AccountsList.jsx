@@ -13,8 +13,8 @@ export default function AccountsList() {
     handleSubmit,
     closeAddForm,
     deleteAccount,
+    seedAccounts,
   } = useAccountsList();
-  console.log(mappableAccountsList);
 
   return (
     <div>
@@ -90,7 +90,12 @@ export default function AccountsList() {
             <th>Account Name</th>
             <th>Accounts Sector</th>
             <th>
-              <CustomTable.AddRowButtonTemplate onClick={openAddForm} label="New" />
+              <CustomTable.ActionButtonsContainer>
+                <CustomTable.AddRowButtonTemplate onClick={openAddForm} label="New" />
+                <CustomTable.ActionButtonTemplate onClick={seedAccounts}>
+                  Get Accounts
+                </CustomTable.ActionButtonTemplate>
+              </CustomTable.ActionButtonsContainer>
             </th>
           </tr>
         </thead>
