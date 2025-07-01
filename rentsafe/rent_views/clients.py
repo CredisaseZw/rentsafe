@@ -3239,16 +3239,6 @@ def store_individual(request):
             land_line=data.get("land_line"),
             # address=data.get("address"),
             identification_type=data.get("identification_type"),
-            unit_number=data.get("unitNumber"),  # Address Fields
-            building_name=data.get("buildingName"),
-            street_number=data.get("streetNumber"),
-            street_name=data.get("streetName"),
-            suburb=data.get("suburb"),
-            city= data.get("city"),
-            province=data.get("province"),
-            country= data.get("country"),
-            area_code=data.get("areaCode"),
-            identification_number=data.get("identificationNumber").upper(),
             unit_number=data.get("unitNumber"),  ## Address Fields
             building_name=data.get("buildingName"),
             street_number=data.get("streetNumber"),

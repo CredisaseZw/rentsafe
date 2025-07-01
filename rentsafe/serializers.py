@@ -266,7 +266,9 @@ class CreateIndividualSchema(Schema):
     country = fields.Str(data_key="country",required=False)
     areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
     
-
+    
+    class Meta:
+        unknown = EXCLUDE
     
 class IndividualSchema(Schema):
     """
@@ -435,6 +437,9 @@ class CreateCompanySchema(Schema):
     country = fields.Str(data_key="country",required=False)
     areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
+    
+    class Meta:
+        unknown = EXCLUDE
 
 # Add-Lease
 class CreateIndividualLeaseSchema(Schema):
