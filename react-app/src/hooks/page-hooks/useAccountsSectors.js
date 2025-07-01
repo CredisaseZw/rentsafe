@@ -41,6 +41,20 @@ export default function useAccountsSectors() {
       .finally(() => setLoading(false));
   }
 
+  function deleteSector(sectorId) {
+    setLoading(true);
+    axios
+      .delete(`/accounting/account-sectors/${sectorId}`)
+      .then(() => {
+        setAccountsSectors((prev) => prev.filter((sector) => sector.id !== sectorId));
+        toast.success("Sector deleted!");
+      })
+      .catch((error) => {
+        toast.error("Error deleting sector. " + userFriendlyErrorOrResponse(error));
+      })
+      .finally(() => setLoading(false));
+  }
+
   return {
     showAdd,
     loading,
@@ -48,5 +62,6 @@ export default function useAccountsSectors() {
     openAddForm,
     closeAddForm,
     handleSubmit,
+    deleteSector,
   };
 }

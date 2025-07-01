@@ -4,8 +4,15 @@ import Layout from "../../../components/Layouts/client/Layout.jsx";
 import ContentModal from "../../../components/ContentModal.jsx";
 
 export default function AccountsSectors() {
-  const { accountsSectors, showAdd, loading, closeAddForm, handleSubmit, openAddForm } =
-    useAccountsSectors();
+  const {
+    accountsSectors,
+    showAdd,
+    loading,
+    closeAddForm,
+    handleSubmit,
+    openAddForm,
+    deleteSector,
+  } = useAccountsSectors();
   return (
     <div>
       <ContentModal
@@ -33,7 +40,7 @@ export default function AccountsSectors() {
           </div>
 
           <div className="mt-5 text-center">
-            <button disabled={loading} type="submit" className="btn btn-primary">
+            <CustomTable.ActionButtonTemplate disabled={loading} type="submit">
               {loading ? (
                 <>
                   <span className="spinner-grow spinner-grow-sm"></span>
@@ -42,17 +49,20 @@ export default function AccountsSectors() {
               ) : (
                 "Save"
               )}
-            </button>
+            </CustomTable.ActionButtonTemplate>
           </div>
         </form>
       </ContentModal>
 
       <CustomTable.Table tabletitle="Accounts Sectors" tabletitleBg="info" tabletitleColor="white">
-        <CustomTable.ColGroup ratios={[1, null]} />
+        <CustomTable.ColGroup ratios={[1, null, 1]} />
         <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
           <tr>
             <th>Code</th>
             <th>Sector</th>
+            <th>
+              <CustomTable.AddRowButtonTemplate onClick={openAddForm} label="New" />
+            </th>
           </tr>
         </thead>
 
@@ -61,18 +71,15 @@ export default function AccountsSectors() {
             <tr key={index}>
               <td className="text-nowrap">{sector.code}</td>
               <td>{sector.name}</td>
+              <td className="text-center">
+                <CustomTable.RemoveRowButtonTemplate onClick={() => deleteSector(sector.id)} />
+              </td>
             </tr>
           ))}
 
           {accountsSectors.length === 0 && <CustomTable.NothingToShow colSpan={2} />}
         </tbody>
       </CustomTable.Table>
-
-      <div className="p-3 text-end">
-        <CustomTable.ActionButtonTemplate icon="add" onClick={openAddForm}>
-          New
-        </CustomTable.ActionButtonTemplate>
-      </div>
     </div>
   );
 }
