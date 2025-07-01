@@ -417,6 +417,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "cash_books",
     "sales_invoicing",
     "accounts_list",
+    "view_only_accounts_list",
     "in_development",
     "detailed_general_ledger",
     "cash_books_list",

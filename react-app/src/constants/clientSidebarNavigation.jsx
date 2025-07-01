@@ -214,7 +214,7 @@ export const clientSidebarNavigation = [
                 navLink: "Accounts List",
                 color: "steelblue",
                 type: "link",
-                href: reverseUrl("accounts_list"),
+                href: reverseUrl("view_only_accounts_list"),
               },
             ],
           },

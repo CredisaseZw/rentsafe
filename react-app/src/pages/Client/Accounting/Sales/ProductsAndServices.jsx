@@ -80,20 +80,6 @@ export default function ProductsAndServices() {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="id" className="form-label">
-              Item Id
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="item_id"
-              name="item_id"
-              required
-              defaultValue={itemToEdit?.id}
-            />
-          </div>
-
-          <div className="mb-3">
             <label htmlFor="name" className="form-label">
               Item Name
             </label>
@@ -145,7 +131,6 @@ export default function ProductsAndServices() {
                 </label>
 
                 <input
-                  type="number"
                   className="form-control rounded-0"
                   id="price"
                   name="price"

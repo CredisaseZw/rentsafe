@@ -1,8 +1,17 @@
 import axios from "axios";
+import toast from "react-hot-toast";
+import { Inertia } from "@inertiajs/inertia";
 import { useEffect, useState } from "react";
+import { userFriendlyErrorOrResponse } from "../../utils";
+import { set } from "lodash";
 
 export default function useAccountsSectors() {
   const [accountsSectors, setAccountsSectors] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const closeAddForm = () => setShowAdd(false);
+  const openAddForm = () => setShowAdd(true);
 
   useEffect(() => {
     axios
@@ -15,5 +24,44 @@ export default function useAccountsSectors() {
       });
   }, []);
 
-  return { accountsSectors };
+  function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    const data = Object.fromEntries(new FormData(e.target).entries());
+
+    axios
+      .post("/accounting/account-sectors/", data)
+      .then((res) => {
+        setAccountsSectors((prev) => [...prev, res.data]);
+        closeAddForm();
+      })
+      .catch((error) => {
+        toast.error("Error adding account sector. " + userFriendlyErrorOrResponse(error));
+      })
+      .finally(() => setLoading(false));
+  }
+
+  function deleteSector(sectorId) {
+    setLoading(true);
+    axios
+      .delete(`/accounting/account-sectors/${sectorId}`)
+      .then(() => {
+        setAccountsSectors((prev) => prev.filter((sector) => sector.id !== sectorId));
+        toast.success("Sector deleted!");
+      })
+      .catch((error) => {
+        toast.error("Error deleting sector. " + userFriendlyErrorOrResponse(error));
+      })
+      .finally(() => setLoading(false));
+  }
+
+  return {
+    showAdd,
+    loading,
+    accountsSectors,
+    openAddForm,
+    closeAddForm,
+    handleSubmit,
+    deleteSector,
+  };
 }
