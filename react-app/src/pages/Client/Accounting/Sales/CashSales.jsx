@@ -326,7 +326,7 @@ export default function CashSales() {
         </div>
 
         <div className="text-end p-3">
-          <CustomTable.ActionButtonTemplate disabled={isLoading}>
+          <CustomTable.ActionButtonTemplate disabled={isLoading} type="submit">
             {isLoading ? (
               <>
                 <span className="spinner-grow spinner-grow-sm"></span>

@@ -71,7 +71,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="address"
                   id="address"
                   placeholder="Address..."
@@ -86,7 +85,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="phone"
                   id="phone"
                   placeholder="Phone..."
@@ -95,13 +93,12 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 />
               </div>
 
-              <div className="mb-2 d-flex gap-4 align-items-center">
+              <div className="d-flex gap-4 align-items-center">
                 <label htmlFor="email" className="form-label">
                   Email:
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="email"
                   id="email"
                   placeholder="Email..."
@@ -118,7 +115,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="vat_no"
                   id="vat_no"
                   placeholder="VAT No...."
@@ -133,7 +129,6 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="tin"
                   id="tin"
                   placeholder="TIN..."
@@ -142,13 +137,12 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
                 />
               </div>
 
-              <div className="mb-2 d-flex gap-4 align-items-center">
+              <div className="d-flex gap-4 align-items-center">
                 <label htmlFor="date" className="form-label">
                   Date:
                 </label>
                 <input
                   className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                  required
                   name="date"
                   defaultValue={new Date().toISOString().split("T")[0]}
                   max={new Date().toISOString().split("T")[0]}
@@ -275,7 +269,9 @@ export function SalesInvoiceForm({ invoice, triggerLabel, triggerVariant, isProf
           </CustomTable.Table>
 
           <div className="text-end">
-            <CustomTable.ActionButtonTemplate>Submit</CustomTable.ActionButtonTemplate>
+            <CustomTable.ActionButtonTemplate type="submit">
+              Submit
+            </CustomTable.ActionButtonTemplate>
           </div>
 
           {isLoading && (

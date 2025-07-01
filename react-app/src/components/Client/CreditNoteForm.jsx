@@ -38,22 +38,7 @@ export function CreditNoteForm({ creditNote }) {
           <div className="p-4">
             <div className="row row-cols-2 pb-3 text-nowrap">
               <div className="col">
-                <div className="mb-3 d-flex gap-4 align-items-center">
-                  <label htmlFor="document_number" className="form-label">
-                    Document Number:
-                  </label>
-                  <input
-                    className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
-                    name="document_number"
-                    id="document_number"
-                    placeholder="e.g 112108"
-                    readOnly={Boolean(creditNoteData?.document_number)}
-                    defaultValue={creditNoteData?.document_number}
-                  />
-                </div>
-
-                <div className="mb-3 d-flex gap-4 align-items-center justify-content-between">
+                <div className="mb-2 d-flex gap-4 align-items-center justify-content-between">
                   <label htmlFor="credit_to" className="form-label">
                     Credit To:
                   </label>
@@ -70,13 +55,12 @@ export function CreditNoteForm({ creditNote }) {
                   )}
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="address" className="form-label">
                     Address:
                   </label>
                   <input
                     className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
                     name="address"
                     id="address"
                     placeholder="Address..."
@@ -85,13 +69,12 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="phone" className="form-label">
                     Phone:
                   </label>
                   <input
                     className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
                     name="phone"
                     id="phone"
                     placeholder="Phone..."
@@ -99,16 +82,13 @@ export function CreditNoteForm({ creditNote }) {
                     readOnly={Boolean(creditNoteData?.phone)}
                   />
                 </div>
-              </div>
 
-              <div className="col">
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="d-flex gap-4 align-items-center">
                   <label htmlFor="email" className="form-label">
                     Email:
                   </label>
                   <input
                     className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
                     name="email"
                     id="email"
                     placeholder="Email..."
@@ -116,14 +96,15 @@ export function CreditNoteForm({ creditNote }) {
                     readOnly={Boolean(creditNoteData?.email)}
                   />
                 </div>
+              </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+              <div className="col">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="vat_no" className="form-label">
                     VAT No.:
                   </label>
                   <input
                     className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
                     name="vat_no"
                     id="vat_no"
                     placeholder="VAT No...."
@@ -132,13 +113,12 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="mb-2 d-flex gap-4 align-items-center">
                   <label htmlFor="tin" className="form-label">
                     TIN:
                   </label>
                   <input
                     className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
                     name="tin"
                     id="tin"
                     placeholder="TIN..."
@@ -147,13 +127,12 @@ export function CreditNoteForm({ creditNote }) {
                   />
                 </div>
 
-                <div className="mb-3 d-flex gap-4 align-items-center">
+                <div className="d-flex gap-4 align-items-center">
                   <label htmlFor="date" className="form-label">
                     Date:
                   </label>
                   <input
                     className="form-control form-control-sm border-0 border-bottom flex-fill border-3 "
-                    required
                     name="date"
                     defaultValue={new Date().toISOString().split("T")[0]}
                     max={new Date().toISOString().split("T")[0]}

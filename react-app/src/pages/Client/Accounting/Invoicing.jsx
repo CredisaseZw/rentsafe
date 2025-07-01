@@ -39,7 +39,7 @@ export default function Invoicing(props) {
         tabletitleBg="info"
       >
         <CustomTable.ColGroup
-          ratios={pastDue ? [1, 1, 1, 1, 1, 1, 1, 1, 1, 1] : [1, 1, 1, 1, 1, 1, 1, 1, 1]}
+          ratios={pastDue ? [1, 1, null, 1, 1, 1, 1, 1, 1, 1] : [1, null, 1, 1, 1, 1, 1, 1, 1]}
         />
 
         <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
@@ -106,7 +106,7 @@ export default function Invoicing(props) {
 
               <td>
                 <input
-                  className="form-control form-control-sm"
+                  className="form-control form-control-sm custom-mn-w-15"
                   value={invoice.tenant_acc_no}
                   onChange={(e) =>
                     usdDispatch({
@@ -120,7 +120,7 @@ export default function Invoicing(props) {
 
               <td>
                 <input
-                  className="form-control form-control-sm"
+                  className="form-control form-control-sm custom-mn-w-07"
                   value={invoice.invoice_no}
                   onChange={(e) =>
                     usdDispatch({
@@ -223,7 +223,7 @@ export default function Invoicing(props) {
 
               <td>
                 <input
-                  className="form-control form-control-sm"
+                  className="form-control form-control-sm custom-mn-w-15"
                   value={invoice.tenant_acc_no}
                   onChange={(e) =>
                     zwlDispatch({
@@ -237,7 +237,7 @@ export default function Invoicing(props) {
 
               <td>
                 <input
-                  className="form-control form-control-sm"
+                  className="form-control form-control-sm custom-mn-w-07"
                   value={invoice.invoice_no}
                   onChange={(e) =>
                     zwlDispatch({
