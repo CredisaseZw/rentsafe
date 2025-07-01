@@ -90,12 +90,7 @@ export default function AccountsList() {
             <th>Account Name</th>
             <th>Accounts Sector</th>
             <th>
-              <CustomTable.ActionButtonsContainer>
-                <CustomTable.AddRowButtonTemplate onClick={openAddForm} label="New" />
-                <CustomTable.ActionButtonTemplate onClick={seedAccounts}>
-                  Get Accounts
-                </CustomTable.ActionButtonTemplate>
-              </CustomTable.ActionButtonsContainer>
+              <CustomTable.AddRowButtonTemplate onClick={openAddForm} label="New" />
             </th>
           </tr>
         </thead>
@@ -119,6 +114,12 @@ export default function AccountsList() {
           )}
         </tbody>
       </CustomTable.Table>
+
+      <div className="p-3 text-end">
+        <CustomTable.ActionButtonTemplate onClick={seedAccounts}>
+          Get Accounts
+        </CustomTable.ActionButtonTemplate>
+      </div>
     </div>
   );
 }
