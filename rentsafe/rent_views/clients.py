@@ -2970,15 +2970,7 @@ def company_report(request):
             "trading_status": trading_status,
             "website": website,
             "telephone": telephone,
-            "current_address": (
-                f"{'Unit' + company_profile.unit_number if company_profile.unit_number else ''} "
-                f"{company_profile.building_name + 'Building' if company_profile.building_name else ''} , "
-                f"{company_profile.street_name + 'Street' if company_profile.street_name else ''} , "
-                f"{company_profile.suburb or ''}, "
-                f"{company_profile.city or ''}, "
-                f"{company_profile.province or ''}, "
-                f"{company_profile.country or ''}"
-            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A",
+            "current_address": current_address,
             "mobile_phone": mobile_phone,
             "email": email,
         }
