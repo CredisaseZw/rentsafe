@@ -161,9 +161,9 @@ class CommsHistMessageAdmin(admin.ModelAdmin):
 
 @admin.register(Landlord)
 class LandlordAdmin(admin.ModelAdmin):
-    list_display = ("id","landlord_name","reg_ID_Number","opening_balance")
-    list_display_links = ("id","landlord_name","reg_ID_Number")
-    search_fields = ("landlord_name","reg_ID_Number")
+    list_display = ("id","landlord_name","reg_ID_Number","opening_balance","landlord_id")
+    list_display_links = ("id","landlord_name","reg_ID_Number","landlord_id")
+    search_fields = ("landlord_name","reg_ID_Number","landlord_id")
     ordering =["-created_at"]
 
 @admin.register(LeaseReceiptBreakdown)
