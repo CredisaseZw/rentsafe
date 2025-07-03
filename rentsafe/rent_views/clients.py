@@ -2191,6 +2191,8 @@ def create_bulk_individuals_helper(request):
     valid_national_id = False
     next(reader)
     for i, row in enumerate(reader):
+        if len(row) < 22 or not row[0].strip():
+            continue
         first_name = row[0].upper()                                                     
         last_name = row[1].upper()
         identification_type = row[2].lower()
@@ -2198,13 +2200,21 @@ def create_bulk_individuals_helper(request):
         gender = row[4].upper()
         dob = row[5]
         marital_status = row[6]
-        address = row[7]
-        mobile_number = row[8]
-        landline = row[9]
-        email = row[10]
-        current_employer = row[11]
-        job_title = row[12]
-        date_of_employment = row[13]
+        mobile_number = row[7]
+        landline = row[8]
+        email = row[9]
+        current_employer = row[10]
+        job_title = row[11]
+        date_of_employment = row[12]
+        unit_number= row[13]  ## Address Fields
+        building_name = row[14]
+        street_number= row[15]
+        street_name= row[16]
+        suburb= row[17]
+        city= row[18]
+        province= row[19]
+        country= row[20]
+        area_code= row[21]
         errors = []
         if dob:
             dob_object = convert_to_django_date(dob)
@@ -2242,14 +2252,22 @@ def create_bulk_individuals_helper(request):
                 identification_type=identification_type,
                 gender=gender,
                 dob=dob,
-                address=address,
                 is_verified=True,
                 mobile=mobile_number,
                 land_line=landline,
                 email=email,
+                unit_number=unit_number,
+                building_name=building_name,
+                street_number=street_number,
+                street_name=street_name,
+                suburb=suburb,
+                city=city,
+                province=province,
+                country=country,
+                area_code=area_code,
             )
             if not Individual.objects.filter(
-                ident=identification_number
+                identification_number=identification_number
             ).exists():
                 individual.save()
                 individual_employment_detail = EmployementDetails(
@@ -2304,17 +2322,25 @@ def _extracted_from_create_bulk_individuals_115(skipped_rows, request):
             "Gender",
             "Date of Birth",
             "Marital Status",
-            "Address",
             "Mobile Number",
             "Landline",
             "Email Address",
             "Current Employer",
             "Job Title",
             "Date of Employment",
+            "Unit Number",
+            "Building Name",
+            "Street Number",
+            "Street Name",
+            "Suburb",
+            "City",
+            "Province",
+            "Country",
+            "Area Code",
             "Errors",
         ]
     )
-    writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", ""])
+    writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""])
     writer.writerows(skipped_rows)
     output.seek(0)
 
@@ -3291,7 +3317,7 @@ def store_individual(request):
         hash_password = make_password(user_password)
         # create user
         user = CustomUser(
-            email=individual.identification_number,
+            email=individual.email,
             is_superuser=False,
             company=0,
             individual=individual.id,
