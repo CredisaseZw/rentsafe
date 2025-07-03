@@ -2489,20 +2489,30 @@ def create_bulk_companies_helper(request):
     created_rows = []
     next(reader)
     for i, row in enumerate(reader):
+        if len(row) < 22 or not row[0].strip():
+            continue
         registered_name = row[0].upper() + " " + row[2].upper()
         trading_name = row[1].upper()
         branch = row[2]
         registration_number = row[3].upper()
         registration_date = row[4]
         vat_number = row[5]
-        current_address = row[6]
-        landline = row[7]
-        mobile_number = row[8]
-        email = row[9]
-        website = row[10]
-        industry = row[11]
-        is_government = row[12]
-        note = row[13]
+        landline = row[6]
+        mobile_number = row[7]
+        email = row[8]
+        website = row[9]
+        industry = row[10]
+        is_government = row[11]
+        note = row[12]
+        unit_number= row[13]  ## Address Fields
+        building_name = row[14]
+        street_number= row[15]
+        street_name= row[16]
+        suburb= row[17]
+        city= row[18]
+        province= row[19]
+        country= row[20]
+        area_code= row[21]
         errors = []
         if registration_date:
             registration_date_ob = convert_to_django_date(registration_date)
@@ -2537,13 +2547,21 @@ def create_bulk_companies_helper(request):
                             company=company.id,
                             registration_date=(registration_date or None),
                             vat_number=vat_number,
-                            current_address=current_address,
                             mobile_phone=mobile_number,
                             email=email,
                             website=website,
                             landline_phone=landline,
                             note=note,
                             branch=branch,
+                            unit_number=unit_number,
+                            building_name=building_name,
+                            street_number=street_number,
+                            street_name=street_name,
+                            suburb=suburb,
+                            city=city,
+                            province=province,
+                            country=country,
+                            area_code=area_code,
                         )
                         user_password = generate_otp()
                         hash_password = make_password(user_password)
@@ -2583,7 +2601,6 @@ def create_bulk_companies_helper(request):
                 "Registration Number",
                 "Registration Date",
                 "VAT Number",
-                "Current Address",
                 "Landline Phone",
                 "Mobile Number",
                 "Email Address",
@@ -2591,10 +2608,19 @@ def create_bulk_companies_helper(request):
                 "Industry",
                 "Is Government",
                 "Note",
+                "Unit Number",
+                "Building Name",
+                "Street Number",
+                "Street Name",
+                "Suburb",
+                "City",
+                "Province",
+                "Country",
+                "Area Code",
                 "Errors",
             ]
         )
-        writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", "",""])
+        writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""])
         writer.writerows(skipped_rows)
         output.seek(0)  # Reset the file pointer
 
@@ -2924,8 +2950,8 @@ def company_report(request):
                 f"{company_profile.suburb or ''}, "
                 f"{company_profile.city or ''}, "
                 f"{company_profile.province + ' Province' if company_profile.province else ''}, "
-                f"{company_profile.country or ''}"
-                f"  code : {company_profile.area_code or ''}, "
+                f"{company_profile.country or ''} "
+                f"{' Code: ' + company_profile.area_code if company_profile.area_code else ''}, "
             ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
             mobile_phone = company_profile.mobile_phone or "N/A"
             email = company_profile.email or "N/A"
