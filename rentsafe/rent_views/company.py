@@ -1736,6 +1736,15 @@ def search_individual_users(request):
                                     "job_tittle": employment_details.job_title if employment_details else None,
                                     "is_verified": individual_ob.is_verified,
                                     "created_at": individual_ob.created_at,
+                                    "unit_number": individual_ob.unit_number,
+                                    "building_name": individual_ob.building_name,
+                                    "street_number": individual_ob.street_number,
+                                    "street_name": individual_ob.street_name,
+                                    "suburb": individual_ob.suburb,
+                                    "city": individual_ob.city,
+                                    "province": individual_ob.province,
+                                    "country": individual_ob.country,
+                                    "area_code": individual_ob.area_code,
                                 }
                             }
                         )

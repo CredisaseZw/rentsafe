@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=255,
                         null=True,
-                        on_delete=django.db.models.deletion.PROTECT,
+                        on_delete=django.db.models.deletion.SET_NULL,
                         related_name="lease_address",
                         to="rentsafe.lease",
                     ),
