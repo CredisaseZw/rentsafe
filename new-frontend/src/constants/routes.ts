@@ -6,15 +6,18 @@ import type { Route } from "@/types";
 
 export const ROOT_ROUTES: Route[] = [
    {
+      label: "Home",
       path: "/",
       component: Home,
    },
    {
+      label: "Services Hub",
       path: "/services",
       component: ServicesHub,
       isIndex: true,
    },
    {
+      label: "Not Found",
       path: "*",
       component: NotFound,
    },
