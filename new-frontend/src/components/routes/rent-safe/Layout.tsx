@@ -1,11 +1,16 @@
 import { Outlet } from "react-router";
 import Sidebar from "./Sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function Layout() {
    return (
-      <div className="grid grid-cols-[1fr_3fr] gap-4">
+      <SidebarProvider>
          <Sidebar />
-         <Outlet />
-      </div>
+
+         <div>
+            <SidebarTrigger />
+            <Outlet />
+         </div>
+      </SidebarProvider>
    );
 }
