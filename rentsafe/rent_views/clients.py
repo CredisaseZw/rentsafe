@@ -806,27 +806,28 @@ def edit_lease(request):
                 opening_balance_ob.receipt_number = "Opening Balance"
                 opening_balance_ob.save()
         else:
-            landlord = Landlord(
-                user_id=request.user.id,
-                lease_id=lease_id,
-                landlord_id=landlord_ob.id if landlord_ob else None,
-                reg_ID_Number=data.get("regIdNumber"),
-                opening_balance=data.get('openingBalance'),
-                landlord_name=data.get("landlordName"),
-                is_individual=data.get("landlordType").upper()
-                == LandLordType.INDIVIDUAL,
-                is_company=data.get("landlordType").upper() == LandLordType.COMPANY,
-                agent_commission=float(data.get("commission")),
-            )
-            landlord.save()
-            
-            LeaseReceiptBreakdown.objects.create(
-                lease_id=lease_id,
-                landlord_id=landlord.id,
-                total_amount=data.get('openingBalance'),
-                base_amount=data.get('openingBalance'),
-                receipt_number='Opening Balance',
-            )
+            if len(data.get("landlordName")) > 4:
+                landlord = Landlord(
+                    user_id=request.user.id,
+                    lease_id=lease_id,
+                    landlord_id=landlord_ob.id if landlord_ob else None,
+                    reg_ID_Number=data.get("regIdNumber"),
+                    opening_balance=data.get('openingBalance'),
+                    landlord_name=data.get("landlordName"),
+                    is_individual=data.get("landlordType").upper()
+                    == LandLordType.INDIVIDUAL,
+                    is_company=data.get("landlordType").upper() == LandLordType.COMPANY,
+                    agent_commission=float(data.get("commission")),
+                )
+                landlord.save()
+                
+                LeaseReceiptBreakdown.objects.create(
+                    lease_id=lease_id,
+                    landlord_id=landlord.id,
+                    total_amount=data.get('openingBalance'),
+                    base_amount=data.get('openingBalance'),
+                    receipt_number='Opening Balance',
+                )
 
         if lease:
             if str(lease.leasee_mobile) != str(data.get("lesseePhone")) :
@@ -982,7 +983,7 @@ def create_individual_lease_helper(request):
             ind_lease = True
             # add landlord to lease
             landlord_id = None
-            if data.get("landlordType"):
+            if data.get("landlordType") and data.get("landlordName") != '':
                 if data.get("landlordType").upper() == LandLordType.INDIVIDUAL:
                     individual = Individual.objects.filter(
                         identification_number__iexact=identificationNumber
@@ -1001,7 +1002,7 @@ def create_individual_lease_helper(request):
                 leasee_mobile=data.get("lesseePhone"),
                 is_individual=ind_lease,
                 is_active=True,
-                landlord_id =landlord_id if data.get("landlordType") else None,
+                landlord_id =landlord_id if data.get("landlordName") != '' else None,
                 lease_details=data.get("leaseDetails"),
                 start_date=data.get("leaseStartDate"),
                 rent_guarantor_id=data.get("rentGuarantorId",identificationNumber).upper(),
@@ -1019,7 +1020,7 @@ def create_individual_lease_helper(request):
             lease.save()
 
             try:
-                if landlord_id:
+                if data.get("landlordName") != '':
                     landlord = Landlord(
                         user_id=request.user.id,
                         lease_id=lease.lease_id,
@@ -1453,17 +1454,17 @@ def create_company_lease_helper(request):
             balance_amount = float(data.get("outStandingBalance"))
             comp_lease = True
             landlord_id = None
-
-            if data.get("landlordType").upper() == LandLordType.INDIVIDUAL:
-                individual = Individual.objects.filter(
-                    identification_number=data.get("regIdNumber")
-                ).first()
-                landlord_id = individual.id if individual else 0
-            elif data.get("landlordType").upper() == LandLordType.COMPANY:
-                company = Company.objects.filter(
-                    registration_number=data.get("regIdNumber")
-                ).first()
-                landlord_id = company.id if company else 0
+            if data.get("landlordType") and data.get("landlordName") != '':
+                if data.get("landlordType").upper() == LandLordType.INDIVIDUAL:
+                    individual = Individual.objects.filter(
+                        identification_number=data.get("regIdNumber")
+                    ).first()
+                    landlord_id = individual.id if individual else 0
+                elif data.get("landlordType").upper() == LandLordType.COMPANY:
+                    company = Company.objects.filter(
+                        registration_number=data.get("regIdNumber")
+                    ).first()
+                    landlord_id = company.id if company else 0
             lease = Lease(
                 reg_ID_Number=identificationNumber,
                 lease_giver=request.user.company,
@@ -1471,7 +1472,7 @@ def create_company_lease_helper(request):
                 leasee_mobile=(data.get("lesseePhone") or None),
                 rent_guarantor_id=data.get("rentGuarantorId").upper(),
                 is_company=comp_lease,
-                landlord_id=landlord_id,
+                landlord_id=landlord_id if landlord_id and data.get("landlordName") != '' else None,
                 is_active=True,
                 lease_details=data.get("leaseDetails"),
                 start_date=data.get("leaseStartDate"),
@@ -1495,7 +1496,7 @@ def create_company_lease_helper(request):
             lease.save()
 
             # add agent to lease
-            if data.get("regIdNumber"):
+            if data.get("regIdNumber") and data.get("landlordName") != '':
                 landlord = Landlord(
                     user_id=request.user.id,
                     lease_id=lease.lease_id,
@@ -5448,7 +5449,6 @@ def create_receipt_and_payments(request):
         new_base_amount = base_amount
         total_amount_paid = base_amount
         if landlord:
-            
             if lease_exists:= LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).last():
                 new_base_amount = lease_exists.base_amount+float(base_amount)
                 total_amount_paid = lease_exists.total_amount+float(base_amount)
@@ -5464,7 +5464,6 @@ def create_receipt_and_payments(request):
             )
 
             payment_breakdown.save()
-
         if opening_balance_ob:
             balance_amount = opening_balance_ob.outstanding_balance
 
@@ -5486,7 +5485,6 @@ def create_receipt_and_payments(request):
             total_amount_paid = float(lease.get("paymentAmount"))
             process_payment(total_amount_paid, lease_id)
             lease_status = check_lease_status(lease_id)
-
             lease_receiver = Lease.objects.filter(
                 lease_id=opening_balance_ob.lease_id
             ).first()
