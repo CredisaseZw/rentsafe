@@ -8,7 +8,7 @@ export default function App() {
          <Routes>
             <Route element={<RootLayout />}>
                {ROUTES.map((route) => (
-                  <Route key={route.href} path={route.href} element={<route.component />} />
+                  <Route index={route.isIndex} key={route.href} path={route.href} element={<route.component />} />
                ))}
             </Route>
          </Routes>
