@@ -1232,25 +1232,35 @@ def create_individual_bulk_leases_helper(request):
                 subscription_class="combined",
             ).last()
         for i, row in enumerate(reader):
-
+            print("_______-----______------________-----SOul Provider----________------___--")
+            # if len(row) < 25  or not row[0].strip():
+            #     continue
             identificationNumber = row[0].upper()
             accountNumber = row[1]
             leaseMobileNumber = row[2]
-            leaseAddress = row[3]
-            leaseDetails = row[4]
-            leaseCurrency = row[5]
-            monthlyRental = row[6]
-            isVariable = row[7]
-            depositPeriod = row[8]
-            depositAmount = row[9]
-            leaseStartDate = row[10]
-            paymentPeriodEnd = row[11]
-            current_month = row[12]
-            one_month_back = row[13]
-            two_months_back = row[14]
-            three_months_back = row[15]
-            more_than_three_months_back = row[16]
-
+            unit_number = row[3]
+            building_name = row[4]
+            street_number = row[5]
+            street_name = row[6]
+            suburb = row[7]
+            city = row[8]
+            province = row[9]
+            country = row[10]
+            area_code = row[11]
+            leaseDetails = row[12]
+            leaseCurrency = row[13]
+            monthlyRental = row[14]
+            isVariable = row[15]
+            depositPeriod = row[16]
+            depositAmount = row[17]
+            leaseStartDate = row[18]
+            paymentPeriodEnd = row[19]
+            current_month = row[20]
+            one_month_back = row[21]
+            two_months_back = row[22]
+            three_months_back = row[23]
+            more_than_three_months_back = row[24]
+            
             errors = []
             current_month = float(current_month) if current_month != "" else 0
             one_month_back = float(one_month_back) if one_month_back != "" else 0
@@ -1282,7 +1292,6 @@ def create_individual_bulk_leases_helper(request):
                                 reg_ID_Number=identificationNumber,
                                 lease_giver=request.user.company,
                                 lease_activator=request.user.id,
-                                address=leaseAddress,
                                 rent_guarantor_id=identificationNumber,
                                 is_individual=True,
                                 lease_details=leaseDetails,
@@ -1302,6 +1311,19 @@ def create_individual_bulk_leases_helper(request):
                                 payment_period_end=paymentPeriodEnd,
                             )
                             lease.save()
+                            lease_address = LeaseAddress(
+                                lease_id=lease,
+                                unit_number=unit_number,
+                                building_name=building_name,
+                                street_number=street_number,
+                                street_name=street_name,
+                                suburb=suburb,
+                                city=city,
+                                province=province,
+                                country=country,
+                                area_code=area_code,
+                            )
+                            lease_address.save()
                             out_standing_balance = float(
                                 current_month
                                 + one_month_back
@@ -1358,7 +1380,7 @@ def create_individual_bulk_leases_helper(request):
                             (
                                 leeseeName,
                                 leaseDetails,
-                                lease_start_date,
+                                lease_sturart_date,
                                 currency,
                                 end_date,
                                 deposit_amount,
@@ -1434,7 +1456,15 @@ def return_skipped_rows(skipped_rows, request):
             "Identification Number",
             "Account Number",
             "Lease Mobile Number",
-            "Lease Address",
+            "Unit Number",
+            "Building Name",
+            "Street Number",
+            "Street Name",
+            "Suburb",
+            "City",
+            "Province",
+            "Country",
+            "Area Code",
             "Lease Details",
             "Lease Currency",
             "Monthly Rental",
@@ -1453,6 +1483,14 @@ def return_skipped_rows(skipped_rows, request):
     )
     writer.writerow(
         [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "",
             "",
             "",
