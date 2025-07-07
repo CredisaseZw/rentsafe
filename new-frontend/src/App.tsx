@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ROUTES } from "./constants";
-import RootLayout from "./components/layout/RootLayout";
+import RootLayout from "./components/general/RootLayout";
 
 export default function App() {
    return (

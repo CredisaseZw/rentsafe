@@ -1,4 +1,4 @@
-import ServiceCard from "@/components/pages/services/ServiceCard";
+import ServiceCard from "@/components/routes/services/ServiceCard";
 import { SERVICES } from "@/constants";
 
 export default function ServicesHub() {
