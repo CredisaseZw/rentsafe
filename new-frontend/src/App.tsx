@@ -1,15 +1,27 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import { ROUTES } from "./constants";
 import RootLayout from "./components/general/RootLayout";
+import { RENTSAFE_ROUTES, ROOT_ROUTES } from "./constants/routes";
+import RentsafeLayout from "./components/routes/rent-safe/Layout";
 
 export default function App() {
    return (
       <BrowserRouter>
          <Routes>
             <Route element={<RootLayout />}>
-               {ROUTES.map((route) => (
-                  <Route index={route.isIndex} key={route.href} path={route.href} element={<route.component />} />
+               {ROOT_ROUTES.map((route) => (
+                  <Route index={route.isIndex} key={route.path} path={route.path} element={<route.component />} />
                ))}
+
+               <Route path="/services/rent-safe" element={<RentsafeLayout />}>
+                  {RENTSAFE_ROUTES.map((route) => (
+                     <Route
+                        index={route.isIndex}
+                        key={route.path}
+                        path={"/services/rent-safe" + route.path}
+                        element={<route.component />}
+                     />
+                  ))}
+               </Route>
             </Route>
          </Routes>
       </BrowserRouter>

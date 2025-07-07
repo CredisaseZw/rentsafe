@@ -1,5 +1,5 @@
 export type Route = {
-   href: string;
+   path: string;
    component: React.FC;
    isIndex?: boolean;
 };
