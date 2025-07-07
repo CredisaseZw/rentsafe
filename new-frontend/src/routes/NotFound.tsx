@@ -1,11 +1,10 @@
+import BackBtn from "@/components/general/BackBtn";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Home } from "lucide-react";
+import { Link, useLocation } from "react-router";
 
 export default function NotFound() {
    const { pathname } = useLocation();
-   const navigate = useNavigate();
-   const goBack = () => navigate(-1);
 
    return (
       <div>
@@ -16,10 +15,7 @@ export default function NotFound() {
          <p className="mt-4 text-center">This page is either still in development or does not exist.</p>
 
          <div className="mt-8 flex justify-center gap-2">
-            <Button onClick={goBack}>
-               <ArrowLeft />
-               Go Back
-            </Button>
+            <BackBtn verbose />
 
             <Button variant="secondary" size="icon" asChild>
                <Link to="/">
