@@ -12,7 +12,8 @@
       "check-types": "tsc --noEmit",
       "qc": "pnpm check-types && pnpm lint",
       "fmt": "prettier . --write",
-      "check-fmt": "prettier . --check"
+      "check-fmt": "prettier . --check",
+      "shadcn-add": "pnpm dlx shadcn@latest add"
    },
    "dependencies": {
       "@tailwindcss/vite": "^4.1.11",
