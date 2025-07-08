@@ -459,6 +459,17 @@ def destroy_agent(request):
 @login_required
 @clients_required
 def get_company(request):
+    send_otp(
+        request.build_absolute_uri(),
+        generate_otp(),
+        'gtkandeya@gmail.com',
+        request.user.company,
+        1,
+        "company",
+        settings.ADD_COMPANY,
+        'new_message',
+    )
+    print('otps sent....')
     if request.method != "POST":
         return JsonResponse({"status": "failed"}, safe=False)
     get_company_schema = GetCompanySchema()
