@@ -16,6 +16,7 @@ import LeaseManagement from "@/routes/rent-safe/LeaseManagement";
 import CurrencySettings from "@/routes/rent-safe/CurrencySettings";
 import RentSafeDashboard from "@/routes/rent-safe/Dashboard";
 import SubscriptionManagement from "@/routes/rent-safe/SubscriptionManagement";
+import Login from "@/routes/Login";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -23,6 +24,12 @@ export const ROOT_NAVLINKS: NavLink[] = [
       path: "/",
       segment: "/",
       pageComponent: Home,
+   },
+   {
+      label: "Login",
+      path: "/login",
+      segment: "/login",
+      pageComponent: Login,
    },
    {
       label: "Services Hub",
