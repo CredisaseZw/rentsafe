@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import RootLayout from "./components/general/RootLayout";
-import { RENTSAFE_ROUTES, ROOT_ROUTES } from "./constants/routes";
+import { RENTSAFE_ROUTES, ROOT_ROUTES } from "./constants";
 import RentsafeLayout from "./components/routes/rent-safe/Layout";
+import RootLayout from "./components/general/RootLayout";
 
 export default function App() {
    return (
@@ -9,16 +9,15 @@ export default function App() {
          <Routes>
             <Route element={<RootLayout />}>
                {ROOT_ROUTES.map((route) => (
-                  <Route index={route.isIndex} key={route.path} path={route.path} element={<route.component />} />
+                  <Route key={route.path} path={route.path.replace("//", "/")} element={<route.pageComponent />} />
                ))}
 
                <Route path="/services/rent-safe" element={<RentsafeLayout />}>
                   {RENTSAFE_ROUTES.map((route) => (
                      <Route
-                        index={route.isIndex}
                         key={route.path}
-                        path={"/services/rent-safe" + route.path}
-                        element={<route.component />}
+                        path={("/services/rent-safe" + route.path).replace("//", "/")}
+                        element={<route.pageComponent />}
                      />
                   ))}
                </Route>

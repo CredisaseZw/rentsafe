@@ -17,7 +17,7 @@ export function navlinksToRoutes(navLinks: NavLink[]): Route[] {
          return {
             label: navLink.label,
             path: navLink.path,
-            component: navLink._component || EmptyComponent,
+            pageComponent: navLink.pageComponent || EmptyComponent,
          } as Route;
       })
       .flat();

@@ -1,13 +1,12 @@
 export type Route = {
    label: string;
    path: string;
-   component: React.FC;
-   isIndex?: boolean;
+   pageComponent: React.FC;
 };
 
 export type NavLink = {
    label: string;
    path?: string;
    subLinks?: NavLink[];
-   _component?: React.FC;
+   pageComponent?: React.FC;
 };

@@ -32,7 +32,7 @@ export default function SidebarItem({ navLink }: { navLink: NavLink }) {
       return (
          <SidebarMenuItem className="rounded-sm">
             <SidebarMenuButton asChild>
-               <Link to={"/services/rent-safe/" + navLink.path}>
+               <Link to={("/services/rent-safe/" + navLink.path).replace("//", "/")}>
                   {/* <navLink.icon /> */}
                   <span>{navLink.label}</span>
                </Link>

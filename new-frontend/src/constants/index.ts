@@ -1,5 +1,8 @@
+import type { Route } from "@/types";
 import type { Service } from "@/interfaces";
+import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
+import { RENTSAFE_NAVLINKS, ROOT_NAVLINKS } from "./navlinks";
 
 export const SERVICES: Service[] = [
    {
@@ -15,3 +18,7 @@ export const SERVICES: Service[] = [
       icon: ChartColumnDecreasingIcon,
    },
 ];
+
+export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes(RENTSAFE_NAVLINKS);
+
+export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);

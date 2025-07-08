@@ -1,3 +1,3 @@
 export default function Dashboard() {
-   return <div>rentsafe Dashboard</div>;
+   return <div>Dashboard</div>;
 }
