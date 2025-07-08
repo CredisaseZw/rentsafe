@@ -11,11 +11,37 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(override=True) 
+BASE_DIR = Path(__file__).resolve().parent.parent
+TIME_ZONE = "Africa/Harare"
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ["SECRET_KEY"]
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ["EMAIL_HOST"]
+EMAIL_PORT = os.environ["EMAIL_PORT"]
+EMAIL_USE_SSL = os.environ["EMAIL_USE_SSL"]
+EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
+SMS_USERNAME = os.environ["SMS_USERNAME"]
+SMS_PASSWORD = os.environ["SMS_PASSWORD"]
+SMS_API_KEY = os.environ["SMS_API_KEY"]
+# twilio
+ACCOUNT_SID = os.environ["ACCOUNT_SID"]
+AUTH_TOKEN = os.environ["AUTH_TOKEN"]
+
+#Whatsapp bot Settings
+WHATSAPP_API_MEDIA_URL= os.environ["WHATSAPP_API_MEDIA_URL"]
+WHATSAPP_API_URL = os.environ["WHATSAPP_API_URL"]
+WHATSAPP_ACCESS_TOKEN = os.environ["WHATSAPP_ACCESS_TOKEN"]
+WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -66,7 +92,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,12 +111,83 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+
+
+DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
+DB_USERNAME = os.getenv('DB_USERNAME' , None)
+DB_PASS     = os.getenv('DB_PASS'     , None)
+DB_HOST     = os.getenv('DB_HOST'     , None)
+DB_PORT     = os.getenv('DB_PORT'     , None)
+DB_NAME     = os.getenv('DB_NAME'     , None)
+
+
+if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
+    print("Development mode")
+    DATABASES = { 
+        'default': {
+        'ENGINE'  : DB_ENGINE,
+        'NAME'    : DB_NAME,
+        'USER'    : DB_USERNAME,
+        'PASSWORD': DB_PASS,
+        'HOST'    : DB_HOST,
+        'PORT'    : DB_PORT,
+        }
     }
+else:
+    tmpPostgres =urlparse(os.getenv("PROD_DATABASE_URL", None))
+    if tmpPostgres is not None:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': tmpPostgres.path.replace('/', ''),
+                'USER': tmpPostgres.username,
+                'PASSWORD': tmpPostgres.password,
+                'HOST': tmpPostgres.hostname,
+                'PORT': 5432,
+            }
+        }
+    else:
+        print("\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m")
+        DATABASES = {
+            'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / '20June',
+            }
+        }
+
+
+# CRON JOBS
+# https://django-cron.readthedocs.io/en/latest/installation.html#installation
+CRON_CLASSES = [
+    "rentsafe.cronjob.LeaseOwingBalances",
+]
+
+# REST Framework
+# https://www.django-rest-framework.org/api-guide/settings/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication', 
+        'rest_framework.authentication.TokenAuthentication', 
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
+
+ADD_INDIVIDUAL = "ADD_INDIVIDUAL"
+ADD_INDIVIDUAL_USER = "ADD_INDIVIDUAL_USER"
+ADD_AGENT_USER = "ADD_AGENT_USER"
+ADD_COMPANY = "ADD_COMPANY"
+CREDIT_CHECK = "CREDIT_CHECK"
+SEARCH_INDIVIDUAL = "SEARCH_INDIVIDUAL"
+SEARCH_COMPANY = "SEARCH_COMPANY"
+ADD_IND_LEASE = "INDIVIDUAL_LEASE"
+ADD_COMP_LEASE = "COMPANY_LEASE"
+MAKE_AGENT = "MAKE_AGENT"
+FORGOT_PASSWORD = "FORGOT_PASSWORD"
+ADD_SUBSCRIPTION = "ADD_SUBSCRIPTION"
+PAYMENT_RECEIPT = "PAYMENT_RECEIPT"
+LEASE_STATUS = "LEASE_STATUS"
 
 
 # Password validation
@@ -117,8 +214,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_TZ = True
@@ -128,6 +223,9 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "static"
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = "/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
