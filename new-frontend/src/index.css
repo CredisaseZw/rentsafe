@@ -126,3 +126,19 @@
       @apply bg-background text-foreground;
    }
 }
+
+@layer components {
+   .c_border_markers {
+      @apply relative;
+   }
+   .c_border_markers::before,
+   .c_border_markers::after {
+      @apply bg-foreground absolute left-0 size-[6px] translate-x-[-50%] rounded-full content-[''];
+   }
+   .c_border_markers::before {
+      @apply top-0;
+   }
+   .c_border_markers::after {
+      @apply bottom-0;
+   }
+}

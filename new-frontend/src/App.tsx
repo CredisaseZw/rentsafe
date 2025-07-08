@@ -9,16 +9,12 @@ export default function App() {
          <Routes>
             <Route element={<RootLayout />}>
                {ROOT_ROUTES.map((route) => (
-                  <Route key={route.path} path={route.path.replace("//", "/")} element={<route.pageComponent />} />
+                  <Route key={route.path} path={route.path} element={<route.pageComponent />} />
                ))}
 
-               <Route path="/services/rent-safe" element={<RentsafeLayout />}>
+               <Route element={<RentsafeLayout />}>
                   {RENTSAFE_ROUTES.map((route) => (
-                     <Route
-                        key={route.path}
-                        path={("/services/rent-safe" + route.path).replace("//", "/")}
-                        element={<route.pageComponent />}
-                     />
+                     <Route key={route.path} path={route.path} element={<route.pageComponent />} />
                   ))}
                </Route>
             </Route>

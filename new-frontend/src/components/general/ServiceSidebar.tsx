@@ -3,7 +3,8 @@ import type { NavLink } from "@/types";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
-import SidebarItem from "./SidebarItem";
+import NavLinkItem from "./NavLinkItem";
+import React from "react";
 
 type SidebarProps = {
    title: string;
@@ -11,6 +12,8 @@ type SidebarProps = {
 };
 
 export default function ServiceSidebar({ title, navLinks }: SidebarProps) {
+   const [expandedSegment, expandThisSegment] = React.useState<string>("");
+
    return (
       <Sidebar variant="floating">
          <SidebarHeader>
@@ -29,7 +32,12 @@ export default function ServiceSidebar({ title, navLinks }: SidebarProps) {
                <SidebarGroupContent>
                   <SidebarMenu>
                      {navLinks.map((navLink, index) => (
-                        <SidebarItem key={index} navLink={navLink} />
+                        <NavLinkItem
+                           key={index}
+                           navLink={navLink}
+                           expandedSegment={expandedSegment}
+                           expandThisSegment={expandThisSegment}
+                        />
                      ))}
                   </SidebarMenu>
                </SidebarGroupContent>

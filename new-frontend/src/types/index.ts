@@ -6,6 +6,7 @@ export type Route = {
 
 export type NavLink = {
    label: string;
+   segment: string;
    path?: string;
    subLinks?: NavLink[];
    pageComponent?: React.FC;
