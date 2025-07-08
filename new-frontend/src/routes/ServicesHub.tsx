@@ -1,17 +1,19 @@
 import Container from "@/components/general/Container";
 import ServiceCard from "@/components/routes/services/ServiceCard";
-import { SERVICES } from "@/constants";
+import { PRIMARY_GRADIENT, SERVICES } from "@/constants";
 
 export default function ServicesHub() {
    return (
-      <Container>
-         <h1 className="mb-4 text-2xl font-bold">Services</h1>
+      <div className={`min-h-screen text-[whitesmoke] ${PRIMARY_GRADIENT}`}>
+         <Container className={`p-10 pt-30`} small>
+            <h1 className="mb-6 w-3/4 px-3 text-3xl font-bold">Services</h1>
 
-         <div className="grid grid-cols-4 gap-4">
-            {SERVICES.map((service) => (
-               <ServiceCard key={service.href} service={service} />
-            ))}
-         </div>
-      </Container>
+            <div className="grid w-3/4 grid-cols-3 gap-4">
+               {SERVICES.map((service) => (
+                  <ServiceCard key={service.href} service={service} />
+               ))}
+            </div>
+         </Container>
+      </div>
    );
 }

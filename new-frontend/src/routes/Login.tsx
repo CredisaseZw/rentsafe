@@ -1,12 +1,13 @@
 import Logo from "@/components/general/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PRIMARY_GRADIENT } from "@/constants";
 import { LogInIcon } from "lucide-react";
 import { Link } from "react-router";
 
 export default function Login() {
    return (
-      <div className="from-PRIMARY to-SECONDARY flex min-h-screen items-center justify-center bg-gradient-to-br">
+      <div className={"flex min-h-screen items-center justify-center " + PRIMARY_GRADIENT}>
          <div className="border-foreground/50 flex min-h-[500px] w-full max-w-[500px] flex-col items-center justify-center gap-3 rounded-3xl border bg-white/90 p-5 shadow-lg backdrop-blur-3xl">
             <Logo />
             <h2 className="mb-4 text-center text-lg">Login to proceed</h2>

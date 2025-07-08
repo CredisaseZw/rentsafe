@@ -5,13 +5,13 @@ export default function ServiceCard({ service }: { service: Service }) {
    return (
       <Link
          to={service.href}
-         className="bg-foreground/90 hover:bg-foreground text-background block rounded-lg border p-4 transition-all"
+         className="hover:bg-background text-foreground block rounded-lg border bg-white/90 p-4 backdrop-blur-3xl transition-all"
       >
-         <div className="flex items-center gap-4">
-            <service.icon className="text-background/80 size-7" />
+         <div className="flex items-end gap-4">
+            <service.icon className="text-foreground/80 size-9" />
             <div>
                <h3 className="text-lg font-semibold">{service.name}</h3>
-               <p className="text-background/80 text-sm">{service.description}</p>
+               <p className="text-foreground/80 text-sm">{service.description}</p>
             </div>
          </div>
       </Link>

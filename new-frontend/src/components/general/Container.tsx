@@ -1,5 +1,12 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
-export default function Container({ children }: { children: React.ReactNode }) {
-   return <div className="mx-auto max-w-7xl p-2">{children}</div>;
+type ContainerProps = {
+   children: React.ReactNode;
+   className?: string;
+   small?: boolean;
+};
+
+export default function Container({ children, small, className }: ContainerProps) {
+   return <div className={cn("mx-auto p-2", small ? "max-w-7xl" : "max-w-[1440px]", className)}>{children}</div>;
 }

@@ -1,6 +1,6 @@
 import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu } from "../ui/sidebar";
 import type { NavLink } from "@/types";
-import { ArrowLeft } from "lucide-react";
+import { HomeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import NavLinkItem from "./NavLinkItem";
@@ -18,9 +18,9 @@ export default function ServiceSidebar({ title, navLinks }: SidebarProps) {
       <Sidebar variant="floating">
          <SidebarHeader>
             <h2 className="flex items-center gap-2 text-xl font-bold">
-               <Button variant="outline" size="icon_sm" asChild>
+               <Button variant="outline" className="border-foreground/50" size="icon_sm" asChild>
                   <Link to="/services">
-                     <ArrowLeft />
+                     <HomeIcon />
                   </Link>
                </Button>
                {title}

@@ -22,3 +22,5 @@ export const SERVICES: Service[] = [
 export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes(RENTSAFE_NAVLINKS);
 
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
+
+export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
