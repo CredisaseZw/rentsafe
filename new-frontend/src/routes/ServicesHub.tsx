@@ -6,7 +6,7 @@ export default function ServicesHub() {
       <div>
          <h1 className="mb-4 text-2xl font-bold">Services</h1>
 
-         <div className="grid grid-cols-3 gap-4">
+         <div className="grid grid-cols-4 gap-4">
             {SERVICES.map((service) => (
                <ServiceCard key={service.href} service={service} />
             ))}
