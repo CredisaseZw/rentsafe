@@ -26,3 +26,11 @@ export function navlinksToRoutes(navLinks: NavLink[]): Route[] {
 export function removeTrailingSlash(path: string) {
    return path.endsWith("/") ? path.slice(0, -1) : path;
 }
+
+export function getInitials(name: string): string {
+   const parts = name.split(" ");
+   if (parts.length === 1) {
+      return parts[0].trim().charAt(0).toUpperCase();
+   }
+   return parts[0].trim().charAt(0).toUpperCase() + parts[1].trim().charAt(0).toUpperCase();
+}
