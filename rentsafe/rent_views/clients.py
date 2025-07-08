@@ -459,17 +459,6 @@ def destroy_agent(request):
 @login_required
 @clients_required
 def get_company(request):
-    send_otp(
-        request.build_absolute_uri(),
-        generate_otp(),
-        'gtkandeya@gmail.com',
-        request.user.company,
-        1,
-        "company",
-        settings.ADD_COMPANY,
-        'new_message',
-    )
-    print('otps sent....')
     if request.method != "POST":
         return JsonResponse({"status": "failed"}, safe=False)
     get_company_schema = GetCompanySchema()
@@ -489,14 +478,7 @@ def get_company(request):
                     "status": "success",
                     "name": company.registration_name,
                     "mobile": company_profile.mobile_phone,
-                    "address":{
-                        "unit_number": company_profile.unit_number,
-                        "building_name": company_profile.building_name,
-                        "street_number": company_profile.street_number,
-                        "street_name": company_profile.street_name,
-                        "suburb": company_profile.company_profile.suburb,
-                        "city":company_profile. city
-                    },
+                    "address": company_profile.current_address,
                     "email": company_profile.email,
                     "contact_name": company_profile.contact_person,
                 },
@@ -769,7 +751,6 @@ def edit_lease(request):
     data = json.loads(request.body.decode("utf-8"))
     lease_id = data.get("leaseId")
     lease = Lease.objects.filter(lease_id=lease_id).first()
-    lease_address = LeaseAddress.objects.filter(lease_id=lease).first()
     agent_details = Landlord.objects.filter(lease_id=lease_id).first()
     if request.method == "POST":
         date_string1, date_string2 = data.get("leaseStartDate"), data.get(
@@ -864,7 +845,7 @@ def edit_lease(request):
             lease.deposit_period = data.get("depositPeriod")
             lease.monthly_rentals = data.get("monthlyRental")
             lease.currency = data.get("leaseCurrency")
-            # lease.address = data.get("lesseeAddress")
+            lease.address = data.get("lesseeAddress")
             lease.start_date = datetime_obj1
             lease.end_date = datetime_obj2
             lease.rent_guarantor_id = data.get("rentGuarantorId") or "N/A"
@@ -874,19 +855,6 @@ def edit_lease(request):
             lease.payment_period_end = new_payment_end
             lease.rent_variables = data.get("rentVariable")
             lease.save()
-            
-            # lease_address.lease_id= lease,  ### Lease ID
-            lease_address.unit_number=data.get("unitNumber") ## Address Fields
-            lease_address.building_name=data.get("buildingName")
-            lease_address.street_number=data.get("streetNumber")
-            lease_address.street_name=data.get("streetName")
-            lease_address.suburb=data.get("suburb")
-            lease_address.city= data.get("city")
-            lease_address.province=data.get("province")
-            lease_address.country= data.get("country")
-            lease_address.area_code=data.get("areaCode")
-            lease_address.save()
-            
             messages.success(request, "successfully updated lease")
             share(request, messages=messages)
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
@@ -958,32 +926,18 @@ def edit_lease(request):
         ).first():
             trading_name = lease_receiver_company.trading_name
             registration_number = lease_receiver_company.registration_name
-            if company_profile := CompanyProfile.objects.filter(
+            if comapany_profile := CompanyProfile.objects.filter(
                 company=lease_receiver_company.id
             ).first():
-                mobile = company_profile.mobile_phone
-                email = company_profile.email
-                # address = company_profile.current_address
-                unit_number = company_profile.unit_number
-                building_name = company_profile.building_name
-                street_number = company_profile.street_number
-                street_name = company_profile.street_name
-                suburb = company_profile.suburb
-                city = company_profile.city
-                contact_person = company_profile.contact_person
+                mobile = comapany_profile.mobile_phone
+                email = comapany_profile.email
+                address = comapany_profile.current_address
+                contact_person = comapany_profile.contact_person
             else:
                 mobile = ""
                 email = ""
-                # address = ""
+                address = ""
                 contact_person = ""
-                unit_number =""
-                building_name= ""
-                street_number=""
-                street_name=""
-                suburb= ""
-                city=""
-                
-                
         else:
             trading_name = ""
             registration_number = ""
@@ -994,14 +948,7 @@ def edit_lease(request):
                 "registration_number": registration_number,
                 "mobile": mobile,
                 "email": email,
-                "address": {
-                    "unit_number": unit_number,
-                    "building_name": building_name,
-                    "street_number": street_number,
-                    "street_name": street_name,
-                    "suburb": suburb,
-                    "city": city,
-                } ,
+                "address": address,
                 "contact_person": contact_person,
             },
             safe=False,
@@ -1055,7 +1002,7 @@ def create_individual_lease_helper(request):
                 reg_ID_Number=identificationNumber.upper(),
                 lease_giver=request.user.company,
                 lease_activator=request.user.id,
-                # address=data.get("lesseeAddress"),
+                address=data.get("lesseeAddress"),
                 leasee_mobile=data.get("lesseePhone"),
                 is_individual=ind_lease,
                 is_active=True,
@@ -1075,19 +1022,6 @@ def create_individual_lease_helper(request):
                 payment_period_end=data.get("paymentPeriodEnd"),
             )
             lease.save()
-            lease_address= LeaseAddress(
-                lease_id= lease,  ### Lease ID
-                unit_number=data.get("unitNumber"),  ## Address Fields
-                building_name=data.get("buildingName"),
-                street_number=data.get("streetNumber"),
-                street_name=data.get("streetName"),
-                suburb=data.get("suburb"),
-                city= data.get("city"),
-                province=data.get("province"),
-                country= data.get("country"),
-                area_code=data.get("areaCode"),  
-            )
-            lease_address.save()
 
             try:
                 if landlord_id:
@@ -1538,7 +1472,7 @@ def create_company_lease_helper(request):
             lease = Lease(
                 reg_ID_Number=identificationNumber,
                 lease_giver=request.user.company,
-                # address=data.get("lesseeAddress"),
+                address=data.get("lesseeAddress"),
                 leasee_mobile=(data.get("lesseePhone") or None),
                 rent_guarantor_id=data.get("rentGuarantorId").upper(),
                 is_company=comp_lease,
@@ -1560,23 +1494,10 @@ def create_company_lease_helper(request):
                 payment_period_end=data.get("paymentPeriodEnd"),
                 is_government=bool(data.get("isGovernment")),
             )
-            lease_address = LeaseAddress(
-                lease_id=lease,  ### Lease 
-                unit_number=data.get("unitNumber"),  ## Address Fields
-                building_name=data.get("buildingName"),
-                street_number=data.get("streetNumber"),
-                street_name=data.get("streetName"),
-                suburb=data.get("suburb"),
-                city= data.get("city"),
-                province=data.get("province"),
-                country= data.get("country"),
-                area_code=data.get("areaCode"), 
-            )
             if identificationNumber == request.user.company:
                 props = {"errors": "Cannot lease to self !!!"}
                 return render(request, "Leases/Index", props)
             lease.save()
-            lease_address.save()
 
             # add agent to lease
             if data.get("regIdNumber"):
@@ -2123,15 +2044,6 @@ def create_individuals_helper(request):
                 land_line=data.get("landLine"),
                 identification_type=data.get("identification_type"),
                 identification_number=data.get("identificationNumber"),
-                unit_number=data.get("unitNumber"),  ## Address Fields
-                building_name=data.get("buildingName"),
-                street_number=data.get("streetNumber"),
-                street_name=data.get("streetName"),
-                suburb=data.get("suburb"),
-                city= data.get("city"),
-                province=data.get("province"),
-                country= data.get("country"),
-                area_code=data.get("areaCode"), 
             )
             individual.save()
             request_user_company = Company.objects.filter(
@@ -2362,7 +2274,7 @@ def create_company_helper(request):
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),
                 company_uploader=request.user.company,
-                is_government=data.get("is_gvt"),   
+                is_government=data.get("is_gvt"),
             )
             company_ob.save()
 
@@ -2371,22 +2283,13 @@ def create_company_helper(request):
                 company=company_ob.id,
                 registration_date=(data.get("registrationDate") or None),
                 vat_number=data.get("vatNumber"),
-                # current_address=data.get("currentAddress", None),
+                current_address=data.get("currentAddress"),
                 mobile_phone=data.get("mobileNumber"),
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 note=data.get("note"),
                 landline_phone=data.get("landLine"),
                 branch=data.get("branch"),
-                unit_number=data.get("unitNumber"),  # Address Fields
-                building_name=data.get("buildingName"),
-                street_number=data.get("streetNumber"),
-                street_name=data.get("streetName"),
-                suburb=data.get("suburb"),
-                city= data.get("city"),
-                province=data.get("province"),
-                country= data.get("country"),
-                area_code=data.get("areaCode"), 
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             # send email
@@ -2703,7 +2606,7 @@ def client_users(request):
                             "lastName": individual.surname,
                             "email": user.email,
                             "mobile": individual.mobile,
-                            # "address": individual.address,
+                            "address": individual.address,
                             "identificationNumber": individual.identification_number,
                             "identificationType": individual.identification_type,
                             "access_level": ("admin" if user.is_superuser else "user"),
@@ -2887,15 +2790,10 @@ def company_report(request):
             trading_status = company_profile.trading_status or "N/A"
             website = company_profile.website or "N/A"
             telephone = company_profile.landline_phone or "N/A" ""
-            current_address =(
-                f"{'Unit ' + company_profile.unit_number if company_profile.unit_number else ''} "
-                f"{company_profile.building_name + ' Building' if company_profile.building_name else ''} , "
-                f"{company_profile.street_name + ' Street' if company_profile.street_name else ''} , "
-                f"{company_profile.suburb or ''}, "
-                f"{company_profile.city or ''}, "
-                f"{company_profile.province + ' Province' if company_profile.province else ''}, "
-                f"{company_profile.country or ''}"
-            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
+            current_address = company_profile.current_address
+            mobile_phone = company_profile.mobile_phone
+            email = company_profile.email
+            current_address = company_profile.current_address or "N/A"
             mobile_phone = company_profile.mobile_phone or "N/A"
             email = company_profile.email or "N/A"
             if request.user.user_type == 1:
@@ -3066,15 +2964,7 @@ def individual_report(request):
             landline=individual_ob.land_line
             dob = individual_ob.dob
             gender = individual_ob.gender
-            address =  (
-                f"{'Unit ' + individual_ob.unit_number if individual_ob.unit_number else ''} "
-                f"{individual_ob.building_name + ' Building' if individual_ob.building_name else ''} , "
-                f"{individual_ob.street_name + ' Street' if individual_ob.street_name else ''} , "
-                f"{individual_ob.suburb or ''}, "
-                f"{individual_ob.city or ''}, "
-                f"{individual_ob.province + ' Province' if individual_ob.province else ''}, "
-                f"{individual_ob.country or ''}"
-            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
+            address = individual_ob.address
             email = individual_ob.email
             individual_details = {
                 "national_id": national_id,
@@ -3151,14 +3041,7 @@ def individual_report(request):
             landline=individual_ob.land_line
             dob = individual_ob.dob
             gender = individual_ob.gender
-            address =  (
-                f"{'Unit ' + individual_ob.unit_number if individual_ob.unit_number else ''} "
-                f"{individual_ob.building_name + ' Building' if individual_ob.building_name else ''} , "
-                f"{individual_ob.street_name + ' Street' if individual_ob.street_name else ''} , "
-                f"{individual_ob.city or ''}, "
-                f"{individual_ob.province + ' Province' if individual_ob.province else ''}, "
-                f"{individual_ob.country or ''}"
-            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
+            address = individual_ob.address
             email = individual_ob.email
             individual_details = {
                 "national_id": national_id,
@@ -3239,19 +3122,9 @@ def store_individual(request):
             mobile=data.get("mobile"),
             email=data.get("email"),
             land_line=data.get("land_line"),
-            # address=data.get("address"),
+            address=data.get("address"),
             identification_type=data.get("identification_type"),
             identification_number=data.get("identificationNumber").upper(),
-            unit_number=data.get("unitNumber"),  ## Address Fields
-            building_name=data.get("buildingName"),
-            street_number=data.get("streetNumber"),
-            street_name=data.get("streetName"),
-            suburb=data.get("suburb"),
-            city= data.get("city"),
-            province=data.get("province"),
-            country= data.get("country"),
-            area_code=data.get("areaCode"), 
-            
         )
         individual.save()
         individual_employement_details = EmployementDetails(
@@ -3476,20 +3349,11 @@ def store_company(request):
                 company=company_ob.id,
                 registration_date=data.get("registrationDate"),
                 vat_number=data.get("vatNumber"),
-                # current_address=data.get("currentAddress", None),
+                current_address=data.get("currentAddress"),
                 mobile_phone=data.get("mobileNumber"),
                 email=data.get("emailAddress"),
                 website=data.get("website"),
                 branch=data.get("branch"),
-                unit_number=data.get("unitNumber"),  ## Address Fields
-                building_name=data.get("buildingName"),
-                street_number=data.get("streetNumber"),
-                street_name=data.get("streetName"),
-                suburb=data.get("suburb"),
-                city= data.get("city"),
-                province=data.get("province"),
-                country= data.get("country"),
-                area_code=data.get("areaCode"), 
             )
             email_ob = CompanyProfile.objects.filter(company=company_ob.id).first()
             user_password = generate_random_password(8)
@@ -3844,32 +3708,12 @@ def client_leases_new(request,leases_type=None):
         is_3_months_ago = check_lease_termination_eligibility(i, hundred_days_ago)
         if i.is_terminated and (is_3_months_ago or owing_amount <= 0):
             continue
-        lease_address = LeaseAddress.objects.filter(lease_id=i.lease_id).first()
-        
-        unit_number =lease_address.unit_number if lease_address else ""
-        building_name= lease_address.building_name if lease_address else ""
-        street_number= lease_address.street_number if lease_address else ""
-        street_name= lease_address.street_name if lease_address else ""
-        suburb= lease_address.suburb if lease_address else ""
-        city= lease_address.city if lease_address else ""
-        province= lease_address.province if lease_address else ""
-        country = lease_address.country if lease_address else ""
-        area_code = lease_address.area_code if lease_address else ""
-
         if i.lease_id not in lease_dict:
             lease_dict[i.lease_id] = {
                 "id": individual_id if i.is_individual else company_id,
                 "name": name,
                 "trading_name": trading_name,
-                "unit_number": unit_number,
-                "building_name": building_name,
-                "street_number": street_number,
-                "street_name": street_name,
-                "suburb": suburb,
-                "city": city,
-                "province": province,
-                "country": country,
-                "area_code": area_code,
+                "address": i.address,
                 "email": email,
                 "mobile": mobile,
                 "rent_guarantor_name": f"{rent_guarantor.firstname} {rent_guarantor.surname}" if rent_guarantor else "N/A",
@@ -4474,14 +4318,10 @@ def client_statements_new(request):
                     "id": i.lease_id,
                     "tenant_name": company_ob.registration_name,
                     "address": (
-                        f"{'Unit ' + company_ob_address.unit_number if company_ob_address.unit_number else ''} "
-                        f"{company_ob_address.building_name + ' Building' if company_ob_address.building_name else ''} , "
-                        f"{company_ob_address.street_name + ' Street' if company_ob_address.street_name else ''} , "
-                        f"{company_ob_address.suburb or ''}, "
-                        f"{company_ob_address.city or ''}, "
-                        f"{company_ob_address.province + ' Province' if company_ob_address.province else ''}, "
-                        f"{company_ob_address.country or ''}"
-                    ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A",
+                        company_ob_address.current_address
+                        if company_ob_address
+                        else "N/A"
+                    ),
                     "is_company": True,
                     "color": color,
                     "owing_amount": round(float(opening_balance_record.outstanding_balance),2),
@@ -4566,15 +4406,7 @@ def client_statements_old(request):
                 tenant_company_details = {
                     "id": i.lease_id,
                     "tenant_name": company_ob.registration_name,
-                    "address": (
-                        f"{'Unit ' + company_ob_address.unit_number if company_ob_address.unit_number else ''} "
-                        f"{company_ob_address.building_name + ' Building' if company_ob_address.building_name else ''} , "
-                        f"{company_ob_address.street_name + ' Street' if company_ob_address.street_name else ''} , "
-                        f"{company_ob_address.suburb or ''}, "
-                        f"{company_ob_address.city or ''}, "
-                        f"{company_ob_address.province + ' Province' if company_ob_address.province else ''}, "
-                        f"{company_ob_address.country or ''}"
-                    ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A",
+                    "address": company_ob_address.current_address,
                     "is_company": True,
                     "color": color,
                     "owing_amount": opening_balance_record.outstanding_balance,
@@ -4849,16 +4681,7 @@ def get_invoicing_details(request):
                                     "payment_period_start": i.payment_period_start,
                                     "tenant_name": f"{individual_ob.firstname} {individual_ob.surname}",
                                     "reg_number": individual_ob.identification_number,
-                                    "address": {
-                                        "unit_number ": individual_ob.unit_number,
-                                        "building_name": individual_ob.building_name,
-                                        "street_number": individual_ob.street_number,
-                                        "street_name": individual_ob.street_name,
-                                        "suburb": individual_ob.suburb,
-                                        "city": individual_ob.city,
-                                        "province": individual_ob.province,
-                                        "country": individual_ob.country
-                                        },
+                                    "address": individual_ob.address,
                                     "is_company": False,
                                     "owing_amount": float(i.monthly_rentals),
                                     "lease_currency_type": lease_currency_type,
@@ -4879,15 +4702,7 @@ def get_invoicing_details(request):
                                 "id": i.lease_id,
                                 "payment_period_start": i.payment_period_start,
                                 "tenant_name": company_ob.registration_name,
-                                "address":(
-                                f"{'Unit ' + company_ob_address.unit_number if company_ob_address.unit_number else ''} "
-                                f"{company_ob_address.building_name + ' Building' if company_ob_address.building_name else ''} , "
-                                f"{company_ob_address.street_name + ' Street' if company_ob_address.street_name else ''} , "
-                                f"{company_ob_address.suburb or ''}, "
-                                f"{company_ob_address.city or ''}, "
-                                f"{company_ob_address.province + ' Province' if company_ob_address.province else ''}, "
-                                f"{company_ob_address.country or ''}"
-                            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A",
+                                "address": company_ob_address.current_address,
                                 "reg_number": company_ob.registration_number,
                                 "is_company": True,
                                 "owing_amount": float(i.monthly_rentals),
@@ -4928,15 +4743,7 @@ def get_invoicing_details(request):
                             "id": i.lease_id,
                             "payment_period_start": i.payment_period_start,
                             "tenant_name": company_ob.registration_name,
-                            "address": (
-                                f"{'Unit ' + company_ob_address.unit_number if company_ob_address.unit_number else ''} "
-                                f"{company_ob_address.building_name + ' Building' if company_ob_address.building_name else ''} , "
-                                f"{company_ob_address.street_name + ' Street' if company_ob_address.street_name else ''} , "
-                                f"{company_ob_address.suburb or ''}, "
-                                f"{company_ob_address.city or ''}, "
-                                f"{company_ob_address.province + ' Province' if company_ob_address.province else ''}, "
-                                f"{company_ob_address.country or ''}"
-                            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A",
+                            "address": company_ob_address.current_address,
                             "reg_number": company_ob.registration_number,
                             "is_company": True,
                             "owing_amount": float(i.monthly_rentals),
@@ -5447,16 +5254,7 @@ def detailed_statements(request, tenant_id):
             ).first()
             company_address = ""
             if company_address_ob:
-                company_address = {
-                                f"{'Unit ' + company_address_ob.unit_number if company_address_ob.unit_number else ''} "
-                                f"{company_address_ob.building_name + ' Building' if company_address_ob.building_name else ''} , "
-                                f"{company_address_ob.street_name + ' Street' if company_address_ob.street_name else ''} , "
-                                f"{company_address_ob.suburb or ''}, "
-                                f"{company_address_ob.city or ''}, "
-                                f"{company_address_ob.province + ' Province' if company_address_ob.province else ''}, "
-                                f"{company_address_ob.country or ''}"
-                  .replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A",
-                }
+                company_address = company_address_ob.current_address
         lease_receiver_name = (
             lease_receiver
             if lease_receiver_ind
@@ -6326,35 +6124,6 @@ def sales_accounts(request):
 def rate_setup(request):
     return JsonResponse ({"status": "success"}, safe=False)
 
-@login_required
-@clients_required
-def search_lease_address(request):
-    search_term = request.GET.get("q", "").strip()
-
-    query = Q()
-    if search_term:
-        query |= Q(unit_number__icontains=search_term)
-        query |= Q(building_name__icontains=search_term)
-        query |= Q(street_name__icontains=search_term)
 
 
 
-    results = LeaseAddress.objects.filter(query)
-
-    data = [
-        {
-            "lease_id": addr.lease_id.lease_id if addr.lease_id else None,
-            "unit_number": addr.unit_number,
-            "building_name": addr.building_name,
-            "street_number": addr.street_number,
-            "street_name": addr.street_name,
-            "suburb": addr.suburb,
-            "city": addr.city,
-            "province": addr.province,
-            "country": addr.country,
-            "area_code": addr.area_code,
-        }
-        for addr in results
-    ]
-
-    return JsonResponse({"results": data}, safe=False)

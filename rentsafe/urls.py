@@ -252,10 +252,10 @@ urlpatterns = [
                     claims.create_claim,
                     name="create_claim",
                 ),
-                path(
-                    "search-lease-address/",   ### search lease addresses
-                    clients.search_lease_address,
-                    name="search_lease_address"),
+                # path(
+                #     "search-lease-address/",   ### search lease addresses
+                #     clients.search_lease_address,
+                #     name="search_lease_address"),
                 path(
                     "claims/search/",
                     claims.search_individuals_or_companies,
