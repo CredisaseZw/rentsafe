@@ -35,7 +35,6 @@ export default function useSalesInvoiceForm(invoice, isProforma, onClose) {
   useEffect(() => {
     if (invoice) {
       const newInvoiceData = {
-        document_number: invoice.document_number,
         bill_to: invoice.bill_to,
         address: invoice.address,
         phone: invoice.phone,
