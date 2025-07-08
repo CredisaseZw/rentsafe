@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User } from "lucide-react";
 import { Button } from "../ui/button";
+import { Link } from "react-router";
 
 export default function NavBar({ sidebarTrigger }: { sidebarTrigger?: React.ReactNode }) {
    return (
@@ -20,7 +21,9 @@ export default function NavBar({ sidebarTrigger }: { sidebarTrigger?: React.Reac
                </DropdownMenuTrigger>
 
                <DropdownMenuContent>
-                  <DropdownMenuItem>Logout</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                     <Link to="">Logout</Link>
+                  </DropdownMenuItem>
                </DropdownMenuContent>
             </DropdownMenu>
          </nav>
