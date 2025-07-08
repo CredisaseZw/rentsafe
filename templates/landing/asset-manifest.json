@@ -1,0 +1,29 @@
+{
+  "files": {
+    "main.css": "/static/css/main.579f8177.css",
+    "main.js": "/static/js/main.678ac288.js",
+    "static/js/453.9b8fffbf.chunk.js": "/static/js/453.9b8fffbf.chunk.js",
+    "static/media/debt-collection.png": "/static/media/debt-collection.9c528a5394087f931e3f.png",
+    "static/media/jane-smith.png": "/static/media/jane-smith.13edb5d67ce9d065fdeb.png",
+    "static/media/credit-risk-management.png": "/static/media/credit-risk-management.97acd7996451da7d6134.png",
+    "static/media/john-doe.png": "/static/media/john-doe.2977dc7fabe1727436c2.png",
+    "static/media/car3.png": "/static/media/car3.89f08a2e809761ca9998.png",
+    "static/media/car2.png": "/static/media/car2.cea5351efcc519bcb49a.png",
+    "static/media/risk-review-plan.png": "/static/media/risk-review-plan.80f0c9d5f91efe93c5d7.png",
+    "static/media/car1.png": "/static/media/car1.54bff72a4803c02d4aab.png",
+    "static/media/rental-management.png": "/static/media/rental-management.a20ea33ecbbf8894b80a.png",
+    "static/media/debt-recovery.png": "/static/media/debt-recovery.0e79ccb2a36a51d07f2f.png",
+    "static/media/tenant-rights.png": "/static/media/tenant-rights.4a6553fa69d5b729aa5f.png",
+    "static/media/credit-score.png": "/static/media/credit-score.4f6f342e65a2b3068138.png",
+    "static/media/robert-brown.png": "/static/media/robert-brown.111b544ee7409efa15d8.png",
+    "static/media/credit-process-management.png": "/static/media/credit-process-management.a367a853fd8d615ef2d7.png",
+    "index.html": "/index.html",
+    "main.579f8177.css.map": "/static/css/main.579f8177.css.map",
+    "main.678ac288.js.map": "/static/js/main.678ac288.js.map",
+    "453.9b8fffbf.chunk.js.map": "/static/js/453.9b8fffbf.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.579f8177.css",
+    "static/js/main.678ac288.js"
+  ]
+}
