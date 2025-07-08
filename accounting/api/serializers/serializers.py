@@ -173,15 +173,18 @@ class TransactionLineItemSerializer(serializers.ModelSerializer):
         write_only=True
     )
     quantity = serializers.DecimalField(max_digits=10, decimal_places=2)
-    # unit_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    unit_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    vat_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    total_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+
 
     class Meta:
         model = TransactionLineItem
         fields = [
-            'sales_item', 'sales_item_id', 'quantity',
-            'vat_amount', 'total_price', 'date_created', 'date_updated' 
+            'sales_item', 'sales_item_id', 'quantity', 'unit_price',
+            'vat_amount', 'total_price', 'date_created', 'date_updated'
         ]
-        read_only_fields = ['vat_amount', 'total_price', 'date_created', 'date_updated'] 
+        read_only_fields = ['unit_price', 'vat_amount', 'total_price', 'date_created', 'date_updated']
 
 
 class InvoiceSerializer(BaseCompanySerializer):
@@ -197,20 +200,24 @@ class InvoiceSerializer(BaseCompanySerializer):
     customer_id = serializers.IntegerField(write_only=True)
     is_individual = serializers.BooleanField(write_only=True)
 
+    # These fields are now properties on the Invoice model, so they are ReadOnlyField here
+    total_excluding_vat = serializers.ReadOnlyField()
+    vat_total = serializers.ReadOnlyField()
+    total_inclusive = serializers.ReadOnlyField()
+
     class Meta(BaseCompanySerializer.Meta):
         model = Invoice
         fields = ["id", "document_number", "invoice_type", "currency",
-                "currency_id", "items", "discount", "date_created",
-                "status", "total_excluding_vat", "vat_total",
-                "total_inclusive","customer_details","customer_id","is_individual",
-                "lease", "reference_number", "is_recurring", "frequency",
-                "next_invoice_date", "original_invoice"
-                ]
+                  "currency_id", "items", "discount", "date_created",
+                  "status", "total_excluding_vat", "vat_total",
+                  "total_inclusive","customer_details","customer_id","is_individual",
+                  "lease", "reference_number", "is_recurring", "frequency",
+                  "next_invoice_date", "original_invoice"
+                  ]
         read_only_fields = [
             'document_number', 'user', 'date_created', 'status',
-            'total_excluding_vat', 'vat_total', 'total_inclusive',
-            'individual', 'company', 
-            'original_invoice' 
+            'individual', 'company',
+            'original_invoice'
         ]
         extra_kwargs = {
             'lease': {'required': False, 'allow_null': True},
@@ -223,9 +230,9 @@ class InvoiceSerializer(BaseCompanySerializer):
         request_user = self.context['request'].user
         user_company = request_user.company
 
-        # Validate customer relationship
         customer_id = data.get('customer_id')
         is_individual = data.get('is_individual')
+        invoice_type = data.get('invoice_type')
 
         if not customer_id:
             raise serializers.ValidationError({"customer_id": "Customer ID is required."})
@@ -233,57 +240,64 @@ class InvoiceSerializer(BaseCompanySerializer):
         if is_individual is None:
             raise serializers.ValidationError({"is_individual": "Specify if customer is an individual or company."})
 
+        customer_instance = None
         try:
             if is_individual:
-                customer = Individual.objects.get(id=customer_id)
-                data['individual'] = customer
-                data['company'] = None # Ensure company is null if individual is set
+                customer_instance = Individual.objects.get(id=customer_id)
+                data['individual'] = customer_instance
+                data['company'] = None
             else:
-                customer = Company.objects.get(id=customer_id)
-                data['company'] = customer
+                customer_instance = Company.objects.get(id=customer_id)
+                data['company'] = customer_instance
                 data['individual'] = None
         except (Individual.DoesNotExist, Company.DoesNotExist) as e:
             raise serializers.ValidationError(
                 {"customer_id": "Customer not found."}
             ) from e
 
-        total_excl_vat = Decimal('0')
-        total_vat = Decimal('0')
+        # --- Validation for duplicate invoice type for the same customer ---
+        if invoice_type and customer_instance:
+            qs = Invoice.objects.filter(
+                invoice_type=invoice_type,
+                user__company=user_company 
+            )
+            if is_individual:
+                qs = qs.filter(individual=customer_instance)
+            else:
+                qs = qs.filter(company=customer_instance)
+
+            # If updating an instance, exclude the current instance from the check
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                raise serializers.ValidationError(
+                    f"An invoice of type '{invoice_type}' already exists for this customer."
+                )
+
         items_data = data.get('items', [])
         for item_data in items_data:
             sales_item = item_data.get('sales_item')
             if not sales_item:
-                raise serializers.ValidationError("Invalid sales item provided in line items.")
+                raise serializers.ValidationError({"items": "Invalid sales item provided in line items."})
 
             if hasattr(sales_item, 'user') and sales_item.user and sales_item.user.company != user_company:
                 raise serializers.ValidationError({"items": "One or more sales items do not belong to your company."})
-
 
             vat_setting = sales_item.tax_configuration
             vat_rate = vat_setting.rate / Decimal('100') if vat_setting and vat_setting.vat_applicable else Decimal('0')
 
             quantity = item_data.get('quantity')
-            unit_price = item_data.get('unit_price')
+            unit_price = sales_item.price 
 
-            if quantity is None or unit_price is None:
-                raise serializers.ValidationError({"items": "Quantity and unit price are required for all line items."})
+            if quantity is None:
+                raise serializers.ValidationError({"items": "Quantity is required for all line items."})
 
-            item_total_excl_vat = (quantity * unit_price).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-            item_vat_amount = (item_total_excl_vat * vat_rate).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+            # Store these calculated values temporarily in item_data
+            item_data['unit_price'] = unit_price
+            item_data['vat_amount'] = (quantity * unit_price * vat_rate).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+            item_data['total_price'] = (quantity * unit_price + item_data['vat_amount']).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
 
-            item_data['calculated_vat_amount'] = item_vat_amount
-            item_data['calculated_total_price'] = (item_total_excl_vat + item_vat_amount).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-
-            total_excl_vat += item_total_excl_vat
-            total_vat += item_vat_amount
-
-        discount = data.get('discount', Decimal('0.00'))
-        total_excl_vat = (total_excl_vat - discount).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        total_inclusive = (total_excl_vat + total_vat).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-
-        data['total_excluding_vat'] = total_excl_vat
-        data['vat_total'] = total_vat
-        data['total_inclusive'] = total_inclusive
 
         data.pop('customer_id', None)
         data.pop('is_individual', None)
@@ -305,26 +319,22 @@ class InvoiceSerializer(BaseCompanySerializer):
         invoice = Invoice.objects.create(**validated_data)
 
         for item_data in items_data:
-            calculated_vat_amount = item_data.pop('calculated_vat_amount')
-            calculated_total_price = item_data.pop('calculated_total_price')
-
             TransactionLineItem.objects.create(
                 parent_document=invoice,
                 sales_item=item_data['sales_item'],
                 user=invoice.user,
                 quantity=item_data['quantity'],
                 unit_price=item_data['unit_price'],
-                vat_amount=calculated_vat_amount, 
-                total_price=calculated_total_price 
+                vat_amount=item_data['vat_amount'],
+                total_price=item_data['total_price']
             )
         return invoice
 
     @transaction.atomic
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
-        instance.discount = abs(validated_data.get("discount", instance.discount)) 
+        instance.discount = abs(validated_data.get("discount", instance.discount))
 
-        # Handle customer updates
         if 'individual' in validated_data:
             instance.individual = validated_data.pop('individual')
         if 'company' in validated_data:
@@ -335,33 +345,110 @@ class InvoiceSerializer(BaseCompanySerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        
+
         instance.line_items.all().delete()
         for item_data in items_data:
-            calculated_vat_amount = item_data.pop('calculated_vat_amount')
-            calculated_total_price = item_data.pop('calculated_total_price')
             TransactionLineItem.objects.create(
                 parent_document=instance,
                 sales_item=item_data['sales_item'],
                 user=instance.user,
                 quantity=item_data['quantity'],
                 unit_price=item_data['unit_price'],
-                vat_amount=calculated_vat_amount,
-                total_price=calculated_total_price
+                vat_amount=item_data['vat_amount'],
+                total_price=item_data['total_price']
             )
+        instance.save()
 
-        # Recalculate totals on the invoice after line item updates
-        total_excl_vat = Decimal('0')
-        total_vat = Decimal('0')
-        for item in instance.line_items.all():
-            total_excl_vat += (item.quantity * item.unit_price)
-            total_vat += item.vat_amount
+        return instance
 
-        instance.total_excluding_vat = (total_excl_vat - instance.discount).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        instance.vat_total = total_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-        instance.total_inclusive = (instance.total_excluding_vat + instance.vat_total).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+
+class CashSaleSerializer(BaseCompanySerializer):
+    items = TransactionLineItemSerializer(many=True, required=False)
+    currency = CurrencySerializer(read_only=True)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='currency',
+        write_only=True
+    )
+
+    total_amount = serializers.ReadOnlyField() # Now a property
+
+    class Meta(BaseCompanySerializer.Meta):
+        model = CashSale
+        fields = ['id', 'sale_date', 'total_amount', 'currency', 'currency_id', 'items']
+        read_only_fields = ['sale_date']
+
+    def validate(self, data):
+        items_data = data.get('items', [])
+        request_user = self.context['request'].user
+        user_company = request_user.company
+
+        if not data.get('currency'):
+            raise serializers.ValidationError({"currency_id": "Currency is required for Cash Sale."})
+
+        for item_data in items_data:
+            sales_item = item_data.get('sales_item')
+
+            if not sales_item:
+                raise serializers.ValidationError({"items": "Invalid sales item provided in line items."})
+
+            if hasattr(sales_item, 'user') and sales_item.user and sales_item.user.company != user_company:
+                raise serializers.ValidationError({"items": "One or more sales items do not belong to your company."})
+
+
+            vat_setting = sales_item.tax_configuration
+            vat_rate = vat_setting.rate / Decimal('100') if vat_setting and vat_setting.vat_applicable else Decimal('0')
+
+            quantity = item_data.get('quantity')
+            unit_price = sales_item.price
+
+            if quantity is None:
+                raise serializers.ValidationError({"items": "Quantity is required for all line items."})
+
+            item_data['unit_price'] = unit_price
+            item_data['vat_amount'] = (quantity * unit_price * vat_rate).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+            item_data['total_price'] = (quantity * unit_price + item_data['vat_amount']).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        items_data = validated_data.pop('items', [])
+
+        cash_sale = CashSale.objects.create(**validated_data)
+
+        for item_data in items_data:
+            TransactionLineItem.objects.create(
+                parent_document=cash_sale,
+                sales_item=item_data['sales_item'],
+                user=cash_sale.user,
+                quantity=item_data['quantity'],
+                unit_price=item_data['unit_price'],
+                vat_amount=item_data['vat_amount'],
+                total_price=item_data['total_price']
+            )
+        return cash_sale
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        items_data = validated_data.pop('items', [])
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        instance.line_items.all().delete()
+        for item_data in items_data:
+            TransactionLineItem.objects.create(
+                parent_document=instance,
+                sales_item=item_data['sales_item'],
+                user=instance.user,
+                quantity=item_data['quantity'],
+                unit_price=item_data['unit_price'],
+                vat_amount=item_data['vat_amount'],
+                total_price=item_data['total_price']
+            )
         instance.save() 
-
         return instance
 
 
@@ -391,8 +478,8 @@ class CashSaleSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = CashSale
         fields = ['id', 'document_number','is_individual','customer_details','customer_id','sale_date', 'currency', 'currency_id', 'items',
-                  'total_excluding_vat','discount','vat_total','invoice_total','payment_type','payment_type_id',
-                  'cashbook','cashbook_id','details', 'reference', 'amount_received']
+                'total_excluding_vat','discount','vat_total','invoice_total','payment_type','payment_type_id',
+                'cashbook','cashbook_id','details', 'reference', 'amount_received']
         read_only_fields = ['sale_date', 'total_amount'] 
 
     def validate(self, data):
