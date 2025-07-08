@@ -10,7 +10,7 @@ import { Link } from "react-router";
 
 export default function NavBar({ sidebarTrigger }: { sidebarTrigger?: React.ReactNode }) {
    return (
-      <header className="flex items-center justify-between rounded-md p-2 shadow-md">
+      <header className="border-SECONDARY bg-sidebar flex items-center justify-between rounded-md border p-2 shadow-sm">
          {sidebarTrigger}
          <nav>
             <DropdownMenu>
