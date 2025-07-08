@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from users.models import Role # Ensure this import matches your app name
+from users.models.models import Role 
 
 class Command(BaseCommand):
     help = 'Seeds initial roles and assigns relevant permissions for the property management system.'
@@ -16,7 +16,7 @@ class Command(BaseCommand):
             {
                 'name': 'Admin',
                 'description': 'Full administrative access to the entire system.',
-                'permissions': '__ALL__', # Special keyword to grant all existing permissions
+                'permissions': '__ALL__', 
             },
             {
                 'name': 'Superintendent',
@@ -25,7 +25,7 @@ class Command(BaseCommand):
                     'maintenance.add_maintenancerequest',
                     'maintenance.change_maintenancerequest',
                     'maintenance.view_maintenancerequest',
-                    'maintenance.view_servicevendor', # To contact vendors
+                    'maintenance.view_servicevendor', 
                     'properties.view_property',
                     'properties.view_unit',
                     'communications.add_message',
@@ -41,16 +41,27 @@ class Command(BaseCommand):
                     'accounting.add_journalentry', 'accounting.change_journalentry', 'accounting.delete_journalentry', 'accounting.view_journalentry',
                     'accounting.add_bankreconciliation', 'accounting.change_bankreconciliation', 'accounting.delete_bankreconciliation', 'accounting.view_bankreconciliation',
                     'accounting.add_currency', 'accounting.change_currency', 'accounting.delete_currency', 'accounting.view_currency',
-                    'accounting.add_budget', 'accounting.change_budget', 'accounting.delete_budget', 'accounting.view_budget',
-                    # Payments Module
-                    'payments.add_payment', 'payments.change_payment', 'payments.delete_payment', 'payments.view_payment',
-                    'payments.add_invoice', 'payments.change_invoice', 'payments.delete_invoice', 'payments.view_invoice',
-                    'payments.add_transaction', 'payments.change_transaction', 'payments.delete_transaction', 'payments.view_transaction',
-                    
-                    # View-only access for context
+                    'accounting.add_salesitem', 'accounting.change_salesitem', 'accounting.delete_salesitem', 'accounting.view_salesitem',
+                    'accounting.add_salescategory', 'accounting.change_salescategory', 'accounting.delete_salescategory', 'accounting.view_salescategory',
+                    'accounting.add_vatsetting', 'accounting.change_vatsetting', 'accounting.delete_vatsetting', 'accounting.view_vatsetting',
+                    'accounting.add_salesaccount', 'accounting.change_salesaccount', 'accounting.delete_salesaccount', 'accounting.view_salesaccount',
+                    'accounting.add_accountsector', 'accounting.change_accountsector', 'accounting.delete_accountsector', 'accounting.view_accountsector',
+                    'accounting.add_generalledgeraccount', 'accounting.change_generalledgeraccount', 'accounting.delete_generalledgeraccount', 'accounting.view_generalledgeraccount',
+                    'accounting.add_ledgertransaction', 'accounting.change_ledgertransaction', 'accounting.delete_ledgertransaction', 'accounting.view_ledgertransaction',
+                    'accounting.add_transactiontype', 'accounting.change_transactiontype', 'accounting.delete_transactiontype', 'accounting.view_transactiontype',
+                    # Core Payment/Invoice/Cash models
+                    'accounting.add_invoice', 'accounting.change_invoice', 'accounting.delete_invoice', 'accounting.view_invoice',
+                    'accounting.add_cashsale', 'accounting.change_cashsale', 'accounting.delete_cashsale', 'accounting.view_cashsale',
+                    'accounting.add_creditnote', 'accounting.change_creditnote', 'accounting.delete_creditnote', 'accounting.view_creditnote',
+                    'accounting.add_payment', 'accounting.change_payment', 'accounting.delete_payment', 'accounting.view_payment',
+                    'accounting.add_paymentmethod', 'accounting.change_paymentmethod', 'accounting.delete_paymentmethod', 'accounting.view_paymentmethod',
+                    'accounting.add_cashbook', 'accounting.change_cashbook', 'accounting.delete_cashbook', 'accounting.view_cashbook',
+                    'accounting.add_cashbookentry', 'accounting.change_cashbookentry', 'accounting.delete_cashbookentry', 'accounting.view_cashbookentry',
+                    'accounting.add_transactionlineitem', 'accounting.change_transactionlineitem', 'accounting.delete_transactionlineitem', 'accounting.view_transactionlineitem',
+                    'accounting.add_currencyrate', 'accounting.change_currencyrate', 'accounting.delete_currencyrate', 'accounting.view_currencyrate',
                     'leases.view_lease',
-                    'companies.view_company', # For vendor/landlord billing details
-                    'individuals.view_individual', # For tenant payment details
+                    'companies.view_company',
+                    'individuals.view_individual', 
                 ]
             },
             {
@@ -69,19 +80,20 @@ class Command(BaseCommand):
                     'individuals.add_individual', 'individuals.change_individual', 'individuals.delete_individual', 'individuals.view_individual',
                     'companies.add_company', 'companies.change_company', 'companies.delete_company', 'companies.view_company',
 
-                    # Payments Module (Limited - for recording/viewing rent, not full accounting)
-                    'payments.add_payment', 'payments.change_payment', 'payments.view_payment',
-                    'payments.view_invoice', # Can view invoices, but not full accounting details
-
+                    # Payments/Invoices (Limited - for recording/viewing rent, not full accounting setup)
+                    'accounting.add_payment', 'accounting.change_payment', 'accounting.view_payment',
+                    'accounting.add_invoice', 'accounting.change_invoice', 'accounting.view_invoice', 
+                    'accounting.add_cashsale', 'accounting.change_cashsale', 'accounting.view_cashsale', 
+                    'accounting.view_creditnote', 
+                    'accounting.view_paymentmethod', 
+                    'accounting.view_cashbook', 
+                    'accounting.view_cashbookentry',
+                    'accounting.view_transactionlineitem', 
                     # Maintenance Module
                     'maintenance.add_maintenancerequest', 'maintenance.change_maintenancerequest', 'maintenance.delete_maintenancerequest', 'maintenance.view_maintenancerequest',
                     'maintenance.add_servicevendor', 'maintenance.change_servicevendor', 'maintenance.delete_servicevendor', 'maintenance.view_servicevendor',
-
-                    # Communications & Documents Modules
                     'communications.add_message', 'communications.change_message', 'communications.view_message',
                     'documents.add_document', 'documents.change_document', 'documents.delete_document', 'documents.view_document',
-
-                    # User management (view only, to see linked tenants/landlords)
                     'users.view_customuser',
                 ]
             },
@@ -92,13 +104,16 @@ class Command(BaseCommand):
                     'leases.add_lease', 'leases.change_lease', 'leases.delete_lease', 'leases.view_lease',
                     'leases.add_rentalapplication', 'leases.change_rentalapplication', 'leases.delete_rentalapplication', 'leases.view_rentalapplication',
                     
-                    'individuals.add_individual', 'individuals.change_individual', 'individuals.view_individual', # For applicant/tenant data
+                    'individuals.add_individual', 'individuals.change_individual', 'individuals.view_individual', 
                     
-                    'properties.view_property', 'properties.view_unit', # To check property details for leases
+                    'properties.view_property', 'properties.view_unit', 
                     
-                    'documents.add_document', 'documents.change_document', 'documents.delete_document', 'documents.view_document', # For lease documents
+                    'documents.add_document', 'documents.change_document', 'documents.delete_document', 'documents.view_document', 
                     
-                    'communications.add_message', 'communications.view_message', # For communicating with applicants/tenants
+                    'communications.add_message', 'communications.view_message',
+                    
+                    'accounting.view_invoice', 
+                    'accounting.view_payment', 
                 ]
             },
             {
@@ -107,61 +122,62 @@ class Command(BaseCommand):
                 'permissions': [
                     'maintenance.add_maintenancerequest', 'maintenance.change_maintenancerequest', 'maintenance.delete_maintenancerequest', 'maintenance.view_maintenancerequest',
                     'maintenance.add_servicevendor', 'maintenance.change_servicevendor', 'maintenance.delete_servicevendor', 'maintenance.view_servicevendor',
-                    
-                    'properties.view_property', 'properties.view_unit', # To locate properties for maintenance
-                    
-                    'individuals.view_individual', # To see tenant contact info for maintenance
-                    
+                    'properties.view_property', 'properties.view_unit',
+                    'individuals.view_individual', 
+                    'companies.view_company', 
                     'communications.add_message', 'communications.change_message', 'communications.view_message',
+                    'accounting.view_invoice', 
+                    'accounting.view_payment',
                 ]
             },
             {
                 'name': 'Tenant',
                 'description': 'For system users who are tenants. Can view their own property/lease details, make payments, and submit maintenance requests.',
                 'permissions': [
-                    'properties.view_property', # Needs object-level permission in views to restrict to *their* property
-                    'leases.view_lease', # Needs object-level permission in views to restrict to *their* lease
-                    'payments.add_payment', 'payments.view_payment', # Add payment, view their own payments (needs object-level)
-                    'maintenance.add_maintenancerequest', 'maintenance.view_maintenancerequest', # Submit, view their own (needs object-level)
-                    'documents.view_document', # View documents related to their lease (needs object-level)
-                    'users.change_customuser', 'users.view_customuser', # To update their own profile (password, profile picture)
-                    'communications.add_message', 'communications.view_message', # For communicating with management
+                    'properties.view_property',
+                    'leases.view_lease', 
+                    'accounting.add_payment', 'accounting.view_payment', 
+                    'accounting.view_invoice',
+                    'maintenance.add_maintenancerequest', 'maintenance.view_maintenancerequest', 
+                    'documents.view_document',
+                    'users.change_customuser', 'users.view_customuser', 
+                    'communications.add_message', 'communications.view_message',
                 ]
             },
             {
-                'name': 'Agent', # Or 'Leasing Agent'
+                'name': 'Agent',
                 'description': 'Manages property listings, interacts with prospective tenants, and handles leads.',
                 'permissions': [
                     'listings.add_listing', 'listings.change_listing', 'listings.delete_listing', 'listings.view_listing',
                     'leads.add_lead', 'leads.change_lead', 'leads.delete_lead', 'leads.view_lead',
                     
-                    'properties.view_property', 'properties.view_unit', # To show properties to leads
+                    'properties.view_property', 'properties.view_unit', 
                     
-                    'leases.add_rentalapplication', 'leases.change_rentalapplication', 'leases.view_rentalapplication', # To process applications
+                    'leases.add_rentalapplication', 'leases.change_rentalapplication', 'leases.view_rentalapplication', 
                     
-                    'individuals.add_individual', 'individuals.change_individual', 'individuals.view_individual', # For new leads/applicants
+                    'individuals.add_individual', 'individuals.change_individual', 'individuals.view_individual', 
                     
                     'communications.add_message', 'communications.change_message', 'communications.view_message',
-                    'marketing.add_campaign', 'marketing.change_campaign', 'marketing.view_campaign', # If you have a marketing app
+                    'marketing.add_campaign', 'marketing.change_campaign', 'marketing.view_campaign',
+                    
+                    'accounting.view_salesitem', 
                 ]
             },
             {
                 'name': 'Analytics Manager',
                 'description': 'Has comprehensive access to all data for reporting and analytical purposes.',
                 'permissions': [
-                    # Permissions specific to a 'reports' app or custom report access
-                    'reports.view_report', # General view report permission (if you have a Report model)
-                    # Custom permissions for specific report types:
-                    # 'reports.can_view_financial_reports',
-                    # 'reports.can_view_operational_reports',
-                    # 'reports.can_view_marketing_reports',
-
-                    # View access to ALL underlying data required for comprehensive reporting
+                    'reports.view_report', 
                     'properties.view_property', 'properties.view_unit',
                     'leases.view_lease', 'leases.view_rentalapplication',
-                    'payments.view_payment', 'payments.view_invoice', 'payments.view_transaction',
-                    'maintenance.view_maintenancerequest', 'maintenance.view_servicevendor',
+                    
+                    'accounting.view_payment', 'accounting.view_invoice', 'accounting.view_cashsale', 'accounting.view_creditnote',
+                    'accounting.view_transactionlineitem', 'accounting.view_paymentmethod', 'accounting.view_cashbook', 'accounting.view_cashbookentry',
                     'accounting.view_chartofaccounts', 'accounting.view_journalentry', 'accounting.view_bankreconciliation', 'accounting.view_budget',
+                    'accounting.view_currency', 'accounting.view_salesitem', 'accounting.view_salesaccount', 'accounting.view_vatsetting',
+                    'accounting.view_currencyrate',
+                    
+                    'maintenance.view_maintenancerequest', 'maintenance.view_servicevendor',
                     'individuals.view_individual',
                     'companies.view_company',
                     'users.view_customuser',
@@ -180,9 +196,13 @@ class Command(BaseCommand):
                     # This role mostly relies on "view" permissions and custom report permissions
                     'properties.view_property', 'properties.view_unit',
                     'leases.view_lease', 'leases.view_rentalapplication',
-                    'payments.view_payment', 'payments.view_invoice', 'payments.view_transaction',
-                    'maintenance.view_maintenancerequest', 'maintenance.view_servicevendor',
+                    
+                    'accounting.view_payment', 'accounting.view_invoice', 'accounting.view_cashsale', 'accounting.view_creditnote',
+                    'accounting.view_transactionlineitem', 'accounting.view_cashbook', 'accounting.view_cashbookentry',
                     'accounting.view_chartofaccounts', 'accounting.view_journalentry', 'accounting.view_bankreconciliation', 'accounting.view_budget',
+                    'accounting.view_currency', 'accounting.view_salesitem',
+                    
+                    'maintenance.view_maintenancerequest', 'maintenance.view_servicevendor',
                     'individuals.view_individual',
                     'companies.view_company',
                     'users.view_customuser',
@@ -191,55 +211,57 @@ class Command(BaseCommand):
                     'communications.view_message',
                     'documents.view_document',
                     'marketing.view_campaign',
-                    # Add any specific 'can_view_dashboard' or high-level report permissions here
-                    # 'reports.can_view_executive_dashboard'
                 ]
             },
             {
                 'name': 'Vendor',
                 'description': 'Limited access for service vendors to view assigned maintenance tasks and update status.',
                 'permissions': [
-                    'maintenance.view_maintenancerequest', # Needs object-level permission for assigned tasks
-                    'maintenance.change_maintenancerequest', # To update status (e.g., 'completed')
-                    'communications.add_message', 'communications.view_message', # To communicate about tasks
-                    'documents.view_document', # To view related work orders/schematics (needs object-level)
+                    'maintenance.view_maintenancerequest',
+                    'maintenance.change_maintenancerequest', 
+                    'communications.add_message', 'communications.view_message', 
+                    'documents.view_document', 
+                    'accounting.view_invoice',
+                    'accounting.view_payment', 
                 ]
             },
             {
                 'name': 'Landlord',
                 'description': 'Allows property owners to view their property details, financial statements, and tenant information.',
                 'permissions': [
-                    'properties.view_property', # Needs object-level for their properties
-                    'properties.view_unit', # Needs object-level for units in their properties
-                    'leases.view_lease', # Needs object-level for leases on their properties
-                    'individuals.view_individual', # Needs object-level for tenants on their properties
-                    'payments.view_payment', # Needs object-level for payments related to their properties
-                    'payments.view_invoice', # Needs object-level for invoices related to their properties
-                    'accounting.view_journalentry', # Needs object-level for entries related to their properties (e.g., owner distributions)
-                    'maintenance.view_maintenancerequest', # Needs object-level for requests on their properties
-                    'documents.view_document', # Needs object-level for owner statements, property docs
-                    'reports.view_owner_statement', # Custom permission
+                    'properties.view_property', 
+                    'properties.view_unit', 
+                    'leases.view_lease', 
+                    'individuals.view_individual', 
+                    
+                    'accounting.view_payment',
+                    'accounting.view_invoice', 
+                    'accounting.view_cashsale', 
+                    'accounting.view_creditnote', 
+                    'accounting.view_journalentry', 
+
+                    'maintenance.view_maintenancerequest',
+                    'documents.view_document',
+
                 ]
             },
             {
                 'name': 'Read-Only User',
                 'description': 'Can view most non-sensitive data but cannot make any changes.',
                 'permissions': [
-                    # This would be a long list, e.g., view_property, view_unit, view_lease, etc. for all relevant models.
-                    # Or, you could dynamically get all 'view' permissions. For now, a comprehensive list:
                     'properties.view_property',
                     'properties.view_unit',
                     'leases.view_lease',
                     'leases.view_rentalapplication',
                     'individuals.view_individual',
                     'companies.view_company',
-                    'payments.view_payment',
-                    'payments.view_invoice',
-                    'payments.view_transaction',
-                    'accounting.view_chartofaccounts',
-                    'accounting.view_journalentry',
-                    'accounting.view_bankreconciliation',
-                    'accounting.view_budget',
+                    
+                    'accounting.view_payment', 'accounting.view_invoice', 'accounting.view_cashsale', 'accounting.view_creditnote',
+                    'accounting.view_paymentmethod', 'accounting.view_transactionlineitem', 'accounting.view_cashbook', 'accounting.view_cashbookentry',
+                    'accounting.view_chartofaccounts', 'accounting.view_journalentry', 'accounting.view_bankreconciliation', 'accounting.view_budget',
+                    'accounting.view_currency', 'accounting.view_salesitem', 'accounting.view_salesaccount', 'accounting.view_vatsetting',
+                    'accounting.view_currencyrate',
+                    
                     'maintenance.view_maintenancerequest',
                     'maintenance.view_servicevendor',
                     'users.view_customuser',
@@ -248,14 +270,13 @@ class Command(BaseCommand):
                     'leads.view_lead',
                     'communications.view_message',
                     'marketing.view_campaign',
-                    'django_admin_log.view_logentry', # Useful for auditing
+                    'django_admin_log.view_logentry',
                 ]
             }
         ]
 
         with transaction.atomic():
             self.stdout.write(self.style.NOTICE('Fetching all existing permissions for validation...'))
-            # Pre-fetch all permissions to avoid hitting DB in loop unnecessarily
             all_db_permissions = {
                 f"{p.content_type.app_label}.{p.codename}": p
                 for p in Permission.objects.select_related('content_type').all()
@@ -290,7 +311,6 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.SUCCESS(f"  Created role: '{role.name}'"))
                 else:
                     self.stdout.write(self.style.WARNING(f"  Role '{role.name}' already exists."))
-                    # Optionally, update description if it has changed
                     if role.description != role_data['description']:
                         role.description = role_data['description']
                         role.save()

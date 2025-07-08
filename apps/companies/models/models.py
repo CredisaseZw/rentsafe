@@ -96,3 +96,4 @@ class BranchContact(models.Model):
         return f"{self.first_name} {self.last_name} ({self.get_contact_type_display()})"
     def get_contact_type_display(self):
         return dict(self.CONTACT_TYPES).get(self.contact_type, 'Unknown')
+

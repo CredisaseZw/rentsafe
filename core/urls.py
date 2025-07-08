@@ -16,16 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/individuals/', include('individuals.urls')),
-    path('api/landlords/', include('landlords.urls')),
-    path('api/leases/', include('leases.urls')),
-    path('api/maintenance/', include('maintenance.urls')),
-    path('api/reports/', include('reporting.urls')),
-    path('api/auth/', include('users.urls')),
-    path('api/inspections/', include('inspections.urls')),
-    path('api/communication/', include('communications.urls')),
-    path('api/common/', include('common.urls')),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'), 
+    path('api/individuals/', include('individuals.api.urls')),
+    path('api/leases/', include('leases.api.urls')),
+    path('api/maintenance/', include('maintenance.api.urls')),
+    path('api/reports/', include('reporting.api.urls')),
+    path('api/auth/', include('users.api.urls')),
+    # path('api/inspections/', include('inspections.api.urls')),
+    path('api/communication/', include('communications.api.urls')),
+    path('api/common/', include('common.api.urls')),
 ]

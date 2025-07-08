@@ -31,8 +31,6 @@ class CustomUser(AbstractUser):
     
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='CLIENT',
                 help_text=_("The role or type of the user in the system."))
-    mobile = models.CharField(max_length=20, blank=True, null=True,
-                help_text=_("Mobile phone number of the user."))
     is_verified = models.BooleanField(default=False,
                 help_text=_("Designates whether the user's account has been verified (e.g., email/phone)."))
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True,
@@ -64,15 +62,30 @@ class CustomUser(AbstractUser):
 
     REQUIRED_FIELDS = ['email']
 
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-        db_table = "users" 
-        constraints = [
-            models.UniqueConstraint(fields=['profile_content_type', 'profile_object_id'],
-                        name='unique_user_profile_link',
-                        condition=Q(profile_content_type__isnull=False)) 
-        ]
+    class Meta(AbstractUser.Meta):
+        swappable = 'AUTH_USER_MODEL'
+        verbose_name = _("Custom User")
+        verbose_name_plural = _("Custom Users")
+
+    def clean(self):
+        super().clean()
+        if not self.is_superuser and not self.is_staff:
+            if not self.profile_object or not isinstance(self.profile_object, Individual):
+                raise ValidationError(
+                    _("Non-superuser/non-staff users must be linked to an Individual profile.")
+                )
+            if self.profile_object_id is None or self.profile_content_type is None:
+                raise ValidationError(
+                    _("Profile link is incomplete. Both profile_content_type and profile_object_id must be set.")
+                )
+            if not self.company:
+                raise ValidationError(
+                    _("Non-superuser/non-staff users must be assigned to a company.")
+                )
+    
+    def get_associated_company(self):
+        """Returns the company this user directly belongs to."""
+        return self.company
 
     def __str__(self):
         full_name = self.get_full_name()
@@ -80,26 +93,9 @@ class CustomUser(AbstractUser):
             return f"{full_name} ({self.username})"
         return self.username or self.email or f"User {self.pk}"
 
-    def clean(self):
-        super().clean()
-        if not self.is_superuser and not self.is_staff:
-            if not self.profile_object:
-                raise ValidationError(
-                    _("Non-superuser and non-staff users must be linked to an Individual or Company profile.")
-                )
-            if self.profile_object_id is None or self.profile_content_type is None:
-                raise ValidationError(
-                    _("Profile link is incomplete. Both profile_content_type and profile_object_id must be set.")
-                )
-
     def save(self, *args, **kwargs):
         self.full_clean() 
         super().save(*args, **kwargs)
-
-    def get_associated_company(self):
-        if self.profile_object and isinstance(self.profile_object, Company):
-            return self.profile_object
-        return None
 
     def get_associated_individual(self):
         if self.profile_object and isinstance(self.profile_object, Individual):
@@ -113,14 +109,11 @@ class CustomUser(AbstractUser):
         """
         if super().has_perm(perm, obj=obj):
             return True
-        
+
         if not self.is_active or self.is_anonymous:
             return False
 
-        for role in self.roles.all():
-            if role.has_perm(perm):
-                return True
-        return False
+        return any(role.has_perm(perm) for role in self.roles.all())
 
     def get_all_permissions(self, obj=None):
         """
@@ -159,23 +152,25 @@ class Role(BaseModel):
         """
         if not self.is_active:
             return False
-        
+
         try:
             app_label, codename = perm_codename.split('.')
-        except ValueError:
-            raise ValueError(f"Permission codename must be in 'app_label.codename' format. Got: {perm_codename}")
-            
+        except ValueError as e:
+            raise ValueError(
+                f"Permission codename must be in 'app_label.codename' format. Got: {perm_codename}"
+            ) from e
+
         return self.permissions.filter(content_type__app_label=app_label, codename=codename).exists()
 
     def get_all_permissions(self):
         """Returns a set of all permission codenames granted by this role."""
         if not self.is_active:
             return set()
-        
-        return set(
+
+        return {
             f"{p.content_type.app_label}.{p.codename}"
             for p in self.permissions.all()
-        )
+        }
 
 class UserSetting(BaseModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='settings',

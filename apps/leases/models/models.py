@@ -1,3 +1,4 @@
+import contextlib
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from common.models.models import Document, Note
@@ -11,6 +12,7 @@ from django.utils import timezone
 from datetime import date
 from decimal import Decimal
 from common.models.base_models import BaseModel
+from django.conf import settings
 
 class Lease(BaseModel):
     LEASE_STATUS_CHOICES = (
@@ -100,6 +102,123 @@ class Lease(BaseModel):
         return [lt.tenant_object.__str__() for lt in self.lease_tenants.all()]
 
     def save(self, *args, **kwargs):
+        is_new = not self.pk
+        original_status = None
+        original_landlord = None
+        original_deposit_amount = None
+
+        request = kwargs.pop('request', None)
+        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+        if not is_new:
+            try:
+                original_lease = Lease.objects.get(pk=self.pk)
+                original_status = original_lease.status
+                original_landlord = original_lease.landlord
+                original_deposit_amount = original_lease.deposit_amount
+            except Lease.DoesNotExist:
+                pass 
+
+        if not self.pk and not self.lease_id:
+            self.lease_id = self._generate_unique_lease_id()
+
+        status_changed_to_active = (self.status == 'ACTIVE' and original_status != 'ACTIVE')
+        status_changed_from_active = (original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED'])
+
+        current_lease_details = {
+            'lease_id_at_log_time': self.lease_id,
+            'unit_id_at_log_time': self.unit.id if self.unit else None,
+            'tenant_names_at_log_time': self.get_tenant_names(),
+            'start_date_at_log_time': self.start_date.isoformat() if self.start_date else None,
+            'unit_name_at_log_time': str(self.unit) if self.unit else None,
+            'landlord_id_at_log_time': self.landlord.id if self.landlord else None,
+            'landlord_name_at_log_time': str(self.landlord) if self.landlord else None,
+        }
+
+        super().save(*args, **kwargs)
+
+        if is_new:
+            log_details = current_lease_details.copy()
+            log_details.update({'initial_status': self.status})
+            LeaseLog.objects.create(
+                lease=self,
+                log_type='LEASE_CREATED',
+                user=user,
+                details=log_details
+            )
+        else:
+            log_details = current_lease_details.copy()
+
+            if self.status != original_status:
+                log_details |= {
+                    'old_status': original_status,
+                    'new_status': self.status,
+                }
+                LeaseLog.objects.create(
+                    lease=self,
+                    log_type='LEASE_STATUS_CHANGED',
+                    user=user,
+                    details=log_details
+                )
+                log_details = current_lease_details.copy()
+
+            # Check for landlord changes
+            if self.landlord != original_landlord:
+                log_details.update({
+                    'field': 'landlord',
+                    'old_landlord_id': original_landlord.id if original_landlord else None,
+                    'old_landlord_name': str(original_landlord) if original_landlord else None,
+                    'new_landlord_id': self.landlord.id if self.landlord else None,
+                    'new_landlord_name': str(self.landlord) if self.landlord else None,
+                })
+                LeaseLog.objects.create(
+                    lease=self,
+                    log_type='LEASE_UPDATED',
+                    user=user,
+                    details=log_details
+                )
+                log_details = current_lease_details.copy()
+
+            if self.deposit_amount != original_deposit_amount:
+                log_details.update({
+                    'old_deposit_amount': str(original_deposit_amount),
+                    'new_deposit_amount': str(self.deposit_amount)
+                })
+                LeaseLog.objects.create(
+                    lease=self,
+                    log_type='DEPOSIT_UPDATED',
+                    user=user,
+                    details=log_details
+                )
+                log_details = current_lease_details.copy()
+        if status_changed_to_active:
+            with transaction.atomic():
+                if not self._try_decrement_subscription_slot(request=request): 
+                    LeaseLog.objects.create(
+                        lease=self,
+                        log_type='OTHER',
+                        user=user,
+                        details={
+                            'event': 'Subscription Slot Decrement Failed',
+                            'lease_status_attempted': 'ACTIVE',
+                            **current_lease_details
+                        }
+                    )
+                    print("WARNING: Lease activated but subscription slot decrement failed.")
+
+        elif status_changed_from_active:
+            with transaction.atomic():
+                self._try_increment_subscription_slot(request=request) 
+                LeaseLog.objects.create(
+                    lease=self,
+                    log_type='OTHER',
+                    user=user,
+                    details={
+                        'event': 'Subscription Slot Incremented',
+                        'lease_status_changed_from': original_status,
+                        **current_lease_details
+                    }
+                )
         if not self.pk and not self.lease_id:
             self.lease_id = self._generate_unique_lease_id()
 
@@ -114,6 +233,13 @@ class Lease(BaseModel):
             with transaction.atomic():
                 if not self._try_decrement_subscription_slot(request=kwargs.get('request')):
                     raise ValueError(_("Cannot activate lease: No active subscription with available slots found for the landlord's associated entity."))
+        elif original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED']:
+            with transaction.atomic():
+                self._try_increment_subscription_slot(request=kwargs.get('request'))
+
+        # super().save(*args, **kwargs)
+        if not self._try_decrement_subscription_slot(request=kwargs.get('request')):
+            raise ValueError(_("Cannot activate lease: No active subscription with available slots found for the landlord's associated entity."))
         elif original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED']:
             with transaction.atomic():
                 self._try_increment_subscription_slot(request=kwargs.get('request'))
@@ -147,10 +273,10 @@ class Lease(BaseModel):
             due_date__lt=today,
             status__in=['pending', 'partially_paid', 'draft']
         ).order_by('due_date')
-        outstanding_periods = set()
-        for invoice in overdue_invoices:
-            outstanding_periods.add((invoice.due_date.year, invoice.due_date.month))
-            
+        outstanding_periods = {
+            (invoice.due_date.year, invoice.due_date.month)
+            for invoice in overdue_invoices
+        }
         return len(outstanding_periods)
 
     @property
@@ -266,6 +392,79 @@ class LeaseTenant(BaseModel):
     
     def __str__(self):
         return f"{self.tenant_object} on Lease {self.lease.lease_id}"
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        original_primary_status = None
+
+        request = kwargs.pop('request', None)
+        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+        if not is_new:
+            with contextlib.suppress(LeaseTenant.DoesNotExist):
+                original_lease_tenant = LeaseTenant.objects.get(pk=self.pk)
+                original_primary_status = original_lease_tenant.is_primary_tenant
+        super().save(*args, **kwargs)
+
+        tenant_obj_id = self.tenant_object.id if self.tenant_object else None
+        tenant_obj_name = str(self.tenant_object) if self.tenant_object else "N/A"
+
+        lease_details_for_log = {
+            'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
+            'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
+            'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
+            'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
+            'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
+            'tenant_id': tenant_obj_id,
+            'tenant_name': tenant_obj_name,
+        }
+
+        if is_new:
+            LeaseLog.objects.create(
+                lease=self.lease, 
+                log_type='TENANT_ADDED',
+                user=user,
+                details={**lease_details_for_log, 'is_primary': self.is_primary_tenant},
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.pk
+            )
+        elif original_primary_status != self.is_primary_tenant:
+            LeaseLog.objects.create(
+                lease=self.lease,
+                log_type='PRIMARY_TENANT_CHANGED',
+                user=user,
+                details={
+                    **lease_details_for_log,
+                    'old_primary_status': original_primary_status,
+                    'new_primary_status': self.is_primary_tenant
+                },
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.pk
+            )
+
+    def delete(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+        tenant_obj_id = self.tenant_object.id if self.tenant_object else None
+        tenant_obj_name = str(self.tenant_object) if self.tenant_object else "N/A"
+        
+        lease_details_for_log = {
+            'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
+            'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
+            'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
+            'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
+            'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
+            'tenant_id': tenant_obj_id,
+            'tenant_name': tenant_obj_name,
+        }
+
+        LeaseLog.objects.create(
+            lease=self.lease,
+            log_type='TENANT_REMOVED',
+            user=user,
+            details={**lease_details_for_log, 'was_primary': self.is_primary_tenant}
+        )
+        super().delete(*args, **kwargs)
 
 
 class Guarantor(BaseModel):
@@ -328,7 +527,99 @@ class LeaseCharge(BaseModel):
     def save(self, *args, **kwargs):
         if self.frequency == 'ONE_TIME' and self.end_date:
             self.end_date = None
+        is_new = not self.pk
+        original_amount = None
+        original_frequency = None
+        original_charge_type = None
+
+        request = kwargs.pop('request', None)
+        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+        if not is_new:
+            with contextlib.suppress(LeaseCharge.DoesNotExist):
+                original_charge = LeaseCharge.objects.get(pk=self.pk)
+                original_amount = original_charge.amount
+                original_frequency = original_charge.frequency
+                original_charge_type = original_charge.charge_type
         super().save(*args, **kwargs)
+
+        # Capture lease, unit, and landlord details for the log
+        lease_details_for_log = {
+            'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
+            'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
+            'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
+            'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
+            'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
+        }
+
+        if is_new:
+            LeaseLog.objects.create(
+                lease=self.lease,
+                log_type='CHARGE_ADDED',
+                user=user,
+                details={
+                    **lease_details_for_log,
+                    'charge_type': self.charge_type,
+                    'amount': str(self.amount),
+                    'currency_code': self.currency.code if self.currency else None,
+                    'frequency': self.frequency,
+                    'description': self.description
+                },
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.pk
+            )
+        else:
+            log_details = lease_details_for_log.copy() # Start with core details
+
+            # Track changes to charge fields
+            changed_fields = False
+            if self.amount != original_amount:
+                log_details['old_amount'] = str(original_amount)
+                log_details['new_amount'] = str(self.amount)
+                changed_fields = True
+            if self.frequency != original_frequency:
+                log_details['old_frequency'] = original_frequency
+                log_details['new_frequency'] = self.frequency
+                changed_fields = True
+            if self.charge_type != original_charge_type:
+                log_details['old_charge_type'] = original_charge_type
+                log_details['new_charge_type'] = self.charge_type
+                changed_fields = True
+
+            if changed_fields:
+                LeaseLog.objects.create(
+                    lease=self.lease,
+                    log_type='CHARGE_UPDATED',
+                    user=user,
+                    details=log_details,
+                    content_type=ContentType.objects.get_for_model(self),
+                    object_id=self.pk
+                )
+
+    def delete(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+        lease_details_for_log = {
+            'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
+            'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
+            'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
+            'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
+            'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
+        }
+
+        LeaseLog.objects.create(
+            lease=self.lease,
+            log_type='CHARGE_REMOVED',
+            user=user,
+            details={
+                **lease_details_for_log,
+                'charge_type': self.charge_type,
+                'amount': str(self.amount),
+                'description': self.description
+            }
+        )
+        super().delete(*args, **kwargs)
 
 
 class LeaseTermination(BaseModel):
@@ -344,3 +635,75 @@ class LeaseTermination(BaseModel):
 
     def __str__(self):
         return f"Termination of Lease {self.lease.lease_id} on {self.termination_date}"
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super().save(*args, **kwargs)
+
+        if is_new:
+            request = kwargs.pop('request', None)
+            user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
+
+            lease_details_for_log = {
+                'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
+                'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
+                'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
+                'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
+                'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
+            }
+
+            LeaseLog.objects.create(
+                lease=self.lease,
+                log_type='LEASE_TERMINATED',
+                user=user,
+                details={**lease_details_for_log, 'termination_date': str(self.termination_date), 'reason': self.reason}
+            )
+            
+            if self.lease.status != 'TERMINATED':
+                self.lease.status = 'TERMINATED'
+                self.lease.save(request=request) # Pass request
+
+
+class LeaseLog(BaseModel):
+    LOG_TYPE_CHOICES = (
+        ('LEASE_CREATED', 'Lease Created'),
+        ('LEASE_UPDATED', 'Lease Updated'),
+        ('TENANT_ADDED', 'Tenant Added'),
+        ('TENANT_REMOVED', 'Tenant Removed'),
+        ('PRIMARY_TENANT_CHANGED', 'Primary Tenant Changed'),
+        ('LEASE_STATUS_CHANGED', 'Lease Status Changed'),
+        ('LEASE_TERMINATED', 'Lease Terminated'),
+        ('LEASE_RENEWED', 'Lease Renewed'),
+        ('CHARGE_ADDED', 'Charge Added'),
+        ('CHARGE_UPDATED', 'Charge Updated'),
+        ('CHARGE_REMOVED', 'Charge Removed'),
+        ('DEPOSIT_UPDATED', 'Deposit Updated'),
+        ('OTHER', 'Other'),
+    )
+
+    lease = models.ForeignKey(Lease, on_delete=models.SET_NULL, null=True, blank=True, related_name='logs',
+                        help_text="The lease associated with this log entry. Set to NULL if the lease is deleted.")
+    
+    log_type = models.CharField(max_length=50, choices=LOG_TYPE_CHOICES,
+                        help_text="The type of event being logged.")
+    timestamp = models.DateTimeField(auto_now_add=True,
+                        help_text="The date and time the event occurred.")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                        help_text="The user who performed the action, if applicable.")
+    
+    details = models.JSONField(null=True, blank=True,
+                        help_text="JSON field to store detailed changes or relevant data, including core lease identifiers.")
+    
+    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True,
+                                    help_text="The content type of the related object (e.g., LeaseTenant).")
+    object_id = models.PositiveIntegerField(null=True, blank=True,
+                        help_text="The ID of the related object.")
+    related_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        verbose_name = _('lease log')
+        verbose_name_plural = _('lease logs')
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        lease_identifier = self.details.get('lease_id_at_log_time', 'N/A') if self.lease is None else self.lease.lease_id
+        return f"{self.log_type} for Lease {lease_identifier} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
