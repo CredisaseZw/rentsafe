@@ -1,3 +1,4 @@
+import { SearchBarStyles } from "../constants";
 import useSearchBar from "../hooks/component-hooks/useSearchBar";
 
 export default function SearchBar({ searchBy, placeholder }) {
@@ -5,21 +6,17 @@ export default function SearchBar({ searchBy, placeholder }) {
 
   return (
     <form onSubmit={handleSearch} ref={formRef}>
-      <div className="input-group">
-        <button
-          type="button"
-          className="btn btn-light border border-2 custom-z-0 c-rounded-s-pill"
-          onClick={clear}
-        >
-          <i className="material-icons small">close</i>
+      <div className={SearchBarStyles.containerClassname}>
+        <button type="button" className={SearchBarStyles.leftButtonClassname} onClick={clear}>
+          <i className="material-icons">close</i>
         </button>
         <input
           name={searchBy}
           defaultValue={defaultValue}
           placeholder={placeholder || `Search by ${searchBy}`}
-          className="form-control py-1 custom-mx-w-3 border border-2"
+          className={SearchBarStyles.inputClassname}
         />
-        <button type="submit" className="btn btn-sm btn-primary custom-z-0 c-rounded-e-pill">
+        <button type="submit" className={SearchBarStyles.rightButtonClassname}>
           <i className="material-icons">search</i>
         </button>
       </div>

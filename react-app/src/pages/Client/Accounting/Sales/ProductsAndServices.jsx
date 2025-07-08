@@ -1,5 +1,6 @@
-import ContentModal from "../../../../components/ContentModal.jsx";
 import Layout from "../../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../../components/Client/table/CustomTable.jsx";
+import ContentModal from "../../../../components/ContentModal.jsx";
 import MessageModal from "../../../../components/MessageModal.jsx";
 import useProductsAndServices from "../../../../hooks/page-hooks/useProductsAndServices.js";
 import { friendlyDate } from "../../../../utils/index.js";
@@ -79,20 +80,6 @@ export default function ProductsAndServices() {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="id" className="form-label">
-              Item Id
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="item_id"
-              name="item_id"
-              required
-              defaultValue={itemToEdit?.id}
-            />
-          </div>
-
-          <div className="mb-3">
             <label htmlFor="name" className="form-label">
               Item Name
             </label>
@@ -144,7 +131,6 @@ export default function ProductsAndServices() {
                 </label>
 
                 <input
-                  type="number"
                   className="form-control rounded-0"
                   id="price"
                   name="price"
@@ -229,81 +215,57 @@ export default function ProductsAndServices() {
         </form>
       </ContentModal>
 
-      <h5 className="position-relative text-center mb-2 p-2 mb-0">
-        Sales Items
-        <div className="position-absolute top-0 end-0">
-          <button className="btn btn-info text-white" onClick={openShowAdd}>
-            <i className="leading-icon material-icons">add</i>
-            Add
-          </button>
-        </div>
-      </h5>
+      <CustomTable.Table tabletitle="Sales Items" tabletitleBg="info" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, 1, null, 1, 1, 1]} />
 
-      <table className="table table-sm table-striped border bg-white">
-        <thead className="position-sticky c-table-top text-white bg-info shadow-sm c-z-5">
-          <tr className="c-force-borders c-force-borders-white">
-            <th className="ps-3">
-              <div>Category</div>
-            </th>
-            <th>
-              <div>Id </div>
-            </th>
-            <th>
-              <div>Name </div>
-            </th>
-            <th>
-              <div>Unit Price </div>
-            </th>
-            <th>
-              <div>Date Created </div>
-            </th>
-            <th>
-              <div> </div>
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+          <tr>
+            <th>Category</th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Unit Price</th>
+            <th>Date Created</th>
+            <th className="text-end">
+              <CustomTable.ActionButtonTemplate icon="add" onClick={openShowAdd}>
+                Add
+              </CustomTable.ActionButtonTemplate>
             </th>
           </tr>
         </thead>
 
         <tbody>
-          {!Boolean(items?.length) && (
-            <tr>
-              <td colSpan={6}>
-                <div className="custom-h-3 bg-white d-flex justify-content-center align-items-center">
-                  Nothing to show
-                </div>
-              </td>
-            </tr>
-          )}
+          {!Boolean(items?.length) && <CustomTable.NothingToShow colSpan={6} />}
 
           {items?.map((item, index) => (
             <tr key={index}>
-              <td className="ps-3">{item.category_object.name}</td>
-
-              <td className="ps-3">{item.id}</td>
-
-              <td className="ps-3">{item.name}</td>
-
-              <td className="ps-3">
+              <td className="text-nowrap">{item.category_object.name}</td>
+              <td className="text-nowrap">{item.id}</td>
+              <td className="text-nowrap">{item.name}</td>
+              <td className="text-nowrap">
                 {`${item.currency_object?.currency_code || ""} ${item.price} / ${item.unit_name}`}
               </td>
+              <td className="text-nowrap">
+                {item.date_created && friendlyDate(item.date_created)}
+              </td>
 
-              <td className="ps-3">{item.date_created && friendlyDate(item.date_created)}</td>
+              <td>
+                <CustomTable.ActionButtonsContainer>
+                  <CustomTable.ActionButtonTemplate onClick={() => setItemToEdit(item)}>
+                    Edit
+                  </CustomTable.ActionButtonTemplate>
 
-              <td className="d-flex gap-2 justify-content-end pe-3">
-                <button
-                  className="btn btn-sm btn-info text-white"
-                  onClick={() => setItemToEdit(item)}
-                >
-                  Edit
-                </button>
-
-                <button className="btn btn-sm btn-danger" onClick={() => setItemToDelete(item)}>
-                  Delete
-                </button>
+                  <CustomTable.ActionButtonTemplate
+                    variant="danger"
+                    onClick={() => setItemToDelete(item)}
+                  >
+                    Delete
+                  </CustomTable.ActionButtonTemplate>
+                </CustomTable.ActionButtonsContainer>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </CustomTable.Table>
     </main>
   );
 }

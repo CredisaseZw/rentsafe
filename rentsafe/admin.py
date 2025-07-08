@@ -190,3 +190,10 @@ class WorkScheduleAdmin(admin.ModelAdmin):
     list_filter = ("created_at",)
     ordering = ("-created_at",)
 
+@admin.register(LeaseAddress)
+class LeaseAddressAdmin(admin.ModelAdmin):
+    list_display = ("lease_id","id", "unit_number", "building_name", "street_number", "street_name", "suburb", "city", "province", "country", "area_code")
+    list_display_links = ("id","unit_number")
+    search_fields = ("lease_id__lease_id", "unit_number", "building_name", "street_number")
+    list_filter = ("city", "street_name", "country")
+    ordering = ("-id",)

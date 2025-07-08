@@ -239,9 +239,9 @@ class CreateIndividualSchema(Schema):
     mobile = fields.Str(
         data_key="mobileNumber", required=True, validate=validate_mobile_number
     )
-    address = fields.Str(
-        data_key="address", required=True, validate=validate.Length(min=3)
-    )
+    # address = fields.Str(
+    #     data_key="address", required=False, validate=validate.Length(min=0)
+    # )
     identification_type = fields.Str(
         data_key="identificationType", required=True, validate=validate.Length(min=5)
     )
@@ -254,8 +254,22 @@ class CreateIndividualSchema(Schema):
     land_line = fields.Str(data_key="landLine", required=False)
     date_of_employment = fields.Str(data_key="dateOfemployment", required=False)
     individual_id = fields.Int(data_key="individualId", required=False)
-
-
+    
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
+    
+    
+    class Meta:
+        unknown = EXCLUDE
+    
 class IndividualSchema(Schema):
     """
     A schema definition using the Marshmallow library in Python.
@@ -303,7 +317,7 @@ class AgentSchema(Schema):
     employer_name = fields.Str(required=True)
     job_title = fields.Str(required=True)
     is_agent = fields.Bool(required=True)
-
+    
     def __init__(self, *args, **kwargs):
         """
         Initialize the IndividualSchema class.
@@ -395,9 +409,7 @@ class CreateCompanySchema(Schema):
 
     registrationDate = fields.Str(data_key="registrationDate", required=False)
     vatNumber = fields.Str(data_key="vatNumber", required=False)
-    currentAddress = fields.Str(
-        data_key="currentAddress", required=True, validate=validate.Length(min=3)
-    )
+    # currentAddress = fields.Str(data_key="currentAddress", required=False)
     landLine = fields.Str(data_key="landLine", required=False)
     mobileNumber = fields.Str(
         data_key="mobileNumber", required=False, validate=validate.Length(max=15)
@@ -413,7 +425,21 @@ class CreateCompanySchema(Schema):
     companyId = fields.Str(data_key="company_id", required=False)
     pageType = fields.Str(data_key="pageType", required=False)
     tin_number = fields.Str(data_key="tinNumber", required=False)
+    
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
+    
+    class Meta:
+        unknown = EXCLUDE
 
 # Add-Lease
 class CreateIndividualLeaseSchema(Schema):
@@ -434,9 +460,9 @@ class CreateIndividualLeaseSchema(Schema):
     )
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=True)
 
-    lesseeAddress = fields.Str(
-        data_key="lesseeAddress", required=True, validate=validate.Length(min=3)
-    )
+    # lesseeAddress = fields.Str(
+    #     data_key="lesseeAddress", required=False, validate=validate.Length(min=0)
+    # )
     leaseEndDate = fields.Str(data_key="leaseEndDate", required=True, validate=validated_date)
     lesseePhone = fields.Str(
         data_key="lesseePhone",
@@ -491,6 +517,21 @@ class CreateIndividualLeaseSchema(Schema):
     regIdNumber = fields.Str(data_key="regIdNumber", required=False)
     openingBalance = fields.Float(data_key="openingBalance", required=False)
 
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
+    
+    ## for testing purpose!!!
+    class Meta:
+        unknown = EXCLUDE
+
 
 class CreateCompanyLeaseSchema(Schema):
     identificationNumber = fields.Str(data_key="identificationNumber", required=False)
@@ -508,9 +549,9 @@ class CreateCompanyLeaseSchema(Schema):
     )
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=True)
 
-    lesseeAddress = fields.Str(
-        data_key="lesseeAddress", required=True, validate=validate.Length(min=3)
-    )
+    # lesseeAddress = fields.Str(
+    #     data_key="lesseeAddress", required=False
+    # )
     leaseEndDate = fields.Str(data_key="leaseEndDate", required=True,validate=validated_date)
     mobile = fields.Str(data_key="mobile", required=False)
     email = fields.Email(
@@ -566,7 +607,21 @@ class CreateCompanyLeaseSchema(Schema):
     regIdNumber = fields.Str(data_key="regIdNumber", required=False)
     openingBalance = fields.Float(data_key="openingBalance", required=False)
     accountNumber = fields.Str(data_key="accountNumber", required=False)
+    
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
+        ## For testing purposes only need to be removed 
+    class Meta:
+        unknown = EXCLUDE
 
 def validate_email(value):
     # Check if the email already exists in the database
@@ -669,6 +724,18 @@ class CreateAgentSchema(Schema):
     dateOfEmployment = fields.Str(data_key="dateOfemployment", required=False)
     individualId = fields.Int(data_key="individualId", required=False)
     isAgent = fields.Boolean(data_key="isAgent", required=False)
+    
+    # Address validation
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    suburb = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
+
 
 
 class UpdateAgentSchema(Schema):
@@ -714,7 +781,7 @@ class CheckUserSchema(Schema):
 class GetUserSchema(Schema):
     identificationNumber = fields.Str(data_key="identificationNumber", required=True)
     lesseeName = fields.Str(data_key="lesseeName", required=False)
-    lesseeAddress = fields.Str(data_key="lesseeAddress", required=False)
+    # lesseeAddress = fields.Str(data_key="lesseeAddress", required=False)
     lesseePhone = fields.Str(data_key="lesseePhone", required=False)
     leaseDetails = fields.Str(data_key="leaseDetails", required=False)
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=False)
@@ -762,10 +829,10 @@ class GetCompanySchema(Schema):
     )
     leaseStartDate = fields.Str(data_key="leaseStartDate", required=False)
 
-    lesseeAddress = fields.Str(
-        data_key="lesseeAddress",
-        required=False,
-    )
+    # lesseeAddress = fields.Str(
+    #     data_key="lesseeAddress",
+    #     required=False,
+    # )
     leaseEndDate = fields.Str(data_key="leaseEndDate", required=False)
     mobile = fields.Str(
         data_key="mobile",
@@ -814,6 +881,16 @@ class GetCompanySchema(Schema):
     currentBalance = fields.Str(data_key="currentBalance", required=False)
     outStandingBalance = fields.Int(data_key="outStandingBalance", required=False)
 
+    #Address infor
+    unitNumber = fields.Str(data_key="unitNumber",required=False)
+    buildingName = fields.Str(data_key="buildingName",required=False)
+    streetNumber = fields.Str(data_key="streetNumber",required=False)
+    streetName = fields.Str(data_key="streetName",required=False)
+    surbub = fields.Str(data_key="suburb",required=False)
+    city = fields.Str(data_key="city",required=False)
+    province = fields.Str(data_key="province",required=False)
+    country = fields.Str(data_key="country",required=False)
+    areaCode = fields.Str(data_key="areaCode",required=False, validate=validate.Length(max=15))
 
 class CreateSubscriptionSchema(Schema):
     subscriberName = fields.Str(
@@ -1153,5 +1230,15 @@ class DebtCallFilterDataSchema(Schema):
     balance_filter = fields.Int(data_key="balance_filter", required=False)
     sms_message = fields.Str(data_key="sms_message", required=False)
     email_message = fields.Str(data_key="email_message", required=False)
-    
-    
+
+class LeaseAddressSchema(Schema):
+    lease_id = fields.Str(data_key="lease_id", required=False)
+    unit_number = fields.Str(data_key="unit_number", required=False)
+    building_name = fields.Str(data_key="building_name", required=False)
+    street_number = fields.Str(data_key="street_number", required=False)
+    street_name = fields.Str(data_key="street_name", required=False)
+    suburb = fields.Str(data_key="suburb", required=False)
+    city = fields.Str(data_key="city", required=False)
+    province = fields.Str(data_key="province", required=False)
+    country = fields.Str(data_key="country", required=False)
+    area_code = fields.Str(data_key="area_code", required=False)

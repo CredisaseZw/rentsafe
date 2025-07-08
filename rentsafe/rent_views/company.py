@@ -107,7 +107,7 @@ def agents(request):
                             "landline": user.land_line,
                             "is_agent": True if agent.user_type == 3 else False,
                             "email": user.email,
-                            "address": user.address,
+                            "address": user.unit_number if user.unit_number else "N/A",
                             "identification_type": user.identification_type,
                             "identification_number": user.identification_number,
                             "dob": user.dob,
@@ -151,7 +151,7 @@ def agents(request):
                             "landline": user.land_line,
                             "email": user.email,
                             "is_agent": True if agent.user_type == 3 else False,
-                            "address": user.address,
+                            # "address": user.address,
                             "identification_type": user.identification_type,
                             "identification_number": user.identification_number,
                             "dob": user.dob,
@@ -191,10 +191,19 @@ def create_agent_user(request):
                 land_line=data.get("landline"),
                 gender=data.get("gender"),
                 mobile=data.get("mobileNumber"),
-                address=data.get("address"),
+                # address=data.get("address"),
                 identification_type=data.get("identificationType"),
                 identification_number=data.get("identificationNumber").upper(),
                 is_user=True,
+                unit_number=data.get("unitNumber"),  ## Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
             )
             individual.save()
             new_message = "Accept Agent Account registration on CrediSafe? Give OTP below as confirmation."
@@ -383,10 +392,18 @@ def create_individual(request):
                 mobile=data.get("mobile"),
                 email=data.get("email"),
                 land_line=data.get("land_line"),
-                address=data.get("address"),
                 identification_type=data.get("identification_type"),
                 identification_number=data.get("identificationNumber").upper(),
                 is_verified=True,
+                unit_number=data.get("unitNumber"),  ## Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
             )
             individual.save()
             # send OTP
@@ -466,11 +483,21 @@ def create_individual_user(request):
                 mobile=data.get("mobile"),
                 email=data.get("email"),
                 land_line=data.get("land_line"),
-                address=data.get("address"),
+                # address=data.get("address"),
                 identification_type=data.get("identification_type"),
                 identification_number=data.get("identificationNumber").upper(),
                 is_user=True,
                 is_verified=True,
+                unit_number=data.get("unitNumber"),  ## Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
+                
             )
             individual.save()
             individual_employement_details = EmployementDetails(
@@ -584,7 +611,7 @@ def create_company(request):
                 trading_name=data.get("tradingName").upper(),
                 industry=data.get("industry"),is_client = True if data.get("is_contracted") else False,
                 company_uploader=request.user.company,
-                is_government=data.get("is_gvt"),
+                is_government=data.get("is_gvt"),    
             )
             company_ob.save()
             # Create the company profile
@@ -592,13 +619,21 @@ def create_company(request):
                 company=company_ob.id,
                 registration_date=data.get("registrationDate") if data.get("registrationDate") else None,
                 vat_number=data.get("vatNumber"),
-                current_address=data.get("currentAddress"),
                 mobile_phone=data.get("mobileNumber"),
                 email=data.get("emailAddress"),
                 website=data.get("website") ,
                 note=data.get("note"),
                 landline_phone=data.get("landLine"),
                 branch=data.get("branch"),
+                unit_number=data.get("unitNumber"),
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"), 
             )
             email_ob = data.get("emailAddress")
             # send email
@@ -1208,7 +1243,7 @@ def view_subscription_details(request, subscription_id):
                 {
                     i.lease_id: {
                         "name": name,
-                        "address": i.address,
+                        # "address": i.address,
                         "mobile": mobile,
                         "lease_id": i.lease_id,
                         "reg_ID_Number": i.reg_ID_Number,
@@ -1685,13 +1720,31 @@ def search_individual_users(request):
                                     "dob": individual_ob.dob if individual_ob.dob else None,
                                     "landline": individual_ob.land_line,
                                     "email": individual_ob.email,
-                                    "address": individual_ob.address,
+                                    # "address": individual_ob.address,
+                                    "unit_number": individual_ob.unit_number,
+                                    "building_name": individual_ob.building_name,
+                                    "street_number": individual_ob.street_number,
+                                    "street_name": individual_ob.street_name,
+                                    "suburb": individual_ob.suburb,
+                                    "city": individual_ob.city,
+                                    "province": individual_ob.province,
+                                    "country": individual_ob.country,
+                                    "area_code": individual_ob.area_code,
                                     "identification_type": individual_ob.identification_type,
                                     "identification_number": individual_ob.identification_number,
                                     "date_of_employment": employment_details.date_of_employment if employment_details else None,
                                     "job_tittle": employment_details.job_title if employment_details else None,
                                     "is_verified": individual_ob.is_verified,
                                     "created_at": individual_ob.created_at,
+                                    "unit_number": individual_ob.unit_number,
+                                    "building_name": individual_ob.building_name,
+                                    "street_number": individual_ob.street_number,
+                                    "street_name": individual_ob.street_name,
+                                    "suburb": individual_ob.suburb,
+                                    "city": individual_ob.city,
+                                    "province": individual_ob.province,
+                                    "country": individual_ob.country,
+                                    "area_code": individual_ob.area_code,
                                 }
                             }
                         )
@@ -1771,11 +1824,21 @@ def search_company_users(request):
                                         "registration_date": com_profile.registration_date,
                                         "email": com_profile.email,
                                         "website": com_profile.website,
-                                        "address": com_profile.current_address,
+                                        # "address": com_profile.current_address,
                                         "branch":com_profile.branch if com_profile.branch else "",
                                         "note": com_profile.note,
                                         "vat_number": com_profile.vat_number,
                                         "is_government": company_ob.is_government,
+                                        "unit_number": com_profile.unit_number,
+                                        "building_name": com_profile.building_name,
+                                        "street_number": com_profile.street_number,
+                                        "street_name": com_profile.street_name,
+                                        "suburb": com_profile.suburb,
+                                        "city": com_profile.city,
+                                        "province": com_profile.province,
+                                        "country": com_profile.country,
+                                        "area_code": com_profile.area_code,
+                                        
                                     }
                                 }
                             )
@@ -1868,10 +1931,20 @@ def edit_individual_user(request):
         individual_obj.identification_type = json_data["identificationType"]
         individual_obj.mobile = json_data["mobileNumber"]
         individual_obj.land_line = json_data.get("landLine")
-        individual_obj.address = json_data["address"]
+        # individual_obj.address = json_data["address"]
         individual_obj.email = json_data.get("emailAddress") if json_data.get("emailAddress") else None
         individual_obj.dob = json_data.get("dob") if json_data.get("dob") else None
         individual_obj.gender = json_data.get("gender") if json_data.get("gender") else None
+        individual_obj.unit_number = json_data.get("unitNumber")
+        individual_obj.street_number =json_data.get("streetNumber")
+        individual_obj.street_name =json_data.get("streetName")
+        individual_obj.building_name =json_data.get("buildingName")
+        individual_obj.suburb = json_data.get("suburb")
+        individual_obj.city = json_data.get("city")
+        individual_obj.province = json_data.get("province")
+        individual_obj.country = json_data.get("country")
+        individual_obj.area_code = json_data.get("areaCode")
+        
         individual_obj.save()
         if employment_details:
             employment_details.job_title = json_data.get("jobTitle") if json_data.get("jobTitle") else None
@@ -1904,17 +1977,27 @@ def edit_company_user(request):
     company_obj.industry = json_data.get("industry")
     company_obj.is_client = json_data.get("is_contracted")
     company_obj.is_government = json_data.get("is_gvt")
+    
     company_obj.save()
     if comp_profile:
         comp_profile.registration_date = json_data.get("registrationDate")
         comp_profile.vat_number = json_data.get("vatNumber")
-        comp_profile.current_address = json_data.get("currentAddress")
+        # comp_profile.current_address = json_data.get("currentAddress",None)
         comp_profile.mobile_phone = json_data.get("mobileNumber")
         comp_profile.landline_phone = json_data.get("landLine")
         comp_profile.email = json_data.get("emailAddress")
         comp_profile.website = json_data.get("website")
         comp_profile.note = json_data.get("note")
         comp_profile.branch=json_data.get("branch") if json_data.get("branch") != comp_profile.branch else comp_profile.branch
+        comp_profile.unit_number = json_data.get("unitNumber")
+        comp_profile.street_number =json_data.get("streetNumber")
+        comp_profile.street_name =json_data.get("streetName")
+        comp_profile.building_name =json_data.get("buildingName")
+        comp_profile.suburb = json_data.get("suburb")
+        comp_profile.city = json_data.get("city")
+        comp_profile.province = json_data.get("province")
+        comp_profile.country = json_data.get("country")
+        comp_profile.area_code = json_data.get("areaCode")
         comp_profile.save()
     is_client = company_obj.is_client
     return JsonResponse(
@@ -2160,15 +2243,32 @@ def get_all_companies(request):
             company_profiles = CompanyProfile.objects.filter(company__in=[c.id for c in result])
             email_map = {cp.company: cp.email for cp in company_profiles}
             mobile_map = {cp.company: cp.mobile_phone for cp in company_profiles}
-            address_map = {cp.company: cp.current_address for cp in company_profiles}
+            unit_map = {cp.company: cp.unit_number for cp in company_profiles}
+            building_map = {cp.company: cp.building_name for cp in company_profiles}
+            street_number_map = {cp.company: cp.street_number for cp in company_profiles}
+            street_name_map = {cp.company: cp.street_name for cp in company_profiles}
+            suburb_map = {cp.company: cp.suburb for cp in company_profiles}
+            city_map = {cp.company: cp.city for cp in company_profiles}
+            province_map = {cp.company: cp.province for cp in company_profiles}
+            country_map = {cp.company: cp.country for cp in company_profiles}
+            area_code_map = {cp.company: cp.area_code for cp in company_profiles}
+                       
 
             company_schema = CompanySchema(many=True)
             companies_data = company_schema.dump(list(result))
             for company_data in companies_data:
                 company_data['email'] = email_map.get(str(company_data['id']), '')
                 company_data['mobile'] = mobile_map.get(str(company_data['id']), '')
-                company_data['address'] = address_map.get(str(company_data['id']), '')
-            
+                company_data['unit_number'] = unit_map.get(str(company_data['id']), '')
+                company_data['building_name'] = building_map.get(str(company_data['id']), '')
+                company_data['street_number'] = street_number_map.get(str(company_data['id']), '')
+                company_data['street_name'] = street_name_map.get(str(company_data['id']), '')
+                company_data['suburb'] = suburb_map.get(str(company_data['id']), '')
+                company_data['city'] = city_map.get(str(company_data['id']), '')
+                company_data['province'] = province_map.get(str(company_data['id']), '')
+                company_data['country'] = country_map.get(str(company_data['id']), '')
+                company_data['area_code'] = area_code_map.get(str(company_data['id']), '')
+
             return JsonResponse(companies_data, safe=False)
     else:
         return JsonResponse({"result": "No companies found.", "status": "failed"})
@@ -2255,9 +2355,18 @@ def get_contracted_company(request):
                                         "registration_date": com_profile.registration_date,
                                         "email": com_profile.email,
                                         "website": com_profile.website,
-                                        "address": com_profile.current_address,
+                                        # "address": com_profile.current_address,
                                         "note": com_profile.note,
                                         "vat_number": com_profile.vat_number,
+                                        "unit_number": com_profile.unit_number,
+                                        "building_name": com_profile.building_name,
+                                        "street_number": com_profile.street_number,
+                                        "street_name": com_profile.street_name,
+                                        "suburb": com_profile.suburb,
+                                        "city": com_profile.city,
+                                        "province": com_profile.province,
+                                        "country": com_profile.country,
+                                        "area_code": com_profile.area_code,
                                     }
                                 }
                             )
@@ -2378,7 +2487,17 @@ def get_customer_subs_info():
         if subscriber_details:
             subscriber_name = subscriber_details.firstname + " " + subscriber_details.surname
             subscriber_id = subscriber_details.identification_number
-            subscriber_address = subscriber_details.address
+            subscriber_address = {
+                "unit_number": subscriber_details.unit_number,
+                "building_name": subscriber_details.building_name,
+                "street_number": subscriber_details.street_number,
+                "street_name": subscriber_details.street_name,
+                "suburb": subscriber_details.suburb,
+                "city": subscriber_details.city,
+                "province": subscriber_details.province,
+                "country": subscriber_details.country,
+                "area_code": subscriber_details.area_code,
+            }
             activated_leases_count = Lease.objects.filter(is_active=True,lease_giver=subscriber_details.identification_number)
             individuals_customers_list.append({
                 "subscriber_name": subscriber_name,
@@ -2394,13 +2513,23 @@ def get_customer_subs_info():
                 subscriber_name = subscriber_details.registration_name
                 subscriber_id = subscriber_details.registration_number
                 address_ob = CompanyProfile.objects.filter(company=subscriber_details.id).first()
-                subscriber_address = address_ob.current_address if address_ob else 'N/A'
+                subscriber_address = {
+                    "unit_number": address_ob.unit_number,
+                    "building_name": address_ob.building_name,
+                    "street_number": address_ob.street_number,
+                    "street_name": address_ob.street_name,
+                    "suburb": address_ob.suburb,
+                    "city": address_ob.city,
+                    "province": address_ob.province,
+                    "country": address_ob.country,
+                    "area_code": address_ob.area_code,
+                }
                 activated_leases_count = Lease.objects.filter(is_active=True,lease_giver=subscriber_details.id)
                 companies_customers_list.append({
                     "subscriber_name": subscriber_name,
                     "individual_leases_count": activated_leases_count.filter(is_individual=True).count() if activated_leases_count else 0,
                     "company_leases_count": activated_leases_count.filter(is_company=True).count() if activated_leases_count else 0,
                     "subscriber_id": subscriber_id,
-                    "subscriber_address": subscriber_address,
+                    # "subscriber_address": subscriber_address,
                 })
     return individuals_customers_list,companies_customers_list

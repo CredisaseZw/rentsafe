@@ -233,6 +233,7 @@ urlpatterns = [
         "clients/",
         include(
             [
+                path("sandbox", clients.sandbox, name="sandbox"),
                 path("commission-statements", clients.commission_statements, name="commission_statements"),
                 path("adverse-data", clients.adverse_data, name="adverse_data"),
                 path("cash-sales", clients.cash_sales, name="cash_sales"),
@@ -246,11 +247,21 @@ urlpatterns = [
                 path("sales-invoicing", clients.sales_invoicing, name="sales_invoicing"),
                 path("general-ledger", clients.sales_invoicing, name="general_ledger"),
                 path("accounts-list", clients.accounts_list, name="accounts_list"),
+                path("accounts-list-view-only", clients.view_only_accounts_list, name="view_only_accounts_list"),
                 path(
                     "claims/",
                     claims.create_claim,
                     name="create_claim",
                 ),
+                path(
+                    "lease-address/",   ### lease addresses
+                    clients.lease_address,
+                    name="lease_address"
+                ),
+                # path(
+                #     "search-lease-address/",   ### search lease addresses
+                #     clients.search_lease_address,
+                #     name="search_lease_address"),
                 path(
                     "claims/search/",
                     claims.search_individuals_or_companies,

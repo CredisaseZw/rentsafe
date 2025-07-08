@@ -27,7 +27,6 @@ export default function useCreditNoteForm(creditNote) {
   useEffect(() => {
     if (creditNote) {
       const newCreditNoteData = {
-        document_number: creditNote.document_number,
         credit_to: creditNote.bill_to,
         address: creditNote.address,
         phone: creditNote.phone,

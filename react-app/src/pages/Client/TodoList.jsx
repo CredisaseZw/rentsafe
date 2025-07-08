@@ -4,7 +4,7 @@ import WorksAndMaintenance from "../../components/Client/ClientView/WorksAndMain
 import { formatCurrency } from "../../utils/formatting.js";
 import { truncate } from "lodash";
 import { friendlyDate } from "../../utils/index.js";
-import NewPageHeader from "../../components/NewPageHeader.jsx";
+import CustomTable from "../../components/Client/table/CustomTable.jsx";
 
 export default function TodoList({ status, message, works, reminders, maintenance, Auth }) {
   const {
@@ -27,7 +27,7 @@ export default function TodoList({ status, message, works, reminders, maintenanc
   }
 
   return (
-    <>
+    <div>
       {Boolean(viewDefaults) && (
         <WorksAndMaintenance
           isOpen={Boolean(viewDefaults)}
@@ -37,52 +37,55 @@ export default function TodoList({ status, message, works, reminders, maintenanc
         />
       )}
 
-      <NewPageHeader title="To Do List" color="danger" />
+      <CustomTable.Table tabletitle="To Do List" tabletitleBg="danger" tabletitleColor="white">
+        <CustomTable.ColGroup ratios={[1, 1, 1, null, 1, 1]} />
 
-      <div className="p-2 fw-bold d-flex justify-content-between align-items-center">
-        <div>{friendlyDate(new Date())}</div>
-        <div>{username}</div>
-      </div>
-
-      <table className="table table-responsive table-bordered table-sm bg-white">
-        <thead className="position-sticky bg-white shadow-sm c-table-top text-nowrap">
+        <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
+          <tr>
+            <th colSpan={6}>
+              <div className="fw-bold d-flex justify-content-between align-items-center">
+                <div>{friendlyDate(new Date())}</div>
+                <div>{username}</div>
+              </div>
+            </th>
+          </tr>
           <tr>
             <th>#</th>
             <th>Date</th>
             <th>Function</th>
-            <th className="custom-mn-w-5">Details</th>
+            <th>Details</th>
             <th>Balance Owing</th>
-            <th className="custom-mn-w-06"></th>
+            <th></th>
           </tr>
         </thead>
 
         <tbody>
           {todos.map((todo, index) => (
             <tr key={index} className={todo.status === "DONE" ? "c-done-block" : ""}>
-              <th className="text-nowrap ps-3">{index + 1}</th>
+              <td>{index + 1}</td>
 
-              <td className="ps-3 text-nowrap">
-                {todo.date ? new Date(todo.date).toISOString().split("T")[0] : "N/A"}
-              </td>
+              <td className="ps-3 text-nowrap">{todo.date ? friendlyDate(todo.date) : "N/A"}</td>
 
               {todo.function.toLowerCase() === "works" ? (
-                <td
-                  onClick={() => openScheduledWorks(todo)}
-                  className={`text-white bg-primary text-center ${todo.function === "works" ? "c-pointer" : ""}`}
-                >
-                  {todo.function}
+                <td className="text-nowrap">
+                  <CustomTable.ActionButtonTemplate
+                    onClick={() => openScheduledWorks(todo)}
+                    variant="primary"
+                  >
+                    {todo.function}
+                  </CustomTable.ActionButtonTemplate>
                 </td>
               ) : (
-                <th className="text-nowrap text-center bg-light">{todo.function}</th>
+                <td className="text-nowrap text-center bg-light">{todo.function}</td>
               )}
 
-              <th className="custom-mn-w-4  px-2">
-                <p className={"m-0 c-line-clamp-1" + (todo.status === "DONE" ? "c-done" : "")}>
+              <td className={todo.status === "DONE" ? "c-done" : ""}>
+                <small>
                   <span className="text-capitalize">{todo?.title}</span>
                   {todo?.title && todo?.details ? " - " : ""}
                   <span className="text-capitalize"> {todo?.details}</span>
-                </p>
-              </th>
+                </small>
+              </td>
 
               <td>
                 <div
@@ -102,43 +105,31 @@ export default function TodoList({ status, message, works, reminders, maintenanc
               </td>
 
               <td>
-                <div className="d-flex justify-content-center align-items-center gap-2">
-                  <button
-                    onClick={() => goToOrigin(todo)}
-                    className="btn btn-sm flex-fill justify-content-center btn-info text-white"
-                  >
+                <CustomTable.ActionButtonsContainer>
+                  <CustomTable.ActionButtonTemplate onClick={() => goToOrigin(todo)}>
                     View
-                  </button>
+                  </CustomTable.ActionButtonTemplate>
 
-                  <button
+                  <CustomTable.ActionButtonTemplate
                     disabled={todo.status === "DONE"}
-                    className={"btn btn-sm btn-success flex-fill justify-content-center "}
+                    variant="success"
                     onClick={() => done(todo)}
                   >
                     Done
-                  </button>
+                  </CustomTable.ActionButtonTemplate>
 
-                  <button
-                    className="btn btn-sm btn-danger flex-fill justify-content-center"
-                    onClick={() => dismiss(todo)}
-                  >
+                  <CustomTable.ActionButtonTemplate variant="danger" onClick={() => dismiss(todo)}>
                     Dismiss
-                  </button>
-                </div>
+                  </CustomTable.ActionButtonTemplate>
+                </CustomTable.ActionButtonsContainer>
               </td>
             </tr>
           ))}
 
-          {!Boolean(todos.length) && (
-            <tr>
-              <td colSpan={6} className="p-5 text-center">
-                Nothing to show
-              </td>
-            </tr>
-          )}
+          {!Boolean(todos.length) && <CustomTable.NothingToShow colSpan={6} />}
         </tbody>
-      </table>
-    </>
+      </CustomTable.Table>
+    </div>
   );
 }
 

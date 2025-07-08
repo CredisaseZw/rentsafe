@@ -856,6 +856,33 @@ def edit_lease(request):
             lease.payment_period_end = new_payment_end
             lease.rent_variables = data.get("rentVariable")
             lease.save()
+            if lease_address:
+                lease_address.lease_id = lease
+                lease_address.unit_number = data.get("unitNumber")
+                lease_address.building_name = data.get("buildingName")
+                lease_address.street_number = data.get("streetNumber")
+                lease_address.street_name = data.get("streetName")
+                lease_address.suburb = data.get("suburb")
+                lease_address.city = data.get("city")
+                lease_address.province = data.get("province")
+                lease_address.country = data.get("country")
+                lease_address.area_code = data.get("areaCode")
+                lease_address.save()
+            else:
+                lease_address = LeaseAddress(
+                    lease_id=lease,
+                    unit_number=data.get("unitNumber"),
+                    building_name=data.get("buildingName"),
+                    street_number=data.get("streetNumber"),
+                    street_name=data.get("streetName"),
+                    suburb=data.get("suburb"),
+                    city=data.get("city"),
+                    province=data.get("province"),
+                    country=data.get("country"),
+                    area_code=data.get("areaCode"),
+                )
+                lease_address.save()
+            
             messages.success(request, "successfully updated lease")
             share(request, messages=messages)
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
@@ -1163,25 +1190,35 @@ def create_individual_bulk_leases_helper(request):
                 subscription_class="combined",
             ).last()
         for i, row in enumerate(reader):
-
+            print("_______-----______------________-----SOul Provider----________------___--")
+            # if len(row) < 25  or not row[0].strip():
+            #     continue
             identificationNumber = row[0].upper()
             accountNumber = row[1]
             leaseMobileNumber = row[2]
-            leaseAddress = row[3]
-            leaseDetails = row[4]
-            leaseCurrency = row[5]
-            monthlyRental = row[6]
-            isVariable = row[7]
-            depositPeriod = row[8]
-            depositAmount = row[9]
-            leaseStartDate = row[10]
-            paymentPeriodEnd = row[11]
-            current_month = row[12]
-            one_month_back = row[13]
-            two_months_back = row[14]
-            three_months_back = row[15]
-            more_than_three_months_back = row[16]
-
+            unit_number = row[3]
+            building_name = row[4]
+            street_number = row[5]
+            street_name = row[6]
+            suburb = row[7]
+            city = row[8]
+            province = row[9]
+            country = row[10]
+            area_code = row[11]
+            leaseDetails = row[12]
+            leaseCurrency = row[13]
+            monthlyRental = row[14]
+            isVariable = row[15]
+            depositPeriod = row[16]
+            depositAmount = row[17]
+            leaseStartDate = row[18]
+            paymentPeriodEnd = row[19]
+            current_month = row[20]
+            one_month_back = row[21]
+            two_months_back = row[22]
+            three_months_back = row[23]
+            more_than_three_months_back = row[24]
+            
             errors = []
             current_month = float(current_month) if current_month != "" else 0
             one_month_back = float(one_month_back) if one_month_back != "" else 0
@@ -1213,7 +1250,6 @@ def create_individual_bulk_leases_helper(request):
                                 reg_ID_Number=identificationNumber,
                                 lease_giver=request.user.company,
                                 lease_activator=request.user.id,
-                                address=leaseAddress,
                                 rent_guarantor_id=identificationNumber,
                                 is_individual=True,
                                 lease_details=leaseDetails,
@@ -1233,6 +1269,19 @@ def create_individual_bulk_leases_helper(request):
                                 payment_period_end=paymentPeriodEnd,
                             )
                             lease.save()
+                            lease_address = LeaseAddress(
+                                lease_id=lease,
+                                unit_number=unit_number,
+                                building_name=building_name,
+                                street_number=street_number,
+                                street_name=street_name,
+                                suburb=suburb,
+                                city=city,
+                                province=province,
+                                country=country,
+                                area_code=area_code,
+                            )
+                            lease_address.save()
                             out_standing_balance = float(
                                 current_month
                                 + one_month_back
@@ -1289,7 +1338,7 @@ def create_individual_bulk_leases_helper(request):
                             (
                                 leeseeName,
                                 leaseDetails,
-                                lease_start_date,
+                                lease_sturart_date,
                                 currency,
                                 end_date,
                                 deposit_amount,
@@ -1365,7 +1414,15 @@ def return_skipped_rows(skipped_rows, request):
             "Identification Number",
             "Account Number",
             "Lease Mobile Number",
-            "Lease Address",
+            "Unit Number",
+            "Building Name",
+            "Street Number",
+            "Street Name",
+            "Suburb",
+            "City",
+            "Province",
+            "Country",
+            "Area Code",
             "Lease Details",
             "Lease Currency",
             "Monthly Rental",
@@ -1384,6 +1441,14 @@ def return_skipped_rows(skipped_rows, request):
     )
     writer.writerow(
         [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "",
             "",
             "",
@@ -2100,6 +2165,8 @@ def create_bulk_individuals_helper(request):
     valid_national_id = False
     next(reader)
     for i, row in enumerate(reader):
+        if len(row) < 22 or not row[0].strip():
+            continue
         first_name = row[0].upper()                                                     
         last_name = row[1].upper()
         identification_type = row[2].lower()
@@ -2107,13 +2174,21 @@ def create_bulk_individuals_helper(request):
         gender = row[4].upper()
         dob = row[5]
         marital_status = row[6]
-        address = row[7]
-        mobile_number = row[8]
-        landline = row[9]
-        email = row[10]
-        current_employer = row[11]
-        job_title = row[12]
-        date_of_employment = row[13]
+        mobile_number = row[7]
+        landline = row[8]
+        email = row[9]
+        current_employer = row[10]
+        job_title = row[11]
+        date_of_employment = row[12]
+        unit_number= row[13]  ## Address Fields
+        building_name = row[14]
+        street_number= row[15]
+        street_name= row[16]
+        suburb= row[17]
+        city= row[18]
+        province= row[19]
+        country= row[20]
+        area_code= row[21]
         errors = []
         if dob:
             dob_object = convert_to_django_date(dob)
@@ -2151,14 +2226,22 @@ def create_bulk_individuals_helper(request):
                 identification_type=identification_type,
                 gender=gender,
                 dob=dob,
-                address=address,
                 is_verified=True,
                 mobile=mobile_number,
                 land_line=landline,
                 email=email,
+                unit_number=unit_number,
+                building_name=building_name,
+                street_number=street_number,
+                street_name=street_name,
+                suburb=suburb,
+                city=city,
+                province=province,
+                country=country,
+                area_code=area_code,
             )
             if not Individual.objects.filter(
-                ident=identification_number
+                identification_number=identification_number
             ).exists():
                 individual.save()
                 individual_employment_detail = EmployementDetails(
@@ -2213,17 +2296,25 @@ def _extracted_from_create_bulk_individuals_115(skipped_rows, request):
             "Gender",
             "Date of Birth",
             "Marital Status",
-            "Address",
             "Mobile Number",
             "Landline",
             "Email Address",
             "Current Employer",
             "Job Title",
             "Date of Employment",
+            "Unit Number",
+            "Building Name",
+            "Street Number",
+            "Street Name",
+            "Suburb",
+            "City",
+            "Province",
+            "Country",
+            "Area Code",
             "Errors",
         ]
     )
-    writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", ""])
+    writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""])
     writer.writerows(skipped_rows)
     output.seek(0)
 
@@ -2363,20 +2454,30 @@ def create_bulk_companies_helper(request):
     created_rows = []
     next(reader)
     for i, row in enumerate(reader):
+        if len(row) < 22 or not row[0].strip():
+            continue
         registered_name = row[0].upper() + " " + row[2].upper()
         trading_name = row[1].upper()
         branch = row[2]
         registration_number = row[3].upper()
         registration_date = row[4]
         vat_number = row[5]
-        current_address = row[6]
-        landline = row[7]
-        mobile_number = row[8]
-        email = row[9]
-        website = row[10]
-        industry = row[11]
-        is_government = row[12]
-        note = row[13]
+        landline = row[6]
+        mobile_number = row[7]
+        email = row[8]
+        website = row[9]
+        industry = row[10]
+        is_government = row[11]
+        note = row[12]
+        unit_number= row[13]  ## Address Fields
+        building_name = row[14]
+        street_number= row[15]
+        street_name= row[16]
+        suburb= row[17]
+        city= row[18]
+        province= row[19]
+        country= row[20]
+        area_code= row[21]
         errors = []
         if registration_date:
             registration_date_ob = convert_to_django_date(registration_date)
@@ -2411,13 +2512,21 @@ def create_bulk_companies_helper(request):
                             company=company.id,
                             registration_date=(registration_date or None),
                             vat_number=vat_number,
-                            current_address=current_address,
                             mobile_phone=mobile_number,
                             email=email,
                             website=website,
                             landline_phone=landline,
                             note=note,
                             branch=branch,
+                            unit_number=unit_number,
+                            building_name=building_name,
+                            street_number=street_number,
+                            street_name=street_name,
+                            suburb=suburb,
+                            city=city,
+                            province=province,
+                            country=country,
+                            area_code=area_code,
                         )
                         user_password = generate_otp()
                         hash_password = make_password(user_password)
@@ -2457,7 +2566,6 @@ def create_bulk_companies_helper(request):
                 "Registration Number",
                 "Registration Date",
                 "VAT Number",
-                "Current Address",
                 "Landline Phone",
                 "Mobile Number",
                 "Email Address",
@@ -2465,10 +2573,19 @@ def create_bulk_companies_helper(request):
                 "Industry",
                 "Is Government",
                 "Note",
+                "Unit Number",
+                "Building Name",
+                "Street Number",
+                "Street Name",
+                "Suburb",
+                "City",
+                "Province",
+                "Country",
+                "Area Code",
                 "Errors",
             ]
         )
-        writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", "",""])
+        writer.writerow(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""])
         writer.writerows(skipped_rows)
         output.seek(0)  # Reset the file pointer
 
@@ -2791,10 +2908,17 @@ def company_report(request):
             trading_status = company_profile.trading_status or "N/A"
             website = company_profile.website or "N/A"
             telephone = company_profile.landline_phone or "N/A" ""
-            current_address = company_profile.current_address
-            mobile_phone = company_profile.mobile_phone
-            email = company_profile.email
-            current_address = company_profile.current_address or "N/A"
+            current_address =(
+                f"{'Unit ' + company_profile.unit_number if company_profile.unit_number else ''} "
+                f"{company_profile.building_name + ' Building' if company_profile.building_name else ''} , "
+                f"{company_profile.street_name + ' Street' if company_profile.street_name else ''} , "
+                f"{company_profile.suburb or ''}, "
+                f"{company_profile.city or ''}, "
+                f"{company_profile.province + ' Province' if company_profile.province else ''}, "
+                f"{company_profile.country or ''} "
+                f"{' Code: ' + company_profile.area_code if company_profile.area_code else ''}, "
+            ).replace("  ", " ").replace(" ,", ",").strip(", ") or "N/A"
+
             mobile_phone = company_profile.mobile_phone or "N/A"
             email = company_profile.email or "N/A"
             if request.user.user_type == 1:
@@ -3125,6 +3249,15 @@ def store_individual(request):
             land_line=data.get("land_line"),
             address=data.get("address"),
             identification_type=data.get("identification_type"),
+            unit_number=data.get("unitNumber"),  ## Address Fields
+            building_name=data.get("buildingName"),
+            street_number=data.get("streetNumber"),
+            street_name=data.get("streetName"),
+            suburb=data.get("suburb"),
+            city= data.get("city"),
+            province=data.get("province"),
+            country= data.get("country"),
+            area_code=data.get("areaCode"), 
             identification_number=data.get("identificationNumber").upper(),
         )
         individual.save()
@@ -3161,7 +3294,7 @@ def store_individual(request):
         hash_password = make_password(user_password)
         # create user
         user = CustomUser(
-            email=individual.identification_number,
+            email=individual.email,
             is_superuser=False,
             company=0,
             individual=individual.id,
@@ -3205,6 +3338,15 @@ def store_individual_user(request):
                 identification_type=data.get("identification_type"),
                 identification_number=data.get("identificationNumber").upper(),
                 is_user=True,
+                unit_number=data.get("unitNumber"),  # Address Fields
+                building_name=data.get("buildingName"),
+                street_number=data.get("streetNumber"),
+                street_name=data.get("streetName"),
+                suburb=data.get("suburb"),
+                city= data.get("city"),
+                province=data.get("province"),
+                country= data.get("country"),
+                area_code=data.get("areaCode"),
             )
             individual.save()
 
@@ -6094,6 +6236,9 @@ def adverse_data(request):
 def commission_statements(request):
     return render(request, "Client/CommissionStatementsSelection")
 
+def sandbox(request):
+    return render(request, "Client/Sandbox")
+
 @login_required
 @clients_required
 def sales_reports(request):
@@ -6117,6 +6262,9 @@ def sales_invoicing(request):
 def accounts_list(request):
     return render(request, "Client/Accounting/AccountsList")
 
+def view_only_accounts_list(request):
+    return render(request, "Client/Accounting/ViewOnlyAccountsList")
+
 @login_required
 @clients_required
 def sales_accounts(request):
@@ -6125,6 +6273,50 @@ def sales_accounts(request):
 def rate_setup(request):
     return JsonResponse ({"status": "success"}, safe=False)
 
+@login_required
+@clients_required
+def lease_address(request):
+    
+    if request.method == "GET":
+        search_term = request.GET.get("q", "").strip()
 
+        if search_term:
+            query = Q()
+            query |= Q(unit_number__icontains=search_term)
+            query |= Q(building_name__icontains=search_term)
+            query |= Q(street_name__icontains=search_term)
 
+            results = LeaseAddress.objects.filter(query)
+        else:
+            results = LeaseAddress.objects.all().order_by("id")
+
+        data = [
+            {
+                "lease_id": addr.lease_id.lease_id if addr.lease_id else None,
+                "unit_number": addr.unit_number,
+                "building_name": addr.building_name,
+                "street_number": addr.street_number,
+                "street_name": addr.street_name,
+                "suburb": addr.suburb,
+                "city": addr.city,
+                "province": addr.province,
+                "country": addr.country,
+                "area_code": addr.area_code,
+            }
+            for addr in results
+        ]
+
+        return JsonResponse({"results": data}, safe=False,)
+
+    else:
+        try:
+            schema= LeaseAddressSchema()
+            data = schema.loads(request.body)
+            LeaseAddress.objects.create(**data)
+            return JsonResponse({
+                "message": "Lease address created successfully",
+                "Address": data,
+            }, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
 

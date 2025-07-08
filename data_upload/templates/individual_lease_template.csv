@@ -1,2 +1,2 @@
-Identification Number,Account Number,Lease Mobile Number,Lease Address,Lease Details,Lease Currency,Monthly Rental,Is Variable,Deposit Period (Months),Deposit Amount,Lease Start Date,Payment Period End,Current Month,1 - 30 days outstanding,31 - 60 days outstanding,61 - 90 days outstanding,+90 days outstanding
-00025912H47,33F,779586059,Club chambers building cnr third & nelson mandela,Rent,ZWG,100,yes,1,100,12/05/2024,12,0,0,0,0,0
+Identification Number,Account Number,Lease Mobile Number,Unit Number,Building Name,Street Number,Street Name,Suburb,City,Province,Country,Area Code,Lease Details,Lease Currency,Monthly Rental,Is Variable,Deposit Period (Months),Deposit Amount,Lease Start Date,Payment Period End,Current Month,1 - 30 days outstanding,31 - 60 days outstanding,61 - 90 days outstanding,+90 days outstanding
+00025912H47,33F,779586059,130,Club Chambers,100,Third,Central,Harare,Harare,Zimbabwe,263,12-05-2024,12,0,0,0,0,0

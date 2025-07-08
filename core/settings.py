@@ -417,6 +417,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "cash_books",
     "sales_invoicing",
     "accounts_list",
+    "view_only_accounts_list",
     "in_development",
     "detailed_general_ledger",
     "cash_books_list",
@@ -433,6 +434,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "accounts_sectors",
     "currency_settings",
     "payment_types",
+    "sandbox",
 ]
 
 LOGIN_URL = "login"

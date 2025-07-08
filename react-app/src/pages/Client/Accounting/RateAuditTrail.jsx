@@ -1,4 +1,5 @@
 import Layout from "../../../components/Layouts/client/Layout.jsx";
+import CustomTable from "../../../components/Client/table/CustomTable.jsx";
 import NewPageHeader from "../../../components/NewPageHeader.jsx";
 import useRateAuditTrail from "../../../hooks/page-hooks/useRateAuditTrail.js";
 import { friendlyDate } from "../../../utils/index.js";
@@ -96,47 +97,39 @@ export default function RateAuditTrail() {
       </div>
 
       <div>
-        <table className="table table-bordered table-responsive table-sm bg-white">
-          <thead className="shadow-sm sticky-top c-table-top bg-white ">
+        <CustomTable.Table>
+          <CustomTable.ColGroup ratios={[1, 1, null, 1, 1, 1]} />
+
+          <thead className={CustomTable.STICKY_TABLE_HEADER_CLASS}>
             <tr>
               <th>Date</th>
               <th>Source</th>
-              <th className="custom-mn-w-2">User</th>
-              <th className="text-end">Base USD</th>
+              <th>User</th>
+              <th>Base USD</th>
               <th>Convert Currency</th>
-              <th className="text-end">Rate</th>
+              <th>Rate</th>
             </tr>
           </thead>
 
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center p-5">
-                  <div className="spinner-border text-info" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </td>
-              </tr>
+              <CustomTable.LoadingIndicator colSpan={6} />
             ) : rows.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="text-center p-5">
-                  Nothing to show
-                </td>
-              </tr>
+              <CustomTable.NothingToShow colSpan={6} />
             ) : (
               rows.map((row, index) => (
                 <tr key={index}>
-                  <td>{friendlyDate(row.date)}</td>
-                  <td>{row.source}</td>
+                  <td className="text-nowrap">{friendlyDate(row.date)}</td>
+                  <td className="text-nowrap">{row.source}</td>
                   <td>{row.user}</td>
                   <td className="text-end">{row.baseUsd}</td>
-                  <td>{row.convertCurrency}</td>
+                  <td className="text-center text-nowrap">{row.convertCurrency}</td>
                   <td className="text-end">{row.rate}</td>
                 </tr>
               ))
             )}
           </tbody>
-        </table>
+        </CustomTable.Table>
       </div>
     </div>
   );

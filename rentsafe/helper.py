@@ -113,7 +113,7 @@ def send_otp(
         )
 
         # send email to company
-        subject = "Login Credentials Link - credisafe."
+        subject = "Login Credentials Link - Fincheck."
         otp_link = f"{url_path}/clients/company-verify-otp/{random_string}T{generated_otp}L{random_string}!{requested_user}B/"
         message = f"{registration_message}\nClick here to enter your login details : {otp_link}"
         mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
@@ -147,7 +147,7 @@ def send_otp(
 
 
             # send email to company
-            subject = "New Lease - credisafe."
+            subject = "New Lease - Fincheck."
             message = registration_message
             try:
                 mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
@@ -182,7 +182,7 @@ def send_otp(
                 )
                 otp_link = f"{url_path}/clients/cl-verify-lease/{random_string}T{generated_otp}L{random_string}!{requested_user}B/"
                 # send email to company
-                subject = "New Lease - credisafe."
+                subject = "New Lease - Fincheck."
                 try:
                     message = f"{registration_message}  "  # + otp_link
                     mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
@@ -210,9 +210,9 @@ def send_otp(
             otpFile.save()
 
 
-            subject = "Payment Status Update - credisafe."
+            subject = "Payment Status Update - Fincheck."
         else:
-            subject = "Payment Receipt - credisafe."
+            subject = "Payment Receipt - Fincheck."
             
         add_msg_to_comms_hist(
             user_id=request_user,

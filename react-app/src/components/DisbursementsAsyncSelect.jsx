@@ -1,8 +1,6 @@
-import React from "react";
 import AsyncSelect from "react-select/async";
 import debounce from "lodash/debounce";
 import axios from "axios";
-import toast from "react-hot-toast";
 
 function fetchData(inputValue, cb) {
   axios
@@ -28,7 +26,7 @@ export default function DisbursementsAsyncSelect({ handleCreditorSelect, index }
   return (
     <AsyncSelect
       handleCreditorSelect={handleCreditorSelect}
-      className="w-100"
+      className="custom-w-160"
       name="creditor"
       id="creditor"
       required
