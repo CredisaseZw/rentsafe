@@ -247,6 +247,7 @@ urlpatterns = [
                 path("sales-invoicing", clients.sales_invoicing, name="sales_invoicing"),
                 path("general-ledger", clients.sales_invoicing, name="general_ledger"),
                 path("accounts-list", clients.accounts_list, name="accounts_list"),
+                path("accounts-list-view-only", clients.view_only_accounts_list, name="view_only_accounts_list"),
                 path(
                     "claims/",
                     claims.create_claim,

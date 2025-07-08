@@ -6116,6 +6116,9 @@ def sales_invoicing(request):
 def accounts_list(request):
     return render(request, "Client/Accounting/AccountsList")
 
+def view_only_accounts_list(request):
+    return render(request, "Client/Accounting/ViewOnlyAccountsList")
+
 @login_required
 @clients_required
 def sales_accounts(request):
