@@ -147,14 +147,35 @@ else:
     print("Testing mode....")
     tmpPostgres =urlparse(os.getenv("PROD_DATABASE_URL", None))
     if tmpPostgres is not None:
+        print("Testing mode....")
+        db_url = os.getenv('PROD_DATABASE_URL')
+        parsed = urlparse(db_url)
+        migration_host = parsed.hostname.replace('-pooler', '')
+
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': tmpPostgres.path.replace('/', ''),
-                'USER': tmpPostgres.username,
-                'PASSWORD': tmpPostgres.password,
-                'HOST': tmpPostgres.hostname,
-                'PORT': 5432,
+                'NAME': parsed.path[1:].split('?')[0], 
+                'USER': parsed.username,
+                'PASSWORD': parsed.password,
+                'HOST': migration_host, 
+                'PORT': parsed.port or 5432,
+                'OPTIONS': {
+                    'sslmode': 'require',
+                    'options': '-c statement_timeout=30000'  
+                },
+            },
+            'pooler': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': parsed.path[1:].split('?')[0], 
+                'USER': parsed.username,
+                'PASSWORD': parsed.password,
+                'HOST': parsed.hostname, 
+                'PORT': parsed.port or 5432,
+                'OPTIONS': {
+                    'sslmode': 'require',
+                    'options': '-c statement_timeout=30000' 
+                },
             }
         }
     else:
