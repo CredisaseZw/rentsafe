@@ -15,12 +15,13 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 from urllib.parse import urlparse
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+import sys
 load_dotenv(override=True) 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+
+
 TIME_ZONE = "Africa/Harare"
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -70,19 +71,19 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     
     # Custom Apps
-    'apps.users',
-    'apps.common',
-    'apps.individuals',
-    'apps.companies',
-    'apps.properties',
-    'apps.leases',
-    'apps.accounting',
-    'apps.communications',
-    'apps.reporting',
-    'apps.maintenance',
-    'apps.subscriptions',
-    'apps.credit_control',
-    'apps.legal',
+    'users',
+    'common',
+    'individuals',
+    'companies',
+    'properties',
+    'leases',
+    'accounting',
+    'communications',
+    'reporting',
+    'maintenance',
+    'subscriptions',
+    'credit_control',
+    'legal',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +101,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -359,7 +360,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "/"
 

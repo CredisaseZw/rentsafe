@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
 from common.models.base_models import BaseModel
 
-class Document(models.Model):
+class Document(BaseModel):
     DOCUMENT_TYPES = (
         ('id', 'Identification'),
         ('proof_of_address', 'Proof of Address'),
@@ -22,11 +22,12 @@ class Document(models.Model):
     document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPES)
     file = models.FileField(upload_to='documents/')
     description = models.TextField(blank=True, null=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.get_document_type_display()} for {self.content_object}"
+    def get_document_type_display(self):
+        return dict(self.DOCUMENT_TYPES).get(self.document_type, 'Unknown Document Type')
 
 class Note(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
