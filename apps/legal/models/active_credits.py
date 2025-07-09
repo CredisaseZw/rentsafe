@@ -5,9 +5,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
-
-
-
 class ActiveCredit(BaseModel): 
     date_time = models.DateTimeField(_("Transaction Date/Time"), auto_now=True,
                 help_text=_("Date and time of the transaction/entry."))
@@ -52,6 +49,7 @@ class ActiveCredit(BaseModel):
     type = models.CharField(_("Transaction Type"), max_length=20, choices=TYPE_CHOICES)
 
     class Meta(BaseModel.Meta):
+        app_label = 'legal'
         db_table = "active_credit" 
         verbose_name = _("Financial Entry")
         verbose_name_plural = _("Financial Entries")

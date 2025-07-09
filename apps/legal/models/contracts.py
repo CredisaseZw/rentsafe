@@ -38,12 +38,16 @@ class Contract(BaseModel):
     party_b = GenericForeignKey('party_b_content_type', 'party_b_object_id')
     
     class Meta:
+        app_label = 'legal'
+        db_table = 'contract'
         verbose_name = _('contract')
         verbose_name_plural = _('contracts')
         ordering = ['-effective_date']
     
     def __str__(self):
         return f"{self.get_contract_type_display()} - {self.reference_number}"
+    def get_contract_type_display(self):
+        return dict(self.CONTRACT_TYPES).get(self.contract_type, 'Unknown Contract Type')
 
 class ContractAmendment(BaseModel):
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='amendments')
@@ -52,6 +56,8 @@ class ContractAmendment(BaseModel):
     changes = models.TextField() 
     
     class Meta:
+        app_label = 'legal'
+        db_table = 'contract_amendment'
         verbose_name = _('contract amendment')
         verbose_name_plural = _('contract amendments')
         ordering = ['-amendment_date']

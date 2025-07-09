@@ -52,6 +52,8 @@ class Client(BaseModel):
     external_client_id = models.UUIDField(blank=True, null=True, unique=True, default=uuid4,
                             help_text=_("An optional external ID for this client (e.g., from a CRM)."))
     class Meta:
+        app_label = 'clients'
+        db_table = 'client'
         verbose_name = _("Client")
         verbose_name_plural = _("Clients")
         ordering = ['name']

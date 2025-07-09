@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'subscriptions',
     'credit_control',
     'legal',
+    'clients',
 ]
 
 MIDDLEWARE = [

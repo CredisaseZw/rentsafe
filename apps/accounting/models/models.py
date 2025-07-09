@@ -8,7 +8,6 @@ import uuid
 from django.core.exceptions import ValidationError
 from individuals.models.models import Individual
 from companies.models.models import Company
-from leases.models.models import Lease
 from decimal import Decimal, ROUND_HALF_UP
 from django.db.models import F, Sum, Q
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -132,7 +131,7 @@ class Invoice(BaseModel):
     document_number = models.CharField(max_length=20, unique=True, editable=False, default=generate_invoice_document_number)
     is_individual = models.BooleanField(default=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
-    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, null=True, blank=True)
+    lease = models.ForeignKey('leases.Lease', on_delete=models.CASCADE, null=True, blank=True)
     reference_number = models.CharField(max_length=20, blank=True, null=True)
 
     # Customer Relationship

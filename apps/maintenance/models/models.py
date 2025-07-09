@@ -3,7 +3,6 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from common.models.base_models import BaseModel
 from django.utils.translation import gettext_lazy as _
-from apps.leases.models import Lease 
 
 class MaintenanceRequest(BaseModel):
     PRIORITY_CHOICES = (
@@ -34,7 +33,7 @@ class MaintenanceRequest(BaseModel):
 
 class WorkSchedule(BaseModel):
     
-    lease = models.ForeignKey(Lease, on_delete=models.SET_NULL, null=True, blank=True,
+    lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True,
                             related_name='work_schedules',
                             help_text=_("The lease associated with this work schedule, if property is leased."))
     
@@ -80,7 +79,7 @@ class WorkSchedule(BaseModel):
         return f"Work Schedule: {self.title} for {self.property or self.lease}"
 
 class MaintenanceSchedule(BaseModel):
-    lease = models.ForeignKey(Lease, on_delete=models.SET_NULL, null=True, blank=True,
+    lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True,
             related_name='maintenance_schedules',
             help_text=_("The lease associated with this maintenance schedule, if property is leased."))
     

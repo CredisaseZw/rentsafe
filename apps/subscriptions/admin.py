@@ -65,7 +65,7 @@ class SubscriptionPeriodAdmin(admin.ModelAdmin):
 
 
 # --- Admin for Subscriptions ---
-@admin.register(Subscriptions)
+@admin.register(Subscription)
 class SubscriptionsAdmin(admin.ModelAdmin):
     list_display = (
         'subscriber_object', 'service', 'is_activated', 'start_date', 'end_date',

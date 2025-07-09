@@ -50,6 +50,8 @@ class Communication(BaseModel):
     related_lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
+        app_label = 'communications'
+        db_table = 'communication'
         verbose_name = _('communication')
         verbose_name_plural = _('communications')
         ordering = ['-timestamp']
@@ -65,6 +67,8 @@ class CommunicationAttachment(BaseModel):
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
+        app_label = 'communications'
+        db_table = 'communication_attachment'
         verbose_name = _('communication attachment')
         verbose_name_plural = _('communication attachments')
     
@@ -90,6 +94,8 @@ class Reminder(BaseModel):
     completed_at = models.DateTimeField(blank=True, null=True)
     
     class Meta:
+        app_label = 'communications'
+        db_table = 'reminder'
         verbose_name = _('reminder')
         verbose_name_plural = _('reminders')
         ordering = ['due_date']
@@ -134,14 +140,14 @@ class OTP(BaseModel):
     is_used = models.BooleanField(_("Is Used"), default=False)
     
     class Meta(BaseModel.Meta):
+        app_label = 'communications'
+        db_table = 'otp'
         verbose_name = _("OTP")
         verbose_name_plural = _("OTPs")
         ordering = ['-created_at']
 
     def __str__(self):
         return f"OTP {self.otp_code} for {self.requested_entity} ({self.otp_type})"
-
-
 class DebtorIntelligenceNote(BaseModel):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                 limit_choices_to=Q(app_label='individuals', model='individual') |
@@ -155,13 +161,14 @@ class DebtorIntelligenceNote(BaseModel):
 
     notes = GenericRelation(Note)
     class Meta(BaseModel.Meta):
+        app_label = 'communications'
+        db_table = 'debtor_intelligence_note'
         verbose_name = _("Debtor Intelligence Note")
         verbose_name_plural = _("Debtor Intelligence Notes")
         ordering = ['-created_at']
 
     def __str__(self):
         return f"Note for {self.client_object} by {self.user.username if self.user else 'System'}"
-
 
 class CommunicationHistoryReminder(BaseModel):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
@@ -194,13 +201,14 @@ class CommunicationHistoryReminder(BaseModel):
     origin = models.CharField(max_length=130,choices=[('tenant_comms_history','Tenant'),('creditor_comms_history','Creditor Comms History')],default='tenant_comms_history')
 
     class Meta(BaseModel.Meta):
+        app_label = 'communications'
+        db_table = 'comms_hist_reminder'
         verbose_name = _("Communication History Reminder")
         verbose_name_plural = _("Communication History Reminders")
         ordering = ['-created_at', 'action_date']
 
     def __str__(self):
         return f"Reminder for {self.client_object} on {self.action_date}"
-
 
 class CommsHistMessage(BaseModel):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
@@ -216,16 +224,18 @@ class CommsHistMessage(BaseModel):
     message = models.TextField(_("Message Content"))
     origin = models.CharField(max_length=130,choices=[('tenant_comms_history','Tenant Comms History'),('creditor_comms_history','Creditor Comms History')],default='tenant_comms_history')
     channel_path = models.CharField(_("Channel Path"), max_length=50, 
-                                help_text=_("The channel path for the reminder."),
-                                choices=[
-                                    ('is_sms', 'SMS'),
-                                    ('is_email', 'Email'),
-                                    ('note','Note')
-                                ],default='is_sms'
-                                )
+                        help_text=_("The channel path for the reminder."),
+                        choices=[
+                            ('is_sms', 'SMS'),
+                            ('is_email', 'Email'),
+                            ('note','Note')
+                        ],default='is_sms'
+                    )
     
 
     class Meta(BaseModel.Meta):
+        app_label = 'communications'
+        db_table = 'comms_hist_message'
         verbose_name = _("Communication Message")
         verbose_name_plural = _("Communication Messages")
         ordering = ['-created_at']

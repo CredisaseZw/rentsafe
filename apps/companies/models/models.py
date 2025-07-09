@@ -39,16 +39,14 @@ class Company(BaseModel):
                             help_text=_("Notes associated with the company."))
 
     class Meta:
+        app_label = 'companies'
+        db_table = 'company'
         verbose_name = _('company')
         verbose_name_plural = _('companies')
         ordering = ['registration_name']
-        # Adding a unique constraint for registration name for robust checking, case-insensitive
         constraints = [
             UniqueConstraint(fields=['registration_name'], name='unique_registration_name_company',
-                             condition=~models.Q(registration_name__isnull=True)), # Only apply if not null
-            # You might want to consider unique on registration_number if it's strictly enforced.
-            # UniqueConstraint(fields=['registration_number'], name='unique_registration_number_company',
-            #                  condition=~models.Q(registration_number__isnull=True)),
+            condition=~models.Q(registration_name__isnull=True)),
         ]
 
     def __str__(self):
@@ -71,13 +69,15 @@ class Company(BaseModel):
             return headquarters_branch
         return None
     
-class CompanyBranch(models.Model):
+class CompanyBranch(BaseModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='branches',
                                 help_text=_("The company this branch belongs to."))
     branch_name = models.CharField(max_length=255, help_text=_("The name of the branch."))
     addresses = GenericRelation(Address, related_query_name='branch_address')
 
     class Meta:
+        app_label = 'companies'
+        db_table = 'company_branch'
         verbose_name = _('company branch')
         verbose_name_plural = _('company branches')
         constraints = [
@@ -110,6 +110,8 @@ class ContactPerson(BaseModel):
 
 
     class Meta:
+        app_label = 'companies'
+        db_table = 'contact_person'
         verbose_name = _("Contact Person")
         verbose_name_plural = _("Contact Persons")
         ordering = ['-date_created']
@@ -236,6 +238,7 @@ class CompanyProfile(BaseModel):
                         help_text=_("Indicates if the company's services are currently suspended."))
     
     class Meta:
+        app_label = 'companies'
         db_table = "company_profile"
         verbose_name = _("Company Profile")
         verbose_name_plural = _("Company Profiles")

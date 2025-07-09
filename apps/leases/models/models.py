@@ -86,6 +86,7 @@ class Lease(BaseModel):
     notes = GenericRelation(Note)
 
     class Meta:
+        app_label = 'leases'
         verbose_name = _('lease')
         verbose_name_plural = _('leases')
         ordering = ['-start_date', 'lease_id']
@@ -386,6 +387,9 @@ class LeaseTenant(BaseModel):
                         help_text="Designates this tenant as the primary contact for the lease.")
 
     class Meta:
+        app_label = 'leases'
+        db_table = 'lease_tenant'
+        ordering = ['tenant_object__name']
         unique_together = ('lease', 'content_type', 'object_id')
         verbose_name = _('lease tenant')
         verbose_name_plural = _('lease tenants')
@@ -476,6 +480,14 @@ class Guarantor(BaseModel):
 
     guarantee_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
                                         help_text="The maximum amount guaranteed by this guarantor, if specified.")
+    
+    class Meta:
+        app_label = 'leases'
+        db_table = 'guarantor'
+        verbose_name = _('guarantor')
+        verbose_name_plural = _('guarantors')
+        unique_together = ('content_type', 'object_id')
+        ordering = ['guarantor_object__name']
 
     def __str__(self):
         guarantor_name = self.guarantor_object.__str__() if self.guarantor_object else "N/A"
@@ -517,6 +529,8 @@ class LeaseCharge(BaseModel):
                                     help_text="Indicates if this charge is currently active and should be applied.")
 
     class Meta:
+        app_label = 'leases'
+        db_table = 'lease_charge'
         verbose_name = _('lease charge')
         verbose_name_plural = _('lease charges')
         ordering = ['lease', 'effective_date', 'charge_type']
@@ -630,6 +644,8 @@ class LeaseTermination(BaseModel):
                             help_text="Additional notes related to the termination.")
 
     class Meta:
+        app_label = 'leases'
+        db_table = 'lease_termination'
         verbose_name = _('lease termination')
         verbose_name_plural = _('lease terminations')
 
@@ -700,6 +716,8 @@ class LeaseLog(BaseModel):
     related_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
+        app_label = 'leases'
+        db_table = 'lease_log'
         verbose_name = _('lease log')
         verbose_name_plural = _('lease logs')
         ordering = ['-timestamp']

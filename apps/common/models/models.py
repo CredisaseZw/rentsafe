@@ -1,7 +1,5 @@
 from django.db import models
-
 # Create your models here.
-from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
@@ -28,7 +26,10 @@ class Document(BaseModel):
         verbose_name = "Document"
         verbose_name_plural = "Documents"
     def __str__(self):
-        return f"{self.get_document_type_display()} for {self.content_object}"
+        if self.content_type and self.object_id:
+            return f"{self.get_document_type_display()} for object ID {self.object_id}"
+        return f"{self.get_document_type_display()} (Unlinked)"
+    
     def get_document_type_display(self):
         return dict(self.DOCUMENT_TYPES).get(self.document_type, 'Unknown Document Type')
 
@@ -48,8 +49,9 @@ class Note(BaseModel):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"Note by {self.author} on {self.content_object}"
-    
+        if self.content_type and self.object_id:
+            return f"Note by {self.author.get_full_name() if self.author else 'Unknown'}"
+        return f"Note by {self.author.get_full_name() if self.author else 'Unknown'} (Unlinked)"
 class Country(BaseModel):
     """Country level location data"""
 

@@ -40,6 +40,8 @@ class Individual(BaseModel):
     notes = GenericRelation(Note)
     
     class Meta:
+        app_label = 'individuals'
+        db_table = 'individual'
         verbose_name = _('individual')
         verbose_name_plural = _('individuals')
         ordering = ['last_name', 'first_name']
@@ -67,6 +69,12 @@ class EmploymentDetail(BaseModel):
     is_current = models.BooleanField(default=True)
     monthly_income = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
+    class Meta:
+        app_label = 'individuals'
+        db_table = 'employment_detail'
+        verbose_name = _('employment detail')
+        verbose_name_plural = _('employment details')
+        ordering = ['-start_date']
     
     def __str__(self):
         return f"{self.job_title} at {self.employer_name}"
@@ -87,6 +95,13 @@ class NextOfKin(BaseModel):
     mobile_phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True, null=True)
     physical_address = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        app_label = 'individuals'
+        db_table = 'next_of_kin'
+        verbose_name = _('next of kin')
+        verbose_name_plural = _('next of kin')
+        ordering = ['last_name', 'first_name']
     
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.get_relationship_display()})"

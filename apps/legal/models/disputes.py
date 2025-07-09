@@ -3,7 +3,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from common.models.base_models import BaseModel
-from apps.legal.models.contracts import Contract
 class LegalDispute(BaseModel):
     DISPUTE_TYPES = (
         ('tenant', 'Tenant Dispute'),
@@ -28,7 +27,7 @@ class LegalDispute(BaseModel):
     opened_date = models.DateField(auto_now_add=True)
     closed_date = models.DateField(null=True, blank=True)
     lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True)
-    contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, blank=True)
+    contract = models.ForeignKey('legal.Contract', on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         verbose_name = _('legal dispute')
