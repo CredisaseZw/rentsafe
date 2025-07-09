@@ -1,0 +1,22 @@
+:root{
+    --bg-dark-body-bg: #f8f8f8;
+    --bg-primary: #176987;
+}
+.bg-dark-body{
+    background-color: var(--bg-dark-body-bg);
+}
+.bg-primary{
+    background-color: var(--bg-primary);
+}
+
+.input-default{
+    padding: 10px 15px;
+    border: 2px solid #c2c2c2;
+    border-radius: 7.5px;
+    outline: none;
+    transition: all ease-in-out 0.3ms;
+}
+.input-default:focus,
+.input-default:hover{
+    border: 2px solid var(--bg-primary);
+}
