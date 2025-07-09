@@ -9,10 +9,7 @@ export default function Layout() {
       <Container>
          <SidebarProvider>
             <Sidebar />
-
-            <div className="w-full">
-               <NavBar sidebarTrigger={<SidebarTrigger />} />
-
+            <div className="w-full bg-primary">
                <div className="py-3">
                   <Outlet />
                </div>

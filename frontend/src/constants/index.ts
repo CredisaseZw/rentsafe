@@ -2,7 +2,11 @@ import type { Route } from "@/types";
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
-import { RENTSAFE_NAVLINKS, ROOT_NAVLINKS } from "./navlinks";
+import { 
+   RENT_ADMIN_PANEL_NAVLINKS, 
+   RENTSAFE_APP_NAVLINKS,
+   RENTSAFE_ACCOUNTING_NAVLINKS,
+   ROOT_NAVLINKS } from "./navlinks";
 
 export const SERVICES: Service[] = [
    {
@@ -19,7 +23,7 @@ export const SERVICES: Service[] = [
    },
 ];
 
-export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes(RENTSAFE_NAVLINKS);
+export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([...RENTSAFE_APP_NAVLINKS, ...RENTSAFE_ACCOUNTING_NAVLINKS, ...RENT_ADMIN_PANEL_NAVLINKS]);
 
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 

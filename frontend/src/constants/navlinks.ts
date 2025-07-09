@@ -46,7 +46,7 @@ export const ROOT_NAVLINKS: NavLink[] = [
 ];
 
 const RENTSAFE_PRE_SEG = "/services/rent-safe";
-export const RENTSAFE_NAVLINKS: NavLink[] = [
+export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
       label: "Dashboard",
       path: RENTSAFE_PRE_SEG + "/",
@@ -77,7 +77,9 @@ export const RENTSAFE_NAVLINKS: NavLink[] = [
          },
       ],
    },
-   {
+];
+export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[]= [
+    {
       label: "Accounting",
       segment: RENTSAFE_PRE_SEG + "/accounting",
       subLinks: [
@@ -196,7 +198,9 @@ export const RENTSAFE_NAVLINKS: NavLink[] = [
             ],
          },
       ],
-   },
+   }
+]
+export const RENT_ADMIN_PANEL_NAVLINKS: NavLink[] = [
    {
       label: "Admin",
       segment: RENTSAFE_PRE_SEG + "/admin",
@@ -215,4 +219,4 @@ export const RENTSAFE_NAVLINKS: NavLink[] = [
          },
       ],
    },
-];
+]
