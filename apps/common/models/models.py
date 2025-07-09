@@ -23,7 +23,10 @@ class Document(BaseModel):
     file = models.FileField(upload_to='documents/')
     description = models.TextField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
-    
+    class Meta:
+        app_label = 'common'
+        verbose_name = "Document"
+        verbose_name_plural = "Documents"
     def __str__(self):
         return f"{self.get_document_type_display()} for {self.content_object}"
     def get_document_type_display(self):
@@ -38,12 +41,15 @@ class Note(BaseModel):
     content = models.TextField()
     is_private = models.BooleanField(default=False)
     
+    class Meta:
+        app_label = 'common'
+        verbose_name = "Note"
+        verbose_name_plural = "Notes"
+        ordering = ['-created_at']
+    
     def __str__(self):
         return f"Note by {self.author} on {self.content_object}"
-
-
-
-
+    
 class Country(BaseModel):
     """Country level location data"""
 
@@ -56,6 +62,7 @@ class Country(BaseModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        app_label = 'common'
         verbose_name_plural = "countries"
         ordering = ["name"]
 
@@ -86,6 +93,8 @@ class Province(BaseModel):
     approved = models.BooleanField(default=False)
 
     class Meta:
+        app_label = 'common'
+        verbose_name_plural = "provinces"
         unique_together = ["country", "code"]
         ordering = ["name"]
 
@@ -116,6 +125,7 @@ class City(BaseModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        app_label = 'common'
         verbose_name_plural = "cities"
         ordering = ["name"]
 
@@ -143,6 +153,8 @@ class Suburb(BaseModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        app_label = 'common'
+        verbose_name_plural = "suburbs"
         ordering = ["name"]
     
     def save(self, *args, **kwargs):
@@ -194,6 +206,7 @@ class Address(BaseModel):
 
     class Meta:
         verbose_name_plural = "Addresses"
+        app_label = 'common'
         # Ensure only one primary address of a given type per object
         unique_together = ('content_type', 'object_id', 'address_type', 'is_primary')
         ordering = ["city", "suburb", "street_address", "address_type"]
