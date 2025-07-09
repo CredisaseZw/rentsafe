@@ -35,4 +35,6 @@ urlpatterns = [
     # path('api/inspections/', include('inspections.api.urls')),
     path('api/communication/', include('communications.api.urls')),
     path('api/common/', include('common.api.urls')),
+    path('api/legal/', include('apps.legal.api.urls')),
+    path('api/credit-control/', include('apps.credit_control.api.urls')),
 ]

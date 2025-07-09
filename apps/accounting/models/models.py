@@ -10,7 +10,7 @@ from individuals.models.models import Individual
 from companies.models.models import Company
 from leases.models.models import Lease
 from decimal import Decimal, ROUND_HALF_UP
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Q
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
@@ -412,32 +412,3 @@ class CashBook(BaseModel):
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
-
-class Disbursement(BaseModel):
-    PAYMENT_METHODS = (
-        ('bank_transfer', 'Bank Transfer'),
-        ('cash', 'Cash'),
-        ('cheque', 'Cheque'),
-        ('mobile_money', 'Mobile Money'),
-    )
-    
-    STATUS_CHOICES = (
-        ('pending', 'Pending Approval'),
-        ('approved', 'Approved'),
-        ('processed', 'Processed'),
-        ('rejected', 'Rejected'),
-    )
-    
-    payee_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    payee_object_id = models.PositiveIntegerField()
-    payee = GenericForeignKey('payee_content_type', 'payee_object_id')
-    
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
-    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.PROTECT, related_name='disbursements')
-    reference = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    payment_date = models.DateField()
-    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_disbursements')
-    processed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='processed_disbursements')
-    notes = models.TextField(blank=True)

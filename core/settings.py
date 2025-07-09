@@ -81,6 +81,8 @@ INSTALLED_APPS = [
     'apps.reporting',
     'apps.maintenance',
     'apps.subscriptions',
+    'apps.credit_control',
+    'apps.legal',
 ]
 
 MIDDLEWARE = [
@@ -233,7 +235,7 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
-        'audit': { # Specific formatter for audit logs, includes user info and IP (if added via extra)
+        'audit': { 
             'format': '{asctime} [{levelname}] {name} User:{user_id} IP:{ip_address} | {message}',
             'style': '{',
             'datefmt': '%Y-%m-%d %H:%M:%S',
@@ -245,7 +247,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        'file_django': { # Logs all Django-related activities
+        'file_django': { 
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs', 'django.log'),
