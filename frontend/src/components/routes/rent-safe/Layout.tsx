@@ -6,15 +6,15 @@ import Container from "@/components/general/Container";
 
 export default function Layout() {
    return (
-      <Container>
+      <div>
          <SidebarProvider>
             <Sidebar />
-            <div className="w-full bg-primary">
+            <div className="w-full main">
                <div className="py-3">
                   <Outlet />
                </div>
             </div>
          </SidebarProvider>
-      </Container>
+      </div>
    );
 }
