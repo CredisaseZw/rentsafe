@@ -380,7 +380,7 @@ class LeaseTenant(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                     limit_choices_to=Q(app_label='individuals', model='individual') |
                                     Q(app_label='companies', model='companybranch'))
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     tenant_object = GenericForeignKey('content_type', 'object_id')
 
     is_primary_tenant = models.BooleanField(default=False,
@@ -389,7 +389,6 @@ class LeaseTenant(BaseModel):
     class Meta:
         app_label = 'leases'
         db_table = 'lease_tenant'
-        ordering = ['tenant_object__name']
         unique_together = ('lease', 'content_type', 'object_id')
         verbose_name = _('lease tenant')
         verbose_name_plural = _('lease tenants')
@@ -475,7 +474,7 @@ class Guarantor(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                     limit_choices_to=Q(app_label='individuals', model='individual') |
                                                     Q(app_label='companies', model='companybranch'))
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     guarantor_object = GenericForeignKey('content_type', 'object_id')
 
     guarantee_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
@@ -487,12 +486,10 @@ class Guarantor(BaseModel):
         verbose_name = _('guarantor')
         verbose_name_plural = _('guarantors')
         unique_together = ('content_type', 'object_id')
-        ordering = ['guarantor_object__name']
 
     def __str__(self):
         guarantor_name = self.guarantor_object.__str__() if self.guarantor_object else "N/A"
         return f"Guarantor: {guarantor_name}"
-
 
 class LeaseCharge(BaseModel):
     CHARGE_TYPE_CHOICES = (
@@ -517,7 +514,7 @@ class LeaseCharge(BaseModel):
                                 help_text="A brief description of the charge (e.g., 'Monthly Rent - Jan 2024', 'Water Bill').")
     amount = models.DecimalField(max_digits=12, decimal_places=2,
                                 help_text="The monetary amount of the charge. Use negative for discounts.")
-    currency = models.ForeignKey('accounts.Currency', on_delete=models.PROTECT,
+    currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT,
                                 help_text="The currency for this specific charge.",
                                 related_name='lease_charges')
     frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default='MONTHLY',

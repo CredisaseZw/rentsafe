@@ -26,9 +26,13 @@ class CustomUser(AbstractUser):
                                         help_text=_("Profile picture of the user."))
     last_password_change = models.DateTimeField(null=True, blank=True,
                                                 help_text=_("Timestamp of the user's last password change."))
+    profile_content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL,null=True,blank=True,related_name='user_profiles',
+                help_text=_("The content type of the associated Individual or Company profile."),
+                )
 
     profile_object_id = models.PositiveIntegerField(null=True, blank=True,
                                             help_text=_("The ID of the associated Individual or Company profile."))
+    # GenericForeignKey is not a model field and should not be included in the model's field list
     profile_object = GenericForeignKey('profile_content_type', 'profile_object_id')
 
     can_send_email = models.BooleanField(default=True,
@@ -50,6 +54,8 @@ class CustomUser(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
         verbose_name = _("Custom User")
         verbose_name_plural = _("Custom Users")
+        ordering = []
+        
     
     def __str__(self):
         full_name = self.get_full_name()
@@ -185,7 +191,6 @@ class UserSetting(BaseModel):
     class Meta:
         verbose_name = _('user setting')
         verbose_name_plural = _('user settings')
-        ordering = ['user__username']
 
     def __str__(self):
         return f"Settings for {self.user.username}"

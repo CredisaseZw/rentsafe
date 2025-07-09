@@ -35,8 +35,8 @@ class Communication(BaseModel):
         ('outbound', 'Outbound'),
     )
     
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     
     communication_type = models.CharField(max_length=20, choices=COMMUNICATION_TYPES)
@@ -83,8 +83,8 @@ class Reminder(BaseModel):
         ('other', 'Other'),
     )
     
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     
     reminder_type = models.CharField(max_length=20, choices=REMINDER_TYPES)

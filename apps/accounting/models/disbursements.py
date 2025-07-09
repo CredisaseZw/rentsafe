@@ -26,7 +26,7 @@ class Disbursement(BaseModel):
     )
     
     payee_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    payee_object_id = models.PositiveIntegerField()
+    payee_object_id = models.PositiveIntegerField(null=True, blank=True)
     payee = GenericForeignKey('payee_content_type', 'payee_object_id')
     
     amount = models.DecimalField(max_digits=12, decimal_places=2)

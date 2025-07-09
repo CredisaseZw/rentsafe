@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
 from common.models.base_models import BaseModel
-
 class Document(BaseModel):
     DOCUMENT_TYPES = (
         ('id', 'Identification'),
@@ -13,8 +12,8 @@ class Document(BaseModel):
         ('other', 'Other'),
     )
     
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     
     document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPES)
@@ -34,11 +33,11 @@ class Document(BaseModel):
         return dict(self.DOCUMENT_TYPES).get(self.document_type, 'Unknown Document Type')
 
 class Note(BaseModel):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     
-    author = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
+    author = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, related_name='notes', null=True, blank=True)
     content = models.TextField()
     is_private = models.BooleanField(default=False)
     
@@ -46,7 +45,6 @@ class Note(BaseModel):
         app_label = 'common'
         verbose_name = "Note"
         verbose_name_plural = "Notes"
-        ordering = ['-created_at']
     
     def __str__(self):
         if self.content_type and self.object_id:
@@ -66,7 +64,6 @@ class Country(BaseModel):
     class Meta:
         app_label = 'common'
         verbose_name_plural = "countries"
-        ordering = ["name"]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -98,7 +95,6 @@ class Province(BaseModel):
         app_label = 'common'
         verbose_name_plural = "provinces"
         unique_together = ["country", "code"]
-        ordering = ["name"]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -129,7 +125,6 @@ class City(BaseModel):
     class Meta:
         app_label = 'common'
         verbose_name_plural = "cities"
-        ordering = ["name"]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -141,7 +136,6 @@ class City(BaseModel):
                 self.slug = f"{self.slug}-{count}"
                 count += 1
         super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.name} - {self.province.name}"
 
@@ -157,7 +151,6 @@ class Suburb(BaseModel):
     class Meta:
         app_label = 'common'
         verbose_name_plural = "suburbs"
-        ordering = ["name"]
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -184,8 +177,8 @@ class Address(BaseModel):
     )
 
     # Generic Foreign Key to link Address to our other models (eg Individual, Company, Property, etc.)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
     # Type of address for the linked object
@@ -211,7 +204,6 @@ class Address(BaseModel):
         app_label = 'common'
         # Ensure only one primary address of a given type per object
         unique_together = ('content_type', 'object_id', 'address_type', 'is_primary')
-        ordering = ["city", "suburb", "street_address", "address_type"]
 
     def __str__(self):
         parts = []

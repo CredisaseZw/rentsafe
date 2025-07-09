@@ -71,6 +71,7 @@ class WorkSchedule(BaseModel):
     status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES, default="PENDING")
     
     class Meta(BaseModel.Meta):
+        app_label = 'maintenance'
         verbose_name = _("Work Schedule")
         verbose_name_plural = _("Work Schedules")
         ordering = ['scheduled_date', 'status']
@@ -128,7 +129,7 @@ class MaintenanceSchedule(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = _("Maintenance Schedule")
         verbose_name_plural = _("Maintenance Schedules")
-        ordering = ['-created_at', 'property']
+        ordering = ['-date_created']
 
     def __str__(self):
-        return f"Maintenance Schedule: {self.title} for {self.property or self.lease} ({self.frequency})"
+        return f"Maintenance Schedule: {self.title} for {self.lease} ({self.frequency})"

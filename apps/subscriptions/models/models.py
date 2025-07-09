@@ -44,7 +44,6 @@ class SubscriptionPeriod(BaseModel):
     def __str__(self) -> str:
         return self.name
 
-
 class Subscription(BaseModel):
     SUB_CLASS_CHOICES = [
         ("INDIVIDUAL", "Individual"),
@@ -97,7 +96,7 @@ class Subscription(BaseModel):
         verbose_name_plural = _('subscriptions')
         ordering = ['-start_date']
         constraints = [
-            models.CheckConstraint(check=models.Q(used_lease_slots__lte=models.F('total_lease_slots')), name='used_lte_total_slots')
+            models.CheckConstraint(check=models.Q(used_slots__lte=models.F('total_slots')), name='used_lte_total_slots')
         ]
 
     def __str__(self) -> str:

@@ -23,7 +23,6 @@ class ReportTemplate(BaseModel):
     description = models.TextField(blank=True, null=True)
     template_file = models.FileField(upload_to='report_templates/')
     is_active = models.BooleanField(default=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         verbose_name = _('report template')
@@ -36,15 +35,14 @@ class GeneratedReport(BaseModel):
     report_template = models.ForeignKey(ReportTemplate, on_delete=models.CASCADE)
     parameters = models.JSONField()
     generated_file = models.FileField(upload_to='generated_reports/')
-    generated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         verbose_name = _('generated report')
         verbose_name_plural = _('generated reports')
-        ordering = ['-created_at']
+        ordering = ['-date_created']
 
     def __str__(self):
-        return f"Report generated from {self.report_template} on {self.created_at}"
+        return f"Report generated from {self.report_template} on {self.date_created}"
 
 class Enquiry(BaseModel):
     enquired_entity_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
@@ -60,7 +58,7 @@ class Enquiry(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = _("Enquiry")
         verbose_name_plural = _("Enquiries")
-        ordering = ['-date_of_enquiry']
+        ordering = ['-date_created']
 
     def __str__(self):
-        return f"Enquiry by {self.user.username if self.user else 'System'} about {self.enquired_entity} on {self.date_of_enquiry}"
+        return f"Enquiry by {self.user.username if self.user else 'System'} about {self.enquired_entity} on {self.date_created}"

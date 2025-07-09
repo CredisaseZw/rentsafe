@@ -9,8 +9,9 @@ from common.models.base_models import BaseModel
 from individuals.models.models import Individual
 from companies.models.models import Company
 from uuid import uuid4
-
-class Client(BaseModel):
+from django.contrib.auth import get_user_model
+from django.conf import settings
+class Client(models.Model):
     """
     Represents a client, which can be either an Individual or a Company.
     """
@@ -51,6 +52,13 @@ class Client(BaseModel):
 
     external_client_id = models.UUIDField(blank=True, null=True, unique=True, default=uuid4,
                             help_text=_("An optional external ID for this client (e.g., from a CRM)."))
+    date_created = models.DateTimeField(auto_now_add=True, help_text=_("The date and time when the client was created."))
+    date_modified = models.DateTimeField(auto_now=True, help_text=_("The date and time when the client was last modified."))
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='client_created_by',
+        help_text=_("The user who created this client profile.")
+    )
     class Meta:
         app_label = 'clients'
         db_table = 'client'

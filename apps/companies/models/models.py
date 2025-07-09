@@ -4,7 +4,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from common.models.models import Address, Document, Note
 from common.models.base_models import BaseModel
 from individuals.models.models import Individual
-from django.db.models import UniqueConstraint
+from django.db.models import UniqueConstraint, Q
 from django.db.models.functions import Lower
 
 
@@ -117,13 +117,8 @@ class ContactPerson(BaseModel):
         ordering = ['-date_created']
         constraints = [
             UniqueConstraint(
-                fields=['contact_type'],
-                condition=models.Q(contact_type='primary', company__isnull=False),
-                name='unique_primary_company_contact'
-            ),
-            UniqueConstraint(
                 fields=['branch', 'contact_type'],
-                condition=models.Q(contact_type='primary', branch__isnull=False),
+                condition=Q(contact_type='primary'),
                 name='unique_primary_branch_contact'
             )
         ]

@@ -144,6 +144,7 @@ if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
         }
     }
 else:
+    print("Testing mode....")
     tmpPostgres =urlparse(os.getenv("PROD_DATABASE_URL", None))
     if tmpPostgres is not None:
         DATABASES = {

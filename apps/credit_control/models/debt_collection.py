@@ -13,7 +13,7 @@ class DebtCase(BaseModel):
     status = models.CharField(max_length=20, choices=CASE_STATUS_CHOICES)
     opening_balance = models.DecimalField(max_digits=12, decimal_places=2)
     current_balance = models.DecimalField(max_digits=12, decimal_places=2)
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='debt_cases')
 
 class PaymentPlan(BaseModel):
     debt_case = models.ForeignKey(DebtCase, on_delete=models.CASCADE)
@@ -38,4 +38,3 @@ class CommunicationLog(BaseModel):
     summary = models.TextField()
     details = models.TextField()
     follow_up_date = models.DateField(null=True, blank=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)

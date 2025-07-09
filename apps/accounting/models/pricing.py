@@ -37,7 +37,7 @@ class SpecialPricing(BaseModel):
         unique_together = ('service', 'client_content_type', 'client_object_id')
 
     def __str__(self):
-        return f"Special Pricing for {self.service.service_name} for {self.client_customer}"
+        return f"Special Pricing for {self.service.service_name}"
 
 
 class StandardPricing(BaseModel):

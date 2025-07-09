@@ -346,8 +346,8 @@ class CreditNote(BaseModel):
 # The old InvoiceItem is now TransactionLineItem
 class TransactionLineItem(BaseModel):
     """Generic model for line items in transactions like invoices, credit notes, etc."""
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     parent_document = GenericForeignKey('content_type', 'object_id')
     sales_item = models.ForeignKey('SalesItem', on_delete=models.PROTECT)
     quantity = models.DecimalField(max_digits=10, decimal_places=2,default=Decimal('0.00'))

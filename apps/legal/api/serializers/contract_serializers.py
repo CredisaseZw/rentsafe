@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.legal.models.contracts import Contract
+from legal.models.contracts import Contract
 
 class ContractSerializer(serializers.ModelSerializer):
     class Meta:

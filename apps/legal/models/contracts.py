@@ -30,11 +30,11 @@ class Contract(BaseModel):
     
     # Parties to the contract
     party_a_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, related_name='party_a_contracts')
-    party_a_object_id = models.PositiveIntegerField()
+    party_a_object_id = models.PositiveIntegerField(null=True, blank=True)
     party_a = GenericForeignKey('party_a_content_type', 'party_a_object_id')
     
     party_b_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, related_name='party_b_contracts')
-    party_b_object_id = models.PositiveIntegerField()
+    party_b_object_id = models.PositiveIntegerField(null=True, blank=True)
     party_b = GenericForeignKey('party_b_content_type', 'party_b_object_id')
     
     class Meta:
