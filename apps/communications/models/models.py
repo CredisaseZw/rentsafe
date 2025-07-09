@@ -118,7 +118,7 @@ class OTP(BaseModel):
     otp_type = models.CharField(_("OTP Type"), max_length=20, choices=OTP_TYPE_CHOICES)
     requested_entity_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                         limit_choices_to=Q(app_label='individuals', model='individual') |
-                                        Q(app_label='companies', model='company'),
+                                        Q(app_label='companies', model='companybranch'),
                                         related_name='otps_for_entity_type',
                                         help_text=_("The type of entity for whom the OTP is requested."))
     requested_entity_object_id = models.PositiveIntegerField(
@@ -145,7 +145,7 @@ class OTP(BaseModel):
 class DebtorIntelligenceNote(BaseModel):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                 limit_choices_to=Q(app_label='individuals', model='individual') |
-                Q(app_label='companies', model='company'),
+                Q(app_label='companies', model='companybranch'),
                 related_name='debtor_intelligence_notes_as_client',
                 help_text=_("The type of entity this note is about (debtor)."))
     client_object_id = models.PositiveIntegerField(
@@ -166,7 +166,7 @@ class DebtorIntelligenceNote(BaseModel):
 class CommunicationHistoryReminder(BaseModel):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
             limit_choices_to=Q(app_label='individuals', model='individual') |
-            Q(app_label='companies', model='company'),
+            Q(app_label='companies', model='companybranch'),
             related_name='reminders_as_client',
             help_text=_("The type of entity this reminder is about."))
     client_object_id = models.PositiveIntegerField(
@@ -182,15 +182,16 @@ class CommunicationHistoryReminder(BaseModel):
                                     ('is_sms', 'SMS'),
                                     ('is_email', 'Email'),
                                     ('note','Note')
-                                ]
+                                ],
+                                default='is_sms'
                                 )
 
     action_date = models.DateField(_("Action Date"), null=True, default=None,
                     help_text=_("The date the reminder action is scheduled for."))
     message_sent = models.BooleanField(_("Message Sent"), default=False,
                     help_text=_("Indicates if the reminder message has been sent."))
-    
-    origin = models.CharField(max_length=100,choices=[('tenant','Tenant'),('creditor','Creditor')])
+
+    origin = models.CharField(max_length=130,choices=[('tenant_comms_history','Tenant'),('creditor_comms_history','Creditor Comms History')],default='tenant_comms_history')
 
     class Meta(BaseModel.Meta):
         verbose_name = _("Communication History Reminder")
@@ -204,7 +205,7 @@ class CommunicationHistoryReminder(BaseModel):
 class CommsHistMessage(BaseModel):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                     limit_choices_to=Q(app_label='individuals', model='individual') |
-                    Q(app_label='companies', model='company'),
+                    Q(app_label='companies', model='companybranch'),
                     related_name='messages_as_client',
                     help_text=_("The type of entity this message is to/from."))
     client_object_id = models.PositiveIntegerField(
@@ -213,14 +214,14 @@ class CommsHistMessage(BaseModel):
     client_object = GenericForeignKey('client_content_type', 'client_object_id')
     
     message = models.TextField(_("Message Content"))
-    origin = models.CharField(max_length=100,choices=[('tenant','Tenant'),('creditor','Creditor')])
+    origin = models.CharField(max_length=130,choices=[('tenant_comms_history','Tenant Comms History'),('creditor_comms_history','Creditor Comms History')],default='tenant_comms_history')
     channel_path = models.CharField(_("Channel Path"), max_length=50, 
                                 help_text=_("The channel path for the reminder."),
                                 choices=[
                                     ('is_sms', 'SMS'),
                                     ('is_email', 'Email'),
                                     ('note','Note')
-                                ]
+                                ],default='is_sms'
                                 )
     
 

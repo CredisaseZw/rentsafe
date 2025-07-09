@@ -30,7 +30,7 @@ class LeaseTenantInline(admin.TabularInline):
         from django.contrib.contenttypes.models import ContentType
         from django.db.models import Q
         formset.form.base_fields['content_type'].queryset = ContentType.objects.filter(
-            Q(app_label='individuals', model='individual') | Q(app_label='companies', model='company')
+            Q(app_label='individuals', model='individual') | Q(app_label='companies', model='companybranch')
         )
         return formset
 

@@ -13,13 +13,13 @@ class ActiveCredit(BaseModel):
                 help_text=_("Date and time of the transaction/entry."))
     dr_content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True,
                                 related_name='debit_entries',
-                                limit_choices_to=Q(app_label='individuals', model='individual') | Q(app_label='companies', model='company'))
+                                limit_choices_to=Q(app_label='individuals', model='individual') | Q(app_label='companies', model='companybranch'))
     dr_object_id = models.PositiveIntegerField(null=True, blank=True)
     debited_party = GenericForeignKey('dr_content_type', 'dr_object_id')
 
     cr_content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True,
                                         related_name='credit_entries',
-                                        limit_choices_to=Q(app_label='parties', model='individual') | Q(app_label='parties', model='company'))
+                                        limit_choices_to=Q(app_label='individuals', model='individual') | Q(app_label='companies', model='companybranch'))
     cr_object_id = models.PositiveIntegerField(null=True, blank=True)
     credited_party = GenericForeignKey('cr_content_type', 'cr_object_id')
     due_date = models.DateField(_("Due Date"), null=True, blank=True)

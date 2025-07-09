@@ -12,7 +12,7 @@ from datetime import date
 class Claim(BaseModel):
     creditor_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                     limit_choices_to=Q(app_label='individuals', model='individual') |
-                    Q(app_label='companies', model='company'),
+                    Q(app_label='companies', model='companybranch'),
                     related_name='claims_as_creditor',
                     help_text=_("The type of entity that is the creditor."))
     creditor_object_id = models.PositiveIntegerField(
@@ -22,7 +22,7 @@ class Claim(BaseModel):
 
     debtor_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                         limit_choices_to=Q(app_label='individuals', model='individual') |
-                        Q(app_label='companies', model='company'),
+                        Q(app_label='companies', model='companybranch'),
                         related_name='claims_as_debtor',
                         help_text=_("The type of entity that is the debtor."))
     debtor_object_id = models.PositiveIntegerField(

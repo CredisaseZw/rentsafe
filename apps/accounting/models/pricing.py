@@ -14,8 +14,8 @@ class SpecialPricing(BaseModel):
                                 help_text=_("The service this special pricing applies to."))
     
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
-                    limit_choices_to=Q(app_label='parties', model='individual') |
-                    Q(app_label='parties', model='company'),
+                    limit_choices_to=Q(app_label='individuals', model='individual') |
+                    Q(app_label='companies', model='companybranch'),
                     related_name='special_pricing_as_client',
                     help_text=_("The type of entity this special pricing is for."))
     client_object_id = models.PositiveIntegerField(

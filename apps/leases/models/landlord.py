@@ -6,7 +6,7 @@ from common.models.base_models import BaseModel
 
 class Landlord(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
-                                    limit_choices_to=Q(app_label='individuals', model='individual') | Q(app_label='companies', model='company'))
+                                    limit_choices_to=Q(app_label='individuals', model='individual') | Q(app_label='companies', model='companybranch'))
     object_id = models.PositiveIntegerField()
     landlord_object = GenericForeignKey('content_type', 'object_id')
     def __str__(self):

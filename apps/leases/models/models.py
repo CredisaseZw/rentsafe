@@ -378,7 +378,7 @@ class LeaseTenant(BaseModel):
     lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='lease_tenants')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                     limit_choices_to=Q(app_label='individuals', model='individual') |
-                                    Q(app_label='companies', model='company'))
+                                    Q(app_label='companies', model='companybranch'))
     object_id = models.PositiveIntegerField()
     tenant_object = GenericForeignKey('content_type', 'object_id')
 
@@ -470,7 +470,7 @@ class LeaseTenant(BaseModel):
 class Guarantor(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                     limit_choices_to=Q(app_label='individuals', model='individual') |
-                                                    Q(app_label='companies', model='company'))
+                                                    Q(app_label='companies', model='companybranch'))
     object_id = models.PositiveIntegerField()
     guarantor_object = GenericForeignKey('content_type', 'object_id')
 

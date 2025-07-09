@@ -13,24 +13,13 @@ from users.utils.manager import CustomUserManager, generate_unique_username
 from individuals.models.models import Individual
 from companies.models.models import Company
 from common.models.base_models import BaseModel
-
-
+from clients.models.models import Client
 
 class CustomUser(AbstractUser):
-    USER_TYPE_CHOICES = (
-        ('ADMIN', 'Admin'),
-        ('AGENT', 'Agent'),
-        ('CLIENT', 'Client'),
-        ('LANDLORD', 'Landlord'),
-        ('INDIVIDUAL_USER', 'Individual Profile User'),
-        ('COMPANY_USER', 'Company Profile User'), 
-    )
 
     email = models.EmailField(_('email address'), unique=True, blank=True, null=True,
             help_text=_("Required. Unique email address for the user."))
     
-    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='CLIENT',
-                help_text=_("The role or type of the user in the system."))
     is_verified = models.BooleanField(default=False,
                 help_text=_("Designates whether the user's account has been verified (e.g., email/phone)."))
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True,
@@ -38,16 +27,6 @@ class CustomUser(AbstractUser):
     last_password_change = models.DateTimeField(null=True, blank=True,
                                                 help_text=_("Timestamp of the user's last password change."))
 
-    reset_token = models.CharField(max_length=100, blank=True, null=True,
-                help_text=_("Temporary token for password reset."))
-    reset_token_expires = models.DateTimeField(blank=True, null=True,
-                                                help_text=_("Expiration time for the password reset token."))
-    
-    # Linking Individual or Company profiles
-    profile_content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True,
-                                    limit_choices_to=Q(app_label='individuals', model='individual') |
-                                    Q(app_label='companies', model='company'),
-                                    help_text=_("Links this user to their associated Individual or Company profile."))
     profile_object_id = models.PositiveIntegerField(null=True, blank=True,
                                             help_text=_("The ID of the associated Individual or Company profile."))
     profile_object = GenericForeignKey('profile_content_type', 'profile_object_id')
@@ -57,6 +36,11 @@ class CustomUser(AbstractUser):
 
     roles = models.ManyToManyField('Role', blank=True, related_name='users',
                     help_text=_("The specific roles assigned to this user, granting specific permissions."))
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='users',
+                                help_text=_("The client (Individual or Company) this user belongs to.")
+                            )
+    last_login = models.DateTimeField(_('last login'), null=True, blank=True,default=timezone.now,
+                help_text=_("The date and time of the user's last login."))
 
     objects = CustomUserManager()
 
@@ -66,36 +50,25 @@ class CustomUser(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
         verbose_name = _("Custom User")
         verbose_name_plural = _("Custom Users")
-
-    def clean(self):
-        super().clean()
-        if not self.is_superuser and not self.is_staff:
-            if not self.profile_object or not isinstance(self.profile_object, Individual):
-                raise ValidationError(
-                    _("Non-superuser/non-staff users must be linked to an Individual profile.")
-                )
-            if self.profile_object_id is None or self.profile_content_type is None:
-                raise ValidationError(
-                    _("Profile link is incomplete. Both profile_content_type and profile_object_id must be set.")
-                )
-            if not self.company:
-                raise ValidationError(
-                    _("Non-superuser/non-staff users must be assigned to a company.")
-                )
     
-    def get_associated_company(self):
-        """Returns the company this user directly belongs to."""
-        return self.company
-
     def __str__(self):
         full_name = self.get_full_name()
         if full_name:
             return f"{full_name} ({self.username})"
         return self.username or self.email or f"User {self.pk}"
 
-    def save(self, *args, **kwargs):
-        self.full_clean() 
-        super().save(*args, **kwargs)
+    
+    def get_associated_client(self):
+        """Returns the client this user directly belongs to."""
+        return self.client.name if self.client else "Clientless User"
+    
+    def clean(self):
+        super().clean()
+        if not self.is_staff:
+            if not self.client:
+                raise ValidationError(
+                    _("Non-staff users must be assigned to a client.")
+                )
 
     def get_associated_individual(self):
         if self.profile_object and isinstance(self.profile_object, Individual):
@@ -125,6 +98,25 @@ class CustomUser(AbstractUser):
             permissions.update(role.get_all_permissions())
         return permissions
 
+    def get_associated_company(self):
+        """Returns the Company object associated with this user's client, if applicable."""
+        if self.client and self.client.is_company_client:
+            return self.client.get_linked_entity
+        return None
+    @property
+    def user_type(self):
+        """
+        Returns the type of user based on their client association.
+        'Individual' if associated with an Individual, 'Company' if associated with a Company.
+        """
+        if self.client:
+            return self.client.client_type
+        return 'Unknown'
+
+
+    def save(self, *args, **kwargs):
+        self.full_clean() 
+        super().save(*args, **kwargs)
 
 # --- New Feature: Role Model ---
 class Role(BaseModel):
