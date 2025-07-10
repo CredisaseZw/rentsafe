@@ -225,13 +225,148 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
       label: "Data",
       segment: RENTSAFE_PRE_SEG + "/data",
       subLinks: [
+      subLinks : [{
+         label : "Leases",
+         path: RENTSAFE_PRE_SEG + "/leases",
+         segment: RENTSAFE_PRE_SEG + "/tenants/leases",
+         pageComponent: Leases,
+      },
+      {
+         label : "Communication",
+         path: RENTSAFE_PRE_SEG + "/communication",
+         segment: RENTSAFE_PRE_SEG + "/tenants/communication",
+         pageComponent: Communication,
+      },
+      {
+         label : "Deposits",
+         path: RENTSAFE_PRE_SEG + "/deposits",
+         segment: RENTSAFE_PRE_SEG + "/tenants/deposits",
+         pageComponent: Deposits,
+      },
+      {
+         label : "Lease Template",
+         path: RENTSAFE_PRE_SEG + "/lease-templates",
+         segment: RENTSAFE_PRE_SEG + "/tenants/lease-templates",
+         pageComponent: LeaseTemplate,
+      },
+   ]},
+   {
+      label: "Landlords",
+      segment : RENTSAFE_PRE_SEG + "/landlords",
+      subLinks : [
          {
-            label: "Claim",
-            path: RENTSAFE_PRE_SEG + "/claim",
-            segment: RENTSAFE_PRE_SEG + "/data/claim",
-            pageComponent: Claim,
+            label : "Statements",
+            path: RENTSAFE_PRE_SEG + "/statements",
+            segment: RENTSAFE_PRE_SEG + "/landlords/statements",
+            pageComponent: Statements,
          },
-      ],
+         {
+            label : "Portfolio Performance",
+            path: RENTSAFE_PRE_SEG + "/portfolio-performance",
+            segment: RENTSAFE_PRE_SEG + "/landlords/portfolio-performance",
+            pageComponent: PortfolioPerformance,
+         },
+         {
+            label : "Communication",
+            path: RENTSAFE_PRE_SEG + "/communication",
+            segment: RENTSAFE_PRE_SEG + "/landlords/communication",
+            pageComponent: Communication,
+         },
+         {
+            label : "R&M Pending Requests",
+            path: RENTSAFE_PRE_SEG + "/rm-pending",
+            segment: RENTSAFE_PRE_SEG + "/landlords/rm-pending",
+            pageComponent: RMPendingRequests,
+         },
+
+      ]},
+      {
+      label: "Properties",
+      segment : RENTSAFE_PRE_SEG + "/properties",
+      subLinks : [
+         {
+            label : "Property List",
+            path: RENTSAFE_PRE_SEG + "/property-list",
+            segment: RENTSAFE_PRE_SEG + "/properties/property-list",
+            pageComponent: PropertyLIst,
+         },
+         {
+            label : "Property Performance Graph",
+            path: RENTSAFE_PRE_SEG + "/pp-graph",
+            segment: RENTSAFE_PRE_SEG + "/properties/pp-graph",
+            pageComponent: PropertyPerformanceReports,
+         },
+         {
+            label : "Inspections",
+            path: RENTSAFE_PRE_SEG + "/inspections",
+            segment: RENTSAFE_PRE_SEG + "/properties/inspections",
+            pageComponent: Inspections,
+         }
+      ]},
+      {
+      label: "Maintenance",
+      segment : RENTSAFE_PRE_SEG + "/maintenance",
+      subLinks : [
+         {
+            label : "Work Orders",
+            path: RENTSAFE_PRE_SEG + "/work-orders",
+            segment: RENTSAFE_PRE_SEG + "/maintenance/work-orders",
+            pageComponent: WorkOrders,
+         },
+         {
+            label : "Maintenance Schedules",
+            path: RENTSAFE_PRE_SEG + "/maintenance-schedules",
+            segment: RENTSAFE_PRE_SEG + "/maintenance/maintenance-schedules",
+            pageComponent: MaintenanceSchedules,
+         },
+         {
+            label : "Contractor Management",
+            path: RENTSAFE_PRE_SEG + "/contractor_management",
+            segment: RENTSAFE_PRE_SEG + "/maintenance/contractor_management",
+            pageComponent: ContractorManagement,
+         },
+         {
+            label : "Costing Tracking",
+            path: RENTSAFE_PRE_SEG + "/costing_tracking",
+            segment: RENTSAFE_PRE_SEG + "/maintenance/costing_tracking",
+            pageComponent: CostTracking,
+         },
+         {
+            label : "R&M History",
+            path: RENTSAFE_PRE_SEG + "/r_m-history",
+            segment: RENTSAFE_PRE_SEG + "/maintenance/r_m-history",
+            pageComponent: RMMaintanceHistory,
+         }
+      ]},
+      {
+         label: "Reports",
+         segment : RENTSAFE_PRE_SEG + "/reports",
+         subLinks : [
+            {
+               label : "Occupancy And vacancy",
+               path: RENTSAFE_PRE_SEG + "/occupancy_vacancy",
+               segment: RENTSAFE_PRE_SEG + "/reports/occupancy_vacancy",
+               pageComponent: OccupancyVacancy,
+            },
+            {
+               label : "Turnover",
+               path: RENTSAFE_PRE_SEG + "/turnover",
+               segment: RENTSAFE_PRE_SEG + "/reports/turnover",
+               pageComponent: Turnover,
+            }
+         ]},
+
+      {
+         label: "Data",
+         segment: RENTSAFE_PRE_SEG + "/data",
+         subLinks: [
+            {
+               label: "Claim",
+               path: RENTSAFE_PRE_SEG + "/claim",
+               segment: RENTSAFE_PRE_SEG + "/data/claim",
+               pageComponent: Claim,
+            },
+         ],
    },
 ];
 export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
