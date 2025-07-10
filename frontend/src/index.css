@@ -6,7 +6,8 @@
    --PRIMARY: #176987;
    --primary-dark: #2086ac;
    --SECONDARY: rgb(38, 41, 43);
-   --SUCCESS: rgb(43, 153, 47);
+   --SUCCESS: rgb(54, 182, 59);
+   --SUCCESS-LIGHT : rgb(172, 255, 175);
    --ERROR: rgb(153, 61, 43);
    --radius: 0.625rem;
    /* --background: oklch(1 0 0); */
