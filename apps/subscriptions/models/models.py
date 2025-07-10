@@ -9,8 +9,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-from common.models.base_models import BaseModel
-from accounting.models.models import Currency, PaymentMethod
+from apps.common.models.base_models import BaseModel
+from apps.accounting.models.models import Currency, PaymentMethod
 
 class Services(BaseModel): 
     service_name = models.CharField(max_length=55, unique=True,
@@ -23,7 +23,6 @@ class Services(BaseModel):
 
     def __str__(self) -> str:
         return self.service_name
-
 
 class SubscriptionPeriod(BaseModel):
     name = models.CharField(max_length=255, unique=True,

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline # For generic relations
 from django.utils.html import format_html
 from django.contrib.contenttypes.models import ContentType
-from accounting.models.models import (
+from apps.accounting.models.models import (
     AccountSector,
     SalesItem,
     SalesCategory,

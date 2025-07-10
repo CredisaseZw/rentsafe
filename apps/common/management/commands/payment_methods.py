@@ -4,7 +4,7 @@ This script creates default payment methods used in the application.
 It is intended to be run once during the initial setup of the application.
 """
 from django.core.management.base import BaseCommand
-from accounting.models.models import PaymentMethod 
+from apps.accounting.models.models import PaymentMethod 
 
 class Command(BaseCommand):
     """Command to seed default payment methods for RentSafe application."""

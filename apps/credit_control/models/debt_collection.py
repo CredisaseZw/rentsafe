@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel
 
 class DebtCase(BaseModel):
     CASE_STATUS_CHOICES = (

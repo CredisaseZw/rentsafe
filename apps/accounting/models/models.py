@@ -1,21 +1,21 @@
 from django.db import models, transaction
-from datetime import datetime
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now, timedelta
-from dateutil.relativedelta import relativedelta
-import uuid
-from django.core.exceptions import ValidationError
-from individuals.models.models import Individual
-from companies.models.models import Company
-from decimal import Decimal, ROUND_HALF_UP
 from django.db.models import F, Sum, Q
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from common.models.base_models import BaseModel
+from dateutil.relativedelta import relativedelta
+import uuid
+from django.core.exceptions import ValidationError
+from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime
+from apps.accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
+from apps.individuals.models.models import Individual
+from apps.companies.models.models import Company
+from apps.common.models.base_models import BaseModel
 
 User = get_user_model()
 

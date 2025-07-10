@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from legal.models.contracts import Contract
-from legal.api.serializers.contract_serializers import ContractSerializer
 from rest_framework.permissions import IsAuthenticated
+from apps.legal.models.contracts import Contract
+from apps.legal.api.serializers.contract_serializers import ContractSerializer
 
 class ContractViewSet(viewsets.ModelViewSet):
     queryset = Contract.objects.all()

@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from common.models.base_models import BaseModel
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
+from apps.common.models.base_models import BaseModel
 
 class ActiveCredit(BaseModel): 
     date_time = models.DateTimeField(_("Transaction Date/Time"), auto_now=True,

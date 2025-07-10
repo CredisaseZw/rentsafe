@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from accounting.api.views import (
+from apps.accounting.api.views import (
     SalesCategoryViewSet,
     SalesAccountViewSet,
     CashSaleViewSet,

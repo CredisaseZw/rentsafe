@@ -2,7 +2,7 @@ from urllib import request
 from django.http import JsonResponse
 from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
-from accounting.models.models import (
+from apps.accounting.models.models import (
     SalesItem,
     VATSetting,
     SalesCategory,
@@ -22,7 +22,7 @@ from accounting.models.models import (
     Currency,
     CreditNote, 
 )
-from accounting.api.serializers.serializers import (
+from apps.accounting.api.serializers.serializers import (
     SalesItemSerializer,
     VATSettingSerializer,
     SalesCategorySerializer,
@@ -48,8 +48,6 @@ from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import action
 from django.utils.timezone import now
-from inertia import render as inertia_render
-from django.core.exceptions import ValidationError # Import ValidationError
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
     """
@@ -172,9 +170,6 @@ class InvoiceViewSet(BaseCompanyViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Removed generate_credit_note and generate_debit_note as they are not in the Invoice model's methods.
-    # CreditNote creation should be a separate endpoint if not directly tied to invoice methods.
 
     @action(detail=False, methods=['get'], url_path='get-pending-invoices') # Changed to False as it's a list operation
     def get_pending_invoices(self, request):

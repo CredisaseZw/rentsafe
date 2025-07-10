@@ -2,7 +2,7 @@
 # legal/models/disputes.py
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel
 class LegalDispute(BaseModel):
     DISPUTE_TYPES = (
         ('tenant', 'Tenant Dispute'),
@@ -30,6 +30,8 @@ class LegalDispute(BaseModel):
     contract = models.ForeignKey('legal.Contract', on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
+        app_label = 'legal'
+        db_table = 'legal_dispute'
         verbose_name = _('legal dispute')
         verbose_name_plural = _('legal disputes')
         ordering = ['-opened_date']

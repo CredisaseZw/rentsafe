@@ -5,9 +5,9 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from common.models.base_models import BaseModel
-from individuals.models.models import Individual
-from companies.models.models import Company
+from apps.common.models.base_models import BaseModel
+from apps.individuals.models.models import Individual
+from apps.companies.models.models import Company
 from uuid import uuid4
 from django.contrib.auth import get_user_model
 from django.conf import settings

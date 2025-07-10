@@ -5,10 +5,10 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from common.models.models import Note
+from apps.common.models.models import Note
 User = get_user_model()
 
 class Communication(BaseModel):
@@ -45,7 +45,6 @@ class Communication(BaseModel):
     content = models.TextField()
     sent_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_communications')
     sent_to = models.CharField(max_length=255, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     related_lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True)
     
@@ -54,17 +53,16 @@ class Communication(BaseModel):
         db_table = 'communication'
         verbose_name = _('communication')
         verbose_name_plural = _('communications')
-        ordering = ['-timestamp']
+        ordering = ['-date_created']
     
     def __str__(self):
-        return f"{self.get_communication_type_display()} - {self.subject or 'No Subject'}"
+        return str(self.id)
 
 class CommunicationAttachment(BaseModel):
     communication = models.ForeignKey(Communication, on_delete=models.CASCADE, related_name='attachments')
     file = models.FileField(upload_to='communication_attachments/')
     file_name = models.CharField(max_length=255)
     file_type = models.CharField(max_length=50)
-    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         app_label = 'communications'
@@ -144,7 +142,7 @@ class OTP(BaseModel):
         db_table = 'otp'
         verbose_name = _("OTP")
         verbose_name_plural = _("OTPs")
-        ordering = ['-created_at']
+        ordering = ['-date_created']
 
     def __str__(self):
         return f"OTP {self.otp_code} for {self.requested_entity} ({self.otp_type})"
@@ -165,7 +163,7 @@ class DebtorIntelligenceNote(BaseModel):
         db_table = 'debtor_intelligence_note'
         verbose_name = _("Debtor Intelligence Note")
         verbose_name_plural = _("Debtor Intelligence Notes")
-        ordering = ['-created_at']
+        ordering = ['-date_created']
 
     def __str__(self):
         return f"Note for {self.client_object} by {self.user.username if self.user else 'System'}"
@@ -205,7 +203,7 @@ class CommunicationHistoryReminder(BaseModel):
         db_table = 'comms_hist_reminder'
         verbose_name = _("Communication History Reminder")
         verbose_name_plural = _("Communication History Reminders")
-        ordering = ['-created_at', 'action_date']
+        ordering = ['-date_created', 'action_date']
 
     def __str__(self):
         return f"Reminder for {self.client_object} on {self.action_date}"
@@ -238,7 +236,7 @@ class CommsHistMessage(BaseModel):
         db_table = 'comms_hist_message'
         verbose_name = _("Communication Message")
         verbose_name_plural = _("Communication Messages")
-        ordering = ['-created_at']
+        ordering = ['-date_created']
 
     def __str__(self):
-        return f"Message for {self.client_object} at {self.created_at}"
+        return f"Message for {self.client_object} at {self.date_created}"

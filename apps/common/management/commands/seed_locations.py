@@ -1,8 +1,8 @@
 import os
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from common.models.models import Country, Province, City, Suburb
-from common.seeding.location_data import COUNTRIES_DATA, PROVINCES_DATA, CITIES_DATA, SUBURBS_DATA
+from apps.common.models.models import Country, Province, City, Suburb
+from apps.common.seeding.location_data import COUNTRIES_DATA, PROVINCES_DATA, CITIES_DATA, SUBURBS_DATA
 
 class Command(BaseCommand):
     help = 'Seeds initial geographical data (Countries, Provinces, Cities, Suburbs).'

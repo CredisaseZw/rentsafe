@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
-from common.models.base_models import BaseModel
 from django.utils.translation import gettext_lazy as _
+from apps.common.models.base_models import BaseModel
 
 class MaintenanceRequest(BaseModel):
     PRIORITY_CHOICES = (

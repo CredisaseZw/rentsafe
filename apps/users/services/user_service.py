@@ -1,9 +1,9 @@
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from individuals.models.models import Individual
-from companies.models.models import Company
 from django.core.exceptions import ValidationError
+from apps.individuals.models.models import Individual
+from apps.companies.models.models import Company
 User = get_user_model()
 
 class UserCreationService:

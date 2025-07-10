@@ -3,9 +3,9 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from common.models.models import Address, Document, Note
+from apps.common.models.models import Address, Document, Note
 from django.contrib.contenttypes.fields import GenericRelation
-from common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel
 
 
 class Individual(BaseModel):

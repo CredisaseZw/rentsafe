@@ -4,12 +4,17 @@ from django.db import models
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
-from common.models.models import Address, Document, Note
-from common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel
+from apps.common.models.models import Address, Document, Note
 
 class PropertyType(BaseModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        app_label = 'properties'
+        verbose_name = _('property type')
+        verbose_name_plural = _('property types')
     
     def __str__(self):
         return self.name

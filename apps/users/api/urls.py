@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (
+from apps.users.api.views import (
     LoginView,
     CurrentUserView,
     CompanyUserCreateView

@@ -1,6 +1,6 @@
 from django.db import transaction
-from legal.models.contracts import Contract
-from communications.models.models import Communication
+from apps.legal.models.contracts import Contract
+from apps.communications.models.models import Communication
 
 class ContractService:
     

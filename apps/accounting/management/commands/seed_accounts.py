@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from accounting.models.models import SalesAccount, AccountSector
-from authentication.models import CustomUser
+from django.contrib.auth import get_user_model
+CustomUser = get_user_model()
 
 class Command(BaseCommand):
     help = "Seeds the database with predefined accounts and sectors"

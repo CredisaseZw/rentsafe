@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from users.models.models import Role 
+from apps.users.models.models import Role 
 
 class Command(BaseCommand):
     help = 'Seeds initial roles and assigns relevant permissions for the property management system.'

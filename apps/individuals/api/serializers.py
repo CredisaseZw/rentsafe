@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from individuals.models.models import Individual, EmploymentDetail, NextOfKin
+from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin
 
 class EmploymentDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,6 +51,6 @@ class IndividualSerializer(serializers.ModelSerializer):
             'identification_number', 'email', 'mobile_phone',
             'landline_phone', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin',
-            'created_at', 'updated_at'
+            'date_created', 'date_updated'
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['date_created', 'date_updated']

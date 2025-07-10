@@ -2,11 +2,11 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
-from common.models.base_models import BaseModel
-from accounting.models.models import Currency, PaymentMethod
 from django.contrib.auth import get_user_model
-from individuals.models.models import Individual
-from companies.models.models import Company
+from apps.common.models.base_models import BaseModel
+from apps.accounting.models.models import Currency, PaymentMethod
+from apps.individuals.models.models import Individual
+from apps.companies.models.models import Company
 
 User = get_user_model()
 

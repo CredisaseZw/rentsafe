@@ -19,7 +19,6 @@ import sys
 load_dotenv(override=True) 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 
 TIME_ZONE = "Africa/Harare"
@@ -71,20 +70,20 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     
     # Custom Apps
-    'users',
-    'common',
-    'individuals',
-    'companies',
-    'properties',
-    'leases',
-    'accounting',
-    'communications',
-    'reporting',
-    'maintenance',
-    'subscriptions',
-    'credit_control',
-    'legal',
-    'clients',
+    'apps.users',
+    'apps.common',
+    'apps.individuals',
+    'apps.companies',
+    'apps.properties',
+    'apps.leases',
+    'apps.accounting',
+    'apps.communications',
+    'apps.reporting',
+    'apps.maintenance',
+    'apps.subscriptions',
+    'apps.credit_control',
+    'apps.legal',
+    'apps.clients',
 ]
 
 MIDDLEWARE = [

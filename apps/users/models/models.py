@@ -9,11 +9,11 @@ from django.db.models import Q
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from users.utils.manager import CustomUserManager, generate_unique_username
-from individuals.models.models import Individual
-from companies.models.models import Company
-from common.models.base_models import BaseModel
-from clients.models.models import Client
+from apps.users.utils.manager import CustomUserManager, generate_unique_username
+from apps.individuals.models.models import Individual
+from apps.companies.models.models import Company
+from apps.common.models.base_models import BaseModel
+from apps.clients.models.models import Client
 
 class CustomUser(AbstractUser):
 

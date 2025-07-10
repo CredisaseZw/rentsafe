@@ -3,7 +3,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from common.models.base_models import BaseModel 
+from apps.common.models.base_models import BaseModel 
 
 class AuditLog(BaseModel): 
     timestamp = models.DateTimeField(auto_now_add=True)

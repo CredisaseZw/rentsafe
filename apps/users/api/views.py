@@ -2,11 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import CustomTokenObtainPairSerializer, UserSerializer
-from users.services.user_service import UserCreationService
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.exceptions import ValidationError
+from apps.users.api.serializers import CustomTokenObtainPairSerializer, UserSerializer
+from apps.users.services.user_service import UserCreationService
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer

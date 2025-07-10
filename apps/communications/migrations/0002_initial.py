@@ -11,14 +11,13 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("leases", "0001_initial"),
+        ("communications", "0001_initial"),
         ("contenttypes", "0002_remove_content_type_name"),
-        ("properties", "0002_initial"),
-        ("accounting", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="leasetermination",
+            model_name="reminder",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -30,29 +29,22 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="leasetenant",
-            name="content_type",
+            model_name="otp",
+            name="requested_entity_content_type",
             field=models.ForeignKey(
+                help_text="The type of entity for whom the OTP is requested.",
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
                 on_delete=django.db.models.deletion.CASCADE,
+                related_name="otps_for_entity_type",
                 to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="leasetenant",
-            name="lease",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="lease_tenants",
-                to="leases.lease",
-            ),
-        ),
-        migrations.AddField(
-            model_name="leasetenant",
+            model_name="otp",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -64,138 +56,22 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="leaselog",
-            name="content_type",
+            model_name="debtorintelligencenote",
+            name="client_content_type",
             field=models.ForeignKey(
-                blank=True,
-                help_text="The content type of the related object (e.g., LeaseTenant).",
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                to="contenttypes.contenttype",
-            ),
-        ),
-        migrations.AddField(
-            model_name="leaselog",
-            name="lease",
-            field=models.ForeignKey(
-                blank=True,
-                help_text="The lease associated with this log entry. Set to NULL if the lease is deleted.",
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="logs",
-                to="leases.lease",
-            ),
-        ),
-        migrations.AddField(
-            model_name="leaselog",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                help_text="The user who performed the action, if applicable.",
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="leasecharge",
-            name="currency",
-            field=models.ForeignKey(
-                help_text="The currency for this specific charge.",
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="lease_charges",
-                to="accounting.currency",
-            ),
-        ),
-        migrations.AddField(
-            model_name="leasecharge",
-            name="lease",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="charges",
-                to="leases.lease",
-            ),
-        ),
-        migrations.AddField(
-            model_name="leasecharge",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="lease",
-            name="currency",
-            field=models.ForeignKey(
-                help_text="The primary currency in which the lease payments and charges are accounted for.",
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="leases_as_primary_currency",
-                to="accounting.currency",
-            ),
-        ),
-        migrations.AddField(
-            model_name="lease",
-            name="guarantor",
-            field=models.ForeignKey(
-                blank=True,
-                help_text="The guarantor responsible for financial obligations under this lease.",
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                to="leases.guarantor",
-            ),
-        ),
-        migrations.AddField(
-            model_name="lease",
-            name="landlord",
-            field=models.ForeignKey(
-                help_text="The landlord responsible for this lease.",
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="managed_leases",
-                to="leases.landlord",
-            ),
-        ),
-        migrations.AddField(
-            model_name="lease",
-            name="unit",
-            field=models.ForeignKey(
-                help_text="The property unit being leased.",
-                on_delete=django.db.models.deletion.PROTECT,
-                related_name="leases",
-                to="properties.unit",
-            ),
-        ),
-        migrations.AddField(
-            model_name="lease",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="landlord",
-            name="content_type",
-            field=models.ForeignKey(
+                help_text="The type of entity this note is about (debtor).",
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
                 on_delete=django.db.models.deletion.CASCADE,
+                related_name="debtor_intelligence_notes_as_client",
                 to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="landlord",
+            model_name="debtorintelligencenote",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -207,20 +83,22 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="guarantor",
-            name="content_type",
+            model_name="communicationhistoryreminder",
+            name="client_content_type",
             field=models.ForeignKey(
+                help_text="The type of entity this reminder is about.",
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
                 on_delete=django.db.models.deletion.CASCADE,
+                related_name="reminders_as_client",
                 to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="guarantor",
+            model_name="communicationhistoryreminder",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -231,12 +109,95 @@ class Migration(migrations.Migration):
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
-        migrations.AlterUniqueTogether(
-            name="leasetenant",
-            unique_together={("lease", "content_type", "object_id")},
+        migrations.AddField(
+            model_name="communicationattachment",
+            name="communication",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="attachments",
+                to="communications.communication",
+            ),
         ),
-        migrations.AlterUniqueTogether(
-            name="guarantor",
-            unique_together={("content_type", "object_id")},
+        migrations.AddField(
+            model_name="communicationattachment",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user who last created or modified this record.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="communication",
+            name="content_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.contenttype",
+            ),
+        ),
+        migrations.AddField(
+            model_name="communication",
+            name="related_lease",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="leases.lease",
+            ),
+        ),
+        migrations.AddField(
+            model_name="communication",
+            name="sent_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="sent_communications",
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="communication",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user who last created or modified this record.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="commshistmessage",
+            name="client_content_type",
+            field=models.ForeignKey(
+                help_text="The type of entity this message is to/from.",
+                limit_choices_to=models.Q(
+                    models.Q(("app_label", "individuals"), ("model", "individual")),
+                    models.Q(("app_label", "companies"), ("model", "companybranch")),
+                    _connector="OR",
+                ),
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="messages_as_client",
+                to="contenttypes.contenttype",
+            ),
+        ),
+        migrations.AddField(
+            model_name="commshistmessage",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user who last created or modified this record.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

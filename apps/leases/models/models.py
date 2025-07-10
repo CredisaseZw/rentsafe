@@ -1,18 +1,18 @@
 import contextlib
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from common.models.models import Document, Note
-from properties.models.models import Unit
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q, F
-from subscriptions.models.models import Subscription
 from django.db import transaction
+from django.conf import settings
 from django.utils import timezone
 from datetime import date
 from decimal import Decimal
-from common.models.base_models import BaseModel
-from django.conf import settings
+from apps.subscriptions.models.models import Subscription
+from apps.properties.models.models import Unit
+from apps.common.models.models import Document, Note
+from apps.common.models.base_models import BaseModel
 
 class Lease(BaseModel):
     LEASE_STATUS_CHOICES = (
@@ -374,7 +374,6 @@ class Lease(BaseModel):
             print(f"ERROR: During subscription slot increment for Lease {self.lease_id}: {e}")
             return False
     
-
 class LeaseTenant(BaseModel):
     lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='lease_tenants')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
@@ -468,7 +467,6 @@ class LeaseTenant(BaseModel):
             details={**lease_details_for_log, 'was_primary': self.is_primary_tenant}
         )
         super().delete(*args, **kwargs)
-
 
 class Guarantor(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
@@ -632,7 +630,6 @@ class LeaseCharge(BaseModel):
         )
         super().delete(*args, **kwargs)
 
-
 class LeaseTermination(BaseModel):
     lease = models.OneToOneField(Lease, on_delete=models.CASCADE, related_name='termination')
     termination_date = models.DateField()
@@ -674,7 +671,6 @@ class LeaseTermination(BaseModel):
             if self.lease.status != 'TERMINATED':
                 self.lease.status = 'TERMINATED'
                 self.lease.save(request=request) # Pass request
-
 
 class LeaseLog(BaseModel):
     LOG_TYPE_CHOICES = (

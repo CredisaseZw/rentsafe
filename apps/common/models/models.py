@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
-from common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel
 class Document(BaseModel):
     DOCUMENT_TYPES = (
         ('id', 'Identification'),
@@ -36,7 +36,7 @@ class Note(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
     object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    
+
     author = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, related_name='notes', null=True, blank=True)
     content = models.TextField()
     is_private = models.BooleanField(default=False)
