@@ -34,3 +34,10 @@ export function getInitials(name: string): string {
    }
    return parts[0].trim().charAt(0).toUpperCase() + parts[1].trim().charAt(0).toUpperCase();
 }
+
+export function formatCurrency(amount: number): string {
+   return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+   }).format(amount);
+}

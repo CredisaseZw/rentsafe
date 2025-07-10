@@ -15,7 +15,7 @@ export default function Dashboard() {
    ];
 
    return (
-      <div className="container mx-auto">
+      <div className="p-5">
          <Tabs defaultValue={tabs[0].value}>
             <TabsList className="mb-5">
                {tabs.map((tab) => (
