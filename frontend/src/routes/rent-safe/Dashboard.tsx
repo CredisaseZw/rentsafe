@@ -15,20 +15,22 @@ export default function Dashboard() {
    ];
 
    return (
-      <Tabs defaultValue={tabs[0].value} className="w-[400px]">
-         <TabsList>
-            {tabs.map((tab) => (
-               <TabsTrigger key={tab.value} value={tab.value}>
-                  {tab.label}
-               </TabsTrigger>
-            ))}
-         </TabsList>
+      <div className="container mx-auto">
+         <Tabs defaultValue={tabs[0].value}>
+            <TabsList className="mb-5">
+               {tabs.map((tab) => (
+                  <TabsTrigger key={tab.value} value={tab.value}>
+                     {tab.label}
+                  </TabsTrigger>
+               ))}
+            </TabsList>
 
-         {tabs.map((tab) => (
-            <TabsContent key={tab.value} value={tab.value}>
-               {tab.content}
-            </TabsContent>
-         ))}
-      </Tabs>
+            {tabs.map((tab) => (
+               <TabsContent key={tab.value} value={tab.value}>
+                  {tab.content}
+               </TabsContent>
+            ))}
+         </Tabs>
+      </div>
    );
 }
