@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -68,7 +70,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    
+
     # Custom Apps
     'apps.users',
     'apps.common',
@@ -144,36 +146,37 @@ if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
     }
 else:
     print("Testing mode....")
-    tmpPostgres =urlparse(os.getenv("PROD_DATABASE_URL", None))
-    if tmpPostgres is not None:
-        print("Testing mode....")
-        db_url = os.getenv('PROD_DATABASE_URL')
+    if db_url := os.getenv("PROD_DATABASE_URL"):
+        db_url = db_url.strip().strip('"').strip("'") 
         parsed = urlparse(db_url)
+
+        if not parsed.hostname:
+            raise Exception("Invalid PROD_DATABASE_URL: Missing hostname.")
         migration_host = parsed.hostname.replace('-pooler', '')
 
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': parsed.path[1:].split('?')[0], 
+                'NAME': parsed.path[1:].split('?')[0],
                 'USER': parsed.username,
                 'PASSWORD': parsed.password,
-                'HOST': migration_host, 
+                'HOST': migration_host,
                 'PORT': parsed.port or 5432,
                 'OPTIONS': {
                     'sslmode': 'require',
-                    'options': '-c statement_timeout=30000'  
+                    'options': '-c statement_timeout=30000'
                 },
             },
             'pooler': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': parsed.path[1:].split('?')[0], 
+                'NAME': parsed.path[1:].split('?')[0],
                 'USER': parsed.username,
                 'PASSWORD': parsed.password,
-                'HOST': parsed.hostname, 
+                'HOST': parsed.hostname,
                 'PORT': parsed.port or 5432,
                 'OPTIONS': {
                     'sslmode': 'require',
-                    'options': '-c statement_timeout=30000' 
+                    'options': '-c statement_timeout=30000'
                 },
             }
         }
@@ -324,7 +327,7 @@ LOGGING = {
 LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
-    
+
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = 'django-db'
