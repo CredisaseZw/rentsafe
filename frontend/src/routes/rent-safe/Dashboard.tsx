@@ -2,35 +2,41 @@ import CompanyPaymentStatusTab from "@/components/routes/rent-safe/dashboard/Com
 import OverviewTab from "@/components/routes/rent-safe/dashboard/OverviewTab";
 import IndividualPaymentStatusTab from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Building2, ChartLine, User } from "lucide-react";
 
 export default function Dashboard() {
    const tabs = [
-      { value: "overview", label: "Overview", content: <OverviewTab /> },
+      { icon: ChartLine, value: "overview", label: "Overview", content: <OverviewTab /> },
       {
+         icon: User,
          value: "individual-payment-status",
          label: "Individual Payment Status",
          content: <IndividualPaymentStatusTab />,
       },
-      { value: "company-payment-status", label: "Company Payment Status", content: <CompanyPaymentStatusTab /> },
+      {
+         icon: Building2,
+         value: "company-payment-status",
+         label: "Company Payment Status",
+         content: <CompanyPaymentStatusTab />,
+      },
    ];
 
    return (
-      <div className="p-5">
-         <Tabs defaultValue={tabs[0].value}>
-            <TabsList className="mb-5">
-               {tabs.map((tab) => (
-                  <TabsTrigger key={tab.value} value={tab.value}>
-                     {tab.label}
-                  </TabsTrigger>
-               ))}
-            </TabsList>
-
+      <Tabs defaultValue={tabs[0].value}>
+         <TabsList className="border-foreground mb-5">
             {tabs.map((tab) => (
-               <TabsContent key={tab.value} value={tab.value}>
-                  {tab.content}
-               </TabsContent>
+               <TabsTrigger key={tab.value} value={tab.value}>
+                  <tab.icon />
+                  {tab.label}
+               </TabsTrigger>
             ))}
-         </Tabs>
-      </div>
+         </TabsList>
+
+         {tabs.map((tab) => (
+            <TabsContent key={tab.value} value={tab.value}>
+               {tab.content}
+            </TabsContent>
+         ))}
+      </Tabs>
    );
 }
