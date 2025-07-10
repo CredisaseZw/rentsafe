@@ -6,10 +6,12 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "../ui/sidebar";
+import { Collapsible } from "@radix-ui/react-collapsible";
 import { Link } from "react-router";
 import { cn } from "@/lib/utils";
 import useNavLinkItem from "@/hooks/components/general/useNavLinkItem";
 import type { NavLink } from "@/types";
+import { ChevronDown } from "lucide-react";
 
 type NavLinkItemProps = {
   navLink: NavLink;
