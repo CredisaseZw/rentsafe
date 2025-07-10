@@ -1,6 +1,6 @@
 import { Sidebar, SidebarHeader, SidebarGroupLabel,SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarFooter } from "../ui/sidebar";
 import type { NavLink } from "@/types";
-import { HomeIcon } from "lucide-react";
+import { HomeIcon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import NavLinkItem from "./NavLinkItem";
@@ -81,8 +81,11 @@ export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAcc
 
          {/* SIDE BAR FOOTER */}
          <SidebarFooter>
-            <div>
-               hello FOotger
+            <div className="p-2">
+               <div className="flex p-3 flex-row justify-center align-center bg-primary-dark rounded-xl text-white gap-3">
+                     <User size={18}/>
+                     <h6>Hilton Somebody</h6>
+               </div>
             </div>
          </SidebarFooter>
          
