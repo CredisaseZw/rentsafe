@@ -32,7 +32,6 @@ class CustomUser(AbstractUser):
 
     profile_object_id = models.PositiveIntegerField(null=True, blank=True,
                                             help_text=_("The ID of the associated Individual or Company profile."))
-    # GenericForeignKey is not a model field and should not be included in the model's field list
     profile_object = GenericForeignKey('profile_content_type', 'profile_object_id')
 
     can_send_email = models.BooleanField(default=True,
@@ -51,6 +50,7 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['email']
 
     class Meta(AbstractUser.Meta):
+        app_label = 'users'
         swappable = 'AUTH_USER_MODEL'
         verbose_name = _("Custom User")
         verbose_name_plural = _("Custom Users")
@@ -125,7 +125,7 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
 
 # --- New Feature: Role Model ---
-class Role(BaseModel):
+class Role(models.Model):
     name = models.CharField(max_length=100, unique=True,
                             help_text=_("Unique name for the role (e.g., 'Property Manager', 'Tenant User')."))
     description = models.TextField(blank=True,

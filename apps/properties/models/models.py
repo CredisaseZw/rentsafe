@@ -37,6 +37,7 @@ class Property(BaseModel):
                             help_text=_("Notes associated with the property."))
 
     class Meta:
+        app_label = 'properties'
         verbose_name = _('property')
         verbose_name_plural = _('properties')
     
@@ -71,6 +72,7 @@ class Unit(BaseModel):
     features = models.TextField(blank=True, null=True)
     
     class Meta:
+        app_label = 'properties'
         verbose_name = _('unit')
         verbose_name_plural = _('units')
         unique_together = ('property', 'unit_number')

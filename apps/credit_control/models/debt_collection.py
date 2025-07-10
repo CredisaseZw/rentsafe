@@ -14,6 +14,16 @@ class DebtCase(BaseModel):
     opening_balance = models.DecimalField(max_digits=12, decimal_places=2)
     current_balance = models.DecimalField(max_digits=12, decimal_places=2)
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='debt_cases')
+    
+    class Meta:
+        app_label = 'credit_control'
+        db_table = "debt_cases"
+        verbose_name = 'Debt Case'
+        verbose_name_plural = 'Debt Cases'
+        ordering = ['-date_created']
+    
+    def __str__(self):
+        return f"Debt Case for Lease {self.lease.id} - Status: {self.get_status_display()} - Balance: {self.current_balance}"
 
 class PaymentPlan(BaseModel):
     debt_case = models.ForeignKey(DebtCase, on_delete=models.CASCADE)
@@ -23,6 +33,15 @@ class PaymentPlan(BaseModel):
     installment_amount = models.DecimalField(max_digits=12, decimal_places=2)
     frequency = models.CharField(max_length=20) 
     status = models.CharField(max_length=20)
+    
+    class Meta:
+        app_label = 'credit_control'
+        db_table = "payment_plans"
+        verbose_name = 'Payment Plan'
+        verbose_name_plural = 'Payment Plans'
+        ordering = ['-date_created']
+    def __str__(self):
+        return f"Payment Plan for Debt Case {self.debt_case.id} - Total: {self.total_amount} - Status: {self.status}"
 
 class CommunicationLog(BaseModel):
     COMMUNICATION_TYPES = (
@@ -38,3 +57,11 @@ class CommunicationLog(BaseModel):
     summary = models.TextField()
     details = models.TextField()
     follow_up_date = models.DateField(null=True, blank=True)
+    class Meta:
+        app_label = 'credit_control'
+        db_table = "communication_logs"
+        verbose_name = 'Communication Log'
+        verbose_name_plural = 'Communication Logs'
+        ordering = ['-date_created']
+    def __str__(self):
+        return f"Communication Log for Debt Case {self.debt_case.id}"

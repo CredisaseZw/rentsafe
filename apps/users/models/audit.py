@@ -6,13 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from common.models.base_models import BaseModel 
 
 class AuditLog(BaseModel): 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name='audit_logs',
-        help_text=_("User who performed the action (if authenticated).")
-    )
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255, help_text=_("Description of the action performed."))
     ip_address = models.GenericIPAddressField(null=True, blank=True, help_text=_("IP address from which the action originated."))

@@ -16,6 +16,8 @@ class Services(BaseModel):
     service_name = models.CharField(max_length=55, unique=True,
                                     help_text=_("The name of the service provided."))
     class Meta:
+        app_label = 'subscriptions'
+        db_table = "services"
         verbose_name = _('service')
         verbose_name_plural = _('services')
 
@@ -38,6 +40,8 @@ class SubscriptionPeriod(BaseModel):
     )
 
     class Meta:
+        app_label = 'subscriptions'
+        db_table = "subscription_periods"
         verbose_name = _('subscription period')
         verbose_name_plural = _('subscription periods')
 
@@ -91,6 +95,7 @@ class Subscription(BaseModel):
                                         help_text=_("The equivalent monthly cost of the subscription, if applicable."))
 
     class Meta:
+        app_label = 'subscriptions'
         db_table = "subscriptions"
         verbose_name = _('subscription')
         verbose_name_plural = _('subscriptions')

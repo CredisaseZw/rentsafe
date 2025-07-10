@@ -30,6 +30,12 @@ class MaintenanceRequest(BaseModel):
     requested_date = models.DateTimeField(auto_now_add=True)
     completed_date = models.DateTimeField(null=True, blank=True)
     photos = GenericRelation('common.Document')
+    
+    class Meta(BaseModel.Meta):
+        app_label = 'maintenance'
+        verbose_name = _("Maintenance Request")
+        verbose_name_plural = _("Maintenance Requests")
+        ordering = ['-requested_date']
 
 class WorkSchedule(BaseModel):
     
@@ -127,6 +133,7 @@ class MaintenanceSchedule(BaseModel):
     status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES, default="PENDING")
 
     class Meta(BaseModel.Meta):
+        app_label = 'maintenance'
         verbose_name = _("Maintenance Schedule")
         verbose_name_plural = _("Maintenance Schedules")
         ordering = ['-date_created']

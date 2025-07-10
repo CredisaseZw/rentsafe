@@ -25,6 +25,8 @@ class ReportTemplate(BaseModel):
     is_active = models.BooleanField(default=True)
     
     class Meta:
+        app_label = 'reporting'
+        db_table = "report_templates"
         verbose_name = _('report template')
         verbose_name_plural = _('report templates')
     
@@ -37,6 +39,8 @@ class GeneratedReport(BaseModel):
     generated_file = models.FileField(upload_to='generated_reports/')
     
     class Meta:
+        app_label = 'reporting'
+        db_table = "generated_reports"
         verbose_name = _('generated report')
         verbose_name_plural = _('generated reports')
         ordering = ['-date_created']
@@ -56,6 +60,8 @@ class Enquiry(BaseModel):
     enquired_entity = GenericForeignKey('enquired_entity_content_type', 'enquired_entity_object_id')
 
     class Meta(BaseModel.Meta):
+        app_label = 'reporting'
+        db_table = "enquiries"
         verbose_name = _("Enquiry")
         verbose_name_plural = _("Enquiries")
         ordering = ['-date_created']
