@@ -574,9 +574,9 @@ def link_unlinked_issues_to_project(repo, project_v2_obj):
     for title in expected_issue_titles:
         if title in all_repo_issues:
             issue = all_repo_issues[title]
-            if issue.number in existing_project_issues:
-                print(f"  Issue #{issue.number} - '{issue.title}' is already linked to the project. Skipping.")
-            elif issue_node_id := get_issue_node_id(issue.number):
+            # if issue.number in existing_project_issues:
+            #     print(f"  Issue #{issue.number} - '{issue.title}' is already linked to the project. Skipping.")
+            if issue_node_id := get_issue_node_id(issue.number):
                 priority = None
                 size = None
                 for app_name in DJANGO_APPS:
