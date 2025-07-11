@@ -1,4 +1,5 @@
 import CreditSummary from "./CreditSummary";
+import OverviewCard from "./OverviewCard";
 
 export default function OverviewTab() {
    return (
@@ -6,14 +7,8 @@ export default function OverviewTab() {
          <h2 className="text-muted-foreground mb-4 px-3">Your Payment Status</h2>
 
          <div className="mb-10 flex items-center gap-5">
-            <div className="border-foreground/10 flex items-center gap-5 rounded-md border bg-white p-2">
-               Risk Level<div className="bg-SUCCESS w-fit rounded-sm px-2.5 py-0.5 text-sm text-white">Low Risk</div>
-            </div>
-
-            <div className="border-foreground/10 flex items-center gap-5 rounded-md border bg-white p-2">
-               Oldest Creditor
-               <div className="bg-muted w-fit rounded-sm px-2.5 py-0.5 text-sm">Jerad Spiwe</div>
-            </div>
+            <OverviewCard label="Risk Level" value="Low Risk" color="SUCCESS" />
+            <OverviewCard label="Oldest Creditor" value="Jerad Spiwe" />
          </div>
 
          <h2 className="text-muted-foreground mb-4 px-3">Credit Summary</h2>
