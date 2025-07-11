@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import BaseCard from "@/components/general/BaseCard";
 
 type CreditSummaryProps = {
    title: string;
@@ -25,7 +26,7 @@ export default function CreditSummary({ title, amounts }: CreditSummaryProps) {
    const totalAmount = chartData.reduce((sum, item) => sum + item.amount, 0);
 
    return (
-      <div className="border-foreground/10 top-0 bottom-0 left-0 h-full w-full rounded-lg border bg-white p-3.5 shadow-sm">
+      <BaseCard>
          <div className="mb-2 font-semibold underline underline-offset-4">{title}</div>
 
          <div className="flex flex-col items-start justify-start gap-2">
@@ -51,6 +52,6 @@ export default function CreditSummary({ title, amounts }: CreditSummaryProps) {
                </div>
             ))}
          </div>
-      </div>
+      </BaseCard>
    );
 }
