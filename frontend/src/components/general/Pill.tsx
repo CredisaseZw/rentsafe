@@ -15,7 +15,7 @@ let variants: Record<string , string> = {
 }
 
 Pill.defaultProps = {
-    varient : "primary"
+    variant : "primary"
 }
 function Pill({variant, children, className}: PillProps) {
   return (
