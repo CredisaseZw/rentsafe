@@ -1,3 +1,5 @@
+import BaseCard from "@/components/general/BaseCard";
+
 type OverviewCardProps = {
    label: string;
    value: string;
@@ -6,9 +8,9 @@ type OverviewCardProps = {
 
 export default function OverviewCard({ color, label, value }: OverviewCardProps) {
    return (
-      <div className="border-foreground/10 flex overflow-hidden rounded-xl border bg-white text-sm shadow-sm">
+      <BaseCard className="flex overflow-hidden p-0 text-sm">
          <div className="grow p-2"> {label}</div>
          <div className={`grow p-2 ${color ? "bg-" + color : "bg-foreground/50"} text-white`}>{value}</div>
-      </div>
+      </BaseCard>
    );
 }
