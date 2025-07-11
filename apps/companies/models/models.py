@@ -143,7 +143,6 @@ class ContactPerson(BaseModel):
                 _("Contact person cannot be associated with a branch that is not linked to a company.")
             )
 
-
 class CompanyProfile(BaseModel):
     company = models.OneToOneField(Company, on_delete=models.CASCADE, primary_key=True, related_name='profile',
             help_text=_("The company this profile belongs to."))
@@ -175,15 +174,13 @@ class CompanyProfile(BaseModel):
                 help_text=_("The official registration date of the company profile."))
     bp_number = models.CharField(_("BP Number"), max_length=255, blank=True, null=True,
                 help_text=_("Business Partner Number."))
-    subscription_category = models.TextField(_("Subscription Category"), blank=True, null=True,
-                help_text=_("Categorization for subscription purposes (e.g., 'Gold', 'Silver')."))
+
     vat_number = models.CharField(_("VAT Number"), max_length=255, blank=True, null=True,
                 help_text=_("Value Added Tax (VAT) registration number."))
     number_of_employees = models.IntegerField(_("Number of Employees"), blank=True, null=True,
                 help_text=_("Approximate number of employees."))
     website = models.URLField(_("Website"), max_length=255, blank=True, null=True,
                 help_text=_("Official website URL of the company."))
-
     TREND_CHOICES = (
         ('GROWING', _('Growing')),
         ('STABLE', _('Stable')),
@@ -201,9 +198,6 @@ class CompanyProfile(BaseModel):
     operations = models.TextField(_("Operations Details"), blank=True, null=True,
                             help_text=_("Detailed description of company operations."))
 
-    subscription_contract = models.CharField(_("Subscription Contract"), max_length=100, blank=True, null=True,
-                            help_text=_("Reference to the active subscription contract."))
-
     contact_person = models.ForeignKey(ContactPerson, on_delete=models.SET_NULL, null=True, blank=True,
                             related_name='companies_as_primary_contact',
                             help_text=_("The primary contact person for this company profile."))
@@ -214,7 +208,7 @@ class CompanyProfile(BaseModel):
         ('HIGH', _('High Risk')),
         ('VERY_HIGH', _('Very High Risk')),
     )
-    risk_class = models.CharField(_("Risk Class"), max_length=20, choices=RISK_CLASS_CHOICES, blank=True, null=True,
+    risk_class = models.CharField(_("Risk Class"), max_length=20, choices=RISK_CLASS_CHOICES, default='LOW', blank=True, null=True,
                 help_text=_("Assessed risk classification of the company."))
 
     account_number = models.CharField(_("Account Number"), max_length=255, blank=True, null=True,
@@ -227,6 +221,7 @@ class CompanyProfile(BaseModel):
         ('PENDING', _('Pending Assessment')),
     )
     is_under_judicial = models.CharField(_("Is Under Judicial Process"), max_length=20, choices=IS_JUDICIAL_CHOICES, blank=True, null=True,
+                            default='NO_INFO',
                             help_text=_("Indicates if the company is currently under judicial management or liquidation."))
 
     is_suspended = models.BooleanField(_("Is Suspended"), default=False,

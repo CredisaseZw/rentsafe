@@ -6,7 +6,7 @@ from apps.users.api.views import (
 )
 
 urlpatterns = [
-    path('auth/login/', LoginView.as_view(), name='login'),
-    path('auth/me/', CurrentUserView.as_view(), name='current-user'),
-    path('users/company/', CompanyUserCreateView.as_view(), name='company-user-create'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('me/', CurrentUserView.as_view(), name='current-user'),
+    path('company/', CompanyUserCreateView.as_view(), name='company-user-create'),
 ]

@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.exceptions import ValidationError
-from apps.users.api.serializers import CustomTokenObtainPairSerializer, UserSerializer
+from .serializers import CustomTokenObtainPairSerializer, UserSerializer
 from apps.users.services.user_service import UserCreationService
 
 class LoginView(TokenObtainPairView):
@@ -13,7 +13,13 @@ class LoginView(TokenObtainPairView):
 
     @method_decorator(cache_page(60*5))  
     def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
+        try:
+            return super().post(request, *args, **kwargs)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class CurrentUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
