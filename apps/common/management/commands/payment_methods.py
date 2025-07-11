@@ -25,6 +25,6 @@ class Command(BaseCommand):
 
         # Create or update each payment method
         for method in payment_methods:
-            PaymentMethod.objects.get_or_create(name=method)
+            PaymentMethod.objects.get_or_create(payment_method_name=method)
 
         self.stdout.write(self.style.SUCCESS("Default payment methods seeded successfully."))

@@ -73,7 +73,6 @@ class Command(BaseCommand):
                     defaults={
                         'name': data['city_name'],
                         'is_active': True,
-                        'approved': bool(data['approved']),
                     }
                 )
                 if created:
@@ -100,7 +99,6 @@ class Command(BaseCommand):
                     defaults={
                         'name': data['suburb_name'],
                         'is_active': True,
-                        'approved': bool(data['approved']), 
                     }
                 )
                 if created:

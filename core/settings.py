@@ -10,8 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-
-
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -70,6 +68,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'django_filters',
 
     # Custom Apps
     'apps.users',

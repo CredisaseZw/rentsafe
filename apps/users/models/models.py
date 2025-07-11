@@ -70,11 +70,10 @@ class CustomUser(AbstractUser):
     
     def clean(self):
         super().clean()
-        if not self.is_staff:
-            if not self.client:
-                raise ValidationError(
-                    _("Non-staff users must be assigned to a client.")
-                )
+        if not self.is_staff and not self.client:
+            raise ValidationError(
+                _("Non-staff users must be assigned to a client.")
+            )
 
     def get_associated_individual(self):
         if self.profile_object and isinstance(self.profile_object, Individual):
@@ -115,9 +114,13 @@ class CustomUser(AbstractUser):
         Returns the type of user based on their client association.
         'Individual' if associated with an Individual, 'Company' if associated with a Company.
         """
-        if self.client:
-            return self.client.client_type
-        return 'Unknown'
+        if self.is_staff or self.is_superuser:
+            return 'Staff'
+        if self.client and self.client.is_individual_client:
+            return 'Individual'
+        if self.client and self.client.is_company_client:
+            return 'Company'
+        return self.client.client_type if self.client else 'Unknown'
 
 
     def save(self, *args, **kwargs):
