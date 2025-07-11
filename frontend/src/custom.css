@@ -57,5 +57,27 @@
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background-color: #176987;
+  background-color: var(--bg-primary);
+}
+.select-input{
+  border: 2px solid #c2c2c2;
+  border-radius: 7.5px;
+}
+.select-input select, 
+.select-input input{
+  border: none;
+  outline: none;
+  padding: 10px 15px;
+}
+.select-input select{
+  background-color: var(--bg-primary);
+  color: white;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.select-input input {
+  width: 100%;
+}
+.select-input:has(input:focus) {
+  border-color: var(--bg-primary);
 }

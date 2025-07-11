@@ -7,7 +7,7 @@ import NavLinkItem from "./NavLinkItem";
 import React from "react";
 
 type SidebarProps = {
-   title: string;
+   title?: string;
    rentsafeAppNavlinks: NavLink[];
    rentsafeAccountingNavlinks: NavLink[];
    rentsafeAdminPanelNavlinks: NavLink[];

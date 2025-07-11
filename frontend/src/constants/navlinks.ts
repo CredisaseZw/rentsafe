@@ -224,7 +224,6 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
       label: "Data",
       segment: RENTSAFE_PRE_SEG + "/data",
-      subLinks: [
       subLinks : [{
          label : "Leases",
          path: RENTSAFE_PRE_SEG + "/leases",
