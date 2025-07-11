@@ -1,6 +1,6 @@
 import { Sidebar, SidebarHeader, SidebarGroupLabel,SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarFooter } from "../ui/sidebar";
 import type { NavLink } from "@/types";
-import { HomeIcon } from "lucide-react";
+import { HomeIcon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import NavLinkItem from "./NavLinkItem";
@@ -17,21 +17,18 @@ export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAcc
    const [expandedSegment, expandThisSegment] = React.useState<string>("");
 
    return (
-      <Sidebar variant="sidebar" className="sidebar">
-         <div>
-  <SidebarHeader className="p-5">
-            <h2 className="flex items-center gap-2 text-xl font-bold">
-               <Button variant="outline" className="border-foreground/50" size="sm" asChild>
-                  <Link to="/services">
-                     <HomeIcon />
-                  </Link>
-               </Button>
-               {title}
-            </h2>
-         </SidebarHeader>
+       <Sidebar className="bg-PRIMARY text-white border-r border-white/10 w-[300px]">
          <SidebarContent>
+            <div className="px-5 pt-5">
+               <div className="bg-primary-dark rounded-xl p-5 flex items-center gap-2">
+                  <div className="bg-white text-[#0d475c] p-2 rounded-[7.5px]">
+                     <HomeIcon size={22} />
+                  </div>
+                  <span className="text-xl font-bold">Rentsafe</span>
+               </div>
+            </div>
             <SidebarGroup>
-               <SidebarGroupLabel>Application</SidebarGroupLabel>
+               <SidebarGroupLabel className="text-blue-100 sidebar-labels">APPLICATION</SidebarGroupLabel>
                <SidebarGroupContent>
                   <SidebarMenu>
                      {rentsafeAppNavlinks.map((navLink, index) => (
@@ -48,9 +45,9 @@ export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAcc
             
             {/* ACCOUNTING NAVS */}
             <SidebarGroup>
-               <SidebarGroupLabel>Accounting</SidebarGroupLabel>
+               <SidebarGroupLabel className="text-blue-100 sidebar-labels">Accounting</SidebarGroupLabel>
                <SidebarContent>
-                    <SidebarMenu>
+                  <SidebarMenu>
                      {rentsafeAccountingNavlinks.map((navLink, index) => (
                         <NavLinkItem
                            key={index}
@@ -63,9 +60,9 @@ export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAcc
                </SidebarContent>
             </SidebarGroup>
 
-             {/* ADMIN LINKS */}
+            {/* ADMIN LINKS */}
             <SidebarGroup>
-               <SidebarGroupLabel>Admin</SidebarGroupLabel>
+               <SidebarGroupLabel className="text-blue-100 sidebar-labels">Admin</SidebarGroupLabel>
                <SidebarContent>
                      <SidebarMenu>
                      {rentsafeAdminPanelNavlinks.map((navLink, index) => (
@@ -84,11 +81,14 @@ export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAcc
 
          {/* SIDE BAR FOOTER */}
          <SidebarFooter>
-            <div>
-               hello FOotger
+            <div className="p-2">
+               <div className="flex p-3 flex-row justify-center align-center bg-primary-dark rounded-xl text-white gap-3">
+                     <User size={18}/>
+                     <h6>Hilton Somebody</h6>
+               </div>
             </div>
          </SidebarFooter>
-         </div>       
+         
       </Sidebar>
    );
 }
