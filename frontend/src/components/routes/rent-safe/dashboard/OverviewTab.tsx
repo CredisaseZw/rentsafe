@@ -1,17 +1,18 @@
+import SectionHeading from "@/components/general/SectionHeading";
 import CreditSummary from "./CreditSummary";
 import OverviewCard from "./OverviewCard";
 
 export default function OverviewTab() {
    return (
       <div>
-         <h2 className="text-muted-foreground mb-4 px-3">Your Payment Status</h2>
+         <SectionHeading>Your Payment Status</SectionHeading>
 
          <div className="mb-5 flex items-center gap-5">
             <OverviewCard label="Risk Level" value="Low Risk" color="SUCCESS" />
             <OverviewCard label="Oldest Creditor" value="Jerad Spiwe" />
          </div>
 
-         <h2 className="text-muted-foreground mb-4 px-3">Credit Summary</h2>
+         <SectionHeading>Credit Summary</SectionHeading>
 
          <div className="grid grid-cols-2 gap-4">
             <CreditSummary
