@@ -45,7 +45,7 @@ export default function CreditSummary({ title, amounts }: CreditSummaryProps) {
 
                         <div>{((item.amount / totalAmount) * 100).toFixed(2)}%</div>
                      </div>
-                     <Button asChild size="xs">
+                     <Button asChild variant="outline" size="xs">
                         <Link to={`/services/rent-safe/leases?show=${item.status}`}>View</Link>
                      </Button>
                   </div>
