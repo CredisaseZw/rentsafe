@@ -6,7 +6,7 @@ export default function OverviewTab() {
       <div>
          <h2 className="text-muted-foreground mb-4 px-3">Your Payment Status</h2>
 
-         <div className="mb-10 flex items-center gap-5">
+         <div className="mb-5 flex items-center gap-5">
             <OverviewCard label="Risk Level" value="Low Risk" color="SUCCESS" />
             <OverviewCard label="Oldest Creditor" value="Jerad Spiwe" />
          </div>
