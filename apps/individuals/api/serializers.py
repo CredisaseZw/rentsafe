@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin
+from apps.common.api.serializers import AddressSerializer
 
 class EmploymentDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +44,16 @@ class IndividualSerializer(serializers.ModelSerializer):
         read_only=True
     )
     
+    address = AddressSerializer(
+        source='addresses',
+        many=True,
+        read_only=True
+    )
+    address_id = serializers.PrimaryKeyRelatedField(
+        queryset=Address.objects.all(),
+        write_only=True,
+    )
+    
     class Meta:
         model = Individual
         fields = [
@@ -51,6 +63,24 @@ class IndividualSerializer(serializers.ModelSerializer):
             'identification_number', 'email', 'mobile_phone',
             'landline_phone', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin',
-            'date_created', 'date_updated'
+            'date_created', 'date_updated', 'address', 'address_id'
         ]
         read_only_fields = ['date_created', 'date_updated']
+        
+    def create(self, validated_data):
+        employment_details_data = validated_data.pop('employment_details', [])
+        next_of_kin_data = validated_data.pop('next_of_kin', [])
+        address_data = validated_data.pop('addresses', [])
+        
+        individual = Individual.objects.create(**validated_data)
+        
+        for employment_detail in employment_details_data:
+            EmploymentDetail.objects.create(individual=individual, **employment_detail)
+        
+        for kin in next_of_kin_data:
+            NextOfKin.objects.create(individual=individual, **kin)
+            
+        for address in address_data:
+            Address.objects.create(content_object=individual, **address)
+
+        return individual
