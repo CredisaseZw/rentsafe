@@ -142,8 +142,8 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ['id', 'content', 'is_private', 'author_id', 'author_name', 'date_created', 'date_modified']
-        read_only_fields = ['date_created', 'date_modified']
+        fields = ['id', 'content', 'is_private', 'author_id', 'author_name', 'date_created', 'date_updated']
+        read_only_fields = ['date_created', 'date_updated']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
