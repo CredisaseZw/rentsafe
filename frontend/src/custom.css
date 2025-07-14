@@ -14,14 +14,14 @@
 
 .input-default{
     padding: 10px 15px;
-    border: 2px solid #c2c2c2;
+    border: 1.5px solid #c2c2c2;
     border-radius: 7.5px;
     outline: none;
     transition: all ease-in-out 0.3ms;
 }
 .input-default:focus,
 .input-default:hover{
-    border: 2px solid var(--bg-primary);
+    border: 1.8px solid var(--bg-primary);
 }
 .sidebar{
     width: 300px;
@@ -55,7 +55,17 @@
 .dark ::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
 }
-
+.form-group{
+  display: flex;
+  flex-direction: column;
+}
+.form-group label{
+  margin-bottom: 10px;
+}
+label.required::after{
+  content: "*";
+  color: red;
+}
 .dark ::-webkit-scrollbar-thumb {
   background-color: var(--bg-primary);
 }

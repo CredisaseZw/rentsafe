@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 function usePropertyList() {
-
+    let [addPropertyModal, setAddPropertyModal] = useState(false);
     let [SummaryCards, setSummaryCard] = useState([ { subTitle: "Total Properties", value: 35 },
       { subTitle: "Occupied", value: 28 },
       { subTitle: "Vacant", value: 5 },
@@ -22,9 +22,21 @@ function usePropertyList() {
     let onSearchValue = (searchValue:string) =>{
         console.log("SERACHING VALUE " + searchValue)
     }
+
+    let openModal = () =>{
+        setAddPropertyModal(true);
+    }
+
+    let closeModal = () =>{
+        setAddPropertyModal(false);
+    }
+
     return {
         onSearchValue,
         onSelectFilter,
+        openModal,
+        closeModal,
+        addPropertyModal,
         filterOptions,
         SummaryCards,
         selectedFilter
