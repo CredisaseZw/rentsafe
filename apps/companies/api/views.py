@@ -206,7 +206,6 @@ class CompanyViewSet(viewsets.ModelViewSet):
         """Create a new branch for a company"""
         company = self.get_object()
         
-        # Add company to the request data
         data = request.data.copy()
         data['company'] = company.id
         
@@ -215,7 +214,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             branch = serializer.save()
             
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Return the created branch with its addresses
+            response_serializer = CompanyBranchSerializer(branch)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.error(f"Error creating branch for company {pk}: {str(e)}")
             return Response(
@@ -288,14 +289,23 @@ class CompanyViewSet(viewsets.ModelViewSet):
             
     @action(detail=True, methods=['post'], url_path='toggle-active')
     def toggle_active(self, request, pk=None):
-        """Toggle company active status"""
-        company = self.get_object()
-        company.is_active = not company.is_active
-        company.save()
-        
-        serializer = CompanyDetailSerializer(company)
-        return Response(serializer.data)
-    
+        """Toggle company active/deleted status"""
+        try:
+            company = Company.objects.get(pk=pk)
+            company.is_active = not company.is_active
+            company.is_deleted = not company.is_active
+            company.save()
+
+            serializer = CompanyDetailSerializer(company)
+            return Response({
+                "message": f"Company has been {'activated' if company.is_active else 'deactivated'}",
+                "company": serializer.data
+            }, status=status.HTTP_200_OK)
+        except Company.DoesNotExist:
+            return Response(
+                {'error': 'Company not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
     @action(detail=True, methods=['post'], url_path='toggle-verified')
     def toggle_verified(self, request, pk=None):
         """Toggle company verified status"""

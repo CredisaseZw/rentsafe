@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 from apps.common.models.base_models import BaseModel
 class Document(BaseModel):
     DOCUMENT_TYPES = (
@@ -226,13 +227,35 @@ class Address(BaseModel):
             return f"Address (ID: {self.pk})"
 
         return f"{', '.join(parts)} ({self.get_address_type_display()})"
+    def clean(self):
+        """Validate address hierarchy"""
+        super().clean()
+        
+        if self.suburb and self.city and self.suburb.city != self.city:
+            raise ValidationError({
+                'suburb': f'Suburb "{self.suburb.name}" does not belong to city "{self.city.name}"'
+            })
+        
+        if self.city and self.province and self.city.province != self.province:
+            raise ValidationError({
+                'city': f'City "{self.city.name}" does not belong to province "{self.province.name}"'
+            })
+        
+        if self.province and self.country and self.province.country != self.country:
+            raise ValidationError({
+                'province': f'Province "{self.province.name}" does not belong to country "{self.country.name}"'
+            })
 
     def save(self, *args, **kwargs):
+        if self.suburb and not self.city:
+            self.city = self.suburb.city
         if self.city and not self.province:
             self.province = self.city.province
         if self.province and not self.country:
             self.country = self.province.country
-
+        
+        self.full_clean()
+        
         if self.is_primary and self.content_object:
             qs = Address.objects.filter(
                 content_type=self.content_type,
