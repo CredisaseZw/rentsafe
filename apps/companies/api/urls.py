@@ -1,16 +1,23 @@
-# apps/companies/api/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from apps.companies.api import views
+from apps.companies.api.views import CompanyViewSet
 
 router = DefaultRouter()
-router.register(r'companies', views.CompanyViewSet)
-router.register(r'branches', views.CompanyBranchViewSet)
-router.register(r'contact-persons', views.ContactPersonViewSet)
-router.register(r'profiles', views.CompanyProfileViewSet) 
+router.register(r'', CompanyViewSet, basename='company')
 
-app_name = 'companies_api'
-
-urlpatterns = [ 
+urlpatterns = [
     path('', include(router.urls)),
 ]
+
+# urlpatterns += [
+#     path('companies/search/', CompanyViewSet.as_view({'get': 'search'}), name='company-search'),
+    
+#     # Location data endpoint
+#     path('companies/location-data/', CompanyViewSet.as_view({'get': 'get_location_data'}), name='company-location-data'),
+    
+#     # Choices endpoint
+#     path('companies/choices/', CompanyViewSet.as_view({'get': 'get_choices'}), name='company-choices'),
+    
+#     # Company branches by company
+#     path('branches/by-company/', CompanyBranchViewSet.as_view({'get': 'by_company'}), name='branches-by-company'),
+# ]

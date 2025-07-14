@@ -88,6 +88,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'apps.common.middleware.DetailedErrorLoggingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -211,6 +212,10 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    'DEFAULT_RENDERER_CLASSES': [
+            'rest_framework.renderers.JSONRenderer',
+            'rest_framework.renderers.BrowsableAPIRenderer',
+        ],
 }
 
 # SIMPLE JWT SETTINGS
@@ -246,6 +251,10 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+# Create the logs directory if it doesn't exist
+LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
 
 LOGGING = {
     'version': 1,
@@ -271,6 +280,14 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
+        },
+        'file_companies': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'companies.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
         },
         'file_django': { 
             'level': 'INFO',
@@ -300,6 +317,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'django.db.backends': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+        'propagate': False,
+    },
         'django.request': { 
             'handlers': ['file_django'], 
             'level': 'INFO',
@@ -315,17 +337,18 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'companies': {
+        'handlers': ['console', 'file_django'],
+        'level': 'DEBUG',  # Set to DEBUG to capture all messages
+        'propagate': False,
     },
     'root': { 
         'handlers': ['console', 'file_django'],
         'level': 'WARNING',
     }
+    }
 }
 
-# Create the logs directory if it doesn't exist
-LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
-if not os.path.exists(LOGS_DIR):
-    os.makedirs(LOGS_DIR)
 
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')

@@ -23,7 +23,9 @@ class Company(BaseModel):
     trading_name = models.CharField(max_length=255, blank=True, null=True,
                                     help_text=_("The name the company trades under, if different from registration name."))
     legal_status = models.CharField(max_length=20, choices=LEGAL_STATUS_CHOICES,
-                                    help_text=_("The legal status or type of the company."))
+                                    help_text=_("The legal status or type of the company."),
+                                    default='private', blank=True, null=True
+                                    )
     date_of_incorporation = models.DateField(blank=True, null=True,
                                 help_text=_("The date the company was officially incorporated."))
     industry = models.CharField(max_length=255, blank=True, null=True,
@@ -62,11 +64,17 @@ class Company(BaseModel):
         This method can be called after saving the company instance.
         """
         if not self.branches.filter(branch_name=self.registration_name).exists():
-            headquarters_branch = CompanyBranch.objects.create(
+            return CompanyBranch.objects.create(
                 company=self,
                 branch_name=self.registration_name,
+                is_headquarters=True,
+                addresses=Address.objects.filter(
+                    content_type__model='company',
+                    object_id=self.id,
+                    address_type='physical',
+                    is_primary=True,
+                ).first(),
             )
-            return headquarters_branch
         return None
     
 class CompanyBranch(BaseModel):
@@ -74,6 +82,8 @@ class CompanyBranch(BaseModel):
                                 help_text=_("The company this branch belongs to."))
     branch_name = models.CharField(max_length=255, help_text=_("The name of the branch."))
     addresses = GenericRelation(Address, related_query_name='branch_address')
+    is_deleted = models.BooleanField(default=False, help_text=_("Indicates if the branch is deleted."))
+    is_headquarters = models.BooleanField(default=False, help_text=_("Indicates if this branch is the headquarters."))
 
     class Meta:
         app_label = 'companies'
