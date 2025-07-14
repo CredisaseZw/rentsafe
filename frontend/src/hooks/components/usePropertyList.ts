@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 
 function usePropertyList() {
     let [addPropertyModal, setAddPropertyModal] = useState(false);
@@ -14,6 +14,34 @@ function usePropertyList() {
         { label: "Vacant", value: "vacant" },
     ])
     let [selectedFilter, setSelectFilter] = useState(filterOptions[0].value)
+    let [addPropertyForm, setAddPropertyForm] = useState({
+        property_type: '',
+        unit_number: '',
+        building_name: '',
+        street_number: '',
+        street_name: '',
+        area: '',
+        city_town: '',
+        province: '',
+        country: '',
+        area_code: '',
+        lanlord_type: '',
+        landlord_id: '',
+        landlord_name: '',
+        property_details: '',
+    })
+
+    let onChangeHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+        setAddPropertyForm(prev=>({
+            ...prev,
+            [e.target.name] : e.target.value
+        }))
+    }
+
+    let submitAddPropertyForm = (e: React.FormEvent<HTMLFormElement>) =>{
+        e.preventDefault();
+        console.log(addPropertyForm);
+    }
 
     let onSelectFilter = (filterOption: string) =>{
         setSelectFilter(filterOption)
@@ -32,10 +60,13 @@ function usePropertyList() {
     }
 
     return {
+        onChangeHandler,
         onSearchValue,
         onSelectFilter,
+        submitAddPropertyForm,
         openModal,
         closeModal,
+        addPropertyForm,
         addPropertyModal,
         filterOptions,
         SummaryCards,
