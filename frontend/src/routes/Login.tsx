@@ -1,12 +1,34 @@
 import Logo from "@/components/general/Logo";
 import { LogInIcon } from "lucide-react";
 import { Link } from "react-router";
+import { useNavigate } from "react-router-dom";
 import  useAuth from "@/hooks/components/useAuth";
-import { useEffect } from "react";
+import useLoginAuth from "@/hooks/apiHooks/useLogin";
 
 export default function Login() {
-   let {loginForm, onLogin, validateForm, handleChange} = useAuth();
+   let {loginForm, validateForm, handleChange} = useAuth();
+   let login = useLoginAuth();
+   let navigate = useNavigate();
+    
+    let onLogin = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
+         let isValid = validateForm();
+         if (!isValid.isUsername || !isValid.isPassword) return;
+
+         login.mutate(loginForm, {
+            onSuccess: (data)=>{
+               localStorage.setItem("token", JSON.stringify(data))
+               let next = new URLSearchParams(location.search).get("next");
+               navigate(next || "/services/rent-safe", {replace : true})
+
+            },
+            onError:(error)=>{
+
+            }
+         })
+        
+    }
    return (
       <div className={"flex min-h-screen items-center justify-center bg-dark-body"}>
          <div className="border-foreground/20 border bg-white/90 w-md flex  flex-col items-center justify-center rounded-xl p-6 shadow-lg bg-white w">
@@ -22,9 +44,9 @@ export default function Login() {
                            type="email"
                            autoComplete="email"
                            required
-                           id="email"
-                           name="email"
-                           value={loginForm.email}
+                           id="username"
+                           name="username"
+                           value={loginForm.username}
                            onChange={handleChange}
                         />
                   </div>
