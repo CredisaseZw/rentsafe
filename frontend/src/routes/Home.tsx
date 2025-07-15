@@ -4,6 +4,7 @@ import { LogIn } from "lucide-react";
 import { Link } from "react-router";
 
 export default function Home() {
+   
    return (
       <div className="text-center">
          <div className="mb-5 pt-30">
