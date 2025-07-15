@@ -59,13 +59,21 @@ export default function BaseTable({ title, titleClassName, headers, rows: data, 
                </TableHeader>
 
                <TableBody>
-                  {mappableRows.map((row, index) => (
-                     <TableRow key={index} noHover>
-                        {headers.map((field) => (
-                           <TableCell key={field.name}>{row[field.name]}</TableCell>
-                        ))}
+                  {mappableRows.length ? (
+                     mappableRows.map((row, index) => (
+                        <TableRow key={index} noHover>
+                           {headers.map((field) => (
+                              <TableCell key={field.name}>{row[field.name]}</TableCell>
+                           ))}
+                        </TableRow>
+                     ))
+                  ) : (
+                     <TableRow noHover>
+                        <TableCell colSpan={headers.length} className="text-muted-foreground py-5 text-center">
+                           No data
+                        </TableCell>
                      </TableRow>
-                  ))}
+                  )}
                </TableBody>
             </Table>
          </div>
