@@ -1,183 +1,281 @@
 # apps/common/api/views.py
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from apps.common.models.models import Country, Province, City, Suburb
 from apps.common.api.serializers import (
     CountrySerializer, ProvinceSerializer,
     CitySerializer, SuburbSerializer
 )
-from rest_framework.permissions import IsAuthenticated
+from apps.common.utils.caching import CacheHelper
+from apps.common.utils.mixins import CachingMixin
+from rest_framework.renderers import JSONRenderer 
 import logging
 
-logger = logging.getLogger('common')
+logger = logging.getLogger('locations')
 
-class CountryViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing countries with filtering and search capabilities
-    """
-    queryset = Country.objects.filter(is_active=True)
+class BaseViewSet(CachingMixin,viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,
+            'user': self.request.user if self.request.user.is_authenticated else None,
+        })
+        return context
+    
+    def perform_create(self, serializer):
+        if hasattr(serializer.Meta.model, 'user') and self.request.user.is_authenticated:
+            serializer.save(user=self.request.user) 
+        else:
+            serializer.save()
+            
+        if hasattr(serializer.Meta.model, 'user') and not self.request.user.is_authenticated:
+            logger.warning(f"Creating {serializer.Meta.model.__name__} without authenticated user")
+    
+    def perform_update(self, serializer):
+        if hasattr(serializer.Meta.model, 'user') and self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+        else:
+            serializer.save()
+    def _create_rendered_response(self, data, status_code=status.HTTP_200_OK):
+        """
+        Helper to create and render a DRF Response for consistent caching.
+        This method ensures the response content is rendered into a string/bytes
+        before it's returned, making it safe for caching backends that pickle.
+        """
+        response = Response(data, status=status_code)
+
+        if hasattr(self, 'get_renderers') and self.get_renderers():
+            response.accepted_renderer = self.get_renderers()[0]
+            response.accepted_media_type = response.accepted_renderer.media_type
+        else:
+            response.accepted_renderer = JSONRenderer()
+            response.accepted_media_type = 'application/json'
+        response.renderer_context = self.get_renderer_context()
+        response.render()
+        return response
+
+class BaseSoftDeleteViewSet(BaseViewSet):
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if hasattr(self.get_serializer_class().Meta.model, 'is_active'):
+            return queryset.filter(is_active=True)
+        return queryset
+    
+    def perform_destroy(self, instance):
+        if hasattr(instance, 'is_active'):
+            instance.is_active = False
+            if hasattr(instance, 'user') and self.request.user.is_authenticated:
+                instance.user = self.request.user
+            instance.save(request=self.request)
+            logger.info(f"Soft deleted {instance.__class__.__name__} with id {instance.pk}")
+        else:
+            super().perform_destroy(instance)
+            
+
+class LocationViewSet(BaseViewSet):
+    queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['name', 'code', 'currency_code']
-    filterset_fields = ['is_active']
-    http_method_names = ['get', 'post', 'patch', 'delete'] 
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.order_by('name')
-
-    def perform_destroy(self, instance):
-        """Override delete to set is_active=False instead of actual deletion"""
-        instance.is_active = False
-        instance.save()
-
-    @action(detail=True, methods=['get'], url_path='provinces')
-    def provinces(self, request, pk=None):
-        """Get all provinces for a specific country"""
-        country = self.get_object()
-        provinces = country.provinces.filter(is_active=True)
-        serializer = ProvinceSerializer(provinces, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['get'], url_path='with-inactive')
-    def with_inactive(self, request):
-        """Get all countries including inactive ones (for admin purposes)"""
-        if not request.user.is_staff:
-            return Response(
-                {'error': 'Only admin users can view inactive countries'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        countries = Country.objects.all()
-        serializer = self.get_serializer(countries, many=True)
-        return Response(serializer.data)
-
-class ProvinceViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing provinces with filtering by country
-    """
-    queryset = Province.objects.filter(is_active=True)
-    serializer_class = ProvinceSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['name', 'code']
-    filterset_fields = ['country', 'is_active', 'approved']
-    http_method_names = ['get', 'post', 'patch', 'delete']  
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if country_id := self.request.query_params.get('country_id'):
-            queryset = queryset.filter(country_id=country_id)
-        return queryset.order_by('name')
-
-    def perform_destroy(self, instance):
-        """Override delete to set is_active=False instead of actual deletion"""
-        instance.is_active = False
-        instance.save()
-
-    @action(detail=True, methods=['get'], url_path='cities')
-    def cities(self, request, pk=None):
-        """Get all cities for a specific province"""
-        province = self.get_object()
-        cities = province.cities.filter(is_active=True)
-        serializer = CitySerializer(cities, many=True)
-        return Response(serializer.data)
-
-    @action(detail=True, methods=['patch'], url_path='approve')
-    def approve(self, request, pk=None):
-        """Approve a province (admin only)"""
-        if not request.user.is_staff:
-            return Response(
-                {'error': 'Only admin users can approve provinces'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        province = self.get_object()
-        province.approved = True
-        province.save()
-        serializer = self.get_serializer(province)
-        return Response(serializer.data)
-
-class CityViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing cities with filtering by province
-    """
-    queryset = City.objects.filter(is_active=True)
-    serializer_class = CitySerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['name']
-    filterset_fields = ['province', 'is_active']
-    http_method_names = ['get', 'post', 'patch', 'delete']  
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if province_id := self.request.query_params.get('province_id'):
-            queryset = queryset.filter(province_id=province_id)
-        return queryset.order_by('name')
-
-    def perform_destroy(self, instance):
-        """Override delete to set is_active=False instead of actual deletion"""
-        instance.is_active = False
-        instance.save()
-
-    @action(detail=True, methods=['get'], url_path='suburbs')
-    def suburbs(self, request, pk=None):
-        """Get all suburbs for a specific city"""
-        city = self.get_object()
-        suburbs = city.suburbs.filter(is_active=True)
-        serializer = SuburbSerializer(suburbs, many=True)
-        return Response(serializer.data)
-
-class SuburbViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing suburbs with filtering by city
-    """
-    queryset = Suburb.objects.filter(is_active=True)
-    serializer_class = SuburbSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['name']
-    filterset_fields = ['city', 'is_active']
-    http_method_names = ['get', 'post', 'patch', 'delete']  
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if city_id := self.request.query_params.get('city_id'):
-            queryset = queryset.filter(city_id=city_id)
-        return queryset.order_by('name')
-
-    def perform_destroy(self, instance):
-        """Override delete to set is_active=False instead of actual deletion"""
-        instance.is_active = False
-        instance.save()
-
-    @action(detail=False, methods=['get'], url_path='nearby')
-    def nearby_suburbs(self, request):
-        """
-        Get suburbs near a specific suburb (by ID)
-        Useful for location-based searches
-        """
-        suburb_id = request.query_params.get('suburb_id')
-        if not suburb_id:
-            return Response(
-                {'error': 'suburb_id parameter is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+    cache_timeout = 60 * 20  # 20 minutes for regular endpoints 
+    long_cache_timeout = 60 * 60 * 2  # 2 hours for hierarchy data
+    
+    def get_serializer_class(self):
+        if self.action in ['countries', 'country_detail']:
+            return CountrySerializer
+        elif self.action in ['provinces', 'create_province', 'province_detail']:
+            return ProvinceSerializer
+        elif self.action in ['cities', 'create_city', 'city_detail']:
+            return CitySerializer
+        elif self.action in ['suburbs', 'create_suburb', 'suburb_detail']:
+            return SuburbSerializer
+        return super().get_serializer_class()
+    
+    def get_serializer_context(self, include_nested=False):
+        context = super().get_serializer_context()
+        context.update({
+            'include_nested': include_nested,
+        })
+        return context
+    
+    def create_objects_helper(self, request):
+        serializer = self.get_serializer_class()(
+            data=request.data, context=self.get_serializer_context(include_nested=False)
+        )
+        if not serializer.is_valid():
+            logger.error(f"Validation error: {serializer.errors}")
+            raise ValidationError(serializer.errors)
         try:
-            suburb = get_object_or_404(Suburb, pk=suburb_id)
-            # Get suburbs in the same city
-            nearby = Suburb.objects.filter(
-                city=suburb.city,
-                is_active=True
-            ).exclude(pk=suburb_id)
-            serializer = self.get_serializer(nearby, many=True)
-            return Response(serializer.data)
-        except Suburb.DoesNotExist:
-            return Response(
-                {'error': 'Suburb not found'},
-                status=status.HTTP_404_NOT_FOUND
+            self.perform_create(serializer)
+        except Exception as e:
+            logger.error(f"Error creating {self.get_serializer_class().Meta.model.__name__}: {str(e)}")
+            raise
+        return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+
+    def update_object_helper(self, request, obj):
+        partial = request.method == 'PATCH'
+        serializer = self.get_serializer_class()(
+            obj, data=request.data, partial=partial,
+            context=self.get_serializer_context(include_nested=False)
+        )
+        if not serializer.is_valid():
+            logger.error(f"Validation error: {serializer.errors}")
+            raise ValidationError(serializer.errors)
+        
+        self.perform_update(serializer)
+        return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+
+    def delete_object_helper(self, obj):
+        if hasattr(obj, 'is_active'):
+            obj.is_active = False
+            if hasattr(obj, 'user') and self.request.user.is_authenticated:
+                obj.user = self.request.user
+            obj.save(request=self.request)
+            logger.info(f"Soft deleted {obj.__class__.__name__} with id {obj.pk}")
+        else:
+            obj.delete()
+            logger.info(f"Hard deleted {obj.__class__.__name__} with id {obj.pk}")
+        
+        return self._create_rendered_response(
+            {"message": "Deleted successfully."}, 
+            status.HTTP_204_NO_CONTENT
+        )
+    
+    @CachingMixin.cached_method()
+    def countries(self, request, pk=None):
+        if pk is not None:
+            return self.country_detail(request, pk)
+        
+        queryset = Country.objects.filter(is_active=True)
+        serializer = self.get_serializer(
+            queryset, many=True, context=self.get_serializer_context(include_nested=False)
+        )
+        return self._create_rendered_response(serializer.data)
+
+    @CachingMixin.cached_method()
+    def country_detail(self, request, pk=None):
+        country = get_object_or_404(Country, pk=pk)
+
+        if request.method == 'GET':
+            serializer = self.get_serializer(
+                country, context=self.get_serializer_context(include_nested=True)
             )
+            return self._create_rendered_response(serializer.data)
+        elif request.method in ['PUT', 'PATCH']:
+            return self.update_object_helper(request, country)
+        elif request.method == 'DELETE':
+            return self.delete_object_helper(country)
+
+    @CachingMixin.cached_method()
+    def provinces(self, request):
+        queryset = Province.objects.filter(is_active=True)
+        if country_id := request.query_params.get('country_id'):
+            queryset = queryset.filter(country_id=country_id)
+
+        serializer = self.get_serializer(
+            queryset, many=True, context=self.get_serializer_context(include_nested=False)
+        )
+        return self._create_rendered_response(serializer.data)
+
+    def create_province(self, request):
+        return self.create_objects_helper(request)
+
+    @CachingMixin.cached_method()
+    def province_detail(self, request, pk=None):
+        province = get_object_or_404(Province, pk=pk)
+
+        if request.method == 'GET':
+            serializer = self.get_serializer(
+                province, context=self.get_serializer_context(include_nested=True)
+            )
+            return self._create_rendered_response(serializer.data)
+        elif request.method in ['PUT', 'PATCH']:
+            return self.update_object_helper(request, province)
+        elif request.method == 'DELETE':
+            return self.delete_object_helper(province)
+        
+    @CachingMixin.cached_method()
+    def cities(self, request):
+        queryset = City.objects.filter(is_active=True)
+        province_id = request.query_params.get('province_id')
+        country_id = request.query_params.get('country_id')
+        
+        if province_id:
+            queryset = queryset.filter(province_id=province_id)
+        elif country_id:
+            queryset = queryset.filter(province__country_id=country_id)
+        
+        serializer = self.get_serializer(
+            queryset, many=True, context=self.get_serializer_context(include_nested=False)
+        )
+        return self._create_rendered_response(serializer.data)
+
+    def create_city(self, request):
+        return self.create_objects_helper(request)
+    
+    @CachingMixin.cached_method()
+    def city_detail(self, request, pk=None):
+        city = get_object_or_404(City, pk=pk)
+
+        if request.method == 'GET':
+            serializer = self.get_serializer(
+                city, context=self.get_serializer_context(include_nested=True)
+            )
+            return self._create_rendered_response(serializer.data)
+        elif request.method in ['PUT', 'PATCH']:
+            return self.update_object_helper(request, city)
+        elif request.method == 'DELETE':
+            return self.delete_object_helper(city)
+        
+    @CachingMixin.cached_method()
+    def suburbs(self, request):
+        queryset = Suburb.objects.filter(is_active=True)
+        city_id = request.query_params.get('city_id')
+        province_id = request.query_params.get('province_id')
+        country_id = request.query_params.get('country_id')
+        
+        if city_id:
+            queryset = queryset.filter(city_id=city_id)
+        elif province_id:
+            queryset = queryset.filter(city__province_id=province_id)
+        elif country_id:
+            queryset = queryset.filter(city__province__country_id=country_id)
+        
+        serializer = self.get_serializer(
+            queryset, many=True, context=self.get_serializer_context(include_nested=False)
+        )
+        return self._create_rendered_response(serializer.data)
+
+    def create_suburb(self, request):
+        return self.create_objects_helper(request)
+    
+    @CachingMixin.cached_method()
+    def suburb_detail(self, request, pk=None):
+        suburb = get_object_or_404(Suburb, pk=pk)
+
+        if request.method == 'GET':
+            serializer = self.get_serializer(
+                suburb, context=self.get_serializer_context(include_nested=True)
+            )
+            return self._create_rendered_response(serializer.data)
+        elif request.method in ['PUT', 'PATCH']:
+            return self.update_object_helper(request, suburb)
+        elif request.method == 'DELETE':
+            return self.delete_object_helper(suburb)
+
+    @CachingMixin.cached_method(timeout=BaseViewSet.long_cache_timeout) 
+    def location_hierarchy(self, request):
+        countries = Country.objects.filter(is_active=True)
+        country_serializer = self.get_serializer(
+            countries, many=True, context=self.get_serializer_context(include_nested=True)
+        )
+        
+        data = {
+            'countries': country_serializer.data,
+        }
+        return self._create_rendered_response(data)

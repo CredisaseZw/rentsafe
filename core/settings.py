@@ -265,7 +265,7 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
-        "KEY_PREFIX": "rentsafe"
+        "KEY_PREFIX": "rentsafe",
     }
 }
 
@@ -390,11 +390,21 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'locations': { 
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'cache': {
+            'handlers': ['console'],
+            'level': 'DEBUG', 
+            'propagate': False,
+        },
         'companies': {
-        'handlers': ['console', 'file_django'],
-        'level': 'DEBUG',  # Set to DEBUG to capture all messages
-        'propagate': False,
-    },
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     'root': { 
         'handlers': ['console', 'file_django'],
         'level': 'WARNING',
