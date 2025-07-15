@@ -1,13 +1,14 @@
 import type { Route } from "@/types";
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
-import { ChartColumnDecreasingIcon, House, icons } from "lucide-react";
+import { ChartColumnDecreasingIcon, House } from "lucide-react";
 
-import { 
-   RENT_ADMIN_PANEL_NAVLINKS, 
+import {
+   RENT_ADMIN_PANEL_NAVLINKS,
    RENTSAFE_APP_NAVLINKS,
    RENTSAFE_ACCOUNTING_NAVLINKS,
-   ROOT_NAVLINKS } from "./navlinks";
+   ROOT_NAVLINKS,
+} from "./navlinks";
 
 export const SERVICES: Service[] = [
    {
@@ -22,10 +23,22 @@ export const SERVICES: Service[] = [
       href: "/services/count-safe",
       icon: ChartColumnDecreasingIcon,
    },
-]
+];
 
-export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([...RENTSAFE_APP_NAVLINKS, ...RENTSAFE_ACCOUNTING_NAVLINKS, ...RENT_ADMIN_PANEL_NAVLINKS]);
+export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([
+   ...RENTSAFE_APP_NAVLINKS,
+   ...RENTSAFE_ACCOUNTING_NAVLINKS,
+   ...RENT_ADMIN_PANEL_NAVLINKS,
+]);
 
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 
 export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
+
+export const PAYMENT_STATUS_CLASSIFICATIONS = [
+   { label: "Low", className: "bg-SUCCESS text-white" },
+   { label: "Medium", className: "bg-[darkorange] text-white" },
+   { label: "High-", className: "bg-[tomato] text-white" },
+   { label: "High+", className: "bg-[firebrick] text-white" },
+   { label: "Non Payer", className: "bg-[black] text-white" },
+];
