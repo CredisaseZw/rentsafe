@@ -71,7 +71,7 @@ class ProvinceSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Province.objects.all(),
-                fields=['country', 'code'],
+                fields=['country_id', 'code'],
                 message="Province with this code already exists for this country."
             )
         ]
