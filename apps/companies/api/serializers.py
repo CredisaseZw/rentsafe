@@ -32,34 +32,40 @@ class ContactPersonSerializer(serializers.ModelSerializer):
 
 class CompanyBranchSerializer(serializers.ModelSerializer):
     """Serializer for CompanyBranch model"""
-    addresses = AddressSerializer(many=True, read_only=True)
+    addresses = AddressSerializer(many=True, required=False)
     contacts = ContactPersonSerializer(many=True, read_only=True)
     
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'branch_name', 'addresses', 'contacts']
-
-
-class CompanyProfile2Serializer(serializers.ModelSerializer):
-    """Serializer for CompanyProfile model"""
-    trading_status_display = serializers.CharField(source='get_trading_status_display', read_only=True)
-    trend_display = serializers.CharField(source='get_trend_display', read_only=True)
-    risk_class_display = serializers.CharField(source='get_risk_class_display', read_only=True)
-    is_under_judicial_display = serializers.CharField(source='get_is_under_judicial_display', read_only=True)
-    contact_person = ContactPersonSerializer(read_only=True)
+        fields = ['id', 'company', 'branch_name', 'addresses', 'contacts']
     
-    class Meta:
-        model = CompanyProfile
-        fields = [
-            'trading_status', 'trading_status_display', 'mobile_phone', 'landline_phone',
-            'email', 'logo', 'registration_date', 'bp_number', 'vat_number',
-            'number_of_employees', 'website', 'trend', 'trend_display',
-            'twitter', 'facebook', 'instagram', 'linkedin', 'operations',
-            'contact_person', 'risk_class', 'risk_class_display',
-            'account_number', 'is_under_judicial', 'is_under_judicial_display',
-            'is_suspended'
-        ]
-
+    def create(self, validated_data):
+        addresses_data = validated_data.pop('addresses', [])
+        branch = CompanyBranch.objects.create(**validated_data)
+        
+        # Create addresses for the branch
+        for address_data in addresses_data:
+            Address.objects.create(
+                content_object=branch,
+                **address_data
+            )
+        
+        return branch
+    
+    def update(self, instance, validated_data):
+        addresses_data = validated_data.pop('addresses', None)
+        instance = super().update(instance, validated_data)
+        
+        if addresses_data is not None:
+            instance.addresses.all().delete()
+            for address_data in addresses_data:
+                Address.objects.create(
+                    content_object=instance,
+                    **address_data
+                )
+        
+        return instance
+    
 class CompanyProfileSerializer(serializers.ModelSerializer):
     """Serializer for CompanyProfile model"""
     trading_status_display = serializers.CharField(source='get_trading_status_display', read_only=True)

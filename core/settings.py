@@ -50,9 +50,20 @@ WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
 SECRET_KEY = 'django-insecure-78wfplq%ozyj9-2v=#-cazg7m(14fhtzx9&%p+^)=grb)qpzu1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True' 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
+if not DEBUG:
+    ALLOWED_HOSTS = [
+        '.credi-safe.com',
+    ]
+else:
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        '[::1]',
+        # '192.168.1.10',
+    ]
 
 
 # Application definition
@@ -69,7 +80,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'django_filters',
-
+    'corsheaders',
     # Custom Apps
     'apps.users',
     'apps.common',
@@ -89,6 +100,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'apps.common.middleware.DetailedErrorLoggingMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -96,6 +109,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -189,6 +203,34 @@ else:
             }
         }
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://credi-safe.com",
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = DEBUG 
+
+if not CORS_ALLOW_ALL_ORIGINS:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://credi-safe.com",
+        "https://www.credi-safe.com",
+    ]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+
+
+
 
 # CRON JOBS
 # https://django-cron.readthedocs.io/en/latest/installation.html#installation
@@ -205,7 +247,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication', 
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', # Default to requiring authentication
+        'rest_framework.permissions.IsAuthenticated', 
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -217,6 +259,18 @@ REST_FRAMEWORK = {
             'rest_framework.renderers.BrowsableAPIRenderer',
         ],
 }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "rentsafe",
+    }
+}
+
+
 
 # SIMPLE JWT SETTINGS
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
@@ -343,6 +397,16 @@ LOGGING = {
         'users': {
             'handlers': ['console', 'file_django'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'locations': { 
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'cache': {
+            'handlers': ['console'],
+            'level': 'DEBUG', 
             'propagate': False,
         },
         'companies': {

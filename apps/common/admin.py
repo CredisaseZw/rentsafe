@@ -1,51 +1,86 @@
-from apps.common.models.models import Document, Note, Country, City, Province, Suburb
-from django.contrib import admin
-from django.utils.translation import gettext_lazy as _
 
-@admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'document_type', 'file', 'is_verified', 'date_created', 'date_updated')
-    search_fields = ('document_type', 'file')
-    list_filter = ('is_verified', 'date_created', 'date_updated')
-    ordering = ('-date_created', 'date_updated')
+from django.utils.translation import gettext_lazy as _
+# apps/common/admin.py
+from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
+from apps.common.models.models import (
+    Document, Note, Country, Province, City, Suburb, Address
+)
+
+class AddressInline(GenericTabularInline):
+    model = Address
+    extra = 1
+    fields = (
+        'address_type', 'is_primary', 'street_address', 'line_2',
+        'country', 'province', 'city', 'suburb', 'postal_code',
+        'latitude', 'longitude'
+    )
+    raw_id_fields = ('country', 'province', 'city', 'suburb')
+
+class DocumentInline(GenericTabularInline):
+    model = Document
+    extra = 1
+    fields = ('document_type', 'file', 'description', 'is_verified')
     readonly_fields = ('date_created', 'date_updated')
 
-@admin.register(Note)
-class NoteAdmin(admin.ModelAdmin):
-    list_display = ('id', 'author', 'content', 'is_private', 'date_created', 'date_updated')
-    search_fields = ('author__username', 'content')
-    list_filter = ('is_private', 'date_created', 'date_updated')
-    ordering = ('-date_created', 'date_updated')
+class NoteInline(GenericTabularInline):
+    model = Note
+    extra = 1
+    fields = ('author', 'content', 'is_private')
     readonly_fields = ('date_created', 'date_updated')
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'slug', 'dial_code', 'currency_code', 'currency_name', 'is_active')
-    search_fields = ('name', 'code', 'slug')
+    list_display = ('name', 'code', 'dial_code', 'currency_code', 'is_active')
     list_filter = ('is_active',)
-    ordering = ('name',)
+    search_fields = ('name', 'code')
     prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(Province)
 class ProvinceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country', 'code', 'slug', 'is_active', 'approved')
-    search_fields = ('name', 'code', 'slug', 'country__name')
-    list_filter = ('is_active', 'approved')
-    ordering = ('country__name', 'name')
+    list_display = ('name', 'code', 'country', 'is_active', 'approved')
+    list_filter = ('country', 'is_active', 'approved')
+    search_fields = ('name', 'code')
+    raw_id_fields = ('country',)
     prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     list_display = ('name', 'province', 'is_active')
-    search_fields = ('name', 'province__name')
-    list_filter = ('is_active',)
-    ordering = ('province__name', 'name')
+    list_filter = ('province__country', 'province', 'is_active')
+    search_fields = ('name',)
+    raw_id_fields = ('province',)
     prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(Suburb)
 class SuburbAdmin(admin.ModelAdmin):
     list_display = ('name', 'city', 'is_active')
-    search_fields = ('name', 'city__name')
-    list_filter = ('is_active',)
-    ordering = ('city__name', 'name')
+    list_filter = ('city__province__country', 'city__province', 'city', 'is_active')
+    search_fields = ('name',)
+    raw_id_fields = ('city',)
     prepopulated_fields = {'slug': ('name',)}
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = (
+        'content_object', 'address_type', 'is_primary',
+        'street_address', 'city', 'country'
+    )
+    list_filter = ('address_type', 'is_primary', 'country', 'province', 'city')
+    search_fields = ('street_address', 'line_2', 'postal_code')
+    raw_id_fields = ('content_type', 'country', 'province', 'city', 'suburb')
+
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = ('content_object', 'document_type', 'is_verified', 'date_created')
+    list_filter = ('document_type', 'is_verified')
+    search_fields = ('description',)
+    raw_id_fields = ('content_type',)
+
+@admin.register(Note)
+class NoteAdmin(admin.ModelAdmin):
+    list_display = ('content_object', 'author', 'is_private', 'date_created')
+    list_filter = ('is_private',)
+    search_fields = ('content',)
+    raw_id_fields = ('content_type', 'author')
+
