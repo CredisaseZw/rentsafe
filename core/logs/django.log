@@ -1,0 +1,23 @@
+INFO 2025-07-16 12:10:33 basehttp 101696 126485618751168 "GET /api/companies/3/get-branches/ HTTP/1.1" 200 1034
+INFO 2025-07-16 12:11:12 autoreload 101696 126485710745728 /home/tnqn/Documents/rentsafe_project/core/settings.py changed, reloading.
+INFO 2025-07-16 12:11:14 autoreload 102359 136580856180864 Watching for file changes with StatReloader
+INFO 2025-07-16 12:11:18 basehttp 102359 136580694013632 "GET /api/companies/3/get-branches/ HTTP/1.1" 200 1034
+INFO 2025-07-16 12:11:28 autoreload 102359 136580856180864 /home/tnqn/Documents/rentsafe_project/core/settings.py changed, reloading.
+INFO 2025-07-16 12:11:29 autoreload 102555 123389240467584 Watching for file changes with StatReloader
+INFO 2025-07-16 12:11:35 basehttp 102555 123389148657344 "GET /api/companies/3/get-branches/ HTTP/1.1" 200 1034
+INFO 2025-07-16 12:11:54 basehttp 102555 123389148657344 "GET /api/companies/ HTTP/1.1" 200 1379
+INFO 2025-07-16 12:14:20 autoreload 102555 123389240467584 /home/tnqn/Documents/rentsafe_project/apps/companies/api/views.py changed, reloading.
+INFO 2025-07-16 12:14:21 autoreload 103693 140689819504768 Watching for file changes with StatReloader
+INFO 2025-07-16 12:15:10 autoreload 103693 140689819504768 /home/tnqn/Documents/rentsafe_project/apps/companies/api/views.py changed, reloading.
+INFO 2025-07-16 12:15:11 autoreload 104093 140038479798400 Watching for file changes with StatReloader
+INFO 2025-07-16 12:15:16 basehttp 104093 140038388053696 "GET /api/companies/ HTTP/1.1" 200 1379
+INFO 2025-07-16 12:15:58 autoreload 104093 140038479798400 /home/tnqn/Documents/rentsafe_project/core/settings.py changed, reloading.
+INFO 2025-07-16 12:16:00 autoreload 104489 138072446288000 Watching for file changes with StatReloader
+INFO 2025-07-16 12:16:49 autoreload 104489 138072446288000 /home/tnqn/Documents/rentsafe_project/apps/companies/api/views.py changed, reloading.
+INFO 2025-07-16 12:16:50 autoreload 104913 133976702455936 Watching for file changes with StatReloader
+INFO 2025-07-16 12:16:54 autoreload 104913 133976702455936 /home/tnqn/Documents/rentsafe_project/apps/companies/api/views.py changed, reloading.
+INFO 2025-07-16 12:16:56 autoreload 105006 131648632426624 Watching for file changes with StatReloader
+WARNING 2025-07-16 12:17:00 log 105006 131648465139392 Bad Request: /api/companies/
+WARNING 2025-07-16 12:17:00 basehttp 105006 131648465139392 "GET /api/companies/ HTTP/1.1" 400 105
+INFO 2025-07-16 12:17:34 autoreload 105006 131648632426624 /home/tnqn/Documents/rentsafe_project/apps/companies/api/views.py changed, reloading.
+INFO 2025-07-16 12:17:36 autoreload 105385 130825197011072 Watching for file changes with StatReloader
