@@ -10,14 +10,13 @@ from apps.common.api.serializers import (
     CountrySerializer, ProvinceSerializer,
     CitySerializer, SuburbSerializer
 )
-from apps.common.utils.caching import CacheHelper
-from apps.common.utils.mixins import CachingMixin
 from rest_framework.renderers import JSONRenderer 
+from apps.common.utils.caching import CacheService
 import logging
 
 logger = logging.getLogger('locations')
 
-class BaseViewSet(CachingMixin,viewsets.ModelViewSet):
+class BaseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_serializer_context(self):
@@ -42,6 +41,7 @@ class BaseViewSet(CachingMixin,viewsets.ModelViewSet):
             serializer.save(user=self.request.user)
         else:
             serializer.save()
+    
     def _create_rendered_response(self, data, status_code=status.HTTP_200_OK):
         """
         Helper to create and render a DRF Response for consistent caching.
@@ -56,8 +56,14 @@ class BaseViewSet(CachingMixin,viewsets.ModelViewSet):
         else:
             response.accepted_renderer = JSONRenderer()
             response.accepted_media_type = 'application/json'
+        
         response.renderer_context = self.get_renderer_context()
-        response.render()
+        
+        try:
+            response.render()
+        except Exception as e:
+            logger.error(f"Failed to render response: {e}")
+        
         return response
 
 class BaseSoftDeleteViewSet(BaseViewSet):
@@ -82,9 +88,7 @@ class BaseSoftDeleteViewSet(BaseViewSet):
 class LocationViewSet(BaseViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    cache_timeout = 60 * 20  # 20 minutes for regular endpoints 
-    long_cache_timeout = 60 * 60 * 2  # 2 hours for hierarchy data
-    
+
     def get_serializer_class(self):
         if self.action in ['countries', 'country_detail']:
             return CountrySerializer
@@ -146,7 +150,7 @@ class LocationViewSet(BaseViewSet):
             status.HTTP_204_NO_CONTENT
         )
     
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:countries',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def countries(self, request, pk=None):
         if pk is not None:
             return self.country_detail(request, pk)
@@ -157,7 +161,7 @@ class LocationViewSet(BaseViewSet):
         )
         return self._create_rendered_response(serializer.data)
 
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:{pk}:country')
     def country_detail(self, request, pk=None):
         country = get_object_or_404(Country, pk=pk)
 
@@ -171,7 +175,7 @@ class LocationViewSet(BaseViewSet):
         elif request.method == 'DELETE':
             return self.delete_object_helper(country)
 
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:provinces')
     def provinces(self, request):
         queryset = Province.objects.filter(is_active=True)
         if country_id := request.query_params.get('country_id'):
@@ -185,7 +189,7 @@ class LocationViewSet(BaseViewSet):
     def create_province(self, request):
         return self.create_objects_helper(request)
 
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:{pk}:province',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def province_detail(self, request, pk=None):
         province = get_object_or_404(Province, pk=pk)
 
@@ -199,7 +203,7 @@ class LocationViewSet(BaseViewSet):
         elif request.method == 'DELETE':
             return self.delete_object_helper(province)
         
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:cities',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def cities(self, request):
         queryset = City.objects.filter(is_active=True)
         province_id = request.query_params.get('province_id')
@@ -218,7 +222,7 @@ class LocationViewSet(BaseViewSet):
     def create_city(self, request):
         return self.create_objects_helper(request)
     
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:{pk}:city')
     def city_detail(self, request, pk=None):
         city = get_object_or_404(City, pk=pk)
 
@@ -232,7 +236,7 @@ class LocationViewSet(BaseViewSet):
         elif request.method == 'DELETE':
             return self.delete_object_helper(city)
         
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:suburbs',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def suburbs(self, request):
         queryset = Suburb.objects.filter(is_active=True)
         city_id = request.query_params.get('city_id')
@@ -254,7 +258,7 @@ class LocationViewSet(BaseViewSet):
     def create_suburb(self, request):
         return self.create_objects_helper(request)
     
-    @CachingMixin.cached_method()
+    @CacheService.cached(tag_prefix='locations:{pk}:suburb')
     def suburb_detail(self, request, pk=None):
         suburb = get_object_or_404(Suburb, pk=pk)
 
@@ -268,7 +272,7 @@ class LocationViewSet(BaseViewSet):
         elif request.method == 'DELETE':
             return self.delete_object_helper(suburb)
 
-    @CachingMixin.cached_method(timeout=BaseViewSet.long_cache_timeout) 
+    @CacheService.cached(tag_prefix='locations:hierarchy')
     def location_hierarchy(self, request):
         countries = Country.objects.filter(is_active=True)
         country_serializer = self.get_serializer(
