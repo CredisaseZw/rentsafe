@@ -22,5 +22,5 @@ def verify_content_type(sender, instance, **kwargs):
         logger.error(f"Missing object_id for {sender.__name__} with content_type {instance.content_type}")
     elif not instance.content_type_id and instance.object_id:
         logger.error(f"Missing content_type for {sender.__name__} with object_id {instance.object_id}")
-    elif not instance.content_type_id and not instance.object_id:
+    elif not instance.content_type_id:
         logger.error(f"Missing both content_type and object_id for {sender.__name__}")

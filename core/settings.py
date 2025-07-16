@@ -100,7 +100,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'apps.common.middleware.DetailedErrorLoggingMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -109,7 +109,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -267,6 +267,7 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
         "KEY_PREFIX": "rentsafe",
+        "TIMEOUT": 300, 
     }
 }
 
@@ -336,14 +337,30 @@ LOGGING = {
             'formatter': 'simple'
         },
         'file_companies': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOGS_DIR, 'companies.log'),
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
             'formatter': 'verbose',
         },
-        'file_django': { 
+        'file_locations': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'locations.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'file_caching': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'caching.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'file_django': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs', 'django.log'),
@@ -405,7 +422,7 @@ LOGGING = {
             'propagate': False,
         },
         'cache': {
-            'handlers': ['console'],
+            'handlers': ['console','file_caching'],
             'level': 'DEBUG', 
             'propagate': False,
         },
@@ -417,6 +434,8 @@ LOGGING = {
         'file_individuals': {
             'handlers': ['console', 'file_individuals'],
             'level': 'DEBUG',
+            'handlers': ['console','file_companies'],
+            'level': 'ERROR',
             'propagate': False,
         },
     'root': { 
