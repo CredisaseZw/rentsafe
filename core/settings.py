@@ -80,7 +80,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'django_filters',
-
+    'corsheaders',
     # Custom Apps
     'apps.users',
     'apps.common',
@@ -101,6 +101,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'apps.common.middleware.DetailedErrorLoggingMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
