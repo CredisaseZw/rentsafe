@@ -305,6 +305,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'audit',
         },
+        'file_individuals':{
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'individuals.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            },
         'db_audit': { 
             'level': 'INFO',
             'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
@@ -341,7 +349,12 @@ LOGGING = {
         'handlers': ['console', 'file_django'],
         'level': 'DEBUG',  # Set to DEBUG to capture all messages
         'propagate': False,
-    },
+        },
+        'file_individuals': {
+            'handlers': ['console', 'file_individuals'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     'root': { 
         'handlers': ['console', 'file_django'],
         'level': 'WARNING',
