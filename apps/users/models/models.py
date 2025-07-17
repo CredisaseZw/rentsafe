@@ -127,7 +127,6 @@ class CustomUser(AbstractUser):
         self.full_clean() 
         super().save(*args, **kwargs)
 
-# --- New Feature: Role Model ---
 class Role(models.Model):
     name = models.CharField(max_length=100, unique=True,
                             help_text=_("Unique name for the role (e.g., 'Property Manager', 'Tenant User')."))
@@ -174,9 +173,6 @@ class Role(models.Model):
         }
 
 class UserSetting(BaseModel):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='settings',
-                                help_text=_("The user to whom these settings belong."))
-    
     dark_mode_enabled = models.BooleanField(default=False,
                                             help_text=_("Enable dark mode for the user interface."))
     email_notifications_enabled = models.BooleanField(default=True,

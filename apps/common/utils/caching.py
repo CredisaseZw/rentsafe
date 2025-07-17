@@ -21,7 +21,7 @@ class CacheService:
     """
     DEFAULT_TIMEOUT = settings.CACHES['default'].get('TIMEOUT', 300)
     LONG_CACHE_TIMEOUT = 60 * 60 * 2  # 2 hours
-    VERSION_TIMEOUT = 60 * 60 * 24 * 7 # Cache versions for a week
+    VERSION_TIMEOUT = 60 * 60 * 24 # Cache versions for a day
 
     @classmethod
     def _get_version_key(cls, tag: str) -> str:
@@ -55,6 +55,18 @@ class CacheService:
         """Creates a final, versioned cache key."""
         return f"cache:data:{base_key}:{version}"
 
+    @classmethod
+    def clear_all_versions(cls):
+        """Clear all version keys (for testing/debugging)"""
+        try:
+            keys = cache.keys(f"{cls._get_version_key('*')}")
+            if keys:
+                cache.delete_many(keys)
+            return len(keys)
+        except Exception as e:
+            logger.error(f"Error clearing version keys: {e}")
+            return 0
+        
     @classmethod
     def cached(cls, tag_prefix: str, timeout: int = None):
         """

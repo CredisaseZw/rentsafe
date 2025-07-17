@@ -15,6 +15,7 @@ from apps.companies.api.serializers import (
     CompanyMinimalSerializer, CompanyBranchSearchSerializer, CompanyBranchSerializer
 )
 import logging
+from celery import shared_task
 
 logger = logging.getLogger('companies')
 
@@ -219,25 +220,31 @@ class CompanyViewSet(BaseViewSet):
     
     @action(detail=True, methods=['post'], url_path='create-branch')
     def create_branch(self, request, pk=None):
+        from apps.companies.services.tasks import create_company_branch_task
         """Create a new branch for a company"""
         company = self.get_object()
         
         data = request.data.copy()
         data['company'] = company.id
-        
+        if CompanyBranch.objects.filter(company=company, branch_name=data.get('branch_name')).exists():
+            return self._create_rendered_response(
+                {'error': 'Branch with this name already exists'},
+                status.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            serializer = CompanyBranchSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            branch = serializer.save()
-            response_serializer = CompanyBranchSerializer(branch)
-            return self._create_rendered_response(response_serializer.data, status.HTTP_201_CREATED)
+            create_company_branch_task.delay(data)
+            return self._create_rendered_response(
+                {'message': 'Branch creation in progress'},
+                status.HTTP_202_ACCEPTED
+            )
         except Exception as e:
             logger.error(f"Error creating branch for company {pk}: {str(e)}")
             return self._create_rendered_response(
                 {'error': 'Failed to create branch', 'details': str(e)},
                 status.HTTP_400_BAD_REQUEST
             )
-    
+
     @action(detail=True, methods=['get', 'put', 'patch', 'delete'], url_path='branches/(?P<branch_pk>[^/.]+)')
     def branch_operations(self, request, pk=None, branch_pk=None):
         """Handle all branch operations (GET, PUT, PATCH, DELETE)"""
@@ -422,3 +429,53 @@ class CompanyViewSet(BaseViewSet):
                 {'error': 'Company not found'}, 
                 status.HTTP_404_NOT_FOUND
             )
+    @action(detail=False, methods=['get'], url_path='task-status/(?P<task_id>[^/.]+)')
+    def task_status(self, request, task_id=None):
+        """
+        Check the status of a background task
+        """
+        try:
+            from celery.result import AsyncResult
+            
+            task_result = AsyncResult(task_id)
+            
+            if task_result.ready():
+                if task_result.successful():
+                    result = task_result.get()
+                    if result.get('success'):
+                        company_id = result.get('company_id')
+                        try:
+                            company = Company.objects.get(id=company_id)
+                            detail_serializer = CompanyDetailSerializer(company)
+                            return self._create_rendered_response({
+                                'status': 'completed',
+                                'company': detail_serializer.data,
+                                'message': result.get('message', 'Company created successfully')
+                            })
+                        except Company.DoesNotExist:
+                            return self._create_rendered_response({
+                                'status': 'completed',
+                                'message': result.get('message', 'Company created successfully')
+                            })
+                    else:
+                        return self._create_rendered_response({
+                            'status': 'failed',
+                            'error': result.get('error', 'Unknown error')
+                        })
+                else:
+                    return self._create_rendered_response({
+                        'status': 'failed',
+                        'error': str(task_result.info)
+                    })
+            else:
+                return self._create_rendered_response({
+                    'status': 'processing',
+                    'message': 'Company creation is still in progress'
+                })
+                
+        except Exception as e:
+            logger.error(f"Error checking task status: {str(e)}")
+            return self._create_rendered_response({
+                'status': 'error',
+                'error': 'Failed to check task status'
+            }, status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -28,6 +28,9 @@ django-ses==3.5.0
 django-storages==1.14
 django-timezone-field==7.1
 django-redis
+django-celery-beat
+django-celery-results
+celery
 django-cors-headers
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.0

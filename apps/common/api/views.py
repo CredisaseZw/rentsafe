@@ -224,7 +224,6 @@ class LocationViewSet(BaseViewSet):
     def create_city(self, request):
         return self.create_objects_helper(request)
     
-    @CacheService.cached(tag_prefix='locations:{pk}:city')
     def city_detail(self, request, pk=None):
         city = get_object_or_404(City, pk=pk)
 
@@ -260,7 +259,6 @@ class LocationViewSet(BaseViewSet):
     def create_suburb(self, request):
         return self.create_objects_helper(request)
     
-    @CacheService.cached(tag_prefix='locations:{pk}:suburb')
     def suburb_detail(self, request, pk=None):
         suburb = get_object_or_404(Suburb, pk=pk)
 
