@@ -3,7 +3,7 @@ import { Fullscreen, UserPlus, UserSearch } from "lucide-react";
 import SectionHeading from "@/components/general/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import PaymentStatusReport from "./PaymentStatusReport";
+import IndividualPaymentStatusReport from "./IndividualPaymentStatusReport";
 
 export default function IndividualPaymentStatusTab() {
    const rows: BaseTableRow[] = [
@@ -60,7 +60,7 @@ export default function IndividualPaymentStatusTab() {
    ].map((cell) => ({
       ...cell,
       select: (
-         <PaymentStatusReport
+         <IndividualPaymentStatusReport
             trigger={
                <Button variant="outline" size="xs">
                   View <Fullscreen size={16} />

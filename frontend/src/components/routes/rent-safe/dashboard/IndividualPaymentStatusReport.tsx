@@ -8,7 +8,7 @@ import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 
-type ReportDialogProps = {
+type IndividualPaymentStatusReportProps = {
    trigger: React.ReactNode;
    report: {
       employmentHistory: { employer: string; position: string; startDate: string }[];
@@ -33,7 +33,7 @@ type ReportDialogProps = {
    };
 };
 
-export default function PaymentStatusReport({ trigger, report }: ReportDialogProps) {
+export default function IndividualPaymentStatusReport({ trigger, report }: IndividualPaymentStatusReportProps) {
    const { employmentHistory, claims, activeRentals, historicRentals, personalDetails, rating } = report;
 
    const ratingColor =
