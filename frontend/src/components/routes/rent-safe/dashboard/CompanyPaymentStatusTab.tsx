@@ -1,9 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Fullscreen, Plus, Search } from "lucide-react";
+import { Fullscreen, Search } from "lucide-react";
 import BaseTable, { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import CompanyPaymentStatusReport from "./CompanyPaymentStatusReport";
 import SectionHeading from "@/components/general/SectionHeading";
+import CompanyForm from "./CompanyForm";
 
 export default function CompanyPaymentStatusTab() {
    const rows: BaseTableRow[] = [
@@ -75,9 +76,7 @@ export default function CompanyPaymentStatusTab() {
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
                   </form>
-                  <Button size="sm">
-                     Add New Company <Plus />
-                  </Button>
+                  <CompanyForm />
                </div>
             }
          />

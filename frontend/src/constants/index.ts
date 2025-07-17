@@ -42,3 +42,17 @@ export const PAYMENT_STATUS_CLASSIFICATIONS = [
    { label: "High Risk+", className: "bg-[firebrick] text-white" },
    { label: "Non Payer", className: "bg-[black] text-white" },
 ];
+
+export const INDUSTRIES = [
+   "Agriculture",
+   "Construction",
+   "Education",
+   "Finance",
+   "Healthcare",
+   "Hospitality",
+   "Information Technology",
+   "Manufacturing",
+   "Retail",
+   "Transportation",
+   "Other",
+];
