@@ -1,9 +1,9 @@
+import SectionHeading from "@/components/general/SectionHeading";
+import IndividualPaymentStatusReport from "./IndividualPaymentStatusReport";
 import BaseTable, { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import { Fullscreen, UserPlus, UserSearch } from "lucide-react";
-import SectionHeading from "@/components/general/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import IndividualPaymentStatusReport from "./IndividualPaymentStatusReport";
 
 export default function IndividualPaymentStatusTab() {
    const rows: BaseTableRow[] = [
@@ -125,11 +125,11 @@ const sampleReport = {
       { claimant: "John Doe", type: "Rent", currency: "USD", amount: 500, dateOfClaim: "2023-01-10" },
       { claimant: "Jane Smith", type: "Deposit", currency: "USD", amount: 300, dateOfClaim: "2023-02-20" },
    ],
-   activeRentals: [
+   active: [
       { creditor: "Landlord A", type: "Residential", outstandingSince: "2023-03-01", amount: 200 },
       { creditor: "Landlord B", type: "Commercial", outstandingSince: "2023-04-15", amount: 1000 },
    ],
-   historicRentals: [
+   historic: [
       { creditor: "Landlord C", type: "Residential", outstandingSince: "2022-05-10", amount: 150 },
       { creditor: "Landlord D", type: "Commercial", outstandingSince: "2021-08-20", amount: 800 },
    ],

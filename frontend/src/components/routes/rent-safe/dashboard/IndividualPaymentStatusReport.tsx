@@ -1,20 +1,20 @@
-import Logo from "@/components/general/Logo";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { friendlyDate } from "@/lib/utils";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { Link } from "react-router";
-import OverviewCard from "./OverviewCard";
-import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { friendlyDate } from "@/lib/utils";
+import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import OverviewCard from "./OverviewCard";
+import Logo from "@/components/general/Logo";
 
 type IndividualPaymentStatusReportProps = {
    trigger: React.ReactNode;
    report: {
       employmentHistory: { employer: string; position: string; startDate: string }[];
       claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
-      activeRentals: { creditor: string; type: string; outstandingSince: string; amount: number }[];
-      historicRentals: { creditor: string; type: string; outstandingSince: string; amount: number }[];
+      active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
+      historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
       rating: string;
       personalDetails: {
          surname: string;
@@ -34,7 +34,7 @@ type IndividualPaymentStatusReportProps = {
 };
 
 export default function IndividualPaymentStatusReport({ trigger, report }: IndividualPaymentStatusReportProps) {
-   const { employmentHistory, claims, activeRentals, historicRentals, personalDetails, rating } = report;
+   const { employmentHistory, claims, active, historic, personalDetails, rating } = report;
 
    const ratingColor =
       PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === rating.toLowerCase())?.className ||
@@ -59,7 +59,7 @@ export default function IndividualPaymentStatusReport({ trigger, report }: Indiv
                      <p>Securing you rental investments</p>
                      <p>
                         Rent Payment Status Report on{" "}
-                        <span className="">
+                        <span className="font-semibold">
                            {personalDetails.otherNames} {personalDetails.surname}
                         </span>{" "}
                         as at <span className="">{friendlyDate(new Date())}</span>
@@ -235,7 +235,7 @@ export default function IndividualPaymentStatusReport({ trigger, report }: Indiv
                         <div>Amount</div>
                      </div>
 
-                     {activeRentals.map((rental, index) => (
+                     {active.map((rental, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-4 items-center gap-2 border border-t-0 p-1 text-center"
@@ -258,7 +258,7 @@ export default function IndividualPaymentStatusReport({ trigger, report }: Indiv
                         <div>Amount</div>
                      </div>
 
-                     {historicRentals.map((rental, index) => (
+                     {historic.map((rental, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-4 items-center gap-2 border border-t-0 p-1 text-center"
