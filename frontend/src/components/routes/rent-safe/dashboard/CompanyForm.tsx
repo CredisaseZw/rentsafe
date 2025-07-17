@@ -16,7 +16,7 @@ export default function CompanyForm() {
    }
 
    return (
-      <Dialog modal defaultOpen>
+      <Dialog modal>
          <DialogTrigger asChild>
             <Button size="sm">
                Add New Company <Plus />

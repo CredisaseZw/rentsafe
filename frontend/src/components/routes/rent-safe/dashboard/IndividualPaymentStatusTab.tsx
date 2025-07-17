@@ -1,9 +1,10 @@
 import SectionHeading from "@/components/general/SectionHeading";
 import IndividualPaymentStatusReport from "./IndividualPaymentStatusReport";
 import BaseTable, { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
-import { Fullscreen, UserPlus, UserSearch } from "lucide-react";
+import { Fullscreen, UserSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import IndividualForm from "./IndividualForm";
 
 export default function IndividualPaymentStatusTab() {
    const rows: BaseTableRow[] = [
@@ -106,9 +107,7 @@ export default function IndividualPaymentStatusTab() {
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
                   </form>
-                  <Button size="sm">
-                     Add New Individual <UserPlus />
-                  </Button>
+                  <IndividualForm />
                </div>
             }
          />
