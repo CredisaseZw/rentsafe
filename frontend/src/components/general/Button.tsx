@@ -3,14 +3,15 @@ import { cn } from '@/lib/utils';
 
 interface ButtonProps {
   children: React.ReactNode;
-  variant?: 'primary'; // add more variants as needed
+  variant?: 'primary' | 'success'; // add more variants as needed
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
 }
 
-const variants: Record<'primary', string> = {
+const variants: Record<'primary' | 'success', string> = {
   primary: 'bg-PRIMARY hover:bg-primary-dark',
+  success: 'bg-green-600 hover:bg-green-800',
 };
 
 function Button({

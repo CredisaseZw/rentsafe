@@ -4,7 +4,7 @@ import { HomeIcon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import NavLinkItem from "./NavLinkItem";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 type SidebarProps = {
    title?: string;
@@ -15,8 +15,21 @@ type SidebarProps = {
 
 export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAccountingNavlinks, rentsafeAdminPanelNavlinks }: SidebarProps) {
    const [expandedSegment, expandThisSegment] = React.useState<string>("");
+   let [username, setUsername] = useState<String>("");
 
-   return (
+   useEffect(()=>{
+      let token = localStorage.getItem("token")
+      if(token){
+         try{
+            let parsedToken = JSON.parse(token);
+            setUsername(parsedToken.username);
+         } catch{
+            console.log("Error parsing token")
+         }
+      }
+   })
+
+   return ( 
        <Sidebar className="bg-PRIMARY text-white border-r border-white/10 w-[300px]">
          <SidebarContent>
             <div className="px-5 pt-5">
@@ -83,8 +96,8 @@ export default function ServiceSidebar({ title, rentsafeAppNavlinks, rentsafeAcc
          <SidebarFooter>
             <div className="p-2">
                <div className="flex p-3 flex-row justify-center align-center bg-primary-dark rounded-xl text-white gap-3">
-                     <User size={18}/>
-                     <h6>Hilton Somebody</h6>
+                     <User className="self-center" size={18}/>
+                     <h6>{username}</h6>
                </div>
             </div>
          </SidebarFooter>

@@ -7,6 +7,10 @@ import useLoginAuth from "../apiHooks/useLogin";
 
 export default function useAuth(){
     let navigation = useNavigate();
+    let [status, setStatus] = useState({
+        error : false,
+        isAccount : false
+    })
     let [loginForm, setLoginForm]  = useState({
         username : "",
         password : ""
@@ -24,9 +28,19 @@ export default function useAuth(){
         }))
     }
 
+    let onError = (key: "error" | "isAccount")=>{
+        setStatus((prev)=>({
+            ...prev,
+            [key] : !prev[key]
+        }))
+    }
+
     return {
         loginForm,
+        status,
         validateForm,
-        handleChange
+        handleChange,
+        onError,
+
     }
 }

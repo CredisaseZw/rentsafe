@@ -91,3 +91,6 @@ label.required::after{
 .select-input:has(input:focus) {
   border-color: var(--bg-primary);
 }
+.table-row{
+  margin-bottom: 15ppx ;
+}

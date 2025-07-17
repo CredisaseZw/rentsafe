@@ -4,9 +4,10 @@ import { Link } from "react-router";
 import { useNavigate } from "react-router-dom";
 import  useAuth from "@/hooks/components/useAuth";
 import useLoginAuth from "@/hooks/apiHooks/useLogin";
+import Alert from "@/components/general/Alerts";
 
 export default function Login() {
-   let {loginForm, validateForm, handleChange} = useAuth();
+   let {loginForm, validateForm, handleChange, status, onError} = useAuth();
    let login = useLoginAuth();
    let navigate = useNavigate();
     
@@ -21,10 +22,10 @@ export default function Login() {
                localStorage.setItem("token", JSON.stringify(data))
                let next = new URLSearchParams(location.search).get("next");
                navigate(next || "/services/rent-safe", {replace : true})
-
             },
             onError:(error)=>{
-
+               console.log(error)
+               onError("isAccount");
             }
          })
         
@@ -61,8 +62,14 @@ export default function Login() {
                         onChange={handleChange}
                      />
                   </div>
-
-               <div className="mt-7 flex flex-col gap-3 w-full ">
+                  {
+                     status.isAccount &&
+                     <div className="mt-7">
+                        <Alert type="danger" message="Invalid account." />
+                     </div>
+                }
+                
+                  <div className="mt-7 flex flex-col gap-3 w-full ">
                      <button type="submit" className="text-white gap-2 bg-PRIMARY hover:bg-PRIMARY-DARK focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex flex-row items-center justify-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
                         Sign in
                         <LogInIcon size={15} className="flex self-center"/>
