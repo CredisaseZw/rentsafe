@@ -1,9 +1,10 @@
-import BaseTable, { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
-import { Fullscreen, UserPlus, UserSearch } from "lucide-react";
 import SectionHeading from "@/components/general/SectionHeading";
+import IndividualPaymentStatusReport from "./IndividualPaymentStatusReport";
+import BaseTable, { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
+import { Fullscreen, UserSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import PaymentStatusReport from "./PaymentStatusReport";
+import IndividualForm from "./IndividualForm";
 
 export default function IndividualPaymentStatusTab() {
    const rows: BaseTableRow[] = [
@@ -60,13 +61,13 @@ export default function IndividualPaymentStatusTab() {
    ].map((cell) => ({
       ...cell,
       select: (
-         <PaymentStatusReport
+         <IndividualPaymentStatusReport
             trigger={
                <Button variant="outline" size="xs">
                   View <Fullscreen size={16} />
                </Button>
             }
-            report={{}}
+            report={sampleReport}
          />
       ),
    }));
@@ -106,12 +107,47 @@ export default function IndividualPaymentStatusTab() {
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
                   </form>
-                  <Button size="sm">
-                     Add New Individual <UserPlus />
-                  </Button>
+                  <IndividualForm />
                </div>
             }
          />
       </div>
    );
 }
+
+const sampleReport = {
+   employmentHistory: [
+      { employer: "Company A", position: "Manager", startDate: "2020-01-01" },
+      { employer: "Company B", position: "Developer", startDate: "2018-06-15" },
+   ],
+   claims: [
+      { claimant: "John Doe", type: "Rent", currency: "USD", amount: 500, dateOfClaim: "2023-01-10" },
+      { claimant: "Jane Smith", type: "Deposit", currency: "USD", amount: 300, dateOfClaim: "2023-02-20" },
+   ],
+   active: [
+      { creditor: "Landlord A", type: "Residential", outstandingSince: "2023-03-01", amount: 200 },
+      { creditor: "Landlord B", type: "Commercial", outstandingSince: "2023-04-15", amount: 1000 },
+   ],
+   historic: [
+      { creditor: "Landlord C", type: "Residential", outstandingSince: "2022-05-10", amount: 150 },
+      { creditor: "Landlord D", type: "Commercial", outstandingSince: "2021-08-20", amount: 800 },
+   ],
+   rating: "Non payer",
+   personalDetails: {
+      surname: "Spiwe",
+      otherNames: "Jerad",
+      idNumber: "47225912M47",
+      dateOfBirth: "1990-01-01",
+      gender: "Female",
+      nationality: "Zimbabwean",
+      maritalStatus: "Single",
+      dependants: [
+         { name: "Child A", age: 5, relationship: "Daughter" },
+         { name: "Child B", age: 3, relationship: "Son" },
+      ],
+      mobileNumber: "071 123 4567",
+      telephoneNumber: "04 123 456",
+      email: "jerad.spiwe@example.com",
+      address: "123 Main St, Harare, Zimbabwe",
+   },
+};

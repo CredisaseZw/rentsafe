@@ -36,9 +36,23 @@ export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
 
 export const PAYMENT_STATUS_CLASSIFICATIONS = [
-   { label: "Low", className: "bg-SUCCESS text-white" },
-   { label: "Medium", className: "bg-[darkorange] text-white" },
-   { label: "High-", className: "bg-[tomato] text-white" },
-   { label: "High+", className: "bg-[firebrick] text-white" },
+   { label: "Low Risk", className: "bg-SUCCESS text-white" },
+   { label: "Medium Risk", className: "bg-[darkorange] text-white" },
+   { label: "High Risk", className: "bg-[tomato] text-white" },
+   { label: "High Risk+", className: "bg-[firebrick] text-white" },
    { label: "Non Payer", className: "bg-[black] text-white" },
+];
+
+export const INDUSTRIES = [
+   "Agriculture",
+   "Construction",
+   "Education",
+   "Finance",
+   "Healthcare",
+   "Hospitality",
+   "Information Technology",
+   "Manufacturing",
+   "Retail",
+   "Transportation",
+   "Other",
 ];
