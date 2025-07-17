@@ -345,7 +345,7 @@ LOGGING = {
             'formatter': 'verbose',
         },
         'file_locations': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOGS_DIR, 'locations.log'),
             'maxBytes': 1024 * 1024 * 5,
@@ -417,8 +417,8 @@ LOGGING = {
             'propagate': False,
         },
         'locations': { 
-            'handlers': ['console'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'file_locations'],
+            'level': 'ERROR',
             'propagate': False,
         },
         'cache': {

@@ -6,13 +6,13 @@ from rest_framework.decorators import action
 
 from apps.individuals.api.serializers import IndividualSerializer , IndividualUpdateSerializer,IndividualCreateSerializer, IndividualSearchSerializer
 from apps.individuals.models import Individual
-# from apps.utils.utils.mixins import CachingMixin
-
+from apps.common.api.views import BaseViewSet
+from apps.common.utils.caching import CacheService
 import logging
 
 logger = logging.getLogger('file_individuals')
 
-class IndividualViewSet(viewsets.ModelViewSet):
+class IndividualViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
@@ -59,8 +59,37 @@ class IndividualViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.warning(f"Error updating individual: {str(e)}")
             return Response({"error": "Failed to update individual"}, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
+    
+    @CacheService.cached(tag_prefix='individuals:list')
+    def list(self, request,*arg, **kwarg):
+        try:
+            queryset= self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            logger.info(f"Listing individuals, total count: {queryset.count()}")
+            if page is not None:
+                serializer = IndividualSearchSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = IndividualSearchSerializer(queryset, many=True)
+            return self._create_rendered_response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error listing individuals: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "failed to list individuals", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    @CacheService.cached(tag_prefix='individual:{pk}')
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            Individual = self.get_object()
+            serializer = IndividualSerializer(Individual)
+            return self._create_rendered_response(serializer.data)
+        except Individual.DoesNotExist:
+            return self._create_rendered_response(
+                {'error': 'Individual not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    @action(detail=True, methods=['delete'], url_path='delete')
+    def soft_delete(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
             instance.is_deleted = True
@@ -81,32 +110,43 @@ class IndividualViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['PUT', 'PATCH'], url_path='verify')
     def verify_individual(self, request, pk=None):
         try:
-            individual = self.get_queryset().get(pk=pk)
-
-            if individual.is_verified:
-                logger.info(f"Individual {pk} is already verified.")
-                return Response(
-                    {"message": "Individual is already verified."},
-                    status=status.HTTP_200_OK
-                )
-
-            individual.is_verified = True
+            individual = Individual.objects.get(pk=pk)
+            individual.is_verified = not individual.is_verified
             individual.save()
 
             serializer = self.get_serializer(individual)
-            logger.info(f"Individual {pk} has been successfully verified.")
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
+            return self._create_rendered_response({
+                "message": f"Individual has been {'verified'  if individual.is_active else 'unverified'}"
+            })
         except Individual.DoesNotExist:
             logger.warning(f"Individual with ID {pk} does not exist.")
             return Response({"error": "Individual not found"}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
-            logger.error(f"Error verifying individual {pk}: {e}")
-            return Response({"error": "Failed to verify individual"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # @CachingMixin.cached_method   
+            return self._create_rendered_response({
+                'error': 'Indivudal not found'},
+                status= status.HTTP_404_NOT_FOUND
+            )
+            
+    @action(detail=True, methods=['PUT','PATCH'], url_path='activate')
+    def activate_individual(self, request, pk=None):
+        try:
+            individual = Individual.objects.get(pk=pk)
+            individual.is_active= not individual.is_active
+            individual.save()
+            
+            serializer = IndividualSearchSerializer(individual)
+            return self._create_rendered_response({
+                "message": f"Individual has been {'activated'  if individual.is_active else 'deactivated'}"
+            })
+        except Individual.DoesNotExist:
+            return self._create_rendered_response({
+                'error': 'Indivudal not found'},
+                status= status.HTTP_404_NOT_FOUND
+            )
+            
     @action(detail=False, methods=['GET'], url_path='search')
+    @CacheService.cached(tag_prefix= 'individual:search')
     def search_individuals(self, request):
         """Search Individuals Returning minimal information."""
         query = request.query_params.get('q', '')
@@ -159,18 +199,4 @@ class IndividualViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.error(f"Error retrieving individual details {pk}: {e}")
             return Response({"error": "Failed to retrieve individual details"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    @action(detail=True, methods=['PATCH'], url_path='update-address')
-    def update_address(self, request, pk=None):
-        ### Partial Update for individual
-        try:
-            individual = self.get_object()
-            address_data = response.data.get('addresses', [])
-            
-            if not address_data:
-                retun
-            data = request.data
-        except Individual.DoesNotExist:
-            logger.warning(f"Individual with ID {pk} does not exist.")
-            return Response({"error": "Individual not found"}, status=status.HTTP_404_NOT_FOUND)
-            
+              

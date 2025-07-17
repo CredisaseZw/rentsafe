@@ -3,6 +3,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from apps.common.utils.caching import CacheService
 from apps.companies.models.models import Company, CompanyBranch
+from apps.common.models.models import Country, City, Suburb, Province
 
 
 def invalidate_caches(instance):
@@ -10,9 +11,7 @@ def invalidate_caches(instance):
     model_name = instance._meta.model_name.lower()
     
     CacheService.invalidate_tag(f"{model_name}:list")
-    
     CacheService.invalidate_tag(f"{model_name}:search")
-    
     if hasattr(instance, 'pk') and instance.pk:
         CacheService.invalidate_tag(f"{model_name}:{instance.pk}")
         CacheService.invalidate_tag(f"{model_name}:{instance.pk}:branches")
@@ -22,13 +21,22 @@ def invalidate_caches(instance):
         CacheService.invalidate_tag(f"{parent_model_name}:{instance.company.pk}")
         CacheService.invalidate_tag(f"{parent_model_name}:{instance.company.pk}:branches")
 
+    if isinstance(instance, Country):
+        print("Invalidating country cache")
+        # CacheService.invalidate_tag(f"{model_name}:locations:{instance.pk}:countries")
+        CacheService.invalidate_tag('countries:list')
+    
+    if isinstance(instance, Province):
+        print("Invalidating city cache---------")
+        # CacheService.invalidate_tag('locations:{instance.country.id}:countries')
+
 
 @receiver([post_save, post_delete])
 def invalidate_model_cache(sender, instance, **kwargs):
     """
     Signal receiver to invalidate cache when any registered model is saved or deleted.
     """
-    MONITORED_MODELS = (Company, CompanyBranch)
+    MONITORED_MODELS = (Company, CompanyBranch, Country, City, Suburb, Province)
     
     if sender in MONITORED_MODELS:
         invalidate_caches(instance)
