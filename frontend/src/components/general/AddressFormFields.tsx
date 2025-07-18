@@ -55,7 +55,7 @@ export default function AddressFormFields() {
                <Label className="px-2 font-normal" htmlFor="city_id">
                   City <span className="text-PRIMARY">*</span>
                </Label>
-               <Select name="city_id" required>
+               <Select name="city_id">
                   <SelectTrigger id="city_id" className="border-foreground/40 w-full bg-white">
                      <SelectValue placeholder="Select city" />
                   </SelectTrigger>
