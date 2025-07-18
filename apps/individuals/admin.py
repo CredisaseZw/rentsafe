@@ -3,7 +3,7 @@ from apps.individuals.models.models import Individual, EmploymentDetail, NextOfK
 
 @admin.register(Individual)
 class IndividualAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name', 'gender', 'identification_number', 'date_of_birth')
+    list_display = ('id','last_name', 'first_name', 'gender', 'identification_number', 'date_of_birth')
     list_display_links = ('last_name', 'first_name','identification_number')
     list_filter = ('gender', 'identification_type', 'is_active', 'is_verified')
     search_fields = ('first_name', 'last_name', 'identification_number')

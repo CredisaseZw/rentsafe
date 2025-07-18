@@ -12,7 +12,7 @@ from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
 import logging
 
-logger = logging.getLogger('file_individuals')
+logger = logging.getLogger('individuals')
 
 class IndividualViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
@@ -34,20 +34,20 @@ class IndividualViewSet(BaseViewSet):
         elif self.action == 'retrieve_full_individual_details':
             return IndividualSerializer
         elif self.action == 'list':
-            return IndividualMinimalSerializer
+            return IndividualSearchSerializer
         return IndividualMinimalSerializer  # fallback
 
     
     def create(self, request, *args, **kwargs):
         try:
             if Individual.objects.filter(identification_number=request.data.get('identification_number')).exists():
-                return Response({"error": "Individual already exists"}, status=status.HTTP_400_BAD_REQUEST)
+                logger.error(f"Individual with the privided ID Already Exists!")
+                return Response({"error": "Individual already exists"},status=status.HTTP_400_BAD_REQUEST)
             serializer = IndividualCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            self.perform_create(self,serializer)
+            self.perform_create(serializer)
 
-            detail_serializer = IndividualCreateSerializer(serializer.instance)
-            return Response(detail_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.error(f"Error creating individual: {str(e)}")
             return Response({"error": "Failed to create individual"}, status=status.HTTP_400_BAD_REQUEST)
@@ -60,41 +60,42 @@ class IndividualViewSet(BaseViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
-            return Response(detail_serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.warning(f"Error updating individual: {str(e)}")
-            return Response({"error": "Failed to update individual"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
     @CacheService.cached(tag_prefix='individuals:list')
-    def list(self, request,*arg, **kwarg):
+    def list(self,*arg, **kwarg):
         try:
             queryset= self.get_queryset()
             page = self.paginate_queryset(queryset)
             logger.info(f"Listing individuals, total count: {queryset.count()}")
             if page is not None:
-                serializer = IndividualMinimalSerializer(page, many=True)
+                serializer = IndividualSearchSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
-            serializer = IndividualMinimalSerializer(queryset, many=True)
-            return self._create_rendered_response(serializer.data, status=status.HTTP_200_OK)
+            return Response({serializer.data },status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Error listing individuals: {str(e)}")
-            return self._create_rendered_response(
-                {"error": "failed to list individuals", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST
+            return Response(
+                {"error": "failed to list individuals", "details": str(e)}
             )
     
     @CacheService.cached(tag_prefix='individual:{pk}')
     def retrieve(self, request, *args, **kwargs):
         try:
-            Individual = self.get_queryset()
-            serializer = IndividualMinimalSerializer(Individual)
-            return self._create_rendered_response(serializer.data, status=status.HTTP_200_OK)
+            individual = self.get_object()
+            serializer = IndividualMinimalSerializer(individual)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Individual.DoesNotExist:
-            return self._create_rendered_response(
+            logger.error(f"Individual wiht ID {id} Does not exist")
+            return Response(
                 {'error': 'Individual not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            return self._create_rendered_response({"error": "Failed to retrieve individual details"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"Failed to retreive individual: {str(e)} ")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
     def destroy(self, request, *args, **kwargs):
         logger.info(f"Soft deleting individual with ID: {kwargs.get('pk', 'unknown')}")
@@ -114,13 +115,7 @@ class IndividualViewSet(BaseViewSet):
             )
         except Exception as e:
             logger.error(f"Error deleting individual: {e}")
-            return Response({"error": "Failed to delete individual"}, status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, **kwargs):
-        """Partial update company (PATCH request)"""
-        kwargs['partial'] = True
-        return self.update(request, *args, **kwargs)
-    
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)    
 
     @action(detail=True, methods=['PUT', 'PATCH'], url_path='verify')
     def verify_individual(self, request, pk=None):

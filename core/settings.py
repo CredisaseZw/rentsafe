@@ -445,7 +445,7 @@ LOGGING = {
         },
         'individuals': {
             'handlers': ['console', 'file_individuals'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         },
     'root': { 
