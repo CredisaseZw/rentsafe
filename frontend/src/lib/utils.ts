@@ -96,3 +96,17 @@ export function getTimeElapsedSince(date: Date | string): string {
       return `${elapsedMinutes} min`;
    }
 }
+
+export function toIntElseUndefined(value: string | number): number | undefined {
+   const intValue = parseInt(value as string, 10);
+   return isNaN(intValue) ? undefined : intValue;
+}
+
+// return YYYY-MM-DD
+export function formatDateToPythonSLiking(date: string): string {
+   const d = new Date(date);
+   const year = d.getFullYear();
+   const month = String(d.getMonth() + 1).padStart(2, "0");
+   const day = String(d.getDate()).padStart(2, "0");
+   return `${year}-${month}-${day}`;
+}
