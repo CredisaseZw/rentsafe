@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Fullscreen, Printer } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { friendlyDate } from "@/lib/utils";
 import { MODAL_WIDTHS, PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
@@ -9,7 +9,6 @@ import OverviewCard from "./OverviewCard";
 import Logo from "@/components/general/Logo";
 
 type IndividualPaymentStatusReportProps = {
-   trigger: React.ReactNode;
    report: {
       employmentHistory: { employer: string; position: string; startDate: string }[];
       claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
@@ -33,7 +32,7 @@ type IndividualPaymentStatusReportProps = {
    };
 };
 
-export default function IndividualPaymentStatusReport({ trigger, report }: IndividualPaymentStatusReportProps) {
+export default function IndividualPaymentStatusReport({ report }: IndividualPaymentStatusReportProps) {
    const { employmentHistory, claims, active, historic, personalDetails, rating } = report;
 
    const ratingColor =
@@ -42,7 +41,11 @@ export default function IndividualPaymentStatusReport({ trigger, report }: Indiv
 
    return (
       <Dialog modal>
-         <DialogTrigger asChild>{trigger}</DialogTrigger>
+         <DialogTrigger asChild>
+            <Button variant="outline" size="xs">
+               View <Fullscreen size={16} />
+            </Button>
+         </DialogTrigger>
 
          <DialogContent className={`max-w-[${MODAL_WIDTHS.lg}] sm:max-w-[default]`}>
             <DialogTitle>

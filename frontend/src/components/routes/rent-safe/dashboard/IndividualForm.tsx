@@ -6,14 +6,10 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddressFormFields from "@/components/general/AddressFormFields";
 import { MODAL_WIDTHS } from "@/constants";
+import useIndividualForm from "@/hooks/components/useIndividualForm";
 
 export default function IndividualForm() {
-   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const data = Object.fromEntries(formData.entries());
-      console.log("Submitted data:", data);
-   }
+   const { handleSubmit } = useIndividualForm();
 
    return (
       <Dialog modal>
