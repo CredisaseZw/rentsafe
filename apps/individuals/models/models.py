@@ -57,7 +57,7 @@ class Individual(BaseModel):
         return f"{self.first_name} {self.last_name}"
 
 class IndividualContactDetail(BaseModel):
-    Individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
+    individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
     email = models.EmailField(blank=True, null=True)
     mobile_phone = models.JSONField()
     
@@ -66,12 +66,17 @@ class IndividualContactDetail(BaseModel):
         db_table = 'contact_detail'
         verbose_name= 'contact detail'
         verbose_name_plural= 'contact details'
-        ordering = ('id')
+        ordering = ('id',)
         
     
     def __str__(self):
-        return 
-        
+        if self.phone_number:
+            return f"Phone: {self.phone_number} for {self.individual}"
+        elif self.contact_value:
+            return f"Email: {self.contact_value} for {self.individual}"
+        else:
+            return f"Contact Detail for {self.individual}"
+            
         
 class EmploymentDetail(BaseModel):    
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='employment_details')

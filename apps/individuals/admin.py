@@ -24,9 +24,8 @@ class NextOfKinAdmin(admin.ModelAdmin):
     list_filter = ('relationship',)
     ordering = ('last_name', 'first_name')
 
-@admin.refgister(IndividualContactDetail)
+@admin.register(IndividualContactDetail)
 class IndividualContactDetailAdmin(admin.ModelAdmin):
-    list_display = ('individual', 'email', 'mobile_phone')
+    list_display = ('id','individual', 'email', 'mobile_phone')
     list_display_links = ('individual',)
     search_fields = ('individual__first_name', 'individual__last_name', 'email')
-    ordering = ('individual__last_name', 'individual__first_name')
