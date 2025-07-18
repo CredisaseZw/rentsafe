@@ -7,7 +7,7 @@
    --primary-dark: #2086ac;
    --SECONDARY: rgb(38, 41, 43);
    --SUCCESS: rgb(54, 182, 59);
-   --SUCCESS-LIGHT : rgb(172, 255, 175);
+   --SUCCESS-LIGHT: rgb(172, 255, 175);
    --ERROR: rgb(153, 61, 43);
    --radius: 0.625rem;
    /* --background: oklch(1 0 0); */
@@ -145,4 +145,7 @@
    .c_border_markers::after {
       @apply bottom-0;
    }
+}
+details summary {
+   @apply text-foreground/80 hover:text-foreground hover:bg-foreground/10 bg-foreground/5 w-fit cursor-pointer rounded-md p-1 px-3 transition-colors;
 }
