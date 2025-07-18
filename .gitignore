@@ -11,3 +11,4 @@ __pycache__/
 *.pot
 node_modules/
 .venv/
+.vscode/tasks.json
