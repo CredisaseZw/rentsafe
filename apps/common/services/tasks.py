@@ -10,6 +10,9 @@ import requests
 import logging
 from typing import Union, Dict, Any, Optional
 import contextlib
+from django.core import serializers
+from django.contrib.contenttypes.models import ContentType
+
 
 logger = logging.getLogger(__name__)
 
@@ -166,7 +169,45 @@ def send_email(email: str, subject: str, message: str, is_html: bool = False) ->
         logger.error(f"Email sending failed: {e}")
         return False
 
+@shared_task(bind=True)
+def create_object_task(self, serializer_class, model_class, data, context):
+    """
+    Async object creation with status tracking
+    """
+    try:
+        serializer = serializer_class(data=data, context=context)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return {
+            'status': 'SUCCESS',
+            'instance_id': instance.id,
+            'content_type_id': ContentType.objects.get_for_model(model_class).id
+        }
+    except Exception as e:
+        return {
+            'status': 'FAILURE',
+            'error': str(e)
+        }
 
+@shared_task(bind=True)
+def update_object_task(self, serializer_class, model_class, instance_id, data, context):
+    """
+    Async object update with status tracking
+    """
+    try:
+        instance = model_class.objects.get(pk=instance_id)
+        serializer = serializer_class(instance, data=data, context=context, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return {
+            'status': 'SUCCESS',
+            'instance_id': instance_id
+        }
+    except Exception as e:
+        return {
+            'status': 'FAILURE',
+            'error': str(e)
+        }
 def _generate_otp_link(url_path: str, otp_code: str, recipient_id: int, notification_type: str) -> Optional[str]:
     """Generate OTP verification link based on notification type"""
     import random

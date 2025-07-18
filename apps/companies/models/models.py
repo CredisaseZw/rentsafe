@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from apps.common.models.models import Address, Document, Note
 from apps.common.models.base_models import BaseModel
 from apps.individuals.models.models import Individual
@@ -63,18 +64,37 @@ class Company(BaseModel):
         Automatically create a headquarters branch if it doesn't exist.
         This method can be called after saving the company instance.
         """
-        if not self.branches.filter(branch_name=self.registration_name).exists():
-            return CompanyBranch.objects.create(
+        if not self.branches.filter(is_headquarters=True).exists():
+            company_address = Address.objects.filter(
+                content_type=ContentType.objects.get_for_model(Company),
+                object_id=self.id,
+                address_type='physical',
+                is_primary=True
+            ).first()
+            branch = CompanyBranch.objects.create(
                 company=self,
                 branch_name=self.registration_name,
-                is_headquarters=True,
-                addresses=Address.objects.filter(
-                    content_type__model='company',
-                    object_id=self.id,
-                    address_type='physical',
-                    is_primary=True,
-                ).first(),
+                is_headquarters=True
             )
+
+            if company_address:
+                Address.objects.create(
+                    content_type=ContentType.objects.get_for_model(CompanyBranch),
+                    object_id=branch.id,
+                    address_type=company_address.address_type,
+                    is_primary=True,
+                    street_address=company_address.street_address,
+                    line_2=company_address.line_2,
+                    postal_code=company_address.postal_code,
+                    city=company_address.city,
+                    suburb=company_address.suburb,
+                    province=company_address.province,
+                    country=company_address.country,
+                    latitude=company_address.latitude,
+                    longitude=company_address.longitude
+                )
+            
+            return branch
         return None
     
 class CompanyBranch(BaseModel):
@@ -182,7 +202,7 @@ class CompanyProfile(BaseModel):
                 help_text=_("Company logo image file."))
     registration_date = models.DateField(_("Registration Date"), blank=True, null=True,
                 help_text=_("The official registration date of the company profile."))
-    bp_number = models.CharField(_("BP Number"), max_length=255, blank=True, null=True,
+    tin_number = models.CharField(_("BP Number"), max_length=255, blank=True, null=True,
                 help_text=_("Business Partner Number."))
 
     vat_number = models.CharField(_("VAT Number"), max_length=255, blank=True, null=True,
