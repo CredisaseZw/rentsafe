@@ -42,11 +42,14 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         addresses_data = validated_data.pop('addresses', [])
         branch = CompanyBranch.objects.create(**validated_data)
-        
+        user = self.context.get('user')
+        company_content_type = ContentType.objects.get_for_model(CompanyBranch)
         # Create addresses for the branch
         for address_data in addresses_data:
             Address.objects.create(
-                content_object=branch,
+                user=user,
+                content_type=company_content_type,
+                object_id=branch.id,
                 **address_data
             )
         
@@ -55,12 +58,15 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop('addresses', None)
         instance = super().update(instance, validated_data)
+        user = self.context.get('user')
         
         if addresses_data is not None:
             instance.addresses.all().delete()
             for address_data in addresses_data:
                 Address.objects.create(
-                    content_object=instance,
+                    user=user,
+                    content_type=ContentType.objects.get_for_model(CompanyBranch),
+                    object_id=instance.id,
                     **address_data
                 )
         
@@ -78,7 +84,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         model = CompanyProfile
         fields = [
             'trading_status', 'trading_status_display', 'mobile_phone', 'landline_phone',
-            'email', 'logo', 'registration_date', 'bp_number', 'vat_number',
+            'email', 'logo', 'registration_date', 'tin_number', 'vat_number',
             'number_of_employees', 'website', 'trend', 'trend_display',
             'twitter', 'facebook', 'instagram', 'linkedin', 'operations',
             'contact_person', 'risk_class', 'risk_class_display',
@@ -137,40 +143,70 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
 class CompanyCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating companies with addresses and profile"""
     addresses = AddressSerializer(many=True, required=False)
+    documents = DocumentSerializer(many=True, required=False)
+    notes = NoteSerializer(many=True, required=False)
     profile = CompanyProfileSerializer(required=False)
-    
     class Meta:
         model = Company
         fields = [
             'registration_number', 'registration_name', 'trading_name',
             'legal_status', 'date_of_incorporation', 'industry',
-            'addresses', 'profile'
+            'addresses','documents', 'notes', 'profile'
         ]
     
     @transaction.atomic
     def create(self, validated_data):
         addresses_data = validated_data.pop('addresses', [])
         profile_data = validated_data.pop('profile', None)
-        
-        # Create company
+        documents_data = validated_data.pop('documents', [])
+        notes_data = validated_data.pop('notes', [])
+        user = self.context.get('user')
         company = Company.objects.create(**validated_data)
-        
-        # Create addresses
+        company_content_type = ContentType.objects.get_for_model(Company)
+
         for address_data in addresses_data:
+            if is_primary := address_data.get('is_primary', False):
+                Address.objects.filter(
+                    user=user,
+                    content_type=company_content_type,
+                    object_id=company.id,
+                    address_type=address_data['address_type'],
+                    is_primary=True
+                ).update(is_primary=False)
+
             Address.objects.create(
-                content_object=company,
+                user=user,
+                content_type=company_content_type,
+                object_id=company.id,
                 **address_data
             )
+        # Creating documents
+        for document_data in documents_data:
+            Document.objects.create(
+                user=user,
+                content_type=company_content_type,
+                object_id=company.id,
+                **document_data
+            )
         
-        # Create profile if provided
+        # Creating notes
+        for note_data in notes_data:
+            Note.objects.create(
+                user=user,
+                content_type=company_content_type,
+                object_id=company.id,
+                **note_data
+            )
+
         if profile_data:
             CompanyProfile.objects.create(
+                user=user,
                 company=company,
                 **profile_data
             )
-        
+
         company.auto_create_hq_branch()
-        
+
         return company
 
 class CompanyUpdateSerializer(serializers.ModelSerializer):
@@ -189,6 +225,7 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
     
     @transaction.atomic
     def update(self, instance, validated_data):
+        user = self.context.get('user')
         addresses_data = validated_data.pop('addresses', None)
         profile_data = validated_data.pop('profile', None)
         
@@ -203,6 +240,7 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
             
             for address_data in addresses_data:
                 Address.objects.create(
+                    user=user,
                     content_type=company_content_type,
                     object_id=instance.id,
                     **address_data
@@ -210,14 +248,15 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
         
         if profile_data is not None:
             try:
-                profile = CompanyProfile.objects.get(company=instance)
-                
+                profile = CompanyProfile.objects.get(user=user, company=instance)
+
                 for attr, value in profile_data.items():
                     setattr(profile, attr, value)
                 profile.save()
                 
             except CompanyProfile.DoesNotExist:
                 CompanyProfile.objects.create(
+                    user=user,
                     company=instance,
                     **profile_data
                 )

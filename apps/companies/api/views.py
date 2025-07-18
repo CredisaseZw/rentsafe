@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
-
+from apps.common.api.serializers import DocumentSerializer, NoteSerializer
 from apps.companies.models.models import Company, CompanyBranch, CompanyProfile
 from apps.companies.api.serializers import (
     CompanyCreateSerializer, CompanyUpdateSerializer, CompanyDetailSerializer,
@@ -26,6 +26,7 @@ class CompanyViewSet(BaseViewSet):
     Inherits caching and soft-delete logic from BaseSoftDeleteViewSet.
     """
     permission_classes = [IsAuthenticated]
+    use_async = True # Enable async processing for create and update actions
     
     def get_queryset(self):
         """
@@ -220,7 +221,6 @@ class CompanyViewSet(BaseViewSet):
     
     @action(detail=True, methods=['post'], url_path='create-branch')
     def create_branch(self, request, pk=None):
-        from apps.companies.services.tasks import create_company_branch_task
         """Create a new branch for a company"""
         company = self.get_object()
         
@@ -231,13 +231,12 @@ class CompanyViewSet(BaseViewSet):
                 {'error': 'Branch with this name already exists'},
                 status.HTTP_400_BAD_REQUEST
             )
-
         try:
-            create_company_branch_task.delay(data)
-            return self._create_rendered_response(
-                {'message': 'Branch creation in progress'},
-                status.HTTP_202_ACCEPTED
-            )
+            serializer = CompanyBranchSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            branch = serializer.save()
+            response_serializer = CompanyBranchSerializer(branch)
+            return self._create_rendered_response(response_serializer.data, status.HTTP_201_CREATED)
         except Exception as e:
             logger.error(f"Error creating branch for company {pk}: {str(e)}")
             return self._create_rendered_response(
@@ -479,3 +478,17 @@ class CompanyViewSet(BaseViewSet):
                 'status': 'error',
                 'error': 'Failed to check task status'
             }, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    @action(detail=True, methods=['post'], url_path='add-documents')
+    def add_document(self, request, pk=None):
+        company = self.get_object()
+        serializer = DocumentSerializer(
+            data=request.data,
+            context={
+                'content_type': ContentType.objects.get_for_model(Company),
+                'object_id': company.id
+            }
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
