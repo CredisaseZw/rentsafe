@@ -4,14 +4,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AddressFormFields from "@/components/general/AddressFormFields";
+import { MODAL_WIDTHS } from "@/constants";
+import useIndividualForm from "@/hooks/components/useIndividualForm";
 
 export default function IndividualForm() {
-   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const data = Object.fromEntries(formData.entries());
-      console.log("Submitted data:", data);
-   }
+   const { handleSubmit } = useIndividualForm();
 
    return (
       <Dialog modal>
@@ -21,7 +19,7 @@ export default function IndividualForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent className="max-w-[900px] sm:max-w-[default]">
+         <DialogContent className={`max-w-[${MODAL_WIDTHS.md}] sm:max-w-[default]`}>
             <DialogTitle>Add New Individual</DialogTitle>
 
             <form onSubmit={handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
@@ -107,19 +105,6 @@ export default function IndividualForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="address">
-                        Address <span className="text-PRIMARY">*</span>
-                     </Label>
-                     <Input
-                        id="address"
-                        name="address"
-                        required
-                        placeholder="e.g. 123 Main St, Harare"
-                        className="border-foreground/40 bg-white"
-                     />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="mobileNumber">
                         Mobile Number <span className="text-PRIMARY">*</span>
                      </Label>
@@ -128,17 +113,6 @@ export default function IndividualForm() {
                         name="mobileNumber"
                         required
                         placeholder="e.g. +263 712 345678"
-                        className="border-foreground/40 bg-white"
-                     />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="landline">
-                        Landline
-                     </Label>
-                     <Input
-                        id="landline"
-                        name="landline"
-                        placeholder="e.g. 020 1234567"
                         className="border-foreground/40 bg-white"
                      />
                   </div>
@@ -156,165 +130,54 @@ export default function IndividualForm() {
                      />
                   </div>
 
-                  <div className="col-span-3">
-                     <fieldset className="border-foreground/40 mt-4 grid grid-cols-3 items-center gap-5 border-t pt-8">
-                        <legend className="mx-5 px-2 font-semibold">Employment Details</legend>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="currentEmployer">
-                              Current Employer
-                           </Label>
-                           <Input
-                              id="currentEmployer"
-                              name="currentEmployer"
-                              placeholder="e.g. ABC Corp"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="currentJobTitle">
-                              Current Job Title
-                           </Label>
-                           <Input
-                              id="currentJobTitle"
-                              name="currentJobTitle"
-                              placeholder="e.g. Software Engineer"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="dateOfEmployment">
-                              Date of Employment
-                           </Label>
-                           <Input
-                              id="dateOfEmployment"
-                              name="dateOfEmployment"
-                              type="date"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-                     </fieldset>
+                  <div className="col-span-3 pt-5">
+                     <AddressFormFields />
                   </div>
 
-                  <div className="col-span-3">
-                     <fieldset className="border-foreground/40 mt-4 grid grid-cols-3 items-center gap-5 border-t pt-8">
-                        <legend className="mx-5 px-2 font-semibold">Address</legend>
+                  <div className="col-span-3 pt-5">
+                     <details>
+                        <summary>
+                           <span className="font-semibold">Toggle Employment Details</span>
+                        </summary>
 
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="country">
-                              Country <span className="text-PRIMARY">*</span>
-                           </Label>
-                           <Select name="country" required>
-                              <SelectTrigger id="country" className="border-foreground/40 w-full bg-white">
-                                 <SelectValue placeholder="Select country" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="Zimbabwe">Zimbabwe</SelectItem>
-                                 <SelectItem value="South Africa">South Africa</SelectItem>
-                                 <SelectItem value="Botswana">Botswana</SelectItem>
-                              </SelectContent>
-                           </Select>
-                        </div>
+                        <div className="mt-5 grid grid-cols-3 items-center gap-5">
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="currentEmployer">
+                                 Current Employer
+                              </Label>
+                              <Input
+                                 id="currentEmployer"
+                                 name="currentEmployer"
+                                 placeholder="e.g. ABC Corp"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
 
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="province">
-                              Province <span className="text-PRIMARY">*</span>
-                           </Label>
-                           <Select name="province" required>
-                              <SelectTrigger id="province" className="border-foreground/40 w-full bg-white">
-                                 <SelectValue placeholder="Select province" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="Harare">Harare</SelectItem>
-                                 <SelectItem value="Bulawayo">Bulawayo</SelectItem>
-                                 <SelectItem value="Mashonaland East">Mashonaland East</SelectItem>
-                              </SelectContent>
-                           </Select>
-                        </div>
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="currentJobTitle">
+                                 Current Job Title
+                              </Label>
+                              <Input
+                                 id="currentJobTitle"
+                                 name="currentJobTitle"
+                                 placeholder="e.g. Software Engineer"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
 
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="city">
-                              City <span className="text-PRIMARY">*</span>
-                           </Label>
-                           <Select name="city" required>
-                              <SelectTrigger id="city" className="border-foreground/40 w-full bg-white">
-                                 <SelectValue placeholder="Select city" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="Harare">Harare</SelectItem>
-                                 <SelectItem value="Bulawayo">Bulawayo</SelectItem>
-                                 <SelectItem value="Chitungwiza">Chitungwiza</SelectItem>
-                              </SelectContent>
-                           </Select>
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="dateOfEmployment">
+                                 Date of Employment
+                              </Label>
+                              <Input
+                                 id="dateOfEmployment"
+                                 name="dateOfEmployment"
+                                 type="date"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
                         </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="suburb">
-                              Suburb <span className="text-PRIMARY">*</span>
-                           </Label>
-                           <Select name="suburb" required>
-                              <SelectTrigger id="suburb" className="border-foreground/40 w-full bg-white">
-                                 <SelectValue placeholder="Select suburb" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectItem value="Avondale">Avondale</SelectItem>
-                                 <SelectItem value="Borrowdale">Borrowdale</SelectItem>
-                                 <SelectItem value="Greendale">Greendale</SelectItem>
-                              </SelectContent>
-                           </Select>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="street">
-                              Street <span className="text-PRIMARY">*</span>
-                           </Label>
-                           <Input
-                              id="street"
-                              name="street"
-                              required
-                              placeholder="e.g. Sam Nujoma Street"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="building">
-                              Building
-                           </Label>
-                           <Input
-                              id="building"
-                              name="building"
-                              placeholder="e.g. Joina City"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="unit">
-                              Unit
-                           </Label>
-                           <Input
-                              id="unit"
-                              name="unit"
-                              placeholder="e.g. Suite 12B"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="areaCode">
-                              Area Code
-                           </Label>
-                           <Input
-                              id="areaCode"
-                              name="areaCode"
-                              placeholder="e.g. 00263"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-                     </fieldset>
+                     </details>
                   </div>
                </div>
 

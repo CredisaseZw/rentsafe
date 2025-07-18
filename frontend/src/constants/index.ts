@@ -1,4 +1,4 @@
-import type { Route } from "@/types";
+import type { AddressType, Route } from "@/types";
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
@@ -56,3 +56,10 @@ export const INDUSTRIES = [
    "Transportation",
    "Other",
 ];
+
+export const MODAL_WIDTHS = {
+   md: "900px" as const,
+   lg: "1100px" as const,
+};
+
+export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];

@@ -1,15 +1,14 @@
 import Logo from "@/components/general/Logo";
 import OverviewCard from "./OverviewCard";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
+import { MODAL_WIDTHS, PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { friendlyDate } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Printer } from "lucide-react";
+import { Fullscreen, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 
 type CompanyPaymentStatusReportProps = {
-   trigger: React.ReactNode;
    report: {
       claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
       active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
@@ -31,7 +30,7 @@ type CompanyPaymentStatusReportProps = {
    };
 };
 
-export default function CompanyPaymentStatusReport({ trigger, report }: CompanyPaymentStatusReportProps) {
+export default function CompanyPaymentStatusReport({ report }: CompanyPaymentStatusReportProps) {
    const { claims, active, historic, companyDetails, rating } = report;
 
    const ratingColor =
@@ -40,9 +39,13 @@ export default function CompanyPaymentStatusReport({ trigger, report }: CompanyP
 
    return (
       <Dialog modal>
-         <DialogTrigger asChild>{trigger}</DialogTrigger>
+         <DialogTrigger asChild>
+            <Button variant="outline" size="xs">
+               View <Fullscreen size={16} />
+            </Button>
+         </DialogTrigger>
 
-         <DialogContent className="max-w-[1100px] sm:max-w-[default]">
+         <DialogContent className={`max-w-[${MODAL_WIDTHS.lg}] sm:max-w-[default]`}>
             <DialogTitle>
                <Button size="sm">
                   Print
