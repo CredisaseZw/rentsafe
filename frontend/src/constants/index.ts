@@ -56,3 +56,8 @@ export const INDUSTRIES = [
    "Transportation",
    "Other",
 ];
+
+export const MODAL_WIDTHS = {
+   md: "900px" as const,
+   lg: "1100px" as const,
+};

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddressFormFields from "@/components/general/AddressFormFields";
+import { MODAL_WIDTHS } from "@/constants";
 
 export default function IndividualForm() {
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -22,7 +23,7 @@ export default function IndividualForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent className="max-w-[900px] sm:max-w-[default]">
+         <DialogContent className={`max-w-[${MODAL_WIDTHS.md}] sm:max-w-[default]`}>
             <DialogTitle>Add New Individual</DialogTitle>
 
             <form onSubmit={handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">

@@ -1,7 +1,7 @@
 import Logo from "@/components/general/Logo";
 import OverviewCard from "./OverviewCard";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
+import { MODAL_WIDTHS, PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { friendlyDate } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Printer } from "lucide-react";
@@ -42,7 +42,7 @@ export default function CompanyPaymentStatusReport({ trigger, report }: CompanyP
       <Dialog modal>
          <DialogTrigger asChild>{trigger}</DialogTrigger>
 
-         <DialogContent className="max-w-[1100px] sm:max-w-[default]">
+         <DialogContent className={`max-w-[${MODAL_WIDTHS.lg}] sm:max-w-[default]`}>
             <DialogTitle>
                <Button size="sm">
                   Print
