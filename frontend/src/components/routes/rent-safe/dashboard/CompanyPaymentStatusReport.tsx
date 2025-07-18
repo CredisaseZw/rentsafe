@@ -11,7 +11,6 @@ import { Link } from "react-router";
 type CompanyPaymentStatusReportProps = {
    trigger: React.ReactNode;
    report: {
-      employmentHistory: { employer: string; position: string; startDate: string }[];
       claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
       active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
       historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
@@ -33,7 +32,7 @@ type CompanyPaymentStatusReportProps = {
 };
 
 export default function CompanyPaymentStatusReport({ trigger, report }: CompanyPaymentStatusReportProps) {
-   const { employmentHistory, claims, active, historic, companyDetails, rating } = report;
+   const { claims, active, historic, companyDetails, rating } = report;
 
    const ratingColor =
       PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === rating.toLowerCase())?.className ||
@@ -170,29 +169,6 @@ export default function CompanyPaymentStatusReport({ trigger, report }: CompanyP
                            </div>
                         </div>
                      </div>
-                  </div>
-
-                  <div>
-                     <div className="bg-foreground/5 border-foreground/20 border p-0.5 text-center">
-                        Employment History
-                     </div>
-
-                     <div className="border-foreground/30 grid grid-cols-3 items-center gap-2 border border-t-0 p-1 text-center font-semibold">
-                        <div>Employer</div>
-                        <div>Position</div>
-                        <div>Start Date</div>
-                     </div>
-
-                     {employmentHistory.map((employment, index) => (
-                        <div
-                           key={index}
-                           className="border-foreground/30 grid grid-cols-3 items-center gap-2 border border-t-0 p-1 text-center"
-                        >
-                           <div>{employment.employer}</div>
-                           <div>{employment.position}</div>
-                           <div>{friendlyDate(new Date(employment.startDate))}</div>
-                        </div>
-                     ))}
                   </div>
 
                   <div className="flex items-center gap-2 text-center font-bold">

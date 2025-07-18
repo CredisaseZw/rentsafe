@@ -85,10 +85,6 @@ export default function CompanyPaymentStatusTab() {
 }
 
 const sampleReport = {
-   employmentHistory: [
-      { employer: "Company A", position: "Manager", startDate: "2020-01-01" },
-      { employer: "Company B", position: "Developer", startDate: "2018-06-15" },
-   ],
    claims: [
       { claimant: "John Doe", type: "Rent", currency: "USD", amount: 500, dateOfClaim: "2023-01-10" },
       { claimant: "Jane Smith", type: "Deposit", currency: "USD", amount: 300, dateOfClaim: "2023-02-20" },
