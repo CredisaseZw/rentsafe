@@ -4,12 +4,13 @@ import { User, Building, BadgeCent, Send, Printer} from 'lucide-react'
 import Button from '@/components/general/Button'
 import PropertyStatementContainer from '@/components/general/PropertyStatementContainer'
 import { Document, Page, Text, View, PDFDownloadLink } from '@react-pdf/renderer';
+import Header from '@/components/general/Header'
 
 function LandlordStatements() {
  // let {_} = useLandlordStatement();
 
   return (
-    <div className='container px-7 py-4 W-full'>
+    <div className='side-main'>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 ">
             <GlobalSummaryCard
                 value='10'
@@ -119,7 +120,7 @@ function LandlordStatements() {
       </div>
   
       <div className='mt-10 bg-white rounded-xl shadow p-5 w-full min-h-[25vh]' >
-        <div className="bg-blue-200 p-4 w-full rounded text-center"><span className='font-bold text-PRIMARY'>Landlord Property Statement</span></div>
+        <Header title='Landlord Property Statements'/>
         <PropertyStatementContainer/>
       </div>
     </div>

@@ -146,11 +146,7 @@
       @apply bottom-0;
    }
 }
-details summary {
-   @apply text-foreground/80 hover:text-foreground hover:bg-foreground/10 bg-foreground/5 w-fit cursor-pointer rounded-md p-1 px-3 transition-colors;
-}
 
-/* fix needed for sonner bug !! */
-[data-sonner-toaster][data-sonner-theme="dark"] [data-description] {
-   color: rgb(43, 43, 43) !important;
+.side-main{
+   @apply px-7 py-4 w-full
 }

@@ -20,6 +20,7 @@ function GlobalSummaryCard({
 }: GSCProps) {
   let Icon = layoutScheme.icon
 
+  console.log(layoutScheme)
   return (
     <div className="bg-white px-5 py-8 shadow rounded-xl">
       <div className="flex flex-row">

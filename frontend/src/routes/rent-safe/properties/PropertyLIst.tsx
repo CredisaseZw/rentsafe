@@ -23,7 +23,7 @@ function PropertyLIst() {
   } = usePropertyList()
 
   return (
-  <div className='container px-7 py-4 W-full'>
+  <div className='side-main'>
     {addPropertyModal && <Modal 
         onClose={closeModal}
         size={"xl"}
