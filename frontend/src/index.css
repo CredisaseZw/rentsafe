@@ -146,3 +146,7 @@
       @apply bottom-0;
    }
 }
+
+.side-main{
+   @apply px-7 py-4 w-full
+}
