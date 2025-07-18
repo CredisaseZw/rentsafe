@@ -28,7 +28,7 @@ export default function App() {
             </Routes>
          </BrowserRouter>
 
-         <Toaster />
+         <Toaster dismissible position="top-left" duration={5 * 1000} />
       </QueryClientProvider>
    );
 }
