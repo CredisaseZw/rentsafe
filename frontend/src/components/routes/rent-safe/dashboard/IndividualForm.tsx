@@ -105,19 +105,6 @@ export default function IndividualForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="address">
-                        Address <span className="text-PRIMARY">*</span>
-                     </Label>
-                     <Input
-                        id="address"
-                        name="address"
-                        required
-                        placeholder="e.g. 123 Main St, Harare"
-                        className="border-foreground/40 bg-white"
-                     />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="mobileNumber">
                         Mobile Number <span className="text-PRIMARY">*</span>
                      </Label>
@@ -126,17 +113,6 @@ export default function IndividualForm() {
                         name="mobileNumber"
                         required
                         placeholder="e.g. +263 712 345678"
-                        className="border-foreground/40 bg-white"
-                     />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="landline">
-                        Landline
-                     </Label>
-                     <Input
-                        id="landline"
-                        name="landline"
-                        placeholder="e.g. 020 1234567"
                         className="border-foreground/40 bg-white"
                      />
                   </div>
@@ -154,50 +130,54 @@ export default function IndividualForm() {
                      />
                   </div>
 
-                  <div className="col-span-3">
-                     <fieldset className="border-foreground/40 mt-4 grid grid-cols-3 items-center gap-5 border-t pt-8">
-                        <legend className="mx-5 px-2 font-semibold">Employment Details</legend>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="currentEmployer">
-                              Current Employer
-                           </Label>
-                           <Input
-                              id="currentEmployer"
-                              name="currentEmployer"
-                              placeholder="e.g. ABC Corp"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="currentJobTitle">
-                              Current Job Title
-                           </Label>
-                           <Input
-                              id="currentJobTitle"
-                              name="currentJobTitle"
-                              placeholder="e.g. Software Engineer"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                           <Label className="px-2 font-normal" htmlFor="dateOfEmployment">
-                              Date of Employment
-                           </Label>
-                           <Input
-                              id="dateOfEmployment"
-                              name="dateOfEmployment"
-                              type="date"
-                              className="border-foreground/40 bg-white"
-                           />
-                        </div>
-                     </fieldset>
+                  <div className="col-span-3 pt-5">
+                     <AddressFormFields />
                   </div>
 
-                  <div className="col-span-3">
-                     <AddressFormFields />
+                  <div className="col-span-3 pt-5">
+                     <details>
+                        <summary>
+                           <span className="font-semibold">Toggle Employment Details</span>
+                        </summary>
+
+                        <div className="mt-5 grid grid-cols-3 items-center gap-5">
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="currentEmployer">
+                                 Current Employer
+                              </Label>
+                              <Input
+                                 id="currentEmployer"
+                                 name="currentEmployer"
+                                 placeholder="e.g. ABC Corp"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
+
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="currentJobTitle">
+                                 Current Job Title
+                              </Label>
+                              <Input
+                                 id="currentJobTitle"
+                                 name="currentJobTitle"
+                                 placeholder="e.g. Software Engineer"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
+
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="dateOfEmployment">
+                                 Date of Employment
+                              </Label>
+                              <Input
+                                 id="dateOfEmployment"
+                                 name="dateOfEmployment"
+                                 type="date"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
+                        </div>
+                     </details>
                   </div>
                </div>
 

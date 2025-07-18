@@ -11,3 +11,5 @@ export type NavLink = {
    subLinks?: NavLink[];
    pageComponent?: React.FC;
 };
+
+export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
