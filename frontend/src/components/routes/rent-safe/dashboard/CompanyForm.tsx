@@ -2,7 +2,6 @@ import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -49,7 +48,7 @@ export default function CompanyForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="branch">
-                        Main Branch
+                        Branch
                      </Label>
                      <Input id="branch" name="branch" className="border-foreground/40 bg-white" />
                   </div>
@@ -91,19 +90,6 @@ export default function CompanyForm() {
                         TIN Number
                      </Label>
                      <Input id="tinNumber" name="tinNumber" className="border-foreground/40 bg-white" />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="currentAddress">
-                        Current Address <span className="text-PRIMARY">*</span>
-                     </Label>
-                     <Input
-                        id="currentAddress"
-                        name="currentAddress"
-                        required
-                        placeholder="e.g. 123 Main St, Harare"
-                        className="border-foreground/40 bg-white"
-                     />
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -173,25 +159,6 @@ export default function CompanyForm() {
                            ))}
                         </SelectContent>
                      </Select>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="notes">
-                        Notes
-                     </Label>
-                     <Input
-                        id="notes"
-                        name="notes"
-                        placeholder="Additional information"
-                        className="border-foreground/40 bg-white"
-                     />
-                  </div>
-
-                  <div className="flex items-center justify-center gap-3">
-                     <Checkbox id="isGovernment" name="isGovernment" className="border-foreground/40 bg-white" />
-                     <Label className="px-2 font-normal" htmlFor="isGovernment">
-                        Is Government
-                     </Label>
                   </div>
                </div>
 
