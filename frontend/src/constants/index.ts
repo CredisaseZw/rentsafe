@@ -1,4 +1,5 @@
 import type { AddressType, Route } from "@/types";
+import type { ExternalToast } from "sonner";
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
@@ -63,3 +64,11 @@ export const MODAL_WIDTHS = {
 };
 
 export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];
+
+export const DEFAULT_TOAST_OPTIONS: ExternalToast = {
+   classNames: {
+      description: "text-foreground/60",
+   },
+   duration: 10000,
+   dismissible: true,
+};
