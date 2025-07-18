@@ -1,0 +1,33 @@
+name: Auto PR to Staging
+
+on:
+  push:
+    branches:
+      - [rentsafe]
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Create pull request to staging
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        base: staging
+        head: dev
+        title: "Auto PR: Merge dev into staging"
+        body: |
+          This pull request was opened because of a push to `dev` branch.
+          It merges the changes from `dev` into `staging`.
+        commit-message: "Auto PR: Merge dev into staging"
+        labels: auto-pr
+        reviewers: |
+          godfrey-tankan
+          credisafe
+        draft: false
