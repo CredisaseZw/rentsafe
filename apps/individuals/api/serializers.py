@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from apps.common.models.models import Address
-from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document
+from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
@@ -30,6 +30,20 @@ class NextOfKinSerializer(serializers.ModelSerializer):
             'mobile_phone', 'email', 'physical_address'
         ]
 
+class ContactDetailsSerializer(serializers.ModelSerializer):
+    individual_id = serializers.PrimaryKeyRelatedField(
+        queryset = Individual.objects.all(),
+        source= 'individual',
+        write_only = True,  
+    )
+    mobile_phone = serializers.ListField(
+        child=serializers.CharField(max_length=15),
+        allow_empty=False
+    )
+    class Meta:
+        model = IndividualContactDetail
+        fields = ['id','individual_id' ,'mobile_phone', 'email',]
+    
 class IndividualSerializer(serializers.ModelSerializer):
     employment_details = EmploymentDetailSerializer(many=True,required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
@@ -38,6 +52,7 @@ class IndividualSerializer(serializers.ModelSerializer):
     addresses = AddressSerializer(many=True,required=True)
     notes = NoteSerializer(many=True, required=False)
     documents = DocumentSerializer(many=True, required=False)
+    contact_details = ContactDetailsSerializer(many=True, required=False, source='contact_details')
     
     class Meta:
         model = Individual
@@ -45,27 +60,55 @@ class IndividualSerializer(serializers.ModelSerializer):
             'id', 'first_name', 'last_name', 'full_name',
             'date_of_birth', 'gender', 'gender_display',
             'identification_type', 'identification_type_display',
-            'identification_number', 'email', 'mobile_phone',
-            'landline_phone', 'is_verified', 'is_active',
+            'identification_number', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin', 'documents', 
             'addresses', 'notes','date_created', 'date_updated'
         ]
         read_only_fields = ['date_created', 'date_updated']
 
+class IndividualMinimalSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+    current_employment = serializers.SerializerMethodField()
+    contact_details = ContactDetailsSerializer(many=True, required=False, source='contact_details')
+    
+    class Meta:
+        model = Individual
+        fields = ['id', 'first_name', 'last_name', 'identification_number',
+                  'gender','date_of_birth','marital_status','address', 
+                  'current_employment', 'contact_details']
+    
+    # Get the primary address    
+    def get_address(self, obj):
+        primary_address = obj.addresses.filter(is_primary=True).first()
+        if primary_address:
+            return AddressSerializer(primary_address).data
+        # fallback: return first address if no primary is set
+        latest_address = obj.addresses.order_by('id').first()
+        if latest_address:
+            return AddressSerializer(latest_address).data
+        return None
+
+    
+    def get_current_employment(self, obj):
+        current_employment = obj.employment_details.filter(is_current=True).first()
+        if current_employment:
+            return EmploymentDetailSerializer(current_employment).data
+        return None
+
+    
 class IndividualCreateSerializer(serializers.ModelSerializer):
     addresses = AddressSerializer(many=True, required=True)
     employment_details = EmploymentDetailSerializer(many=True, required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
+    contact_details = ContactDetailsSerializer(many=True, required=False, source='contact_details')
     notes = NoteSerializer(many=True, required=False)
     documents = DocumentSerializer(many=True, required=False)
-
     class Meta:
         model = Individual
         fields = [
             'first_name', 'last_name', 'date_of_birth', 'gender',
-            'identification_type', 'identification_number', 'email',
-            'mobile_phone', 'is_active', 'addresses', 'employment_details',
-            'next_of_kin', 'notes', 'documents'
+            'identification_type', 'identification_number','contact_details',
+            'addresses', 'employment_details', 'next_of_kin', 'documents','notes'
         ]
 
     def validate(self, data):
@@ -79,46 +122,54 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         address_data = validated_data.pop('addresses', [])
         employment_data = validated_data.pop('employment_details', [])
         kin_data = validated_data.pop('next_of_kin', [])
+        contact_data= validated_data.pop('contact_details', [])
+        documents_data = validated_data.pop('documents',[])
         notes_data = validated_data.pop('notes', [])
-        documents_data = validated_data.pop('documents', [])
 
         individual = Individual.objects.create(**validated_data)
 
-        for addr in address_data:
-            Address.objects.create(content_object=individual, **addr)
+        # Create addresses
+        for address_data in address_data:
+            Address.objects.create(
+                content_object=individual,
+                **address_data,
+                is_primary=True
+            )
+
+        for contact in contact_data:
+            IndividualContactDetail.objects.create(
+                individual=individual,
+                **contact
+            )
 
         for emp in employment_data:
             EmploymentDetail.objects.create(individual=individual, **emp)
 
-        for kin in kin_data:
-            NextOfKin.objects.create(individual=individual, **kin)
+        if kin_data: 
+            for kin in kin_data:
+                NextOfKin.objects.create(individual=individual, **kin)
+        if documents_data:
+            for doc in documents_data:
+                Document.objects.create(content_object = individual, **doc)  
 
-        for note in notes_data:
-            Note.objects.create(
-                individual=individual,
-                content_type=ContentType.objects.get_for_model(individual),
-                **note
-            )
-
-        for doc in documents_data:
-            Document.objects.create(
-                content_type=ContentType.objects.get_for_model(individual),
-                object_id=individual.pk,
-                **doc
-            )
-
+        if notes_data:
+            for note in notes_data:
+                Note.objects.create(content_object=individual,**note)
+                
         return individual
 
 class IndividualUpdateSerializer(serializers.ModelSerializer):
     addresses = AddressSerializer(many=True, required=False)
     employment_details = EmploymentDetailSerializer(many=True, required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
+    contact_details = ContactDetailsSerializer(many=True, required=False, source='contact_details')
+
 
     class Meta:
         model = Individual
         fields = [
             'first_name', 'last_name', 'date_of_birth', 'gender',
-            'email', 'mobile_phone', 'is_active', 'addresses',
+            'contact_details', 'is_active', 'addresses',
             'employment_details', 'next_of_kin'
         ]
 
@@ -127,41 +178,48 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         addresses = validated_data.pop('addresses', [])
         employment = validated_data.pop('employment_details', [])
         kin = validated_data.pop('next_of_kin', [])
+        contact_details = validated_data.pop('contact_details', [])
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
-        for addr in addresses:
-            Address.objects.create(content_object=instance, **addr)
+        instance.save()
+        
+        if addresses is not None:
+            instance.addresses.update(is_primary=False)
+            for addr in addresses:
+                Address.objects.create(content_object=instance,is_primary=True, **addr)
 
         for emp in employment:
             EmploymentDetail.objects.create(individual=instance, **emp)
 
+        for contact in contact_details:
+            phone_numbers = contact.get('phone_number')
+            email = contact.get('contact_value')
+
+            if phone_numbers:
+                IndividualContactDetail.objects.create(
+                    individual=instance,
+                    phone_number=phone_numbers,
+                )
+
+            if email:
+                IndividualContactDetail.objects.create(
+                    individual=instance,
+                    contact_value=email,
+                )
+            IndividualContactDetail.objects.update(individual=instance,**contact)
+            
         for k in kin:
             NextOfKin.objects.create(individual=instance, **k)
 
-        instance.save()
         return instance
 
 class IndividualSearchSerializer(serializers.ModelSerializer):
     """Serializer for searching individuals Retuning minimal fields"""
-    full_name = serializers.CharField(source='get_full_name', read_only=True)
     latest_address = serializers.SerializerMethodField()
     current_employment = serializers.SerializerMethodField()
+    contact_details = ContactDetailsSerializer(many=True, required=False, source='contact_details')
     class Meta:
         model = Individual
-        fields = ['id', 'first_name', 'last_name', 'full_name',
-                  'email', 'identification_number', 'mobile_phone', 
-                  'latest_address','current_employment']
-
-    def get_latest_address(self, obj):
-        latest_address = obj.addresses.order_by('id').first()
-        if latest_address:
-            return AddressSerializer(latest_address).data
-        return  None
-    
-    def get_current_employment(self, obj):
-        current_employment = obj.employment_details.filter(is_current=True).first()
-        if current_employment:
-            return EmploymentDetailSerializer(current_employment).data
-        return None
+        fields = ['id', 'first_name', 'last_name', 'identification_number',
+                    'contact_details']

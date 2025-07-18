@@ -21,16 +21,19 @@ class Individual(BaseModel):
         ('female', 'Female'),
         ('other', 'Other'),
     )
-    
+    MARITAL_STATUS_CHOICES = (
+        ('single', 'Single'),
+        ('married', 'Married'),
+        ('divorced', 'Divorced'),
+        ('widowed', 'Widowed'),
+    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     identification_type = models.CharField(max_length=20, choices=IDENTIFICATION_TYPES)
     identification_number = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(blank=True, null=True)
-    mobile_phone = models.CharField(max_length=20)
-    landline_phone = models.CharField(max_length=20, blank=True, null=True)
+    marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)    
@@ -53,14 +56,24 @@ class Individual(BaseModel):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-class EmploymentDetail(BaseModel):
-    MARITAL_STATUS_CHOICES = (
-        ('single', 'Single'),
-        ('married', 'Married'),
-        ('divorced', 'Divorced'),
-        ('widowed', 'Widowed'),
-    )
+class IndividualContactDetail(BaseModel):
+    Individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
+    email = models.EmailField(blank=True, null=True)
+    mobile_phone = models.JSONField()
     
+    class Meta:
+        app_label = 'individuals'
+        db_table = 'contact_detail'
+        verbose_name= 'contact detail'
+        verbose_name_plural= 'contact details'
+        ordering = ('id')
+        
+    
+    def __str__(self):
+        return 
+        
+        
+class EmploymentDetail(BaseModel):    
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='employment_details')
     employer_name = models.CharField(max_length=255)
     job_title = models.CharField(max_length=255)
@@ -68,7 +81,6 @@ class EmploymentDetail(BaseModel):
     end_date = models.DateField(blank=True, null=True)
     is_current = models.BooleanField(default=True)
     monthly_income = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     class Meta:
         app_label = 'individuals'
         db_table = 'employment_detail'

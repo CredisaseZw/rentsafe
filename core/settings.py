@@ -389,7 +389,7 @@ LOGGING = {
             'formatter': 'audit',
         },
         'file_individuals':{
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOGS_DIR, 'individuals.log'),
             'maxBytes': 1024 * 1024 * 5,
@@ -443,10 +443,8 @@ LOGGING = {
         'level': 'DEBUG',  # Set to DEBUG to capture all messages
         'propagate': False,
         },
-        'file_individuals': {
+        'individuals': {
             'handlers': ['console', 'file_individuals'],
-            'level': 'DEBUG',
-            'handlers': ['console','file_companies'],
             'level': 'ERROR',
             'propagate': False,
         },
