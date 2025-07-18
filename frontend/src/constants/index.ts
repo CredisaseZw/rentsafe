@@ -66,9 +66,6 @@ export const MODAL_WIDTHS = {
 export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];
 
 export const DEFAULT_TOAST_OPTIONS: ExternalToast = {
-   classNames: {
-      description: "text-foreground/60",
-   },
-   duration: 10000,
+   duration: 5 * 1000,
    dismissible: true,
 };

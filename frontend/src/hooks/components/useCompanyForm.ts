@@ -1,7 +1,10 @@
 import type { CompanyPayload } from "@/interfaces/form-payloads";
 import type React from "react";
+import useCreateCompany from "../apiHooks/useCreateCompany";
 
 export default function useCompanyForm() {
+   const { isPending, createCompany } = useCreateCompany();
+
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
@@ -42,8 +45,9 @@ export default function useCompanyForm() {
          addresses: undefined,
       };
 
-      console.log("new company data:", companyPayload);
+      console.log("submitting company data:", companyPayload);
+      createCompany(companyPayload);
    }
 
-   return { handleSubmit };
+   return { isPending, handleSubmit };
 }

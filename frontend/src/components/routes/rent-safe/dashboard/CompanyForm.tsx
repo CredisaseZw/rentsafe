@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import AddressFormFields from "@/components/general/AddressFormFields";
 import useCompanyForm from "@/hooks/components/useCompanyForm";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 export default function CompanyForm() {
-   const { handleSubmit } = useCompanyForm();
+   const { isPending, handleSubmit } = useCompanyForm();
 
    return (
-      <Dialog modal>
+      <Dialog modal {...(isPending ? { onOpenChange: () => toast("Processing form, please wait") } : undefined)}>
          <DialogTrigger asChild>
             <Button size="sm">
                Add New Company <Plus />
@@ -23,7 +24,7 @@ export default function CompanyForm() {
          <DialogContent className={`max-w-[${MODAL_WIDTHS.md}] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 
-            <form onSubmit={handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
+            <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
                <div className="grid grid-cols-3 items-center gap-5">
                   <>
                      <div className="flex flex-col gap-2">
@@ -349,7 +350,15 @@ export default function CompanyForm() {
                </div>
 
                <div className="mt-10 text-right">
-                  <Button type="submit">Add Company</Button>
+                  <Button disabled={isPending} type="submit">
+                     {isPending ? (
+                        <>
+                           <Loader2 className="animate-spin" /> Adding Company...
+                        </>
+                     ) : (
+                        "Add Company"
+                     )}
+                  </Button>
                </div>
             </form>
          </DialogContent>
