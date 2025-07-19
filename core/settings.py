@@ -37,7 +37,6 @@ SMS_API_KEY = os.environ["SMS_API_KEY"]
 # twilio
 ACCOUNT_SID = os.environ["ACCOUNT_SID"]
 AUTH_TOKEN = os.environ["AUTH_TOKEN"]
-
 #Whatsapp bot Settings
 WHATSAPP_API_MEDIA_URL= os.environ["WHATSAPP_API_MEDIA_URL"]
 WHATSAPP_API_URL = os.environ["WHATSAPP_API_URL"]
@@ -50,7 +49,12 @@ WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
 SECRET_KEY = 'django-insecure-78wfplq%ozyj9-2v=#-cazg7m(14fhtzx9&%p+^)=grb)qpzu1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True' 
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+
+#platform name
+# This is used for branding in emails and notifications 
+PLATFORM_NAME = os.environ.get('PLATFORM_NAME', 'Fincheck')
+FRONTEND_LOGIN_URL = os.environ.get('FRONTEND_LOGIN_URL', 'http://localhost:3000/login')
 
 ALLOWED_HOSTS = []
 if not DEBUG:

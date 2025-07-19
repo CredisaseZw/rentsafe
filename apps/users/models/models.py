@@ -125,7 +125,12 @@ class CustomUser(AbstractUser):
 
     def save(self, *args, **kwargs):
         self.full_clean() 
+    
+        if not self.username:
+            self.username = generate_unique_username(self.email or f"user_{self.pk}")
         super().save(*args, **kwargs)
+        
+
 
 class Role(models.Model):
     name = models.CharField(max_length=100, unique=True,

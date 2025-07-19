@@ -1,22 +1,28 @@
-# from clients.models.models import Client
-# from django.contrib import admin
-# from django.utils.translation import gettext_lazy as _
+from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
+from apps.clients.models.models import Client
 
-# @admin.register(Client)
-# class ClientAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'client_content_type', 'client_object_id', 'status', 'external_client_id', 'created_at')
-#     search_fields = ('name', 'external_client_id')
-#     list_filter = ('status', 'client_content_type')
-#     ordering = ('-created_at',)
+class ClientAdmin(admin.ModelAdmin):
+    list_display = ('name', 'client_type', 'status', 'linked_entity', 'date_created')
+    list_filter = ('client_type', 'status')
+    search_fields = ('name', 'external_client_id')
+    readonly_fields = ('date_created', 'date_modified')
     
-#     fieldsets = (
-#         (None, {
-#             'fields': ('name', 'client_content_type', 'client_object_id', 'status', 'external_client_id')
-#         }),
-#         (_('Metadata'), {
-#             'fields': ('created_at', 'updated_at')
-#         }),
-#     )
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'client_type', 'status', 'external_client_id')
+        }),
+        ('Linked Entity', {
+            'fields': ('client_content_type', 'client_object_id')
+        }),
+        ('Dates', {
+            'fields': ('date_created', 'date_modified'),
+            'classes': ('collapse',)
+        }),
+    )
     
-#     def get_queryset(self, request):
-#         return super().get_queryset(request).select_related('client_content_type')
+    def linked_entity(self, obj):
+        return str(obj.client_object)
+    linked_entity.short_description = 'Linked Entity'
+
+admin.site.register(Client)

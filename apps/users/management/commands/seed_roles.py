@@ -33,6 +33,16 @@ class Command(BaseCommand):
                 ]
             },
             {
+                'name':'General User',
+                'description':'Performs general system tasks',
+                'permissions': [
+                    'maintenance.view_maintenancerequest',
+                    'properties.view_property',
+                    'properties.view_unit',
+                    'communications.view_message',
+                ]
+            },
+            {
                 'name': 'Accountant',
                 'description': 'Manages all financial aspects, including invoices, payments, bank reconciliations, and financial reports.',
                 'permissions': [

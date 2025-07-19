@@ -4,8 +4,74 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from apps.clients.models.models import Client
+from apps.clients.api.serializers import MinimalClientSerializer
+from apps.users.models.models import Role
 
 User = get_user_model()
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = ['id', 'name', 'description']
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    client_id = serializers.PrimaryKeyRelatedField(
+        queryset=Client.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    role_id = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'email', 'username', 'password', 'first_name', 'last_name',
+            'client_id', 'role_id', 'is_staff', 'is_superuser'
+        ]
+        extra_kwargs = {
+            'email': {'required': True},
+            'username': {'required': False}
+        }
+
+    def validate(self, data):
+        client = data.get('client_id')
+        
+        if client and not getattr(client, 'can_have_users', False):
+            raise serializers.ValidationError(
+                "This client type cannot have users associated with it"
+            )
+        
+        if client and client.is_individual_client:
+            individual = client.linked_individual
+            if individual.email and data.get('email', '').lower() != individual.email.lower():
+                raise serializers.ValidationError(
+                    "Email must match the individual's registered email"
+                )
+        
+        return data
+
+class ClientUserSerializer(serializers.ModelSerializer):
+    client = MinimalClientSerializer(read_only=True)
+    is_admin = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'client', 'is_verified', 'is_admin', 'date_joined'
+        ]
+        read_only_fields = fields
+
+    def get_is_admin(self, obj):
+        return obj.is_staff or obj.roles.filter(name='Admin').exists()
 
 class UserMiniSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,21 +119,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 class UserSerializer(serializers.ModelSerializer):
-    client = serializers.PrimaryKeyRelatedField(read_only=True)
+    client = MinimalClientSerializer(read_only=True)
     profile_object = serializers.SerializerMethodField()
+    roles = RoleSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'user_type',
-            'client', 'profile_object', 'is_verified',
+            'client', 'profile_object','roles', 'is_verified',
             'last_login', 'date_joined'
         ]
         read_only_fields = ['last_login', 'date_joined']
 
     def get_profile_object(self, obj):
+        print('all the user details....',obj.roles)
         if not obj.profile_object:
             return None
             
         from individuals.api.serializers import IndividualSerializer
         return IndividualSerializer(obj.profile_object).data
+

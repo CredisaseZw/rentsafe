@@ -229,7 +229,6 @@ class CommsHistMessage(BaseModel):
                             ('note','Note')
                         ],default='is_sms'
                     )
-    
 
     class Meta(BaseModel.Meta):
         app_label = 'communications'
@@ -240,3 +239,16 @@ class CommsHistMessage(BaseModel):
 
     def __str__(self):
         return f"Message for {self.client_object} at {self.date_created}"
+    def get_client_object_name(self):
+        """
+        Returns a string representation of the client object name.
+        """
+        if self.client_object:
+            return str(self.client_object)
+        return "Unknown Client Object"
+    @property
+    def get_message_context(self):
+        message = f"Message for {self.get_client_object_name()} at {self.date_created} - {self.message}"
+        return {
+            'message': message
+        }

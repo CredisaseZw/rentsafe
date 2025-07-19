@@ -62,24 +62,17 @@ def send_notification(
             from apps.companies.models.models import CompanyBranch
             recipient = CompanyBranch.objects.get(id=recipient_id)
             # Get primary contact email from company profile
-            contact_method = getattr(recipient.contacts, 'email', None) if recipient.contacts else None
-            if not contact_method:
-                # Fallback to first contact person's email
-                contact_person = recipient.contacts.first() if recipient.contacts else None
-                if contact_person and contact_person.individual:
-                    contact_method = contact_person.individual.email
+            contact_method = context['user'].email if 'user' in context else recipient.contacts.filter(is_primary=True).first().email
             use_sms = False
-
         if not contact_method:
             raise ValueError(f"No contact method found for {recipient_type} {recipient_id}")
 
         # Prepare message content
-        if template_name:
+        if template_name and recipient_type != 'individual':
             # Use template
             email_content = render_to_string(f'emails/{template_name}.html', context)
-            sms_content = render_to_string(f'sms/{template_name}.txt', context)
+            # sms_content = render_to_string(f'sms/{template_name}.txt', context)
         else:
-            # Use direct message
             email_content = message
             sms_content = message
 
@@ -286,6 +279,7 @@ def _save_otp(otp_code: str, otp_type: str, request_user: int, requested_user: i
 
 def _add_to_communication_history(user_id: int, client_id: int, message: str, is_sms: bool, is_email: bool, is_creditor: bool):
     """Add message to communication history"""
+    return True
     try:
         from apps.communications.utils import add_msg_to_comms_hist 
         add_msg_to_comms_hist(

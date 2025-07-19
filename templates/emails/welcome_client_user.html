@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{ platform_name }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .span {
+            font-weight: bold;
+            color: black;
+            text-transform: capitalize;
+        }
+        .header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        .footer {
+            padding: 15px;
+            text-align: center;
+            background-color: #eee;
+            border-radius: 0 0 5px 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4a6fa5;
+            color: white !important;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .credentials {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to {{ platform_name }}</h1>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ user.first_name }} {{ user.last_name }},</p>
+
+        <p>Your account has been successfully created on {{ platform_name }}. You can now access your account as a <span class="span">{{ user.client.client_object.full_name }}</span> user. Below are your login credentials:</p>
+
+        <div class="credentials">
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Temporary Password:</strong> {{ password }}</p>
+            <p><strong>Your roles:</strong>
+                {% for role in user.roles.all %}
+                    {{ role.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    No roles assigned
+                {% endfor %}
+            </p>
+        </div>
+        
+        <p>For security reasons, we recommend you change your password after logging in.</p>
+        
+        <center>
+            <a href="{{ login_url }}" class="button">Login to Your Account</a>
+        </center>
+        
+        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+        
+        <p>Best regards,<br>The {{ platform_name }} Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>© {% now "Y" %} {{ platform_name }}. All rights reserved.</p>
+        <p>If you think this is a mistake, please contact us immediately.</p>
+    </div>
+</body>
+</html>

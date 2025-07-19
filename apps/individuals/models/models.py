@@ -28,9 +28,9 @@ class Individual(BaseModel):
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     identification_type = models.CharField(max_length=20, choices=IDENTIFICATION_TYPES)
     identification_number = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(blank=True, null=True)
-    mobile_phone = models.CharField(max_length=20)
-    landline_phone = models.CharField(max_length=20, blank=True, null=True)
+    # email = models.EmailField(blank=True, null=True)
+    # mobile_phone = models.CharField(max_length=20)
+    # landline_phone = models.CharField(max_length=20, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)    
@@ -68,7 +68,7 @@ class EmploymentDetail(BaseModel):
     end_date = models.DateField(blank=True, null=True)
     is_current = models.BooleanField(default=True)
     monthly_income = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
+    # marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     class Meta:
         app_label = 'individuals'
         db_table = 'employment_detail'
