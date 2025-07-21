@@ -12,6 +12,8 @@ from typing import Union, Dict, Any, Optional
 import contextlib
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
+from django.apps import apps
+from importlib import import_module
 
 
 logger = logging.getLogger(__name__)
@@ -182,44 +184,75 @@ def send_email(email: str, subject: str, message: str, is_html: bool = False) ->
         return False
 
 @shared_task(bind=True)
-def create_object_task(self, serializer_class, model_class, data, context):
+def create_object_task(self, serializer_class_path, model_name, data, context):
     """
-    Async object creation with status tracking
+    Async object creation with proper serializer/model loading
     """
     try:
+        module_path, class_name = serializer_class_path.rsplit('.', 1)
+        module = import_module(module_path)
+        serializer_class = getattr(module, class_name)
+        
+        model = apps.get_model(model_name)
+        
+        user = apps.get_model('users.User').objects.get(pk=context['user_id'])
+        context = {'request': context.get('request', {}), 'user': user}
+        
         serializer = serializer_class(data=data, context=context)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        
+        if hasattr(model, 'user'):
+            instance = serializer.save(user=user)
+        else:
+            instance = serializer.save()
+            
         return {
             'status': 'SUCCESS',
             'instance_id': instance.id,
-            'content_type_id': ContentType.objects.get_for_model(model_class).id
+            'content_type_id': ContentType.objects.get_for_model(model).id
         }
     except Exception as e:
+        logger.error(f"Async create failed: {str(e)}")
         return {
             'status': 'FAILURE',
             'error': str(e)
         }
 
 @shared_task(bind=True)
-def update_object_task(self, serializer_class, model_class, instance_id, data, context):
+def update_object_task(self, serializer_class_path, model_name, instance_id, data, context):
     """
-    Async object update with status tracking
+    Async object update with proper serializer/model loading
     """
     try:
-        instance = model_class.objects.get(pk=instance_id)
+        module_path, class_name = serializer_class_path.rsplit('.', 1)
+        module = import_module(module_path)
+        serializer_class = getattr(module, class_name)
+        
+        model = apps.get_model(model_name)
+        instance = model.objects.get(pk=instance_id)
+        
+        user = apps.get_model('users.User').objects.get(pk=context['user_id'])
+        context = {'request': context.get('request', {}), 'user': user}
+        
         serializer = serializer_class(instance, data=data, context=context, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        
+        if hasattr(model, 'user'):
+            serializer.save(user=user)
+        else:
+            serializer.save()
+            
         return {
             'status': 'SUCCESS',
             'instance_id': instance_id
         }
     except Exception as e:
+        logger.error(f"Async update failed: {str(e)}")
         return {
             'status': 'FAILURE',
             'error': str(e)
         }
+
 def _generate_otp_link(url_path: str, otp_code: str, recipient_id: int, notification_type: str) -> Optional[str]:
     """Generate OTP verification link based on notification type"""
     import random
@@ -230,7 +263,6 @@ def _generate_otp_link(url_path: str, otp_code: str, recipient_id: int, notifica
     link_patterns = {
         settings.ADD_COMPANY: f"{url_path}/clients/company-verify-otp/{random_string}T{otp_code}L{random_string}!{recipient_id}B/",
         settings.ADD_COMP_LEASE: f"{url_path}/clients/cl-verify-lease/{random_string}T{otp_code}L{random_string}!{recipient_id}B/",
-        # Add more patterns as needed
     }
     
     return link_patterns.get(notification_type)
@@ -252,7 +284,7 @@ def _get_default_subject(notification_type: str) -> str:
 def _save_otp(otp_code: str, otp_type: str, request_user: int, requested_user: int, requested_user_type: str):
     """Save OTP to database"""
     try:
-        from apps.communications.models.models import OTP  # Adjust import based on your OTP model location
+        from apps.communications.models.models import OTP 
         OTP.objects.create(
             otp_code=otp_code,
             otp_type=otp_type,
@@ -267,8 +299,7 @@ def _save_otp(otp_code: str, otp_type: str, request_user: int, requested_user: i
 def _add_to_communication_history(user_id: int, client_id: int, message: str, is_sms: bool, is_email: bool, is_creditor: bool):
     """Add message to communication history"""
     try:
-        # Import your communication history function
-        from apps.communications.utils import add_msg_to_comms_hist  # Adjust import
+        from apps.communications.utils import add_msg_to_comms_hist 
         add_msg_to_comms_hist(
             user_id=user_id,
             client_id=client_id,

@@ -26,7 +26,6 @@ class CompanyViewSet(BaseViewSet):
     Inherits caching and soft-delete logic from BaseSoftDeleteViewSet.
     """
     permission_classes = [IsAuthenticated]
-    use_async = True # Enable async processing for create and update actions
     
     def get_queryset(self):
         """
