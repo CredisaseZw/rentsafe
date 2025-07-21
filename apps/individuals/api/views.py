@@ -81,7 +81,6 @@ class IndividualViewSet(BaseViewSet):
             return Response(
                 {"error": "failed to list individuals", "details": str(e)}
             )
-    
     @CacheService.cached(tag_prefix='individual:{pk}')
     def retrieve(self, request, *args, **kwargs):
         try:
