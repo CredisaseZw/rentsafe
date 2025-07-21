@@ -11,7 +11,6 @@ class IndividualAdmin(admin.ModelAdmin):
     list_filter = ('gender', 'identification_type', 'is_active', 'is_verified','is_deleted')
     search_fields = ('first_name', 'last_name', 'identification_number')
     ordering = ('last_name', 'first_name')
-    readonly_fields = ('date_created', 'date_updated', 'created_by')
     
     actions= ['mark_as_verified', 'mark_as_unverified', 'activate_individuals', 'deactivate_individuals']
     
@@ -45,7 +44,7 @@ class EmploymentDetailAdmin(admin.ModelAdmin):
   
 @admin.register(NextOfKin)
 class NextOfKinAdmin(admin.ModelAdmin):
-    list_display = ('individual', 'first_name', 'last_name','mobile_phone', 'email', 'relationship','physical_address')
+    list_display = ('individual', 'first_name', 'last_name','mobile_phone','email', 'relationship','physical_address')
     list_display_links = ('individual', 'first_name', 'last_name')
     list_filter = ('relationship',)
     ordering = ('last_name', 'first_name')
