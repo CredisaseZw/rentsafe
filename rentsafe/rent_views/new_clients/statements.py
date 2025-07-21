@@ -101,51 +101,82 @@ def commission_statement(request):
     props = {"statement": {"rows": statement_rows}}
 
     return render(request, "Client/Accounting/CommissionStatement", props)
+from django.db.models import Sum, Q
+from collections import defaultdict
 
 @login_required
 def creditor_statements(request):
     props = {"creditors": []}
     # get query params
-    items_per_page = request.GET.get("items_per_page", 60)
+    items_per_page = request.GET.get("items_per_page", 70)
     page = request.GET.get("page", 1)
-    # filters
-    filters = {}
-    # add user filters
-    if request.user.is_superuser:
-        filters["user_id"] = request.user.id
-    else:
-        filters["user_id"] = request.user
-
-    # get landlords
-    paginator = Paginator(
-    object_list=Lease.objects.filter(lease_giver=request.user.company).all().order_by("created_date"),
-    per_page=items_per_page,
-    )
     
-    leases = paginator.get_page(page)
-    for lease in leases:
-        landlord=Landlord.objects.filter(lease_id=lease.lease_id).first()
-        creditor_name ='N/A'
-        if landlord:
-            creditor_name = landlord.landlord_name
-            if total_sum := LeaseReceiptBreakdown.objects.filter(lease_id=lease.lease_id).last():
-                total_sum = total_sum.total_amount
-            else:
-                total_sum =  0
+    # Get all leases for the company
+    all_leases = Lease.objects.filter(lease_giver=request.user.company).order_by("created_date")
+    
+    # Group landlords by reg_ID_Number to combine duplicates
+    landlord_data = {}
+    
+    total_sum = 0
+    for lease in all_leases:
+        landlord = Landlord.objects.filter(lease_id=lease.lease_id).first()
+        if landlord and landlord.landlord_name != "N/A":
+            landlord_leases = Landlord.objects.filter(
+                landlord_name=landlord.landlord_name,
+                user_id=request.user.id
+            ).values_list('lease_id', flat=True)
+            lease_ids = list(landlord_leases)
             
-
-            if lease:
-                props["creditors"].append(
-                    {
-                        "creditor_id": landlord.landlord_id,
-                        "lease_id": lease.lease_id,
-                        "creditor_name": creditor_name,
-                        "address": lease.address,
-                        "balance_owed": total_sum,
-                    }
+            if landlord and landlord.landlord_name != "N/A":
+                reg_id = landlord.landlord_name
+                
+                # Calculate total balance for this lease
+                receipt_breakdowns = LeaseReceiptBreakdown.objects.filter(lease_id__in=lease_ids).exclude(
+                    receipt_number='Opening Balance'
                 )
-        else:
-            pass
+                for receipt_breakdown in receipt_breakdowns:
+                    total_sum += receipt_breakdown.total_amount
+
+            if reg_id not in landlord_data:
+                # First time seeing this landlord
+                landlord_data[reg_id] = {
+                    "creditor_id": landlord.landlord_id,
+                    "reg_id_number": reg_id,
+                    "creditor_name": landlord.landlord_name,
+                    "addresses": [lease.address] if lease.address else [],
+                    "balance_owed": total_sum,
+                    "lease_ids": [lease.lease_id],
+                    "created_date": lease.created_date
+                }
+            else:
+                # Combine data for existing landlord
+                # landlord_data[reg_id]["balance_owed"] += total_sum
+                landlord_data[reg_id]["lease_ids"].append(lease.lease_id)
+                if lease.address and lease.address not in landlord_data[reg_id]["addresses"]:
+                    landlord_data[reg_id]["addresses"].append(lease.address)
+                # Keep the earliest created date
+                if lease.created_date < landlord_data[reg_id]["created_date"]:
+                    landlord_data[reg_id]["created_date"] = lease.created_date
+    
+    # Convert to list and sort by created_date
+    creditors_list = list(landlord_data.values())
+    creditors_list.sort(key=lambda x: x["created_date"])
+    
+    # Apply pagination to the combined results
+    paginator = Paginator(creditors_list, items_per_page)
+    creditors_page = paginator.get_page(page)
+    
+    # Format the data for frontend
+    for creditor in creditors_page:
+        props["creditors"].append({
+            "creditor_id": creditor["creditor_id"],
+            "reg_id_number": creditor["reg_id_number"],
+            "creditor_name": creditor["creditor_name"],
+            "address": ", ".join(creditor["addresses"]) if creditor["addresses"] else "N/A",
+            "balance_owed": creditor["balance_owed"],
+            "lease_ids": ",".join(map(str, creditor["lease_ids"])),  # Pass all lease IDs
+            "lease_count": len(creditor["lease_ids"])
+        })
 
     props["total_pages"] = paginator.num_pages
     props["total_items"] = paginator.count
@@ -154,60 +185,93 @@ def creditor_statements(request):
 
     return render(request, "Client/Accounting/CreditorStatements", props)
 
+
 @login_required
 def detailed_creditor_statement(request, creditor_id):
     statement_rows = []
-    lease_id = request.GET.get("lease_id", 245)
-    lease = Lease.objects.filter(lease_id=lease_id).first()
-    all_creditor_statements = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id).all().order_by("date_received")
-    creditor_name = ""
-    creditor_name = Landlord.objects.filter(lease_id=lease_id).last()
-    statement_rows = [
-        {
-            "date": creditor_name.created_at,
-            "description": "Opening Balance",
-            "ref": "",
-            "amount": float(creditor_name.opening_balance) if creditor_name and creditor_name.opening_balance else 0,
-            "balance": float(creditor_name.opening_balance) if creditor_name and creditor_name.opening_balance else 0,
-        }
-    ]
-    balance = float(creditor_name.opening_balance) if creditor_name and creditor_name.opening_balance else 0
-    for receipt in all_creditor_statements:
-        if receipt.receipt_number=='Opening Balance':
-            continue
-        if lease and lease.is_individual:
-            tenant = Individual.objects.filter(identification_number=lease.reg_ID_Number).first()
-            tenant_name = f"{tenant.firstname} {tenant.surname}"
-        elif lease and lease.is_company:
-            tenant = Company.objects.filter(id=lease.reg_ID_Number).first()
-            tenant_name = tenant.registration_name
+    reg_id_number = request.GET.get("reg_id_number")
+
+    landlord = Landlord.objects.filter(landlord_id=creditor_id).last()
+
+    # Get all leases for this landlord
+    landlord_leases = Landlord.objects.filter(
+        landlord_name=landlord.landlord_name,
+        user_id=request.user.id
+    ).values_list('lease_id', flat=True)
+    lease_ids = list(landlord_leases)
+    # Get landlord info (use any landlord record with this reg_ID_Number)
+
+    creditor_name = landlord.landlord_name if landlord else "Unknown"
+    # Add opening balance
+    opening_balance = float(landlord.opening_balance) if landlord and landlord.opening_balance else 0
+    statement_rows.append({
+        "date": landlord.created_at if landlord else timezone.now(),
+        "description": "Opening Balance",
+        "ref": "",
+        "amount": opening_balance,
+        "balance": opening_balance,
+    })
+    
+    running_balance = opening_balance
+    # Get all receipts for all leases of this landlord
+    all_receipts = LeaseReceiptBreakdown.objects.filter(
+        lease_id__in=lease_ids
+    ).exclude(
+        receipt_number='Opening Balance'
+    ).order_by("date_received")
+    # Process each receipt
+    for receipt in all_receipts:
+        # Get lease and tenant info
+        lease = Lease.objects.filter(lease_id=receipt.lease_id).first()
+        tenant_name = "Unknown Tenant"
+        
+        if lease:
+            if lease.is_individual:
+                tenant = Individual.objects.filter(identification_number=lease.reg_ID_Number).first()
+                if tenant:
+                    tenant_name = f"{tenant.firstname} {tenant.surname}"
+            elif lease.is_company:
+                tenant = Company.objects.filter(id=lease.reg_ID_Number).first()
+                if tenant:
+                    tenant_name = tenant.registration_name
+        
+        # Process different types of receipts
         if receipt.receipt_number.startswith("Disbursement receipted"):
-            balance -= float(receipt.amount_paid)
-            amount = float(receipt.amount_paid)
-            description = f"Disbursement to {creditor_name.landlord_name}"
+            running_balance -= float(receipt.amount_paid)
+            amount = -float(receipt.amount_paid)  # Negative for disbursements
+            description = f"Disbursement to {creditor_name}"
         elif receipt.receipt_number.startswith("Creditor DBT"):
-            balance -= float(receipt.amount_paid)
-            amount = receipt.amount_paid
+            running_balance -= float(receipt.amount_paid)
+            amount = -float(receipt.amount_paid)  # Negative for debits
             description = receipt.receipt_number
         elif receipt.receipt_number.startswith("Creditor CRD"):
-            balance += float(receipt.amount_paid)
-            amount = receipt.amount_paid
+            running_balance += float(receipt.amount_paid)
+            amount = float(receipt.amount_paid)  # Positive for credits
             description = receipt.receipt_number
         else:
-            balance += float(receipt.base_amount) 
-            amount =receipt.base_amount 
+            running_balance += float(receipt.base_amount)
+            amount = float(receipt.base_amount)  # Positive for rent received
             description = f"{tenant_name} Rent Received"
-        statement_rows.append(
-            {
-                "date": receipt.date_received,
-                "description": description,
-                "ref": receipt.receipt_number,
-                "amount":amount * -1 if receipt.receipt_number.startswith("Disbursement receipted") else amount,
-                "balance": balance,
-            }
-        )
-
-    props = {"statement": {"creditor_name": creditor_name.landlord_name,   "rows": statement_rows},}
+            if lease:
+                description += f" - {lease.address}" if lease.address else ""
+        
+        statement_rows.append({
+            "date": receipt.date_received,
+            "description": description,
+            "ref": receipt.receipt_number,
+            "amount": amount,
+            "balance": running_balance,
+        })
+    
+    # props = {
+    #     "statement": {
+    #         "creditor_name": creditor_name,
+    #         "reg_id_number": reg_id_number,
+    #         "total_leases": len(lease_ids),
+    #         "rows": statement_rows
+    #     }
+    # }
+    props = {"statement": {"creditor_name": landlord.landlord_name,   "rows": statement_rows},}
 
     return render(request, "Client/Accounting/DetailedCreditorStatement", props)
 

@@ -502,7 +502,7 @@ def track_lease_balances():
             can_send_message =True
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
             lease_giver_name = (
-                lease_giver.registration_name if lease_giver else "Creditor"
+                lease_giver.trading_name or lease_giver.registration_name
             )
             custom_day = today.replace(day=int(lease.payment_period_end))
             limit_day = today.replace(day=int(lease.payment_period_end) + 1)
@@ -555,9 +555,7 @@ def track_lease_balances():
                             id=lease.reg_ID_Number
                         ).first()
                         lease_receiver_name = (
-                            lease_receiver.trading_name
-                            if lease_receiver
-                            else "Creditor"
+                            lease_receiver.trading_name or lease_receiver.registration_name
                         )
                         if lease_receiver:
                             company_email = CompanyProfile.objects.filter(

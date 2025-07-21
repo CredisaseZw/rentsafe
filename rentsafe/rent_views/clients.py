@@ -849,6 +849,7 @@ def edit_lease(request):
             lease.lease_period = data.get("leasePeriod")
             lease.payment_period_start = data.get("paymentPeriodStart")
             lease.payment_period_end = new_payment_end
+            lease.landlord_id=landlord_ob.id if landlord_ob else None
             lease.rent_variables = data.get("rentVariable")
             lease.save()
             messages.success(request, "successfully updated lease")
@@ -2311,7 +2312,7 @@ def create_company_helper(request):
                         password=hash_password,
                     )
                     company_user.save()
-                    if request.user.id == 11:
+                    if request.user.can_send_email:
                         send_otp.delay(
                             request.build_absolute_uri(),
                             generate_otp(),
@@ -3369,7 +3370,7 @@ def store_company(request):
                         data.get("emailAddress"),
                         user_password,
                         data.get("emailAddress"),
-                        company_ob.registration_name,
+                        company_ob.trading_name or company_ob.registration_name,
                     )
 
             if email_ob:
@@ -5526,7 +5527,7 @@ def create_receipt_and_payments(request):
                 lease_receiver_comp = Company.objects.filter(
                     id=lease_receiver.reg_ID_Number
                 ).first()
-                full_name = lease_receiver_comp.registration_name
+                full_name = lease_receiver_comp.trading_name or lease_receiver_comp.registration_name
                 email_ob = CompanyProfile.objects.filter(
                     company=lease_receiver_comp.id
                 ).first()
