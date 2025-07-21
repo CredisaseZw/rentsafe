@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 import logging
 
-logger = logging.getLogger('file_individual')
+logger = logging.getLogger('individuals')
 class EmploymentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmploymentDetail
@@ -55,7 +55,7 @@ class IndividualSerializer(serializers.ModelSerializer):
             'id', 'first_name', 'last_name', 'full_name',
             'date_of_birth', 'gender', 'gender_display',
             'identification_type', 'identification_type_display',
-            'identification_number', 'is_verified', 'is_active',
+            'identification_number','contact_details', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin', 'documents', 
             'addresses', 'notes','date_created', 'date_updated'
         ]
@@ -188,9 +188,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         
         if addresses_data is not None:
             company_content_type = ContentType.objects.get_for_model(Individual)
-            
-            instance.addresses.all().delete()
-            
+                        
             for address_data in addresses_data:
                 Address.objects.create(
                     user=user,
@@ -200,27 +198,22 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                 )
 
         if employment is not None:
-            instance.employment_details.all().delete()
             for emp in employment:
               EmploymentDetail.objects.create(user=user, individual=instance, **emp)
 
         if contact_data is not None:
-            instance.contact_details.all().delete()
             for contact in contact_data:
                 IndividualContactDetail.objects.create(user=user, individual=instance, **contact)
 
         # Handle Next of Kin
         if kin is not None:
-            instance.next_of_kin.all().delete()
             for k in kin:
                 NextOfKin.objects.create(user=user, individual=instance, **k)
 
         if documents is not None:
-            instance.documents.all().delete()
             for doc in documents:
                 Document.objects.create(user=user,Individual=instance,**doc)
         if notes_data is not None:
-            instance.notes.all().delete()
             for n in notes_data:
                 Note.objects.create(user=user, individual=instance, **n)
         return instance
@@ -231,4 +224,4 @@ class IndividualSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
-                    'contact_details']
+                    'contact_details', 'is_active']

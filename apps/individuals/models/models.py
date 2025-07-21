@@ -55,6 +55,16 @@ class Individual(BaseModel):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+    
+    @property
+    def phone(self):
+        contact = self.contact_details.filter(mobile_phone__isnull=False).exclude(mobile_phone='').first()
+        return contact.mobile_phone if contact else None
+
+    @property
+    def email(self):
+        contact = self.contact_details.filter(email__isnull=False).exclude(email='').first()
+        return contact.email if contact else None
 
 class IndividualContactDetail(BaseModel):
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')

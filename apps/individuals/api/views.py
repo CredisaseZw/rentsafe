@@ -12,7 +12,7 @@ from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
 import logging
 
-logger = logging.getLogger('individuals')
+logger = logging.getLogger(__name__)
 
 class IndividualViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
@@ -58,15 +58,16 @@ class IndividualViewSet(BaseViewSet):
             instance = self.get_object()
             serializer = IndividualUpdateSerializer(instance, data=request.data, partial=partial)
             serializer.is_valid(raise_exception=True)
+        
             self.perform_update(serializer)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.warning(f"Error updating individual: {str(e)}")
+            logger.error(f"Error updating individual: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
-    @CacheService.cached(tag_prefix='individuals:list')
-    def list(self,*arg, **kwarg):
+    @CacheService.cached(tag_prefix='individual:list')
+    def list(self,*args, **kwargs):
         try:
             queryset= self.get_queryset()
             page = self.paginate_queryset(queryset)
@@ -104,12 +105,12 @@ class IndividualViewSet(BaseViewSet):
             instance.is_deleted = True
             instance.is_active = False
             instance.save()
-            
+            self.perform_destroy(instance)
             logger.info(f"Individual {instance.pk} soft deleted by user {request.user}")
             return Response({"message": "Individual deleted successfully"}, status=status.HTTP_200_OK)
         except Individual.DoesNotExist:
             logger.error(f"Individual with ID {kwargs.get('pk','unkown')} not found")
-            return self._create_rendered_response(
+            return Response(
                 {'error': 'Individual not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
@@ -123,17 +124,15 @@ class IndividualViewSet(BaseViewSet):
             individual = Individual.objects.get(pk=pk)
             individual.is_verified = not individual.is_verified
             individual.save()
-
-            serializer = self.get_serializer(individual)
-            return self._create_rendered_response({
+            return Response({
                 "message": f"Individual has been {'verified'  if individual.is_active else 'unverified'}"
             })
         except Individual.DoesNotExist:
-            logger.warning(f"Individual with ID {pk} does not exist.")
+            logger.error(f"Individual with ID {pk} does not exist.")
             return Response({"error": "Individual not found"}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
-            return self._create_rendered_response({
+            return Response({
                 'error': 'Indivudal not found'},
                 status= status.HTTP_404_NOT_FOUND
             )
@@ -146,11 +145,11 @@ class IndividualViewSet(BaseViewSet):
             individual.save()
             
             serializer = IndividualSearchSerializer(individual)
-            return self._create_rendered_response({
+            return Response({
                 "message": f"Individual has been {'activated'  if individual.is_active else 'deactivated'}"
             })
         except Individual.DoesNotExist:
-            return self._create_rendered_response({
+            return Response({
                 'error': 'Indivudal not found'},
                 status= status.HTTP_404_NOT_FOUND
             )
@@ -169,7 +168,7 @@ class IndividualViewSet(BaseViewSet):
             for field in search_fields:
                 filter_conditions |= Q(**{f"{field}__icontains": query})
 
-            individuals = Individual.objects.filter(filter_conditions).prefetch_related('addresses','employment_details', 'next_of_kin',).distinct()
+            individuals = Individual.objects.filter(filter_conditions).prefetch_related('addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
 
             serializer = IndividualSearchSerializer(individuals, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -177,7 +176,8 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error searching individuals: {e}")
             return Response({"error": "Failed to search individuals"}, status=status.HTTP_400_BAD_REQUEST)
-        
+    
+    @CacheService.cached(tag_prefix='individual:{pk}:full-details')    
     @action(detail=True, methods=['GET'], url_path='full-details')
     def retrieve_full_individual_details(self, request, pk=None):
         """Retrieve full detailed information about an individual."""
@@ -187,10 +187,9 @@ class IndividualViewSet(BaseViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         except Individual.DoesNotExist:
-            logger.warning(f"Individual with ID {pk} does not exist.")
+            logger.error(f"Individual with ID {pk} does not exist.")
             return Response({"error": "Individual not found"}, status=status.HTTP_404_NOT_FOUND)
         
         except Exception as e:
             logger.error(f"Error retrieving individual details {pk}: {e}")
             return Response({"error": "Failed to retrieve individual details"}, status=status.HTTP_400_BAD_REQUEST)
-              
