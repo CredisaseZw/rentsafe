@@ -1,5 +1,5 @@
 import React from 'react'
-import GlobalSummaryCard from '../properties/globalSummaryCard'
+import GlobalSummaryCard from '@/components/general/globalSummaryCard'
 import { User, Building, BadgeCent, Send, Printer} from 'lucide-react'
 import Button from '@/components/general/Button'
 import PropertyStatementContainer from '@/components/general/PropertyStatementContainer'
