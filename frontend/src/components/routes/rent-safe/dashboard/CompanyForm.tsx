@@ -2,7 +2,7 @@ import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { INDUSTRIES, MODAL_WIDTHS } from "@/constants";
+import { INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddressFormFields from "@/components/general/AddressFormFields";
@@ -21,7 +21,7 @@ export default function CompanyForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[${MODAL_WIDTHS.md}] sm:max-w-[default]`}>
+         <DialogContent className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 
             <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
