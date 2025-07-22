@@ -2,10 +2,13 @@ import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
+import { useNavigate } from "react-router";
 
 export default function useCompanyPaymentStatusTab() {
+   const navigate = useNavigate();
    const { companies, isLoading } = useMinimalCompaniesList();
 
+   // @ts-expect-error ReactNode types will never be rendered
    const rows: BaseTableRow[] =
       companies?.map((cell) => ({
          ...cell,
@@ -21,14 +24,14 @@ export default function useCompanyPaymentStatusTab() {
    function handleSearch(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
-      const query = formData.get("q") as string;
-      console.log(`Searching for: ${query}`);
+      const q = formData.get("q") as string;
+      navigate({ search: "?q=" + q });
    }
 
    return {
       rows,
       headers,
-      isLoading,
+      isLoading: isLoading,
       handleSearch,
    };
 }
