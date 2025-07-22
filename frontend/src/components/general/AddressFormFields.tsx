@@ -7,15 +7,15 @@ import useAddressFormFields from "@/hooks/components/useAddressFormFields";
 
 export default function AddressFormFields() {
    const {
+      cities,
+      suburbs,
       location,
       countries,
       provinces,
-      cities,
-      suburbs,
-      countriesLoading,
-      provincesLoading,
       citiesLoading,
       suburbsLoading,
+      countriesLoading,
+      provincesLoading,
       dispatch,
    } = useAddressFormFields();
 

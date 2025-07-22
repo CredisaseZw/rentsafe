@@ -38,15 +38,15 @@ export default function useAddressFormFields() {
    }
 
    return {
+      cities,
+      suburbs,
       location,
       countries,
       provinces,
-      cities,
-      suburbs,
-      countriesLoading,
-      provincesLoading,
       citiesLoading,
       suburbsLoading,
+      countriesLoading,
+      provincesLoading,
       dispatch,
    };
 }
