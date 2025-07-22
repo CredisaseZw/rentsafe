@@ -63,13 +63,11 @@ export default function AddressFormFields() {
                      <SelectValue placeholder={provincesLoading ? "Loading..." : "Select province"} />
                   </SelectTrigger>
                   <SelectContent>
-                     {provinces
-                        ?.filter((province) => province.country === location.countryName)
-                        .map((province) => (
-                           <SelectItem key={province.id} value={province.id.toString()} className="line-clamp-1">
-                              {province.name} ({province.code})
-                           </SelectItem>
-                        ))}
+                     {provinces?.map((province) => (
+                        <SelectItem key={province.id} value={province.id.toString()} className="line-clamp-1">
+                           {province.name} ({province.code})
+                        </SelectItem>
+                     ))}
                   </SelectContent>
                </Select>
             </div>
