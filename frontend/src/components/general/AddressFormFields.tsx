@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useAddressFormFields from "@/hooks/components/useAddressFormFields";
 
 export default function AddressFormFields() {
-   const { countries, provinces, cities, suburbs } = useAddressFormFields();
+   const { location, countries, provinces, cities, suburbs, countriesLoading, setLocation } = useAddressFormFields();
 
    return (
       <details>
@@ -19,12 +19,17 @@ export default function AddressFormFields() {
                <Label className="px-2 font-normal" htmlFor="country_id">
                   Country
                </Label>
-               <Select name="country_id">
+               <Select
+                  name="country_id"
+                  disabled={countriesLoading}
+                  value={location.country}
+                  onValueChange={(v) => setLocation((prev) => ({ ...prev, country: v }))}
+               >
                   <SelectTrigger id="country_id" className="border-foreground/40 w-full bg-white">
-                     <SelectValue placeholder="Select country" />
+                     <SelectValue placeholder={countriesLoading ? "Loading..." : "Select country"} />
                   </SelectTrigger>
                   <SelectContent>
-                     {countries.map((country) => (
+                     {countries?.map((country) => (
                         <SelectItem key={country.id} value={country.id.toString()}>
                            {country.name}
                         </SelectItem>

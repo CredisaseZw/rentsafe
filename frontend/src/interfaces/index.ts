@@ -121,3 +121,29 @@ export interface CompanyReport {
       address: string;
    };
 }
+
+export interface City {
+   id: number;
+   name: string;
+}
+
+export interface Country {
+   id: number;
+   name: string;
+   code: string;
+   dial_code: string;
+   currency_code: string;
+   currency_name: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface Province {
+   id: number;
+   name: string;
+}
+
+export interface Suburb {
+   id: number;
+   name: string;
+}

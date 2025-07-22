@@ -1,14 +1,20 @@
+import React from "react";
+import useCountries from "../apiHooks/useCountries";
+
 export default function useAddressFormFields() {
+   const [location, setLocation] = React.useState({
+      country: undefined as string | undefined,
+      province: undefined as string | undefined,
+      city: undefined as string | undefined,
+      suburb: undefined as string | undefined,
+   });
+
+   const { countries, isLoading: countriesLoading } = useCountries();
+
    const cities = [
       { id: 1, name: "Harare" },
       { id: 2, name: "Bulawayo" },
       { id: 3, name: "Chitungwiza" },
-   ];
-
-   const countries = [
-      { id: 1, name: "Zimbabwe" },
-      { id: 2, name: "South Africa" },
-      { id: 3, name: "Botswana" },
    ];
 
    const provinces = [
@@ -23,5 +29,5 @@ export default function useAddressFormFields() {
       { id: 3, name: "Greendale" },
    ];
 
-   return { countries, provinces, cities, suburbs };
+   return { location, countries, provinces, cities, suburbs, countriesLoading, setLocation };
 }
