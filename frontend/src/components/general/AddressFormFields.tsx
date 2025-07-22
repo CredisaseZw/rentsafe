@@ -6,8 +6,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useAddressFormFields from "@/hooks/components/useAddressFormFields";
 
 export default function AddressFormFields() {
-   const { location, countries, provinces, cities, suburbs, countriesLoading, provincesLoading, dispatch } =
-      useAddressFormFields();
+   const {
+      location,
+      countries,
+      provinces,
+      cities,
+      suburbs,
+      countriesLoading,
+      provincesLoading,
+      citiesLoading,
+      dispatch,
+   } = useAddressFormFields();
 
    return (
       <details>
@@ -68,12 +77,17 @@ export default function AddressFormFields() {
                <Label className="px-2 font-normal" htmlFor="city_id">
                   City <span className="text-PRIMARY">*</span>
                </Label>
-               <Select name="city_id">
+               <Select
+                  name="city_id"
+                  disabled={citiesLoading}
+                  value={location.cityId}
+                  onValueChange={(value) => dispatch({ type: "city-changed", value: value })}
+               >
                   <SelectTrigger id="city_id" className="border-foreground/40 w-full bg-white">
-                     <SelectValue placeholder="Select city" />
+                     <SelectValue placeholder={citiesLoading ? "Loading..." : "Select city"} />
                   </SelectTrigger>
                   <SelectContent>
-                     {cities.map((city) => (
+                     {cities?.map((city) => (
                         <SelectItem key={city.id} value={city.id.toString()}>
                            {city.name}
                         </SelectItem>

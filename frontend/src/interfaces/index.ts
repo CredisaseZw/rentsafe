@@ -122,11 +122,6 @@ export interface CompanyReport {
    };
 }
 
-export interface City {
-   id: number;
-   name: string;
-}
-
 export interface Country {
    id: number;
    name: string;
@@ -146,6 +141,14 @@ export interface Province {
    slug: string;
    is_active: boolean;
    approved: boolean;
+}
+
+export interface City {
+   id: number;
+   name: string;
+   province: string;
+   slug: string;
+   is_active: boolean;
 }
 
 export interface Suburb {
