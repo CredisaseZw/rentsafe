@@ -154,6 +154,9 @@ export interface City {
 export interface Suburb {
    id: number;
    name: string;
+   city: string;
+   slug: string;
+   is_active: boolean;
 }
 
 export interface AddressLocation {

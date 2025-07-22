@@ -15,6 +15,7 @@ export default function AddressFormFields() {
       countriesLoading,
       provincesLoading,
       citiesLoading,
+      suburbsLoading,
       dispatch,
    } = useAddressFormFields();
 
@@ -100,12 +101,17 @@ export default function AddressFormFields() {
                <Label className="px-2 font-normal" htmlFor="suburb_id">
                   Suburb
                </Label>
-               <Select name="suburb_id">
+               <Select
+                  name="suburb_id"
+                  disabled={suburbsLoading}
+                  value={location.suburbId}
+                  onValueChange={(value) => dispatch({ type: "suburb-changed", value: value })}
+               >
                   <SelectTrigger id="suburb_id" className="border-foreground/40 w-full bg-white">
-                     <SelectValue placeholder="Select suburb" />
+                     <SelectValue placeholder={suburbsLoading ? "Loading..." : "Select suburb"} />
                   </SelectTrigger>
                   <SelectContent>
-                     {suburbs.map((suburb) => (
+                     {suburbs?.map((suburb) => (
                         <SelectItem key={suburb.id} value={suburb.id.toString()}>
                            {suburb.name}
                         </SelectItem>

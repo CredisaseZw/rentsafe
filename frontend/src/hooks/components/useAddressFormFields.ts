@@ -3,11 +3,13 @@ import useCountries from "../apiHooks/useCountries";
 import useProvinces from "../apiHooks/useProvinces";
 import type { AddressLocation } from "@/interfaces";
 import useCities from "../apiHooks/useCities";
+import useSuburbs from "../apiHooks/useSuburbs";
 
 export default function useAddressFormFields() {
    const { countries, isLoading: countriesLoading } = useCountries();
    const { provinces, isLoading: provincesLoading } = useProvinces();
    const { cities, isLoading: citiesLoading } = useCities();
+   const { suburbs, isLoading: suburbsLoading } = useSuburbs();
 
    const [location, dispatch] = React.useReducer(locationReducer, {
       countryId: undefined as string | undefined,
@@ -35,12 +37,6 @@ export default function useAddressFormFields() {
       }
    }
 
-   const suburbs = [
-      { id: 1, name: "Avondale" },
-      { id: 2, name: "Borrowdale" },
-      { id: 3, name: "Greendale" },
-   ];
-
    return {
       location,
       countries,
@@ -50,6 +46,7 @@ export default function useAddressFormFields() {
       countriesLoading,
       provincesLoading,
       citiesLoading,
+      suburbsLoading,
       dispatch,
    };
 }
