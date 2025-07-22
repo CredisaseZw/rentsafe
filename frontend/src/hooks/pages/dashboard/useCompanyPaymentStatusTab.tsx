@@ -1,17 +1,21 @@
 import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
-import { sampleCompanyReport, sampleCompanyRows } from "@/lib/sampleData";
+import { sampleCompanyReport } from "@/lib/sampleData";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
+import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
 
 export default function useCompanyPaymentStatusTab() {
-   const rows: BaseTableRow[] = sampleCompanyRows.map((cell) => ({
-      ...cell,
-      select: <CompanyPaymentStatusReport report={sampleCompanyReport} />,
-   }));
+   const { companies, isLoading } = useMinimalCompaniesList();
+
+   const rows: BaseTableRow[] =
+      companies?.map((cell) => ({
+         ...cell,
+         select: <CompanyPaymentStatusReport report={sampleCompanyReport} />,
+      })) || [];
 
    const headers: BaseTableColumn[] = [
-      { name: "registeredName", displayName: "Registered Name" },
-      { name: "registrationNumber", displayName: "Registration Number" },
+      { name: "registration_name", displayName: "Registered Name" },
+      { name: "registration_number", displayName: "Registration Number" },
       { name: "select", displayName: "", colGroupclassName: "w-[1%]" },
    ];
 
@@ -25,6 +29,7 @@ export default function useCompanyPaymentStatusTab() {
    return {
       rows,
       headers,
+      isLoading,
       handleSearch,
    };
 }

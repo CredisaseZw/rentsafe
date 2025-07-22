@@ -6,7 +6,7 @@ import SectionHeading from "@/components/general/SectionHeading";
 import useCompanyPaymentStatusTab from "@/hooks/pages/dashboard/useCompanyPaymentStatusTab";
 
 export default function CompanyPaymentStatusTab() {
-   const { rows, headers, handleSearch } = useCompanyPaymentStatusTab();
+   const { rows, headers, isLoading, handleSearch } = useCompanyPaymentStatusTab();
 
    return (
       <div>
@@ -14,6 +14,7 @@ export default function CompanyPaymentStatusTab() {
          <BaseTable
             headers={headers}
             rows={rows}
+            isLoading={isLoading}
             tableActions={
                <div className="flex items-center justify-between gap-2">
                   <form
