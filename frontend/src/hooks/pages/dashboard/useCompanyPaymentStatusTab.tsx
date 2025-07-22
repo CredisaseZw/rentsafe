@@ -25,14 +25,14 @@ export default function useCompanyPaymentStatusTab() {
    function handleSearch(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
-      const q = formData.get("q") as string;
-      navigate({ search: "?q=" + q });
+      const q = formData.get("company_q") as string;
+      navigate({ search: "?company_q=" + q });
    }
 
    function clearSearch() {
       if (searchRef.current) searchRef.current.value = "";
       const searchParams = new URLSearchParams(window.location.search);
-      searchParams.delete("q");
+      searchParams.delete("company_q");
       navigate({ search: "?" + searchParams.toString() });
    }
 

@@ -22,20 +22,20 @@ export default function CompanyPaymentStatusTab() {
                      onSubmit={handleSearch}
                      className="bg-background border-foreground/40 flex items-center rounded-sm border"
                   >
-                     <Button type="submit" variant="ghost" size="xs">
-                        <Search />
+                     <Button onClick={clearSearch} type="button" variant="ghost" size="xs">
+                        <X />
                      </Button>
                      <Input
                         ref={searchRef}
                         placeholder="Search by name or reg..."
-                        name="q"
+                        name="company_q"
                         minLength={2}
                         required
                         defaultValue={searchQuery}
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
-                     <Button onClick={clearSearch} type="button" variant="ghost" size="xs">
-                        <X />
+                     <Button type="submit" variant="ghost" size="xs">
+                        <Search />
                      </Button>
                   </form>
 

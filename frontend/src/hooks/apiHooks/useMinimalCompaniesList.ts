@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router";
 
 export default function useMinimalCompaniesList() {
    const [searchParams] = useSearchParams();
-   const q = searchParams.get("q")?.trim();
+   const q = searchParams.get("company_q")?.trim();
 
    const { data, isLoading, error } = useQuery<CompanyMinimal[]>({
       queryKey: ["companies-minimal", q],
