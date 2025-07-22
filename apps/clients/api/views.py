@@ -5,10 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from apps.clients.models.models import Client
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
-from apps.clients.api.serializers import ClientCreateUpdateSerializer, FullClientSerializer
+from apps.clients.api.serializers import ClientCreateUpdateSerializer, FullClientSerializer, MinimalClientSerializer
 from apps.common.services.tasks import send_notification
 from apps.users.services.user_service import UserCreationService
 from apps.users.api.serializers import UserSerializer
@@ -27,6 +28,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return ClientCreateUpdateSerializer
+        elif self.action in ['search']:
+            return MinimalClientSerializer
         return FullClientSerializer
 
     @action(detail=True, methods=['post'], url_path='create-user')
@@ -105,6 +108,24 @@ class ClientViewSet(viewsets.ModelViewSet):
                 {"detail": "An error occurred while creating user"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+    @action(detail=False, methods=['get'], url_path='search')
+    def search(self, request):
+        """
+        Search for clients by name or external client ID
+        """
+        query = request.query_params.get('q', '').strip()
+        if not query:
+            return Response(
+                {"detail": "Query parameter 'q' is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        clients = Client.objects.filter(
+            Q(name__icontains=query) | Q(external_client_id__icontains=query)
+        ).distinct()
+        
+        serializer = MinimalClientSerializer(clients, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
     def _send_welcome_email(self, user, plaintext_password):
