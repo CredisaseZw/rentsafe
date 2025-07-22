@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import type { ReactNode } from "react";
 import BaseCard from "./BaseCard";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 export type BaseTableColumn = {
    name: string;
@@ -17,9 +18,17 @@ type BaseTableProps = {
    tableActions?: ReactNode;
    title?: string;
    titleClassName?: string;
+   isLoading?: boolean;
 };
 
-export default function BaseTable({ title, titleClassName, headers, rows: data, tableActions }: BaseTableProps) {
+export default function BaseTable({
+   title,
+   titleClassName,
+   headers,
+   rows: data,
+   tableActions,
+   isLoading,
+}: BaseTableProps) {
    const mappableRows = data;
 
    return (
@@ -59,7 +68,16 @@ export default function BaseTable({ title, titleClassName, headers, rows: data, 
                </TableHeader>
 
                <TableBody>
-                  {mappableRows.length ? (
+                  {isLoading ? (
+                     <TableRow noHover>
+                        <TableCell colSpan={headers.length} className="text-muted-foreground py-5 text-center">
+                           <div className="flex flex-col items-center justify-center gap-2">
+                              <Loader2 className="mx-auto animate-spin" />
+                              Loading...
+                           </div>
+                        </TableCell>
+                     </TableRow>
+                  ) : mappableRows.length ? (
                      mappableRows.map((row, index) => (
                         <TableRow key={index} noHover>
                            {headers.map((field) => (
