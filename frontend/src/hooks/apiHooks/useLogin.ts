@@ -8,7 +8,7 @@ interface AuthProps{
 export default function useLoginAuth(){
     return useMutation({
         mutationFn : async({ username, password}: AuthProps)=>{
-            let response = await apis.api.post("/api/auth/login/", {username, password});
+            let response = await apis.api.post(`${import.meta.env.VITE_API_URL}/api/auth/login/`, {username, password});
             return {
                 id :  response.data.user.id,
                 username : response.data.user.username,

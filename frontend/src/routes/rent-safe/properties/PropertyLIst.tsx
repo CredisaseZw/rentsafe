@@ -1,4 +1,4 @@
-import AddPropertyForm from '@/components/general/AddPropertyForm'
+import AddPropertyForm from '@/components/forms/AddPropertyForm'
 import Button from '@/components/general/Button'
 import { Filter } from '@/components/general/Filter'
 import Modal from '@/components/general/Modal'

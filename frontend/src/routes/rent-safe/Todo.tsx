@@ -1,4 +1,4 @@
-import AddTodoForm from "@/components/general/AddTodoForm";
+import AddTodoForm from "@/components/forms/AddTodoForm";
 import Button from "@/components/general/Button";
 import Modal from "@/components/general/Modal";
 import Pill from "@/components/general/Pill";
@@ -12,11 +12,11 @@ export default function Todo() {
    const { ModalState, openModal, closeModal } = useModal();
 
    return <div className="container px-7 py-4 W-full ">
-     {ModalState && 
+    {/*  {ModalState && 
          <Modal onClose={closeModal}>
             <AddTodoForm/>
          </Modal>
-      }
+      } */}
       <div className="to-do-main w-full">
          <div className="header">
             <h1 className="font-semibold text-4xl text-gray-700">10 JULY 2025</h1>
