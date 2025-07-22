@@ -1,4 +1,5 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
+import type { Address } from "@/interfaces";
 import type { NavLink, Route } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -109,4 +110,18 @@ export function formatDateToPythonSLiking(date: string): string {
    const month = String(d.getMonth() + 1).padStart(2, "0");
    const day = String(d.getDate()).padStart(2, "0");
    return `${year}-${month}-${day}`;
+}
+
+export function formatAddress(addr: Address): string {
+   const parts: string[] = [];
+
+   if (addr.street_address) parts.push(addr.street_address);
+   if (addr.line_2) parts.push(addr.line_2);
+   if (addr.suburb?.name) parts.push(addr.suburb.name);
+   if (addr.city?.name) parts.push(addr.city.name);
+   if (addr.province?.name) parts.push(addr.province.name);
+   if (addr.postal_code) parts.push(addr.postal_code.toString());
+   if (addr.country?.name) parts.push(addr.country.name);
+
+   return parts.join(", ");
 }

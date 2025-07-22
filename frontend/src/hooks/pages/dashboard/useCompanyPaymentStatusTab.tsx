@@ -1,6 +1,5 @@
 import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
-import { sampleCompanyReport } from "@/lib/sampleData";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
 
@@ -10,7 +9,7 @@ export default function useCompanyPaymentStatusTab() {
    const rows: BaseTableRow[] =
       companies?.map((cell) => ({
          ...cell,
-         select: <CompanyPaymentStatusReport report={sampleCompanyReport} />,
+         select: <CompanyPaymentStatusReport companyId={cell.id} />,
       })) || [];
 
    const headers: BaseTableColumn[] = [
