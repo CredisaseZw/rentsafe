@@ -16,7 +16,7 @@ export interface CompanyMinimal {
    legal_status_display?: string;
    industry?: string;
    is_verified?: boolean;
-   primary_address?: string;
+   primary_address?: Address;
 }
 
 export interface Address {

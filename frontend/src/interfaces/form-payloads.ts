@@ -1,8 +1,10 @@
+import type { CompanyLegalStatus } from "@/types";
+
 export interface CompanyPayload {
    registration_number: string;
    registration_name: string;
    trading_name?: string;
-   legal_status?: string;
+   legal_status?: CompanyLegalStatus;
    date_of_incorporation?: string;
    industry?: string;
    addresses?: {
@@ -20,20 +22,17 @@ export interface CompanyPayload {
    profile: {
       email: string;
       registration_date?: string;
-      trading_status?: string;
       mobile_phone?: string;
       landline_phone?: string;
       tin_number?: string;
       vat_number?: string;
       number_of_employees?: number;
       website?: string;
-      trend?: string;
       twitter?: string;
       facebook?: string;
       instagram?: string;
       linkedin?: string;
       operations?: string;
-      risk_class?: string;
       account_number?: string;
       is_under_judicial?: "YES" | "NO";
       is_suspended?: boolean;

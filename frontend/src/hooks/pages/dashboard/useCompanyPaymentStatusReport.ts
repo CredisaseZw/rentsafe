@@ -44,7 +44,5 @@ export default function useCompanyPaymentStatusReport(companyId: number) {
       PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === report.rating.toLowerCase())?.className ||
       "bg-gray-500 text-white";
 
-   console.log(company?.addresses);
-
    return { show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress };
 }
