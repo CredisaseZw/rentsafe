@@ -7,18 +7,20 @@ import { useSearchParams } from "react-router";
 
 export default function useMinimalCompaniesList() {
    const [searchParams] = useSearchParams();
-   const q = searchParams.get("q")?.trim() || "all";
+   const q = searchParams.get("q")?.trim();
 
    const { data, isLoading, error } = useQuery<CompanyMinimal[]>({
       queryKey: ["companies-minimal", q],
       queryFn: () =>
-         api
-            // .get<{ results: CompanyMinimal[] }>(`/api/companies/${q ? `search/?q=${encodeURIComponent(q)}` : ""}`)
-            // .then((res) => res.data.results),
-            .get<{ results: { company: CompanyMinimal }[] }>(
-               `/api/companies/${q ? `search/?q=${encodeURIComponent(q)}` : ""}`,
-            )
-            .then((res) => res.data.results.map((item) => item.company)),
+         q
+            ? api
+                 // .get<{ results: CompanyMinimal[] }>(`/api/companies/${q ? `search/?q=${encodeURIComponent(q)}` : ""}`)
+                 // .then((res) => res.data.results),
+                 .get<{ results: { company: CompanyMinimal }[] }>(
+                    `/api/companies/${q ? `search/?q=${encodeURIComponent(q)}` : ""}`,
+                 )
+                 .then((res) => res.data.results.map((item) => item.company))
+            : api.get<{ results: CompanyMinimal[] }>("/api/companies/").then((res) => res.data.results),
    });
 
    useEffect(() => {
@@ -28,7 +30,5 @@ export default function useMinimalCompaniesList() {
       }
    }, [error, q]);
 
-   console.log(data);
-
-   return { companies: data, isLoading };
+   return { companies: data, isLoading, searchQuery: q };
 }

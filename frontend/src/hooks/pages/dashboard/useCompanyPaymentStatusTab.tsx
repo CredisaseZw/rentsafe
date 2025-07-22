@@ -6,7 +6,8 @@ import { useNavigate } from "react-router";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
-   const { companies, isLoading } = useMinimalCompaniesList();
+   const searchRef = React.useRef<HTMLInputElement>(null);
+   const { companies, isLoading, searchQuery } = useMinimalCompaniesList();
 
    // @ts-expect-error ReactNode types will never be rendered
    const rows: BaseTableRow[] =
@@ -28,10 +29,20 @@ export default function useCompanyPaymentStatusTab() {
       navigate({ search: "?q=" + q });
    }
 
+   function clearSearch() {
+      if (searchRef.current) searchRef.current.value = "";
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.delete("q");
+      navigate({ search: "?" + searchParams.toString() });
+   }
+
    return {
       rows,
       headers,
-      isLoading: isLoading,
+      searchRef,
+      isLoading,
+      searchQuery,
+      clearSearch,
       handleSearch,
    };
 }
