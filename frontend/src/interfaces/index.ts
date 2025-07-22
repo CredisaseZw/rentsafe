@@ -141,9 +141,25 @@ export interface Country {
 export interface Province {
    id: number;
    name: string;
+   code: string;
+   country: string;
+   slug: string;
+   is_active: boolean;
+   approved: boolean;
 }
 
 export interface Suburb {
    id: number;
    name: string;
+}
+
+export interface AddressLocation {
+   countryId?: string;
+   provinceId?: string;
+   cityId?: string;
+   suburbId?: string;
+   countryName?: string;
+   provinceName?: string;
+   cityName?: string;
+   suburbName?: string;
 }

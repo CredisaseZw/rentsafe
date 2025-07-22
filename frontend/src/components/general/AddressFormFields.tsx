@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useAddressFormFields from "@/hooks/components/useAddressFormFields";
 
 export default function AddressFormFields() {
-   const { location, countries, provinces, cities, suburbs, countriesLoading, setLocation } = useAddressFormFields();
+   const { location, countries, provinces, cities, suburbs, countriesLoading, provincesLoading, dispatch } =
+      useAddressFormFields();
 
    return (
       <details>
@@ -22,16 +23,16 @@ export default function AddressFormFields() {
                <Select
                   name="country_id"
                   disabled={countriesLoading}
-                  value={location.country}
-                  onValueChange={(v) => setLocation((prev) => ({ ...prev, country: v }))}
+                  value={location.countryId}
+                  onValueChange={(value) => dispatch({ type: "country-changed", value: value })}
                >
                   <SelectTrigger id="country_id" className="border-foreground/40 w-full bg-white">
                      <SelectValue placeholder={countriesLoading ? "Loading..." : "Select country"} />
                   </SelectTrigger>
                   <SelectContent>
                      {countries?.map((country) => (
-                        <SelectItem key={country.id} value={country.id.toString()}>
-                           {country.name}
+                        <SelectItem key={country.id} value={country.id.toString()} className="line-clamp-1">
+                           {country.name} ({country.code})
                         </SelectItem>
                      ))}
                   </SelectContent>
@@ -42,16 +43,23 @@ export default function AddressFormFields() {
                <Label className="px-2 font-normal" htmlFor="province_id">
                   Province
                </Label>
-               <Select name="province_id">
+               <Select
+                  name="province_id"
+                  disabled={provincesLoading}
+                  value={location.provinceId}
+                  onValueChange={(value) => dispatch({ type: "province-changed", value: value })}
+               >
                   <SelectTrigger id="province_id" className="border-foreground/40 w-full bg-white">
-                     <SelectValue placeholder="Select province" />
+                     <SelectValue placeholder={provincesLoading ? "Loading..." : "Select province"} />
                   </SelectTrigger>
                   <SelectContent>
-                     {provinces.map((province) => (
-                        <SelectItem key={province.id} value={province.id.toString()}>
-                           {province.name}
-                        </SelectItem>
-                     ))}
+                     {provinces
+                        ?.filter((province) => province.country === location.countryName)
+                        .map((province) => (
+                           <SelectItem key={province.id} value={province.id.toString()} className="line-clamp-1">
+                              {province.name} ({province.code})
+                           </SelectItem>
+                        ))}
                   </SelectContent>
                </Select>
             </div>
