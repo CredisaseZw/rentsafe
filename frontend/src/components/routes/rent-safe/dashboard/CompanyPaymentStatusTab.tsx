@@ -28,7 +28,7 @@ export default function CompanyPaymentStatusTab() {
                      <Input
                         ref={searchRef}
                         placeholder="Search by name or reg..."
-                        name="q"
+                        name="company_q"
                         minLength={2}
                         required
                         defaultValue={searchQuery}
