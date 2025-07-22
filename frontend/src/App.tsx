@@ -2,15 +2,13 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { RENTSAFE_ROUTES, ROOT_ROUTES } from "./constants";
 import RentsafeLayout from "./components/routes/rent-safe/Layout";
 import RootLayout from "./components/general/RootLayout";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectRoute from "./lib/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
+import ReactQueryProvider from "./providers/ReactQueryProvider";
 
 export default function App() {
-   const queryClient = new QueryClient();
-
    return (
-      <QueryClientProvider client={queryClient}>
+      <ReactQueryProvider>
          <BrowserRouter>
             <Routes>
                <Route element={<RootLayout />}>
@@ -29,6 +27,6 @@ export default function App() {
          </BrowserRouter>
 
          <Toaster dismissible position="top-left" duration={10 * 1000} />
-      </QueryClientProvider>
+      </ReactQueryProvider>
    );
 }
