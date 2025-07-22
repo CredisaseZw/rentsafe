@@ -1,8 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { ReactNode } from "react";
+import LoadingIndicator from "./LoadingIndicator";
 import BaseCard from "./BaseCard";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
 
 export type BaseTableColumn = {
    name: string;
@@ -70,11 +70,8 @@ export default function BaseTable({
                <TableBody>
                   {isLoading ? (
                      <TableRow noHover>
-                        <TableCell colSpan={headers.length} className="text-muted-foreground py-5 text-center">
-                           <div className="flex flex-col items-center justify-center gap-2">
-                              <Loader2 className="mx-auto animate-spin" />
-                              Loading...
-                           </div>
+                        <TableCell colSpan={headers.length}>
+                           <LoadingIndicator />
                         </TableCell>
                      </TableRow>
                   ) : mappableRows.length ? (
