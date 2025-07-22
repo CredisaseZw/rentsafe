@@ -7,8 +7,7 @@ import { api } from "@/api/axios";
 export default function useMinimalCompaniesList() {
    const { data, isLoading, error } = useQuery<CompanyMinimal[]>({
       queryKey: ["companies-minimal"],
-      queryFn: async () =>
-         await api.get<{ results: CompanyMinimal[] }>("/api/companies/").then((res) => res.data.results),
+      queryFn: () => api.get<{ results: CompanyMinimal[] }>("/api/companies/").then((res) => res.data.results),
    });
 
    React.useEffect(() => {

@@ -11,7 +11,7 @@ export default function useCreateCompany(successCallback?: () => void) {
    const client = useClient();
 
    const { mutate, isPending } = useMutation({
-      mutationFn: async (companyPayload: CompanyPayload) =>
+      mutationFn: (companyPayload: CompanyPayload) =>
          api.post<CompanyFull>("/api/companies/", companyPayload).then((res) => res.data),
       onError(error: AxiosError | Error | unknown) {
          console.error("Error creating company:", error);
