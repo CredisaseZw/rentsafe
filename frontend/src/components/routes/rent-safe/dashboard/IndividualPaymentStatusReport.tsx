@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Fullscreen, Printer } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { friendlyDate } from "@/lib/utils";
-import { MODAL_WIDTHS, PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
+import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import OverviewCard from "./OverviewCard";
 import Logo from "@/components/general/Logo";
@@ -47,7 +47,7 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[${MODAL_WIDTHS.lg}] sm:max-w-[default]`}>
+         <DialogContent className={`max-w-[1100px] sm:max-w-[default]`}>
             <DialogTitle>
                <Button size="sm">
                   Print

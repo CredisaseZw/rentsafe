@@ -1,4 +1,4 @@
-import AddPropertyForm from '@/components/general/AddPropertyForm'
+import AddPropertyForm from '@/components/forms/AddPropertyForm'
 import Button from '@/components/general/Button'
 import { Filter } from '@/components/general/Filter'
 import Modal from '@/components/general/Modal'
@@ -23,7 +23,7 @@ function PropertyLIst() {
   } = usePropertyList()
 
   return (
-  <div className='container px-7 py-4 W-full'>
+  <div className='side-main'>
     {addPropertyModal && <Modal 
         onClose={closeModal}
         size={"xl"}

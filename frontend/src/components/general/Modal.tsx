@@ -4,7 +4,7 @@ import React, { useEffect , useRef} from 'react'
 interface ModalProps {
   children? : React.ReactNode,
   size: "md" | "lg" | "xl",
-  allowOverflow : boolean | false,
+  allowOverflow? : boolean | false,
   modalHeader  : string,
   onClose : (event?: React.MouseEvent | React.KeyboardEvent) => void;
 }
@@ -36,27 +36,33 @@ useEffect(() => {
   };
 }, [onClose]);
 
-  return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs ${allowOverflow && "overflow-y-auto" }`}>
-        <div
-          className={`modal rounded-md border p-10 bg-white ${allowOverflow ? "mt-50" : ""} ${modal_sizes.current[size].width}`}>
-            <div className="modal-container relative ">
-                <div className='modal-header mb-5 relative'>
-                    <h1 className='font-bold text-2xl text-PRIMARY'>{modalHeader}</h1>
-                    <div className='absolute top-0 right-0'>
-                      <X 
-                        size={25}
-                        className='text-gray-500 self-center hover:text-red-800'
-                        onClick={onClose}
-                      />
-                    </div>
-                </div>
-            
-                {children}
-            </div>
+return (
+  <div
+    className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs py-10`}
+  >
+    <div
+      className={`modal relative mx-auto rounded-md border p-10 bg-white ${modal_sizes.current[size].width}`}
+    >
+      <div className="modal-container relative">
+        <div className="modal-header mb-5 relative">
+          <h1 className="font-bold text-2xl text-PRIMARY">{modalHeader}</h1>
+          <div className="absolute top-0 right-0">
+            <X
+              size={25}
+              className="text-gray-500 self-center hover:text-red-800"
+              onClick={onClose}
+            />
+          </div>
         </div>
+
+        <div className="max-h-[80vh] overflow-y-auto pr-2">
+          {children}
+        </div>
+      </div>
     </div>
-  )
+  </div>
+);
+
 }
 
 export default Modal

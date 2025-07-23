@@ -2,7 +2,7 @@ import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { INDUSTRIES, MODAL_WIDTHS } from "@/constants";
+import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddressFormFields from "@/components/general/AddressFormFields";
@@ -11,17 +11,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 export default function CompanyForm() {
-   const { isPending, handleSubmit } = useCompanyForm();
+   const { showForm, isPending, handleSubmit, setShowForm } = useCompanyForm();
 
    return (
-      <Dialog modal {...(isPending ? { onOpenChange: () => toast("Processing form, please wait") } : undefined)}>
+      <Dialog
+         modal
+         open={showForm}
+         onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
+      >
          <DialogTrigger asChild>
             <Button size="sm">
                Add New Company <Plus />
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[${MODAL_WIDTHS.md}] sm:max-w-[default]`}>
+         <DialogContent className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 
             <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
@@ -91,15 +95,21 @@ export default function CompanyForm() {
                      </div>
 
                      <div className="flex flex-col gap-2">
-                        <Label className="px-2 font-normal" htmlFor="trading_status">
-                           Trading Status
+                        <Label className="px-2 font-normal" htmlFor="legal_status">
+                           Legal Status
                         </Label>
-                        <Input
-                           id="trading_status"
-                           name="trading_status"
-                           className="border-foreground/40 bg-white"
-                           placeholder="e.g. Active"
-                        />
+                        <Select name="legal_status">
+                           <SelectTrigger id="legal_status" className="border-foreground/40 w-full bg-white">
+                              <SelectValue placeholder="Select legal status" />
+                           </SelectTrigger>
+                           <SelectContent>
+                              {ALL_POSSIBLE_COMPANY_LEGAL_STATUSES.map((status) => (
+                                 <SelectItem key={status} value={status}>
+                                    {status}
+                                 </SelectItem>
+                              ))}
+                           </SelectContent>
+                        </Select>
                      </div>
 
                      <div className="flex flex-col gap-2">
@@ -196,18 +206,6 @@ export default function CompanyForm() {
                            </div>
 
                            <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="legal_status">
-                                 Legal Status
-                              </Label>
-                              <Input
-                                 id="legal_status"
-                                 name="legal_status"
-                                 className="border-foreground/40 bg-white"
-                                 placeholder="e.g. Private Limited"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
                               <Label className="px-2 font-normal" htmlFor="date_of_incorporation">
                                  Date of Incorporation
                               </Label>
@@ -220,18 +218,6 @@ export default function CompanyForm() {
                            </div>
 
                            <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="risk_class">
-                                 Risk Class
-                              </Label>
-                              <Input
-                                 id="risk_class"
-                                 name="risk_class"
-                                 className="border-foreground/40 bg-white"
-                                 placeholder="e.g. Low"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
                               <Label className="px-2 font-normal" htmlFor="operations">
                                  Operations
                               </Label>
@@ -240,18 +226,6 @@ export default function CompanyForm() {
                                  name="operations"
                                  className="border-foreground/40 bg-white"
                                  placeholder="e.g. Manufacturing, Distribution"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="trend">
-                                 Trend
-                              </Label>
-                              <Input
-                                 id="trend"
-                                 name="trend"
-                                 className="border-foreground/40 bg-white"
-                                 placeholder="e.g. Growing"
                               />
                            </div>
 

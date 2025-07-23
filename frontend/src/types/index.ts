@@ -13,3 +13,5 @@ export type NavLink = {
 };
 
 export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
+
+export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";

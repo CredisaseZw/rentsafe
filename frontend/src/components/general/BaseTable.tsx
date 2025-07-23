@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { ReactNode } from "react";
+import LoadingIndicator from "./LoadingIndicator";
 import BaseCard from "./BaseCard";
 import { cn } from "@/lib/utils";
 
@@ -17,9 +18,17 @@ type BaseTableProps = {
    tableActions?: ReactNode;
    title?: string;
    titleClassName?: string;
+   isLoading?: boolean;
 };
 
-export default function BaseTable({ title, titleClassName, headers, rows: data, tableActions }: BaseTableProps) {
+export default function BaseTable({
+   title,
+   titleClassName,
+   headers,
+   rows: data,
+   tableActions,
+   isLoading,
+}: BaseTableProps) {
    const mappableRows = data;
 
    return (
@@ -59,7 +68,13 @@ export default function BaseTable({ title, titleClassName, headers, rows: data, 
                </TableHeader>
 
                <TableBody>
-                  {mappableRows.length ? (
+                  {isLoading ? (
+                     <TableRow noHover>
+                        <TableCell colSpan={headers.length}>
+                           <LoadingIndicator />
+                        </TableCell>
+                     </TableRow>
+                  ) : mappableRows.length ? (
                      mappableRows.map((row, index) => (
                         <TableRow key={index} noHover>
                            {headers.map((field) => (
