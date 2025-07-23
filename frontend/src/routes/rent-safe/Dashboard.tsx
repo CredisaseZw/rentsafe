@@ -28,7 +28,7 @@ export default function Dashboard() {
                <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="data-[state=active]:text-foreground cursor-pointer border-0 text-white transition-all duration-75 hover:bg-black/40"
+                  className="data-[state=active]:text-foreground cursor-pointer border-0 text-white transition-none hover:bg-black/40"
                >
                   <tab.icon />
                   {tab.label}
