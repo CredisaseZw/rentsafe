@@ -68,7 +68,7 @@ class Client(models.Model):
         unique_together = [['client_content_type', 'client_object_id']]
 
     def __str__(self):
-        return self.name or f"Client {self.pk}"
+        return f"{self.name or self.client_object} ({self.get_client_type_display()})"
 
     def save(self, *args, **kwargs):
         if not self.name and self.client_object:
@@ -95,9 +95,48 @@ class Client(models.Model):
     def is_individual_client(self):
         """Returns True if the client is an Individual."""
         return isinstance(self.client_object, Individual)
+    @property
+    def linked_individual(self):
+        """Returns the linked Individual if this is an individual client, else None"""
+        return self.client_object if self.is_individual_client else None
+
+    @property
+    def linked_company_branch(self):
+        """Returns the linked CompanyBranch if this is a company client, else None"""
+        return self.client_object if self.is_company_client else None
+
+    @property
+    def linked_company(self):
+        """Returns the Company if this is a company client, else None"""
+        return self.client_object.company if self.is_company_client else None
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('clients:client-detail', kwargs={'pk': self.pk})
 
     @property
     def is_company_client(self):
         """Returns True if the client is a Company."""
         return isinstance(self.client_object, Company)
-    
+    @property
+    def email(self):
+        """Get email from linked entity"""
+        if self.is_individual_client:
+            return self.linked_individual.first_name or None
+        elif self.is_company_client:
+            primary_contact = self.linked_company_branch.contacts.filter(is_primary=True).first()
+            if primary_contact and primary_contact.individual:
+                return primary_contact.individual.first_name or None
+        return None
+
+    @property
+    def can_have_users(self):
+        """Determine if this client type can have users"""
+        return self.client_type in ['INDIVIDUAL_USER', 'COMPANY_USER', 'CLIENT']
+    @property
+    def get_subscriptions(self):
+        """
+        Returns the display name for the subscription type.
+        This can be overridden in subclasses if needed.
+        """
+        return self.subscriptions if hasattr(self, 'subscriptions') else []

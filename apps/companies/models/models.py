@@ -118,6 +118,9 @@ class CompanyBranch(BaseModel):
 
     def __str__(self):
         return f"{self.branch_name} - {self.company.registration_name}"
+    @property
+    def full_name(self):
+        return f"{self.branch_name}" if self.branch_name else self.company.registration_name
 
 class ContactPerson(BaseModel):
     CONTACT_TYPES = (

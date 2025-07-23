@@ -2,58 +2,88 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from apps.individuals.models.models import Individual
-from apps.companies.models.models import Company
+from apps.clients.models.models import Client
+from apps.individuals.models import Individual
+from apps.companies.models import CompanyBranch
+from apps.users.models.models import Role
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 class UserCreationService:
     @classmethod
     @transaction.atomic
-    def create_company_user(cls, creator, user_data, individual_data=None):
+    def create_client_user(cls, creator, client, user_data):
         """
-        Creates a company user with proper validation and relationships
+        Creates a client user with proper validation and relationships
         """
-        # Validate creator permissions
-        if not creator.is_superuser and creator.user_type not in ['ADMIN', 'AGENT']:
-            raise PermissionError("Only admins or agents can create users")
+        if not client or not isinstance(client, Client):
+            raise ValidationError("Invalid client provided")
+        
+        if not client.can_have_users:
+            raise ValidationError("This client type cannot have users")
 
-        company = user_data.get('company') if creator.is_superuser else creator.company
+        if not user_data.get('email'):
+            raise ValidationError("Email is required")
+        if not user_data.get('password'):
+            raise ValidationError("Password is required")
 
-        if not company and not creator.is_superuser:
-            raise ValidationError("Company is required for non-superuser creators")
-
-        # Create the individual profile if needed
-        profile = None
-        profile_content_type = None
-        if individual_data and not Individual.objects.filter(
-            identification_number=individual_data.get('identification_number')
-            ).exists():
-            profile = Individual.objects.create(
-                first_name=individual_data.get('first_name'),
-                last_name=individual_data.get('last_name'),
-                date_of_birth=individual_data.get('date_of_birth'),
-                gender=individual_data.get('gender', 'other'),
-                identification_type=individual_data.get('identification_type', 'national_id'),
-                identification_number=individual_data.get('identification_number'),
-                email=individual_data.get('email'),
-                mobile_phone=individual_data.get('mobile_phone'),
-                company=company
-            )
-            profile_content_type = ContentType.objects.get_for_model(profile)
-        else:
-            profile = Individual.objects.filter(
-                identification_number=individual_data.get('identification_number')
-            ).first() if individual_data else None
-
-            profile_content_type = ContentType.objects.get_for_model(profile) if profile else None
-
-        return User.objects.create_user(
-            username=user_data.get('username'),
-            email=user_data.get('email'),
-            password=user_data.get('password'),
-            user_type=user_data.get('user_type', 'COMPANY_USER'),
-            company=company,
-            profile_content_type=profile_content_type,
-            profile_object_id=profile.id if profile else None,
-            is_verified=user_data.get('is_verified', False),
+        user = User.objects.create_user(
+            username=user_data.get('email'),
+            email=user_data['email'],
+            password=user_data['password'],
+            first_name=user_data.get('first_name', ''),
+            last_name=user_data.get('last_name', ''),
+            client=client,
+            is_verified=user_data.get('is_verified', False)
         )
+
+        if client.is_individual_client and isinstance(client.client_object, Individual):
+            user.profile_content_type = ContentType.objects.get_for_model(Individual)
+            user.profile_object_id = client.client_object.id
+            user.save()
+
+        if 'role_id' in user_data:
+            try:
+                role = Role.objects.get(id=user_data['role_id'])
+                user.roles.add(role)
+            except Role.DoesNotExist:
+                raise ValidationError("Specified role does not exist")
+
+        return user
+
+    @classmethod
+    def create_system_user(cls, creator, user_data, role_id=None):
+        """
+        Creates a system user (admin/staff) not associated with any client
+        """
+        if not user_data.get('email'):
+            raise ValidationError("Email is required")
+        if not user_data.get('password'):
+            raise ValidationError("Password is required")
+
+        role = None
+        if role_id:
+            try:
+                role = Role.objects.get(id=role_id)
+            except Role.DoesNotExist as e:
+                raise ValidationError("Specified role does not exist") from e
+
+        user = User.objects.create_user(
+            username=user_data.get('email'), 
+            email=user_data['email'],
+            password=user_data['password'],
+            is_staff=user_data.get('is_staff', False),
+            is_superuser=user_data.get('is_superuser', False),
+            is_verified=user_data.get('is_verified', True), 
+            first_name=user_data.get('first_name', ''),
+            last_name=user_data.get('last_name', ''),
+        )
+
+        if role:
+            user.roles.add(role)
+
+        return user

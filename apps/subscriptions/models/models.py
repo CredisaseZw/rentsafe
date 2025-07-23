@@ -57,6 +57,7 @@ class Subscription(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                     limit_choices_to=Q(app_label='individuals', model='individual') |
                                     Q(app_label='companies', model='companybranch'),
+                                    related_name='subscriptions',
                                     help_text=_("The type of entity subscribing (Individual or Company)."))
     object_id = models.PositiveIntegerField(
         help_text=_("The ID of the subscribing entity (Individual or Company)."))
