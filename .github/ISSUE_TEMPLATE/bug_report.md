@@ -2,10 +2,9 @@
 name: 🐛 Bug Report
 about: Report a bug or unexpected behavior in RentSafe Development
 title: "[BUG] "
-labels: bug, triage, P1: High
+labels: bug, triage
 assignees: 
 milestone: "Sprint 3: Integration & Refinement"
-projects: ["CredisaseZw/2"]
 ---
 
 ## 🐛 Bug Description
@@ -29,34 +28,10 @@ What actually happened.
 
 ## 📋 Relevant Area
 - [ ] Frontend
-- [ ] Backend  
+- [ ] Backend
 - [ ] Database
 - [ ] Infrastructure
-- [ ] CI/CD
-- [ ] Documentation
 - [ ] Other: 
-
-## 🏷️ App Label
-<!-- Add the relevant app label (e.g., app:users, app:properties, app:leases, etc.) -->
-- [ ] app:users
-- [ ] app:clients
-- [ ] app:companies
-- [ ] app:individuals
-- [ ] app:common
-- [ ] app:properties
-- [ ] app:leases
-- [ ] app:accounting
-- [ ] app:communications
-- [ ] app:reporting
-- [ ] app:maintenance
-- [ ] app:subscriptions
-- [ ] app:credit_control
-- [ ] app:legal
-
-## 🚨 Priority Level
-- [ ] P0: Critical (System down, data loss)
-- [ ] P1: High (Major functionality broken)
-- [ ] P2: Medium (Minor issues, workarounds available) 
 
 ## 📸 Screenshots/Logs
 <!-- Add screenshots or error logs if applicable -->
