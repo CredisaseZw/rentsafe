@@ -397,6 +397,14 @@ LOGGING = {
             'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
             'formatter': 'audit',
         },
+        'leases_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'leases.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': { 
@@ -436,6 +444,11 @@ LOGGING = {
         },
         'companies': {
             'handlers': ['console','file_companies'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'leases': {
+            'handlers': ['console', 'leases_file'],
             'level': 'ERROR',
             'propagate': False,
         },

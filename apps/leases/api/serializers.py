@@ -26,7 +26,10 @@ class LeaseTenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaseTenant
         fields = ['id', 'lease', 'tenant_object', 'is_primary_tenant', 'tenant_type', 'tenant_id']
-        read_only_fields = ['tenant_object']
+        read_only_fields = ['lease','tenant_object']
+        extra_kwargs = {
+            'lease': {'required': False}
+        }
     
     def get_tenant_object(self, obj):
         if obj.tenant_object:
@@ -51,13 +54,13 @@ class LeaseTenantSerializer(serializers.ModelSerializer):
         tenant_type = data.get('tenant_type')
         tenant_id = data.get('tenant_id')
         
-        if tenant_type not in ['individual', 'company_branch']:
-            raise serializers.ValidationError("Invalid tenant type. Must be 'individual' or 'company_branch'.")
-        
+        if tenant_type not in ['individual', 'company']:
+            raise serializers.ValidationError("Invalid tenant type. Must be 'individual' or 'company'.")
+
         try:
             content_type = ContentType.objects.get(
                 app_label='individuals' if tenant_type == 'individual' else 'companies',
-                model=tenant_type
+                model='individual' if tenant_type == 'individual' else 'companybranch'
             )
             tenant = content_type.get_object_for_this_type(id=tenant_id)
             data['content_type'] = content_type
@@ -81,6 +84,9 @@ class LeaseChargeSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaseCharge
         fields = '__all__'
+        extra_kwargs = {
+            'lease': {'required': False}
+        }
 
 class LeaseTerminationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -169,185 +175,46 @@ class LandlordSerializer(serializers.ModelSerializer):
         landlord_type = data.get('landlord_type')
         landlord_id = data.get('landlord_id')
         
-        if landlord_type not in ['individual', 'company_branch']:
-            raise serializers.ValidationError("Invalid landlord type. Must be 'individual' or 'company_branch'.")
+        if landlord_type not in ['individual', 'company']:
+            raise serializers.ValidationError("Invalid landlord type. Must be 'individual' or 'company'.")
         
         try:
             content_type = ContentType.objects.get(
                 app_label='individuals' if landlord_type == 'individual' else 'companies',
-                model=landlord_type
+                model='individual' if landlord_type == 'individual' else 'companybranch'
             )
-            landlord = content_type.get_object_for_this_type(id=landlord_id)
+            # Check if the referenced object exists
+            model_class = content_type.model_class()
+            if not model_class.objects.filter(id=landlord_id).exists():
+                raise serializers.ValidationError(f"{landlord_type.capitalize()} with ID {landlord_id} does not exist.")
+            
             data['content_type'] = content_type
             data['object_id'] = landlord_id
         except ContentType.DoesNotExist:
             raise serializers.ValidationError(f"Invalid content type for {landlord_type}.")
         except Exception as e:
-            raise serializers.ValidationError(f"Landlord not found: {str(e)}")
+            raise serializers.ValidationError(f"Landlord validation failed: {str(e)}")
         
         return data
-
-class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
-    tenants = LeaseTenantSerializer(many=True, required=False)
-    charges = LeaseChargeSerializer(many=True, required=False)
-    landlord_data = LandlordSerializer(required=False)
-    guarantor_data = GuarantorSerializer(required=False)
-    address_data = serializers.JSONField(required=False)
-    
-    class Meta:
-        model = Lease
-        fields = [
-            'lease_id', 'unit', 'start_date', 'end_date', 'signed_date', 'status',
-            'landlord', 'landlord_data', 'deposit_amount', 'deposit_period', 'currency',
-            'payment_frequency', 'due_day_of_month', 'grace_period_days',
-            'includes_utilities', 'utilities_details', 'guarantor', 'guarantor_data',
-            'account_number', 'tenants', 'charges', 'address_data'
-        ]
     
     def create(self, validated_data):
-        tenants_data = validated_data.pop('tenants', [])
-        charges_data = validated_data.pop('charges', [])
-        landlord_data = validated_data.pop('landlord_data', None)
-        guarantor_data = validated_data.pop('guarantor_data', None)
-        address_data = validated_data.pop('address_data', None)
-        
-        # Handle landlord creation if needed
-        if landlord_data and not validated_data.get('landlord'):
-            landlord_serializer = LandlordSerializer(data=landlord_data)
-            landlord_serializer.is_valid(raise_exception=True)
-            landlord = landlord_serializer.save()
-            validated_data['landlord'] = landlord
-        
-        # Handle guarantor creation if needed
-        if guarantor_data and not validated_data.get('guarantor'):
-            guarantor_serializer = GuarantorSerializer(data=guarantor_data)
-            guarantor_serializer.is_valid(raise_exception=True)
-            guarantor = guarantor_serializer.save()
-            validated_data['guarantor'] = guarantor
-        
-        # Handle address creation for property/unit if needed
-        if address_data:
-            self._handle_address_creation(validated_data['unit'], address_data)
-        
-        lease = Lease.objects.create(**validated_data)
-        
-        # Create tenants
-        for tenant_data in tenants_data:
-            LeaseTenant.objects.create(lease=lease, **tenant_data)
-        
-        # Create charges
-        for charge_data in charges_data:
-            LeaseCharge.objects.create(lease=lease, **charge_data)
-        
-        return lease
-    
-    def update(self, instance, validated_data):
-        tenants_data = validated_data.pop('tenants', None)
-        charges_data = validated_data.pop('charges', None)
-        landlord_data = validated_data.pop('landlord_data', None)
-        guarantor_data = validated_data.pop('guarantor_data', None)
-        address_data = validated_data.pop('address_data', None)
-        
-        # Handle landlord update if needed
-        if landlord_data:
-            landlord_serializer = LandlordSerializer(instance.landlord, data=landlord_data, partial=True)
-            landlord_serializer.is_valid(raise_exception=True)
-            landlord_serializer.save()
-        
-        # Handle guarantor update if needed
-        if guarantor_data:
-            if instance.guarantor:
-                guarantor_serializer = GuarantorSerializer(instance.guarantor, data=guarantor_data, partial=True)
-            else:
-                guarantor_serializer = GuarantorSerializer(data=guarantor_data)
-            guarantor_serializer.is_valid(raise_exception=True)
-            guarantor = guarantor_serializer.save()
-            instance.guarantor = guarantor
-        
-        # Handle address update if needed
-        if address_data:
-            self._handle_address_creation(instance.unit, address_data)
-        
-        # Update lease fields
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        
-        # Handle tenants update if provided
-        if tenants_data is not None:
-            self._update_tenants(instance, tenants_data)
-        
-        # Handle charges update if provided
-        if charges_data is not None:
-            self._update_charges(instance, charges_data)
-        
-        return instance
-    
-    def _handle_address_creation(self, unit, address_data):
-        # Check if property has address, if not create one
-        property = unit.property
-        if not property.addresses.exists():
-            Address.objects.create(
-                content_type=ContentType.objects.get_for_model(Property),
-                object_id=property.id,
-                **address_data
-            )
-        
-        # Check if unit has address, if not create one
-        if not unit.addresses.exists():
-            Address.objects.create(
-                content_type=ContentType.objects.get_for_model(Unit),
-                object_id=unit.id,
-                **address_data
-            )
-    
-    def _update_tenants(self, lease, tenants_data):
-        # Get current tenants
-        current_tenants = list(lease.lease_tenants.all())
-        
-        # Process new tenants
-        for tenant_data in tenants_data:
-            tenant_id = tenant_data.get('id')
-            if tenant_id:
-                # Update existing tenant
-                tenant = next((t for t in current_tenants if t.id == tenant_id), None)
-                if tenant:
-                    for attr, value in tenant_data.items():
-                        if attr not in ['id', 'lease']:
-                            setattr(tenant, attr, value)
-                    tenant.save()
-                    current_tenants.remove(tenant)
-            else:
-                # Create new tenant
-                LeaseTenant.objects.create(lease=lease, **tenant_data)
-        
-        # Delete remaining tenants that weren't in the update
-        for tenant in current_tenants:
-            tenant.delete()
-    
-    def _update_charges(self, lease, charges_data):
-        # Get current charges
-        current_charges = list(lease.charges.all())
-        
-        # Process new charges
-        for charge_data in charges_data:
-            charge_id = charge_data.get('id')
-            if charge_id:
-                # Update existing charge
-                charge = next((c for c in current_charges if c.id == charge_id), None)
-                if charge:
-                    for attr, value in charge_data.items():
-                        if attr not in ['id', 'lease']:
-                            setattr(charge, attr, value)
-                    charge.save()
-                    current_charges.remove(charge)
-            else:
-                # Create new charge
-                LeaseCharge.objects.create(lease=lease, **charge_data)
-        
-        # Delete remaining charges that weren't in the update
-        for charge in current_charges:
-            charge.delete()
+        try:
+            # Check if landlord already exists for this object
+            landlord = Landlord.objects.filter(
+                content_type=validated_data['content_type'],
+                object_id=validated_data['object_id']
+            ).first()
+            
+            if not landlord:
+                landlord = Landlord.objects.create(
+                    content_type=validated_data['content_type'],
+                    object_id=validated_data['object_id']
+                )
+            
+            return landlord
+        except Exception as e:
+            raise serializers.ValidationError(f"Failed to create landlord: {str(e)}")
+
 
 class LeaseDetailSerializer(serializers.ModelSerializer):
     tenants = LeaseTenantSerializer(many=True, read_only=True)
@@ -399,7 +266,6 @@ class LeaseSearchSerializer(serializers.ModelSerializer):
                 'id': obj.landlord.id
             }
         return None
-
 class PropertyCreateSerializer(serializers.ModelSerializer):
     address_data = serializers.JSONField(write_only=True)
     property_type_name = serializers.CharField(write_only=True)
@@ -407,7 +273,19 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = ['name', 'description', 'status', 'year_built', 'total_area', 
-                'is_furnished', 'number_of_rooms', 'address_data', 'property_type_name']
+                'is_furnished', 'total_number_of_units', 'address_data', 'property_type_name','features']
+    
+    def validate(self, data):
+        address_data = data.get('address_data', {})
+        required_fields = ['street_address', 'city']
+        
+        for field in required_fields:
+            if field not in address_data:
+                raise serializers.ValidationError(
+                    f"Address data must include '{field}'"
+                )
+        
+        return data
     
     def create(self, validated_data):
         address_data = validated_data.pop('address_data')
@@ -422,17 +300,227 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
                 **validated_data
             )
             
-            # Create address for property
-            Address.objects.create(
-                content_type=ContentType.objects.get_for_model(Property),
-                object_id=property.id,
-                **address_data
-            )
+            # Process address data
+            from apps.common.models.models import Country, City, Suburb
+            
+            try:
+                country = Country.objects.get(id=address_data['country'])
+                city = City.objects.get(id=address_data['city'])
+                
+                address_data['country'] = country
+                address_data['city'] = city
+                
+                if 'suburb' in address_data:
+                    suburb = Suburb.objects.get(id=address_data['suburb'])
+                    address_data['suburb'] = suburb
+                
+                # Create address for property
+                Address.objects.create(
+                    content_type=ContentType.objects.get_for_model(Property),
+                    object_id=property.id,
+                    **address_data
+                )
+            except Country.DoesNotExist:
+                raise serializers.ValidationError("Invalid country ID provided")
+            except City.DoesNotExist:
+                raise serializers.ValidationError("Invalid city ID provided")
+            except Suburb.DoesNotExist:
+                raise serializers.ValidationError("Invalid suburb ID provided")
+            except Exception as e:
+                raise serializers.ValidationError(f"Address creation failed: {str(e)}")
         
         return property
 
 class UnitCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Unit
-        fields = ['unit_number', 'unit_type', 'number_of_rooms', 'unit_context', 
-                'status', 'monthly_rent', 'deposit_amount', 'features']
+        fields = ['unit_number', 'unit_type', 'number_of_rooms', 
+                'status', 'monthly_rent', 'features']
+
+class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
+    tenants = LeaseTenantSerializer(many=True, required=False)
+    charges = LeaseChargeSerializer(many=True, required=False)
+    landlord_data = LandlordSerializer(required=False)
+    guarantor_data = GuarantorSerializer(required=False)
+    property_data = PropertyCreateSerializer(required=False)
+    unit_data = UnitCreateSerializer(required=False)
+    address_data = serializers.JSONField(required=False)
+    
+    class Meta:
+        model = Lease
+        fields = [
+            'lease_id', 'unit', 'start_date', 'end_date', 'signed_date', 'status',
+            'landlord', 'landlord_data', 'deposit_amount', 'deposit_period', 'currency',
+            'payment_frequency', 'due_day_of_month', 'grace_period_days',
+            'includes_utilities', 'utilities_details', 'guarantor', 'guarantor_data',
+            'account_number', 'tenants', 'charges', 'property_data', 'unit_data', 'address_data'
+        ]
+        extra_kwargs = {
+            'lease_id': {'read_only': True},
+            'unit': {'required': False},
+            'landlord': {'required': False},
+            'currency': {'required': True},
+        }
+    
+    def validate(self, data):
+        # Either unit or property_data + unit_data must be provided
+        if not data.get('unit') and not (data.get('property_data') and data.get('unit_data')):
+            raise serializers.ValidationError(
+                "Either provide an existing unit or property_data + unit_data to create a new one."
+            )
+        
+        # Remove lease field from tenants and charges if present
+        tenants_data = data.get('tenants', [])
+        for tenant in tenants_data:
+            tenant.pop('lease', None)
+        
+        charges_data = data.get('charges', [])
+        for charge in charges_data:
+            charge.pop('lease', None)
+        
+        return data
+    
+    @transaction.atomic
+    def create(self, validated_data):
+        tenants_data = validated_data.pop('tenants', [])
+        charges_data = validated_data.pop('charges', [])
+        landlord_data = validated_data.pop('landlord_data', None)
+        guarantor_data = validated_data.pop('guarantor_data', None)
+        property_data = validated_data.pop('property_data', None)
+        unit_data = validated_data.pop('unit_data', None)
+        address_data = validated_data.pop('address_data', None)
+        
+        # Handle property and unit creation if needed
+        if property_data and unit_data:
+            property_serializer = PropertyCreateSerializer(data=property_data)
+            property_serializer.is_valid(raise_exception=True)
+            property = property_serializer.save()
+            
+            unit_serializer = UnitCreateSerializer(data=unit_data)
+            unit_serializer.is_valid(raise_exception=True)
+            unit = unit_serializer.save(property=property)
+            
+            validated_data['unit'] = unit
+            
+            # Create address for unit if not provided
+            if not address_data and property.addresses.exists():
+                prop_address = property.addresses.first()
+                address_data = {
+                    'street_address': prop_address.street_address,
+                    'city': prop_address.city,
+                    'country': prop_address.country,
+                    'postal_code': prop_address.postal_code,
+                }
+        
+        # Handle address creation for property/unit if needed
+        if address_data:
+            self._handle_address_creation(validated_data['unit'], address_data)
+        
+        # Handle landlord creation if needed
+        landlord = None
+        if landlord_data:
+            try:
+                # First try to get existing landlord
+                content_type = ContentType.objects.get(
+                    app_label='individuals' if landlord_data['landlord_type'] == 'individual' else 'companies',
+                    model=landlord_data['landlord_type']
+                )
+                landlord = Landlord.objects.filter(
+                    content_type=content_type,
+                    object_id=landlord_data['landlord_id']
+                ).first()
+                
+                if not landlord:
+                    # Create new landlord if doesn't exist
+                    landlord_serializer = LandlordSerializer(data=landlord_data)
+                    landlord_serializer.is_valid(raise_exception=True)
+                    landlord = landlord_serializer.save()
+                
+                validated_data['landlord'] = landlord
+            except Exception as e:
+                raise serializers.ValidationError(f"Failed to process landlord: {str(e)}")
+        
+        # Handle guarantor creation if needed
+        if guarantor_data:
+            try:
+                content_type = ContentType.objects.get(
+                    app_label='individuals' if guarantor_data['guarantor_type'] == 'individual' else 'companies',
+                    model=guarantor_data['guarantor_type']
+                )
+                guarantor = Guarantor.objects.filter(
+                    content_type=content_type,
+                    object_id=guarantor_data['guarantor_id']
+                ).first()
+                
+                if not guarantor:
+                    guarantor_serializer = GuarantorSerializer(data=guarantor_data)
+                    guarantor_serializer.is_valid(raise_exception=True)
+                    guarantor = guarantor_serializer.save()
+                
+                validated_data['guarantor'] = guarantor
+            except Exception as e:
+                raise serializers.ValidationError(f"Failed to process guarantor: {str(e)}")
+        
+        # Create lease (lease_id will be auto-generated in the model's save method)
+        lease = Lease.objects.create(**validated_data)
+        
+        # Create tenants
+        for tenant_data in tenants_data:
+            LeaseTenant.objects.create(lease=lease, **tenant_data)
+        
+        # Create charges
+        for charge_data in charges_data:
+            LeaseCharge.objects.create(lease=lease, **charge_data)
+        
+        return lease
+    def _handle_address_creation(self, unit, address_data):
+        """
+        Helper method to create addresses for property and unit if they don't exist
+        """
+        from apps.common.models.models import Country, City, Suburb 
+        
+        try:
+            # Process country
+            country_id = address_data.pop('country', None)
+            if country_id:
+                country = Country.objects.get(id=country_id)
+                address_data['country'] = country
+            
+            # Process city
+            city_id = address_data.pop('city', None)
+            if city_id:
+                city = City.objects.get(id=city_id)
+                address_data['city'] = city
+            
+            # Process suburb
+            suburb_id = address_data.pop('suburb', None)
+            if suburb_id:
+                suburb = Suburb.objects.get(id=suburb_id)
+                address_data['suburb'] = suburb
+            
+            # Check if property has address, if not create one
+            property_ob = unit.property
+            if not property_ob.addresses.exists():
+                Address.objects.create(
+                    content_type=ContentType.objects.get_for_model(Property),
+                    object_id=property_ob.id,
+                    **address_data
+                )
+            
+            # Check if unit has address, if not create one
+            if not unit.addresses.exists():
+                Address.objects.create(
+                    content_type=ContentType.objects.get_for_model(Unit),
+                    object_id=unit.id,
+                    **address_data
+                )
+                
+        except Country.DoesNotExist:
+            raise serializers.ValidationError("Invalid country ID provided")
+        except City.DoesNotExist:
+            raise serializers.ValidationError("Invalid city ID provided")
+        except Suburb.DoesNotExist:
+            raise serializers.ValidationError("Invalid suburb ID provided")
+        except Exception as e:
+            raise serializers.ValidationError(f"Address creation failed: {str(e)}")
+        

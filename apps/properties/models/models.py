@@ -34,6 +34,8 @@ class Property(BaseModel):
     year_built = models.PositiveIntegerField(blank=True, null=True)
     total_area = models.DecimalField(max_digits=10, decimal_places=2, help_text="In square meters")
     is_furnished = models.BooleanField(default=False)
+    total_number_of_units = models.PositiveIntegerField(default=0, help_text="Total number of units in the property")
+    features = models.JSONField(blank=True, null=True, help_text="Additional features of the property")
     # Relationships
     addresses = GenericRelation(Address)
     documents = GenericRelation(Document, related_query_name='property_document', null=True, blank=True,
@@ -67,14 +69,10 @@ class Unit(BaseModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='units')
     unit_number = models.CharField(max_length=50,default=0)
     unit_type = models.CharField(max_length=100,choices=UNIT_TYPE_CHOICES,default='OTHER')
-    floor_number = models.PositiveIntegerField(help_text="Floor number where the unit is located",default=0)
-    bedrooms = models.PositiveIntegerField(help_text="Number of bedrooms in the unit",default=0)
-    bathrooms = models.PositiveIntegerField(help_text="Number of bathrooms in the unit",default=0)
-    area = models.DecimalField(max_digits=10, decimal_places=2, help_text="In square meters",null=True,blank=True)
+    number_of_rooms = models.PositiveIntegerField(help_text="Number of rooms in the unit",default=0)
     status = models.CharField(max_length=20, choices=UNIT_STATUS_CHOICES, default='vacant')
     monthly_rent = models.DecimalField(max_digits=12, decimal_places=2)
-    deposit_amount = models.DecimalField(max_digits=12, decimal_places=2,default=0)
-    features = models.TextField(blank=True, null=True)
+    features = models.JSONField(blank=True, null=True, help_text="Additional features of the unit")
     
     class Meta:
         app_label = 'properties'
