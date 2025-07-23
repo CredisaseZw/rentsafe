@@ -33,8 +33,6 @@ export default function useCompanyForm() {
             linkedin: data.linkedin as string,
             operations: data.operations as string,
             account_number: data.account_number as string,
-            is_under_judicial: data.is_under_judicial as "YES" | "NO",
-            is_suspended: data.is_suspended ? true : false,
          },
          trading_name: data.trading_name as string,
          legal_status: data.legal_status as CompanyLegalStatus,

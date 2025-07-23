@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddressFormFields from "@/components/general/AddressFormFields";
 import useCompanyForm from "@/hooks/components/useCompanyForm";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 export default function CompanyForm() {
@@ -293,30 +292,6 @@ export default function CompanyForm() {
                                  className="border-foreground/40 bg-white"
                                  placeholder="Important remarks"
                               />
-                           </div>
-
-                           <div className="flex items-center justify-center gap-2">
-                              <Checkbox
-                                 id="is_under_judicial"
-                                 name="is_under_judicial"
-                                 value="YES"
-                                 className="border-foreground/40 bg-white"
-                              />
-                              <Label className="px-2 font-normal" htmlFor="is_under_judicial">
-                                 Is Under Judicial
-                              </Label>
-                           </div>
-
-                           <div className="flex items-center justify-center gap-2">
-                              <Checkbox
-                                 id="is_suspended"
-                                 name="is_suspended"
-                                 value="true"
-                                 className="border-foreground/40 bg-white"
-                              />
-                              <Label className="px-2 font-normal" htmlFor="is_suspended">
-                                 Is Suspended
-                              </Label>
                            </div>
                         </div>
                      </details>

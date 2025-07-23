@@ -34,7 +34,5 @@ export interface CompanyPayload {
       linkedin?: string;
       operations?: string;
       account_number?: string;
-      is_under_judicial?: "YES" | "NO";
-      is_suspended?: boolean;
    };
 }
