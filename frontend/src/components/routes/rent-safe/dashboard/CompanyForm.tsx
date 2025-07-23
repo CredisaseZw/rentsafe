@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import AddressFormFields from "@/components/general/AddressFormFields";
 import useCompanyForm from "@/hooks/components/useCompanyForm";
 import { toast } from "sonner";
+import MultiAddressInput from "@/components/general/MultiAddressInput";
 
 export default function CompanyForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useCompanyForm();
@@ -182,7 +182,7 @@ export default function CompanyForm() {
                   </>
 
                   <div className="col-span-3 pt-5">
-                     <AddressFormFields />
+                     <MultiAddressInput />
                   </div>
 
                   <div className="col-span-3 pt-5">

@@ -4,8 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import AddressFormFields from "@/components/general/AddressFormFields";
 import useIndividualForm from "@/hooks/components/useIndividualForm";
+import MultiAddressInput from "@/components/general/MultiAddressInput";
 
 export default function IndividualForm() {
    const { handleSubmit } = useIndividualForm();
@@ -130,7 +130,7 @@ export default function IndividualForm() {
                   </div>
 
                   <div className="col-span-3 pt-5">
-                     <AddressFormFields />
+                     <MultiAddressInput />
                   </div>
 
                   <div className="col-span-3 pt-5">
