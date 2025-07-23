@@ -1,10 +1,12 @@
 import type { CompanyPayload } from "@/interfaces/form-payloads";
-import type React from "react";
+import React from "react";
 import useCreateCompany from "../apiHooks/useCreateCompany";
 import { formatDateToPythonSLiking, toIntElseUndefined } from "@/lib/utils";
+import type { CompanyLegalStatus } from "@/types";
 
 export default function useCompanyForm() {
-   const { isPending, createCompany } = useCreateCompany();
+   const [showForm, setShowForm] = React.useState(false);
+   const { isPending, createCompany } = useCreateCompany(() => setShowForm(false));
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
@@ -19,26 +21,23 @@ export default function useCompanyForm() {
             email: data.email as string,
             // optional
             registration_date: data.registration_date as string,
-            trading_status: data.trading_status as string,
             mobile_phone: data.mobile_phone as string,
             landline_phone: data.landline_phone as string,
             tin_number: data.tin_number as string,
             vat_number: data.vat_number as string,
             number_of_employees: data.number_of_employees ? Number(data.numberOfEmployees) : undefined,
             website: data.website as string,
-            trend: data.trend as string,
             twitter: data.twitter as string,
             facebook: data.facebook as string,
             instagram: data.instagram as string,
             linkedin: data.linkedin as string,
             operations: data.operations as string,
-            risk_class: data.risk_class as string,
             account_number: data.account_number as string,
             is_under_judicial: data.is_under_judicial as "YES" | "NO",
             is_suspended: data.is_suspended ? true : false,
          },
          trading_name: data.trading_name as string,
-         legal_status: data.legal_status as string,
+         legal_status: data.legal_status as CompanyLegalStatus,
          date_of_incorporation: data.date_of_incorporation as string,
          industry: data.industry as string,
          notes: data.notes ? [{ content: data.notes as string }] : [],
@@ -73,5 +72,5 @@ export default function useCompanyForm() {
       createCompany(companyPayload);
    }
 
-   return { isPending, handleSubmit };
+   return { showForm, isPending, handleSubmit, setShowForm };
 }

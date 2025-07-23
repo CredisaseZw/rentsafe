@@ -1,11 +1,10 @@
 import React from 'react'
-import Button from './Button'
+import Button from '../general/Button';
 import { Plus } from 'lucide-react'
-import usePropertyList from '@/hooks/components/usePropertyList'
+import usePropertyList from '@/hooks/components/usePropertyList';
 
 function AddPropertyForm() {
     let {addPropertyForm, onChangeHandler, submitAddPropertyForm} = usePropertyList();
-
   return (
    <form onSubmit={submitAddPropertyForm} method='post'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>

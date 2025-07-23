@@ -6,6 +6,7 @@ interface ButtonProps {
   variant?: 'primary' | 'success'; // add more variants as needed
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
+  disabled? : false | true,
   type?: 'button' | 'submit' | 'reset';
 }
 
@@ -18,12 +19,14 @@ function Button({
   children,
   variant = 'primary',
   onClick,
+  disabled,
   className,
   type = 'button',
 }: ButtonProps) {
   return (
     <button
       type={type}
+      disabled = {disabled}
       onClick={onClick}
       className={cn(
         `${variants[variant]} text-white font-bold py-2 px-4 rounded`,

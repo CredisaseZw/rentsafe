@@ -1,51 +1,28 @@
 import Logo from "@/components/general/Logo";
 import OverviewCard from "./OverviewCard";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { MODAL_WIDTHS, PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
+import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { friendlyDate } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Fullscreen, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
+import LoadingIndicator from "@/components/general/LoadingIndicator";
+import useCompanyPaymentStatusReport from "@/hooks/pages/dashboard/useCompanyPaymentStatusReport";
 
-type CompanyPaymentStatusReportProps = {
-   report: {
-      claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
-      active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
-      historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
-      rating: string;
-      companyDetails: {
-         registeredName: string;
-         tradingName: string;
-         registrationNumber: string;
-         dateOfRegistration: string;
-         tradingStatus: string;
-         industrySector: string;
-         telephoneNumber: string;
-         mobileNumber: string;
-         email: string;
-         website: string;
-         address: string;
-      };
-   };
-};
-
-export default function CompanyPaymentStatusReport({ report }: CompanyPaymentStatusReportProps) {
-   const { claims, active, historic, companyDetails, rating } = report;
-
-   const ratingColor =
-      PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === rating.toLowerCase())?.className ||
-      "bg-gray-500 text-white";
+export default function CompanyPaymentStatusReport({ companyId }: { companyId: number }) {
+   const { show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
+      useCompanyPaymentStatusReport(companyId);
 
    return (
-      <Dialog modal>
+      <Dialog modal open={show} onOpenChange={handleOpenChange}>
          <DialogTrigger asChild>
             <Button variant="outline" size="xs">
                View <Fullscreen size={16} />
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[${MODAL_WIDTHS.lg}] sm:max-w-[default]`}>
+         <DialogContent className={`max-w-[1100px] sm:max-w-[default]`}>
             <DialogTitle>
                <Button size="sm">
                   Print
@@ -60,7 +37,7 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
                      <p>Securing you rental investments</p>
                      <p>
                         Rent Payment Status Report on{" "}
-                        <span className="font-semibold">{companyDetails.tradingName}</span> as at{" "}
+                        <span className="font-semibold">{report?.companyDetails.tradingName}</span> as at{" "}
                         <span className="">{friendlyDate(new Date())}</span>
                      </p>
                   </div>
@@ -81,7 +58,11 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
                <div className="flex flex-col gap-10">
                   <div className="flex items-center justify-between gap-2">
                      <div className="w-fit">
-                        <OverviewCard label="Classification" value={rating} valueClassName={ratingColor} />
+                        <OverviewCard
+                           label="Classification"
+                           value={report?.rating || "N/A"}
+                           valueClassName={ratingColor}
+                        />
                      </div>
 
                      <div className="flex flex-wrap items-center gap-4">
@@ -101,74 +82,97 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
 
                      <div className="grid grid-cols-2">
                         <div className="border-foreground/30 border-x border-b">
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Registered Name</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Registered Name</div>
 
-                              <div>{companyDetails.registeredName}</div>
+                              <div className="col-span-3">{report?.companyDetails.registeredName}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Trading Name</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Trading Name</div>
 
-                              <div>{companyDetails.tradingName}</div>
+                              <div className="col-span-3">{report?.companyDetails.tradingName}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Registration Number</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Registration Number</div>
 
-                              <div>{companyDetails.registrationNumber}</div>
+                              <div className="col-span-3">{report?.companyDetails.registrationNumber}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Date Of Registration</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Date Of Registration</div>
 
-                              <div>{friendlyDate(companyDetails.dateOfRegistration)}</div>
+                              <div className="col-span-3">
+                                 {report?.companyDetails.dateOfRegistration
+                                    ? friendlyDate(report?.companyDetails.dateOfRegistration)
+                                    : "N/A"}
+                              </div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Trading Status</div>
+                           <div className="grid grid-cols-5 items-start gap-2 px-3 py-1">
+                              <div className="col-span-2">Trading Status</div>
 
-                              <div>{companyDetails.tradingStatus}</div>
+                              <div className="col-span-3">{report?.companyDetails.tradingStatus}</div>
                            </div>
                         </div>
 
                         <div className="border-foreground/30 border-x border-b">
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Mobile Number</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Mobile Number</div>
 
-                              <div>{companyDetails.mobileNumber}</div>
+                              <div className="col-span-3">{report?.companyDetails.mobileNumber}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Telephone No</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Telephone No</div>
 
-                              <div>{companyDetails.telephoneNumber}</div>
+                              <div className="col-span-3">{report?.companyDetails.telephoneNumber}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Email</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Email</div>
 
-                              <div>
-                                 <Link to={`mailto:${companyDetails.email}`} className="text-PRIMARY hover:underline">
-                                    {companyDetails.email}
+                              <div className="col-span-3">
+                                 <Link
+                                    to={`mailto:${report?.companyDetails.email}`}
+                                    className="text-PRIMARY hover:underline"
+                                 >
+                                    {report?.companyDetails.email}
                                  </Link>
                               </div>
                            </div>
 
-                           <div className="grid grid-cols-2 items-start gap-2 px-3 py-1">
-                              <div>Website</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Website</div>
 
-                              <div>
-                                 <Link to={companyDetails.website} className="text-PRIMARY hover:underline">
-                                    {companyDetails.website}
+                              <div className="col-span-3">
+                                 <Link
+                                    target="_blank"
+                                    to={report?.companyDetails.website || ""}
+                                    className="text-PRIMARY hover:underline"
+                                 >
+                                    {report?.companyDetails.website}
                                  </Link>
                               </div>
                            </div>
 
-                           <div className="grid grid-cols-2 items-start gap-2 px-3 py-1">
-                              <div>Address</div>
+                           <div className="grid grid-cols-5 items-start gap-2 px-3 py-1">
+                              <div className="col-span-2">Address</div>
 
-                              <div>{companyDetails.address}</div>
+                              <div className="col-span-3 flex items-start gap-1">
+                                 <div className={showFullAddress ? "grow" : "line-clamp-1 grow"}>
+                                    {report?.companyDetails.address}
+                                 </div>
+                                 <Button
+                                    onClick={() => setShowFullAddress((prev) => !prev)}
+                                    variant="outline"
+                                    className="py-0"
+                                    size="xs"
+                                 >
+                                    {showFullAddress ? "-" : "+"}
+                                 </Button>
+                              </div>
                            </div>
                         </div>
                      </div>
@@ -191,7 +195,7 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
                         <div>Date of Claim</div>
                      </div>
 
-                     {claims.map((claim, index) => (
+                     {report?.claims.map((claim, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-5 items-center gap-2 border border-t-0 p-1 text-center"
@@ -215,7 +219,7 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
                         <div>Amount</div>
                      </div>
 
-                     {active.map((rental, index) => (
+                     {report?.active.map((rental, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-4 items-center gap-2 border border-t-0 p-1 text-center"
@@ -238,7 +242,7 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
                         <div>Amount</div>
                      </div>
 
-                     {historic.map((rental, index) => (
+                     {report?.historic.map((rental, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-4 items-center gap-2 border border-t-0 p-1 text-center"
@@ -262,6 +266,12 @@ export default function CompanyPaymentStatusReport({ report }: CompanyPaymentSta
                      <p>All rights reserved</p>
                   </div>
                </div>
+
+               {isLoading && (
+                  <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-black">
+                     <LoadingIndicator />
+                  </div>
+               )}
             </div>
          </DialogContent>
       </Dialog>

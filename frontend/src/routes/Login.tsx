@@ -5,14 +5,18 @@ import { useNavigate } from "react-router-dom";
 import  useAuth from "@/hooks/components/useAuth";
 import useLoginAuth from "@/hooks/apiHooks/useLogin";
 import Alert from "@/components/general/Alerts";
+import { useState } from "react";
+import Spinner from "@/components/general/Spinner";
 
 export default function Login() {
-   let {loginForm, validateForm, handleChange, status, onError} = useAuth();
+   let {loginForm, validateForm, handleChange, status, onError,} = useAuth();
    let login = useLoginAuth();
+   let [isLogin, setIsLogin] = useState(false);
    let navigate = useNavigate();
     
     let onLogin = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+         setIsLogin(true);
+         e.preventDefault();
 
          let isValid = validateForm();
          if (!isValid.isUsername || !isValid.isPassword) return;
@@ -26,7 +30,8 @@ export default function Login() {
             onError:(error)=>{
                console.log(error)
                onError("isAccount");
-            }
+            },
+            onSettled: ()=> setIsLogin(false)
          })
         
     }
@@ -70,9 +75,13 @@ export default function Login() {
                 }
                 
                   <div className="mt-7 flex flex-col gap-3 w-full ">
-                     <button type="submit" className="text-white gap-2 bg-PRIMARY hover:bg-PRIMARY-DARK focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex flex-row items-center justify-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
+                   <button
+                        type="submit"
+                        disabled={isLogin}
+                        className="flex flex-row items-center justify-center gap-2 text-white bg-PRIMARY hover:bg-PRIMARY-DARK focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 disabled:bg-primary-disabled dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                     >
                         Sign in
-                        <LogInIcon size={15} className="flex self-center"/>
+                        {isLogin ? <Spinner /> : <LogInIcon size={15} className="self-center" />}
                      </button>
                      <Link to="" className="text-PRIMARY text-center text-sm font-semibold">
                         Forgot Password?
