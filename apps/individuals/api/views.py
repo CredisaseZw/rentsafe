@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import viewsets,status
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -10,9 +10,10 @@ from apps.individuals.api.serializers import (IndividualSerializer , IndividualU
 from apps.individuals.models import Individual
 from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
+from apps.individuals.services.tasks import create_individual_background
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("individuals")
 
 class IndividualViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
@@ -40,12 +41,10 @@ class IndividualViewSet(BaseViewSet):
     
     def create(self, request, *args, **kwargs):
         try:
-            if Individual.objects.filter(identification_number=request.data.get('identification_number')).exists():
-                logger.error(f"Individual with the privided ID Already Exists!")
-                return Response({"error": "Individual already exists"},status=status.HTTP_400_BAD_REQUEST)
             serializer = IndividualCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
+            create_individual_background.delay(serializer.validated_data)
+            # self.perform_create(serializer)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -88,13 +87,13 @@ class IndividualViewSet(BaseViewSet):
             serializer = IndividualMinimalSerializer(individual)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Individual.DoesNotExist:
-            logger.error(f"Individual wiht ID {id} Does not exist")
+            logger.error(f"Individual with ID {id} Does not exist")
             return Response(
                 {'error': 'Individual not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            logger.error(f"Failed to retreive individual: {str(e)} ")
+            logger.error(f"Failed to retrieve individual: {str(e)} ")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
     def destroy(self, request, *args, **kwargs):
@@ -108,7 +107,7 @@ class IndividualViewSet(BaseViewSet):
             logger.info(f"Individual {instance.pk} soft deleted by user {request.user}")
             return Response({"message": "Individual deleted successfully"}, status=status.HTTP_200_OK)
         except Individual.DoesNotExist:
-            logger.error(f"Individual with ID {kwargs.get('pk','unkown')} not found")
+            logger.error(f"Individual with ID {kwargs.get('pk','unknown')} not found")
             return Response(
                 {'error': 'Individual not found'},
                 status=status.HTTP_404_NOT_FOUND
@@ -132,7 +131,7 @@ class IndividualViewSet(BaseViewSet):
 
         except Exception as e:
             return Response({
-                'error': 'Indivudal not found'},
+                'error': 'Individual not found'},
                 status= status.HTTP_404_NOT_FOUND
             )
             
@@ -149,10 +148,10 @@ class IndividualViewSet(BaseViewSet):
             })
         except Individual.DoesNotExist:
             return Response({
-                'error': 'Indivudal not found'},
+                'error': 'Individual not found'},
                 status= status.HTTP_404_NOT_FOUND
             )
-            
+
     @action(detail=False, methods=['GET'], url_path='search')
     @CacheService.cached(tag_prefix= 'individual:search')
     def search_individuals(self, request):

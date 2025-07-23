@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.common.models.models import Address, Document, Note
 from django.contrib.contenttypes.fields import GenericRelation
 from apps.common.models.base_models import BaseModel
+import re
 
 
 class Individual(BaseModel):
@@ -65,6 +66,21 @@ class Individual(BaseModel):
     def email(self):
         contact = self.contact_details.filter(email__isnull=False).exclude(email='').first()
         return contact.email if contact else None
+    
+    def clean(self):
+        if self.first_name:
+            self.first_name = self.first_name.strip().capitalize()
+            
+        if self.last_name:
+            self.last_name = self.last_name.strip().capitalize()
+            
+        if self.identification_number:
+            cleaned_id = re.sub(r'[-\s]', '', self.identification_number.strip())
+            self.identification_number = cleaned_id.upper()
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)      
 
 class IndividualContactDetail(BaseModel):
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
@@ -77,7 +93,6 @@ class IndividualContactDetail(BaseModel):
         verbose_name= 'contact detail'
         verbose_name_plural= 'contact details'
         ordering = ('id',)
-        
     
     def __str__(self):
         if self.phone_number:

@@ -3,8 +3,13 @@ from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError as DjangoValidationError
+from apps.individuals.services.validators import validate_email
+from apps.individuals.utils.phone import normalize_phone_number
+
 from django.db import transaction
 import logging
+import re
 
 logger = logging.getLogger('individuals')
 class EmploymentDetailSerializer(serializers.ModelSerializer):
@@ -15,6 +20,15 @@ class EmploymentDetailSerializer(serializers.ModelSerializer):
             'start_date', 'end_date', 'is_current',
             'monthly_income'
         ]
+    
+    def validate(self,data):
+        if email:= data.get("email"):
+            try:
+                validate_email(email)
+            except Exception as e:
+                raise ValueError("Invalid employer email address provide")
+            
+        return data
 
 class NextOfKinSerializer(serializers.ModelSerializer):
     relationship_display = serializers.CharField(
@@ -29,16 +43,59 @@ class NextOfKinSerializer(serializers.ModelSerializer):
             'relationship', 'relationship_display',
             'mobile_phone', 'email', 'physical_address'
         ]
+        
+    def validate(self, data):
+        try:
+            if email := data.get("email",''):
+                validate_email(email)
+                
+        except Exception as e:
+            raise ValueError(f"Error while creating next of kin {e}")
+        
+        return data
 
 class ContactDetailsSerializer(serializers.ModelSerializer):
     mobile_phone = serializers.ListField(
         child=serializers.CharField(max_length=15),
         allow_empty=False
     )
+
     class Meta:
         model = IndividualContactDetail
-        fields = ['id','individual_id' ,'mobile_phone', 'email',]
-    
+        fields = ['id', 'individual_id', 'mobile_phone', 'email']
+
+    def validate(self, data):
+        email = data.get('email', '').strip()
+        
+        if IndividualContactDetail.objects.filter(email__iexact=email):
+            raise ValueError("This email address is already registered")
+        # Validate email
+        try:
+            
+            validate_email(email)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError({'email': e.messages})
+        
+        phone = data.get("mobile_phone",[])
+
+        # Access country from parent serializer context
+        country = None
+        parent = self.parent
+        if hasattr(parent, 'initial_data'):
+            address_id = parent.initial_data.get("address")
+            if address_id:
+                try:
+                    address = Address.objects.get(pk=address_id)
+                    country = address.country.lower().strip()
+                except Address.DoesNotExist:
+                    pass
+
+        if phone and country == "zimbabwe":
+            data["mobile_phone"] = normalize_phone_number(phone)
+
+
+        return data
+        
 class IndividualSerializer(serializers.ModelSerializer):
     employment_details = EmploymentDetailSerializer(many=True,required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
@@ -62,7 +119,6 @@ class IndividualSerializer(serializers.ModelSerializer):
         read_only_fields = ['date_created', 'date_updated']
 
 class IndividualMinimalSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
     current_employment = serializers.SerializerMethodField()
     contact_details = ContactDetailsSerializer(many=True, required=False)
     
@@ -74,8 +130,7 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
     
     # Get the primary address    
     def get_address(self, obj):
-        primary_address = obj.addresses.filter(is_primary=True).first()
-        if primary_address:
+        if primary_address := obj.addresses.filter(is_primary=True).first():
             return AddressSerializer(primary_address).data
         # fallback: return first address if no primary is set
         latest_address = obj.addresses.order_by('id').first()
@@ -107,9 +162,15 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        identification_number = data.get('identification_number')
-        if Individual.objects.filter(identification_number__iexact=identification_number).exists():
-            raise serializers.ValidationError({"identification_number": "This identification number is already registered."})
+        identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
+        try:
+            
+            if Individual.objects.filter(identification_number__iexact=identification_number).exists():
+                raise serializers.ValidationError(
+                    f"This identification{identification_number} number is already registered."
+                )
+        except Exception as e:
+            raise serializers.ValidationError(f'failed to create individual: {e}')
         return data
 
     @transaction.atomic

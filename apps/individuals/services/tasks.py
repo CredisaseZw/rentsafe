@@ -115,10 +115,10 @@ def create_individual_background(self, individual_data: dict, user_id:int, reque
 @shared_task
 def send_individual_notification(individual_id: int, notification_type: str, context: dict, sender_id: int = None):
     """
-    Send notification to indivudal
+    Send notification to individual
     
     Args:
-        individual_id: ID of the indivdual
+        individual_id: ID of the individual
         notification_type: Type of notification
         context: Template context
         sender_id: ID of the sender
