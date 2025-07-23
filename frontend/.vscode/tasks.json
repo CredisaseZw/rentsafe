@@ -1,0 +1,48 @@
+{
+   "version": "2.0.0",
+   "tasks": [
+      {
+         "label": "Run Django Server in WSL",
+         "type": "shell",
+         "command": "wsl",
+         "args": ["-e", "bash", "-c", "cd ~/dev/rentsafe && source env/bin/activate && python manage.py runserver"],
+         "problemMatcher": [],
+         "group": "build",
+         "isBackground": true,
+         "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared",
+            "group": "build",
+            "showReuseMessage": true,
+            "clear": false
+         }
+      },
+      {
+         "label": "pnpm: dev",
+         "type": "npm",
+         "script": "dev",
+         "problemMatcher": [],
+         "detail": "vite",
+         "isBackground": true,
+         "group": "build",
+         "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared",
+            "group": "build",
+            "showReuseMessage": true,
+            "clear": false
+         }
+      },
+      {
+         "label": "start all dev",
+         "dependsOn": ["Run Django Server in WSL", "pnpm: dev"],
+         "dependsOrder": "parallel",
+         "problemMatcher": [],
+         "runOptions": {}
+      }
+   ]
+}
