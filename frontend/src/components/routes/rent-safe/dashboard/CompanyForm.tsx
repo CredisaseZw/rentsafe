@@ -25,7 +25,7 @@ export default function CompanyForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[900px] sm:max-w-[default]`}>
+         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 
             <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">

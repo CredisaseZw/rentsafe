@@ -22,7 +22,7 @@ export default function CompanyPaymentStatusReport({ companyId }: { companyId: n
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[1100px] sm:max-w-[default]`}>
+         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1100px] sm:max-w-[default]`}>
             <DialogTitle>
                <Button size="sm">
                   Print

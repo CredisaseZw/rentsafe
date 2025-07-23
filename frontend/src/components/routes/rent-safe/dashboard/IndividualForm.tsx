@@ -18,7 +18,7 @@ export default function IndividualForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[900px] sm:max-w-[default]`}>
+         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Individual</DialogTitle>
 
             <form onSubmit={handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
