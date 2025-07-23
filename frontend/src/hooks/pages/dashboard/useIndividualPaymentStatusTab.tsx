@@ -1,7 +1,6 @@
 import React from "react";
 import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusReport";
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
-import { sampleIndividualReport } from "@/lib/sampleData";
 import { useNavigate } from "react-router";
 import useMinimalIndividualsList from "@/hooks/apiHooks/useMinimalIndividualsList";
 
@@ -13,7 +12,7 @@ export default function useIndividualPaymentStatusTab() {
    const rows: BaseTableRow[] =
       individuals?.map((cell) => ({
          ...cell,
-         select: <IndividualPaymentStatusReport report={sampleIndividualReport} />,
+         select: <IndividualPaymentStatusReport individualId={cell.id} />,
       })) || [];
 
    const headers: BaseTableColumn[] = [

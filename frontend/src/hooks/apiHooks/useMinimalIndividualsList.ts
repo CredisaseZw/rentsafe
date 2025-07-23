@@ -11,7 +11,7 @@ export default function useMinimalIndividualsList() {
 
    const { data, isLoading, error } = useQuery<IndividualMinimal[]>({
       queryKey: ["individuals-minimal", q],
-      queryFn: () => (q ? [] : sampleIndividualRows),
+      queryFn: () => (q ? [] : (sampleIndividualRows as IndividualMinimal[])),
    });
 
    useEffect(() => {

@@ -193,12 +193,14 @@ export interface AddressLocation {
 }
 
 export interface IndividualMinimal {
+   id: number;
    forenames: string;
    surname: string;
    identificationNumber: string;
 }
 
 export interface IndividualFull {
+   id: number;
    forenames: string;
    surname: string;
    identificationNumber: string;
