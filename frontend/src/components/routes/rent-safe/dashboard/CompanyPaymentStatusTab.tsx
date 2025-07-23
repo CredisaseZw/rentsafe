@@ -29,7 +29,6 @@ export default function CompanyPaymentStatusTab() {
                         ref={searchRef}
                         placeholder="Search by name or reg..."
                         name="company_q"
-                        minLength={2}
                         required
                         defaultValue={searchQuery}
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"

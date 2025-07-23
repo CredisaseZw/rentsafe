@@ -2,8 +2,11 @@ import React from "react";
 import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusReport";
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
 import { sampleIndividualReport, sampleIndividualRows } from "@/lib/sampleData";
+import { useNavigate } from "react-router";
 
 export default function useIndividualPaymentStatusTab() {
+   const navigate = useNavigate();
+   const searchRef = React.useRef<HTMLInputElement>(null);
    const rows: BaseTableRow[] = sampleIndividualRows.map((cell) => ({
       ...cell,
       select: <IndividualPaymentStatusReport report={sampleIndividualReport} />,
@@ -19,13 +22,24 @@ export default function useIndividualPaymentStatusTab() {
    function handleSearch(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
-      const query = formData.get("q") as string;
-      console.log(`Searching for: ${query}`);
+      const q = formData.get("individual_q") as string;
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set("individual_q", q);
+      navigate({ search: "?" + searchParams.toString() });
+   }
+
+   function clearSearch() {
+      if (searchRef.current) searchRef.current.value = "";
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.delete("individual_q");
+      navigate({ search: "?" + searchParams.toString() });
    }
 
    return {
       rows,
       headers,
+      searchRef,
+      clearSearch,
       handleSearch,
    };
 }
