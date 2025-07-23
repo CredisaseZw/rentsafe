@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 :root {
    --PRIMARY: #176987;
-   --primary-disabled : #17698794;
+   --primary-disabled: #17698794;
    --primary-dark: #2086ac;
    --SECONDARY: rgb(38, 41, 43);
    --SUCCESS: rgb(54, 182, 59);
@@ -48,7 +48,7 @@
 
 @theme inline {
    --color-PRIMARY: var(--PRIMARY);
-   --col-primary-disable : var(--primary-disabled);
+   --col-primary-disable: var(--primary-disabled);
    --color-primary-dark: var(--primary-dark);
    --color-SECONDARY: var(--SECONDARY);
    --color-SUCCESS: var(--SUCCESS);
@@ -149,6 +149,10 @@
    }
 }
 
-.side-main{
-   @apply px-7 py-4 w-full
+.side-main {
+   @apply w-full px-7 py-4;
+}
+
+details summary {
+   @apply bg-foreground/5 border-foreground/20 text-foreground/80 hover:text-foreground hover:bg-foreground/10 w-fit cursor-pointer rounded-sm border px-2 py-1 transition-all;
 }
