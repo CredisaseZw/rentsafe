@@ -7,7 +7,7 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
-   const { individual, isLoading, refetch } = useIndividual(individualId, false);
+   const { individual, isLoading, refetch } = useIndividual(individualId, false, () => setShow(false));
 
    function handleOpenChange(open: boolean) {
       setShow(open);

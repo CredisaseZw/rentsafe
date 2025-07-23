@@ -8,7 +8,7 @@ export default function useCompanyPaymentStatusReport(companyId: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
-   const { company, isLoading, refetch } = useCompany(companyId, false);
+   const { company, isLoading, refetch } = useCompany(companyId, false, () => setShow(false));
 
    function handleOpenChange(open: boolean) {
       setShow(open);
