@@ -122,6 +122,28 @@ export interface CompanyReport {
    };
 }
 
+export interface IndividualReport {
+   employmentHistory: { employer: string; position: string; startDate: string }[];
+   claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
+   active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
+   historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
+   rating: string;
+   personalDetails: {
+      surname: string;
+      otherNames: string;
+      idNumber: string;
+      dateOfBirth: string;
+      gender: string;
+      nationality: string;
+      maritalStatus: string;
+      dependants: { name: string; age: number; relationship: string }[];
+      mobileNumber: string;
+      telephoneNumber: string;
+      email: string;
+      address: string;
+   };
+}
+
 export interface Country {
    id: number;
    name: string;
@@ -171,6 +193,12 @@ export interface AddressLocation {
 }
 
 export interface IndividualMinimal {
+   forenames: string;
+   surname: string;
+   identificationNumber: string;
+}
+
+export interface IndividualFull {
    forenames: string;
    surname: string;
    identificationNumber: string;
