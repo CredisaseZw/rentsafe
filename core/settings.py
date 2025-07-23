@@ -59,13 +59,15 @@ FRONTEND_LOGIN_URL = os.environ.get('FRONTEND_LOGIN_URL', 'http://localhost:3000
 ALLOWED_HOSTS = []
 if not DEBUG:
     ALLOWED_HOSTS = [
-        '.credi-safe.com',
+        "https://credi-safe.com",
+        "https://rentsafe-backend.onrender.com",
     ]
 else:
     ALLOWED_HOSTS = [
-        'localhost',
-        '127.0.0.1',
-        '[::1]',
+        "*"
+        # 'localhost',
+        # '127.0.0.1',
+        # '[::1]',
         # '192.168.1.10',
     ]
 
@@ -211,8 +213,12 @@ else:
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://credi-safe.com",
+    "https://credi-safe.com",
     "http://localhost:5173",
+    "https://rentsafe-iota.vercel.app",
+    "https://rentsafe.vercel.app",
+    "https://rentsafe-frontend.vercel.app",
+    "https://rentsafe-backend.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -224,6 +230,10 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "http://127.0.0.1:3000",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
+        "https://rentsafe-iota.vercel.app",
+        "https://rentsafe.vercel.app",
+        "https://rentsafe-frontend.vercel.app",
+        "https://rentsafe-backend.onrender.com",
     ]
 
 CORS_ALLOW_METHODS = [
