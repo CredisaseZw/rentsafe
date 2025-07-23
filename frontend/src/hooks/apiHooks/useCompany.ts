@@ -7,7 +7,7 @@ import { api } from "@/api/axios";
 export default function useCompany(companyId: number, enabled?: boolean) {
    const { data, isLoading, error, refetch } = useQuery<CompanyFull>({
       queryKey: ["company", companyId],
-      queryFn: () => api.get(`/api/companies/${companyId}/`).then((res) => res.data),
+      queryFn: () => api.get<CompanyFull>(`/api/companies/${companyId}/`).then((res) => res.data),
       enabled,
    });
 
