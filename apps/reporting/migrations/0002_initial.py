@@ -9,13 +9,14 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("individuals", "0001_initial"),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("reporting", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="nextofkin",
+            model_name="reporttemplate",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -27,28 +28,42 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="individual",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="employmentdetail",
-            name="individual",
+            model_name="generatedreport",
+            name="report_template",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="employment_details",
-                to="individuals.individual",
+                to="reporting.reporttemplate",
             ),
         ),
         migrations.AddField(
-            model_name="employmentdetail",
+            model_name="generatedreport",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user who last created or modified this record.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="enquiry",
+            name="enquired_entity_content_type",
+            field=models.ForeignKey(
+                help_text="The type of entity that was enquired about.",
+                limit_choices_to=models.Q(
+                    models.Q(("app_label", "individuals"), ("model", "individual")),
+                    models.Q(("app_label", "companies"), ("model", "companybranch")),
+                    _connector="OR",
+                ),
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="enquiries_for_entity_type",
+                to="contenttypes.contenttype",
+            ),
+        ),
+        migrations.AddField(
+            model_name="enquiry",
             name="user",
             field=models.ForeignKey(
                 blank=True,

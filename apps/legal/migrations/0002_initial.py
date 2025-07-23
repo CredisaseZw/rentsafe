@@ -9,15 +9,15 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ("legal", "0001_initial"),
         ("contenttypes", "0002_remove_content_type_name"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("leases", "0001_initial"),
-        ("communications", "0001_initial"),
+        ("accounting", "0002_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="reminder",
+            model_name="legaldispute",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -29,49 +29,98 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="otp",
-            name="requested_entity_content_type",
+            model_name="contractamendment",
+            name="contract",
             field=models.ForeignKey(
-                help_text="The type of entity for whom the OTP is requested.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="amendments",
+                to="legal.contract",
+            ),
+        ),
+        migrations.AddField(
+            model_name="contractamendment",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user who last created or modified this record.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="contract",
+            name="party_a_content_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="party_a_contracts",
+                to="contenttypes.contenttype",
+            ),
+        ),
+        migrations.AddField(
+            model_name="contract",
+            name="party_b_content_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="party_b_contracts",
+                to="contenttypes.contenttype",
+            ),
+        ),
+        migrations.AddField(
+            model_name="contract",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user who last created or modified this record.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="claim",
+            name="creditor_content_type",
+            field=models.ForeignKey(
+                help_text="The type of entity that is the creditor.",
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="otps_for_entity_type",
+                related_name="claims_as_creditor",
                 to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="otp",
-            name="user",
+            model_name="claim",
+            name="currency",
             field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
+                help_text="The currency of the claim amount.",
                 on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
+                related_name="claims",
+                to="accounting.currency",
             ),
         ),
         migrations.AddField(
-            model_name="debtorintelligencenote",
-            name="client_content_type",
+            model_name="claim",
+            name="debtor_content_type",
             field=models.ForeignKey(
-                help_text="The type of entity this note is about (debtor).",
+                help_text="The type of entity that is the debtor.",
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="debtor_intelligence_notes_as_client",
+                related_name="claims_as_debtor",
                 to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="debtorintelligencenote",
+            model_name="claim",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -83,113 +132,39 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="communicationhistoryreminder",
-            name="client_content_type",
+            model_name="activecredit",
+            name="cr_content_type",
             field=models.ForeignKey(
-                help_text="The type of entity this reminder is about.",
+                blank=True,
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="reminders_as_client",
-                to="contenttypes.contenttype",
-            ),
-        ),
-        migrations.AddField(
-            model_name="communicationhistoryreminder",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="communicationattachment",
-            name="communication",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="attachments",
-                to="communications.communication",
-            ),
-        ),
-        migrations.AddField(
-            model_name="communicationattachment",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="communication",
-            name="content_type",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                to="contenttypes.contenttype",
-            ),
-        ),
-        migrations.AddField(
-            model_name="communication",
-            name="related_lease",
-            field=models.ForeignKey(
-                blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to="leases.lease",
+                related_name="credit_entries",
+                to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="communication",
-            name="sent_by",
+            model_name="activecredit",
+            name="dr_content_type",
             field=models.ForeignKey(
                 blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="sent_communications",
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="communication",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                default=None,
-                help_text="The user who last created or modified this record.",
-                null=True,
-                on_delete=django.db.models.deletion.PROTECT,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="commshistmessage",
-            name="client_content_type",
-            field=models.ForeignKey(
-                help_text="The type of entity this message is to/from.",
                 limit_choices_to=models.Q(
                     models.Q(("app_label", "individuals"), ("model", "individual")),
                     models.Q(("app_label", "companies"), ("model", "companybranch")),
                     _connector="OR",
                 ),
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="messages_as_client",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="debit_entries",
                 to="contenttypes.contenttype",
             ),
         ),
         migrations.AddField(
-            model_name="commshistmessage",
+            model_name="activecredit",
             name="user",
             field=models.ForeignKey(
                 blank=True,

@@ -11,6 +11,7 @@ class Landlord(BaseModel):
     landlord_object = GenericForeignKey('content_type', 'object_id')
     class Meta:
         app_label = 'leases'
+        db_table = 'landlord'
         verbose_name = 'Landlord'
         verbose_name_plural = 'Landlords'
         ordering = ['-date_created']

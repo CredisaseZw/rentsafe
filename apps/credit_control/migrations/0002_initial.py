@@ -9,13 +9,14 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("individuals", "0001_initial"),
+        ("credit_control", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("leases", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="nextofkin",
+            model_name="paymentplan",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -27,7 +28,25 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="individual",
+            model_name="debtcase",
+            name="assigned_to",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="debt_cases",
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AddField(
+            model_name="debtcase",
+            name="lease",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="leases.lease"
+            ),
+        ),
+        migrations.AddField(
+            model_name="debtcase",
             name="user",
             field=models.ForeignKey(
                 blank=True,
@@ -39,16 +58,15 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name="employmentdetail",
-            name="individual",
+            model_name="communicationlog",
+            name="debt_case",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="employment_details",
-                to="individuals.individual",
+                to="credit_control.debtcase",
             ),
         ),
         migrations.AddField(
-            model_name="employmentdetail",
+            model_name="communicationlog",
             name="user",
             field=models.ForeignKey(
                 blank=True,
