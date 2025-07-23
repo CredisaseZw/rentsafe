@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function IndividualPaymentStatusTab() {
-   const { rows, headers, searchRef, clearSearch, handleSearch } = useIndividualPaymentStatusTab();
+   const { rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } =
+      useIndividualPaymentStatusTab();
 
    return (
       <div>
@@ -15,6 +16,7 @@ export default function IndividualPaymentStatusTab() {
          <BaseTable
             headers={headers}
             rows={rows}
+            isLoading={isLoading}
             tableActions={
                <div className="flex items-center justify-between gap-2">
                   <form
@@ -29,6 +31,7 @@ export default function IndividualPaymentStatusTab() {
                         placeholder="Search by name or ID..."
                         name="individual_q"
                         required
+                        defaultValue={searchQuery}
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
                      <Button type="submit" variant="ghost" size="xs">

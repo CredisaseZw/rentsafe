@@ -169,3 +169,9 @@ export interface AddressLocation {
    cityName?: string;
    suburbName?: string;
 }
+
+export interface IndividualMinimal {
+   forenames: string;
+   surname: string;
+   identificationNumber: string;
+}

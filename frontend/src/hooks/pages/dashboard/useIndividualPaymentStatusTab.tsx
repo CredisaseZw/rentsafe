@@ -1,16 +1,20 @@
 import React from "react";
 import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusReport";
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
-import { sampleIndividualReport, sampleIndividualRows } from "@/lib/sampleData";
+import { sampleIndividualReport } from "@/lib/sampleData";
 import { useNavigate } from "react-router";
+import useMinimalIndividualsList from "@/hooks/apiHooks/useMinimalIndividualsList";
 
 export default function useIndividualPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const rows: BaseTableRow[] = sampleIndividualRows.map((cell) => ({
-      ...cell,
-      select: <IndividualPaymentStatusReport report={sampleIndividualReport} />,
-   }));
+   const { individuals, isLoading, searchQuery } = useMinimalIndividualsList();
+
+   const rows: BaseTableRow[] =
+      individuals?.map((cell) => ({
+         ...cell,
+         select: <IndividualPaymentStatusReport report={sampleIndividualReport} />,
+      })) || [];
 
    const headers: BaseTableColumn[] = [
       { name: "forenames", displayName: "Forenames" },
@@ -39,6 +43,8 @@ export default function useIndividualPaymentStatusTab() {
       rows,
       headers,
       searchRef,
+      isLoading,
+      searchQuery,
       clearSearch,
       handleSearch,
    };
