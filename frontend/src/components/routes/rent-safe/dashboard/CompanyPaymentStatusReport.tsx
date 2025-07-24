@@ -37,7 +37,7 @@ export default function CompanyPaymentStatusReport({ companyId }: { companyId: n
                      <p>Securing you rental investments</p>
                      <p>
                         Rent Payment Status Report on{" "}
-                        <span className="font-semibold">{report?.companyDetails.tradingName}</span> as at{" "}
+                        <span className="font-semibold">{report?.companyDetails.registeredName}</span> as at{" "}
                         <span className="">{friendlyDate(new Date())}</span>
                      </p>
                   </div>
