@@ -19,7 +19,7 @@ class IndividualViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Individual.objects.filter(is_active=True).prefetch_related(
+        return Individual.objects.filter(is_active=True, is_deleted=False).prefetch_related(
             'addresses','addresses__country', 'addresses__province', 
             'addresses__city', 'addresses__suburb', 'employment_details', 
             'next_of_kin', 'notes','documents','contact_details'
@@ -43,8 +43,7 @@ class IndividualViewSet(BaseViewSet):
         try:
             serializer = IndividualCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            create_individual_background.delay(serializer.validated_data)
-            # self.perform_create(serializer)
+            self.perform_create(serializer)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -64,7 +63,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error updating individual: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            
+    
     @CacheService.cached(tag_prefix='individual:list')
     def list(self,*args, **kwargs):
         try:
@@ -103,7 +102,6 @@ class IndividualViewSet(BaseViewSet):
             instance.is_deleted = True
             instance.is_active = False
             instance.save()
-            self.perform_destroy(instance)
             logger.info(f"Individual {instance.pk} soft deleted by user {request.user}")
             return Response({"message": "Individual deleted successfully"}, status=status.HTTP_200_OK)
         except Individual.DoesNotExist:
@@ -156,7 +154,7 @@ class IndividualViewSet(BaseViewSet):
     @CacheService.cached(tag_prefix= 'individual:search')
     def search_individuals(self, request):
         """Search Individuals Returning minimal information."""
-        query = request.query_params.get('q', '')
+        query = request.query_params.get('q', '').strip()
         if not query:
             return Response({"error": "Search query cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -167,7 +165,7 @@ class IndividualViewSet(BaseViewSet):
                 filter_conditions |= Q(**{f"{field}__icontains": query})
 
             individuals = Individual.objects.filter(filter_conditions).prefetch_related('addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
-
+            
             serializer = IndividualSearchSerializer(individuals, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         

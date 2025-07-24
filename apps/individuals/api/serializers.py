@@ -66,19 +66,24 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         email = data.get('email', '').strip()
-        
-        if IndividualContactDetail.objects.filter(email__iexact=email):
-            raise ValueError("This email address is already registered")
-        # Validate email
-        try:
-            
-            validate_email(email)
-        except DjangoValidationError as e:
-            raise serializers.ValidationError({'email': e.messages})
+
+        if email:
+            existing_qs = IndividualContactDetail.objects.filter(email__iexact=email)
+
+            if self.instance:
+                existing_qs = existing_qs.exclude(pk=self.instance.pk)
+
+            if existing_qs.exists():
+                raise serializers.ValidationError({"email": "This email address is already registered"})
+
+            try:
+                validate_email(email)
+            except DjangoValidationError as e:
+                raise serializers.ValidationError({'email': e.messages})
+
         
         phone = data.get("mobile_phone",[])
 
-        # Access country from parent serializer context
         country = None
         parent = self.parent
         if hasattr(parent, 'initial_data'):
@@ -120,28 +125,32 @@ class IndividualSerializer(serializers.ModelSerializer):
 
 class IndividualMinimalSerializer(serializers.ModelSerializer):
     current_employment = serializers.SerializerMethodField()
-    contact_details = ContactDetailsSerializer(many=True, required=False)
+    contact_details = serializers.SerializerMethodField()
+    addresses = serializers.SerializerMethodField()
     
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
-                  'gender','date_of_birth','marital_status','address', 
-                  'current_employment', 'contact_details']
+                  'gender','date_of_birth','marital_status', 
+                  'current_employment', 'contact_details', 'addresses']
     
     # Get the primary address    
-    def get_address(self, obj):
+    def get_addresses(self, obj):
         if primary_address := obj.addresses.filter(is_primary=True).first():
             return AddressSerializer(primary_address).data
         # fallback: return first address if no primary is set
-        latest_address = obj.addresses.order_by('id').first()
-        if latest_address:
+        if latest_address := obj.addresses.order_by('id').first():
             return AddressSerializer(latest_address).data
+        return None
+    
+    def get_contact_details(self, obj):
+        if contact := obj.contact_details.order_by('-id').first():
+            return ContactDetailsSerializer(contact).data
         return None
 
     
     def get_current_employment(self, obj):
-        current_employment = obj.employment_details.filter(is_current=True).first()
-        if current_employment:
+        if current_employment := obj.employment_details.filter(is_current=True).first():
             return EmploymentDetailSerializer(current_employment).data
         return None
 
@@ -160,17 +169,20 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             'identification_type', 'identification_number','contact_details',
             'addresses', 'employment_details', 'next_of_kin', 'documents','notes'
         ]
-
+        
     def validate(self, data):
         identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
         try:
-            
-            if Individual.objects.filter(identification_number__iexact=identification_number).exists():
-                raise serializers.ValidationError(
-                    f"This identification{identification_number} number is already registered."
-                )
+            existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
+            if existing:
+                if not existing.is_deleted:
+                    raise serializers.ValidationError(
+                        f"This identification number {identification_number} is already registered and active."
+                    )
+                self._existing_individual = existing 
         except Exception as e:
-            raise serializers.ValidationError(f'failed to create individual: {e}')
+            logger.error(f"Error validating individual: {e}")
+            raise serializers.ValidationError(f'Failed to validate individual: {e}')
         return data
 
     @transaction.atomic
@@ -182,38 +194,189 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         documents_data = validated_data.pop('documents',[])
         notes_data = validated_data.pop('notes', [])
         user = self.context.get('user')
-
-        individual = Individual.objects.create(**validated_data)
+        
+        individual = getattr(self,'_existing_individual', None)
+        if individual:
+            for attr, value in validated_data.items():
+                setattr(individual, attr, value)
+            individual.is_deleted = False
+            individual.is_active = True
+            individual.save()
+        else:
+            individual = Individual.objects.create(**validated_data)
 
         # Create addresses
-        for address_data in address_data:
-            Address.objects.create(
-                user=user,
-                content_object=individual,
-                **address_data,
-                is_primary=True
-            )
+        # for address_data in address_data:
+        #     Address.objects.create(
+        #         user=user,
+        #         content_object=individual,
+        #         **address_data,
+        #         is_primary=True
+        #     )
+
+        individual_ct = ContentType.objects.get_for_model(individual)
+
+        for addr in address_data:
+            address_id = addr.get('id', None)
+
+            if address_id:
+                try:
+                    address_obj = Address.objects.get(
+                        id=address_id,
+                        content_type=individual_ct,
+                        object_id=individual.pk,
+                        is_primary=True
+                    )
+                    for key, val in addr.items():
+                        setattr(address_obj, key, val)
+                    address_obj.save()
+                except Address.DoesNotExist:
+                    Address.objects.create(
+                        user=user,
+                        content_type=individual_ct,
+                        object_id=individual.pk,
+                        **addr,
+                        is_primary=True
+                    )
+            else:
+                existing = Address.objects.filter(
+                    content_type=individual_ct,
+                    object_id=individual.pk,
+                    address_type=addr.get('address_type'),
+                    is_primary=addr.get('is_primary', True)
+                ).first()
+
+                if existing:
+                    for key, val in addr.items():
+                        setattr(existing, key, val)
+                    existing.save()
+                else:
+                    Address.objects.create(
+                        user=user,
+                        content_type=individual_ct,
+                        object_id=individual.pk,
+                        **addr,
+                        is_primary=True
+                    )
 
         for contact in contact_data:
-            IndividualContactDetail.objects.create(
-                user=user,
-                individual=individual,
-                **contact
-            )
+            contact_id = contact.get('id', None)
+
+            if contact_id:
+                try:
+                    contact_obj = IndividualContactDetail.objects.get(
+                        id=contact_id, 
+                        individual=individual
+                    )
+                    for key, val in contact.items():
+                        setattr(contact_obj, key, val)
+                    contact_obj.save()
+                except IndividualContactDetail.DoesNotExist:
+                    IndividualContactDetail.objects.create(
+                        user=user, 
+                        individual=individual,
+                        **contact
+                    )
+            else:
+                email = contact.get('email', None)
+                if email:
+                    existing = IndividualContactDetail.objects.filter(
+                        individual=individual,
+                        email__iexact=email
+                    ).first()
+                    if existing:
+                        for key, val in contact.items():
+                            setattr(existing, key, val)
+                        existing.save()
+                    else:
+                        IndividualContactDetail.objects.create(
+                            user=user, 
+                            individual=individual,
+                            **contact
+                        )
+                else:
+                    IndividualContactDetail.objects.create(
+                        user=user, 
+                        individual=individual, 
+                        **contact
+                    )
 
         for emp in employment_data:
-            EmploymentDetail.objects.create(user=user,individual=individual, **emp)
+            emp_id = emp.get('id', None)
+            if emp_id:
+                try:
+                    emp_obj = EmploymentDetail.objects.get(
+                        id=emp_id, 
+                        individual=individual
+                    )
+                    for key, val in emp.items():
+                        setattr(emp_obj, key, val)
+                    emp_obj.save()
+                except EmploymentDetail.DoesNotExist:
+                    EmploymentDetail.objects.create(
+                        user=user, 
+                        individual=individual, 
+                        **emp
+                    )
+            else:
+                EmploymentDetail.objects.create(
+                    user=user, 
+                    individual=individual, 
+                    **emp
+                )
 
         if kin_data: 
             for kin in kin_data:
-                NextOfKin.objects.create(user=user,individual=individual, **kin)
+                NextOfKin.objects.create(
+                    user=user,
+                    individual=individual, 
+                    **kin
+                )
         if documents_data:
             for doc in documents_data:
-                Document.objects.create(user=user,content_object = individual, **doc)  
+                document_id = doc.get('id', None)
+                
+                if document_id:
+                    try:
+                        doc_obj = Document.objects.get(
+                            id = document_id,
+                            content_type = individual_ct,
+                            object_id = individual.pk
+                        )
+                        for key , val in doc.items():
+                            setattr(doc_obj, key , val)
+                        doc_obj.save()
+                    except Document.DoesNotExist:
+                        Document.objects.create(
+                            user=user,
+                            content_object = individual, 
+                            **doc
+                        )
+                else:
+                    existing = Document.objects.filter(
+                        content_type=individual_ct,
+                        object_id=individual.pk,
+                        file = doc.get('file'),
+                        document_type = doc.get('document_type')   
+                    ).first()
+                    if existing:
+                        for key, val in addr.items():
+                            setattr(existing, key, val)
+                        existing.save()
+                    else:
+                        Document.objects.create(
+                            user=user,
+                            content_object = individual, 
+                            **doc
+                        )
 
         if notes_data:
             for note in notes_data:
-                Note.objects.create(user=user,content_object=individual,**note)
+                Note.objects.create(
+                    user=user,
+                    content_object=individual,
+                    **note
+                )
                 
         return individual
 
@@ -234,11 +397,11 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        addresses_data = validated_data.pop('addresses', [])
-        employment = validated_data.pop('employment_details', [])
-        kin = validated_data.pop('next_of_kin', [])
+        address_data = validated_data.pop('addresses', [])
+        employment_data = validated_data.pop('employment_details', [])
+        kin_data = validated_data.pop('next_of_kin', [])
         contact_data = validated_data.pop('contact_details', [])
-        documents = validated_data.pop('documents',[])
+        documents_data = validated_data.pop('documents',[])
         notes_data = validated_data.pop('notes', [])
 
         user = self.context.get('user')
@@ -247,42 +410,182 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         
-        if addresses_data is not None:
-            company_content_type = ContentType.objects.get_for_model(Individual)
-                        
-            for address_data in addresses_data:
-                Address.objects.create(
-                    user=user,
-                    content_type=company_content_type,
-                    object_id=instance.id,
-                    **address_data
+
+        individual_ct = ContentType.objects.get_for_model(instance)
+
+        for addr in address_data:
+            address_id = addr.get('id', None)
+
+            if address_id:
+                try:
+                    address_obj = Address.objects.get(
+                        id=address_id,
+                        content_type=individual_ct,
+                        object_id=instance.pk,
+                        is_primary=True
+                    )
+                    for key, val in addr.items():
+                        setattr(address_obj, key, val)
+                    address_obj.save()
+                except Address.DoesNotExist:
+                    Address.objects.create(
+                        user=user,
+                        content_type=individual_ct,
+                        object_id=instance.pk,
+                        **addr,
+                        is_primary=True
+                    )
+            else:
+                existing = Address.objects.filter(
+                    content_type=individual_ct,
+                    object_id=instance.pk,
+                    address_type=addr.get('address_type'),
+                    is_primary=addr.get('is_primary', True)
+                ).first()
+
+                if existing:
+                    for key, val in addr.items():
+                        setattr(existing, key, val)
+                    existing.save()
+                else:
+                    Address.objects.create(
+                        user=user,
+                        content_type=individual_ct,
+                        object_id=instance.pk,
+                        **addr,
+                        is_primary=True
+                    )
+
+        for contact in contact_data:
+            contact_id = contact.get('id', None)
+
+            if contact_id:
+                try:
+                    contact_obj = IndividualContactDetail.objects.get(
+                        id=contact_id, 
+                        individual=instance
+                    )
+                    for key, val in contact.items():
+                        setattr(contact_obj, key, val)
+                    contact_obj.save()
+                except IndividualContactDetail.DoesNotExist:
+                    IndividualContactDetail.objects.create(
+                        user=user, 
+                        individual=instance,
+                        **contact
+                    )
+            else:
+                email = contact.get('email', None)
+                if email:
+                    existing = IndividualContactDetail.objects.filter(
+                        individual=instance,
+                        email__iexact=email
+                    ).first()
+                    if existing:
+                        for key, val in contact.items():
+                            setattr(existing, key, val)
+                        existing.save()
+                    else:
+                        IndividualContactDetail.objects.create(
+                            user=user, 
+                            individual=instance,
+                            **contact
+                        )
+                else:
+                    IndividualContactDetail.objects.create(
+                        user=user, 
+                        individual=instance, 
+                        **contact
+                    )
+
+        for emp in employment_data:
+            emp_id = emp.get('id', None)
+            if emp_id:
+                try:
+                    emp_obj = EmploymentDetail.objects.get(
+                        id=emp_id, 
+                        individual=instance
+                    )
+                    for key, val in emp.items():
+                        setattr(emp_obj, key, val)
+                    emp_obj.save()
+                except EmploymentDetail.DoesNotExist:
+                    EmploymentDetail.objects.create(
+                        user=user, 
+                        individual=instance, 
+                        **emp
+                    )
+            else:
+                EmploymentDetail.objects.create(
+                    user=user, 
+                    individual=instance, 
+                    **emp
                 )
 
-        if employment is not None:
-            for emp in employment:
-              EmploymentDetail.objects.create(user=user, individual=instance, **emp)
+        if kin_data: 
+            for kin in kin_data:
+                NextOfKin.objects.create(
+                    user=user,
+                    individual=instance, 
+                    **kin
+                )
+        if documents_data:
+            for doc in documents_data:
+                document_id = doc.get('id', None)
+                
+                if document_id:
+                    try:
+                        doc_obj = Document.objects.get(
+                            id = document_id,
+                            content_type = individual_ct,
+                            object_id = instance.pk
+                        )
+                        for key , val in doc.items():
+                            setattr(doc_obj, key , val)
+                        doc_obj.save()
+                    except Document.DoesNotExist:
+                        Document.objects.create(
+                            user=user,
+                            content_object = instance, 
+                            **doc
+                        )
+                else:
+                    existing = Document.objects.filter(
+                        content_type=individual_ct,
+                        object_id=instance.pk,
+                        file = doc.get('file'),
+                        document_type = doc.get('document_type')   
+                    ).first()
+                    if existing:
+                        for key, val in addr.items():
+                            setattr(existing, key, val)
+                        existing.save()
+                    else:
+                        Document.objects.create(
+                            user=user,
+                            content_object = instance, 
+                            **doc
+                        )
 
-        if contact_data is not None:
-            for contact in contact_data:
-                IndividualContactDetail.objects.create(user=user, individual=instance, **contact)
-
-        # Handle Next of Kin
-        if kin is not None:
-            for k in kin:
-                NextOfKin.objects.create(user=user, individual=instance, **k)
-
-        if documents is not None:
-            for doc in documents:
-                Document.objects.create(user=user,Individual=instance,**doc)
-        if notes_data is not None:
-            for n in notes_data:
-                Note.objects.create(user=user, individual=instance, **n)
+        if notes_data:
+            for note in notes_data:
+                Note.objects.create(
+                    user=user,
+                    content_object=instance,
+                    **note
+                )
+                
         return instance
 
 class IndividualSearchSerializer(serializers.ModelSerializer):
     """Serializer for searching individuals Retuning minimal fields"""
-    contact_details = ContactDetailsSerializer(many=True, required=False)
+    contact_details = serializers.SerializerMethodField()
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
                     'contact_details', 'is_active']
+        
+    def get_contact_details(self, obj):
+        if contact := obj.contact_details.order_by('-id').first():
+            return ContactDetailsSerializer(contact).data
+        return None

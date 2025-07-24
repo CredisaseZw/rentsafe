@@ -29,7 +29,7 @@ def send_individual_notification(individual_id: int, notification_type: str, con
     )
     
 @shared_task    
-def create_individual_background(self, individual_data: dict, user_id:int, request_path:str=None):
+def create_individual_background(self,individual_data: dict, user_id:int, request_path:str=None):
     """
     Create Individual in background after validation
     

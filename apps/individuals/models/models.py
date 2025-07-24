@@ -95,8 +95,8 @@ class IndividualContactDetail(BaseModel):
         ordering = ('id',)
     
     def __str__(self):
-        if self.phone_number:
-            return f"Phone: {self.phone_number} for {self.individual}"
+        if self.mobile_phone:
+            return f"Phone: {self.mobile_phone} for {self.individual}"
         elif self.contact_value:
             return f"Email: {self.contact_value} for {self.individual}"
         else:
