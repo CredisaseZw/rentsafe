@@ -1,7 +1,6 @@
 import type { NavLink } from "@/types";
 import Todo from "@/routes/rent-safe/Todo";
 import Home from "@/routes/Home";
-import Claim from "@/routes/rent-safe/Claim";
 import Journal from "@/routes/rent-safe/Journal";
 import NotFound from "@/routes/NotFound";
 import DebtCall from "@/routes/rent-safe/DebtCall";
@@ -12,7 +11,6 @@ import Statements from "@/routes/rent-safe/Statements";
 import ServicesHub from "@/routes/ServicesHub";
 import InternalUsers from "@/routes/rent-safe/InternalUsers";
 import Disbursements from "@/routes/rent-safe/Disbursements";
-import LeaseManagement from "@/routes/rent-safe/LeaseManagement";
 import CurrencySettings from "@/routes/rent-safe/CurrencySettings";
 import RentSafeDashboard from "@/routes/rent-safe/Dashboard";
 import SubscriptionManagement from "@/routes/rent-safe/SubscriptionManagement";
@@ -225,31 +223,32 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
       label: "Data",
       segment: RENTSAFE_PRE_SEG + "/data",
-      subLinks : [{
-         label : "Leases",
+      subLinks: [{
+         label: "Leases",
          path: RENTSAFE_PRE_SEG + "/leases",
          segment: RENTSAFE_PRE_SEG + "/tenants/leases",
          pageComponent: Leases,
       },
       {
-         label : "Communication",
+         label: "Communication",
          path: RENTSAFE_PRE_SEG + "/communication",
          segment: RENTSAFE_PRE_SEG + "/tenants/communication",
          pageComponent: Communication,
       },
       {
-         label : "Deposits",
+         label: "Deposits",
          path: RENTSAFE_PRE_SEG + "/deposits",
          segment: RENTSAFE_PRE_SEG + "/tenants/deposits",
          pageComponent: Deposits,
       },
       {
-         label : "Lease Template",
+         label: "Lease Template",
          path: RENTSAFE_PRE_SEG + "/lease-templates",
          segment: RENTSAFE_PRE_SEG + "/tenants/lease-templates",
          pageComponent: LeaseTemplate,
       },
-   ]},
+      ]
+   },
 ];
 export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
    {

@@ -39,7 +39,7 @@ function SummaryCard({ subTitle, value }: SummaryCardProps) {
   const iconData = ICON_DATA[subTitle] || ICON_DATA["Total Properties"];
 
   return (
-    <div className="bg-white px-5 py-8 shadow rounded-xl p-4">
+  <div className="bg-white dark:bg-zinc-950 px-5 py-8 rounded-xl shadow border border-gray-300 dark:border-zinc-800">
       <div className="flex flex-row">
         <div
           className={`icon-container self-center ${iconData.bg} p-4 rounded-full mr-5`}
@@ -47,7 +47,7 @@ function SummaryCard({ subTitle, value }: SummaryCardProps) {
           {iconData.icon}
         </div>
         <div className="flex flex-col">
-          <h1 className="font-semibold text-4xl text-gray-700">{value}</h1>
+          <h1 className="font-semibold text-4xl text-gray-700 dark:text-gray-100">{value}</h1>
           <span className="mt-2 text-sm uppercase">{subTitle}</span>
         </div>
       </div>

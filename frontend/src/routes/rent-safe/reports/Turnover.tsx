@@ -1,9 +1,5 @@
-import React from 'react'
-
 function Turnover() {
-  return (
-    <div>Turnover</div>
-  )
+   return <div>Turnover</div>;
 }
 
-export default Turnover
+export default Turnover;
