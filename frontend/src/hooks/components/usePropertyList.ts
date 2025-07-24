@@ -6,7 +6,7 @@ function usePropertyList() {
    const [SummaryCards, setSummaryCards] = useState<SummaryCardType[]>([]);
 
    const [filterOptions, setFilterOptions] = useState<FilterOptionType[]>([]);
-   const [selectedFilter, setSelectFilter] = useState(filterOptions[0].value);
+   const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [addPropertyForm, setAddPropertyForm] = useState({
       property_type: "",
       unit_number: "",

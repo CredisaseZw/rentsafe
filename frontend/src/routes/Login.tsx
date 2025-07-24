@@ -7,6 +7,7 @@ import useLoginAuth from "@/hooks/apiHooks/useLogin";
 import Alert from "@/components/general/Alerts";
 import { useState } from "react";
 import Spinner from "@/components/general/Spinner";
+import Button from "@/components/general/Button";
 
 export default function Login() {
    const { loginForm, validateForm, handleChange, status, onError } = useAuth();
@@ -35,8 +36,8 @@ export default function Login() {
       });
    };
    return (
-      <div className={"bg-dark-body flex min-h-screen items-center justify-center"}>
-         <div className="border-foreground/20 flex w-md flex-col items-center justify-center rounded-xl border bg-white/90 p-6 shadow-lg">
+      <div className={"flex min-h-screen items-center justify-center bg-gray-100 dark:bg-black"}>
+         <div className="flex w-md flex-col items-center justify-center rounded-xl border border-gray-300 bg-white/90 p-6 shadow dark:border-zinc-800 dark:bg-zinc-950">
             <form onSubmit={onLogin} className="h-full w-full" method="post">
                <div className="mb-7">
                   <Logo />
@@ -73,14 +74,10 @@ export default function Login() {
                )}
 
                <div className="mt-7 flex w-full flex-col gap-3">
-                  <button
-                     type="submit"
-                     disabled={isLogin}
-                     className="bg-PRIMARY hover:bg-PRIMARY-DARK disabled:bg-primary-disabled me-2 mb-2 flex flex-row items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  >
+                  <Button type="submit" disabled={isLogin} asChild={true}>
                      Sign in
                      {isLogin ? <Spinner /> : <LogInIcon size={15} className="self-center" />}
-                  </button>
+                  </Button>
                   <Link to="" className="text-PRIMARY text-center text-sm font-semibold">
                      Forgot Password?
                   </Link>

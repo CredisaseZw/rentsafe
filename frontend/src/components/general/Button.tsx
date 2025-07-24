@@ -2,6 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 interface ButtonProps {
+   asChild?: false | true;
    children: React.ReactNode;
    variant?: "primary" | "success"; // add more variants as needed
    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -15,13 +16,25 @@ const variants: Record<"primary" | "success", string> = {
    success: "bg-green-600 hover:bg-green-800",
 };
 
-function Button({ children, variant = "primary", onClick, disabled, className, type = "button" }: ButtonProps) {
+function Button({
+   children,
+   asChild,
+   variant = "primary",
+   onClick,
+   disabled,
+   className,
+   type = "button",
+}: ButtonProps) {
    return (
       <button
          type={type}
          disabled={disabled}
          onClick={onClick}
-         className={cn(`${variants[variant]} rounded px-4 py-2 font-bold text-white`, className)}
+         className={cn(
+            `${variants[variant]} rounded px-4 py-2 font-bold text-white`,
+            asChild ? "flex flex-row items-center justify-center gap-3" : "",
+            className,
+         )}
       >
          {children}
       </button>
