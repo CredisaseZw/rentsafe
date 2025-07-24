@@ -311,6 +311,10 @@ class NoteSerializer(serializers.ModelSerializer):
         fields = ['id', 'content', 'is_private', 'author_id', 'author_name', 'date_created', 'date_updated']
         read_only_fields = ['date_created', 'date_updated']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
     def create(self, validated_data):
         content_type = self.context.get('content_type')
         object_id = self.context.get('object_id')

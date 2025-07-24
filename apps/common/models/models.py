@@ -110,7 +110,11 @@ class Province(BaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} ({self.code}) - {self.country.name}"
+        try:
+            return f"{self.name} ({self.code}) - {self.country.name}"
+        except Exception:
+            return f"{self.name} ({self.code}) - [Country not loaded]"
+
 
 
 class City(BaseModel):
