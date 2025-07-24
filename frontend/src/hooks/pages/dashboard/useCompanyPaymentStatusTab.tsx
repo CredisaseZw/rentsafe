@@ -2,10 +2,14 @@ import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
+import { useNavigate } from "react-router";
 
 export default function useCompanyPaymentStatusTab() {
+   const navigate = useNavigate();
+   const searchRef = React.useRef<HTMLInputElement>(null);
    const { companies, isLoading } = useMinimalCompaniesList();
 
+   // @ts-expect-error ReactNode types will never be rendered
    const rows: BaseTableRow[] =
       companies?.map((cell) => ({
          ...cell,
@@ -38,6 +42,7 @@ export default function useCompanyPaymentStatusTab() {
       rows,
       headers,
       isLoading,
+      clearSearch,
       handleSearch,
    };
 }
