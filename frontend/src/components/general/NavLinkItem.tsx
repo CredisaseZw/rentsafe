@@ -24,8 +24,8 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
          <SidebarMenuItem>
             <SidebarMenuButton
                className={cn(
-                  "text-md hover:bg-primary-dark data-[state=open]:bg-primary-dark py-4 font-medium text-white",
-                  isActive && "bg-primary-dark",
+                  "text-md hover:bg-primary-dark data-[state=open]:bg-primary-dark p-5 py-4 font-medium text-gray-800 dark:text-white",
+                  isActive && "bg-gray-800 dark:bg-zinc-900",
                )}
             >
                {navLink.label}
