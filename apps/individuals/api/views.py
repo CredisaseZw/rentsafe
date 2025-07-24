@@ -149,7 +149,33 @@ class IndividualViewSet(BaseViewSet):
                 'error': 'Individual not found'},
                 status= status.HTTP_404_NOT_FOUND
             )
-
+            
+    @action(detail=True, methods=['PATCH'], url_path='un-delete')
+    def un_delete(self, request, pk=None):
+        try:
+            if individual := Individual.objects.filter(id=pk).first():
+                if individual.is_deleted == True:
+                    individual.is_deleted= False
+                    individual.is_active= True
+                    individual.save()
+                    logger.info(f"Individual {pk} has been un deleted")
+                    return Response("Individual has been activated successfully")
+                else:
+                    return Response ("This Individual Is already active")
+            else:
+                return ("Individual does not exist")
+        except Exception as e:
+            return Response(f'An error occurred while un-deleting individual{e}')
+                    
+    @action(detail=False, methods=['GET'], url_path='view-deleted')
+    def view_deleted(self,request, pk=None):
+        try:
+            individuals= Individual.objects.filter(is_deleted=True)
+            serializer = IndividualSearchSerializer(individuals,many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error retrieving deleted individuals{e}")
+        
     @action(detail=False, methods=['GET'], url_path='search')
     @CacheService.cached(tag_prefix= 'individual:search')
     def search_individuals(self, request):
@@ -164,7 +190,7 @@ class IndividualViewSet(BaseViewSet):
             for field in search_fields:
                 filter_conditions |= Q(**{f"{field}__icontains": query})
 
-            individuals = Individual.objects.filter(filter_conditions).prefetch_related('addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
+            individuals = Individual.objects.filter(filter_conditions,is_active=True, is_deleted=False).prefetch_related('addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
             
             serializer = IndividualSearchSerializer(individuals, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
