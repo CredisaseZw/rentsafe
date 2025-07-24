@@ -27,7 +27,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Label>
             <Select
                name={"country_id" + number}
-               disabled={countriesLoading || countries?.length === 0}
+               disabled={countriesLoading || !countries?.length}
                value={location.countryId}
                onValueChange={(value) => dispatch({ type: "country-changed", value: value })}
             >
@@ -50,7 +50,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Label>
             <Select
                name={"province_id" + number}
-               disabled={provincesLoading || provinces?.length === 0}
+               disabled={provincesLoading || !provinces?.length}
                value={location.provinceId}
                onValueChange={(value) => dispatch({ type: "province-changed", value: value })}
             >
@@ -74,7 +74,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             <Select
                required
                name={"city_id" + number}
-               disabled={citiesLoading || cities?.length === 0}
+               disabled={citiesLoading || !cities?.length}
                value={location.cityId}
                onValueChange={(value) => dispatch({ type: "city-changed", value: value })}
             >
@@ -97,7 +97,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Label>
             <Select
                name={"suburb_id" + number}
-               disabled={suburbsLoading || suburbs?.length === 0}
+               disabled={suburbsLoading || !suburbs?.length}
                value={location.suburbId}
                onValueChange={(value) => dispatch({ type: "suburb-changed", value: value })}
             >
