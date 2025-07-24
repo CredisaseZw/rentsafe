@@ -24,7 +24,8 @@ export default function CompanyPaymentStatusTab() {
                      <Search size={20} className="mx-2" />
                      <Input
                         placeholder="Search by name or reg..."
-                        name="company_q"
+                        name="q"
+                        minLength={2}
                         required
                         className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
