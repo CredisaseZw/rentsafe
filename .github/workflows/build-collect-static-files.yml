@@ -49,5 +49,7 @@ jobs:
 
     - name: Install Frontend Dependencies
       run: pnpm install
+      working-directory: ./frontend
     - name: Build Frontend
       run: pnpm run build
+      working-directory: ./frontend
