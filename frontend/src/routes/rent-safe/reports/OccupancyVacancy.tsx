@@ -1,9 +1,5 @@
-import React from 'react'
-
 function OccupancyVacancy() {
-  return (
-    <div>OccupancyVacancy</div>
-  )
+   return <div>OccupancyVacancy</div>;
 }
 
-export default OccupancyVacancy
+export default OccupancyVacancy;

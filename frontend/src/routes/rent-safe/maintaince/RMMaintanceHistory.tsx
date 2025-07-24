@@ -1,9 +1,5 @@
-import React from 'react'
-
 function RMMaintanceHistory() {
-  return (
-    <div>RMMaintanceHistory</div>
-  )
+   return <div>RMMaintanceHistory</div>;
 }
 
-export default RMMaintanceHistory
+export default RMMaintanceHistory;
