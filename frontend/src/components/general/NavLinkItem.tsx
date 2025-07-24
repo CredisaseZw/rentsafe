@@ -23,7 +23,7 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
          <SidebarMenuItem>
             <SidebarMenuButton
                className={cn(
-                  "text-md data-[state=open]:bg-primary-dark p-5 py-4 font-medium",
+                  "text-md p-5 py-4 font-medium",
                   hoverClasses,
                   isActive && activeClasses,
                   isActive ? activeTextClasses : inactiveTextClasses,
@@ -55,7 +55,7 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
             isActive ? activeTextClasses : inactiveTextClasses,
          )}
       >
-         <SidebarMenuButton asChild>
+         <SidebarMenuButton asChild className={cn(hoverClasses)}>
             <Link to={navLink.path || "#"}>{navLink.label}</Link>
          </SidebarMenuButton>
       </SidebarMenuItem>

@@ -41,7 +41,7 @@ function PropertyListTableRow() {
             </table>
          </td>
          <td className="td-border-color border px-4 py-2">
-            <Button className="bg-PRIMARY hover:bg-primary-dark flex flex-row gap-3">
+            <Button asChild={true}>
                <Eye size={18} className="self-center" />
                <span className="self-center">View Lease</span>
             </Button>
