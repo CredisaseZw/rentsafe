@@ -1,9 +1,5 @@
-import React from 'react'
-
 function LeaseTemplate() {
-  return (
-    <div>LeaseTemplate</div>
-  )
+   return <div>LeaseTemplate</div>;
 }
 
-export default LeaseTemplate
+export default LeaseTemplate;

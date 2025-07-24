@@ -1,9 +1,5 @@
-import React from 'react'
-
 function PropertyPerformanceReports() {
-  return (
-    <div>PropertyPerformanceReports</div>
-  )
+   return <div>PropertyPerformanceReports</div>;
 }
 
-export default PropertyPerformanceReports
+export default PropertyPerformanceReports;
