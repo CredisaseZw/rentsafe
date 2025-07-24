@@ -1,13 +1,15 @@
 import React from "react";
-import type { City } from "@/interfaces";
+import type { CityMinimal, ProvinceWithCities } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 
-export default function useCities() {
-   const { data, isLoading, error } = useQuery<City[]>({
-      queryKey: ["cities"],
-      queryFn: () => api.get<City[]>("/api/common/locations/cities/").then((res) => res.data),
+export default function useCities(provinceId?: string) {
+   const { data, isLoading, error } = useQuery<CityMinimal[]>({
+      queryKey: ["cities", provinceId],
+      queryFn: () =>
+         api.get<ProvinceWithCities>(`/api/common/locations/provinces/${provinceId}/`).then((res) => res.data.cities),
+      enabled: !!provinceId,
    });
 
    React.useEffect(() => {

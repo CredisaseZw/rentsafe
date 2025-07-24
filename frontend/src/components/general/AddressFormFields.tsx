@@ -141,7 +141,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             <Label className="px-2 font-normal" htmlFor={"address_type" + number}>
                Address Type
             </Label>
-            <Select name={"address_type" + number}>
+            <Select name={"address_type" + number} defaultValue={ALL_ADDRESS_TYPES[0]}>
                <SelectTrigger id={"address_type" + number} className="border-foreground/40 w-full bg-white">
                   <SelectValue placeholder="Select address type" />
                </SelectTrigger>
