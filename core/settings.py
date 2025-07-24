@@ -362,7 +362,7 @@ LOGGING = {
             'formatter': 'verbose',
         },
         'file_locations': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOGS_DIR, 'locations.log'),
             'maxBytes': 1024 * 1024 * 5,
@@ -393,6 +393,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'audit',
         },
+        'file_individuals':{
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'individuals.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            },
         'db_audit': { 
             'level': 'INFO',
             'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
@@ -434,8 +442,8 @@ LOGGING = {
             'propagate': False,
         },
         'locations': { 
-            'handlers': ['console'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'file_locations'],
+            'level': 'ERROR',
             'propagate': False,
         },
         'cache': {
@@ -444,8 +452,13 @@ LOGGING = {
             'propagate': False,
         },
         'companies': {
-            'handlers': ['console','file_companies'],
-            'level': 'ERROR',
+        'handlers': ['console', 'file_django'],
+        'level': 'DEBUG',  # Set to DEBUG to capture all messages
+        'propagate': False,
+        },
+        'individuals': {
+            'handlers': ['console', 'file_individuals'],
+            'level': 'DEBUG',
             'propagate': False,
         },
         'leases': {
