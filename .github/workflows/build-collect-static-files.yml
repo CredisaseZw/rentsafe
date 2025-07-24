@@ -3,6 +3,8 @@ name: Frontend Tests - Build and Push Static Files
 on:
   push:
     branches: [ "staging","rentsafe","live","master" ]
+  pull_request:
+    branches: [ "main","testing","staging","rentsafe","live","master" ]
 
 jobs:
   build-and-push-static:
@@ -48,8 +50,9 @@ jobs:
       run: npm install -g pnpm
 
     - name: Install Frontend Dependencies
+      working-directory: ./frontend
       run: pnpm install
-      working-directory: ./frontend
+
     - name: Build Frontend
-      run: pnpm run build
       working-directory: ./frontend
+      run: pnpm run build
