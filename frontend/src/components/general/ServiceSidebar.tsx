@@ -48,11 +48,11 @@ export default function ServiceSidebar({
       <Sidebar className="w-[300px] border-r border-white/10 bg-white text-gray-800 shadow-md dark:bg-zinc-950 dark:text-white">
          <SidebarContent>
             <div className="px-5 pt-5">
-               <div className="flex items-center gap-2 rounded-xl bg-gray-200 p-5 dark:bg-zinc-900">
+               <div className="flex items-center gap-2 rounded-xl bg-gray-800 p-5 dark:bg-zinc-900">
                   <div className="rounded-[7.5px] bg-white p-2">
                      <HomeIcon size={22} className="text-gray-800" />
                   </div>
-                  <span className="text-xl font-bold text-gray-800 dark:text-white">Rentsafe</span>
+                  <span className="text-xl font-bold text-white">Rentsafe</span>
                </div>
             </div>
 

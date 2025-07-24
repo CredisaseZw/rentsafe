@@ -4,7 +4,7 @@ import Pill from "./Pill";
 
 function PropertyListTableRow() {
    return (
-      <tr className="hover:bg-zinc-800/10">
+      <tr className="hover:bg-gray-100/90 hover:dark:bg-zinc-800/10">
          <td className="td-border-color border px-4 py-2">1</td>
          <td className="td-border-color border">
             <table className="w-full table-auto">
