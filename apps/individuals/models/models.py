@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.common.models.models import Address, Document, Note
 from django.contrib.contenttypes.fields import GenericRelation
 from apps.common.models.base_models import BaseModel
+import re
 
 
 class Individual(BaseModel):
@@ -21,16 +22,19 @@ class Individual(BaseModel):
         ('female', 'Female'),
         ('other', 'Other'),
     )
-    
+    MARITAL_STATUS_CHOICES = (
+        ('single', 'Single'),
+        ('married', 'Married'),
+        ('divorced', 'Divorced'),
+        ('widowed', 'Widowed'),
+    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     identification_type = models.CharField(max_length=20, choices=IDENTIFICATION_TYPES)
     identification_number = models.CharField(max_length=50, unique=True)
-    # email = models.EmailField(blank=True, null=True)
-    # mobile_phone = models.CharField(max_length=20)
-    # landline_phone = models.CharField(max_length=20, blank=True, null=True)
+    marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)    
@@ -52,15 +56,54 @@ class Individual(BaseModel):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-
-class EmploymentDetail(BaseModel):
-    MARITAL_STATUS_CHOICES = (
-        ('single', 'Single'),
-        ('married', 'Married'),
-        ('divorced', 'Divorced'),
-        ('widowed', 'Widowed'),
-    )
     
+    @property
+    def phone(self):
+        contact = self.contact_details.filter(mobile_phone__isnull=False).exclude(mobile_phone='').first()
+        return contact.mobile_phone if contact else None
+
+    @property
+    def email(self):
+        contact = self.contact_details.filter(email__isnull=False).exclude(email='').first()
+        return contact.email if contact else None
+    
+    def clean(self):
+        if self.first_name:
+            self.first_name = self.first_name.strip().capitalize()
+            
+        if self.last_name:
+            self.last_name = self.last_name.strip().capitalize()
+            
+        if self.identification_number:
+            cleaned_id = re.sub(r'[-\s]', '', self.identification_number.strip())
+            self.identification_number = cleaned_id.upper()
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)      
+
+class IndividualContactDetail(BaseModel):
+    individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
+    email = models.EmailField(blank=True, null=True)
+    mobile_phone = models.JSONField()
+    
+    class Meta:
+        app_label = 'individuals'
+        db_table = 'contact_detail'
+        verbose_name= 'contact detail'
+        verbose_name_plural= 'contact details'
+        ordering = ('id',)
+    
+    def __str__(self):
+        if self.mobile_phone:
+            return f"Phone: {self.mobile_phone} for {self.individual}"
+        elif self.contact_value:
+            return f"Email: {self.contact_value} for {self.individual}"
+        else:
+            return f"Contact Detail for {self.individual}"
+            
+        
+class EmploymentDetail(BaseModel):    
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='employment_details')
     employer_name = models.CharField(max_length=255)
     job_title = models.CharField(max_length=255)
@@ -68,7 +111,6 @@ class EmploymentDetail(BaseModel):
     end_date = models.DateField(blank=True, null=True)
     is_current = models.BooleanField(default=True)
     monthly_income = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    # marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
     class Meta:
         app_label = 'individuals'
         db_table = 'employment_detail'

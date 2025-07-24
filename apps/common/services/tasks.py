@@ -56,8 +56,20 @@ def send_notification(
         if recipient_type == 'individual':
             from apps.individuals.models.models import Individual
             recipient = Individual.objects.get(id=recipient_id)
-            contact_method = recipient.mobile_phone
-            use_sms = True
+            # Try mobile phone first
+            contact_method = recipient.phone
+            use_sms = bool(contact_method)
+            # If no phone, try individual's email
+            if not contact_method:
+                contact_method = recipient.email
+                use_sms = False
+            # Fallback to first contact person's individual's email
+            if not contact_method:
+                contact_person = recipient.contacts.first() if hasattr(recipient, 'contacts') else None
+
+                if contact_person and contact_person.individual:
+                    contact_method = contact_person.individual.email
+                    use_sms = False
         else:  # company
             from apps.companies.models.models import CompanyBranch
             recipient = CompanyBranch.objects.get(id=recipient_id)

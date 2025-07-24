@@ -5,13 +5,15 @@ from django.contrib.contenttypes.models import ContentType
 from apps.common.utils.caching import CacheService
 from apps.companies.models.models import Company, CompanyBranch
 from apps.common.models.models import Country, Province, City, Suburb, Address
+from apps.individuals.models.models import Individual, IndividualContactDetail, NextOfKin, EmploymentDetail
 import logging
 
 logger = logging.getLogger('cache')
 
 MONITORED_MODELS = (
     Company, CompanyBranch,
-    Country, Province, City, Suburb, Address
+    Country, Province, City, Suburb, Address,
+    Individual, NextOfKin, EmploymentDetail, IndividualContactDetail
 )
 
 def invalidate_location_caches(instance):
@@ -77,6 +79,28 @@ def invalidate_company_caches(instance):
     CacheService.invalidate_tag('choices:location')
     CacheService.invalidate_tag('choices:company')
     
+def invalidate_individual_caches(instance):
+    """
+    Invalidate cache entries related to the Individual model.
+    """
+    model_name = instance._meta.model_name.lower()
+
+    # Invalidate list & search cache
+    CacheService.invalidate_tag(f'individual:{model_name}:list')
+    CacheService.invalidate_tag(f'individual:{model_name}:search')
+    CacheService.invalidate_tag('individual:list')
+    CacheService.invalidate_tag('individual:search')
+
+    # Invalidate detail & full-details cache if pk is present
+    if hasattr(instance, 'pk') and instance.pk:
+        CacheService.invalidate_tag(f'individual:{model_name}:{instance.pk}')
+        CacheService.invalidate_tag(f'individual:{instance.pk}')
+        CacheService.invalidate_tag(f'individual:{instance.pk}:full-details')
+
+
+    CacheService.invalidate_tag('choices:individual')
+
+    
 def invalidate_address_caches(instance):
     """Handle invalidation for address changes"""
     CacheService.invalidate_tag('address:list')
@@ -104,6 +128,8 @@ def invalidate_model_cache(sender, instance, **kwargs):
             invalidate_company_caches(instance)
         elif sender in (Country, Province, City, Suburb):
             invalidate_location_caches(instance)
+        elif sender in(Individual, NextOfKin,EmploymentDetail,IndividualContactDetail):
+            invalidate_individual_caches(instance)
         elif sender == Address:
             invalidate_address_caches(instance)
             
@@ -120,3 +146,4 @@ def invalidate_m2m_cache(sender, instance, action, **kwargs):
     """
     if action in ['post_add', 'post_remove', 'post_clear']:
         invalidate_model_cache(sender=instance.__class__, instance=instance)
+        

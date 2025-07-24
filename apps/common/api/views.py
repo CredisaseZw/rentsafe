@@ -152,6 +152,7 @@ class LocationViewSet(BaseViewSet):
     
     @CacheService.cached(tag_prefix='locations:countries',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def countries(self, request, pk=None):
+        print("hellowww ----")
         if pk is not None:
             return self.country_detail(request, pk)
         
@@ -161,7 +162,6 @@ class LocationViewSet(BaseViewSet):
         )
         return self._create_rendered_response(serializer.data)
 
-    @CacheService.cached(tag_prefix='locations:{pk}:country')
     def country_detail(self, request, pk=None):
         country = get_object_or_404(Country, pk=pk)
 
@@ -190,18 +190,21 @@ class LocationViewSet(BaseViewSet):
         return self.create_objects_helper(request)
 
     def province_detail(self, request, pk=None):
-        province = get_object_or_404(Province, pk=pk)
-
-        if request.method == 'GET':
-            serializer = self.get_serializer(
-                province, context=self.get_serializer_context(include_nested=True)
-            )
-            return self._create_rendered_response(serializer.data)
-        elif request.method in ['PUT', 'PATCH']:
-            return self.update_object_helper(request, province)
-        elif request.method == 'DELETE':
-            return self.delete_object_helper(province)
-        
+        # province = get_object_or_404(Province, pk=pk)
+        try:
+            province= Province.objects.get(id=pk)
+            if request.method == 'GET':
+                serializer = self.get_serializer(
+                    province, context=self.get_serializer_context(include_nested=True)
+                )
+                return self._create_rendered_response(serializer.data)
+            elif request.method in ['PUT', 'PATCH']:
+                return self.update_object_helper(request, province)
+            elif request.method == 'DELETE':
+                return self.delete_object_helper(province)
+        except Exception as e:
+            logger.error(f"error: {str(e)}")
+            
     @CacheService.cached(tag_prefix='locations:cities',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def cities(self, request):
         queryset = City.objects.filter(is_active=True)
