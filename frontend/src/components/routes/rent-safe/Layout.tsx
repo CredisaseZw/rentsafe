@@ -13,11 +13,11 @@ export default function Layout() {
    };
 
    return (
-      <div className = "bg-gray-200 dark:bg-black">
+      <div className="bg-gray-100 dark:bg-black">
          <SidebarProvider>
             <Sidebar />
             <div className="main w-full">
-               <div className="side-main bg-white dark:bg-zinc-950 border-b border-gray-300 dark:border-zinc-800 flex justify-end">
+               <div className="side-main flex justify-end border-b border-gray-300 bg-white dark:border-zinc-800 dark:bg-zinc-950">
                   {theme === "dark" ? (
                      <Sun onClick={switchTheme} className="cursor-pointer" />
                   ) : (

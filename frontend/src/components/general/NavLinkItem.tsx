@@ -24,8 +24,8 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
          <SidebarMenuItem>
             <SidebarMenuButton
                className={cn(
-                  "text-md hover:bg-primary-dark data-[state=open]:bg-primary-dark py-4 font-medium text-white",
-                  isActive && "bg-primary-dark",
+                  "text-md hover:bg-primary-dark data-[state=open]:bg-primary-dark p-5 py-4 font-medium text-gray-800 dark:text-white",
+                  isActive && "bg-gray-800 dark:bg-zinc-900",
                )}
             >
                {navLink.label}
@@ -38,10 +38,7 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
                   return sub.subLinks && sub.subLinks.length > 0 ? (
                      <SidebarMenuSubItem key={index}>
                         <SidebarMenuSubButton
-                           className={cn(
-                              "hover:bg-primary-dark py-4 font-bold text-white hover:text-white",
-                              isSubActive && "bg-primary-dark",
-                           )}
+                           className={cn("hover:bg-primary-dark py-4 font-bold", isSubActive && "bg-primary-dark")}
                         >
                            {sub.label}
                         </SidebarMenuSubButton>
