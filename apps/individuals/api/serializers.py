@@ -422,7 +422,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         id=address_id,
                         content_type=individual_ct,
                         object_id=instance.pk,
-                        is_primary=True
                     )
                     for key, val in addr.items():
                         setattr(address_obj, key, val)
@@ -440,7 +439,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     content_type=individual_ct,
                     object_id=instance.pk,
                     address_type=addr.get('address_type'),
-                    is_primary=addr.get('is_primary', True)
                 ).first()
 
                 if existing:
@@ -557,7 +555,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         document_type = doc.get('document_type')   
                     ).first()
                     if existing:
-                        for key, val in addr.items():
+                        for key, val in doc.items():
                             setattr(existing, key, val)
                         existing.save()
                     else:
