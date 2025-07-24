@@ -1,9 +1,5 @@
-import React from 'react'
-
 function Inspections() {
-  return (
-    <div>Inspections</div>
-  )
+   return <div>Inspections</div>;
 }
 
-export default Inspections
+export default Inspections;

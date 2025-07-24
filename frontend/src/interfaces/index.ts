@@ -122,41 +122,26 @@ export interface CompanyReport {
    };
 }
 
-export interface Country {
-   id: number;
-   name: string;
-   code: string;
-   dial_code: string;
-   currency_code: string;
-   currency_name: string;
-   slug: string;
-   is_active: boolean;
-}
-
-export interface Province {
-   id: number;
-   name: string;
-   code: string;
-   country: string;
-   slug: string;
-   is_active: boolean;
-   approved: boolean;
-}
-
-export interface City {
-   id: number;
-   name: string;
-   province: string;
-   slug: string;
-   is_active: boolean;
-}
-
-export interface Suburb {
-   id: number;
-   name: string;
-   city: string;
-   slug: string;
-   is_active: boolean;
+export interface IndividualReport {
+   employmentHistory: { employer: string; position: string; startDate: string }[];
+   claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
+   active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
+   historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
+   rating: string;
+   personalDetails: {
+      surname: string;
+      otherNames: string;
+      idNumber: string;
+      dateOfBirth: string;
+      gender: string;
+      nationality: string;
+      maritalStatus: string;
+      dependants: { name: string; age: number; relationship: string }[];
+      mobileNumber: string;
+      telephoneNumber: string;
+      email: string;
+      address: string;
+   };
 }
 
 export interface AddressLocation {
@@ -168,4 +153,71 @@ export interface AddressLocation {
    provinceName?: string;
    cityName?: string;
    suburbName?: string;
+}
+
+export interface IndividualMinimal {
+   id: number;
+   forenames: string;
+   surname: string;
+   identificationNumber: string;
+}
+
+export interface IndividualFull {
+   id: number;
+   forenames: string;
+   surname: string;
+   identificationNumber: string;
+}
+
+export interface PlaceBase {
+   id: number;
+   name: string;
+}
+
+export interface Country extends PlaceBase {
+   code: string;
+   dial_code: string;
+   currency_code: string;
+   currency_name: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface ProvinceMinimal extends PlaceBase {
+   code: string;
+}
+
+export type CityMinimal = PlaceBase;
+
+export type SuburbMinimal = PlaceBase;
+
+export interface Province extends ProvinceMinimal {
+   country: string;
+   slug: string;
+   is_active: boolean;
+   approved: boolean;
+}
+
+export interface City extends CityMinimal {
+   province: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface Suburb extends SuburbMinimal {
+   city: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface CountryWithProvinces extends Country {
+   provinces: ProvinceMinimal[];
+}
+
+export interface ProvinceWithCities extends Province {
+   cities: CityMinimal[];
+}
+
+export interface CityWithSuburbs extends City {
+   suburbs: SuburbMinimal[];
 }

@@ -1,7 +1,7 @@
 import type { CompanyPayload } from "@/interfaces/form-payloads";
 import React from "react";
 import useCreateCompany from "../apiHooks/useCreateCompany";
-import { formatDateToPythonSLiking, toIntElseUndefined } from "@/lib/utils";
+import { extractAddresses, formatDateToPythonSLiking } from "@/lib/utils";
 import type { CompanyLegalStatus } from "@/types";
 
 export default function useCompanyForm() {
@@ -33,8 +33,6 @@ export default function useCompanyForm() {
             linkedin: data.linkedin as string,
             operations: data.operations as string,
             account_number: data.account_number as string,
-            is_under_judicial: data.is_under_judicial as "YES" | "NO",
-            is_suspended: data.is_suspended ? true : false,
          },
          trading_name: data.trading_name as string,
          legal_status: data.legal_status as CompanyLegalStatus,
@@ -42,23 +40,8 @@ export default function useCompanyForm() {
          industry: data.industry as string,
          notes: data.notes ? [{ content: data.notes as string }] : [],
          documents: undefined,
-         addresses: undefined,
+         addresses: extractAddresses(data),
       };
-
-      const address = {
-         street_address: data.street_address as string,
-         city_id: toIntElseUndefined(data.city_id as string),
-         address_type: data.address_type as "physical" | "postal" | "billing" | "work" | "other",
-         is_primary: !!data.is_primary,
-         postal_code: data.postal_code as string,
-         suburb_id: toIntElseUndefined(data.suburb_id as string),
-         province_id: toIntElseUndefined(data.province_id as string),
-         country_id: toIntElseUndefined(data.country_id as string),
-      };
-
-      if (typeof address.city_id === "number") {
-         companyPayload.addresses = [{ ...address, city_id: address.city_id }];
-      }
 
       if (companyPayload.date_of_incorporation) {
          companyPayload.date_of_incorporation = formatDateToPythonSLiking(companyPayload.date_of_incorporation);

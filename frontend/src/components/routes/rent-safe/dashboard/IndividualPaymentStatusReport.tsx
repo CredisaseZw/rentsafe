@@ -1,53 +1,28 @@
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Fullscreen, Printer } from "lucide-react";
+import { AlertTriangle, Fullscreen, Printer } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { friendlyDate } from "@/lib/utils";
+import { formatErrorMessage, friendlyDate } from "@/lib/utils";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import OverviewCard from "./OverviewCard";
 import Logo from "@/components/general/Logo";
+import useIndividualPaymentStatusReport from "@/hooks/pages/dashboard/useIndividualPaymentStatusReport";
+import LoadingIndicator from "@/components/general/LoadingIndicator";
 
-type IndividualPaymentStatusReportProps = {
-   report: {
-      employmentHistory: { employer: string; position: string; startDate: string }[];
-      claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
-      active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
-      historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
-      rating: string;
-      personalDetails: {
-         surname: string;
-         otherNames: string;
-         idNumber: string;
-         dateOfBirth: string;
-         gender: string;
-         nationality: string;
-         maritalStatus: string;
-         dependants: { name: string; age: number; relationship: string }[];
-         mobileNumber: string;
-         telephoneNumber: string;
-         email: string;
-         address: string;
-      };
-   };
-};
-
-export default function IndividualPaymentStatusReport({ report }: IndividualPaymentStatusReportProps) {
-   const { employmentHistory, claims, active, historic, personalDetails, rating } = report;
-
-   const ratingColor =
-      PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === rating.toLowerCase())?.className ||
-      "bg-gray-500 text-white";
+export default function IndividualPaymentStatusReport({ individualId }: { individualId: number }) {
+   const { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
+      useIndividualPaymentStatusReport(individualId);
 
    return (
-      <Dialog modal>
+      <Dialog modal open={show} onOpenChange={handleOpenChange}>
          <DialogTrigger asChild>
             <Button variant="outline" size="xs">
                View <Fullscreen size={16} />
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[1100px] sm:max-w-[default]`}>
+         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1100px] sm:max-w-[default]`}>
             <DialogTitle>
                <Button size="sm">
                   Print
@@ -63,7 +38,7 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                      <p>
                         Rent Payment Status Report on{" "}
                         <span className="font-semibold">
-                           {personalDetails.otherNames} {personalDetails.surname}
+                           {report.personalDetails.otherNames} {report.personalDetails.surname}
                         </span>{" "}
                         as at <span className="">{friendlyDate(new Date())}</span>
                      </p>
@@ -85,7 +60,11 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                <div className="flex flex-col gap-10">
                   <div className="flex items-center justify-between gap-2">
                      <div className="w-fit">
-                        <OverviewCard label="Classification" value={rating} valueClassName={ratingColor} />
+                        <OverviewCard
+                           label="Classification"
+                           value={report?.rating || "N/A"}
+                           valueClassName={ratingColor}
+                        />
                      </div>
 
                      <div className="flex flex-wrap items-center gap-4">
@@ -105,70 +84,89 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
 
                      <div className="grid grid-cols-2">
                         <div className="border-foreground/30 border-x border-b">
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Surname</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Surname</div>
 
-                              <div>{personalDetails.surname}</div>
+                              <div className="col-span-3">{report.personalDetails.surname}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>First Name</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">First Name</div>
 
-                              <div>{personalDetails.otherNames}</div>
+                              <div className="col-span-3">{report.personalDetails.otherNames}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>National ID</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">National ID</div>
 
-                              <div>{personalDetails.idNumber}</div>
+                              <div className="col-span-3">{report.personalDetails.idNumber}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Date Of Birth</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Date Of Birth</div>
 
-                              <div>{friendlyDate(personalDetails.dateOfBirth)}</div>
+                              <div className="col-span-3">
+                                 {report.personalDetails.dateOfBirth
+                                    ? friendlyDate(report.personalDetails.dateOfBirth)
+                                    : "N/A"}
+                              </div>
                            </div>
 
-                           <div className="grid grid-cols-2 items-start gap-2 px-3 py-1">
-                              <div>Marital Status</div>
+                           <div className="grid grid-cols-5 items-start gap-2 px-3 py-1">
+                              <div className="col-span-2">Marital Status</div>
 
-                              <div>{personalDetails.maritalStatus}</div>
+                              <div className="col-span-3">{report.personalDetails.maritalStatus}</div>
                            </div>
                         </div>
 
                         <div className="border-foreground/30 border-x border-b">
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Gender</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Gender</div>
 
-                              <div>{personalDetails.gender}</div>
+                              <div className="col-span-3">{report.personalDetails.gender}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Mobile Number</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Mobile Number</div>
 
-                              <div>{personalDetails.mobileNumber}</div>
+                              <div className="col-span-3">{report.personalDetails.mobileNumber}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Telephone No</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Telephone No</div>
 
-                              <div>{personalDetails.telephoneNumber}</div>
+                              <div className="col-span-3">{report.personalDetails.telephoneNumber}</div>
                            </div>
 
-                           <div className="border-foreground/30 grid grid-cols-2 items-start gap-2 border-b px-3 py-1">
-                              <div>Email</div>
+                           <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
+                              <div className="col-span-2">Email</div>
 
-                              <div>
-                                 <Link to={`mailto:${personalDetails.email}`} className="text-PRIMARY hover:underline">
-                                    {personalDetails.email}
+                              <div className="col-span-3">
+                                 <Link
+                                    to={`mailto:${report.personalDetails.email}`}
+                                    className="text-PRIMARY hover:underline"
+                                 >
+                                    {report.personalDetails.email}
                                  </Link>
                               </div>
                            </div>
 
-                           <div className="grid grid-cols-2 items-start gap-2 px-3 py-1">
-                              <div>Address</div>
+                           <div className="grid grid-cols-5 items-start gap-2 px-3 py-1">
+                              <div className="col-span-2">Address</div>
 
-                              <div>{personalDetails.address}</div>
+                              <div className="col-span-3 flex items-start gap-1">
+                                 <div className={showFullAddress ? "grow" : "line-clamp-1 grow"}>
+                                    {report.personalDetails.address}
+                                 </div>
+                                 <Button
+                                    onClick={() => setShowFullAddress((prev) => !prev)}
+                                    variant="outline"
+                                    className="py-0"
+                                    size="xs"
+                                 >
+                                    {showFullAddress ? "-" : "+"}
+                                 </Button>
+                              </div>
                            </div>
                         </div>
                      </div>
@@ -185,7 +183,7 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                         <div>Start Date</div>
                      </div>
 
-                     {employmentHistory.map((employment, index) => (
+                     {report.employmentHistory.map((employment, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-3 items-center gap-2 border border-t-0 p-1 text-center"
@@ -214,7 +212,7 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                         <div>Date of Claim</div>
                      </div>
 
-                     {claims.map((claim, index) => (
+                     {report.claims.map((claim, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-5 items-center gap-2 border border-t-0 p-1 text-center"
@@ -238,7 +236,7 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                         <div>Amount</div>
                      </div>
 
-                     {active.map((rental, index) => (
+                     {report.active.map((rental, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-4 items-center gap-2 border border-t-0 p-1 text-center"
@@ -261,7 +259,7 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                         <div>Amount</div>
                      </div>
 
-                     {historic.map((rental, index) => (
+                     {report.historic.map((rental, index) => (
                         <div
                            key={index}
                            className="border-foreground/30 grid grid-cols-4 items-center gap-2 border border-t-0 p-1 text-center"
@@ -285,6 +283,21 @@ export default function IndividualPaymentStatusReport({ report }: IndividualPaym
                      <p>All rights reserved</p>
                   </div>
                </div>
+
+               {isLoading && (
+                  <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-black">
+                     <LoadingIndicator />
+                  </div>
+               )}
+
+               {error && (
+                  <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-center text-black">
+                     <div>
+                        <AlertTriangle className="mx-auto mb-2" />
+                        {formatErrorMessage(error)}
+                     </div>
+                  </div>
+               )}
             </div>
          </DialogContent>
       </Dialog>

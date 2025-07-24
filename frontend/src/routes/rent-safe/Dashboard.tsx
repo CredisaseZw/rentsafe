@@ -23,9 +23,13 @@ export default function Dashboard() {
 
    return (
       <Tabs defaultValue={tabs[0].value}>
-         <TabsList className="border-foreground mb-5">
+         <TabsList className="border-foreground bg-PRIMARY mb-5 h-fit p-1">
             {tabs.map((tab) => (
-               <TabsTrigger key={tab.value} value={tab.value}>
+               <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="data-[state=active]:text-foreground cursor-pointer border-0 text-white transition-none hover:bg-black/40"
+               >
                   <tab.icon />
                   {tab.label}
                </TabsTrigger>
