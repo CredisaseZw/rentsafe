@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Fullscreen, Printer } from "lucide-react";
+import { AlertTriangle, Fullscreen, Printer } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { friendlyDate } from "@/lib/utils";
+import { formatErrorMessage, friendlyDate } from "@/lib/utils";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import OverviewCard from "./OverviewCard";
@@ -11,7 +11,7 @@ import useIndividualPaymentStatusReport from "@/hooks/pages/dashboard/useIndivid
 import LoadingIndicator from "@/components/general/LoadingIndicator";
 
 export default function IndividualPaymentStatusReport({ individualId }: { individualId: number }) {
-   const { show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
+   const { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
       useIndividualPaymentStatusReport(individualId);
 
    return (
@@ -287,6 +287,15 @@ export default function IndividualPaymentStatusReport({ individualId }: { indivi
                {isLoading && (
                   <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-black">
                      <LoadingIndicator />
+                  </div>
+               )}
+
+               {error && (
+                  <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-center text-black">
+                     <div>
+                        <AlertTriangle className="mx-auto mb-2" />
+                        {formatErrorMessage(error)}
+                     </div>
                   </div>
                )}
             </div>

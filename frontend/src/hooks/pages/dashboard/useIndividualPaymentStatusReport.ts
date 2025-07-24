@@ -7,7 +7,7 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
-   const { individual, isLoading, refetch } = useIndividual(individualId, false, () => setShow(false));
+   const { error, individual, isLoading, refetch } = useIndividual(individualId, false);
 
    function handleOpenChange(open: boolean) {
       setShow(open);
@@ -45,5 +45,5 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
       PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === report.rating.toLowerCase())?.className ||
       "bg-gray-500 text-white";
 
-   return { show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress };
+   return { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress };
 }

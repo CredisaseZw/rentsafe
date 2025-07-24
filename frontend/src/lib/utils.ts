@@ -146,3 +146,14 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
 
    return addresses;
 }
+
+export function formatErrorMessage(error: unknown): string {
+   if (error instanceof Error) {
+      return error.message;
+   } else if (typeof error === "string") {
+      return error;
+   } else if (error && typeof error === "object" && "message" in error) {
+      return (error as { message: string }).message;
+   }
+   return JSON.stringify(error, null, 2) || "An unknown error occurred";
+}

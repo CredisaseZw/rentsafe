@@ -2,16 +2,16 @@ import Logo from "@/components/general/Logo";
 import OverviewCard from "./OverviewCard";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
-import { friendlyDate } from "@/lib/utils";
+import { formatErrorMessage, friendlyDate } from "@/lib/utils";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Fullscreen, Printer } from "lucide-react";
+import { AlertTriangle, Fullscreen, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import LoadingIndicator from "@/components/general/LoadingIndicator";
 import useCompanyPaymentStatusReport from "@/hooks/pages/dashboard/useCompanyPaymentStatusReport";
 
 export default function CompanyPaymentStatusReport({ companyId }: { companyId: number }) {
-   const { show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
+   const { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
       useCompanyPaymentStatusReport(companyId);
 
    return (
@@ -270,6 +270,15 @@ export default function CompanyPaymentStatusReport({ companyId }: { companyId: n
                {isLoading && (
                   <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-black">
                      <LoadingIndicator />
+                  </div>
+               )}
+
+               {error && (
+                  <div className="absolute top-0 left-0 flex size-full items-center justify-center rounded-md bg-white/80 text-center text-black">
+                     <div>
+                        <AlertTriangle className="mx-auto mb-2" />
+                        {formatErrorMessage(error)}
+                     </div>
                   </div>
                )}
             </div>
