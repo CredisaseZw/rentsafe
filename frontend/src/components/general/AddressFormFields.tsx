@@ -27,7 +27,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Label>
             <Select
                name={"country_id" + number}
-               disabled={countriesLoading || countries?.length === 0}
+               disabled={countriesLoading || !countries?.length}
                value={location.countryId}
                onValueChange={(value) => dispatch({ type: "country-changed", value: value })}
             >
@@ -50,7 +50,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Label>
             <Select
                name={"province_id" + number}
-               disabled={provincesLoading || provinces?.length === 0}
+               disabled={provincesLoading || !provinces?.length}
                value={location.provinceId}
                onValueChange={(value) => dispatch({ type: "province-changed", value: value })}
             >
@@ -74,7 +74,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             <Select
                required
                name={"city_id" + number}
-               disabled={citiesLoading || cities?.length === 0}
+               disabled={citiesLoading || !cities?.length}
                value={location.cityId}
                onValueChange={(value) => dispatch({ type: "city-changed", value: value })}
             >
@@ -97,7 +97,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Label>
             <Select
                name={"suburb_id" + number}
-               disabled={suburbsLoading || suburbs?.length === 0}
+               disabled={suburbsLoading || !suburbs?.length}
                value={location.suburbId}
                onValueChange={(value) => dispatch({ type: "suburb-changed", value: value })}
             >
@@ -141,7 +141,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             <Label className="px-2 font-normal" htmlFor={"address_type" + number}>
                Address Type
             </Label>
-            <Select name={"address_type" + number}>
+            <Select name={"address_type" + number} defaultValue={ALL_ADDRESS_TYPES[0]}>
                <SelectTrigger id={"address_type" + number} className="border-foreground/40 w-full bg-white">
                   <SelectValue placeholder="Select address type" />
                </SelectTrigger>

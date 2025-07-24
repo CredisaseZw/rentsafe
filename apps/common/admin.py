@@ -64,7 +64,7 @@ class SuburbAdmin(admin.ModelAdmin):
 class AddressAdmin(admin.ModelAdmin):
     list_display = (
         'content_object', 'address_type', 'is_primary',
-        'street_address', 'city', 'country'
+        'street_address', 'city', 'country','date_created'
     )
     list_filter = ('address_type', 'is_primary', 'country', 'province', 'city')
     search_fields = ('street_address', 'line_2', 'postal_code')

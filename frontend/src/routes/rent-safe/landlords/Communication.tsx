@@ -1,9 +1,5 @@
-import React from 'react'
-
 function Communication() {
-  return (
-    <div>Communication</div>
-  )
+   return <div>Communication</div>;
 }
 
-export default Communication
+export default Communication;

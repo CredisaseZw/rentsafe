@@ -1,23 +1,21 @@
-import React, { useState } from 'react'
+import { useState } from "react";
 
-// ESC BTN SHOULD CLOSE THE BTN 
+// ESC BTN SHOULD CLOSE THE BTN
 function useModal() {
-    let [ModalState, setModalState] = useState(false); // FALSE -> MODAL IS CLOSED, TRUE -> !! WELL YOU GET THE JIST
+   const [ModalState, setModalState] = useState(false); // FALSE -> MODAL IS CLOSED, TRUE -> !! WELL YOU GET THE JIST
 
-    let openModal =()=>{
+   const openModal = () => {
       setModalState(true);
-    }
-    
-    let closeModal = ()=>{
-      setModalState(false)
-    }
-    return (
-    {
+   };
+
+   const closeModal = () => {
+      setModalState(false);
+   };
+   return {
       ModalState,
       openModal,
-      closeModal
-    }
-  )
+      closeModal,
+   };
 }
 
-export default useModal
+export default useModal;

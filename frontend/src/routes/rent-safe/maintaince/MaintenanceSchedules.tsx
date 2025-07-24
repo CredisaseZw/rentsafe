@@ -1,9 +1,5 @@
-import React from 'react'
-
 function MaintenanceSchedules() {
-  return (
-    <div>MaintenanceSchedules</div>
-  )
+   return <div>MaintenanceSchedules</div>;
 }
 
-export default MaintenanceSchedules
+export default MaintenanceSchedules;

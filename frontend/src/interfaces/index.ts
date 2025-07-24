@@ -144,43 +144,6 @@ export interface IndividualReport {
    };
 }
 
-export interface Country {
-   id: number;
-   name: string;
-   code: string;
-   dial_code: string;
-   currency_code: string;
-   currency_name: string;
-   slug: string;
-   is_active: boolean;
-}
-
-export interface Province {
-   id: number;
-   name: string;
-   code: string;
-   country: string;
-   slug: string;
-   is_active: boolean;
-   approved: boolean;
-}
-
-export interface City {
-   id: number;
-   name: string;
-   province: string;
-   slug: string;
-   is_active: boolean;
-}
-
-export interface Suburb {
-   id: number;
-   name: string;
-   city: string;
-   slug: string;
-   is_active: boolean;
-}
-
 export interface AddressLocation {
    countryId?: string;
    provinceId?: string;
@@ -204,4 +167,57 @@ export interface IndividualFull {
    forenames: string;
    surname: string;
    identificationNumber: string;
+}
+
+export interface PlaceBase {
+   id: number;
+   name: string;
+}
+
+export interface Country extends PlaceBase {
+   code: string;
+   dial_code: string;
+   currency_code: string;
+   currency_name: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface ProvinceMinimal extends PlaceBase {
+   code: string;
+}
+
+export type CityMinimal = PlaceBase;
+
+export type SuburbMinimal = PlaceBase;
+
+export interface Province extends ProvinceMinimal {
+   country: string;
+   slug: string;
+   is_active: boolean;
+   approved: boolean;
+}
+
+export interface City extends CityMinimal {
+   province: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface Suburb extends SuburbMinimal {
+   city: string;
+   slug: string;
+   is_active: boolean;
+}
+
+export interface CountryWithProvinces extends Country {
+   provinces: ProvinceMinimal[];
+}
+
+export interface ProvinceWithCities extends Province {
+   cities: CityMinimal[];
+}
+
+export interface CityWithSuburbs extends City {
+   suburbs: SuburbMinimal[];
 }

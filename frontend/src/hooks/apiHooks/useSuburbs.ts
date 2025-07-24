@@ -1,13 +1,15 @@
 import React from "react";
-import type { Suburb } from "@/interfaces";
+import type { CityWithSuburbs, SuburbMinimal } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 
-export default function useSuburbs() {
-   const { data, isLoading, error } = useQuery<Suburb[]>({
-      queryKey: ["suburbs"],
-      queryFn: () => api.get<Suburb[]>("/api/common/locations/suburbs/").then((res) => res.data),
+export default function useSuburbs(cityId?: string) {
+   const { data, isLoading, error } = useQuery<SuburbMinimal[]>({
+      queryKey: ["suburbs", cityId],
+      queryFn: () =>
+         api.get<CityWithSuburbs>(`/api/common/locations/cities/${cityId}/`).then((res) => res.data.suburbs),
+      enabled: !!cityId,
    });
 
    React.useEffect(() => {

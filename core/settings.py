@@ -266,6 +266,7 @@ REST_FRAMEWORK = {
         ],
 }
 REDIS_CACHE_LOCATION = os.getenv('REDIS_CACHE_LOCATION', "redis://127.0.0.1:6379/1")
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -277,6 +278,7 @@ CACHES = {
         "TIMEOUT": 300, 
     }
 }
+# Celery Configuration
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
 
@@ -284,7 +286,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
-
 
 
 
@@ -405,6 +406,14 @@ LOGGING = {
             'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
             'formatter': 'audit',
         },
+        'leases_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'leases.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': { 
@@ -452,6 +461,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'leases': {
+            'handlers': ['console', 'leases_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
     'root': { 
         'handlers': ['console', 'file_django'],
         'level': 'WARNING',
@@ -460,13 +474,7 @@ LOGGING = {
 }
 
 
-# Celery Configuration
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Africa/Harare'
+
 
 ADD_INDIVIDUAL = "ADD_INDIVIDUAL"
 ADD_INDIVIDUAL_USER = "ADD_INDIVIDUAL_USER"

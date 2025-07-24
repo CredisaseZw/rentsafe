@@ -18,6 +18,8 @@ from apps.common.models.models import Address
 from django.contrib.contenttypes.models import ContentType
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+import logging
+logger = logging.getLogger('leases')
 
 class LeaseViewSet(viewsets.ModelViewSet):
     queryset = Lease.objects.all()
@@ -42,22 +44,26 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.context['request'] = request
+            lease = serializer.save()
+            
+            if lease.status == 'ACTIVE':
+                lease.unit.status = 'occupied'
+                lease.unit.save()
+                
+            return Response(LeaseDetailSerializer(lease).data, 
+                        status=status.HTTP_201_CREATED)
         
-        # Set the request in the context for logging purposes
-        serializer.context['request'] = request
-        
-        lease = serializer.save()
-        
-        # Update unit status if lease is active
-        if lease.status == 'ACTIVE':
-            lease.unit.status = 'occupied'
-            lease.unit.save()
-        
-        headers = self.get_success_headers(serializer.data)
-        return Response(LeaseDetailSerializer(lease).data, status=status.HTTP_201_CREATED, headers=headers)
-
+        except Exception as e:
+            # Log the full error for debugging
+            logger.error(f"Lease creation failed: {str(e)}", exc_info=True)
+            return Response(
+                {"error": "Lease creation failed", "details": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
