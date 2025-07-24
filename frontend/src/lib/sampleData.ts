@@ -29,22 +29,27 @@ export const sampleCompanyReport = {
 
 export const sampleCompanyRows = [
    {
+      id: 1,
       registeredName: "Tech Solutions Ltd",
       registrationNumber: "123456789",
    },
    {
+      id: 2,
       registeredName: "Innovatech Corp",
       registrationNumber: "987654321",
    },
    {
+      id: 3,
       registeredName: "Global Enterprises",
       registrationNumber: "456789123",
    },
    {
+      id: 4,
       registeredName: "Future Tech Inc",
       registrationNumber: "321654987",
    },
    {
+      id: 5,
       registeredName: "Smart Innovations",
       registrationNumber: "789123456",
    },
@@ -89,51 +94,61 @@ export const sampleIndividualReport = {
 
 export const sampleIndividualRows = [
    {
+      id: 1,
       forenames: "John",
       surname: "Doe",
       identificationNumber: "123456789",
    },
    {
+      id: 2,
       forenames: "Jane",
       surname: "Smith",
       identificationNumber: "987654321",
    },
    {
+      id: 3,
       forenames: "Alice",
       surname: "Johnson",
       identificationNumber: "456789123",
    },
    {
+      id: 4,
       forenames: "Bob",
       surname: "Brown",
       identificationNumber: "321654987",
    },
    {
+      id: 5,
       forenames: "Charlie",
       surname: "Davis",
       identificationNumber: "789123456",
    },
    {
+      id: 6,
       forenames: "Eve",
       surname: "Wilson",
       identificationNumber: "654321789",
    },
    {
+      id: 7,
       forenames: "Frank",
       surname: "Garcia",
       identificationNumber: "159753486",
    },
    {
+      id: 8,
       forenames: "Grace",
       surname: "Martinez",
       identificationNumber: "753159852",
    },
    {
+      id: 9,
       forenames: "Hank",
       surname: "Lopez",
       identificationNumber: "951357468",
    },
    {
+      id: 10,
       forenames: "Ivy",
       surname: "Gonzalez",
       identificationNumber: "357951246",

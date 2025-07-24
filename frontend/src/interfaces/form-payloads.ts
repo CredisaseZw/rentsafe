@@ -7,16 +7,7 @@ export interface CompanyPayload {
    legal_status?: CompanyLegalStatus;
    date_of_incorporation?: string;
    industry?: string;
-   addresses?: {
-      street_address: string;
-      city_id: number;
-      address_type?: "physical" | "postal" | "billing" | "work" | "other";
-      is_primary?: boolean;
-      postal_code?: string;
-      suburb_id?: number;
-      province_id?: number;
-      country_id?: number;
-   }[];
+   addresses?: AddressPayload[];
    documents?: { document_type: string; file: string; description: string }[];
    notes?: { content: string }[];
    profile: {
@@ -34,7 +25,16 @@ export interface CompanyPayload {
       linkedin?: string;
       operations?: string;
       account_number?: string;
-      is_under_judicial?: "YES" | "NO";
-      is_suspended?: boolean;
    };
+}
+
+export interface AddressPayload {
+   street_address: string;
+   city_id: number;
+   address_type?: "physical" | "postal" | "billing" | "work" | "other";
+   is_primary?: boolean;
+   postal_code?: string;
+   suburb_id?: number;
+   province_id?: number;
+   country_id?: number;
 }
