@@ -14,12 +14,13 @@ const fileApi = axios.create({
 }); // USE THIS ONE FOR FILE TYPE UPLOADS
 
 const attachToken = (config: any) => {
-   let token: string | null = localStorage.getItem("token");
+   const token: string | null = localStorage.getItem("token");
    let parsedToken: { access_token?: string } | null = null;
 
    try {
       parsedToken = token ? JSON.parse(token) : null;
    } catch (err) {
+      console.log(err);
       parsedToken = null;
    }
 

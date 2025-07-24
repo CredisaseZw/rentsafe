@@ -5,28 +5,31 @@ import RootLayout from "./components/general/RootLayout";
 import ProtectRoute from "./lib/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
+import { ThemeProvider } from "next-themes";
 
 export default function App() {
    return (
-      <ReactQueryProvider>
-         <BrowserRouter>
-            <Routes>
-               <Route element={<RootLayout />}>
-                  {ROOT_ROUTES.map((route) => (
-                     <Route key={route.path} path={route.path} element={<route.pageComponent />} />
-                  ))}
-                  <Route element={<ProtectRoute />}>
-                     <Route element={<RentsafeLayout />}>
-                        {RENTSAFE_ROUTES.map((route) => (
-                           <Route key={route.path} path={route.path} element={<route.pageComponent />} />
-                        ))}
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+         <ReactQueryProvider>
+            <BrowserRouter>
+               <Routes>
+                  <Route element={<RootLayout />}>
+                     {ROOT_ROUTES.map((route) => (
+                        <Route key={route.path} path={route.path} element={<route.pageComponent />} />
+                     ))}
+                     <Route element={<ProtectRoute />}>
+                        <Route element={<RentsafeLayout />}>
+                           {RENTSAFE_ROUTES.map((route) => (
+                              <Route key={route.path} path={route.path} element={<route.pageComponent />} />
+                           ))}
+                        </Route>
                      </Route>
                   </Route>
-               </Route>
-            </Routes>
-         </BrowserRouter>
+               </Routes>
+            </BrowserRouter>
 
-         <Toaster dismissible position="top-left" duration={10 * 1000} />
-      </ReactQueryProvider>
+            <Toaster dismissible position="top-left" duration={10 * 1000} />
+         </ReactQueryProvider>
+      </ThemeProvider>
    );
 }
