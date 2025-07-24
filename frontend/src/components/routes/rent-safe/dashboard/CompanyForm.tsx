@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import AddressFormFields from "@/components/general/AddressFormFields";
 import useCompanyForm from "@/hooks/components/useCompanyForm";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import MultiAddressInput from "@/components/general/MultiAddressInput";
 
 export default function CompanyForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useCompanyForm();
@@ -25,7 +24,7 @@ export default function CompanyForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent className={`max-w-[900px] sm:max-w-[default]`}>
+         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 
             <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
@@ -183,13 +182,13 @@ export default function CompanyForm() {
                   </>
 
                   <div className="col-span-3 pt-5">
-                     <AddressFormFields />
+                     <MultiAddressInput />
                   </div>
 
                   <div className="col-span-3 pt-5">
                      <details>
-                        <summary>
-                           <span className="font-semibold">Toggle Extra Details</span>
+                        <summary className="bg-SECONDARY w-fit cursor-pointer rounded-md p-2 text-white">
+                           Toggle Extra Details
                         </summary>
 
                         <div className="mt-5 grid grid-cols-3 items-center gap-5">
@@ -293,30 +292,6 @@ export default function CompanyForm() {
                                  className="border-foreground/40 bg-white"
                                  placeholder="Important remarks"
                               />
-                           </div>
-
-                           <div className="flex items-center justify-center gap-2">
-                              <Checkbox
-                                 id="is_under_judicial"
-                                 name="is_under_judicial"
-                                 value="YES"
-                                 className="border-foreground/40 bg-white"
-                              />
-                              <Label className="px-2 font-normal" htmlFor="is_under_judicial">
-                                 Is Under Judicial
-                              </Label>
-                           </div>
-
-                           <div className="flex items-center justify-center gap-2">
-                              <Checkbox
-                                 id="is_suspended"
-                                 name="is_suspended"
-                                 value="true"
-                                 className="border-foreground/40 bg-white"
-                              />
-                              <Label className="px-2 font-normal" htmlFor="is_suspended">
-                                 Is Suspended
-                              </Label>
                            </div>
                         </div>
                      </details>

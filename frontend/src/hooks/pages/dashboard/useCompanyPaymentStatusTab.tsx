@@ -26,7 +26,9 @@ export default function useCompanyPaymentStatusTab() {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       const q = formData.get("company_q") as string;
-      navigate({ search: "?company_q=" + q });
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set("company_q", q);
+      navigate({ search: "?" + searchParams.toString() });
    }
 
    function clearSearch() {
