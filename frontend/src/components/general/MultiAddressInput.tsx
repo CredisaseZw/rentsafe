@@ -31,8 +31,8 @@ export default function MultiAddressInput() {
             </fieldset>
          ))}
 
-         <Button size="sm" type="button" onClick={addAddress}>
-            Add Address <Plus />
+         <Button variant="SECONDARY" size="sm" type="button" onClick={addAddress}>
+            <Plus /> Add Address
          </Button>
       </div>
    );

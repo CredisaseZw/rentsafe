@@ -187,8 +187,8 @@ export default function CompanyForm() {
 
                   <div className="col-span-3 pt-5">
                      <details>
-                        <summary>
-                           <span className="font-semibold">Toggle Extra Details</span>
+                        <summary className="bg-SECONDARY w-fit cursor-pointer rounded-md p-2 text-white">
+                           Toggle Extra Details
                         </summary>
 
                         <div className="mt-5 grid grid-cols-3 items-center gap-5">

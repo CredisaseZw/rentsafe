@@ -135,8 +135,8 @@ export default function IndividualForm() {
 
                   <div className="col-span-3 pt-5">
                      <details>
-                        <summary>
-                           <span className="font-semibold">Toggle Employment Details</span>
+                        <summary className="bg-SECONDARY/90 hover:bg-SECONDARY w-fit cursor-pointer rounded-md p-2 text-white transition-all">
+                           Toggle Employment Details
                         </summary>
 
                         <div className="mt-5 grid grid-cols-3 items-center gap-5">
