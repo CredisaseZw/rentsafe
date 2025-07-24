@@ -63,7 +63,7 @@ html.dark .input-default::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-   background-color: #2086ac; /* primary-dark */
+   background-color: #1e2939d2; /* primary-dark */
    border-radius: 15px;
 
    border: 2px solid transparent;
@@ -86,7 +86,7 @@ label.required::after {
    color: red;
 }
 .dark ::-webkit-scrollbar-thumb {
-   background-color: var(--bg-primary);
+   background-color: #27272a;
 }
 .select-input {
    border: 2px solid #c2c2c2;

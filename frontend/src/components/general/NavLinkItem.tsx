@@ -24,26 +24,34 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
          <SidebarMenuItem>
             <SidebarMenuButton
                className={cn(
-                  "text-md hover:bg-primary-dark data-[state=open]:bg-primary-dark p-5 py-4 font-medium text-gray-800 dark:text-white",
-                  isActive && "bg-gray-800 dark:bg-zinc-900",
+                  "text-md data-[state=open]:bg-primary-dark p-5 py-4 font-medium hover:bg-gray-200/90 hover:dark:bg-zinc-900",
+                  isActive && "bg-gray-800 dark:bg-zinc-800",
+                  !isActive ? "text-gray-800 dark:text-white" : "text-white hover:text-gray-800 hover:dark:text-white",
                )}
             >
                {navLink.label}
             </SidebarMenuButton>
 
-            <SidebarMenuSub className="ml-3 border-l border-white/40 pl-3">
+            <SidebarMenuSub className="ml-3 border-l border-gray-800 pl-3 dark:border-white/40">
                {navLink.subLinks.map((sub, index) => {
                   const { isActive: isSubActive } = useNavLinkItem(sub, expandedSegment, expandThisSegment);
 
                   return sub.subLinks && sub.subLinks.length > 0 ? (
                      <SidebarMenuSubItem key={index}>
                         <SidebarMenuSubButton
-                           className={cn("hover:bg-primary-dark py-4 font-bold", isSubActive && "bg-primary-dark")}
+                           className={cn(
+                              "hover:bg-gray-200/90 hover:dark:bg-zinc-900",
+                              "py-4 font-bold",
+                              isSubActive && "bg-gray-900 dark:bg-zinc-900",
+                              !isSubActive
+                                 ? "text-gray-800 dark:text-white"
+                                 : "text-white hover:text-gray-800 hover:dark:text-white",
+                           )}
                         >
                            {sub.label}
                         </SidebarMenuSubButton>
 
-                        <SidebarMenuSub className="ml-3 border-l border-white/40 pl-3">
+                        <SidebarMenuSub className="ml-3 border-l border-gray-800 pl-3 dark:border-white/40">
                            {sub.subLinks.map((child, childIndex) => {
                               const { isActive: isChildActive } = useNavLinkItem(
                                  child,
@@ -56,8 +64,12 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
                                     <SidebarMenuSubButton
                                        asChild
                                        className={cn(
-                                          "hover:bg-primary-dark py-4 font-normal text-white hover:text-white",
-                                          isChildActive && "bg-primary-dark",
+                                          "hover:bg-gray-200/90 hover:dark:bg-zinc-900",
+                                          "py-4 font-normal text-white hover:text-white",
+                                          isChildActive && "bg-gray-900 dark:bg-zinc-900",
+                                          !isChildActive
+                                             ? "text-gray-800 dark:text-white"
+                                             : "text-white hover:text-gray-800 hover:dark:text-white",
                                        )}
                                     >
                                        <Link to={child.path || "#"}>{child.label}</Link>
@@ -72,11 +84,16 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
                         <SidebarMenuSubButton
                            asChild
                            className={cn(
-                              "text-md hover:bg-primary-dark py-4 font-medium text-white",
-                              isSubActive && "bg-primary-dark",
+                              "text-md py-4 font-medium hover:bg-gray-200/90 hover:dark:bg-zinc-900",
+                              isSubActive && "bg-gray-900 dark:bg-zinc-900",
+                              !isSubActive
+                                 ? "text-gray-800 dark:text-white"
+                                 : "text-white hover:text-gray-800 hover:dark:text-white",
                            )}
                         >
-                           <Link to={sub.path || "#"}>{sub.label}</Link>
+                           <Link className="" to={sub.path || "#"}>
+                              {sub.label}
+                           </Link>
                         </SidebarMenuSubButton>
                      </SidebarMenuSubItem>
                   );
@@ -88,7 +105,12 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
 
    return (
       <SidebarMenuItem
-         className={cn("transition-[font_weight] duration-75", isActive && "bg-primary-dark rounded-xl font-bold")}
+         className={cn(
+            "hover:bg-gray-200/90 hover:dark:bg-zinc-900",
+            "transition-[font_weight] duration-75",
+            isActive && "rounded-xl bg-gray-800 font-bold dark:bg-zinc-800",
+            !isActive ? "text-gray-800 dark:text-white" : "text-white hover:text-gray-800 hover:dark:text-white",
+         )}
       >
          <SidebarMenuButton asChild>
             <Link to={navLink.path || "#"}>{navLink.label}</Link>

@@ -2,12 +2,12 @@ import { MapPin, Phone, Smartphone, Mail } from "lucide-react";
 
 function ContractManagementTR() {
    return (
-      <tr className="w-full border-t border-b border-gray-300 text-sm">
-         <td className="border-r border-gray-300 px-5 py-3 text-center">1</td>
-         <td className="border-r border-gray-300">
+      <tr className="td-border-color w-full border-t border-b text-sm">
+         <td className="td-border-color border-r px-5 py-3 text-center">1</td>
+         <td className="td-border-color border-r">
             <table className="w-full">
                <tbody>
-                  <tr className="border-b border-gray-300">
+                  <tr className="td-border-color border-b">
                      <td colSpan={2} className="px-5 py-3 text-center">
                         <div className="flex w-full flex-col items-center">
                            <h6 className="text-PRIMARY text-lg font-bold">Cool Air</h6>
@@ -32,7 +32,7 @@ function ContractManagementTR() {
                      </td>
                   </tr>
                   <tr>
-                     <td className="w-1/2 border-r border-gray-300 px-5 py-3 align-top">
+                     <td className="td-border-color w-1/2 border-r px-5 py-3 align-top">
                         <div className="flex flex-col gap-1">
                            <span className="text-PRIMARY font-bold">Contact Person</span>
                            <div className="flex flex-col gap-1">

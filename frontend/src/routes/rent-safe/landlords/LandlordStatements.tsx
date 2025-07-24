@@ -43,8 +43,8 @@ function LandlordStatements() {
          </div>
 
          <div className="flex w-full justify-center">
-            <div className="mt-10 h-fit w-fit rounded-xl bg-white p-5 shadow">
-               <h1 className="text-center text-2xl font-bold text-gray-700">Selection</h1>
+            <div className="td-border-color card mt-10 h-fit w-fit rounded-xl p-5">
+               <h1 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200">Selection</h1>
                <div className="mt-5 flex justify-center">
                   <form method="post" className="w-[800px]">
                      <div className="flex w-full flex-row justify-between gap-5">
@@ -145,7 +145,7 @@ function LandlordStatements() {
             </div>
          </div>
 
-         <div className="mt-10 min-h-[25vh] w-full rounded-xl bg-white p-5 shadow">
+         <div className="main-card mt-10 min-h-[25vh] w-full rounded-xl p-5 shadow">
             <Header title="Landlord Property Statements" />
             <PropertyStatementContainer />
          </div>
