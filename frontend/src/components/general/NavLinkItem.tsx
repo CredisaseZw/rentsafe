@@ -32,58 +32,14 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
             </SidebarMenuButton>
 
             <SidebarMenuSub className="ml-3 border-l border-white/40 pl-3">
-               {navLink.subLinks.map((sub, index) => {
-                  const { isActive: isSubActive } = useNavLinkItem(sub, expandedSegment, expandThisSegment);
-
-                  return sub.subLinks && sub.subLinks.length > 0 ? (
-                     <SidebarMenuSubItem key={index}>
-                        <SidebarMenuSubButton
-                           className={cn(
-                              "hover:bg-primary-dark py-4 font-bold text-white hover:text-white",
-                              isSubActive && "bg-primary-dark",
-                           )}
-                        >
-                           {sub.label}
-                        </SidebarMenuSubButton>
-
-                        <SidebarMenuSub className="ml-3 border-l border-white/40 pl-3">
-                           {sub.subLinks.map((child, childIndex) => {
-                              const { isActive: isChildActive } = useNavLinkItem(
-                                 child,
-                                 expandedSegment,
-                                 expandThisSegment,
-                              );
-
-                              return (
-                                 <SidebarMenuSubItem key={childIndex}>
-                                    <SidebarMenuSubButton
-                                       asChild
-                                       className={cn(
-                                          "hover:bg-primary-dark py-4 font-normal text-white hover:text-white",
-                                          isChildActive && "bg-primary-dark",
-                                       )}
-                                    >
-                                       <Link to={child.path || "#"}>{child.label}</Link>
-                                    </SidebarMenuSubButton>
-                                 </SidebarMenuSubItem>
-                              );
-                           })}
-                        </SidebarMenuSub>
-                     </SidebarMenuSubItem>
-                  ) : (
-                     <SidebarMenuSubItem key={index}>
-                        <SidebarMenuSubButton
-                           asChild
-                           className={cn(
-                              "text-md hover:bg-primary-dark py-4 font-medium text-white",
-                              isSubActive && "bg-primary-dark",
-                           )}
-                        >
-                           <Link to={sub.path || "#"}>{sub.label}</Link>
-                        </SidebarMenuSubButton>
-                     </SidebarMenuSubItem>
-                  );
-               })}
+               {navLink.subLinks.map((sub, index) => (
+                  <SidebarMenuSubSub
+                     key={index}
+                     sub={sub}
+                     expandedSegment={expandedSegment}
+                     expandThisSegment={expandThisSegment}
+                  />
+               ))}
             </SidebarMenuSub>
          </SidebarMenuItem>
       );
@@ -97,5 +53,79 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
             <Link to={navLink.path || "#"}>{navLink.label}</Link>
          </SidebarMenuButton>
       </SidebarMenuItem>
+   );
+}
+
+function SidebarMenuSubSub({
+   sub,
+   expandedSegment,
+   expandThisSegment,
+}: {
+   sub: NavLink;
+   expandedSegment: string;
+   expandThisSegment: (id: string) => void;
+}) {
+   const { isActive: isSubActive } = useNavLinkItem(sub, expandedSegment, expandThisSegment);
+
+   return sub.subLinks && sub.subLinks.length > 0 ? (
+      <SidebarMenuSubItem>
+         <SidebarMenuSubButton
+            className={cn(
+               "hover:bg-primary-dark py-4 font-bold text-white hover:text-white",
+               isSubActive && "bg-primary-dark",
+            )}
+         >
+            {sub.label}
+         </SidebarMenuSubButton>
+
+         <SidebarMenuSub className="ml-3 border-l border-white/40 pl-3">
+            {sub.subLinks.map((child, childIndex) => (
+               <SidebarMenuSubSubSub
+                  key={childIndex}
+                  child={child}
+                  expandedSegment={expandedSegment}
+                  expandThisSegment={expandThisSegment}
+               />
+            ))}
+         </SidebarMenuSub>
+      </SidebarMenuSubItem>
+   ) : (
+      <SidebarMenuSubItem>
+         <SidebarMenuSubButton
+            asChild
+            className={cn(
+               "text-md hover:bg-primary-dark py-4 font-medium text-white",
+               isSubActive && "bg-primary-dark",
+            )}
+         >
+            <Link to={sub.path || "#"}>{sub.label}</Link>
+         </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+   );
+}
+
+function SidebarMenuSubSubSub({
+   child,
+   expandedSegment,
+   expandThisSegment,
+}: {
+   child: NavLink;
+   expandedSegment: string;
+   expandThisSegment: (id: string) => void;
+}) {
+   const { isActive: isChildActive } = useNavLinkItem(child, expandedSegment, expandThisSegment);
+
+   return (
+      <SidebarMenuSubItem>
+         <SidebarMenuSubButton
+            asChild
+            className={cn(
+               "hover:bg-primary-dark py-4 font-normal text-white hover:text-white",
+               isChildActive && "bg-primary-dark",
+            )}
+         >
+            <Link to={child.path || "#"}>{child.label}</Link>
+         </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
    );
 }

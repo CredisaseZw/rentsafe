@@ -19,7 +19,7 @@
    --ERROR: rgb(153, 61, 43);
    --radius: 0.625rem;
 }
-  
+
 /* Add all other light-mode variables here */
 @theme inline {
    --color-PRIMARY: var(--PRIMARY);

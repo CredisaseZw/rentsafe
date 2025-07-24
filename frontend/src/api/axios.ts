@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -13,7 +13,7 @@ const fileApi = axios.create({
    baseURL: API_BASE_URL,
 }); // USE THIS ONE FOR FILE TYPE UPLOADS
 
-const attachToken = (config: any) => {
+const attachToken = (config: InternalAxiosRequestConfig) => {
    const token: string | null = localStorage.getItem("token");
    let parsedToken: { access_token?: string } | null = null;
 
