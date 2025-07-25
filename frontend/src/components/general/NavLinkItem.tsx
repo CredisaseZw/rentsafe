@@ -65,7 +65,6 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
          </Collapsible>
       );
    }
-
    return (
       <SidebarMenuItem>
          <SidebarMenuButton
