@@ -1,7 +1,7 @@
 import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/general/Button";
 import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,7 +19,7 @@ export default function CompanyForm() {
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
       >
          <DialogTrigger asChild>
-            <Button size="sm">
+            <Button asChild>
                Add New Company <Plus />
             </Button>
          </DialogTrigger>

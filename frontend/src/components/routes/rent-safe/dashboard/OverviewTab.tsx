@@ -8,8 +8,8 @@ export default function OverviewTab() {
          <SectionHeading>Your Payment Status</SectionHeading>
 
          <div className="mb-5 flex items-center gap-5">
-            <OverviewCard label="Risk Level" value="Low Risk" valueClassName="bg-SUCCESS text-white" />
-            <OverviewCard label="Oldest Creditor" value="Jerad Spiwe" valueClassName="bg-foreground/60 text-white" />
+            <OverviewCard label="Risk Level" value="Low Risk" valueClassName="bg-green-700 text-white" />
+            <OverviewCard label="Oldest Creditor" value="Jerad Spiwe" valueClassName="bg-red-600 text-white" />
          </div>
 
          <SectionHeading>Credit Summary</SectionHeading>
