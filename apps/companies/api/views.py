@@ -1,4 +1,5 @@
 # apps/companies/api/views.py
+
 from rest_framework import viewsets, mixins, status, serializers
 from rest_framework.decorators import action, api_view
 from django.db import transaction, IntegrityError
@@ -12,13 +13,13 @@ from apps.common.api.serializers import DocumentSerializer, NoteSerializer
 from apps.companies.models.models import Company, CompanyBranch, CompanyProfile
 from apps.companies.api.serializers import (
     CompanyCreateSerializer, CompanyUpdateSerializer, CompanyDetailSerializer,
-    CompanyMinimalSerializer, CompanyBranchSearchSerializer, CompanyBranchSerializer
+    CompanyMinimalSerializer, CompanyBranchSearchSerializer, CompanyBranchSerializer,
+    CompanyBranchDetailSerializer
 )
 import logging
 from celery import shared_task
 
 logger = logging.getLogger('companies')
-
 
 class CompanyViewSet(BaseViewSet):
     """
@@ -29,21 +30,19 @@ class CompanyViewSet(BaseViewSet):
     
     def get_queryset(self):
         """
-        Returns the base queryset for companies, filtering out soft-deleted ones.
-        Overrides BaseSoftDeleteViewSet's get_queryset if Company model uses `is_deleted`.
+        Returns the base queryset for company branches, filtering out soft-deleted ones.
         """
         return (
-            Company.objects.filter(is_deleted=False)
-            .select_related()
+            CompanyBranch.objects.filter(is_deleted=False, company__is_deleted=False)
+            .select_related('company')
             .prefetch_related(
                 'addresses',
                 'addresses__country',
                 'addresses__province',
                 'addresses__city',
                 'addresses__suburb',
-                'branches',
-                'branches__addresses',
-                'profile',
+                'company__addresses',
+                'company__profile',
             )
         )
     
@@ -59,7 +58,7 @@ class CompanyViewSet(BaseViewSet):
             return CompanyBranchSearchSerializer
         elif self.action in ['create_branch', 'update_branch', 'partial_update_branch', 'branch_detail']:
             return CompanyBranchSerializer
-        return CompanyMinimalSerializer
+        return CompanyBranchSearchSerializer  # Default for list action
 
     def create(self, request, *args, **kwargs):
         """Create a new company, using perform_create from BaseViewSet."""
@@ -68,8 +67,17 @@ class CompanyViewSet(BaseViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             
-            detail_serializer = CompanyDetailSerializer(serializer.instance)
-            return self._create_rendered_response(detail_serializer.data, status.HTTP_201_CREATED)
+            # After creation, return the HQ branch details
+            company = serializer.instance
+            hq_branch = company.branches.filter(is_headquarters=True).first()
+            if hq_branch:
+                serializer = CompanyBranchDetailSerializer(hq_branch)
+                return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+            else:
+                return self._create_rendered_response(
+                    {'error': 'Company created but HQ branch not found'},
+                    status.HTTP_201_CREATED
+                )
         except Exception as e:
             logger.error(f"Error creating company: {str(e)}")
             return self._create_rendered_response(
@@ -79,9 +87,10 @@ class CompanyViewSet(BaseViewSet):
     
     @CacheService.cached(tag_prefix='company:{pk}')
     def retrieve(self, request, *args, **kwargs):
-        """Retrieve full company details, with caching."""
+        """Retrieve full branch details, with caching."""
         try:
             company = self.get_object()
+            print('Fetching company from the DB....:', company.id)
             serializer = CompanyDetailSerializer(company)
             return self._create_rendered_response(serializer.data)
         except Company.DoesNotExist:
@@ -94,12 +103,20 @@ class CompanyViewSet(BaseViewSet):
         """Update company (PUT request), using perform_update from BaseViewSet."""
         try:
             partial = kwargs.pop('partial', False)
-            instance = self.get_object()
+            instance = self.get_object().company
             serializer = self.get_serializer(instance, data=request.data, partial=partial)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
-            detail_serializer = CompanyDetailSerializer(serializer.instance)
-            return self._create_rendered_response(detail_serializer.data)
+            
+            # Return the updated HQ branch
+            hq_branch = instance.branches.filter(is_headquarters=True).first()
+            if hq_branch:
+                detail_serializer = CompanyBranchDetailSerializer(hq_branch)
+                return self._create_rendered_response(detail_serializer.data)
+            return self._create_rendered_response(
+                {'error': 'Company updated but HQ branch not found'},
+                status.HTTP_200_OK
+            )
         except Exception as e:
             logger.error(f"Error updating company {kwargs.get('pk', 'unknown')}: {str(e)}")
             return self._create_rendered_response(
@@ -107,23 +124,24 @@ class CompanyViewSet(BaseViewSet):
                 status.HTTP_400_BAD_REQUEST
             )
 
-    @CacheService.cached(tag_prefix='company:list')
+    @CacheService.cached(tag_prefix='companies:list')
     def list(self, request, *args, **kwargs):
-        """List companies with minimal data, with caching."""
+        """List company branches with minimal data, with caching."""
         try:
             queryset = self.get_queryset()
             page = self.paginate_queryset(queryset)
-            logger.info(f"Listing companies, total count: {queryset.count()}")
+            logger.info(f"Listing company branches, total count: {queryset.count()}")
+            
             if page is not None:
-                serializer = CompanyMinimalSerializer(page, many=True)
+                serializer = CompanyBranchSearchSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
             
-            serializer = CompanyMinimalSerializer(queryset, many=True)
+            serializer = CompanyBranchSearchSerializer(queryset, many=True)
             return self._create_rendered_response(serializer.data)
         except Exception as e:
-            logger.error(f"Error listing companies: {str(e)}")
+            logger.error(f"Error listing company branches: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to list companies', 'details': str(e)},
+                {'error': 'Failed to list company branches', 'details': str(e)},
                 status.HTTP_400_BAD_REQUEST
             )
 
@@ -133,27 +151,66 @@ class CompanyViewSet(BaseViewSet):
         """
         logger.info(f"Soft deleting company with ID: {kwargs.get('pk', 'unknown')}")
         try:
-            company = self.get_object()
+            branch = self.get_object()
+            company = branch.company
             company.is_deleted = True
             company.is_active = False 
             company.save()
-            self.perform_destroy(company)
-            return self._create_rendered_response({'message': 'Company deleted successfully'}, status.HTTP_204_NO_CONTENT)
-        except Company.DoesNotExist:
-            logger.error(f"Company with ID {kwargs.get('pk', 'unknown')} not found for deletion.")
+            
+            # Soft delete all branches
+            company.branches.update(is_deleted=True)
+            
             return self._create_rendered_response(
-                {'error': 'Company not found'}, 
+                {'message': 'Company and all branches deleted successfully'}, 
+                status.HTTP_204_NO_CONTENT
+            )
+        except CompanyBranch.DoesNotExist:
+            logger.error(f"Branch with ID {kwargs.get('pk', 'unknown')} not found for deletion.")
+            return self._create_rendered_response(
+                {'error': 'Branch not found'}, 
                 status.HTTP_404_NOT_FOUND
             )
-
+    
     @action(detail=False, methods=['get'], url_path='search')
     @CacheService.cached(tag_prefix='company:search')
     def search(self, request):
-        """
-        Search companies by registration name, trading name, or registration number, with caching.
-        """
+        """Search companies and branches."""
         search_term = request.query_params.get('q', '').strip()
         company_pk = request.query_params.get('pk', '').strip()
+        print('Search term:', search_term)
+        if not search_term:
+            return self._create_rendered_response(
+                {'error': 'Search term (q) is required'}, 
+                status.HTTP_400_BAD_REQUEST
+            )
+        
+        companies = Company.objects.filter(
+            Q(registration_name__icontains=search_term) |
+            Q(trading_name__icontains=search_term) |
+            Q(registration_number__icontains=search_term),
+            is_deleted=False,
+            is_active=True
+        ).select_related('profile').prefetch_related(
+            'addresses', 'addresses__country', 'addresses__province',
+            'addresses__city', 'addresses__suburb'
+        )
+        
+        page = self.paginate_queryset(companies)
+        if page is not None:
+            serializer = CompanyMinimalSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = CompanyMinimalSerializer(companies, many=True)
+        return self._create_rendered_response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='search-branches')
+    @CacheService.cached(tag_prefix='companies:search')
+    def branch_search(self, request):
+        """
+        Search company branches by registration name, trading name, or registration number, with caching.
+        """
+        search_term = request.query_params.get('q', '').strip()
+        branch_pk = request.query_params.get('pk', '').strip()
         
         if not search_term:
             return self._create_rendered_response(
@@ -161,14 +218,14 @@ class CompanyViewSet(BaseViewSet):
                 status.HTTP_400_BAD_REQUEST
             )
         
-        if company_pk:
+        if branch_pk:
             try:
-                company = Company.objects.get(pk=company_pk, is_deleted=False)
-                serializer = CompanyDetailSerializer(company)
+                branch = CompanyBranch.objects.get(pk=branch_pk, is_deleted=False)
+                serializer = CompanyBranchDetailSerializer(branch)
                 return self._create_rendered_response(serializer.data)
-            except Company.DoesNotExist:
+            except CompanyBranch.DoesNotExist:
                 return self._create_rendered_response(
-                    {'error': 'Company not found'}, 
+                    {'error': 'Branch not found'}, 
                     status.HTTP_404_NOT_FOUND
                 )
         
@@ -181,7 +238,7 @@ class CompanyViewSet(BaseViewSet):
             company__is_active=True,
             is_deleted=False
         ).select_related(
-            'company'
+            'company', 'company__profile'
         ).prefetch_related(
             'company__addresses', 'company__addresses__country',
             'company__addresses__province', 'company__addresses__city',

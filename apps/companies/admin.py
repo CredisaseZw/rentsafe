@@ -33,7 +33,7 @@ class CompanyProfileInline(admin.StackedInline):
     fields = (
         ('trading_status', 'trend', 'risk_class'),
         ('mobile_phone', 'landline_phone', 'email'),
-        ('website', 'vat_number', 'bp_number'),
+        ('website', 'vat_number', 'tin_number'),
         ('number_of_employees', 'account_number'),
         ('is_under_judicial', 'is_suspended'),
         ('twitter', 'facebook', 'instagram', 'linkedin'),
@@ -302,7 +302,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'company__registration_name', 'company__trading_name',
-        'email', 'website', 'vat_number', 'bp_number'
+        'email', 'website', 'vat_number', 'tin_number'
     )
     readonly_fields = ('date_created', 'date_updated', 'created_by', 'logo_preview')
     
@@ -324,7 +324,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
         }),
         (_('Business Information'), {
             'fields': (
-                ('vat_number', 'bp_number'),
+                ('vat_number', 'tin_number'),
                 'account_number',
                 'number_of_employees',
                 'registration_date',

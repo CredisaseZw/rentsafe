@@ -74,7 +74,8 @@ class Company(BaseModel):
             branch = CompanyBranch.objects.create(
                 company=self,
                 branch_name=self.registration_name,
-                is_headquarters=True
+                is_headquarters=True,
+                # addresses=company_address if company_address else None
             )
 
             if company_address:
@@ -205,8 +206,8 @@ class CompanyProfile(BaseModel):
                 help_text=_("Company logo image file."))
     registration_date = models.DateField(_("Registration Date"), blank=True, null=True,
                 help_text=_("The official registration date of the company profile."))
-    tin_number = models.CharField(_("BP Number"), max_length=255, blank=True, null=True,
-                help_text=_("Business Partner Number."))
+    tin_number = models.CharField(_("Tin Number"), max_length=255, blank=True, null=True,
+                help_text=_("Tax Identification Number."))
 
     vat_number = models.CharField(_("VAT Number"), max_length=255, blank=True, null=True,
                 help_text=_("Value Added Tax (VAT) registration number."))

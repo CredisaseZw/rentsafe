@@ -3,10 +3,11 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 
 from apps.individuals.api.serializers import (IndividualSerializer , IndividualUpdateSerializer,
-                                              IndividualCreateSerializer, IndividualSearchSerializer,
-                                              IndividualMinimalSerializer)
+                            IndividualCreateSerializer, IndividualSearchSerializer,
+                            IndividualMinimalSerializer)
 from apps.individuals.models import Individual
 from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
@@ -46,9 +47,12 @@ class IndividualViewSet(BaseViewSet):
             self.perform_create(serializer)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as ve:
+            logger.error(f"Validation error creating individual: {str(ve)}")
+            return Response({"error": str(ve)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(f"Error creating individual: {str(e)}")
-            return Response({"error": "Failed to create individual"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Failed to create individual"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def update(self, request, *args, **kwargs):
         try:

@@ -29,22 +29,21 @@ class ContactPersonSerializer(serializers.ModelSerializer):
             return f"{obj.individual.first_name} {obj.individual.last_name}"
         return None
 
-
 class CompanyBranchSerializer(serializers.ModelSerializer):
-    """Serializer for CompanyBranch model"""
+    """Base serializer for CompanyBranch model"""
     addresses = AddressSerializer(many=True, required=False)
     contacts = ContactPersonSerializer(many=True, read_only=True)
     
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'company', 'branch_name', 'addresses', 'contacts']
+        fields = ['id', 'company', 'branch_name', 'addresses', 'contacts', 'is_headquarters']
     
     def create(self, validated_data):
         addresses_data = validated_data.pop('addresses', [])
         branch = CompanyBranch.objects.create(**validated_data)
         user = self.context.get('user')
         company_content_type = ContentType.objects.get_for_model(CompanyBranch)
-        # Create addresses for the branch
+        
         for address_data in addresses_data:
             Address.objects.create(
                 user=user,
@@ -52,7 +51,6 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
                 object_id=branch.id,
                 **address_data
             )
-        
         return branch
     
     def update(self, instance, validated_data):
@@ -69,7 +67,6 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
                     object_id=instance.id,
                     **address_data
                 )
-        
         return instance
     
 class CompanyProfileSerializer(serializers.ModelSerializer):
@@ -101,26 +98,16 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 
 
 class CompanyMinimalSerializer(serializers.ModelSerializer):
-    """Minimal serializer for company search results"""
+    """Minimal serializer for company data in branch context"""
     legal_status_display = serializers.CharField(source='get_legal_status_display', read_only=True)
-    primary_address = serializers.SerializerMethodField()
     
     class Meta:
         model = Company
         fields = [
             'id', 'registration_number', 'registration_name', 'trading_name',
-            'legal_status', 'legal_status_display', 'industry', 'is_verified',
-            'primary_address'
+            'legal_status', 'legal_status_display', 'is_verified'
         ]
-    
-    def get_primary_address(self, obj):
-        """Get the primary physical address"""
-        primary_address = obj.addresses.filter(
-            address_type='physical', 
-            is_primary=True
-        ).first()
 
-        return AddressSerializer(primary_address).data if primary_address else None
 
 
 class CompanyDetailSerializer(serializers.ModelSerializer):
@@ -165,15 +152,14 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         company_content_type = ContentType.objects.get_for_model(Company)
 
         for address_data in addresses_data:
-            if is_primary := address_data.get('is_primary', False):
-                Address.objects.filter(
+            
+            address_data['is_primary'] = False if Address.objects.filter(
                     user=user,
                     content_type=company_content_type,
                     object_id=company.id,
                     address_type=address_data['address_type'],
                     is_primary=True
-                ).update(is_primary=False)
-
+                ).exists() else True
             Address.objects.create(
                 user=user,
                 content_type=company_content_type,
@@ -270,7 +256,10 @@ class CompanyBranchSearchSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'branch_name', 'company', 'primary_address']
+        fields = [
+            'id', 'branch_name', 'is_headquarters', 
+            'company', 'primary_address'
+        ]
     
     def get_primary_address(self, obj):
         """Get the primary address for this branch"""
@@ -278,5 +267,27 @@ class CompanyBranchSearchSerializer(serializers.ModelSerializer):
             address_type='physical', 
             is_primary=True
         ).first()
+        return AddressSerializer(primary_address).data if primary_address else None
 
+class CompanyBranchDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for full branch data"""
+    company = CompanyMinimalSerializer(read_only=True)
+    addresses = AddressSerializer(many=True, read_only=True)
+    contacts = ContactPersonSerializer(many=True, read_only=True)
+    primary_address = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CompanyBranch
+        fields = [
+            'id', 'branch_name', 'is_headquarters', 'is_deleted',
+            'company', 'addresses', 'contacts', 'primary_address',
+            'date_created', 'date_updated'
+        ]
+    
+    def get_primary_address(self, obj):
+        """Get the primary address for this branch"""
+        primary_address = obj.addresses.filter(
+            address_type='physical', 
+            is_primary=True
+        ).first()
         return AddressSerializer(primary_address).data if primary_address else None
