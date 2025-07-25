@@ -1,8 +1,5 @@
 module.exports = {
-  // ...
-  safelist: [
-    'data-[active=true]:bg-primary-dark',
-    'data-[active=true]:text-sidebar-accent-foreground',
-  ],
-  darkMode : "class"
-}
+   // ...
+   safelist: ["data-[active=true]:bg-primary-dark", "data-[active=true]:text-sidebar-accent-foreground"],
+   darkMode: "class",
+};
