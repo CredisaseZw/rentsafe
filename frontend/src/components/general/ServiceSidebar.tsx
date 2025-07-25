@@ -7,10 +7,9 @@ import {
    SidebarFooter,
    SidebarMenu,
 } from "../ui/sidebar";
-import { HomeIcon, ChevronDown } from "lucide-react";
+import { HomeIcon } from "lucide-react";
 import NavLinkItem from "./NavLinkItem";
 import { useEffect, useState } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"; // ShadCN
 import type { NavLink } from "@/types";
 import SidebarFooterContent from "./SidebarFooterContent";
 
@@ -28,9 +27,6 @@ export default function ServiceSidebar({
 }: SidebarProps) {
    const [expandedSegment, expandThisSegment] = useState<string>("");
    const [username, setUsername] = useState<string>("");
-   const [openApp, setOpenApp] = useState(true);
-   const [openAccounting, setOpenAccounting] = useState(true);
-   const [openAdmin, setOpenAdmin] = useState(true);
 
    useEffect(() => {
       const token = localStorage.getItem("token");
@@ -58,83 +54,57 @@ export default function ServiceSidebar({
 
             {/* APPLICATION */}
             <SidebarGroup>
-               <Collapsible open={openApp} onOpenChange={setOpenApp}>
-                  <CollapsibleTrigger asChild>
-                     <SidebarGroupLabel className="sidebar-labels flex cursor-pointer items-center justify-between text-gray-800 dark:text-white/50">
-                        APPLICATION
-                        <ChevronDown className={`transition-transform ${openApp ? "rotate-180" : ""}`} size={16} />
-                     </SidebarGroupLabel>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                     <SidebarGroupContent>
-                        <SidebarMenu>
-                           {rentsafeAppNavlinks.map((navLink, index) => (
-                              <NavLinkItem
-                                 key={index}
-                                 navLink={navLink}
-                                 expandedSegment={expandedSegment}
-                                 expandThisSegment={expandThisSegment}
-                              />
-                           ))}
-                        </SidebarMenu>
-                     </SidebarGroupContent>
-                  </CollapsibleContent>
-               </Collapsible>
+               <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">
+                  APPLICATION
+               </SidebarGroupLabel>
+               <SidebarGroupContent>
+                  <SidebarMenu>
+                     {rentsafeAppNavlinks.map((navLink, index) => (
+                        <NavLinkItem
+                           key={index}
+                           navLink={navLink}
+                           expandedSegment={expandedSegment}
+                           expandThisSegment={expandThisSegment}
+                        />
+                     ))}
+                  </SidebarMenu>
+               </SidebarGroupContent>
             </SidebarGroup>
 
             {/* ACCOUNTING */}
             <SidebarGroup>
-               <Collapsible open={openAccounting} onOpenChange={setOpenAccounting}>
-                  <CollapsibleTrigger asChild>
-                     <SidebarGroupLabel className="sidebar-labels flex cursor-pointer items-center justify-between text-gray-800 dark:text-white/50">
-                        Accounting
-                        <ChevronDown
-                           className={`transition-transform ${openAccounting ? "rotate-180" : ""}`}
-                           size={16}
+               <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">
+                  ACCOUNTING
+               </SidebarGroupLabel>
+               <SidebarGroupContent>
+                  <SidebarMenu>
+                     {rentsafeAccountingNavlinks.map((navLink, index) => (
+                        <NavLinkItem
+                           key={index}
+                           navLink={navLink}
+                           expandedSegment={expandedSegment}
+                           expandThisSegment={expandThisSegment}
                         />
-                     </SidebarGroupLabel>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                     <SidebarGroupContent>
-                        <SidebarMenu>
-                           {rentsafeAccountingNavlinks.map((navLink, index) => (
-                              <NavLinkItem
-                                 key={index}
-                                 navLink={navLink}
-                                 expandedSegment={expandedSegment}
-                                 expandThisSegment={expandThisSegment}
-                              />
-                           ))}
-                        </SidebarMenu>
-                     </SidebarGroupContent>
-                  </CollapsibleContent>
-               </Collapsible>
+                     ))}
+                  </SidebarMenu>
+               </SidebarGroupContent>
             </SidebarGroup>
 
             {/* ADMIN */}
             <SidebarGroup>
-               <Collapsible open={openAdmin} onOpenChange={setOpenAdmin}>
-                  <CollapsibleTrigger asChild>
-                     <SidebarGroupLabel className="sidebar-labels flex cursor-pointer items-center justify-between text-gray-800 dark:text-white/50">
-                        Admin
-                        <ChevronDown className={`transition-transform ${openAdmin ? "rotate-180" : ""}`} size={16} />
-                     </SidebarGroupLabel>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                     <SidebarGroupContent>
-                        <SidebarMenu>
-                           {rentsafeAdminPanelNavlinks.map((navLink, index) => (
-                              <NavLinkItem
-                                 key={index}
-                                 navLink={navLink}
-                                 expandedSegment={expandedSegment}
-                                 expandThisSegment={expandThisSegment}
-                              />
-                           ))}
-                        </SidebarMenu>
-                     </SidebarGroupContent>
-                  </CollapsibleContent>
-               </Collapsible>
+               <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">ADMIN</SidebarGroupLabel>
+               <SidebarGroupContent>
+                  <SidebarMenu>
+                     {rentsafeAdminPanelNavlinks.map((navLink, index) => (
+                        <NavLinkItem
+                           key={index}
+                           navLink={navLink}
+                           expandedSegment={expandedSegment}
+                           expandThisSegment={expandThisSegment}
+                        />
+                     ))}
+                  </SidebarMenu>
+               </SidebarGroupContent>
             </SidebarGroup>
          </SidebarContent>
 

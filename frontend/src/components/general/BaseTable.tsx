@@ -32,7 +32,7 @@ export default function BaseTable({
    const mappableRows = data;
 
    return (
-      <BaseCard className="rounded-sm p-0">
+      <BaseCard className="rounded-sm p-3">
          {title && (
             <div
                className={cn(
@@ -52,7 +52,7 @@ export default function BaseTable({
                   ))}
                </colgroup>
 
-               <TableHeader stickToTop className="border-foreground border-b-2">
+               <TableHeader stickToTop className="border-color border-b-1 bg-transparent">
                   {tableActions && (
                      <TableRow>
                         <TableHead colSpan={headers.length}>{tableActions}</TableHead>
@@ -60,7 +60,7 @@ export default function BaseTable({
                   )}
                   <TableRow>
                      {headers.map((header) => (
-                        <TableHead key={header.name} className="font-semibold">
+                        <TableHead key={header.name} className="py-4 font-bold">
                            {header.displayName}
                         </TableHead>
                      ))}

@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/general/Button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useIndividualForm from "@/hooks/components/useIndividualForm";
@@ -13,7 +13,7 @@ export default function IndividualForm() {
    return (
       <Dialog modal>
          <DialogTrigger asChild>
-            <Button size="sm">
+            <Button asChild>
                Add New Individual <Plus />
             </Button>
          </DialogTrigger>
@@ -72,7 +72,7 @@ export default function IndividualForm() {
                         <SelectTrigger id="gender" className="border-foreground/40 w-full bg-white">
                            <SelectValue placeholder="Gender" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-zinc-900">
                            <SelectItem value="male">Male</SelectItem>
                            <SelectItem value="female">Female</SelectItem>
                            <SelectItem value="other">Other</SelectItem>

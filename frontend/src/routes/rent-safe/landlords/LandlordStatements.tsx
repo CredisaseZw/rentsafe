@@ -43,7 +43,7 @@ function LandlordStatements() {
          </div>
 
          <div className="flex w-full justify-center">
-            <div className="td-border-color card mt-10 h-fit w-fit rounded-xl p-5">
+            <div className="border-color card mt-10 h-fit w-fit rounded-xl p-5">
                <h1 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200">Selection</h1>
                <div className="mt-5 flex justify-center">
                   <form method="post" className="w-[800px]">
