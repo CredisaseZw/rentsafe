@@ -45,7 +45,7 @@ function ContractorManagement() {
                }}
             />
          </div>
-         <div className="mt-5 w-full rounded-xl bg-white p-5 shadow">
+         <div className="main-card mt-5 w-full rounded-xl p-5 shadow">
             <div className="section_header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                <div className="w-full sm:w-auto">
                   <Searchbox placeholder="Contractor Name, Industry, Contact Person" handleSearch={() => {}} />

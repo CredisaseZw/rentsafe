@@ -223,151 +223,146 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
       label: "Data",
       segment: RENTSAFE_PRE_SEG + "/data",
-      subLinks: [{
-         label: "Leases",
-         path: RENTSAFE_PRE_SEG + "/leases",
-         segment: RENTSAFE_PRE_SEG + "/tenants/leases",
-         pageComponent: Leases,
-      },
-      {
-         label: "Communication",
-         path: RENTSAFE_PRE_SEG + "/communication",
-         segment: RENTSAFE_PRE_SEG + "/tenants/communication",
-         pageComponent: Communication,
-      },
-      {
-         label: "Deposits",
-         path: RENTSAFE_PRE_SEG + "/deposits",
-         segment: RENTSAFE_PRE_SEG + "/tenants/deposits",
-         pageComponent: Deposits,
-      },
-      {
-         label: "Lease Template",
-         path: RENTSAFE_PRE_SEG + "/lease-templates",
-         segment: RENTSAFE_PRE_SEG + "/tenants/lease-templates",
-         pageComponent: LeaseTemplate,
-      },
-      ]
+      subLinks: [
+         {
+            label: "Leases",
+            path: RENTSAFE_PRE_SEG + "/leases",
+            segment: RENTSAFE_PRE_SEG + "/tenants/leases",
+            pageComponent: Leases,
+         },
+         {
+            label: "Communication",
+            path: RENTSAFE_PRE_SEG + "/communication",
+            segment: RENTSAFE_PRE_SEG + "/tenants/communication",
+            pageComponent: Communication,
+         },
+         {
+            label: "Deposits",
+            path: RENTSAFE_PRE_SEG + "/deposits",
+            segment: RENTSAFE_PRE_SEG + "/tenants/deposits",
+            pageComponent: Deposits,
+         },
+         {
+            label: "Lease Template",
+            path: RENTSAFE_PRE_SEG + "/lease-templates",
+            segment: RENTSAFE_PRE_SEG + "/tenants/lease-templates",
+            pageComponent: LeaseTemplate,
+         },
+      ],
    },
 ];
 export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
    {
-      label: "Accounting",
-      segment: RENTSAFE_PRE_SEG + "/accounting",
+      label: "Customers",
+      segment: RENTSAFE_PRE_SEG + "/accounting/customers",
       subLinks: [
          {
-            label: "Customers",
-            segment: RENTSAFE_PRE_SEG + "/accounting/customers",
+            label: "Invoicing",
+            path: RENTSAFE_PRE_SEG + "/customers/invoicing",
+            segment: RENTSAFE_PRE_SEG + "/accounting/customers/invoicing",
+            pageComponent: Invoicing,
+         },
+         {
+            label: "Receipts",
+            path: RENTSAFE_PRE_SEG + "/customers/receipts",
+            segment: RENTSAFE_PRE_SEG + "/accounting/customers/receipts",
+            pageComponent: Receipts,
+         },
+         {
+            label: "Customer Statements",
+            path: RENTSAFE_PRE_SEG + "/customers/statements",
+            segment: RENTSAFE_PRE_SEG + "/accounting/customers/statements",
+            pageComponent: Statements,
+         },
+         {
+            label: "Debt Call",
+            path: RENTSAFE_PRE_SEG + "/customers/debt-call",
+            segment: RENTSAFE_PRE_SEG + "/accounting/customers/debt-call",
+            pageComponent: DebtCall,
+         },
+         {
+            label: "Journals",
+            segment: RENTSAFE_PRE_SEG + "/accounting/customers/journals",
             subLinks: [
                {
-                  label: "Invoicing",
-                  path: RENTSAFE_PRE_SEG + "/customers/invoicing",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/invoicing",
-                  pageComponent: Invoicing,
+                  label: "Debit Journal",
+                  path: RENTSAFE_PRE_SEG + "/customers/journals/debit",
+                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/journals/debit",
+                  pageComponent: Journal,
                },
                {
-                  label: "Receipts",
-                  path: RENTSAFE_PRE_SEG + "/customers/receipts",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/receipts",
-                  pageComponent: Receipts,
-               },
-               {
-                  label: "Customer Statements",
-                  path: RENTSAFE_PRE_SEG + "/customers/statements",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/statements",
-                  pageComponent: Statements,
-               },
-               {
-                  label: "Journals",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/journals",
-                  subLinks: [
-                     {
-                        label: "Debit Journal",
-                        path: RENTSAFE_PRE_SEG + "/customers/journals/debit",
-                        segment: RENTSAFE_PRE_SEG + "/accounting/customers/journals/debit",
-                        pageComponent: Journal,
-                     },
-                     {
-                        label: "Credit Journal",
-                        path: RENTSAFE_PRE_SEG + "/customers/journals/credit",
-                        segment: RENTSAFE_PRE_SEG + "/accounting/customers/journals/credit",
-                        pageComponent: Journal,
-                     },
-                  ],
-               },
-               {
-                  label: "Debt Call",
-                  path: RENTSAFE_PRE_SEG + "/customers/debt-call",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/debt-call",
-                  pageComponent: DebtCall,
+                  label: "Credit Journal",
+                  path: RENTSAFE_PRE_SEG + "/customers/journals/credit",
+                  segment: RENTSAFE_PRE_SEG + "/accounting/customers/journals/credit",
+                  pageComponent: Journal,
                },
             ],
          },
+      ],
+   },
+   {
+      label: "Creditors",
+      segment: RENTSAFE_PRE_SEG + "/accounting/creditors",
+      subLinks: [
          {
-            label: "Creditors",
-            segment: RENTSAFE_PRE_SEG + "/accounting/creditors",
+            label: "Disbursements",
+            path: RENTSAFE_PRE_SEG + "/creditors/disbursements",
+            segment: RENTSAFE_PRE_SEG + "/accounting/creditors/disbursements",
+            pageComponent: Disbursements,
+         },
+         {
+            label: "Creditor Statements",
+            path: RENTSAFE_PRE_SEG + "/creditors/statements",
+            segment: RENTSAFE_PRE_SEG + "/accounting/creditors/statements",
+            pageComponent: Statements,
+         },
+         {
+            label: "Journals",
+            segment: RENTSAFE_PRE_SEG + "/accounting/creditors/journals",
             subLinks: [
                {
-                  label: "Disbursements",
-                  path: RENTSAFE_PRE_SEG + "/creditors/disbursements",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/creditors/disbursements",
-                  pageComponent: Disbursements,
+                  label: "Debit Journal",
+                  path: RENTSAFE_PRE_SEG + "/creditors/journals/debit",
+                  segment: RENTSAFE_PRE_SEG + "/accounting/creditors/journals/debit",
+                  pageComponent: Journal,
                },
                {
-                  label: "Creditor Statements",
-                  path: RENTSAFE_PRE_SEG + "/creditors/statements",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/creditors/statements",
-                  pageComponent: Statements,
-               },
-               {
-                  label: "Journals",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/creditors/journals",
-                  subLinks: [
-                     {
-                        label: "Debit Journal",
-                        path: RENTSAFE_PRE_SEG + "/creditors/journals/debit",
-                        segment: RENTSAFE_PRE_SEG + "/accounting/creditors/journals/debit",
-                        pageComponent: Journal,
-                     },
-                     {
-                        label: "Credit Journal",
-                        path: RENTSAFE_PRE_SEG + "/creditors/journals/credit",
-                        segment: RENTSAFE_PRE_SEG + "/accounting/creditors/journals/credit",
-                        pageComponent: Journal,
-                     },
-                  ],
+                  label: "Credit Journal",
+                  path: RENTSAFE_PRE_SEG + "/creditors/journals/credit",
+                  segment: RENTSAFE_PRE_SEG + "/accounting/creditors/journals/credit",
+                  pageComponent: Journal,
                },
             ],
          },
+      ],
+   },
+   {
+      label: "Reports",
+      segment: RENTSAFE_PRE_SEG + "/accounting/reports",
+      subLinks: [
          {
-            label: "Reports",
-            segment: RENTSAFE_PRE_SEG + "/accounting/reports",
-            subLinks: [
-               {
-                  label: "Commission Statements",
-                  path: RENTSAFE_PRE_SEG + "/reports/commission-statements",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/reports/commission-statements",
-                  pageComponent: Statements,
-               },
-               {
-                  label: "Cashflow Forecasts",
-                  path: RENTSAFE_PRE_SEG + "/reports/forecasts",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/reports/forecasts",
-                  pageComponent: Forecasts,
-               },
-            ],
+            label: "Commission Statements",
+            path: RENTSAFE_PRE_SEG + "/reports/commission-statements",
+            segment: RENTSAFE_PRE_SEG + "/accounting/reports/commission-statements",
+            pageComponent: Statements,
          },
          {
-            label: "Settings",
-            segment: RENTSAFE_PRE_SEG + "/accounting/settings",
-            subLinks: [
-               {
-                  label: "Currency",
-                  path: RENTSAFE_PRE_SEG + "/settings/currency",
-                  segment: RENTSAFE_PRE_SEG + "/accounting/settings/currency",
-                  pageComponent: CurrencySettings,
-               },
-            ],
+            label: "Cashflow Forecasts",
+            path: RENTSAFE_PRE_SEG + "/reports/forecasts",
+            segment: RENTSAFE_PRE_SEG + "/accounting/reports/forecasts",
+            pageComponent: Forecasts,
+         },
+      ],
+   },
+   {
+      label: "Settings",
+      segment: RENTSAFE_PRE_SEG + "/accounting/settings",
+      subLinks: [
+         {
+            label: "Currency",
+            path: RENTSAFE_PRE_SEG + "/settings/currency",
+            segment: RENTSAFE_PRE_SEG + "/accounting/settings/currency",
+            pageComponent: CurrencySettings,
          },
       ],
    },
