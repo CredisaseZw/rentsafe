@@ -130,3 +130,4 @@ def send_individual_notification(individual_id: int, notification_type: str, con
         context=context,
         sender_id=sender_id,
     )
+    

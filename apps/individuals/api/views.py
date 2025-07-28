@@ -215,3 +215,12 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving individual details {pk}: {e}")
             return Response({"error": "Failed to retrieve individual details"}, status=status.HTTP_400_BAD_REQUEST)
+
+def bulk_upload_individuals(request):
+    if request.method =='POST' and request.FILES.get('file'):
+        file =  request.FILES['file']
+        ext= file.name.split('.')[-1].lower()
+        
+        ...
+
+            
