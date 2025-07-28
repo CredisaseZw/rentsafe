@@ -159,16 +159,27 @@ class ContactPerson(BaseModel):
 
     def __str__(self):
         name = f"{self.individual.first_name} {self.individual.last_name}" if self.individual else _("Unnamed Contact")
-        context = ""
-        if self.branch:
-            context = f" ( {self.branch.branch_name})"
-
+        context = f" ( {self.branch.branch_name})" if self.branch else ""
         contact_type_display = self.get_contact_type_display() if self.contact_type else 'General'
 
         return f"{name}{context} [{contact_type_display}]"
 
     def get_contact_type_display(self):
         return dict(self.CONTACT_TYPES).get(self.contact_type, 'Unknown')
+    
+    @property
+    def full_name(self):
+        return f"{self.individual.first_name} {self.individual.last_name}" if self.individual else _("Unnamed Contact")
+
+    @property
+    def full_contact_info(self):
+        """
+        Returns a formatted string with the contact person's full name and position.
+        """
+        name = self.full_name
+        position = self.position or ''
+        mobile = self.individual.contact_details.first().first_mobile_phone if self.individual else ''
+        return f"{name} - {position} - {mobile}".strip()
 
     def clean(self):
         super().clean()

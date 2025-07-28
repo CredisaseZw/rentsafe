@@ -12,17 +12,30 @@ from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
-class ContactPersonSerializer(serializers.ModelSerializer):
-    """Serializer for ContactPerson model"""
-    individual_name = serializers.SerializerMethodField()
-    contact_type_display = serializers.CharField(source='get_contact_type_display', read_only=True)
+class MinimalContactPersonSerializer(serializers.ModelSerializer):
+    """Minimal serializer for ContactPerson model"""
+    full_contact = serializers.CharField(source='full_contact_info', read_only=True)
     
     class Meta:
         model = ContactPerson
+        fields = ['id', 'full_contact']
+        read_only_fields = ['id', 'full_contact']
+
+class ContactPersonSerializer(serializers.ModelSerializer):
+    """Serializer for ContactPerson model (now writable for nested ops)"""
+    individual_name = serializers.SerializerMethodField(read_only=True)
+    contact_type_display = serializers.CharField(source='get_contact_type_display', read_only=True)
+    full_contact = serializers.CharField(source='full_contact_info', read_only=True)
+    class Meta:
+        model = ContactPerson
         fields = [
-            'id', 'individual', 'individual_name', 'contact_type', 
-            'contact_type_display', 'is_primary', 'position'
+            'id', 'branch', 'individual', 'individual_name', 'contact_type',
+            'contact_type_display', 'is_primary', 'position', 'full_contact'
         ]
+        read_only_fields = ['id', 'individual_name', 'contact_type_display']
+    
+    def validate(self, attrs):
+        return super().validate(attrs)
     
     def get_individual_name(self, obj):
         if obj.individual:
@@ -30,9 +43,9 @@ class ContactPersonSerializer(serializers.ModelSerializer):
         return None
 
 class CompanyBranchSerializer(serializers.ModelSerializer):
-    """Base serializer for CompanyBranch model"""
+    """Base serializer for CompanyBranch model (now handles contacts)"""
     addresses = AddressSerializer(many=True, required=False)
-    contacts = ContactPersonSerializer(many=True, read_only=True)
+    contacts = ContactPersonSerializer(many=True, required=False, write_only=True)
     
     class Meta:
         model = CompanyBranch
@@ -40,33 +53,63 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         addresses_data = validated_data.pop('addresses', [])
-        branch = CompanyBranch.objects.create(**validated_data)
-        user = self.context.get('user')
-        company_content_type = ContentType.objects.get_for_model(CompanyBranch)
+        contacts_data = validated_data.pop('contacts', []) 
+        request = self.context.get('request')
+        user = request.user if request and hasattr(request, 'user') else None
         
-        for address_data in addresses_data:
-            Address.objects.create(
-                user=user,
-                content_type=company_content_type,
-                object_id=branch.id,
-                **address_data
-            )
+        with transaction.atomic():
+            branch = CompanyBranch.objects.create(**validated_data)
+            company_branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
+            
+            for address_data in addresses_data:
+                Address.objects.create(
+                    user=user,
+                    content_type=company_branch_content_type,
+                    object_id=branch.id,
+                    **address_data
+                )
+                logger.debug(f"CREATE: Address created for branch {branch.id}")
+            
+            for i, contact_data in enumerate(contacts_data):
+                try:
+                    ContactPerson.objects.create(branch=branch, **contact_data)
+                    logger.debug(f"CREATE: Contact {i} created for branch {branch.id}: {contact_data}")
+                except Exception as e:
+                    logger.error(f"CREATE: Error creating contact {i} for branch {branch.id}: {str(e)} - Data: {contact_data}")
+                    raise
+        
         return branch
     
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop('addresses', None)
+        contacts_data = validated_data.pop('contacts', None) 
+
+        request = self.context.get('request')
+        user = request.user if request and hasattr(request, 'user') else None
+
         instance = super().update(instance, validated_data)
-        user = self.context.get('user')
-        
+
         if addresses_data is not None:
-            instance.addresses.all().delete()
+            instance.addresses.all().delete() 
+            company_branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
             for address_data in addresses_data:
                 Address.objects.create(
                     user=user,
-                    content_type=ContentType.objects.get_for_model(CompanyBranch),
+                    content_type=company_branch_content_type,
                     object_id=instance.id,
                     **address_data
                 )
+        
+        if contacts_data is not None:
+            instance.contacts.all().delete() 
+
+            for i, contact_data in enumerate(contacts_data):
+                try:
+                    ContactPerson.objects.create(branch=instance, **contact_data)
+                except Exception as e:
+                    logger.error(f"UPDATE: Error creating contact {i} for branch {instance.id}: {str(e)} - Data: {contact_data}")
+                    raise 
+
         return instance
     
 class CompanyProfileSerializer(serializers.ModelSerializer):
@@ -248,6 +291,14 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
                 )
         
         return instance
+    
+class CompanyBranchMinimalSerializer(serializers.ModelSerializer):
+    """Minimal serializer for company branch data"""
+    company = CompanyMinimalSerializer(read_only=True)
+    class Meta:
+        model = CompanyBranch
+        fields = ['id', 'branch_name', 'is_headquarters', 'company']
+
 
 class CompanyBranchSearchSerializer(serializers.ModelSerializer):
     """Serializer for company branch search results"""
@@ -272,15 +323,15 @@ class CompanyBranchSearchSerializer(serializers.ModelSerializer):
 class CompanyBranchDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for full branch data"""
     company = CompanyMinimalSerializer(read_only=True)
-    addresses = AddressSerializer(many=True, read_only=True)
-    contacts = ContactPersonSerializer(many=True, read_only=True)
+    contacts = MinimalContactPersonSerializer(many=True, read_only=True)
     primary_address = serializers.SerializerMethodField()
-    
+    profile = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = CompanyBranch
         fields = [
             'id', 'branch_name', 'is_headquarters', 'is_deleted',
-            'company', 'addresses', 'contacts', 'primary_address',
+            'company', 'contacts', 'primary_address', 'profile',
             'date_created', 'date_updated'
         ]
     
@@ -291,3 +342,9 @@ class CompanyBranchDetailSerializer(serializers.ModelSerializer):
             is_primary=True
         ).first()
         return AddressSerializer(primary_address).data if primary_address else None
+    def get_profile(self, obj):
+        """Get the profile for this branch's company"""
+        try:
+            return CompanyProfileSerializer(obj.company.profile).data
+        except CompanyProfile.DoesNotExist:
+            return None
