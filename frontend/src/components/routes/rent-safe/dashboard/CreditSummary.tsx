@@ -28,7 +28,6 @@ export default function CreditSummary({ title, amounts }: CreditSummaryProps) {
    return (
       <BaseCard>
          <div className="mb-2 font-semibold underline underline-offset-4">{title}</div>
-
          <div className="flex flex-col items-start justify-start gap-2">
             {chartData.map((item) => (
                <div key={item.status} className="flex w-full items-center gap-4 text-sm">
@@ -36,7 +35,7 @@ export default function CreditSummary({ title, amounts }: CreditSummaryProps) {
                      {item.status}
                   </div>
 
-                  <div className="bg-foreground/10 h-0.5 grow border" />
+                  <div className="bg-foreground/10 border-color h-0.5 grow border" />
 
                   <div className="flex gap-3 text-nowrap">
                      <div className="flex items-center gap-2">

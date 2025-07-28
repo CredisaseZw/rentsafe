@@ -11,31 +11,31 @@ function PropertStatement() {
             <table className="w-full">
                <thead>
                   <tr className="">
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Lease ID
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Tenant
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Balance B/F
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Amount Charged (Exl VAT)
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         VAT
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Amount Charged (Inc VAT)
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Amount Paid
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         Adjustments
                      </th>
-                     <th className="text-PRIMARY td-border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
+                     <th className="text-PRIMARY border-color border bg-blue-200 px-5 py-3 font-bold dark:bg-blue-800/10">
                         End Balance
                      </th>
                   </tr>
@@ -45,8 +45,8 @@ function PropertStatement() {
                      <td className="px-5 py-3 text-center">45</td>
                      <td className="px-5 py-3 text-start">Ezel Pool</td>
                      <td className="px-5 py-3 text-start">2,683.00</td>
-                     <td className="td-border-color border-l px-5 py-3 text-end">-</td>
-                     <td className="td-border-color border-r px-5 py-3 text-end">-</td>
+                     <td className="border-color border-l px-5 py-3 text-end">-</td>
+                     <td className="border-color border-r px-5 py-3 text-end">-</td>
                      <td className="px-5 py-3 text-start">-</td>
                      <td className="px-5 py-3 text-start">(2,683.00)</td>
                      <td className="px-5 py-3 text-end">-</td>
@@ -56,8 +56,8 @@ function PropertStatement() {
                      <td className="px-5 py-3 text-center">66</td>
                      <td className="px-5 py-3 text-start">Ezel Pool</td>
                      <td className="px-5 py-3 text-start">2,683.00</td>
-                     <td className="td-border-color border-l px-5 py-3 text-end">-</td>
-                     <td className="td-border-color border-r px-5 py-3 text-end">-</td>
+                     <td className="border-color border-l px-5 py-3 text-end">-</td>
+                     <td className="border-color border-r px-5 py-3 text-end">-</td>
                      <td className="px-5 py-3 text-start">-</td>
                      <td className="px-5 py-3 text-start">(2,683.00)</td>
                      <td className="px-5 py-3 text-end">-</td>
@@ -67,8 +67,8 @@ function PropertStatement() {
                      <td className="px-5 py-3 text-center">45</td>
                      <td className="px-5 py-3 text-start">Tin Roof</td>
                      <td className="px-5 py-3 text-start">9,800.00</td>
-                     <td className="td-border-color border-l px-5 py-3 text-end">-</td>
-                     <td className="td-border-color border-r px-5 py-3 text-end">-</td>
+                     <td className="border-color border-l px-5 py-3 text-end">-</td>
+                     <td className="border-color border-r px-5 py-3 text-end">-</td>
                      <td className="px-5 py-3 text-start">-</td>
                      <td className="px-5 py-3 text-start">(2,683.00)</td>
                      <td className="px-5 py-3 text-end">-</td>

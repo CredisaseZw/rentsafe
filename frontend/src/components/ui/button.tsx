@@ -10,7 +10,7 @@ const buttonVariants = cva(
       variants: {
          variant: {
             default: "bg-primary text-primary-foreground shadow-xs  hover:bg-primary/90",
-            DANGER: "bg-ERROR/90 text-white shadow-xs hover:bg-ERROR ",
+            DANGER: "bg-ERROR/90 text-white shadow-xs hover:bg-ERROR dark:bg-red-700 hover:dark:bg-red-800",
             SECONDARY: "bg-SECONDARY/90 text-white shadow-xs hover:bg-SECONDARY ",
             SUCCESS: "bg-SUCCESS/90 text-white shadow-xs hover:bg-SUCCESS ",
             WARNING: "bg-WARNING/90 text-white shadow-xs hover:bg-WARNING ",
