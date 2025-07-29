@@ -3,6 +3,7 @@ import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboa
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
 import { useNavigate } from "react-router";
 import useMinimalIndividualsList from "@/hooks/apiHooks/useMinimalIndividualsList";
+import type { IndividualMinimal } from "@/interfaces";
 
 export default function useIndividualPaymentStatusTab() {
    const navigate = useNavigate();
@@ -10,15 +11,15 @@ export default function useIndividualPaymentStatusTab() {
    const { individuals, isLoading, searchQuery } = useMinimalIndividualsList();
 
    const rows: BaseTableRow[] =
-      individuals?.map((cell) => ({
+      (individuals as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => ({
          ...cell,
          select: <IndividualPaymentStatusReport individualId={cell.id} />,
       })) || [];
 
    const headers: BaseTableColumn[] = [
-      { name: "forenames", displayName: "Forenames" },
-      { name: "surname", displayName: "Surname" },
-      { name: "identificationNumber", displayName: "Identification Number" },
+      { name: "first_name", displayName: "First Name" },
+      { name: "last_name", displayName: "Last Name" },
+      { name: "identification_number", displayName: "ID Number" },
       { name: "select", displayName: "", colGroupclassName: "w-[1%]" },
    ];
 

@@ -3,7 +3,7 @@ import type { IndividualMinimal } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router";
-import { sampleIndividualRows } from "@/lib/sampleData";
+import { api } from "@/api/axios";
 
 export default function useMinimalIndividualsList() {
    const [searchParams] = useSearchParams();
@@ -11,7 +11,7 @@ export default function useMinimalIndividualsList() {
 
    const { data, isLoading, error } = useQuery<IndividualMinimal[]>({
       queryKey: ["individuals-minimal", q],
-      queryFn: () => (q ? [] : (sampleIndividualRows as IndividualMinimal[])),
+      queryFn: () => (q ? api.get<IndividualMinimal[]>(`/api/individuals/search/?q=${q}`).then((res) => res.data) : []),
    });
 
    useEffect(() => {

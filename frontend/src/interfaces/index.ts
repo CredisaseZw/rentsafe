@@ -157,9 +157,16 @@ export interface AddressLocation {
 
 export interface IndividualMinimal {
    id: number;
-   forenames: string;
-   surname: string;
-   identificationNumber: string;
+   first_name: string;
+   last_name: string;
+   identification_number: string;
+   contact_details: {
+      id: number;
+      individual_id: number;
+      mobile_phone: string[];
+      email: string;
+   };
+   is_active: boolean;
 }
 
 export interface IndividualFull {
