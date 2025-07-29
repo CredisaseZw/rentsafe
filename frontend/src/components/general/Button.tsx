@@ -31,7 +31,7 @@ function Button({
          disabled={disabled}
          onClick={onClick}
          className={cn(
-            `${variants[variant]} rounded px-4 py-2 font-bold text-white`,
+            `${variants[variant]} rounded px-4 py-2 text-sm text-white`,
             asChild ? "flex flex-row items-center justify-center gap-3" : "",
             className,
          )}

@@ -9,7 +9,7 @@ import Invoicing from "@/routes/rent-safe/Invoicing";
 import Forecasts from "@/routes/rent-safe/Forecasts";
 import Statements from "@/routes/rent-safe/Statements";
 import ServicesHub from "@/routes/ServicesHub";
-import InternalUsers from "@/routes/rent-safe/InternalUsers";
+import InternalUsers from "@/routes/rent-safe/admin/InternalUsers";
 import Disbursements from "@/routes/rent-safe/Disbursements";
 import CurrencySettings from "@/routes/rent-safe/CurrencySettings";
 import RentSafeDashboard from "@/routes/rent-safe/Dashboard";

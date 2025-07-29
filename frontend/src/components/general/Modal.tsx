@@ -9,10 +9,6 @@ interface ModalProps {
    onClose: (event?: React.MouseEvent | React.KeyboardEvent) => void;
 }
 
-Modal.defaultProps = {
-   size: "md",
-};
-
 function Modal({ children, onClose, size, modalHeader }: ModalProps) {
    const modal_sizes = useRef({
       md: { width: "w-[500px]" },
@@ -38,7 +34,9 @@ function Modal({ children, onClose, size, modalHeader }: ModalProps) {
 
    return (
       <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 py-10 backdrop-blur-xs`}>
-         <div className={`modal relative mx-auto rounded-md border bg-white p-10 ${modal_sizes.current[size].width}`}>
+         <div
+            className={`modal bg-background relative mx-auto rounded-md border border-gray-300 p-10 dark:border-zinc-800 ${modal_sizes.current[size].width}`}
+         >
             <div className="modal-container relative">
                <div className="modal-header relative mb-5">
                   <h1 className="text-PRIMARY text-2xl font-bold">{modalHeader}</h1>
@@ -53,5 +51,9 @@ function Modal({ children, onClose, size, modalHeader }: ModalProps) {
       </div>
    );
 }
+
+Modal.defaultProps = {
+   size: "md",
+};
 
 export default Modal;

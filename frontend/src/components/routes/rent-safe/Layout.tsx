@@ -13,7 +13,7 @@ export default function Layout() {
    };
 
    return (
-      <div className="bg-gray-200 dark:bg-black">
+      <div className="bg-background">
          <SidebarProvider>
             <Sidebar />
             <div className="main w-full">

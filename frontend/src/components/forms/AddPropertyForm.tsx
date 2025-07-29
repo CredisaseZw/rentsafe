@@ -3,7 +3,12 @@ import { Plus } from "lucide-react";
 import usePropertyList from "@/hooks/components/usePropertyList";
 
 function AddPropertyForm() {
-   const { addPropertyForm, onChangeHandler, submitAddPropertyForm } = usePropertyList();
+   const { addPropertyForm, onChangeHandler } = usePropertyList();
+
+   const submitAddPropertyForm = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      console.log(addPropertyForm);
+   };
    return (
       <form onSubmit={submitAddPropertyForm} method="post">
          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -201,7 +206,7 @@ function AddPropertyForm() {
          </div>
          <div className="mt-5 flex w-full justify-end">
             <Button type={"submit"} className="bg-PRIMARY flex flex-row gap-3">
-               <Plus size={18} className="self-center" />
+               <Plus size={15} className="self-center" />
                <span>Submit</span>
             </Button>
          </div>
