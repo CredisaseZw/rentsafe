@@ -180,7 +180,7 @@ export interface IndividualFull {
    identification_number: string;
    contact_details: { id: number; individual_id: number; mobile_phone: string[]; email: string }[];
    addresses: Address[];
-   employment_details: {
+   current_employment: {
       id: number;
       employer_name: string;
       job_title: string;
