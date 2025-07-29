@@ -1,4 +1,4 @@
-import type { CompanyLegalStatus } from "@/types";
+import type { CompanyLegalStatus, IndividualMaritalStatus } from "@/types";
 
 export interface CompanyPayload {
    registration_number: string;
@@ -37,4 +37,34 @@ export interface AddressPayload {
    suburb_id?: number;
    province_id?: number;
    country_id?: number;
+}
+
+export interface IndividualPayload {
+   first_name: string;
+   last_name: string;
+   date_of_birth: string;
+   gender: string;
+   identification_type: string;
+   identification_number: string;
+   marital_status: IndividualMaritalStatus;
+   contact_details: { email: string; mobile_phone: string[] }[];
+   addresses?: AddressPayload[];
+   documents?: { document_type: string; file: string; description: string }[];
+   notes?: { content: string }[];
+   employment_details: {
+      employer_name: string;
+      job_title: string;
+      start_date: string;
+      end_date?: string;
+      email?: string;
+      monthly_income?: number;
+   }[];
+   next_of_kin?: {
+      first_name: string;
+      last_name: string;
+      relationship: string;
+      mobile_phone: string;
+      email?: string;
+      physical_address?: string;
+   }[];
 }

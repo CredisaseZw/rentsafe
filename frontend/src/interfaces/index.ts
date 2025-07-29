@@ -160,20 +160,47 @@ export interface IndividualMinimal {
    first_name: string;
    last_name: string;
    identification_number: string;
-   contact_details: {
+   contact_details?: {
       id: number;
       individual_id: number;
       mobile_phone: string[];
       email: string;
-   };
+   }[];
    is_active: boolean;
 }
 
 export interface IndividualFull {
    id: number;
-   forenames: string;
-   surname: string;
-   identificationNumber: string;
+   first_name: string;
+   last_name: string;
+   date_of_birth: string;
+   gender: string;
+   marital_status: string;
+   identification_type: string;
+   identification_number: string;
+   contact_details: { id: number; individual_id: number; mobile_phone: string[]; email: string }[];
+   addresses: Address[];
+   employment_details: {
+      id: number;
+      employer_name: string;
+      job_title: string;
+      start_date?: string;
+      end_date?: string;
+      is_current: boolean;
+      monthly_income?: string | number;
+   }[];
+   next_of_kin?: {
+      id: number;
+      first_name: string;
+      last_name: string;
+      relationship: string;
+      relationship_display: string;
+      mobile_phone: string;
+      email: string;
+      physical_address: string;
+   }[];
+   documents?: { id: number; document_type: string; file: string; description: string; is_verified: boolean }[];
+   notes?: { id: number; content: string; is_private: boolean; date_created: string; date_updated: string }[];
 }
 
 export interface PlaceBase {
