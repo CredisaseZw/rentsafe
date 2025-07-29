@@ -38,6 +38,7 @@ class UserCreationService:
             first_name=user_data.get('first_name', ''),
             last_name=user_data.get('last_name', ''),
             client=client,
+            is_staff=user_data.get('is_staff', False),
             is_verified=user_data.get('is_verified', False)
         )
 

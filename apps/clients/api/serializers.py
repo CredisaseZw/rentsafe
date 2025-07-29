@@ -7,11 +7,10 @@ from django.contrib.contenttypes.models import ContentType
 class MinimalClientSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='get_client_type_display')
     status = serializers.CharField(source='get_status_display')
-    subscriptions = serializers.CharField(source='get_subscriptions', allow_null=True)
     
     class Meta:
         model = Client
-        fields = ['id', 'name', 'type', 'status', 'subscriptions', 'date_created']
+        fields = ['id', 'name', 'type', 'status']
         read_only_fields = fields
 
 class IndividualClientSerializer(serializers.ModelSerializer):
@@ -30,13 +29,15 @@ class FullClientSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source='get_client_type_display')
     status = serializers.CharField(source='get_status_display')
     has_users = serializers.SerializerMethodField()
+    subscriptions = serializers.CharField(source='get_subscriptions', allow_null=True)
+    
     
     class Meta:
         model = Client
         fields = [
             'id', 'name', 'type', 'status', 'client_details',
             'external_client_id', 'date_created', 'date_modified',
-            'has_users'
+            'has_users', 'subscriptions'
         ]
         read_only_fields = fields
     
