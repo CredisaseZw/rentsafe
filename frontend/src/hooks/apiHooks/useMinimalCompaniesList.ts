@@ -11,16 +11,10 @@ export default function useMinimalCompaniesList() {
 
    const { data, isLoading, error } = useQuery<CompanyMinimal[]>({
       queryKey: ["companies-minimal", q],
-      queryFn: () =>
-         q
-            ? api
-                 // .get<{ results: CompanyMinimal[] }>(`/api/companies/${q ? `search/?q=${encodeURIComponent(q)}` : ""}`)
-                 // .then((res) => res.data.results),
-                 .get<{ results: { company: CompanyMinimal }[] }>(
-                    `/api/companies/${q ? `search/?q=${encodeURIComponent(q)}` : ""}`,
-                 )
-                 .then((res) => res.data.results.map((item) => item.company))
-            : api.get<{ results: CompanyMinimal[] }>("/api/companies/").then((res) => res.data.results),
+      queryFn: () => {
+         const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
+         return api.get<{ results: CompanyMinimal[] }>(`/api/companies/${query}`).then((res) => res.data.results);
+      },
    });
 
    useEffect(() => {
