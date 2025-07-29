@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const { companies, isLoading } = useMinimalCompaniesList();
+   const { companies, isLoading, searchQuery } = useMinimalCompaniesList();
 
    // @ts-expect-error ReactNode types will never be rendered
    const rows: BaseTableRow[] =
@@ -41,7 +41,9 @@ export default function useCompanyPaymentStatusTab() {
    return {
       rows,
       headers,
+      searchRef,
       isLoading,
+      searchQuery,
       clearSearch,
       handleSearch,
    };

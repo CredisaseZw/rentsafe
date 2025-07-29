@@ -1,12 +1,13 @@
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import BaseTable from "@/components/general/BaseTable";
 import CompanyForm from "./CompanyForm";
 import SectionHeading from "@/components/general/SectionHeading";
 import useCompanyPaymentStatusTab from "@/hooks/pages/dashboard/useCompanyPaymentStatusTab";
+import { Button } from "@/components/ui/button";
 
 export default function CompanyPaymentStatusTab() {
-   const { rows, headers, isLoading, handleSearch } = useCompanyPaymentStatusTab();
+   const { rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } = useCompanyPaymentStatusTab();
 
    return (
       <div>
@@ -19,17 +20,24 @@ export default function CompanyPaymentStatusTab() {
                <div className="flex items-center justify-between gap-2">
                   <form
                      onSubmit={handleSearch}
-                     className="border-foreground/40 flex items-center rounded-sm border bg-transparent"
+                     className="bg-background border-foreground/40 flex items-center rounded-sm border"
                   >
-                     <Search size={20} className="mx-2" />
+                     <Button onClick={clearSearch} type="button" variant="ghost" size="xs">
+                        <X />
+                     </Button>
                      <Input
+                        ref={searchRef}
                         placeholder="Search by name or reg..."
-                        name="q"
-                        minLength={2}
+                        name="company_q"
                         required
-                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-3 py-3 text-gray-900 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
+                        defaultValue={searchQuery}
+                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
                      />
+                     <Button type="submit" variant="ghost" size="xs">
+                        <Search />
+                     </Button>
                   </form>
+
                   <CompanyForm />
                </div>
             }
