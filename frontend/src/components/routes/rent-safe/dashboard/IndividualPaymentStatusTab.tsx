@@ -21,9 +21,9 @@ export default function IndividualPaymentStatusTab() {
                <div className="flex items-center justify-between gap-2">
                   <form
                      onSubmit={handleSearch}
-                     className="border-color flex items-center rounded-sm border bg-white dark:bg-zinc-900"
+                     className="border-foreground/40 flex items-center rounded-sm border bg-transparent"
                   >
-                     <Button onClick={clearSearch} className="h-full" type="button" variant="ghost" size="xs">
+                     <Button onClick={clearSearch} type="button" variant="ghost" size="sm">
                         <X />
                      </Button>
                      <Input
@@ -32,13 +32,13 @@ export default function IndividualPaymentStatusTab() {
                         name="individual_q"
                         required
                         defaultValue={searchQuery}
-                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-3 py-3 text-gray-900 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
+                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 py-2 focus-visible:ring-0"
                      />
-
-                     <Button type="submit" variant="ghost" size="xs">
+                     <Button type="submit" variant="ghost" size="sm">
                         <Search />
                      </Button>
                   </form>
+
                   <IndividualForm />
                </div>
             }

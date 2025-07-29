@@ -20,9 +20,9 @@ export default function CompanyPaymentStatusTab() {
                <div className="flex items-center justify-between gap-2">
                   <form
                      onSubmit={handleSearch}
-                     className="bg-background border-foreground/40 flex items-center rounded-sm border"
+                     className="border-foreground/40 flex items-center rounded-sm border bg-transparent"
                   >
-                     <Button onClick={clearSearch} type="button" variant="ghost" size="xs">
+                     <Button onClick={clearSearch} type="button" variant="ghost" size="sm">
                         <X />
                      </Button>
                      <Input
@@ -31,9 +31,9 @@ export default function CompanyPaymentStatusTab() {
                         name="company_q"
                         required
                         defaultValue={searchQuery}
-                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 focus-visible:ring-0"
+                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 py-2 focus-visible:ring-0"
                      />
-                     <Button type="submit" variant="ghost" size="xs">
+                     <Button type="submit" variant="ghost" size="sm">
                         <Search />
                      </Button>
                   </form>
