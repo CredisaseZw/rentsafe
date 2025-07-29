@@ -140,3 +140,10 @@ class UserSerializer(serializers.ModelSerializer):
         from individuals.api.serializers import IndividualSerializer
         return IndividualSerializer(obj.profile_object).data
 
+class MinimalUserSerializer(serializers.ModelSerializer):
+    client = MinimalClientSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'user_type', 'is_verified', 'client']
+        read_only_fields = fields

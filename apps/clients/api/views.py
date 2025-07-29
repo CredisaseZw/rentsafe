@@ -12,9 +12,10 @@ from apps.companies.models import CompanyBranch
 from apps.clients.api.serializers import ClientCreateUpdateSerializer, FullClientSerializer, MinimalClientSerializer
 from apps.common.services.tasks import send_notification
 from apps.users.services.user_service import UserCreationService
-from apps.users.api.serializers import UserSerializer
+from apps.users.api.serializers import UserSerializer, MinimalUserSerializer
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 import logging
 logger = logging.getLogger(__name__)
 
@@ -108,6 +109,20 @@ class ClientViewSet(viewsets.ModelViewSet):
                 {"detail": "An error occurred while creating user"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+    @action(detail=False, methods=['get'], url_path='users')
+    def list_users(self, request):
+        """
+        List all users associated with a given client ID passed as a query param (?pk=1)
+        """
+        client_pk = request.query_params.get('pk')
+        if not client_pk:
+            return Response({'error': 'Missing client pk in query params'}, status=status.HTTP_400_BAD_REQUEST)
+
+        client = get_object_or_404(Client, pk=client_pk)
+        users = User.objects.filter(client=client).distinct()
+        serializer = MinimalUserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
     @action(detail=False, methods=['get'], url_path='search')
     def search(self, request):
         """
