@@ -51,7 +51,7 @@
 }
 
 @theme inline {
-   --color-PRIMARY: var(--PRIMARY);
+   --color-PRIMARY: var(--primary);
    --col-primary-disable: var(--primary-disabled);
    --color-primary-dark: var(--primary-dark);
    --color-SECONDARY: var(--SECONDARY);
