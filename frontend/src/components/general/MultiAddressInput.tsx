@@ -11,9 +11,9 @@ export default function MultiAddressInput() {
          {addresses.map((_, index) => (
             <fieldset
                key={index}
-               className="border-foreground/30 relative mb-5 rounded-xl border bg-white p-5 shadow-md"
+               className="border-foreground/30 relative mb-5 rounded-xl border bg-white/50 p-5 shadow-md dark:bg-transparent"
             >
-               <legend className="px-2 font-bold">{index === 0 ? "Primary Address" : `Address ${index + 1}`}</legend>
+               <legend className="px-4 font-bold">{index === 0 ? "Primary Address" : `Address ${index + 1}`}</legend>
 
                <AddressFormFields number={index + 1} />
 

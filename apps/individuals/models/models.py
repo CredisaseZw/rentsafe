@@ -86,6 +86,12 @@ class IndividualContactDetail(BaseModel):
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
     email = models.EmailField(blank=True, null=True)
     mobile_phone = models.JSONField()
+
+    @property
+    def first_mobile_phone(self):
+        if isinstance(self.mobile_phone, list) and self.mobile_phone:
+            return self.mobile_phone[0]
+        return None
     
     class Meta:
         app_label = 'individuals'

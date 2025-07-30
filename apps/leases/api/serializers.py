@@ -8,6 +8,7 @@ from apps.properties.models.models import Property, Unit, PropertyType
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
 from apps.common.models.models import Address
+from apps.common.api.serializers import AddressSerializer
 from decimal import Decimal
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
@@ -267,16 +268,16 @@ class LeaseSearchSerializer(serializers.ModelSerializer):
             }
         return None
 class PropertyCreateSerializer(serializers.ModelSerializer):
-    address_data = serializers.JSONField(write_only=True)
+    addresses = AddressSerializer(required=True)
     property_type_name = serializers.CharField(write_only=True)
     
     class Meta:
         model = Property
         fields = ['name', 'description', 'status', 'year_built', 'total_area', 
-                'is_furnished', 'total_number_of_units', 'address_data', 'property_type_name','features']
+                'is_furnished', 'total_number_of_units', 'addresses', 'property_type_name','features']
     
     def validate(self, data):
-        address_data = data.get('address_data', {})
+        address_data = data.get('addresses', {})
         required_fields = ['street_address', 'city']
         
         for field in required_fields:
@@ -288,7 +289,7 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        address_data = validated_data.pop('address_data')
+        address_data = validated_data.pop('addresses')
         property_type_name = validated_data.pop('property_type_name')
         
         # Get or create property type

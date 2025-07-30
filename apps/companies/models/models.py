@@ -74,7 +74,8 @@ class Company(BaseModel):
             branch = CompanyBranch.objects.create(
                 company=self,
                 branch_name=self.registration_name,
-                is_headquarters=True
+                is_headquarters=True,
+                # addresses=company_address if company_address else None
             )
 
             if company_address:
@@ -158,16 +159,27 @@ class ContactPerson(BaseModel):
 
     def __str__(self):
         name = f"{self.individual.first_name} {self.individual.last_name}" if self.individual else _("Unnamed Contact")
-        context = ""
-        if self.branch:
-            context = f" ( {self.branch.branch_name})"
-
+        context = f" ( {self.branch.branch_name})" if self.branch else ""
         contact_type_display = self.get_contact_type_display() if self.contact_type else 'General'
 
         return f"{name}{context} [{contact_type_display}]"
 
     def get_contact_type_display(self):
         return dict(self.CONTACT_TYPES).get(self.contact_type, 'Unknown')
+    
+    @property
+    def full_name(self):
+        return f"{self.individual.first_name} {self.individual.last_name}" if self.individual else _("Unnamed Contact")
+
+    @property
+    def full_contact_info(self):
+        """
+        Returns a formatted string with the contact person's full name and position.
+        """
+        name = self.full_name
+        position = self.position or ''
+        mobile = self.individual.contact_details.first().first_mobile_phone if self.individual else ''
+        return f"{name} - {position} - {mobile}".strip()
 
     def clean(self):
         super().clean()
@@ -205,8 +217,8 @@ class CompanyProfile(BaseModel):
                 help_text=_("Company logo image file."))
     registration_date = models.DateField(_("Registration Date"), blank=True, null=True,
                 help_text=_("The official registration date of the company profile."))
-    tin_number = models.CharField(_("BP Number"), max_length=255, blank=True, null=True,
-                help_text=_("Business Partner Number."))
+    tin_number = models.CharField(_("Tin Number"), max_length=255, blank=True, null=True,
+                help_text=_("Tax Identification Number."))
 
     vat_number = models.CharField(_("VAT Number"), max_length=255, blank=True, null=True,
                 help_text=_("Value Added Tax (VAT) registration number."))
