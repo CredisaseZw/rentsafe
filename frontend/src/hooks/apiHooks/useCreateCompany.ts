@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
-import type { CompanyFull, CompanyMinimal } from "@/interfaces";
+import type { CompanyCreationResponse } from "@/interfaces";
 import { stringifyAndFmt } from "@/lib/utils";
 
 export default function useCreateCompany(successCallback?: () => void) {
@@ -12,7 +12,7 @@ export default function useCreateCompany(successCallback?: () => void) {
 
    const { mutate, isPending } = useMutation({
       mutationFn: (companyPayload: CompanyPayload) =>
-         api.post<CompanyFull>("/api/companies/", companyPayload).then((res) => res.data),
+         api.post<CompanyCreationResponse>("/api/companies/", companyPayload).then((res) => res.data),
       onError(error: AxiosError | Error | unknown) {
          console.error("Error creating company:", error);
          if (isAxiosError(error)) {
@@ -24,7 +24,7 @@ export default function useCreateCompany(successCallback?: () => void) {
          toast.error("Failed to create company. Please try again.", { description: stringifyAndFmt(error) });
       },
       onSuccess(company) {
-         client.setQueryData<CompanyFull>(["company", company.id], company);
+         client.setQueryData<CompanyCreationResponse>(["company", company.id], company);
 
          const matchingSearchQueries = client.getQueryCache().findAll({
             queryKey: ["companies-minimal"],
@@ -32,9 +32,9 @@ export default function useCreateCompany(successCallback?: () => void) {
                const key = query.queryKey;
                return !!key.find((k) => {
                   const q = String(k).trim().toLowerCase();
-                  const matchesRegName = company.registration_name.trim().toLowerCase().includes(q);
-                  const matchesTradeName = company.trading_name?.trim().toLowerCase().includes(q);
-                  const matchesRegNum = company.registration_number.trim().toLowerCase().includes(q);
+                  const matchesRegName = company.company.registration_name.trim().toLowerCase().includes(q);
+                  const matchesTradeName = company.company.trading_name?.trim().toLowerCase().includes(q);
+                  const matchesRegNum = company.company.registration_number.trim().toLowerCase().includes(q);
                   return matchesRegName || matchesTradeName || matchesRegNum;
                });
             },
@@ -42,23 +42,7 @@ export default function useCreateCompany(successCallback?: () => void) {
          const keys = matchingSearchQueries.map((q) => q.queryKey);
          keys.push(["companies-minimal", null]);
 
-         keys.forEach((key) => {
-            client.setQueryData<CompanyMinimal[]>(key, (old) => {
-               const minimalCompany: CompanyMinimal = {
-                  id: company.id,
-                  registration_name: company.registration_name,
-                  registration_number: company.registration_number,
-                  industry: company.industry,
-                  is_verified: company.is_verified,
-                  legal_status: company.legal_status,
-                  legal_status_display: company.legal_status_display,
-                  primary_address: company.addresses
-                     ? company.addresses.find((addr) => addr.is_primary) || company.addresses[0]
-                     : undefined,
-               };
-               return old ? [...old, minimalCompany] : [minimalCompany];
-            });
-         });
+         keys.forEach((key) => client.invalidateQueries({ queryKey: key }));
 
          toast.success("Company created successfully!");
          if (successCallback) successCallback();

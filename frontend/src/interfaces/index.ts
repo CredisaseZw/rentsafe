@@ -102,6 +102,53 @@ export interface CompanyFull {
    date_updated?: string;
 }
 
+export interface CompanyCreationResponse {
+   id: number;
+   branch_name: string;
+   is_headquarters: boolean;
+   is_deleted: boolean;
+   company: {
+      id: number;
+      registration_number: string;
+      registration_name: string;
+      trading_name: string;
+      legal_status: string;
+      legal_status_display: string;
+      is_verified: boolean;
+   };
+   // contacts: [];
+   // primary_address: null;
+   profile: {
+      trading_status: string;
+      trading_status_display: string | null;
+      mobile_phone: string;
+      landline_phone: string;
+      email: string;
+      logo: string | null;
+      registration_date: string | null;
+      tin_number: string;
+      vat_number: string;
+      number_of_employees: string | null;
+      website: string | null;
+      trend: string | null;
+      trend_display: string | null;
+      twitter: string | null;
+      facebook: string | null;
+      instagram: string | null;
+      linkedin: string | null;
+      operations: string | null;
+      contact_person: string | null;
+      risk_class: string | null;
+      risk_class_display: string | null;
+      account_number: string | null;
+      is_under_judicial: string | null;
+      is_under_judicial_display: string | null;
+      is_suspended: boolean | null;
+   };
+   date_created: string;
+   date_updated: string;
+}
+
 export interface CompanyReport {
    claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
    active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
