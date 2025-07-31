@@ -51,7 +51,7 @@ export default function IndividualForm() {
                            <SelectValue placeholder="Identification type" />
                         </SelectTrigger>
                         <SelectContent>
-                           <SelectItem value="national-id">National ID</SelectItem>
+                           <SelectItem value="national_id">National ID</SelectItem>
                            <SelectItem value="passport">Passport</SelectItem>
                         </SelectContent>
                      </Select>
@@ -129,13 +129,12 @@ export default function IndividualForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="email">
-                        Email Address <span className="text-PRIMARY">*</span>
+                        Email Address
                      </Label>
                      <Input
                         id="email"
                         name="email"
                         type="email"
-                        required
                         placeholder="e.g. info@company.com"
                         className="border-foreground/40 bg-white"
                      />
@@ -154,12 +153,11 @@ export default function IndividualForm() {
                         <div className="mt-5 grid grid-cols-3 items-center gap-5">
                            <div className="flex flex-col gap-2">
                               <Label className="px-2 font-normal" htmlFor="employerName">
-                                 Employer Name <span className="text-PRIMARY">*</span>
+                                 Employer Name
                               </Label>
                               <Input
                                  id="employerName"
                                  name="employerName"
-                                 required
                                  placeholder="e.g. ABC Corp"
                                  className="border-foreground/40 bg-white"
                               />
@@ -167,12 +165,11 @@ export default function IndividualForm() {
 
                            <div className="flex flex-col gap-2">
                               <Label className="px-2 font-normal" htmlFor="jobTitle">
-                                 Job Title <span className="text-PRIMARY">*</span>
+                                 Job Title
                               </Label>
                               <Input
                                  id="jobTitle"
                                  name="jobTitle"
-                                 required
                                  placeholder="e.g. Software Engineer"
                                  className="border-foreground/40 bg-white"
                               />
@@ -180,13 +177,12 @@ export default function IndividualForm() {
 
                            <div className="flex flex-col gap-2">
                               <Label className="px-2 font-normal" htmlFor="startDate">
-                                 Start Date <span className="text-PRIMARY">*</span>
+                                 Start Date
                               </Label>
                               <Input
                                  id="startDate"
                                  name="startDate"
                                  type="date"
-                                 required
                                  max={new Date().toISOString().split("T")[0]}
                                  className="border-foreground/40 bg-white"
                               />
