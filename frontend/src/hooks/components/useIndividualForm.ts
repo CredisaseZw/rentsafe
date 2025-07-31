@@ -41,7 +41,7 @@ export default function useIndividualForm() {
       if (individualPayload.date_of_birth) {
          individualPayload.date_of_birth = formatDateToPythonSLiking(individualPayload.date_of_birth);
       }
-      for (const employment of individualPayload.employment_details) {
+      for (const employment of individualPayload.employment_details || []) {
          if (employment.start_date) {
             employment.start_date = formatDateToPythonSLiking(employment.start_date);
          }
