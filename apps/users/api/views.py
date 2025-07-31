@@ -5,12 +5,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.exceptions import ValidationError
-from apps.users.api.serializers import CustomTokenObtainPairSerializer, UserSerializer, UserCreateSerializer
+from apps.users.api.serializers import CustomTokenObtainPairSerializer, UserSerializer, UserCreateSerializer, RoleSerializer, RoleMinimalSerializer
+from apps.users.models import Role
 from apps.users.services.user_service import UserCreationService
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, UserCreateSerializer
 from django.db import transaction
 User = get_user_model()
 
@@ -93,3 +93,15 @@ class UserViewSet(viewsets.ModelViewSet):
                 {"detail": "An error occurred while creating user"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class RoleViewSet(viewsets.ModelViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def minimal(self, request):
+        """
+        Get a minimal list of roles with only id, name, and description
+        """
+        roles = Role.objects.all()
+        serializer = RoleMinimalSerializer(roles, many=True)
+        return Response(serializer.data)

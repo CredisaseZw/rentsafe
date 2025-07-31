@@ -10,10 +10,17 @@ from apps.users.models.models import Role
 
 User = get_user_model()
 
-class RoleSerializer(serializers.ModelSerializer):
+class RoleMinimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = ['id', 'name', 'description']
+
+class RoleSerializer(serializers.ModelSerializer):
+    permissions = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = Role
+        fields = ['id', 'name', 'description', 'permissions']
 
 class UserCreateSerializer(serializers.ModelSerializer):
     client_id = serializers.PrimaryKeyRelatedField(
@@ -126,7 +133,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'user_type',
+            'id', 'username', 'email', 'user_type','first_name', 'last_name',
             'client', 'profile_object','roles', 'is_verified',
             'last_login', 'date_joined'
         ]
