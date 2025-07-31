@@ -136,7 +136,7 @@ function LandlordStatements() {
                      </div>
                      <div className="mt-5 flex flex-row justify-end">
                         <Button type="submit" className="flex flex-row gap-3">
-                           <Send size={18} className="self-center" />
+                           <Send size={15} className="self-center" />
                            Submit
                         </Button>
                      </div>
