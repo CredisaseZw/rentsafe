@@ -27,9 +27,9 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
       rating: "",
       employmentHistory: [
          {
-            employer: individual?.current_employment[0]?.employer_name || "",
-            position: individual?.current_employment[0]?.job_title || "",
-            startDate: individual?.current_employment[0]?.start_date || "",
+            employer: individual?.employment_details ? individual?.employment_details[0]?.employer_name || "" : "",
+            position: individual?.employment_details ? individual?.employment_details[0]?.job_title || "" : "",
+            startDate: individual?.employment_details ? individual?.employment_details[0]?.start_date || "" : "",
          },
       ],
       personalDetails: {
@@ -44,8 +44,7 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
          mobileNumber: individual?.contact_details[0]?.mobile_phone[0] || "",
          telephoneNumber: "n/a",
          email: individual?.contact_details[0]?.email || "",
-         address: (individual?.addresses ? [individual?.addresses] : [])?.map(formatAddress).join(" | ") || "",
-         // address: individual?.addresses?.map(formatAddress).join(" | ") || "",
+         address: individual?.addresses?.map(formatAddress).join(" | ") || "",
       },
    };
 
