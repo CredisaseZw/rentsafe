@@ -45,7 +45,7 @@ function PropertyLIst() {
                   </div>
                   <div className="flex flex-row justify-end p-4">
                      <Button onClick={openModal} className="flex flex-row gap-3">
-                        <Plus size={20} className="self-center" />
+                        <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
                      </Button>
                   </div>

@@ -14,7 +14,7 @@ export default function IndividualForm() {
       <Dialog modal>
          <DialogTrigger asChild>
             <Button asChild>
-               Add New Individual <Plus />
+               Add New Individual <Plus size={15} />
             </Button>
          </DialogTrigger>
 

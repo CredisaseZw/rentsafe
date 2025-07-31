@@ -1,7 +1,7 @@
 import useContractorManagement from "@/hooks/components/useContractorManagement";
 import Button from "../general/Button";
 import { Plus } from "lucide-react";
-import Spinner from "../general/Spinner";
+import Spinner from "../general/ButtonSpinner";
 
 function AddContractorForm() {
    const { contractor, isLoading, uploadContractorHandler, onChangeHandler } = useContractorManagement();

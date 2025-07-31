@@ -20,7 +20,7 @@ export default function CompanyForm() {
       >
          <DialogTrigger asChild>
             <Button asChild>
-               Add New Company <Plus />
+               Add New Company <Plus size={15} />
             </Button>
          </DialogTrigger>
 

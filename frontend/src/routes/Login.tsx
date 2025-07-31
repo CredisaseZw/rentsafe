@@ -6,7 +6,7 @@ import useAuth from "@/hooks/components/useAuth";
 import useLoginAuth from "@/hooks/apiHooks/useLogin";
 import Alert from "@/components/general/Alerts";
 import { useState } from "react";
-import Spinner from "@/components/general/Spinner";
+import ButtonSpinner from "@/components/general/ButtonSpinner";
 import Button from "@/components/general/Button";
 
 export default function Login() {
@@ -76,7 +76,7 @@ export default function Login() {
                <div className="mt-7 flex w-full flex-col gap-3">
                   <Button type="submit" disabled={isLogin} asChild={true}>
                      Sign in
-                     {isLogin ? <Spinner /> : <LogInIcon size={15} className="self-center" />}
+                     {isLogin ? <ButtonSpinner /> : <LogInIcon size={15} className="self-center" />}
                   </Button>
                   <Link to="" className="text-PRIMARY text-center text-sm font-semibold">
                      Forgot Password?
