@@ -164,7 +164,7 @@ class CustomUserAdmin(UserAdmin):
         self.message_user(request, f"Welcome emails will be sent to {queryset.count()} users.")
 
 class RoleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active', 'permissions_count', 'users_count')
+    list_display = ('id','name', 'is_active', 'permissions_count', 'users_count')
     list_filter = ('is_active',)
     search_fields = ('name', 'description')
     filter_horizontal = ('permissions',)
