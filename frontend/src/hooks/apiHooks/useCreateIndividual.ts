@@ -5,6 +5,7 @@ import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { IndividualFull, IndividualMinimal } from "@/interfaces";
+import { stringifyAndFmt } from "@/lib/utils";
 
 export default function useCreateIndividual(successCallback?: () => void) {
    const client = useClient();
@@ -16,11 +17,11 @@ export default function useCreateIndividual(successCallback?: () => void) {
          console.error("Error creating individual:", error);
          if (isAxiosError(error)) {
             toast.error("Failed to create individual", {
-               description: JSON.stringify(error.response?.data.details),
+               description: stringifyAndFmt(error.response?.data.details || error.response?.data.error),
             });
             return;
          }
-         toast.error("Failed to create individual. Please try again.", { description: JSON.stringify(error) });
+         toast.error("Failed to create individual. Please try again.", { description: stringifyAndFmt(error) });
       },
       onSuccess(individual) {
          client.setQueryData<IndividualFull>(["individual", individual.id], individual);

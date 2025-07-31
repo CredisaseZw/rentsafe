@@ -5,6 +5,7 @@ import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { CompanyFull, CompanyMinimal } from "@/interfaces";
+import { stringifyAndFmt } from "@/lib/utils";
 
 export default function useCreateCompany(successCallback?: () => void) {
    const client = useClient();
@@ -16,11 +17,11 @@ export default function useCreateCompany(successCallback?: () => void) {
          console.error("Error creating company:", error);
          if (isAxiosError(error)) {
             toast.error("Failed to create company", {
-               description: JSON.stringify(error.response?.data.details),
+               description: stringifyAndFmt(error.response?.data.details || error.response?.data.error),
             });
             return;
          }
-         toast.error("Failed to create company. Please try again.", { description: JSON.stringify(error) });
+         toast.error("Failed to create company. Please try again.", { description: stringifyAndFmt(error) });
       },
       onSuccess(company) {
          client.setQueryData<CompanyFull>(["company", company.id], company);

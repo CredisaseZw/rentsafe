@@ -163,3 +163,12 @@ export function validateZimNationalId(idNumber: string): boolean {
    const regex = /^\d{8,9}[A-Za-z]{1}\d{2}$/;
    return regex.test(idNumber);
 }
+
+export function stringifyAndFmt(val: unknown): string {
+   if (val === null || val === undefined) return "";
+   if (typeof val === "string") return val.replace(/^"|"$/g, "");
+   if (typeof val === "object") {
+      return JSON.stringify(val, (_, v) => (v === null || v === undefined ? undefined : v)).replace(/^"|"$/g, "");
+   }
+   return String(val);
+}
