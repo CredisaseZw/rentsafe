@@ -41,7 +41,7 @@ export default function ServiceSidebar({
    }, []);
 
    return (
-      <Sidebar className="w-[300px] border-r border-white/10 bg-white text-gray-800 shadow-md dark:bg-zinc-950 dark:text-white">
+      <Sidebar className="w-[300px] border-r border-gray-300 bg-white text-gray-800 shadow-md dark:border-zinc-900 dark:bg-zinc-950 dark:text-white">
          <SidebarContent>
             <div className="px-5 pt-5">
                <div className="flex items-center gap-2 rounded-xl bg-gray-800 p-5 dark:bg-zinc-900">
