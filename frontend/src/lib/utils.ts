@@ -157,3 +157,9 @@ export function formatErrorMessage(error: unknown): string {
    }
    return JSON.stringify(error, null, 2) || "An unknown error occurred";
 }
+
+export function validateZimNationalId(idNumber: string): boolean {
+   //23155637M75
+   const regex = /^\d{8,9}[A-Za-z]{1}\d{2}$/;
+   return regex.test(idNumber);
+}

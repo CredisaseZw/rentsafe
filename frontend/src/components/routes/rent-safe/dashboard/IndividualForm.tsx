@@ -51,7 +51,7 @@ export default function IndividualForm() {
                            <SelectValue placeholder="Identification type" />
                         </SelectTrigger>
                         <SelectContent>
-                           <SelectItem value="national_id">National ID</SelectItem>
+                           <SelectItem value="national_id">National ID (ZW only)</SelectItem>
                            <SelectItem value="passport">Passport</SelectItem>
                         </SelectContent>
                      </Select>

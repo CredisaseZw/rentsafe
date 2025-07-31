@@ -1,8 +1,9 @@
 import type { IndividualPayload } from "@/interfaces/form-payloads";
 import React from "react";
-import { extractAddresses, formatDateToPythonSLiking } from "@/lib/utils";
+import { extractAddresses, formatDateToPythonSLiking, validateZimNationalId } from "@/lib/utils";
 import type { IndividualMaritalStatus } from "@/types";
 import useCreateIndividual from "../apiHooks/useCreateIndividual";
+import { toast } from "sonner";
 
 export default function useIndividualForm() {
    const [showForm, setShowForm] = React.useState(false);
@@ -37,6 +38,16 @@ export default function useIndividualForm() {
          documents: undefined,
          addresses: extractAddresses(data),
       };
+
+      if (individualPayload.identification_type === "national_id") {
+         const isValid = validateZimNationalId(individualPayload.identification_number);
+         if (!isValid) {
+            toast.error(`Invalid Zimbabwean National ID '${individualPayload.identification_number}'`, {
+               description: "Remove any spaces or dashes.",
+            });
+            return;
+         }
+      }
 
       if (individualPayload.date_of_birth) {
          individualPayload.date_of_birth = formatDateToPythonSLiking(individualPayload.date_of_birth);
