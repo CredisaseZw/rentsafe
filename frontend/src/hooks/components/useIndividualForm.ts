@@ -26,9 +26,9 @@ export default function useIndividualForm() {
          notes: data.notes ? [{ content: data.notes as string }] : [],
          employment_details: [
             {
-               employer_name: data.employerName as string,
-               job_title: data.jobTitle as string,
-               start_date: data.startDate as string,
+               employer_name: (data.employerName as string) || undefined,
+               job_title: (data.jobTitle as string) || undefined,
+               start_date: (data.startDate as string) || undefined,
                end_date: data.endDate ? (data.endDate as string) : undefined,
                email: data.employerEmail ? (data.employerEmail as string) : undefined,
                monthly_income: data.monthlyIncome ? parseFloat(data.monthlyIncome as string) : undefined,
@@ -39,11 +39,20 @@ export default function useIndividualForm() {
          addresses: extractAddresses(data),
       };
 
+      if (
+         individualPayload.employment_details &&
+         (!individualPayload.employment_details[0].employer_name ||
+            !individualPayload.employment_details[0].job_title ||
+            !individualPayload.employment_details[0].start_date)
+      ) {
+         delete individualPayload.employment_details;
+      }
+
       if (individualPayload.identification_type === "national_id") {
          const isValid = validateZimNationalId(individualPayload.identification_number);
          if (!isValid) {
             toast.error(`Invalid Zimbabwean National ID '${individualPayload.identification_number}'`, {
-               description: "Remove any spaces or dashes.",
+               description: "Use correct format, without spaces or dashes.",
             });
             return;
          }
