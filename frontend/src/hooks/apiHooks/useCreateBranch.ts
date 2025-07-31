@@ -23,7 +23,7 @@ export default function useCreateBranch(successCallback?: () => void) {
          toast.error("Failed to create branch. Please try again.", { description: stringifyAndFmt(error) });
       },
       onSuccess() {
-         client.invalidateQueries({ queryKey: ["companies-minimal"], exact: false });
+         client.invalidateQueries({ queryKey: ["company-branches"], exact: false });
          toast.success("Branch created successfully!");
          if (successCallback) successCallback();
       },

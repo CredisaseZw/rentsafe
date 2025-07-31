@@ -27,7 +27,7 @@ export default function useCreateCompany(successCallback?: () => void) {
          client.setQueryData<CompanyCreationResponse>(["company", company.id], company);
 
          const matchingSearchQueries = client.getQueryCache().findAll({
-            queryKey: ["companies-minimal"],
+            queryKey: ["company-branches"],
             predicate(query) {
                const key = query.queryKey;
                return !!key.find((k) => {
@@ -40,7 +40,7 @@ export default function useCreateCompany(successCallback?: () => void) {
             },
          });
          const keys = matchingSearchQueries.map((q) => q.queryKey);
-         keys.push(["companies-minimal", null]);
+         keys.push(["company-branches", null]);
 
          keys.forEach((key) => client.invalidateQueries({ queryKey: key }));
 

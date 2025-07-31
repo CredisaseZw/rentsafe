@@ -1,19 +1,26 @@
 import { useEffect } from "react";
-import type { CompanyMinimal } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 import { useSearchParams } from "react-router";
+import type { BranchComplete } from "@/interfaces";
 
-export default function useMinimalCompaniesList() {
+export default function useCompanyBranches() {
    const [searchParams] = useSearchParams();
    const q = searchParams.get("company_q")?.trim();
 
-   const { data, isLoading, error } = useQuery<CompanyMinimal[]>({
-      queryKey: ["companies-minimal", q],
+   const { data, isLoading, error } = useQuery<BranchComplete[]>({
+      queryKey: ["company-branches", q],
       queryFn: () => {
          const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
-         return api.get<{ results: CompanyMinimal[] }>(`/api/companies/${query}`).then((res) => res.data.results);
+         return api
+            .get<{
+               count: number;
+               next?: string;
+               previous?: string;
+               results: BranchComplete[];
+            }>(`/api/branches/${query}`)
+            .then((res) => res.data.results);
       },
    });
 
@@ -24,5 +31,5 @@ export default function useMinimalCompaniesList() {
       }
    }, [error, q]);
 
-   return { companies: data, isLoading, searchQuery: q };
+   return { branches: data, isLoading, searchQuery: q };
 }

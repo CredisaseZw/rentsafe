@@ -50,6 +50,21 @@ export interface Address {
    date_updated: string;
 }
 
+export interface BranchComplete {
+   id: number;
+   branch_name: string;
+   is_headquarters: boolean;
+   company: {
+      id: number;
+      registration_number: string;
+      registration_name: string;
+      trading_name: string;
+      legal_status: string;
+      legal_status_display: string;
+      is_verified: boolean;
+   };
+}
+
 export interface Branch {
    id: number;
    company: number;
