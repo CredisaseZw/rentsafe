@@ -1,16 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import apis from "@/api/axios";
-
+const { api } = apis;
 interface AddInternalUserProps {
    firstName: string;
    lastName: string;
    email: string;
    accessLevel: string;
 }
-export default function AddInternalUsersApi() {
+
+export default function useAddInternalUsersApi(userID: number) {
    return useMutation({
       mutationFn: async ({ firstName, lastName, email, accessLevel }: AddInternalUserProps) => {
-         const response = await apis.api.post(`${import.meta.env.VITE_API_URL}/api/clients/clients/1/create-user/`, {
+         const response = await api.post(`${import.meta.env.VITE_API_URL}/api/clients/clients/${userID}/create-user/`, {
             first_name: firstName,
             last_name: lastName,
             email: email,

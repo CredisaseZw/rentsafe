@@ -12,6 +12,7 @@ import NavLinkItem from "./NavLinkItem";
 import { useEffect, useState } from "react";
 import type { NavLink } from "@/types";
 import SidebarFooterContent from "./SidebarFooterContent";
+import { getCookie } from "typescript-cookie";
 
 type SidebarProps = {
    title?: string;
@@ -29,7 +30,7 @@ export default function ServiceSidebar({
    const [username, setUsername] = useState<string>("");
 
    useEffect(() => {
-      const token = localStorage.getItem("token");
+      const token = getCookie("token");
       if (token) {
          try {
             const parsedToken = JSON.parse(token);

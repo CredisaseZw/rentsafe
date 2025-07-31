@@ -1,4 +1,5 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
+import { getCookie } from "typescript-cookie";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -14,7 +15,7 @@ const fileApi = axios.create({
 }); // USE THIS ONE FOR FILE TYPE UPLOADS
 
 const attachToken = (config: InternalAxiosRequestConfig) => {
-   const token: string | null = localStorage.getItem("token");
+   const token = getCookie("token");
    let parsedToken: { access_token?: string } | null = null;
 
    try {

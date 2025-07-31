@@ -9,6 +9,7 @@ import { CheckCheck, CircleDashed, Combine, PackageOpen, Plus, Timer } from "luc
 import Pill from "@/components/general/Pill";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useWorkOrders from "@/hooks/components/useWorkOrders";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 function WorkOrders() {
    const { workOrderOptions, setWorkOrder } = useWorkOrders();
@@ -72,40 +73,70 @@ function WorkOrders() {
                      New Work Order
                   </Button>
                </div>
-
-               <div className="card mt-5">
-                  <div className="flex flex-row gap-3 self-center">
-                     <h6 className="self-center">#WO-2025-002</h6>
-                     <Pill variant={"danger"}>High</Pill>
-                     <div>
-                        <Select
-                           onValueChange={(value) =>
-                              setWorkOrder({
-                                 id: "",
-                                 selectedOption: value,
-                              })
-                           }
-                        >
-                           <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder={workOrderOptions.current["open"]} />{" "}
-                           </SelectTrigger>
-                           <SelectContent>
-                              <SelectItem value="open">Open</SelectItem>
-                              <SelectItem value="scheduled">Scheduled</SelectItem>
-                              <SelectItem value="in_progress">In Progress</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                           </SelectContent>
-                        </Select>
+               <ColumnsContainer numberOfCols={2}>
+                  <div className="card mt-5">
+                     <div className="flex flex-row gap-3 self-center">
+                        <h6 className="self-center">#WO-2025-002</h6>
+                        <Pill variant={"danger"}>High</Pill>
+                        <div>
+                           <Select
+                              onValueChange={(value) =>
+                                 setWorkOrder({
+                                    id: "",
+                                    selectedOption: value,
+                                 })
+                              }
+                           >
+                              <SelectTrigger className="w-[180px]">
+                                 <SelectValue placeholder={workOrderOptions.current["open"]} />{" "}
+                              </SelectTrigger>
+                              <SelectContent>
+                                 <SelectItem value="open">
+                                    <Tooltip>
+                                       <TooltipTrigger>Open</TooltipTrigger>
+                                       <TooltipContent>
+                                          <p>Request for repairs</p>
+                                       </TooltipContent>
+                                    </Tooltip>
+                                 </SelectItem>
+                                 <SelectItem value="scheduled">
+                                    <Tooltip>
+                                       <TooltipTrigger>Scheduled</TooltipTrigger>
+                                       <TooltipContent>
+                                          <p>Requested of payer</p>
+                                       </TooltipContent>
+                                    </Tooltip>
+                                 </SelectItem>
+                                 <SelectItem value="in_progress">
+                                    <Tooltip>
+                                       <TooltipTrigger> In Progress</TooltipTrigger>
+                                       <TooltipContent>
+                                          <p>Work started</p>
+                                       </TooltipContent>
+                                    </Tooltip>
+                                 </SelectItem>
+                                 <SelectItem value="completed">
+                                    <Tooltip>
+                                       <TooltipTrigger> Completed</TooltipTrigger>
+                                       <TooltipContent>
+                                          <p>Work Completed</p>
+                                       </TooltipContent>
+                                    </Tooltip>
+                                 </SelectItem>
+                              </SelectContent>
+                           </Select>
+                        </div>
                      </div>
+                     <div className="mt-5">
+                        <h4 className="font-bold">Kitchen Sink Leak</h4>
+                        <p className="mt-2">
+                           Water is dripping from under the kitchen sink. The leak appears to be coming from the pipe
+                           connection
+                        </p>
+                     </div>
+                     <div className="mt-5"></div>
                   </div>
-                  <div className="mt-5">
-                     <h4 className="font-bold">Kitchen Sink Leak</h4>
-                     <p className="mt-2">
-                        Water is dripping from under the kitchen sink. The leak appears to be coming from the pipe
-                        connection
-                     </p>
-                  </div>
-               </div>
+               </ColumnsContainer>
             </div>
          </div>
       </div>

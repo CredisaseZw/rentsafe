@@ -8,6 +8,7 @@ import Alert from "@/components/general/Alerts";
 import { useState } from "react";
 import ButtonSpinner from "@/components/general/ButtonSpinner";
 import Button from "@/components/general/Button";
+import { setCookie } from "typescript-cookie";
 
 export default function Login() {
    const { loginForm, validateForm, handleChange, status, onError } = useAuth();
@@ -24,7 +25,7 @@ export default function Login() {
 
       login.mutate(loginForm, {
          onSuccess: (data) => {
-            localStorage.setItem("token", JSON.stringify(data));
+            setCookie("token", JSON.stringify(data), { expires: 3 });
             const next = new URLSearchParams(location.search).get("next");
             navigate(next || "/services/rent-safe", { replace: true });
          },

@@ -7,69 +7,28 @@ import { TableBase } from "@/components/general/TableBase";
 import { TableRow, TableCell } from "@/components/ui/table";
 import useInternalUsers from "@/hooks/components/useInternalUsers";
 import { Eye, Plus, Trash } from "lucide-react";
+import { useGetInternalUserClients } from "@/hooks/apiHooks/useGetInternalClients";
+import { useEffect, useState } from "react";
+import type { Clients, DataInternalUser } from "@/types";
+//import useGetUserId from "@/hooks/components/useGetUserID";
 
 export default function InternalUsers() {
-   const { handleUserSearch, closeodal, openModal, modalVisible } = useInternalUsers();
-   const headers = [
-      {
-         name: "First Name",
-         textAlign: "left",
-      },
-      {
-         name: "Last Name",
-         textAlign: "left",
-      },
-      {
-         name: "Access Level",
-         textAlign: "left",
-      },
-      {
-         name: "Email",
-         textAlign: "left",
-      },
-      {
-         name: "Actions",
-         textAlign: "center",
-      },
-   ];
-   const bodyChildren = [
-      {
-         email: "john@doe.com",
-         lastName: "Doe",
-         firstName: "John",
-         access_level: "admin",
-      },
-      {
-         email: "jane@smith.com",
-         lastName: "Smith",
-         firstName: "Jane",
-         access_level: "user",
-      },
-      {
-         email: "mark@lee.com",
-         lastName: "Lee",
-         firstName: "Mark",
-         access_level: "admin",
-      },
-      {
-         email: "sarah@williams.com",
-         lastName: "Williams",
-         firstName: "Sarah",
-         access_level: "user",
-      },
-      {
-         email: "david@brown.com",
-         lastName: "Brown",
-         firstName: "David",
-         access_level: "admin",
-      },
-      {
-         email: "emily@johnson.com",
-         lastName: "Johnson",
-         firstName: "Emily",
-         access_level: "user",
-      },
-   ];
+   const { handleUserSearch, closeodal, openModal, headers, modalVisible } = useInternalUsers();
+   const [clients, setClients] = useState<Clients>([]);
+   const { data, isLoading, isError } = useGetInternalUserClients(2);
+
+   useEffect(() => {
+      if (data && Array.isArray(data)) {
+         const trimmedClients: Clients = data.map((client: DataInternalUser) => ({
+            id: client.id,
+            firstName: client.first_name,
+            lastName: client.last_name,
+            email: client.email,
+            accessLevel: client.access_level,
+         }));
+         setClients(trimmedClients);
+      }
+   }, [data]);
 
    return (
       <div className="relative">
@@ -87,30 +46,45 @@ export default function InternalUsers() {
                   <div className="flex justify-end">
                      <Button asChild onClick={openModal}>
                         <Plus size={15} />
-                        Add Inteneral User
+                        Add Internal User
                      </Button>
                   </div>
                </div>
             </div>
+
             <div className="mt-10 overflow-x-auto">
-               <TableBase headers={headers} isLoading={Boolean(bodyChildren === null)}>
-                  {bodyChildren.map((row, index) => {
-                     const baseCellClass = "border-color border-r";
-                     return (
-                        <TableRow key={index}>
-                           <TableCell className={`${baseCellClass}`}>{row.lastName}</TableCell>
-                           <TableCell className={`${baseCellClass}`}>{row.firstName}</TableCell>
-                           <TableCell className={`${baseCellClass}`}>{row.access_level}</TableCell>
-                           <TableCell className={`${baseCellClass}`}>{row.email}</TableCell>
-                           <TableCell className={``}>
-                              <div className="flex flex-row items-center justify-center gap-3">
-                                 <Eye size={18} className="text-gray-800 dark:text-white" />
-                                 <Trash size={18} className="text-red-700" />
-                              </div>
-                           </TableCell>
-                        </TableRow>
-                     );
-                  })}
+               <TableBase headers={headers} isLoading={isLoading} isError={isError}>
+                  {clients.length > 0
+                     ? clients.map((row, index) => {
+                          const baseCellClass = "border-color border-r";
+                          return (
+                             <TableRow key={index}>
+                                <TableCell className={baseCellClass}>{row.lastName}</TableCell>
+                                <TableCell className={baseCellClass}>{row.firstName}</TableCell>
+                                <TableCell className={baseCellClass}>{row.accessLevel}</TableCell>
+                                <TableCell className={baseCellClass}>{row.email}</TableCell>
+                                <TableCell>
+                                   <div className="flex flex-row items-center justify-center gap-3">
+                                      <Eye size={18} className="text-gray-800 dark:text-white" />
+                                      <Trash size={18} className="text-red-700" />
+                                   </div>
+                                </TableCell>
+                             </TableRow>
+                          );
+                       })
+                     : !isLoading && (
+                          <TableRow>
+                             <TableCell colSpan={headers.length}>
+                                <div className="flex flex-col items-center justify-center gap-3 py-4 text-gray-600">
+                                   No clients registered in the system yet.
+                                   <Button asChild onClick={openModal}>
+                                      <Plus size={15} />
+                                      Add Internal User
+                                   </Button>
+                                </div>
+                             </TableCell>
+                          </TableRow>
+                       )}
                </TableBase>
             </div>
          </div>

@@ -1,12 +1,21 @@
 import useInternalUsers from "@/hooks/components/useInternalUsers";
 import Button from "../general/Button";
 import { Plus } from "lucide-react";
-import AddInternalUsersApi from "@/hooks/apiHooks/useInternalUsersApi";
+import AddInternalUsersApi from "@/hooks/apiHooks/useAddInternalUsersApi";
+import { useEffect, useState } from "react";
+import useGetUserRoles from "@/hooks/apiHooks/useGetUserRoles";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import type { Roles } from "@/types";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Input } from "../ui/input";
+//import useGetUserId from "@/hooks/components/useGetUserID";
 
 function AddInternalUsersForm() {
-   const { onChangeHandler, addInternalUsersFormData } = useInternalUsers();
-   const addInternalUser = AddInternalUsersApi();
+   const { onChangeHandler, addInternalUsersFormData, setAddInternalUsersFormData } = useInternalUsers();
+   const [userRoles, setUserRoles] = useState<Roles>([]);
+   const addInternalUser = AddInternalUsersApi(2);
 
+   const { data, isLoading, isError } = useGetUserRoles();
    // Function to handle form submission
    const submitAddInternalUsersForm = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -20,6 +29,11 @@ function AddInternalUsersForm() {
       });
    };
 
+   useEffect(() => {
+      if (data && Array.isArray(data)) {
+         setUserRoles(data);
+      }
+   }, [data]);
    return (
       <form onSubmit={submitAddInternalUsersForm} method="post">
          <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -27,12 +41,11 @@ function AddInternalUsersForm() {
                <label htmlFor="" className="required">
                   First name
                </label>
-               <input
+               <Input
                   type="text"
                   required
                   onChange={onChangeHandler}
                   value={addInternalUsersFormData.firstName}
-                  className="input-default"
                   name="firstName"
                   placeholder="First name.."
                />
@@ -41,12 +54,11 @@ function AddInternalUsersForm() {
                <label htmlFor="" className="required">
                   Last name
                </label>
-               <input
+               <Input
                   type="text"
                   required
                   onChange={onChangeHandler}
                   value={addInternalUsersFormData.lastName}
-                  className="input-default"
                   name="lastName"
                   placeholder="Last Name ..."
                />
@@ -55,12 +67,11 @@ function AddInternalUsersForm() {
                <label htmlFor="" className="required">
                   Email
                </label>
-               <input
+               <Input
                   type="text"
                   required
                   onChange={onChangeHandler}
                   value={addInternalUsersFormData.email}
-                  className="input-default"
                   name="email"
                   placeholder="Email"
                />
@@ -69,16 +80,34 @@ function AddInternalUsersForm() {
                <label htmlFor="" className="required">
                   Access Level
                </label>
-               <select
-                  name="accessLevel"
-                  className="input-default"
-                  onChange={onChangeHandler}
-                  value={addInternalUsersFormData.accessLevel}
-                  id=""
-               >
-                  <option value="1">Admin</option>
-                  <option value="2">User</option>
-               </select>
+               <div className="w-full self-center">
+                  <Select
+                     disabled={isError}
+                     onValueChange={(value) => setAddInternalUsersFormData((prev) => ({ ...prev, accessLevel: value }))}
+                  >
+                     <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Role" />
+                     </SelectTrigger>
+                     <SelectContent>
+                        {isLoading ? (
+                           <SelectItem value="loading" disabled>
+                              Loading...
+                           </SelectItem>
+                        ) : (
+                           userRoles.map((role) => (
+                              <Tooltip key={role.id}>
+                                 <TooltipTrigger asChild>
+                                    <SelectItem value={String(role.id)}>{role.name}</SelectItem>
+                                 </TooltipTrigger>
+                                 <TooltipContent>
+                                    <p>{role.description}</p>
+                                 </TooltipContent>
+                              </Tooltip>
+                           ))
+                        )}
+                     </SelectContent>
+                  </Select>
+               </div>
             </div>
          </div>
          <div className="mt-6 flex w-full justify-end">

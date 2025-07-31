@@ -2,6 +2,7 @@ import { EllipsisVertical, LogOut, User } from "lucide-react";
 import Button from "./Button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useNavigate } from "react-router";
+import { removeCookie } from "typescript-cookie";
 interface SDFooter {
    username: string;
 }
@@ -10,7 +11,7 @@ function SidebarFooterContent({ username }: SDFooter) {
    const navigate = useNavigate();
 
    function logOut() {
-      localStorage.removeItem("token");
+      removeCookie("token");
       navigate("/");
    }
    return (
