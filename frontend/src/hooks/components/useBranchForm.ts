@@ -1,6 +1,6 @@
 import type { BranchPayload } from "@/interfaces/form-payloads";
 import React from "react";
-import { extractAddresses } from "@/lib/utils";
+import { extractAddresses, extractContacts } from "@/lib/utils";
 import useCreateBranch from "../apiHooks/useCreateBranch";
 
 export default function useBranchForm(companyId: number) {
@@ -16,7 +16,7 @@ export default function useBranchForm(companyId: number) {
          company: companyId,
          branch_name: data.branch_name as string,
          addresses: extractAddresses(data),
-         contacts: [],
+         contacts: extractContacts(data),
       };
 
       console.log({ branchPayload });

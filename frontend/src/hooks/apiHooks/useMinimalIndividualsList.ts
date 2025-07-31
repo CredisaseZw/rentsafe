@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { useSearchParams } from "react-router";
 import { api } from "@/api/axios";
 
-export default function useMinimalIndividualsList() {
+export default function useMinimalIndividualsList(individualQuery?: string) {
    const [searchParams] = useSearchParams();
-   const q = searchParams.get("individual_q")?.trim();
+   const q = searchParams.get("individual_q")?.trim() || individualQuery?.trim();
 
    const { data, isLoading, error } = useQuery<IndividualMinimal[]>({
       queryKey: ["individuals-minimal", q],

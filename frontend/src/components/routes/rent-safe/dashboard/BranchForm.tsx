@@ -7,6 +7,7 @@ import MultiAddressInput from "@/components/general/MultiAddressInput";
 import { Button } from "@/components/ui/button";
 import useBranchForm from "@/hooks/components/useBranchForm";
 import useCompany from "@/hooks/apiHooks/useCompany";
+import MultiContactInput from "@/components/general/MultiContactInput";
 
 export default function BranchForm({ companyId }: { companyId: number }) {
    const { showForm, isPending, handleSubmit, setShowForm } = useBranchForm(companyId);
@@ -49,6 +50,10 @@ export default function BranchForm({ companyId }: { companyId: number }) {
                         Branch Name <span className="text-PRIMARY">*</span>
                      </Label>
                      <Input id="branch_name" name="branch_name" required className="border-foreground/40 bg-white" />
+                  </div>
+
+                  <div className="col-span-3 pt-5">
+                     <MultiContactInput />
                   </div>
 
                   <div className="col-span-3 pt-5">

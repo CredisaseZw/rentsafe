@@ -1,6 +1,6 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address } from "@/interfaces";
-import type { AddressPayload } from "@/interfaces/form-payloads";
+import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
 import type { NavLink, Route } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -145,6 +145,22 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
    }
 
    return addresses;
+}
+
+export function extractContacts(data: { [k: string]: FormDataEntryValue }): ContactPayload[] {
+   const contacts: ContactPayload[] = [];
+   const contactsCount = Object.keys(data).filter((key) => key.startsWith("contact_type")).length;
+   for (let i = 1; i < contactsCount + 1; i++) {
+      const contact: ContactPayload = {
+         individual: toIntElseUndefined(data[`individual${i}`] as string)!,
+         position: data[`position${i}`] as string,
+         contact_type: data[`contact_type${i}`] as "email" | "phone" | "fax" | "other",
+         is_primary: !!data[`is_primary${i}`],
+      };
+      contacts.push(contact);
+   }
+
+   return contacts;
 }
 
 export function formatErrorMessage(error: unknown): string {
