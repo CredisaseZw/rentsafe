@@ -3,24 +3,21 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 import { useSearchParams } from "react-router";
-import type { BranchComplete } from "@/interfaces";
+import type { BranchApiResponse } from "@/interfaces";
 
 export default function useCompanyBranches() {
    const [searchParams] = useSearchParams();
    const q = searchParams.get("company_q")?.trim();
+   const page = searchParams.get("page") || "1";
 
-   const { data, isLoading, error } = useQuery<BranchComplete[]>({
-      queryKey: ["company-branches", q],
+   const { data, isLoading, error } = useQuery<BranchApiResponse>({
+      queryKey: ["company-branches", q, page],
       queryFn: () => {
-         const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
-         return api
-            .get<{
-               count: number;
-               next?: string;
-               previous?: string;
-               results: BranchComplete[];
-            }>(`/api/branches/${query}`)
-            .then((res) => res.data.results);
+         let query = q ? `search/?q=${encodeURIComponent(q)}` : "";
+         if (page) {
+            query += `&page=${page}`;
+         }
+         return api.get<BranchApiResponse>(`/api/branches/${query}`).then((res) => res.data);
       },
    });
 
@@ -31,5 +28,5 @@ export default function useCompanyBranches() {
       }
    }, [error, q]);
 
-   return { branches: data, isLoading, searchQuery: q };
+   return { data, isLoading, searchQuery: q };
 }

@@ -7,7 +7,8 @@ import useCompanyPaymentStatusTab from "@/hooks/pages/dashboard/useCompanyPaymen
 import { Button } from "@/components/ui/button";
 
 export default function CompanyPaymentStatusTab() {
-   const { rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } = useCompanyPaymentStatusTab();
+   const { paginationData, rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } =
+      useCompanyPaymentStatusTab();
 
    return (
       <div>
@@ -15,6 +16,7 @@ export default function CompanyPaymentStatusTab() {
          <BaseTable
             headers={headers}
             rows={rows}
+            paginationData={paginationData}
             isLoading={isLoading}
             tableActions={
                <div className="flex items-center justify-between gap-2">

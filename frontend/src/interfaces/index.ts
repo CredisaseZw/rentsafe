@@ -325,3 +325,13 @@ export interface BranchCreationResponse {
    addresses: Address[];
    is_headquarters: boolean;
 }
+
+export interface PaginationData {
+   count: number;
+   next?: string;
+   previous?: string;
+}
+
+export interface BranchApiResponse extends PaginationData {
+   results: BranchComplete[];
+}

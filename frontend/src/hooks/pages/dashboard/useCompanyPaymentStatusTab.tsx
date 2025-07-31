@@ -4,14 +4,15 @@ import { type BaseTableColumn, type BaseTableRow } from "@/components/general/Ba
 import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
 import { useNavigate } from "react-router";
 import BranchForm from "@/components/routes/rent-safe/dashboard/BranchForm";
+import type { PaginationData } from "@/interfaces";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const { branches, isLoading, searchQuery } = useCompanyBranches();
+   const { data, isLoading, searchQuery } = useCompanyBranches();
 
    const rows: BaseTableRow[] =
-      branches?.map((cell) => ({
+      data?.results?.map((cell) => ({
          branch: cell.branch_name,
          registration_name: cell.company?.registration_name || "",
          registration_number: cell.company?.registration_number || "",
@@ -47,7 +48,10 @@ export default function useCompanyPaymentStatusTab() {
       navigate({ search: "?" + searchParams.toString() });
    }
 
+   const paginationData = data as PaginationData;
+
    return {
+      paginationData,
       rows,
       headers,
       searchRef,
