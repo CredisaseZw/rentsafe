@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface PillProps {
    children: React.ReactNode;
-   variant: string;
+   variant: "success" | "primary" | "danger" | "warning";
    className?: string;
 }
 
@@ -19,7 +19,13 @@ Pill.defaultProps = {
 };
 function Pill({ variant, children, className }: PillProps) {
    return (
-      <div className={cn("inline-block rounded-full px-3 py-1 text-sm font-medium", variants[variant], className)}>
+      <div
+         className={cn(
+            "inline-block h-fit self-center rounded-full px-3 py-1 text-sm font-medium",
+            variants[variant],
+            className,
+         )}
+      >
          {children}
       </div>
    );
