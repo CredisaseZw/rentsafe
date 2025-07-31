@@ -3,6 +3,7 @@ import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
 import { useNavigate } from "react-router";
+import BranchForm from "@/components/routes/rent-safe/dashboard/BranchForm";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
@@ -13,7 +14,12 @@ export default function useCompanyPaymentStatusTab() {
    const rows: BaseTableRow[] =
       companies?.map((cell) => ({
          ...cell,
-         select: <CompanyPaymentStatusReport companyId={cell.id} />,
+         select: (
+            <div className="flex items-center gap-2">
+               <BranchForm companyId={cell.id} />
+               <CompanyPaymentStatusReport companyId={cell.id} />
+            </div>
+         ),
       })) || [];
 
    const headers: BaseTableColumn[] = [

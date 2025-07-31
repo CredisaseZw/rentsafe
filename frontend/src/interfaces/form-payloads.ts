@@ -68,3 +68,15 @@ export interface IndividualPayload {
       physical_address?: string;
    }[];
 }
+
+export interface BranchPayload {
+   company: number;
+   branch_name: string;
+   addresses: AddressPayload[];
+   contacts: {
+      individual: number;
+      contact_type: string;
+      is_primary: boolean;
+      position: string;
+   }[];
+}

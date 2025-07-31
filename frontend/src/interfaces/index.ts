@@ -302,3 +302,11 @@ export interface ProvinceWithCities extends Province {
 export interface CityWithSuburbs extends City {
    suburbs: SuburbMinimal[];
 }
+
+export interface BranchCreationResponse {
+   id: number;
+   company: number;
+   branch_name: string;
+   addresses: Address[];
+   is_headquarters: boolean;
+}
