@@ -8,7 +8,13 @@ import {
 } from "@/components/ui/pagination";
 import type { PaginationData } from "@/interfaces";
 
-export default function TablePagination({ paginationData }: { paginationData: PaginationData }) {
+export default function TablePagination({
+   paginationData,
+   paginationName,
+}: {
+   paginationData: PaginationData;
+   paginationName: string;
+}) {
    const nextPage = paginationData?.next ? new URL(paginationData.next).searchParams.get("page") : null;
    const previousPage = paginationData?.previous ? new URL(paginationData.previous).searchParams.get("page") : null;
    const currentPage = nextPage ? parseInt(nextPage) - 1 : previousPage ? parseInt(previousPage) + 1 : 1;
@@ -18,7 +24,7 @@ export default function TablePagination({ paginationData }: { paginationData: Pa
          <PaginationContent>
             {paginationData?.previous && (
                <PaginationItem>
-                  <PaginationPrevious to={{ search: `?page=${previousPage}` }} />
+                  <PaginationPrevious to={{ search: `?${paginationName}=${previousPage}` }} />
                </PaginationItem>
             )}
 
@@ -31,7 +37,7 @@ export default function TablePagination({ paginationData }: { paginationData: Pa
 
             {paginationData?.next && (
                <PaginationItem>
-                  <PaginationNext to={{ search: `?page=${nextPage}` }} />
+                  <PaginationNext to={{ search: `?${paginationName}=${nextPage}` }} />
                </PaginationItem>
             )}
          </PaginationContent>

@@ -17,6 +17,7 @@ export default function CompanyPaymentStatusTab() {
             headers={headers}
             rows={rows}
             paginationData={paginationData}
+            paginationName="company_page"
             isLoading={isLoading}
             tableActions={
                <div className="flex items-center justify-between gap-2">

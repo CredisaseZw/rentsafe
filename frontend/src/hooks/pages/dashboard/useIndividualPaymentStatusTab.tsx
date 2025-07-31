@@ -3,15 +3,15 @@ import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboa
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
 import { useNavigate } from "react-router";
 import useMinimalIndividualsList from "@/hooks/apiHooks/useMinimalIndividualsList";
-import type { IndividualMinimal } from "@/interfaces";
+import type { IndividualMinimal, PaginationData } from "@/interfaces";
 
 export default function useIndividualPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const { individuals, isLoading, searchQuery } = useMinimalIndividualsList();
+   const { data, isLoading, searchQuery } = useMinimalIndividualsList();
 
    const rows: BaseTableRow[] =
-      (individuals as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => ({
+      (data?.results as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => ({
          ...cell,
          select: <IndividualPaymentStatusReport individualId={cell.id} />,
       })) || [];
@@ -38,6 +38,7 @@ export default function useIndividualPaymentStatusTab() {
       searchParams.delete("individual_q");
       navigate({ search: "?" + searchParams.toString() });
    }
+   const paginationData = data as PaginationData;
 
    return {
       rows,
@@ -45,6 +46,7 @@ export default function useIndividualPaymentStatusTab() {
       searchRef,
       isLoading,
       searchQuery,
+      paginationData,
       clearSearch,
       handleSearch,
    };

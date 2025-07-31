@@ -8,16 +8,18 @@ import type { BranchApiResponse } from "@/interfaces";
 export default function useCompanyBranches() {
    const [searchParams] = useSearchParams();
    const q = searchParams.get("company_q")?.trim();
-   const page = searchParams.get("page") || "1";
+   const page = searchParams.get("company_page") || "1";
+   console.log({ page });
 
    const { data, isLoading, error } = useQuery<BranchApiResponse>({
       queryKey: ["company-branches", q, page],
       queryFn: () => {
-         let query = q ? `search/?q=${encodeURIComponent(q)}` : "";
-         if (page) {
-            query += `&page=${page}`;
-         }
-         return api.get<BranchApiResponse>(`/api/branches/${query}`).then((res) => res.data);
+         const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
+         return api
+            .get<BranchApiResponse>(
+               `/api/branches/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`,
+            )
+            .then((res) => res.data);
       },
    });
 

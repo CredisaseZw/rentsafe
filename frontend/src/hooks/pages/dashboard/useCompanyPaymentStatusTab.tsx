@@ -51,12 +51,12 @@ export default function useCompanyPaymentStatusTab() {
    const paginationData = data as PaginationData;
 
    return {
-      paginationData,
       rows,
       headers,
       searchRef,
       isLoading,
       searchQuery,
+      paginationData,
       clearSearch,
       handleSearch,
    };

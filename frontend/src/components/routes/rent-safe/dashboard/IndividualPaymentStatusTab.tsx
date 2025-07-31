@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function IndividualPaymentStatusTab() {
-   const { rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } =
+   const { rows, headers, isLoading, searchRef, searchQuery, paginationData, clearSearch, handleSearch } =
       useIndividualPaymentStatusTab();
 
    return (
@@ -17,6 +17,8 @@ export default function IndividualPaymentStatusTab() {
             headers={headers}
             rows={rows}
             isLoading={isLoading}
+            paginationData={paginationData}
+            paginationName="individual_page"
             tableActions={
                <div className="flex items-center justify-between gap-2">
                   <form

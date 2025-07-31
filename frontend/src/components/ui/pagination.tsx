@@ -24,7 +24,13 @@ function PaginationContent({ className, ...props }: React.ComponentProps<"ul">) 
 }
 
 function PaginationItem({ ...props }: React.ComponentProps<"li">) {
-   return <li data-slot="pagination-item" {...props} />;
+   return (
+      <li
+         data-slot="pagination-item"
+         className={cn("text-PRIMARY/70 hover:text-PRIMARY", props.className)}
+         {...props}
+      />
+   );
 }
 
 type PaginationLinkProps = {

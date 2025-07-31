@@ -22,6 +22,7 @@ type BaseTableProps = {
    titleClassName?: string;
    isLoading?: boolean;
    paginationData: PaginationData;
+   paginationName: string;
 };
 
 export default function BaseTable({
@@ -32,6 +33,7 @@ export default function BaseTable({
    tableActions,
    isLoading,
    paginationData,
+   paginationName,
 }: BaseTableProps) {
    const mappableRows = data;
 
@@ -96,7 +98,7 @@ export default function BaseTable({
                </TableBody>
             </Table>
 
-            <TablePagination paginationData={paginationData} />
+            <TablePagination paginationData={paginationData} paginationName={paginationName} />
          </div>
       </BaseCard>
    );

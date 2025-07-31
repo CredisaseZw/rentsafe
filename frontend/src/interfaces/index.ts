@@ -335,3 +335,7 @@ export interface PaginationData {
 export interface BranchApiResponse extends PaginationData {
    results: BranchComplete[];
 }
+
+export interface IndividualApiResponse extends PaginationData {
+   results: IndividualMinimal[];
+}

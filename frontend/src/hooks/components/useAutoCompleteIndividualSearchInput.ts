@@ -7,14 +7,14 @@ export default function useAutoCompleteIndividualSearchInput() {
    const [open, setOpen] = React.useState(false);
    const [query, setQuery] = React.useState("");
    const [selectedIndividual, setSelectedIndividual] = React.useState<null | IndividualMinimal>(null);
-   const { individuals, isLoading } = useMinimalIndividualsList(query);
+   const { data, isLoading } = useMinimalIndividualsList(query);
 
    return {
       open,
       query,
       isLoading,
       inputRef,
-      individuals,
+      individuals: data?.results,
       selectedIndividual,
       setOpen,
       setQuery,
