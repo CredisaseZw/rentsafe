@@ -36,9 +36,9 @@ def download_excel_template(request):
     headers = [
         "First Name*", "Last Name*", "Date of Birth (YYYY-MM-DD)",
         "Gender", "Identification Type*", "Identification Number*", 
-        "Marital Status","date Of Birth", "Phone Number*", "Email Address", "Address Type",
+        "Marital Status", "Phone Number*", "Email Address", "Address Type",
         "House/Flat Number", "Building/Complex Name", "Street Number*", 
-        "Street Name*","Suburb", "City/Town*", "Province", "Country", "Area Code", 
+        "Street Name*","Suburb", "City/Town*", "Province", "Country", "Postal Code", 
         "Current Employer", "Job Title", "Date Of Employment (YYYY-MM-DD)"
     ]
     ws.append(headers)
@@ -60,7 +60,7 @@ def download_excel_template(request):
         hidden[f"D{i}"] = val
 
     lookup_sheet = wb.create_sheet(title='Address-Lookups')
-    lookup_sheet.append(["Suburb", "City", "Province", "Country", "Area-Code"])
+    lookup_sheet.append(["Suburb", "City", "Province", "Country"])
     
     suburbs = Suburb.objects.select_related("city__province__country")
     for i, suburb in enumerate(suburbs, start=2):
@@ -69,10 +69,10 @@ def download_excel_template(request):
             suburb.city.name,
             suburb.city.province.name,
             suburb.city.province.country.name,
-            print("Total suburbs found:", suburbs.count())
         ])    
+    print("Total suburbs found:", suburbs.count())
     # Named range for suburb list
-    suburb_range = f"{quote_sheetname('AddressLookup')}!$A$2:$A${len(suburbs)+1}"
+    suburb_range = f"{quote_sheetname('Address-Lookups')}!$A$2:$A${len(suburbs)+1}"
     dn = DefinedName(name="SuburbList", attr_text=suburb_range)
     wb.defined_names.add(dn)
     
@@ -93,14 +93,15 @@ def download_excel_template(request):
     id_dv.add("E2:E100")
     marital_dv.add("G2:G100")
     address_type_dv.add("K2:K100")
-    suburb_dv.add("P1:P100")
+    suburb_dv.add("P2:P100")
     
-        # Auto-fill lookup formulas for city, province, country
+    # Auto-fill lookup formulas for city, province, country
+
     for row in range(2, 101):
-        ws[f"Q{row}"] = f'=IFERROR(VLOOKUP(P{row}, AddressLookup!$A$2:$E${len(suburbs)+1}, 2, FALSE), "")'
-        ws[f"R{row}"] = f'=IFERROR(VLOOKUP(P{row}, AddressLookup!$A$2:$E${len(suburbs)+1}, 3, FALSE), "")'
-        ws[f"S{row}"] = f'=IFERROR(VLOOKUP(P{row}, AddressLookup!$A$2:$E${len(suburbs)+1}, 4, FALSE), "")'
-        ws[f"T{row}"] = f'=IFERROR(VLOOKUP(P{row}, AddressLookup!$A$2:$E${len(suburbs)+1}, 5, FALSE), "")'
+        ws[f"Q{row}"] = f'=IFERROR(VLOOKUP(P{row}, \'Address-Lookups\'!$A$2:$D${len(suburbs)+1}, 2, FALSE), "")'
+        ws[f"R{row}"] = f'=IFERROR(VLOOKUP(P{row}, \'Address-Lookups\'!$A$2:$D${len(suburbs)+1}, 3, FALSE), "")'
+        ws[f"S{row}"] = f'=IFERROR(VLOOKUP(P{row}, \'Address-Lookups\'!$A$2:$D${len(suburbs)+1}, 4, FALSE), "")'
+        
 
 
     hidden.sheet_state = 'hidden'

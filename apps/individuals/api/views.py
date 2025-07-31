@@ -10,7 +10,7 @@ from apps.individuals.api.serializers import (IndividualSerializer , IndividualU
 from apps.individuals.models import Individual
 from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
-from apps.individuals.services.tasks import create_individual_background
+from apps.individuals.services.tasks import process_individuals_excel, process_individuals_csv
 import logging
 
 logger = logging.getLogger("individuals")
@@ -216,11 +216,27 @@ class IndividualViewSet(BaseViewSet):
             logger.error(f"Error retrieving individual details {pk}: {e}")
             return Response({"error": "Failed to retrieve individual details"}, status=status.HTTP_400_BAD_REQUEST)
 
-def bulk_upload_individuals(request):
-    if request.method =='POST' and request.FILES.get('file'):
-        file =  request.FILES['file']
-        ext= file.name.split('.')[-1].lower()
-        
-        ...
 
+class BulkUpload(BaseViewSet):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        file =  request.FILES.get['file']
+        if not file:
+            return Response({'error': 'No file selected'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        import tempfile
+
+        ext= file.name.split('.')[-1].lower()
+        if ext not in ['xlsx', 'csv']:
+            return Response({'error': 'Unsupported file type. Please upload .csv or .xlsx '}, status=status.HTTP_400_BAD_REQUEST)
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+            for chunk in file.chunks():
+                tmp.write(chunk)
+            tmp_path = tmp.name
+
+        if ext == 'csv':
+            process_individuals_csv.delay(tmp_path)
+        elif ext == 'xlsx':
+            process_individuals_excel.delay(tmp_path)
             
