@@ -1,4 +1,3 @@
-
 # apps/companies/tasks.py
 import re
 import csv
@@ -10,10 +9,11 @@ from django.conf import settings
 from django.db import transaction
 from openpyxl import load_workbook
 from django.http import HttpResponse
+from django.core.exceptions import ValidationError
 from apps.common.models.models import Address, Suburb
 from apps.common.services.tasks import send_notification
 from django.contrib.contenttypes.models import ContentType
-from apps.individuals.services.validators import validate_email, validate_national_id
+from apps.individuals.services.validators import validate_email, validate_national_id, normalize_zimbabwe_mobile
 from apps.individuals.models.models import Individual, IndividualContactDetail,NextOfKin,EmploymentDetail
 
 logger = logging.getLogger('individuals')
@@ -118,32 +118,37 @@ def create_individual_background(self,individual_data: dict, user_id:int, reques
             'error': str(exc)
         }
 
-def parse_date(value):
-    if not value or str(value).strip() == "":
-        return None
-    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
-        try:
-            return datetime.strptime(str(value).strip(), fmt).date()
-        except ValueError:
-            continue
-    return None
-
-    
 @shared_task
 def process_individuals_csv(file_path):
-    with open(file_path,newline='', encoding='utf-8') as csv_file:
+    import os
+
+    def parse_date(value):
+        if not value or str(value).strip() == "":
+            return None
+        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+            try:
+                return datetime.strptime(str(value).strip(), fmt).date()
+            except ValueError:
+                continue
+        return None
+
+    with open(file_path, newline='', encoding='utf-8') as csv_file:
         reader = csv.reader(csv_file)
         headers = next(reader)
 
         skipped_rows = []
         created_rows = []
-        valid_national_id= False
-        
-        # individual_ct = ContentType.objects.get_for_model(individual)
-        
+
         for row in reader:
             if not any(row):
                 continue
+
+            errors = []
+
+            if len(row) < 22:
+                skipped_rows.append(row + ["Row too short"])
+                continue
+
             first_name = row[0].strip()
             last_name = row[1].strip()
             dob = parse_date(row[2].strip())
@@ -151,7 +156,7 @@ def process_individuals_csv(file_path):
             id_type = row[4].strip().lower()
             id_number = row[5].strip().upper()
             marital_status = row[6].strip()
-            phone = row[7]
+            phone = row[7].strip()
             email = row[8].strip()
             address_type = row[9].strip()
             house_number = row[10].strip()
@@ -167,108 +172,127 @@ def process_individuals_csv(file_path):
             job_title = row[20].strip()
             employment_date = parse_date(row[21].strip())
 
-            errors= []
-
-            # check validations
+            # Required fields check
             if not first_name or not last_name or not dob or not id_number:
-                skipped_rows.append(row)
-                continue
-            
-            #Validate national id number
+                errors.append("Missing required fields")
+
+            # Duplicate check
+            if Individual.objects.filter(identification_number=id_number).exists():
+                errors.append("Individual with this Identification number already exists.")
+
+            # Validate national id or passport
+            valid_national_id = False
             national_id_list = ["nationalid", "national id", "national_id"]
-            if id_type.lower().strip() in national_id_list:
-                id_type = "nationalid"
-                if id_number == "":
+            if id_type in national_id_list:
+                id_type = "national_id"
+                if not id_number:
                     errors.append("Missing identification number")
                 else:
-                    valid_id_format = validate_national_id(id_number)
-                    if valid_id_format:
+                    try:
+                        validate_national_id(id_number, "zimbabwe")
                         valid_national_id = True
-                    else:
-                        errors.append("Invalid national ID")
-            elif id_type.lower().strip() == "passport":
+                    except (ValidationError, ValueError) as e:
+                        errors.append(str(e))
+            elif id_type == "passport":
                 id_type = "passport"
                 valid_national_id = True
             else:
                 errors.append("Invalid identification type")
-            
-            #validate and format phone number
-            if re.match(r"^7\d{8}$", phone):
-                phone = f"2637{phone[1:]}"
-            elif phone.startswith("263") and len(phone) == 12:
-                phone = phone
+
+            #validate phone 
+            normalized_phone = normalize_zimbabwe_mobile(phone)
+            if normalized_phone:
+                phone = normalized_phone
             else:
                 errors.append("Invalid mobile number")
-            
-            #validate email
+
+            # Validate email
             if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
-                email = email  
+                email = email
             else:
                 errors.append("Invalid Email address")
 
-            if valid_national_id:
-                # Create Individual
-                individual = Individual.objects.create(
-                    first_name=first_name,
-                    last_name=last_name,
-                    date_of_birth=dob,
-                    gender=gender,
-                    identification_type=id_type,
-                    identification_number=id_number,
-                    marital_status=marital_status,
-                )
-                # Create contact info
-                IndividualContactDetail.objects.create(
-                    individual= individual,
-                    mobile_phone=phone,
-                    email= email
-                )
+            if not errors and valid_national_id:
+                try:
+                    # Create Individual
+                    individual = Individual.objects.create(
+                        first_name=first_name,
+                        last_name=last_name,
+                        date_of_birth=dob,
+                        gender=gender,
+                        identification_type=id_type,
+                        identification_number=id_number,
+                        marital_status=marital_status,
+                    )
+                    # Create contact info
+                    IndividualContactDetail.objects.create(
+                        individual=individual,
+                        mobile_phone=phone,
+                        email=email
+                    )
+                    # Create employment info
+                    EmploymentDetail.objects.create(
+                        individual=individual,
+                        employer_name=employer,
+                        job_title=job_title,
+                        start_date=employment_date,
+                    )
+                    # Get or create Suburb
+                    suburb, _ = Suburb.objects.get_or_create(
+                        name=suburb_name,
+                        city__name=city,
+                        city__province__name=province,
+                        city__province__country__name=country
+                    )
+                    # Create Address
+                    Address.objects.create(
+                        content_object=individual,
+                        object_id=individual.pk,
+                        address_type=address_type,
+                        street_address=house_number,
+                        line_2=building,
+                        # street_number=street_number,
+                        # street_name=street_name,
+                        suburb=suburb,
+                        postal_code=postal_code,
+                    )
 
-                # Create employment info
-                EmploymentDetail.objects.create(
-                    individual= individual,
-                    current_employer=employer,
-                    job_title=job_title,
-                    date_of_employment=employment_date,
-                )
-
-                # Get or create Suburb
-                suburb, _ = Suburb.objects.get_or_create(
-                    name=suburb_name,
-                    city__name=city,
-                    city__province__name=province,
-                    city__province__country__name=country
-                )
-
-                # Create Address
-                Address.objects.create(
-                    content_object=individual,
-                    object_id=individual.pk,
-                    address_type=address_type,
-                    house_number=house_number,
-                    building_name=building,
-                    street_number=street_number,
-                    street_name=street_name,
-                    suburb=suburb,
-                
-                    postal_code=postal_code,
-                )
-
-            if errors:
+                    created_rows += 1
+                except Exception as e:
+                    errors.append(str(e))
+                    skipped_rows.append(row + [", ".join(errors)])
+            else:
                 skipped_rows.append(row + [", ".join(errors)])
-                continue
 
+        # Write errors to file if any
+        import os
+
+        errors_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "errors")
+        os.makedirs(errors_dir, exist_ok=True)
         if skipped_rows:
-            with open('errors.csv','w', newline='') as f:
+            error_file_path = os.path.join(errors_dir, f"errors_{os.path.basename(file_path)}")
+            with open(error_file_path, 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(['First Name', 'Last Name', 'Date Of Birth', 'Gender', 'Identification Type', 'ID Number', 'Marital Status', 'Phone Number', 'Email Address', 'Errors '])
-                writer.writerow(skipped_rows)
-
-
-            with open('errors.csv', 'rb') as f:
-                response = HttpResponse(f.read(), content_type='text/csv')
-                response['Content-Disposition'] = 'attachment; filename="errors.csv"'
-                return response
+                writer.writerow([
+                    'First Name', 'Last Name', 'Date Of Birth', 'Gender', 'Identification Type', 'ID Number',
+                    'Marital Status', 'Phone Number', 'Email Address', 'Address Type', 'House/Flat Number',
+                    'Building/Complex Name', 'Street Number', 'Street Name', 'Suburb', 'City/Town', 'Province',
+                    'Country', 'Postal Code', 'Current Employer', 'Job Title', 'Date Of Employment', 'Errors'
+                ])
+                for row in skipped_rows:
+                    writer.writerow(row)
+            return {
+                "status": "completed_with_errors",
+                "created": len(created_rows),
+                "skipped": len(skipped_rows),
+                "error_file": error_file_path
+            }
+        else:
+            return {
+                "status": "completed",
+                "created": len(created_rows),
+                "skipped": 0
+            }
                         
 
 @shared_task

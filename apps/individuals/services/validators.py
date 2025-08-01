@@ -33,7 +33,7 @@ def validate_national_id(national_id, country):
     if not pattern:
         raise ValueError(f"No national ID validation pattern for {country}")
     
-    national_id_clean = national_id.strip().upper()
+    national_id_clean = national_id.strip().upper().replace(" ", "").replace("-","")
 
     if not re.match(pattern, national_id_clean):
         raise ValidationError(f"Invalid national ID for {country}: {national_id_clean}")
@@ -93,6 +93,22 @@ def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(pattern,email):
         raise ValueError("Invalid email address")
+
+def normalize_zimbabwe_mobile(phone):
+    phone = phone.strip().replace(" ", "").replace("-", "")
+    # Remove leading +
+    if phone.startswith("+"):
+        phone = phone[1:]
+    # Remove leading 0
+    if phone.startswith("0"):
+        phone = phone[1:]
+    # Remove leading 263 if present
+    if phone.startswith("263"):
+        phone = phone[3:]
+    # Now should start with 7 and be 8 digits
+    if re.match(r"^7\d{8}$", phone):
+        return f"+263{phone}"
+    return None
 
 # def validate_zimbabwean_phone(phone):  
 #     # Step 1: Clean input  

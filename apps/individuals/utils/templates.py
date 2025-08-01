@@ -13,17 +13,24 @@ def download_csv_template(request):
     response['Content-Disposition'] = 'attachment; filename="individual_template.csv"'    
     writer = csv.writer(response)
 
-    writer.writerow(["First Name*", "Last Name*", "Identification Type*", 
-                     "ID Number*", "Marital Status", "date Of Birth", 
-                     "Phone Number*", "Email Address","Address Type", "House/Flat Number", 
-                     "Building/Complex Name", "Street Number*", "Street Name*", 
-                     "City/Town*", "Province", "Country", "Area Code", "Current Employer", 
-                     "Job Title", "Date Of Employment"])
     writer.writerow([
-        "John", "Doe", "National ID", "63-1234567-A-00",
-        "Married", "1985-07-15", "+263712345678", "john.doe@example.com","physical",
-        "12B", "Greenwood Heights", "102", "Kwame Nkrumah Ave", "Bulawayo",
-        "Bulawayo", "Zimbabwe", "00263","Tech Solutions", "Software Engineer", "2010-05-20"
+        "First Name*", "Last Name*", "Date Of Birth*", "Gender*",
+        "Identification Type*", "ID Number*", "Marital Status",
+        "Phone Number*", "Email Address", "Address Type",
+        "House/Flat Number", "Building/Complex Name", "Street Number*",
+        "Street Name*", "Suburb", "City/Town*", "Province",
+        "Country", "Postal Code", "Current Employer",
+        "Job Title", "Date Of Employment"
+    ])
+
+    writer.writerow([
+        "John", "Doe", "1985-07-15", "Male",
+        "National ID", "63-1234567-A-00", "Married",
+        "+263712345678", "john.doe@example.com", "physical",
+        "12B", "Greenwood Heights", "102",
+        "Kwame Nkrumah Ave", "Suburbs", "Bulawayo", "Bulawayo",
+        "Zimbabwe", "00263", "Tech Solutions",
+        "Software Engineer", "2010-05-20"
     ])
     return response
 
