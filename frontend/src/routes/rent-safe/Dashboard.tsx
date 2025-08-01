@@ -23,7 +23,7 @@ export default function Dashboard() {
 
    return (
       <Tabs defaultValue={tabs[0].value}>
-         <TabsList className="border-foreground dark:bg-foreground/20 mx-auto mb-5 h-fit gap-3 rounded-md bg-white p-3 shadow-md">
+         <TabsList className="border-color dim-card mx-auto mb-5 h-fit gap-3 rounded-md border p-3 shadow-md">
             {tabs.map((tab) => (
                <TabsTrigger
                   key={tab.value}
@@ -36,7 +36,7 @@ export default function Dashboard() {
             ))}
          </TabsList>
 
-         <div className="dark:bg-foreground/20 rounded-md bg-white p-4 shadow-md">
+         <div className="main-sm-card rounded-md p-4 shadow-md">
             {tabs.map((tab) => (
                <TabsContent key={tab.value} value={tab.value}>
                   {tab.content}

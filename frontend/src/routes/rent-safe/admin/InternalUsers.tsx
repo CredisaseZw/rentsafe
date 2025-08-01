@@ -72,7 +72,8 @@ export default function InternalUsers() {
                              </TableRow>
                           );
                        })
-                     : !isLoading && (
+                     : !isLoading &&
+                       clients.length == 0 && (
                           <TableRow>
                              <TableCell colSpan={headers.length}>
                                 <div className="flex flex-col items-center justify-center gap-3 py-4 text-gray-600">
