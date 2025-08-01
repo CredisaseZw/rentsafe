@@ -190,7 +190,7 @@ export default function IndividualPaymentStatusReport({ individualId }: { indivi
                         >
                            <div>{employment.employer}</div>
                            <div>{employment.position}</div>
-                           <div>{friendlyDate(new Date(employment.startDate))}</div>
+                           <div>{employment.startDate ? friendlyDate(new Date(employment.startDate)) : "N/A"}</div>
                         </div>
                      ))}
                   </div>

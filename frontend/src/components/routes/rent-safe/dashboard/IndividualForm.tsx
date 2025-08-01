@@ -1,33 +1,38 @@
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Button from "@/components/general/Button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useIndividualForm from "@/hooks/components/useIndividualForm";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export default function IndividualForm() {
-   const { handleSubmit } = useIndividualForm();
+   const { showForm, isPending, handleSubmit, setShowForm } = useIndividualForm();
 
    return (
-      <Dialog modal>
+      <Dialog
+         modal
+         open={showForm}
+         onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
+      >
          <DialogTrigger asChild>
-            <Button asChild>
-               Add New Individual <Plus size={15} />
+            <Button>
+               Add New Individual <Plus />
             </Button>
          </DialogTrigger>
 
          <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Individual</DialogTitle>
 
-            <form onSubmit={handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
+            <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
                <div className="grid grid-cols-3 items-center gap-5">
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="surname">
-                        Surname <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal" htmlFor="lastName">
+                        Last Name <span className="text-PRIMARY">*</span>
                      </Label>
-                     <Input id="surname" name="surname" required className="border-foreground/40 bg-white" />
+                     <Input id="lastName" name="lastName" required className="border-foreground/40 bg-white" />
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -46,7 +51,7 @@ export default function IndividualForm() {
                            <SelectValue placeholder="Identification type" />
                         </SelectTrigger>
                         <SelectContent>
-                           <SelectItem value="national-id">National ID</SelectItem>
+                           <SelectItem value="national_id">National ID (ZW only)</SelectItem>
                            <SelectItem value="passport">Passport</SelectItem>
                         </SelectContent>
                      </Select>
@@ -66,9 +71,9 @@ export default function IndividualForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="gender">
-                        Gender
+                        Gender <span className="text-PRIMARY">*</span>
                      </Label>
-                     <Select name="gender">
+                     <Select name="gender" required>
                         <SelectTrigger id="gender" className="border-foreground/40 w-full bg-white">
                            <SelectValue placeholder="Gender" />
                         </SelectTrigger>
@@ -82,16 +87,22 @@ export default function IndividualForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="dateOfBirth">
-                        Date Of Birth
+                        Date Of Birth <span className="text-PRIMARY">*</span>
                      </Label>
-                     <Input id="dateOfBirth" name="dateOfBirth" type="date" className="border-foreground/40 bg-white" />
+                     <Input
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        required
+                        type="date"
+                        className="border-foreground/40 bg-white"
+                     />
                   </div>
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="maritalStatus">
-                        Marital Status
+                        Marital Status <span className="text-PRIMARY">*</span>
                      </Label>
-                     <Select name="maritalStatus">
+                     <Select name="maritalStatus" required>
                         <SelectTrigger id="maritalStatus" className="border-foreground/40 w-full bg-white">
                            <SelectValue placeholder="Marital Status" />
                         </SelectTrigger>
@@ -104,12 +115,12 @@ export default function IndividualForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="mobileNumber">
-                        Mobile Number <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal" htmlFor="mobilePhone">
+                        Mobile Phone <span className="text-PRIMARY">*</span>
                      </Label>
                      <Input
-                        id="mobileNumber"
-                        name="mobileNumber"
+                        id="mobilePhone"
+                        name="mobilePhone"
                         required
                         placeholder="e.g. +263 712 345678"
                         className="border-foreground/40 bg-white"
@@ -117,12 +128,12 @@ export default function IndividualForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="emailAddress">
+                     <Label className="px-2 font-normal" htmlFor="email">
                         Email Address
                      </Label>
                      <Input
-                        id="emailAddress"
-                        name="emailAddress"
+                        id="email"
+                        name="email"
                         type="email"
                         placeholder="e.g. info@company.com"
                         className="border-foreground/40 bg-white"
@@ -141,37 +152,74 @@ export default function IndividualForm() {
 
                         <div className="mt-5 grid grid-cols-3 items-center gap-5">
                            <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="currentEmployer">
-                                 Current Employer
+                              <Label className="px-2 font-normal" htmlFor="employerName">
+                                 Employer Name
                               </Label>
                               <Input
-                                 id="currentEmployer"
-                                 name="currentEmployer"
+                                 id="employerName"
+                                 name="employerName"
                                  placeholder="e.g. ABC Corp"
                                  className="border-foreground/40 bg-white"
                               />
                            </div>
 
                            <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="currentJobTitle">
-                                 Current Job Title
+                              <Label className="px-2 font-normal" htmlFor="jobTitle">
+                                 Job Title
                               </Label>
                               <Input
-                                 id="currentJobTitle"
-                                 name="currentJobTitle"
+                                 id="jobTitle"
+                                 name="jobTitle"
                                  placeholder="e.g. Software Engineer"
                                  className="border-foreground/40 bg-white"
                               />
                            </div>
 
                            <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="dateOfEmployment">
-                                 Date of Employment
+                              <Label className="px-2 font-normal" htmlFor="startDate">
+                                 Start Date
                               </Label>
                               <Input
-                                 id="dateOfEmployment"
-                                 name="dateOfEmployment"
+                                 id="startDate"
+                                 name="startDate"
                                  type="date"
+                                 max={new Date().toISOString().split("T")[0]}
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
+
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="endDate">
+                                 End Date
+                              </Label>
+                              <Input
+                                 id="endDate"
+                                 name="endDate"
+                                 type="date"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
+
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="employerEmail">
+                                 Email Address
+                              </Label>
+                              <Input
+                                 id="employerEmail"
+                                 name="employerEmail"
+                                 type="email"
+                                 className="border-foreground/40 bg-white"
+                              />
+                           </div>
+
+                           <div className="flex flex-col gap-2">
+                              <Label className="px-2 font-normal" htmlFor="monthlyIncome">
+                                 Monthly Income
+                              </Label>
+                              <Input
+                                 id="monthlyIncome"
+                                 name="monthlyIncome"
+                                 type="number"
                                  className="border-foreground/40 bg-white"
                               />
                            </div>
@@ -181,7 +229,15 @@ export default function IndividualForm() {
                </div>
 
                <div className="mt-10 text-right">
-                  <Button type="submit">Add Individual</Button>
+                  <Button disabled={isPending} type="submit">
+                     {isPending ? (
+                        <>
+                           <Loader2 className="animate-spin" /> Adding Individual...
+                        </>
+                     ) : (
+                        "Add Individual"
+                     )}
+                  </Button>
                </div>
             </form>
          </DialogContent>

@@ -23,21 +23,20 @@ export default function Dashboard() {
 
    return (
       <Tabs defaultValue={tabs[0].value}>
-         <div className="flex w-full items-center justify-center">
-            <TabsList className="border-foreground card mb-5 h-fit gap-3 p-1">
-               {tabs.map((tab) => (
-                  <TabsTrigger
-                     key={tab.value}
-                     value={tab.value}
-                     className={`border-color cursor-pointer border px-4 py-2 text-gray-800 transition-none hover:bg-gray-100 data-[state=active]:bg-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md dark:text-white hover:dark:bg-zinc-900 data-[state=active]:dark:bg-zinc-900`}
-                  >
-                     <tab.icon />
-                     {tab.label}
-                  </TabsTrigger>
-               ))}
-            </TabsList>
-         </div>
-         <div className="main-sm-card">
+         <TabsList className="border-foreground dark:bg-foreground/20 mx-auto mb-5 h-fit gap-3 rounded-md bg-white p-3 shadow-md">
+            {tabs.map((tab) => (
+               <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className={`border-color cursor-pointer border px-4 py-2 text-gray-800 transition-none hover:bg-gray-100 data-[state=active]:bg-gray-800 data-[state=active]:text-white dark:text-white hover:dark:bg-zinc-900 data-[state=active]:dark:bg-zinc-900`}
+               >
+                  <tab.icon />
+                  {tab.label}
+               </TabsTrigger>
+            ))}
+         </TabsList>
+
+         <div className="dark:bg-foreground/20 rounded-md bg-white p-4 shadow-md">
             {tabs.map((tab) => (
                <TabsContent key={tab.value} value={tab.value}>
                   {tab.content}

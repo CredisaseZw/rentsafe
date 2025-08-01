@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import LoadingIndicator from "./LoadingIndicator";
 import BaseCard from "./BaseCard";
 import { cn } from "@/lib/utils";
+import TablePagination from "./TablePagination";
+import type { PaginationData } from "@/interfaces";
 
 export type BaseTableColumn = {
    name: string;
@@ -19,6 +21,8 @@ type BaseTableProps = {
    title?: string;
    titleClassName?: string;
    isLoading?: boolean;
+   paginationData: PaginationData;
+   paginationName: string;
 };
 
 export default function BaseTable({
@@ -28,6 +32,8 @@ export default function BaseTable({
    rows: data,
    tableActions,
    isLoading,
+   paginationData,
+   paginationName,
 }: BaseTableProps) {
    const mappableRows = data;
 
@@ -91,6 +97,8 @@ export default function BaseTable({
                   )}
                </TableBody>
             </Table>
+
+            <TablePagination paginationData={paginationData} paginationName={paginationName} />
          </div>
       </BaseCard>
    );
