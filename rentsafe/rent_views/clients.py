@@ -3677,7 +3677,8 @@ def client_leases_new(request,leases_type=None):
 
         if i.is_company:
             if company_ob := Company.objects.filter(id=i.reg_ID_Number).first():
-                name, trading_name = company_ob.registration_name, company_ob.trading_name
+                # name = company_ob.registration_name
+                name = trading_name = company_ob.trading_name
                 if company_profile := CompanyProfile.objects.filter(company=company_ob.id).first():
                     mobile, email = company_profile.mobile_phone or "N/A", company_profile.email or "N/A"
                     company_id = company_ob.id
