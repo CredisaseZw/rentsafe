@@ -9,6 +9,7 @@ from celery import shared_task
 from django.conf import settings
 from django.db import transaction
 from openpyxl import load_workbook
+from django.http import HttpResponse
 from apps.common.models.models import Address, Suburb
 from apps.common.services.tasks import send_notification
 from django.contrib.contenttypes.models import ContentType
@@ -126,9 +127,11 @@ def parse_date(value):
         except ValueError:
             continue
     return None
+
+    
 @shared_task
 def process_individuals_csv(file_path):
-    with open(file_path,newline=',', encoding='utf-8') as csv_file:
+    with open(file_path,newline='', encoding='utf-8') as csv_file:
         reader = csv.reader(csv_file)
         headers = next(reader)
 
@@ -136,14 +139,14 @@ def process_individuals_csv(file_path):
         created_rows = []
         valid_national_id= False
         
-        individual_ct = ContentType.objects.get_for_model(individual)
+        # individual_ct = ContentType.objects.get_for_model(individual)
         
         for row in reader:
             if not any(row):
                 continue
             first_name = row[0].strip()
             last_name = row[1].strip()
-            parse_date(row[2].strip())
+            dob = parse_date(row[2].strip())
             gender = row[3].strip()
             id_type = row[4].strip().lower()
             id_number = row[5].strip().upper()
@@ -239,7 +242,7 @@ def process_individuals_csv(file_path):
 
                 # Create Address
                 Address.objects.create(
-                    content_type=individual_ct,
+                    content_object=individual,
                     object_id=individual.pk,
                     address_type=address_type,
                     house_number=house_number,
@@ -254,6 +257,19 @@ def process_individuals_csv(file_path):
             if errors:
                 skipped_rows.append(row + [", ".join(errors)])
                 continue
+
+        if skipped_rows:
+            with open('errors.csv','w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['First Name', 'Last Name', 'Date Of Birth', 'Gender', 'Identification Type', 'ID Number', 'Marital Status', 'Phone Number', 'Email Address', 'Errors '])
+                writer.writerow(skipped_rows)
+
+
+            with open('errors.csv', 'rb') as f:
+                response = HttpResponse(f.read(), content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="errors.csv"'
+                return response
+                        
 
 @shared_task
 def process_individuals_excel(file_path):
