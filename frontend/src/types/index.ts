@@ -25,3 +25,5 @@ export type FilterOptionType = {
 export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
 
 export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";
+
+export type IndividualMaritalStatus = "divorced" | "married" | "single";

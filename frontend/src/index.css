@@ -21,8 +21,10 @@
 }
 
 @theme inline {
-   --navlink: var(--navlink);
    --color-PRIMARY: var(--primary);
+   --col-primary-disable: var(--primary-disabled);
+   --color-primary-dark: var(--primary-dark);
+   --navlink: var(--navlink);
    --color-SECONDARY: var(--SECONDARY);
    --color-SUCCESS: var(--SUCCESS);
    --color-ERROR: var(--ERROR);

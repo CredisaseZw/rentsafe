@@ -1,13 +1,13 @@
 import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Button from "@/components/general/Button";
 import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useCompanyForm from "@/hooks/components/useCompanyForm";
 import { toast } from "sonner";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
+import { Button } from "@/components/ui/button";
 
 export default function CompanyForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useCompanyForm();
@@ -19,8 +19,8 @@ export default function CompanyForm() {
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
       >
          <DialogTrigger asChild>
-            <Button asChild>
-               Add New Company <Plus size={15} />
+            <Button>
+               Add New Company <Plus />
             </Button>
          </DialogTrigger>
 

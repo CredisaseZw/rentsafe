@@ -1,24 +1,34 @@
 import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
-import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
+import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
 import { useNavigate } from "react-router";
+import BranchForm from "@/components/routes/rent-safe/dashboard/BranchForm";
+import type { PaginationData } from "@/interfaces";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const { companies, isLoading } = useMinimalCompaniesList();
+   const { data, isLoading, searchQuery } = useCompanyBranches();
 
-   // @ts-expect-error ReactNode types will never be rendered
    const rows: BaseTableRow[] =
-      companies?.map((cell) => ({
-         ...cell,
-         select: <CompanyPaymentStatusReport companyId={cell.id} />,
+      data?.results?.map((cell) => ({
+         branch: cell.branch_name,
+         registration_name: cell.company?.registration_name || "",
+         registration_number: cell.company?.registration_number || "",
+         id: cell.id,
+         select: (
+            <div className="flex items-center gap-2">
+               <BranchForm companyId={cell.company.id} />
+               <CompanyPaymentStatusReport companyId={cell.company.id} />
+            </div>
+         ),
       })) || [];
 
    const headers: BaseTableColumn[] = [
       { name: "registration_name", displayName: "Registered Name" },
       { name: "registration_number", displayName: "Registration Number" },
+      { name: "branch", displayName: "Branch Name" },
       { name: "select", displayName: "", colGroupclassName: "w-[1%]" },
    ];
 
@@ -38,10 +48,15 @@ export default function useCompanyPaymentStatusTab() {
       navigate({ search: "?" + searchParams.toString() });
    }
 
+   const paginationData = data as PaginationData;
+
    return {
       rows,
       headers,
+      searchRef,
       isLoading,
+      searchQuery,
+      paginationData,
       clearSearch,
       handleSearch,
    };

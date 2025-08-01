@@ -2,6 +2,7 @@ import type { IndividualReport } from "@/interfaces";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import React from "react";
 import useIndividual from "@/hooks/apiHooks/useIndividual";
+import { formatAddress } from "@/lib/utils";
 
 export default function useIndividualPaymentStatusReport(individualId: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
@@ -24,20 +25,26 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
       active: [],
       historic: [],
       rating: "",
-      employmentHistory: [],
+      employmentHistory: [
+         {
+            employer: individual?.employment_details ? individual?.employment_details[0]?.employer_name || "" : "",
+            position: individual?.employment_details ? individual?.employment_details[0]?.job_title || "" : "",
+            startDate: individual?.employment_details ? individual?.employment_details[0]?.start_date || "" : "",
+         },
+      ],
       personalDetails: {
-         surname: individual?.surname || "",
-         otherNames: individual?.forenames || "",
-         idNumber: individual?.identificationNumber || "",
-         dateOfBirth: "",
-         gender: "",
-         nationality: "",
-         maritalStatus: "",
+         surname: individual?.last_name || "",
+         otherNames: individual?.first_name || "",
+         idNumber: individual?.identification_number || "",
+         dateOfBirth: individual?.date_of_birth || "",
+         gender: individual?.gender || "",
+         nationality: "n/a",
+         maritalStatus: individual?.marital_status || "",
          dependants: [],
-         mobileNumber: "",
-         telephoneNumber: "",
-         email: "",
-         address: "",
+         mobileNumber: individual?.contact_details[0]?.mobile_phone[0] || "",
+         telephoneNumber: "n/a",
+         email: individual?.contact_details[0]?.email || "",
+         address: individual?.addresses?.map(formatAddress).join(" | ") || "",
       },
    };
 

@@ -45,7 +45,7 @@ function TableRow({ noHover, className, ...props }: React.ComponentProps<"tr"> &
          className={cn(
             "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
             noHover ? "hover:bg-transparent" : "",
-            "border-color py-4",
+            "border-foreground/25 py-4",
             className,
          )}
          {...props}

@@ -5,7 +5,7 @@ import { api } from "@/api/axios";
 export default function useIndividual(individualId: number, enabled?: boolean) {
    const { data, isLoading, error, refetch } = useQuery<IndividualFull>({
       queryKey: ["individual", individualId],
-      queryFn: () => api.get<IndividualFull>(`/api/individuals/${individualId}/`).then((res) => res.data),
+      queryFn: () => api.get<IndividualFull>(`/api/individuals/${individualId}/full-details/`).then((res) => res.data),
       enabled,
    });
 
