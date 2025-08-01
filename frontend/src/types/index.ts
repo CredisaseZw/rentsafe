@@ -26,7 +26,6 @@ export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
 
 export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";
 
-<<<<<<< HEAD
 export type Client = {
    id: number;
    firstName: string;
@@ -46,7 +45,7 @@ export type DataInternalUser = {
    last_name: string;
    client: Client;
    profile_object: null;
-   roles: string[];
+   roles: Role[];
    is_verified: boolean;
    last_login: string;
    access_level: "Admin" | string;
@@ -57,9 +56,8 @@ export type Role = {
    id: number;
    name: string;
    description: string;
+   permissions: string[];
 };
 
 export type Roles = Role[];
-=======
 export type IndividualMaritalStatus = "divorced" | "married" | "single";
->>>>>>> 8746b4e24f03e09cd643fc0c326c60c0bf23fb03

@@ -24,7 +24,7 @@ export default function InternalUsers() {
             firstName: client.first_name,
             lastName: client.last_name,
             email: client.email,
-            accessLevel: client.access_level,
+            accessLevel: client.roles[0].name,
          }));
          setClients(trimmedClients);
       }

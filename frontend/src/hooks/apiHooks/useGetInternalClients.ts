@@ -4,7 +4,7 @@ const { api } = apis;
 
 export function useGetInternalUserClients(userID: number) {
    const { data, isLoading, isError, refetch } = useQuery({
-      queryKey: ["client_id", userID],
+      queryKey: ["clients_for", userID],
       queryFn: async () => {
          const response = await api.get(`${import.meta.env.VITE_API_URL}/api/clients/users/?client_id=${userID}`);
          return response.data;

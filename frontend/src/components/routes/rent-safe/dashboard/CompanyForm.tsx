@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useCompanyForm from "@/hooks/components/useCompanyForm";
 import { toast } from "sonner";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/general/Button";
 
 export default function CompanyForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useCompanyForm();
@@ -19,8 +19,8 @@ export default function CompanyForm() {
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
       >
          <DialogTrigger asChild>
-            <Button>
-               Add New Company <Plus />
+            <Button asChild>
+               Add New Company <Plus size={18} />
             </Button>
          </DialogTrigger>
 

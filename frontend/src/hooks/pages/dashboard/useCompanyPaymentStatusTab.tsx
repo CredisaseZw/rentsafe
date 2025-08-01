@@ -13,8 +13,7 @@ export default function useCompanyPaymentStatusTab() {
 
    const rows: BaseTableRow[] =
       data?.results?.map((cell) => ({
-         branch: cell.branch_name,
-         registration_name: cell.company?.registration_name || "",
+         registration_name: cell.branch_name || "",
          registration_number: cell.company?.registration_number || "",
          id: cell.id,
          select: (
@@ -28,7 +27,6 @@ export default function useCompanyPaymentStatusTab() {
    const headers: BaseTableColumn[] = [
       { name: "registration_name", displayName: "Registered Name" },
       { name: "registration_number", displayName: "Registration Number" },
-      { name: "branch", displayName: "Branch Name" },
       { name: "select", displayName: "", colGroupclassName: "w-[1%]" },
    ];
 

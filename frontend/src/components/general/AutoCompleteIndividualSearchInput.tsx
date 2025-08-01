@@ -29,6 +29,11 @@ export default function AutoCompleteIndividualSearchInput({ number }: { number: 
                   setQuery("");
                }
             }}
+            onBlur={() => {
+               setTimeout(() => {
+                  setOpen(false);
+               }, 100);
+            }}
             onChange={(e) => {
                setQuery(e.target.value);
                if (e.target.value.length) setOpen(true);
@@ -44,18 +49,18 @@ export default function AutoCompleteIndividualSearchInput({ number }: { number: 
          />
 
          {open && (
-            <div className="border-foreground/60 absolute top-full left-1/2 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col items-center justify-center overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
+            <div className="border-color absolute top-full left-1/2 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col items-center justify-center overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
                {isLoading ? (
                   <div className="flex items-center justify-center">
                      <Loader2 className="text-foreground/60 animate-spin" />
                   </div>
                ) : !individuals?.length ? (
-                  <div className="text-foreground/60 p-2">No results found</div>
+                  <div className="p-2 text-gray-800">No results found</div>
                ) : (
                   individuals?.map((individual) => (
                      <div
                         key={individual.id}
-                        className="border-foreground/60 text-foreground/90 w-full cursor-pointer border-b p-1.5 last:border-b-0 hover:bg-gray-100"
+                        className="border-color w-full cursor-pointer border-b p-1.5 last:border-b-0 hover:bg-gray-100"
                         onClick={() => {
                            setSelectedIndividual(individual);
                            setQuery("");
