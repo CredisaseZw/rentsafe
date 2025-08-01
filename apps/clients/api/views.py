@@ -158,7 +158,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         else:
             recipient_type = 'company'
         
-        send_notification.delay(
+        send_notification(
             recipient_type=recipient_type,
             recipient_id=recipient_id,
             notification_type='NEW_CLIENT_USER',
