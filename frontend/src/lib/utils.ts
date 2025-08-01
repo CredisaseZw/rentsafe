@@ -150,6 +150,7 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
 export function extractContacts(data: { [k: string]: FormDataEntryValue }): ContactPayload[] {
    const contacts: ContactPayload[] = [];
    const contactsCount = Object.keys(data).filter((key) => key.startsWith("contact_type")).length;
+
    for (let i = 1; i < contactsCount + 1; i++) {
       const contact: ContactPayload = {
          individual: toIntElseUndefined(data[`individual${i}`] as string)!,

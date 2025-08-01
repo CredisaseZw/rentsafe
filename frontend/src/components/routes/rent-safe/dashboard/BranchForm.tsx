@@ -6,13 +6,10 @@ import { toast } from "sonner";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
 import { Button } from "@/components/ui/button";
 import useBranchForm from "@/hooks/components/useBranchForm";
-import useCompany from "@/hooks/apiHooks/useCompany";
 import MultiContactInput from "@/components/general/MultiContactInput";
 
-export default function BranchForm({ companyId }: { companyId: number }) {
-   const { showForm, isPending, handleSubmit, setShowForm } = useBranchForm(companyId);
-   const { company } = useCompany(companyId);
-
+export default function BranchForm({ companyID, companyName }: { companyID: number; companyName: string }) {
+   const { showForm, isPending, handleSubmit, setShowForm } = useBranchForm(companyID);
    return (
       <Dialog
          modal
@@ -38,7 +35,7 @@ export default function BranchForm({ companyId }: { companyId: number }) {
                      <Input
                         id="company_name"
                         name="company_name"
-                        value={company?.registration_name + " - " + company?.registration_number}
+                        value={companyName}
                         readOnly
                         disabled
                         className="border-foreground/40 bg-white"
@@ -76,4 +73,6 @@ export default function BranchForm({ companyId }: { companyId: number }) {
          </DialogContent>
       </Dialog>
    );
+
+   return <></>;
 }

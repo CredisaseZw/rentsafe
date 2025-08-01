@@ -14,7 +14,7 @@ export default function useAutoCompleteIndividualSearchInput() {
       query,
       isLoading,
       inputRef,
-      individuals: data?.results,
+      individuals: data,
       selectedIndividual,
       setOpen,
       setQuery,

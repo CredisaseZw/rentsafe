@@ -1,14 +1,14 @@
 import type { CompanyReport } from "@/interfaces";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
-import useCompany from "@/hooks/apiHooks/useCompany";
+import useBranch from "@/hooks/apiHooks/useBranch";
 import React from "react";
 import { formatAddress } from "@/lib/utils";
 
-export default function useCompanyPaymentStatusReport(companyId: number) {
+export default function useCompanyPaymentStatusReport(branchID: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
-   const { error, company, isLoading, refetch } = useCompany(companyId, false);
+   const { error, company, isLoading, refetch } = useBranch(branchID, false);
 
    function handleOpenChange(open: boolean) {
       setShow(open);

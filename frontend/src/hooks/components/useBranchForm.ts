@@ -18,9 +18,8 @@ export default function useBranchForm(companyId: number) {
          addresses: extractAddresses(data),
          contacts: extractContacts(data),
       };
-
-      console.log({ branchPayload });
-      createBranch(branchPayload);
+      console.log(branchPayload);
+      //      createBranch(branchPayload);
    }
 
    return { showForm, isPending, handleSubmit, setShowForm };

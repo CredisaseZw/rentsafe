@@ -12,17 +12,23 @@ export default function useCompanyPaymentStatusTab() {
    const { data, isLoading, searchQuery } = useCompanyBranches();
 
    const rows: BaseTableRow[] =
-      data?.results?.map((cell) => ({
-         registration_name: cell.branch_name || "",
-         registration_number: cell.company?.registration_number || "",
-         id: cell.id,
-         select: (
-            <div className="flex items-center gap-2">
-               <BranchForm companyId={cell.company.id} />
-               <CompanyPaymentStatusReport companyId={cell.company.id} />
-            </div>
-         ),
-      })) || [];
+      data?.results?.map((cell) => {
+         console.log(cell);
+         return {
+            registration_name: cell.branch_name || "",
+            registration_number: cell.company?.registration_number || "",
+            id: cell.id,
+            select: (
+               <div className="flex items-center gap-2">
+                  <BranchForm
+                     companyID={cell.company.id}
+                     companyName={cell?.company.registration_name + " - " + cell?.company.registration_number}
+                  />
+                  <CompanyPaymentStatusReport branchID={cell.id} />
+               </div>
+            ),
+         };
+      }) || [];
 
    const headers: BaseTableColumn[] = [
       { name: "registration_name", displayName: "Registered Name" },

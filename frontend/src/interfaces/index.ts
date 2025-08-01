@@ -50,20 +50,52 @@ export interface Address {
    date_updated: string;
 }
 
-export interface BranchComplete {
+export type BranchComplete = {
    id: number;
    branch_name: string;
    is_headquarters: boolean;
+   is_deleted: boolean;
    company: {
       id: number;
       registration_number: string;
       registration_name: string;
-      trading_name: string;
+      trading_name: string | null;
       legal_status: string;
       legal_status_display: string;
       is_verified: boolean;
    };
-}
+   contacts: []; // <--- CHANGE
+   primary_address: string | null;
+   profile: {
+      trading_status: string | null;
+      trading_status_display: string | null;
+      mobile_phone: string | null;
+      landline_phone: string | null;
+      email: string | null;
+      logo: string | null;
+      registration_date: string | null;
+      tin_number: string | null;
+      vat_number: string | null;
+      number_of_employees: number | null;
+      website: string | null;
+      trend: string | null;
+      trend_display: string | null;
+      twitter: string | null;
+      facebook: string | null;
+      instagram: string | null;
+      linkedin: string | null;
+      operations: string | null;
+      contact_person: string | null;
+      risk_class: string | null;
+      risk_class_display: string | null;
+      account_number: string | null;
+      is_under_judicial: string;
+      is_under_judicial_display: string;
+      is_suspended: boolean;
+   };
+   date_created: string;
+   date_updated: string;
+};
 
 export interface Branch {
    id: number;

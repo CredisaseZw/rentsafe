@@ -3,8 +3,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "../ui/checkbox";
 import AutoCompleteIndividualSearchInput from "./AutoCompleteIndividualSearchInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 export default function ContactFormFields({ number }: { number: number }) {
+   const [selectedPosition, setSelectedPosition] = useState("primary");
    return (
       <div className="mt-5 grid grid-cols-4 items-center gap-5">
          <div className="flex flex-col gap-2">
@@ -14,11 +16,19 @@ export default function ContactFormFields({ number }: { number: number }) {
             <AutoCompleteIndividualSearchInput number={number} />
          </div>
          <div className="flex flex-col gap-2">
+            <input
+               type="hidden"
+               id={"contact_type" + number}
+               name={"contact_type" + number}
+               value={selectedPosition}
+               readOnly
+            />
+
             <Label className="px-2 font-normal" htmlFor={"contact_type" + number}>
                Contact Type
             </Label>
 
-            <Select /*onValueChange={(value) => console.log(value)}*/>
+            <Select onValueChange={(value) => setSelectedPosition(value)}>
                <SelectTrigger
                   id={"contact_type" + number}
                   name={"contact_type" + number}

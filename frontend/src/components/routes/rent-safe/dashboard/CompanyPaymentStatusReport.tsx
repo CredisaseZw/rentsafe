@@ -10,9 +10,9 @@ import { Link } from "react-router";
 import LoadingIndicator from "@/components/general/LoadingIndicator";
 import useCompanyPaymentStatusReport from "@/hooks/pages/dashboard/useCompanyPaymentStatusReport";
 
-export default function CompanyPaymentStatusReport({ companyId }: { companyId: number }) {
+export default function CompanyPaymentStatusReport({ branchID }: { branchID: number }) {
    const { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
-      useCompanyPaymentStatusReport(companyId);
+      useCompanyPaymentStatusReport(branchID);
 
    return (
       <Dialog modal open={show} onOpenChange={handleOpenChange}>
