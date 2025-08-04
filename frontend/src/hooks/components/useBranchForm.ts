@@ -3,7 +3,7 @@ import React from "react";
 import { extractAddresses, extractContacts } from "@/lib/utils";
 import useCreateBranch from "../apiHooks/useCreateBranch";
 
-export default function useBranchForm(companyId: number) {
+export default function useBranchForm() {
    const [showForm, setShowForm] = React.useState(false);
    const { isPending, createBranch } = useCreateBranch(() => setShowForm(false));
 
@@ -13,13 +13,12 @@ export default function useBranchForm(companyId: number) {
       const data = Object.fromEntries(formData.entries());
 
       const branchPayload: BranchPayload = {
-         company: companyId,
+         company: parseInt(data.companyId as string),
          branch_name: data.branch_name as string,
          addresses: extractAddresses(data),
          contacts: extractContacts(data),
       };
-
-      console.log({ branchPayload });
+      console.log(branchPayload);
       createBranch(branchPayload);
    }
 

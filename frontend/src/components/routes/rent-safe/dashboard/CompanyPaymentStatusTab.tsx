@@ -5,6 +5,7 @@ import CompanyForm from "./CompanyForm";
 import SectionHeading from "@/components/general/SectionHeading";
 import useCompanyPaymentStatusTab from "@/hooks/pages/dashboard/useCompanyPaymentStatusTab";
 import { Button } from "@/components/ui/button";
+import BranchForm from "./BranchForm";
 
 export default function CompanyPaymentStatusTab() {
    const { paginationData, rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } =
@@ -41,7 +42,10 @@ export default function CompanyPaymentStatusTab() {
                      </Button>
                   </form>
 
-                  <CompanyForm />
+                  <div className="flex flex-row gap-3">
+                     <BranchForm />
+                     <CompanyForm />
+                  </div>
                </div>
             }
          />

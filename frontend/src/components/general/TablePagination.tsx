@@ -15,9 +15,11 @@ export default function TablePagination({
    paginationData: PaginationData;
    paginationName: string;
 }) {
+   const pageSize = 10;
    const nextPage = paginationData?.next ? new URL(paginationData.next).searchParams.get("page") : null;
    const previousPage = paginationData?.previous ? new URL(paginationData.previous).searchParams.get("page") : null;
    const currentPage = nextPage ? parseInt(nextPage) - 1 : previousPage ? parseInt(previousPage) + 1 : 1;
+   const totalPages = Math.ceil(paginationData?.count / pageSize);
 
    return (
       <Pagination>
@@ -31,7 +33,7 @@ export default function TablePagination({
             <PaginationItem>
                <PaginationLink to="">
                   {currentPage}
-                  {paginationData?.count ? ` / ${paginationData.count}` : ""}
+                  {paginationData?.count ? ` / ${totalPages}` : ""}
                </PaginationLink>
             </PaginationItem>
 

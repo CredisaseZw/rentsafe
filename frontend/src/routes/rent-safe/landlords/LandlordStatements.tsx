@@ -3,13 +3,14 @@ import { User, Building, BadgeCent, Send } from "lucide-react";
 import Button from "@/components/general/Button";
 import PropertyStatementContainer from "@/components/general/PropertyStatementContainer";
 import Header from "@/components/general/Header";
+import ColumnsContainer from "@/components/general/ColumnsContainer";
 
 function LandlordStatements() {
    // let {_} = useLandlordStatement();
 
    return (
       <div className="">
-         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+         <ColumnsContainer numberOfCols={3}>
             <GlobalSummaryCard
                value="10"
                subTitle="Landlords"
@@ -40,10 +41,10 @@ function LandlordStatements() {
                   color: "purple",
                }}
             />
-         </div>
+         </ColumnsContainer>
 
          <div className="flex w-full justify-center">
-            <div className="border-color card mt-10 h-fit w-fit rounded-xl p-5">
+            <div className="border-color dim-card mt-10 h-fit w-fit border">
                <h1 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200">Selection</h1>
                <div className="mt-5 flex justify-center">
                   <form method="post" className="w-[800px]">

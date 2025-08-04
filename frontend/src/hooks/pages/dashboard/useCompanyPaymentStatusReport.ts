@@ -1,14 +1,14 @@
 import type { CompanyReport } from "@/interfaces";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
-import useCompany from "@/hooks/apiHooks/useCompany";
+import useBranch from "@/hooks/apiHooks/useBranch";
 import React from "react";
-import { formatAddress } from "@/lib/utils";
+//import { formatAddress } from "@/lib/utils";
 
-export default function useCompanyPaymentStatusReport(companyId: number) {
+export default function useCompanyPaymentStatusReport(branchID: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
-   const { error, company, isLoading, refetch } = useCompany(companyId, false);
+   const { error, branch, isLoading, refetch } = useBranch(branchID, false);
 
    function handleOpenChange(open: boolean) {
       setShow(open);
@@ -25,18 +25,20 @@ export default function useCompanyPaymentStatusReport(companyId: number) {
       active: [],
       historic: [],
       rating: "",
-      companyDetails: {
-         registeredName: company?.registration_name || "",
-         tradingName: company?.trading_name || "",
-         registrationNumber: company?.registration_number || "",
-         dateOfRegistration: company?.date_of_incorporation || "",
-         tradingStatus: company?.profile?.trading_status || "",
-         industrySector: company?.industry || "",
-         telephoneNumber: company?.profile?.landline_phone || "",
-         mobileNumber: company?.profile?.mobile_phone || "",
-         email: company?.profile?.email || "",
-         website: company?.profile?.website || "",
-         address: company?.addresses?.map(formatAddress).join(" | ") || "",
+      branchDetails: {
+         branchName: branch?.branch_name || "",
+         registrationName: branch?.company?.registration_name || "",
+         tradingName: branch?.company?.trading_name || "",
+         registrationNumber: branch?.company?.registration_number || "",
+         dateOfRegistration: branch?.profile.registration_date || "",
+         tradingStatus: branch?.profile?.trading_status_display || "",
+         telephoneNumber: branch?.profile?.landline_phone || "",
+         mobileNumber: branch?.profile?.mobile_phone || "",
+         email: branch?.profile?.email || "",
+         website: branch?.profile?.website || "",
+         isHeadquaters: false,
+         industrySector: "",
+         address: `${branch?.primary_address?.street_address}, ${branch?.primary_address?.suburb?.name}, ${branch?.primary_address?.city?.name}, ${branch?.primary_address?.province?.name}, ${branch?.primary_address?.country?.name}`,
       },
    };
 

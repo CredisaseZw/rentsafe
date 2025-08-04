@@ -2,12 +2,13 @@ import Button from "@/components/general/Button";
 import Logo from "@/components/general/Logo";
 import { LogIn } from "lucide-react";
 import { useNavigate } from "react-router";
+import { getCookie } from "typescript-cookie";
 
 export default function Home() {
    const navigate = useNavigate();
 
    const checkAuth = () => {
-      const token = localStorage.getItem("token");
+      const token = getCookie("token");
 
       try {
          const parsed_token = token ? (JSON.parse(token) as { access_token?: string }) : null;

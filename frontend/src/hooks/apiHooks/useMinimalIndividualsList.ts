@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import type { IndividualApiResponse } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router";
@@ -9,16 +8,13 @@ export default function useMinimalIndividualsList(individualQuery?: string) {
    const [searchParams] = useSearchParams();
    const q = searchParams.get("individual_q")?.trim() || individualQuery?.trim();
    const page = searchParams.get("individual_page") || "1";
-   console.log({ page });
 
-   const { data, isLoading, error } = useQuery<IndividualApiResponse>({
+   const { data, isLoading, error } = useQuery({
       queryKey: ["individuals-minimal", q],
       queryFn: () => {
          const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
          return api
-            .get<IndividualApiResponse>(
-               `/api/individuals/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`,
-            )
+            .get(`/api/individuals/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`)
             .then((res) => res.data);
       },
 

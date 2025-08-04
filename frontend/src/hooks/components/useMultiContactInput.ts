@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function useMultiContactInput() {
-   const [contacts, setContacts] = React.useState<undefined[]>([]);
+   const [contacts, setContacts] = React.useState<undefined[]>([undefined]);
 
    function addContact() {
       setContacts((prev) => [...prev, undefined]);

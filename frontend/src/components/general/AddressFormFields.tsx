@@ -68,8 +68,8 @@ export default function AddressFormFields({ number }: { number: number }) {
          </div>
 
          <div className="flex flex-col gap-2">
-            <Label className="px-2 font-normal" htmlFor={"city_id" + number}>
-               City <span className="text-PRIMARY">*</span>
+            <Label className="required px-2 font-normal" htmlFor={"city_id" + number}>
+               City
             </Label>
             <Select
                required
@@ -157,14 +157,14 @@ export default function AddressFormFields({ number }: { number: number }) {
 
          <div className="flex items-center justify-center gap-2">
             <Checkbox
-               id={"is_primary" + number}
-               name={"is_primary" + number}
+               id={"is_primary_address" + number}
+               name={"is_primary_address" + number}
                value="true"
                className="border-foreground/40 bg-white"
                checked={number === 1}
                disabled={number !== 1}
             />
-            <Label className="px-2 font-normal" htmlFor={"is_primary" + number}>
+            <Label className="px-2 font-normal" htmlFor={"is_primary_address" + number}>
                Is Primary
             </Label>
          </div>
