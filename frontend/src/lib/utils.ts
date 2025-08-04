@@ -132,7 +132,7 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
    const addressesCount = Object.keys(data).filter((key) => key.startsWith("city_id")).length;
    for (let i = 1; i < addressesCount + 1; i++) {
       const address: AddressPayload = {
-         // is_primary: !!data[`is_primary${i}`],
+         is_primary: !!data[`is_primary_address${i}`],
          address_type: data[`address_type${i}`] as "physical" | "postal" | "billing" | "work" | "other",
          postal_code: data[`postal_code${i}`] as string,
          country_id: toIntElseUndefined(data[`country_id${i}`] as string),

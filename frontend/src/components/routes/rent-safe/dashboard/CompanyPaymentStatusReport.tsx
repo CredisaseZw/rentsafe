@@ -1,5 +1,6 @@
 import Logo from "@/components/general/Logo";
 import OverviewCard from "./OverviewCard";
+import { useRef } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import { formatErrorMessage, friendlyDate } from "@/lib/utils";
@@ -9,10 +10,29 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import LoadingIndicator from "@/components/general/LoadingIndicator";
 import useCompanyPaymentStatusReport from "@/hooks/pages/dashboard/useCompanyPaymentStatusReport";
+import { useReactToPrint } from "react-to-print";
 
 export default function CompanyPaymentStatusReport({ branchID }: { branchID: number }) {
    const { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
       useCompanyPaymentStatusReport(branchID);
+
+   const componentRefence = useRef<HTMLDivElement>(null);
+   const expandAddress = useRef<HTMLButtonElement>(null);
+
+   const onDownloadPDF = useReactToPrint({
+      contentRef: componentRefence,
+      documentTitle: `REPORT_${report.branchDetails.branchName}_-_${new Date().toISOString()}`,
+      pageStyle: `
+               @page {
+                  margin: 0.3in;
+               }
+                  
+               body {
+                     margin: 0;
+                     padding: 0;
+               }
+            `,
+   });
 
    return (
       <Dialog modal open={show} onOpenChange={handleOpenChange}>
@@ -24,13 +44,13 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
          <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1100px] sm:max-w-[default]`}>
             <DialogTitle>
-               <Button size="sm">
+               <Button size="sm" onClick={onDownloadPDF}>
                   Print
                   <Printer />
                </Button>
             </DialogTitle>
 
-            <div className="h-[80vh] overflow-auto p-8 text-sm">
+            <div className="h-[80vh] overflow-auto p-8 text-sm" ref={componentRefence}>
                <div className="mb-10 flex justify-between gap-3">
                   <div>
                      <Logo className="w-fit text-xl" imageClassName="w-4" />
@@ -77,7 +97,7 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
                   <div>
                      <div className="bg-foreground/5 border-foreground/20 border border-b-0 p-0.5 text-center">
-                        Company Details
+                        Branch Details
                      </div>
 
                      <div className="grid grid-cols-2">
@@ -162,9 +182,10 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
                               <div className="col-span-3 flex items-start gap-1">
                                  <div className={showFullAddress ? "grow" : "line-clamp-1 grow"}>
-                                    {/*report?.branchDetails.address*/}
+                                    {report?.branchDetails.address}
                                  </div>
                                  <Button
+                                    ref={expandAddress}
                                     onClick={() => setShowFullAddress((prev) => !prev)}
                                     variant="outline"
                                     className="py-0"
@@ -231,7 +252,6 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
                         </div>
                      ))}
                   </div>
-
                   <div>
                      <div className="bg-foreground/5 border-foreground/20 border p-0.5 text-center">Historic</div>
 

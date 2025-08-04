@@ -7,26 +7,27 @@ import type { BranchApiResponse } from "@/interfaces";
 
 export default function useCompanyBranches() {
    const [searchParams] = useSearchParams();
-   const q = searchParams.get("company_q")?.trim();
+   const q = searchParams.get("company_q")?.trim() || "";
    const page = searchParams.get("company_page") || "1";
-   console.log({ page });
 
    const { data, isLoading, error } = useQuery<BranchApiResponse>({
       queryKey: ["company-branches", q, page],
-      queryFn: () => {
-         const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
-         return api
-            .get<BranchApiResponse>(
-               `/api/branches/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`,
-            )
-            .then((res) => res.data);
+      queryFn: async () => {
+         const params = new URLSearchParams();
+         if (q) params.append("q", q);
+         if (page) params.append("page", page === "null" ? "1" : page);
+
+         const url = q ? `/api/branches/search/?${params}` : `/api/branches/?${params}`;
+         const res = await api.get<BranchApiResponse>(url);
+         return res.data;
       },
+      enabled: !!page,
    });
 
    useEffect(() => {
       if (error) {
-         console.log(error);
-         toast.error(q ? `Search failed for query "${q}"` : "Could not fetch companies");
+         console.error(error);
+         toast.error(q ? `Search failed for "${q}"` : "Could not fetch company branches");
       }
    }, [error, q]);
 

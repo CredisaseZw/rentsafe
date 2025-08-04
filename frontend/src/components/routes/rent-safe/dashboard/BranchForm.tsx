@@ -4,12 +4,13 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/general/Button";
 import useBranchForm from "@/hooks/components/useBranchForm";
 import MultiContactInput from "@/components/general/MultiContactInput";
+import AutoCompleteCompanySearchInput from "@/components/general/AutoCompleteCompanySearchInput";
 
-export default function BranchForm({ companyID, companyName }: { companyID: number; companyName: string }) {
-   const { showForm, isPending, handleSubmit, setShowForm } = useBranchForm(companyID);
+export default function BranchForm() {
+   const { showForm, isPending, handleSubmit, setShowForm } = useBranchForm();
    return (
       <Dialog
          modal
@@ -17,7 +18,7 @@ export default function BranchForm({ companyID, companyName }: { companyID: numb
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
       >
          <DialogTrigger asChild>
-            <Button variant="outline" size="xs">
+            <Button asChild variant={"outline"}>
                New Branch <Plus size={16} />
             </Button>
          </DialogTrigger>
@@ -28,23 +29,15 @@ export default function BranchForm({ companyID, companyName }: { companyID: numb
             <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
                <div className="grid grid-cols-3 items-center gap-5">
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="company_name">
-                        Company
-                        <span className="text-PRIMARY">*</span>
+                     <Label className="required px-2 font-normal" htmlFor="branch_name">
+                        Company Name
                      </Label>
-                     <Input
-                        id="company_name"
-                        name="company_name"
-                        value={companyName}
-                        readOnly
-                        disabled
-                        className="border-foreground/40 bg-white"
-                     />
+                     <AutoCompleteCompanySearchInput elementName="companyId" />
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="branch_name">
-                        Branch Name <span className="text-PRIMARY">*</span>
+                     <Label className="required px-2 font-normal" htmlFor="branch_name">
+                        Branch Name
                      </Label>
                      <Input id="branch_name" name="branch_name" required className="border-foreground/40 bg-white" />
                   </div>
@@ -59,7 +52,7 @@ export default function BranchForm({ companyID, companyName }: { companyID: numb
                </div>
 
                <div className="mt-10 text-right">
-                  <Button disabled={isPending} type="submit">
+                  <Button disabled={isPending} asChild type="submit">
                      {isPending ? (
                         <>
                            <Loader2 className="animate-spin" /> Adding Branch...

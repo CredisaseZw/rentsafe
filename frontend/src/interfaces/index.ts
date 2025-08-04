@@ -46,25 +46,8 @@ export interface Address {
       id: number;
       name: string;
    };
-   date_created: string;
-   date_updated: string;
 }
 
-export type BranchComplete = {
-   id: number;
-   branch_name: string;
-   is_headquarters: boolean;
-   is_deleted: boolean;
-   company: {
-      id: number;
-      registration_number: string;
-      registration_name: string;
-      trading_name: string | null;
-      legal_status: string;
-      legal_status_display: string;
-      is_verified: boolean;
-   };
-};
 export interface Contact {
    id: number;
    full_contact: string;
@@ -101,6 +84,7 @@ export interface Branch {
    branch_name: string;
    is_headquarters: boolean;
    is_deleted: boolean;
+   company: CompanyMinimal;
    addresses: Address[];
    contacts: Contact[];
    primary_address: Address | null;
@@ -187,7 +171,7 @@ export interface CompanyReport {
       mobileNumber: string;
       email: string;
       website: string;
-      // address: string;
+      address: string;
    };
 }
 
@@ -340,9 +324,13 @@ export interface PaginationData {
 }
 
 export interface BranchApiResponse extends PaginationData {
-   results: BranchComplete[];
+   results: Branch[];
 }
 
 export interface IndividualApiResponse extends PaginationData {
    results: IndividualMinimal[];
+}
+
+export interface SearchCompanyApiRespionse extends PaginationData {
+   results: CompanyMinimal[];
 }

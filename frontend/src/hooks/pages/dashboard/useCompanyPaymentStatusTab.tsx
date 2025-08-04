@@ -3,7 +3,6 @@ import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
 import { useNavigate } from "react-router";
-import BranchForm from "@/components/routes/rent-safe/dashboard/BranchForm";
 import type { PaginationData } from "@/interfaces";
 
 export default function useCompanyPaymentStatusTab() {
@@ -13,17 +12,12 @@ export default function useCompanyPaymentStatusTab() {
 
    const rows: BaseTableRow[] =
       data?.results?.map((cell) => {
-         console.log(cell);
          return {
             registration_name: cell.branch_name || "",
             registration_number: cell.company?.registration_number || "",
             id: cell.id,
             select: (
                <div className="flex items-center gap-2">
-                  <BranchForm
-                     companyID={cell.company.id}
-                     companyName={cell?.company.registration_name + " - " + cell?.company.registration_number}
-                  />
                   <CompanyPaymentStatusReport branchID={cell.id} />
                </div>
             ),

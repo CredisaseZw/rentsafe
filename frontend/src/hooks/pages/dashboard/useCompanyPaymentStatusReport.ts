@@ -38,7 +38,7 @@ export default function useCompanyPaymentStatusReport(branchID: number) {
          website: branch?.profile?.website || "",
          isHeadquaters: false,
          industrySector: "",
-         //address: branch?.addresses?.map(formatAddress).join(" | ") || "",
+         address: `${branch?.primary_address?.street_address}, ${branch?.primary_address?.suburb?.name}, ${branch?.primary_address?.city?.name}, ${branch?.primary_address?.province?.name}, ${branch?.primary_address?.country?.name}`,
       },
    };
 

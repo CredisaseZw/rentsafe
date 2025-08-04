@@ -61,9 +61,9 @@ export default function AutoCompleteIndividualSearchInput({ number }: { number: 
          </div>
 
          {open && (
-            <div className="border-color absolute top-full left-1/2 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col items-center justify-center overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
+            <div className="border-color absolute top-full left-1/2 z-50 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col items-center justify-center overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
                {isLoading ? (
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center py-5">
                      <Loader2 className="text-foreground/60 animate-spin" />
                   </div>
                ) : !individuals?.length ? (
@@ -73,7 +73,7 @@ export default function AutoCompleteIndividualSearchInput({ number }: { number: 
                      <button
                         key={individual.id}
                         type="button"
-                        className="border-color w-full border-b bg-white p-1.5 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
+                        className="border-color w-full border-b bg-white px-2 py-3 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                            setSelectedIndividual(individual);
