@@ -64,13 +64,46 @@ export interface BranchComplete {
       is_verified: boolean;
    };
 }
-
+export interface Contact {
+   id: number;
+   full_contact: string;
+}
+export interface Profile {
+   trading_status: string | null;
+   trading_status_display: string | null;
+   mobile_phone: string | null;
+   landline_phone: string | null;
+   email: string | null;
+   logo: string | null;
+   registration_date: string | null;
+   tin_number: string | null;
+   vat_number: string | null;
+   number_of_employees: number | null;
+   website: string | null;
+   trend: string | null;
+   trend_display: string | null;
+   twitter: string | null;
+   facebook: string | null;
+   instagram: string | null;
+   linkedin: string | null;
+   operations: string | null;
+   contact_person: string | null;
+   risk_class: string | null;
+   risk_class_display: string | null;
+   account_number: string | null;
+   is_under_judicial: string | null;
+   is_under_judicial_display: string | null;
+   is_suspended: boolean;
+}
 export interface Branch {
    id: number;
-   company: number;
    branch_name: string;
+   is_headquarters: boolean;
+   is_deleted: boolean;
    addresses: Address[];
-   contacts: string[];
+   contacts: Contact[];
+   primary_address: Address | null;
+   profile: Profile;
 }
 
 export interface CompanyFull {
@@ -86,35 +119,7 @@ export interface CompanyFull {
    is_active?: boolean;
    addresses?: Address[];
    branches?: Branch[];
-   profile?: {
-      email?: string;
-      trading_status?: string;
-      trading_status_display?: string;
-      mobile_phone?: string;
-      landline_phone?: string;
-      logo?: string;
-      registration_date?: string;
-      tin_number?: string;
-      vat_number?: string;
-      number_of_employees?: string;
-      website?: string;
-      trend?: string;
-      trend_display?: string;
-      twitter?: string;
-      facebook?: string;
-      instagram?: string;
-      linkedin?: string;
-      operations?: string;
-      contact_person?: string;
-      risk_class?: string;
-      risk_class_display?: string;
-      account_number?: string;
-      is_under_judicial?: boolean | string;
-      is_under_judicial_display?: boolean | string;
-      is_suspended?: boolean;
-   };
-   date_created?: string;
-   date_updated?: string;
+   profile?: Profile;
 }
 
 export interface CompanyCreationResponse {
