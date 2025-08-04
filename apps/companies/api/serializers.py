@@ -32,7 +32,7 @@ class ContactPersonSerializer(serializers.ModelSerializer):
             'id', 'branch', 'individual', 'individual_name', 'contact_type',
             'contact_type_display', 'is_primary', 'position', 'full_contact'
         ]
-        read_only_fields = ['id', 'individual_name', 'contact_type_display']
+        read_only_fields = ['id', 'individual_name', 'contact_type_display','branch']
     
     def validate(self, attrs):
         return super().validate(attrs)
@@ -339,7 +339,6 @@ class CompanyBranchDetailSerializer(serializers.ModelSerializer):
         """Get the primary address for this branch"""
         primary_address = obj.addresses.filter(
             address_type='physical', 
-            is_primary=True
         ).first()
         return AddressSerializer(primary_address).data if primary_address else None
     def get_profile(self, obj):
