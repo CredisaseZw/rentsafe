@@ -2,13 +2,13 @@ import type { CompanyReport } from "@/interfaces";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import useBranch from "@/hooks/apiHooks/useBranch";
 import React from "react";
-import { formatAddress } from "@/lib/utils";
+//import { formatAddress } from "@/lib/utils";
 
 export default function useCompanyPaymentStatusReport(branchID: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
-   const { error, company, isLoading, refetch } = useBranch(branchID, false);
+   const { error, branch, isLoading, refetch } = useBranch(branchID, false);
 
    function handleOpenChange(open: boolean) {
       setShow(open);
@@ -25,18 +25,20 @@ export default function useCompanyPaymentStatusReport(branchID: number) {
       active: [],
       historic: [],
       rating: "",
-      companyDetails: {
-         registeredName: company?.company?.registration_name || "",
-         tradingName: company?.company?.trading_name || "",
-         registrationNumber: company?.company?.registration_number || "",
-         dateOfRegistration: company?.company.date_of_incorporation || "",
-         tradingStatus: company?.profile?.trading_status || "",
-         industrySector: company?.industry || "",
-         telephoneNumber: company?.profile?.landline_phone || "",
-         mobileNumber: company?.profile?.mobile_phone || "",
-         email: company?.profile?.email || "",
-         website: company?.profile?.website || "",
-         address: company?.addresses?.map(formatAddress).join(" | ") || "",
+      branchDetails: {
+         branchName: branch?.branch_name || "",
+         registrationName: branch?.company?.registration_name || "",
+         tradingName: branch?.company?.trading_name || "",
+         registrationNumber: branch?.company?.registration_number || "",
+         dateOfRegistration: branch?.profile.registration_date || "",
+         tradingStatus: branch?.profile?.trading_status_display || "",
+         telephoneNumber: branch?.profile?.landline_phone || "",
+         mobileNumber: branch?.profile?.mobile_phone || "",
+         email: branch?.profile?.email || "",
+         website: branch?.profile?.website || "",
+         isHeadquaters: false,
+         industrySector: "",
+         //address: branch?.addresses?.map(formatAddress).join(" | ") || "",
       },
    };
 

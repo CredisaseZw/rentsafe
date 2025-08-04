@@ -37,7 +37,7 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
                      <p>Securing you rental investments</p>
                      <p>
                         Rent Payment Status Report on{" "}
-                        <span className="font-semibold">{report?.companyDetails.registeredName}</span> as at{" "}
+                        <span className="font-semibold">{report?.branchDetails.registrationName}</span> as at{" "}
                         <span className="">{friendlyDate(new Date())}</span>
                      </p>
                   </div>
@@ -85,27 +85,27 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Registered Name</div>
 
-                              <div className="col-span-3">{report?.companyDetails.registeredName}</div>
+                              <div className="col-span-3">{report?.branchDetails.registrationName}</div>
                            </div>
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Trading Name</div>
 
-                              <div className="col-span-3">{report?.companyDetails.tradingName}</div>
+                              <div className="col-span-3">{report?.branchDetails.tradingName}</div>
                            </div>
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Registration Number</div>
 
-                              <div className="col-span-3">{report?.companyDetails.registrationNumber}</div>
+                              <div className="col-span-3">{report?.branchDetails.registrationNumber}</div>
                            </div>
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Date Of Registration</div>
 
                               <div className="col-span-3">
-                                 {report?.companyDetails.dateOfRegistration
-                                    ? friendlyDate(report?.companyDetails.dateOfRegistration)
+                                 {report?.branchDetails.dateOfRegistration
+                                    ? friendlyDate(report?.branchDetails.dateOfRegistration)
                                     : "N/A"}
                               </div>
                            </div>
@@ -113,7 +113,7 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
                            <div className="grid grid-cols-5 items-start gap-2 px-3 py-1">
                               <div className="col-span-2">Trading Status</div>
 
-                              <div className="col-span-3">{report?.companyDetails.tradingStatus}</div>
+                              <div className="col-span-3">{report?.branchDetails.tradingStatus}</div>
                            </div>
                         </div>
 
@@ -121,13 +121,13 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Mobile Number</div>
 
-                              <div className="col-span-3">{report?.companyDetails.mobileNumber}</div>
+                              <div className="col-span-3">{report?.branchDetails.mobileNumber}</div>
                            </div>
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Telephone No</div>
 
-                              <div className="col-span-3">{report?.companyDetails.telephoneNumber}</div>
+                              <div className="col-span-3">{report?.branchDetails.telephoneNumber}</div>
                            </div>
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
@@ -135,10 +135,10 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
                               <div className="col-span-3">
                                  <Link
-                                    to={`mailto:${report?.companyDetails.email}`}
+                                    to={`mailto:${report?.branchDetails.email}`}
                                     className="text-PRIMARY hover:underline"
                                  >
-                                    {report?.companyDetails.email}
+                                    {report?.branchDetails.email}
                                  </Link>
                               </div>
                            </div>
@@ -149,10 +149,10 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
                               <div className="col-span-3">
                                  <Link
                                     target="_blank"
-                                    to={report?.companyDetails.website || ""}
+                                    to={report?.branchDetails.website || ""}
                                     className="text-PRIMARY hover:underline"
                                  >
-                                    {report?.companyDetails.website}
+                                    {report?.branchDetails.website}
                                  </Link>
                               </div>
                            </div>
@@ -162,7 +162,7 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
                               <div className="col-span-3 flex items-start gap-1">
                                  <div className={showFullAddress ? "grow" : "line-clamp-1 grow"}>
-                                    {report?.companyDetails.address}
+                                    {/*report?.branchDetails.address*/}
                                  </div>
                                  <Button
                                     onClick={() => setShowFullAddress((prev) => !prev)}

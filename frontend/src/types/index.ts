@@ -59,5 +59,11 @@ export type Role = {
    permissions: string[];
 };
 
+export type Contact = {
+   individual: number;
+   contact_type: "primary" | "finance" | "technical" | "other" | string;
+   is_primary: true | false;
+   position: string;
+};
 export type Roles = Role[];
 export type IndividualMaritalStatus = "divorced" | "married" | "single";

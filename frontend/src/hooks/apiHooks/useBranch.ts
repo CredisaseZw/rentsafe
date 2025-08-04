@@ -9,5 +9,5 @@ export default function useBranch(companyId: number, enabled?: boolean) {
       enabled,
    });
 
-   return { error, company: data, isLoading, refetch };
+   return { error, branch: data, isLoading, refetch };
 }

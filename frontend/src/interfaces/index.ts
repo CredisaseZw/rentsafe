@@ -148,7 +148,6 @@ export interface CompanyFull {
    date_created?: string;
    date_updated?: string;
 }
-
 export interface CompanyCreationResponse {
    id: number;
    branch_name: string;
@@ -201,18 +200,20 @@ export interface CompanyReport {
    active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
    historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
    rating: string;
-   companyDetails: {
-      registeredName: string;
+   branchDetails: {
+      branchName: string;
       tradingName: string;
+      registrationName: string;
       registrationNumber: string;
       dateOfRegistration: string;
       tradingStatus: string;
+      isHeadquaters: false | true;
       industrySector: string;
       telephoneNumber: string;
       mobileNumber: string;
       email: string;
       website: string;
-      address: string;
+      // address: string;
    };
 }
 

@@ -5,7 +5,7 @@ import useCreateBranch from "../apiHooks/useCreateBranch";
 
 export default function useBranchForm(companyId: number) {
    const [showForm, setShowForm] = React.useState(false);
-   const { isPending, createBranch } = useCreateBranch(() => setShowForm(false));
+   const { isPending /*createBranch*/ } = useCreateBranch(() => setShowForm(false));
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
