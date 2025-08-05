@@ -219,55 +219,29 @@ class IndividualViewSet(BaseViewSet):
 
 class BulkUpload(BaseViewSet):
     permission_classes = [IsAuthenticated]
-    # def post(self,request):
-    #     # file =  request.FILES.get['file']
-    #     path_to_file = '/home/seh/testcsv.csv'
-    #     file = os.path.dirname(path_to_file)
-    #     if not file:
-    #         return Response({'error': 'No file selected'}, status=status.HTTP_400_BAD_REQUEST)
-        
-    #     try:
-        
-    #         import tempfile
 
-    #         ext= file.name.split('.')[-1].lower()
-    #         if ext not in ['xlsx', 'csv']:
-    #             return Response({'error': 'Unsupported file type. Please upload .csv or .xlsx '}, status=status.HTTP_400_BAD_REQUEST)
-            
-    #         with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-    #             for chunk in file.chunks():
-    #                 tmp.write(chunk)
-    #             tmp_path = tmp.name
-
-    #         if ext == 'csv':
-    #             process_individuals_csv.delay(tmp_path)
-    #         elif ext == 'xlsx':
-    #             process_individuals_excel.delay(tmp_path)
-    #     except Exception as e:
-    #         logger.error(f"Error processing file: {e}")
-    #         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-    #     return Response({'message': 'File uploaded successfully'}, status=status.HTTP_200_OK)
     @action(detail=False, methods=['post'], url_path='run')
     def post(self, request):
-        path_to_file = '/home/seh/testcsv.csv'
-        import os   
+        file = request.FILES.get('file')
+        import os
+        import tempfile
 
-        # Check if file exists
-        if not os.path.exists(path_to_file):
-            return Response({'error': 'File not found on server'}, status=status.HTTP_400_BAD_REQUEST)
+        if not file:
+            return Response({'error': 'No file selected uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check extension
-        ext = path_to_file.split('.')[-1].lower()
-        if ext not in ['csv', 'xlsx']:
-            return Response({'error': 'Unsupported file type. Please upload .csv or .xlsx'}, status=status.HTTP_400_BAD_REQUEST)
+        ext = file.name.split('.')[-1].lower()
+        if ext != 'csv':
+            return Response({'error': 'Unsupported file type. Please upload .csv files'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Just call your celery tasks with the existing file path
-            if ext == 'csv':
-                process_individuals_csv.delay(path_to_file)
-            elif ext == 'xlsx':
-                process_individuals_excel.delay(path_to_file)
+            # Save the uploaded file to a temporary location
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{ext}') as tmp:
+                for chunk in file.chunks():
+                    tmp.write(chunk)
+                tmp_path = tmp.name
+
+            process_individuals_csv.delay(tmp_path)
+           
         except Exception as e:
             logger.error(f"Error processing file: {e}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

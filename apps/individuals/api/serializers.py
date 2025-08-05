@@ -23,9 +23,9 @@ class EmploymentDetailSerializer(serializers.ModelSerializer):
     
     def validate(self,data):
         if email:= data.get("email"):
-            try:
-                validate_email(email)
-            except Exception as e:
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
                 raise ValueError("Invalid employer email address provide")
             
         return data
@@ -44,14 +44,13 @@ class NextOfKinSerializer(serializers.ModelSerializer):
             'mobile_phone', 'email', 'physical_address'
         ]
         
-    def validate(self, data):
-        try:
-            if email := data.get("email",''):
-                validate_email(email)
-                
-        except Exception as e:
-            raise ValueError(f"Error while creating next of kin {e}")
-        
+    def validate(self,data):
+        if email:= data.get("email"):
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValueError("Invalid email address provide")
+            
         return data
 
 class ContactDetailsSerializer(serializers.ModelSerializer):
@@ -76,10 +75,10 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
             if existing_qs.exists():
                 raise serializers.ValidationError({"email": "This email address is already registered"})
 
-            try:
-                validate_email(email)
-            except DjangoValidationError as e:
-                raise serializers.ValidationError({'email': e.messages})
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValueError("Invalid email address provide")
 
         
         phone = data.get("mobile_phone",[])

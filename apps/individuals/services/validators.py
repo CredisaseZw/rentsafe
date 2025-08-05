@@ -1,18 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
 
-# def validate_national_id(id_number: str) -> bool:
-#     pattern = r'\d{8,9}[a-zA-Z]+\d{2}'
-#     return re.match(pattern, id_number)
-
-# def validate_passport_number(passport_number: str) -> bool:
-#     pattern=  r'^[A-Z]{2}\d{6,7}$'
-#     if not passport_number:
-#         return False
-
-#     passport_number = passport_number.strip().upper()
-    
-#     return bool(re.match(pattern, passport_number))
 
 def validate_national_id(national_id, country):
     patterns = {
@@ -89,36 +77,19 @@ def validate_passport_number(passport_number, country):
     if not re.match(pattern, passport_number):
         raise ValidationError(f"Invalid passport number for {country}: {passport_number}")
     
-def validate_email(email):
+def validate_email(email: str)-> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if not re.match(pattern,email):
-        raise ValueError("Invalid email address")
+    return re.match(pattern,email)
+
 
 def normalize_zimbabwe_mobile(phone):
     phone = phone.strip().replace(" ", "").replace("-", "")
-    # Remove leading +
     if phone.startswith("+"):
         phone = phone[1:]
-    # Remove leading 0
     if phone.startswith("0"):
         phone = phone[1:]
-    # Remove leading 263 if present
     if phone.startswith("263"):
         phone = phone[3:]
-    # Now should start with 7 and be 8 digits
     if re.match(r"^7\d{8}$", phone):
         return f"+263{phone}"
     return None
-
-# def validate_zimbabwean_phone(phone):  
-#     # Step 1: Clean input  
-#     cleaned = re.sub(r'[+\s-]', '', phone)  
-
-#     # Step 2: Validate  
-#     if cleaned.startswith('07') and len(cleaned) == 10:  
-#         if cleaned[2] in ['7', '1', '8', '3']:  
-#             return True  
-#     elif cleaned.startswith('2637') and len(cleaned) == 12:  
-#         if cleaned[4] in ['7', '1', '8', '3']:  
-#             return True  
-#     return False  

@@ -118,63 +118,53 @@ def create_individual_background(self,individual_data: dict, user_id:int, reques
             'error': str(exc)
         }
 
+def parse_date(value):
+    if not value or str(value).strip() == "":
+        return None
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(str(value).strip(), fmt).date()
+        except ValueError:
+            continue
+    return None
+
 @shared_task
 def process_individuals_csv(file_path):
     import os
 
-    def parse_date(value):
-        if not value or str(value).strip() == "":
-            return None
-        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
-            try:
-                return datetime.strptime(str(value).strip(), fmt).date()
-            except ValueError:
-                continue
-        return None
 
     with open(file_path, newline='', encoding='utf-8') as csv_file:
         reader = csv.reader(csv_file)
         headers = next(reader)
 
         skipped_rows = []
-        created_rows = []
+        created_rows = 0
 
         for row in reader:
+
             if not any(row):
                 continue
 
             errors = []
 
-            if len(row) < 22:
-                skipped_rows.append(row + ["Row too short"])
-                continue
+            # if len(row) < 4:
+            #     skipped_rows.append(row + ["Row too short"])
+            #     continue
 
             first_name = row[0].strip()
             last_name = row[1].strip()
             dob = parse_date(row[2].strip())
-            gender = row[3].strip()
+            gender = row[3].strip().lower()
             id_type = row[4].strip().lower()
             id_number = row[5].strip().upper()
-            marital_status = row[6].strip()
+            marital_status = row[6].strip().lower()
             phone = row[7].strip()
             email = row[8].strip()
-            address_type = row[9].strip()
-            house_number = row[10].strip()
-            building = row[11].strip()
-            street_number = row[12].strip()
-            street_name = row[13].strip()
-            suburb_name = row[14].strip()
-            city = row[15].strip()
-            province = row[16].strip()
-            country = row[17].strip()
-            postal_code = row[18].strip()
-            employer = row[19].strip()
-            job_title = row[20].strip()
-            employment_date = parse_date(row[21].strip())
 
             # Required fields check
-            if not first_name or not last_name or not dob or not id_number:
-                errors.append("Missing required fields")
+            required_fields= [first_name,last_name,id_number, phone]
+            if not required_fields:
+                errors.append(f"Missing required field{required_fields}")
 
             # Duplicate check
             if Individual.objects.filter(identification_number=id_number).exists():
@@ -204,10 +194,9 @@ def process_individuals_csv(file_path):
             if normalized_phone:
                 phone = normalized_phone
             else:
-                errors.append("Invalid mobile number")
+                errors.append(f"Invalid mobile number{phone}")
 
-            # Validate email
-            if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            if validate_email(email):
                 email = email
             else:
                 errors.append("Invalid Email address")
@@ -230,33 +219,7 @@ def process_individuals_csv(file_path):
                         mobile_phone=phone,
                         email=email
                     )
-                    # Create employment info
-                    EmploymentDetail.objects.create(
-                        individual=individual,
-                        employer_name=employer,
-                        job_title=job_title,
-                        start_date=employment_date,
-                    )
-                    # Get or create Suburb
-                    suburb, _ = Suburb.objects.get_or_create(
-                        name=suburb_name,
-                        city__name=city,
-                        city__province__name=province,
-                        city__province__country__name=country
-                    )
-                    # Create Address
-                    Address.objects.create(
-                        content_object=individual,
-                        object_id=individual.pk,
-                        address_type=address_type,
-                        street_address=house_number,
-                        line_2=building,
-                        # street_number=street_number,
-                        # street_name=street_name,
-                        suburb=suburb,
-                        postal_code=postal_code,
-                    )
-
+                    
                     created_rows += 1
                 except Exception as e:
                     errors.append(str(e))
@@ -264,7 +227,6 @@ def process_individuals_csv(file_path):
             else:
                 skipped_rows.append(row + [", ".join(errors)])
 
-        # Write errors to file if any
         import os
 
         errors_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "errors")
@@ -275,23 +237,21 @@ def process_individuals_csv(file_path):
                 writer = csv.writer(f)
                 writer.writerow([
                     'First Name', 'Last Name', 'Date Of Birth', 'Gender', 'Identification Type', 'ID Number',
-                    'Marital Status', 'Phone Number', 'Email Address', 'Address Type', 'House/Flat Number',
-                    'Building/Complex Name', 'Street Number', 'Street Name', 'Suburb', 'City/Town', 'Province',
-                    'Country', 'Postal Code', 'Current Employer', 'Job Title', 'Date Of Employment', 'Errors'
+                    'Marital Status', 'Phone Number', 'Email Address', 'Errors'
                 ])
                 for row in skipped_rows:
                     writer.writerow(row)
             return {
                 "status": "completed_with_errors",
-                "created": len(created_rows),
+                "created": created_rows,
                 "skipped": len(skipped_rows),
                 "error_file": error_file_path
             }
         else:
             return {
                 "status": "completed",
-                "created": len(created_rows),
-                "skipped": 0
+                "created": created_rows,
+                "skipped": len(skipped_rows)
             }
                         
 

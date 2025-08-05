@@ -16,28 +16,24 @@ def download_csv_template(request):
     writer.writerow([
         "First Name*", "Last Name*", "Date Of Birth*", "Gender*",
         "Identification Type*", "ID Number*", "Marital Status",
-        "Phone Number*", "Email Address", "Address Type",
-        "House/Flat Number", "Building/Complex Name", "Street Number*",
-        "Street Name*", "Suburb", "City/Town*", "Province",
-        "Country", "Postal Code", "Current Employer",
-        "Job Title", "Date Of Employment"
+        "Phone Number*", "Email Address"
     ])
 
     writer.writerow([
         "John", "Doe", "1985-07-15", "Male",
         "National ID", "63-1234567-A-00", "Married",
-        "+263712345678", "john.doe@example.com", "physical",
-        "12B", "Greenwood Heights", "102",
-        "Kwame Nkrumah Ave", "Suburbs", "Bulawayo", "Bulawayo",
-        "Zimbabwe", "00263", "Tech Solutions",
-        "Software Engineer", "2010-05-20"
+        "+263712345678", "john.doe@example.com"
     ])
     return response
 
 def download_excel_template(request):
     wb = Workbook()
-    ws = wb.active
-    ws.title = "Individuals"
+    if wb.active is None:
+        ws = wb.create_sheet(title="Individuals")
+        wb.remove(wb['Sheet'])
+    else:
+        ws = wb.active
+        ws.title = "Individuals"
 
     # Define headers
     headers = [
