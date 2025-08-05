@@ -77,7 +77,7 @@ def validate_passport_number(passport_number, country):
     if not re.match(pattern, passport_number):
         raise ValidationError(f"Invalid passport number for {country}: {passport_number}")
     
-def validate_email(email: str)-> bool:
+def validate_email(email: str) -> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern,email)
 

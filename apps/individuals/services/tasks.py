@@ -162,9 +162,15 @@ def process_individuals_csv(file_path):
             email = row[8].strip()
 
             # Required fields check
-            required_fields= [first_name,last_name,id_number, phone]
-            if not required_fields:
-                errors.append(f"Missing required field{required_fields}")
+            required_fields = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "id_number": id_number,
+                "phone": phone
+            }
+            missing_fields = [field for field, value in required_fields.items() if not value]
+            if missing_fields:
+                errors.append(f"Missing required fields: {', '.join(missing_fields)}")
 
             # Duplicate check
             if Individual.objects.filter(identification_number=id_number).exists():
@@ -188,13 +194,13 @@ def process_individuals_csv(file_path):
                 valid_national_id = True
             else:
                 errors.append("Invalid identification type")
-
+                errors.append(f"Invalid mobile number: {phone}")
             #validate phone 
             normalized_phone = normalize_zimbabwe_mobile(phone)
             if normalized_phone:
                 phone = normalized_phone
             else:
-                errors.append(f"Invalid mobile number{phone}")
+                errors.append(f"Invalid mobile number: {phone}")
 
             if validate_email(email):
                 email = email
@@ -227,7 +233,6 @@ def process_individuals_csv(file_path):
             else:
                 skipped_rows.append(row + [", ".join(errors)])
 
-        import os
 
         errors_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "errors")
         os.makedirs(errors_dir, exist_ok=True)
@@ -283,7 +288,7 @@ def process_individuals_excel(file_path):
         postal_code = row[18]
         employer = row[19]
         job_title = row[20]
-        employment_date = row[20]
+        employment_date = row[21]
 
         suburb, _ = Suburb.objects.get_or_create(
             name=suburb_name,

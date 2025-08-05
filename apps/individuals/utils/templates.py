@@ -73,7 +73,6 @@ def download_excel_template(request):
             suburb.city.province.name,
             suburb.city.province.country.name,
         ])    
-    print("Total suburbs found:", suburbs.count())
     # Named range for suburb list
     suburb_range = f"{quote_sheetname('Address-Lookups')}!$A$2:$A${len(suburbs)+1}"
     dn = DefinedName(name="SuburbList", attr_text=suburb_range)
@@ -82,8 +81,8 @@ def download_excel_template(request):
     gender_dv = DataValidation(type="list", formula1="=Dropdowns!$A$1:$A$3", allow_blank=False)
     id_dv = DataValidation(type="list", formula1="=Dropdowns!$B$1:$B$4", allow_blank=False)
     marital_dv = DataValidation(type="list", formula1="=Dropdowns!$C$1:$C$4", allow_blank=True)
-    address_type_dv = DataValidation(type="list", formula1="=Dropdowns!$D1:$D$5", allow_blank=False)
-    suburb_dv= DataValidation(type="list",formula1="=SuburbList", allow_blank=False)
+    address_type_dv = DataValidation(type="list", formula1="=Dropdowns!$D$1:$D$5", allow_blank=False)
+    suburb_dv = DataValidation(type="list", formula1="=SuburbList", allow_blank=False)
     
 
     ws.add_data_validation(gender_dv)

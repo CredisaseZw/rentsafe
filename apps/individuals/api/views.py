@@ -227,7 +227,7 @@ class BulkUpload(BaseViewSet):
         import tempfile
 
         if not file:
-            return Response({'error': 'No file selected uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
         ext = file.name.split('.')[-1].lower()
         if ext != 'csv':
