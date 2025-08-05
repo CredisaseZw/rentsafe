@@ -1,32 +1,42 @@
-import { SearchIcon } from "lucide-react";
 import { useState } from "react";
-
+import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 interface SearchboxProps {
    placeholder: string;
    handleSearch: (value: string) => void;
 }
+
 function Searchbox({ handleSearch, placeholder }: SearchboxProps) {
    const [searchValue, setSearchValue] = useState("");
+
+   const clearSearch = () => {
+      setSearchValue("");
+   };
+
    return (
-      <div className="w-full">
-         <div className="flex flex-row items-center rounded">
-            <button className="flex items-center gap-2 rounded-tl rounded-bl border border-green-600 bg-green-600 px-4 py-2 text-white">
-               <span>Search</span>
-               <SearchIcon size={15} />
-            </button>
-            <input
-               type="text"
-               className="flex-1 rounded-r-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-transparent focus:ring-2 focus:ring-green-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
-               placeholder={placeholder}
-               value={searchValue}
-               onChange={(e) => setSearchValue(e.target.value)}
-               onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                     handleSearch(searchValue);
-                  }
-               }}
-            />
-         </div>
+      <div className="border-color flex items-center justify-between rounded-sm border bg-white sm:w-full md:w-fit dark:bg-zinc-900">
+         <Button onClick={clearSearch} className="h-full" type="button" variant="ghost" size="xs">
+            <X />
+         </Button>
+         <Input
+            value={searchValue}
+            onChange={(text) => setSearchValue(text.target.value)}
+            placeholder={placeholder}
+            name="search_value "
+            className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-3 py-3 text-gray-900 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
+         />
+
+         <Button
+            type="submit"
+            onClick={() => {
+               if (searchValue.trim()) handleSearch(searchValue.trim());
+            }}
+            variant="ghost"
+            size="xs"
+         >
+            <Search />
+         </Button>
       </div>
    );
 }

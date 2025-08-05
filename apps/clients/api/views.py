@@ -114,13 +114,13 @@ class ClientViewSet(viewsets.ModelViewSet):
         """
         List all users associated with a given client ID passed as a query param (?pk=1)
         """
-        client_pk = request.query_params.get('pk')
+        client_pk = request.query_params.get('client_id')
         if not client_pk:
             return Response({'error': 'Missing client pk in query params'}, status=status.HTTP_400_BAD_REQUEST)
 
         client = get_object_or_404(Client, pk=client_pk)
         users = User.objects.filter(client=client).distinct()
-        serializer = MinimalUserSerializer(users, many=True)
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
     @action(detail=False, methods=['get'], url_path='search')
@@ -158,7 +158,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         else:
             recipient_type = 'company'
         
-        send_notification.delay(
+        send_notification(
             recipient_type=recipient_type,
             recipient_id=recipient_id,
             notification_type='NEW_CLIENT_USER',

@@ -18,10 +18,10 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
    const hasSubLinks = navLink.subLinks && navLink.subLinks.length > 0;
    const [open, setOpen] = useState(false);
 
-   const activeClasses = "bg-gray-800 dark:bg-zinc-800";
+   const activeClasses = "bg-[var(--navlink)] dark:bg-zinc-800";
    const inactiveTextClasses = "text-gray-800 dark:text-white";
-   const activeTextClasses = "text-white hover:text-gray-800 hover:dark:text-white";
-   const hoverClasses = "hover:bg-gray-200/90 hover:dark:bg-zinc-900";
+   const activeTextClasses = "text-blue-700 dark:text-white hover:text-gray-800 hover:dark:text-white";
+   const hoverClasses = "hover:bg-gray-100/90 hover:dark:bg-zinc-900";
 
    if (hasSubLinks) {
       return (

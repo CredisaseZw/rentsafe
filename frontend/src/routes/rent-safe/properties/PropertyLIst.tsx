@@ -5,6 +5,7 @@ import Modal from "@/components/general/Modal";
 import PropertyListTableRow from "@/components/general/PropertyListTableRow";
 import Searchbox from "@/components/general/Searchbox";
 import SummaryCard from "@/components/general/SummaryCard";
+import ColumnsContainer from "@/components/general/ColumnsContainer";
 import usePropertyList from "@/hooks/components/usePropertyList";
 import { Plus } from "lucide-react";
 
@@ -28,11 +29,11 @@ function PropertyLIst() {
             </Modal>
          )}
          <div className="summary-container w-full">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <ColumnsContainer numberOfCols={5}>
                {SummaryCards.map((card, index) => (
                   <SummaryCard key={index} subTitle={card.subTitle} value={card.value} />
                ))}
-            </div>
+            </ColumnsContainer>
             <div className="main-card">
                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                   <div className="start aligh-center">
@@ -45,7 +46,7 @@ function PropertyLIst() {
                   </div>
                   <div className="flex flex-row justify-end p-4">
                      <Button onClick={openModal} className="flex flex-row gap-3">
-                        <Plus size={20} className="self-center" />
+                        <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
                      </Button>
                   </div>

@@ -1,20 +1,28 @@
 import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
-import useMinimalCompaniesList from "@/hooks/apiHooks/useMinimalCompaniesList";
+import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
 import { useNavigate } from "react-router";
+import type { PaginationData } from "@/interfaces";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const { companies, isLoading } = useMinimalCompaniesList();
+   const { data, isLoading, searchQuery } = useCompanyBranches();
 
-   // @ts-expect-error ReactNode types will never be rendered
    const rows: BaseTableRow[] =
-      companies?.map((cell) => ({
-         ...cell,
-         select: <CompanyPaymentStatusReport companyId={cell.id} />,
-      })) || [];
+      data?.results?.map((cell) => {
+         return {
+            registration_name: cell.branch_name || "",
+            registration_number: cell.company?.registration_number || "",
+            id: cell.id,
+            select: (
+               <div className="flex items-center gap-2">
+                  <CompanyPaymentStatusReport branchID={cell.id} />
+               </div>
+            ),
+         };
+      }) || [];
 
    const headers: BaseTableColumn[] = [
       { name: "registration_name", displayName: "Registered Name" },
@@ -38,10 +46,15 @@ export default function useCompanyPaymentStatusTab() {
       navigate({ search: "?" + searchParams.toString() });
    }
 
+   const paginationData = data as PaginationData;
+
    return {
       rows,
       headers,
+      searchRef,
       isLoading,
+      searchQuery,
+      paginationData,
       clearSearch,
       handleSearch,
    };

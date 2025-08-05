@@ -1,17 +1,24 @@
 import { useEffect } from "react";
-import type { IndividualMinimal } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router";
-import { sampleIndividualRows } from "@/lib/sampleData";
+import { api } from "@/api/axios";
 
-export default function useMinimalIndividualsList() {
+export default function useMinimalIndividualsList(individualQuery?: string) {
    const [searchParams] = useSearchParams();
-   const q = searchParams.get("individual_q")?.trim();
+   const q = searchParams.get("individual_q")?.trim() || individualQuery?.trim();
+   const page = searchParams.get("individual_page") || "1";
 
-   const { data, isLoading, error } = useQuery<IndividualMinimal[]>({
+   const { data, isLoading, error } = useQuery({
       queryKey: ["individuals-minimal", q],
-      queryFn: () => (q ? [] : (sampleIndividualRows as IndividualMinimal[])),
+      queryFn: () => {
+         const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
+         return api
+            .get(`/api/individuals/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`)
+            .then((res) => res.data);
+      },
+
+      // (q ? api.get<IndividualMinimal[]>(`/api/individuals/search/?q=${q}`).then((res) => res.data) : []),
    });
 
    useEffect(() => {
@@ -21,5 +28,5 @@ export default function useMinimalIndividualsList() {
       }
    }, [error, q]);
 
-   return { individuals: data, isLoading, searchQuery: q };
+   return { data, isLoading, searchQuery: q };
 }

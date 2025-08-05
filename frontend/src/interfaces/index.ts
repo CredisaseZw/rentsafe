@@ -46,16 +46,49 @@ export interface Address {
       id: number;
       name: string;
    };
-   date_created: string;
-   date_updated: string;
 }
 
+export interface Contact {
+   id: number;
+   full_contact: string;
+}
+export interface Profile {
+   trading_status: string | null;
+   trading_status_display: string | null;
+   mobile_phone: string | null;
+   landline_phone: string | null;
+   email: string | null;
+   logo: string | null;
+   registration_date: string | null;
+   tin_number: string | null;
+   vat_number: string | null;
+   number_of_employees: number | null;
+   website: string | null;
+   trend: string | null;
+   trend_display: string | null;
+   twitter: string | null;
+   facebook: string | null;
+   instagram: string | null;
+   linkedin: string | null;
+   operations: string | null;
+   contact_person: string | null;
+   risk_class: string | null;
+   risk_class_display: string | null;
+   account_number: string | null;
+   is_under_judicial: string | null;
+   is_under_judicial_display: string | null;
+   is_suspended: boolean;
+}
 export interface Branch {
    id: number;
-   company: number;
    branch_name: string;
+   is_headquarters: boolean;
+   is_deleted: boolean;
+   company: CompanyMinimal;
    addresses: Address[];
-   contacts: string[];
+   contacts: Contact[];
+   primary_address: Address | null;
+   profile: Profile;
 }
 
 export interface CompanyFull {
@@ -71,35 +104,53 @@ export interface CompanyFull {
    is_active?: boolean;
    addresses?: Address[];
    branches?: Branch[];
-   profile?: {
-      email?: string;
-      trading_status?: string;
-      trading_status_display?: string;
-      mobile_phone?: string;
-      landline_phone?: string;
-      logo?: string;
-      registration_date?: string;
-      tin_number?: string;
-      vat_number?: string;
-      number_of_employees?: string;
-      website?: string;
-      trend?: string;
-      trend_display?: string;
-      twitter?: string;
-      facebook?: string;
-      instagram?: string;
-      linkedin?: string;
-      operations?: string;
-      contact_person?: string;
-      risk_class?: string;
-      risk_class_display?: string;
-      account_number?: string;
-      is_under_judicial?: boolean | string;
-      is_under_judicial_display?: boolean | string;
-      is_suspended?: boolean;
+   profile?: Profile;
+}
+export interface CompanyCreationResponse {
+   id: number;
+   branch_name: string;
+   is_headquarters: boolean;
+   is_deleted: boolean;
+   company: {
+      id: number;
+      registration_number: string;
+      registration_name: string;
+      trading_name: string;
+      legal_status: string;
+      legal_status_display: string;
+      is_verified: boolean;
    };
-   date_created?: string;
-   date_updated?: string;
+   // contacts: [];
+   // primary_address: null;
+   profile: {
+      trading_status: string;
+      trading_status_display: string | null;
+      mobile_phone: string;
+      landline_phone: string;
+      email: string;
+      logo: string | null;
+      registration_date: string | null;
+      tin_number: string;
+      vat_number: string;
+      number_of_employees: string | null;
+      website: string | null;
+      trend: string | null;
+      trend_display: string | null;
+      twitter: string | null;
+      facebook: string | null;
+      instagram: string | null;
+      linkedin: string | null;
+      operations: string | null;
+      contact_person: string | null;
+      risk_class: string | null;
+      risk_class_display: string | null;
+      account_number: string | null;
+      is_under_judicial: string | null;
+      is_under_judicial_display: string | null;
+      is_suspended: boolean | null;
+   };
+   date_created: string;
+   date_updated: string;
 }
 
 export interface CompanyReport {
@@ -107,12 +158,14 @@ export interface CompanyReport {
    active: { creditor: string; type: string; outstandingSince: string; amount: number }[];
    historic: { creditor: string; type: string; outstandingSince: string; amount: number }[];
    rating: string;
-   companyDetails: {
-      registeredName: string;
+   branchDetails: {
+      branchName: string;
       tradingName: string;
+      registrationName: string;
       registrationNumber: string;
       dateOfRegistration: string;
       tradingStatus: string;
+      isHeadquaters: false | true;
       industrySector: string;
       telephoneNumber: string;
       mobileNumber: string;
@@ -157,16 +210,50 @@ export interface AddressLocation {
 
 export interface IndividualMinimal {
    id: number;
-   forenames: string;
-   surname: string;
-   identificationNumber: string;
+   first_name: string;
+   last_name: string;
+   identification_number: string;
+   contact_details?: {
+      id: number;
+      individual_id: number;
+      mobile_phone: string[];
+      email: string;
+   }[];
+   is_active: boolean;
 }
 
 export interface IndividualFull {
    id: number;
-   forenames: string;
-   surname: string;
-   identificationNumber: string;
+   first_name: string;
+   last_name: string;
+   date_of_birth: string;
+   gender: string;
+   marital_status: string;
+   identification_type: string;
+   identification_number: string;
+   contact_details: { id: number; individual_id: number; mobile_phone: string[]; email: string }[];
+   addresses: Address[];
+   employment_details: {
+      id: number;
+      employer_name: string;
+      job_title: string;
+      start_date?: string;
+      end_date?: string;
+      is_current: boolean;
+      monthly_income?: string | number;
+   }[];
+   next_of_kin?: {
+      id: number;
+      first_name: string;
+      last_name: string;
+      relationship: string;
+      relationship_display: string;
+      mobile_phone: string;
+      email: string;
+      physical_address: string;
+   }[];
+   documents?: { id: number; document_type: string; file: string; description: string; is_verified: boolean }[];
+   notes?: { id: number; content: string; is_private: boolean; date_created: string; date_updated: string }[];
 }
 
 export interface PlaceBase {
@@ -220,4 +307,30 @@ export interface ProvinceWithCities extends Province {
 
 export interface CityWithSuburbs extends City {
    suburbs: SuburbMinimal[];
+}
+
+export interface BranchCreationResponse {
+   id: number;
+   company: number;
+   branch_name: string;
+   addresses: Address[];
+   is_headquarters: boolean;
+}
+
+export interface PaginationData {
+   count: number;
+   next?: string;
+   previous?: string;
+}
+
+export interface BranchApiResponse extends PaginationData {
+   results: Branch[];
+}
+
+export interface IndividualApiResponse extends PaginationData {
+   results: IndividualMinimal[];
+}
+
+export interface SearchCompanyApiRespionse extends PaginationData {
+   results: CompanyMinimal[];
 }

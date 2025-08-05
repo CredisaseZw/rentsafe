@@ -55,7 +55,7 @@ html.dark .input-default::placeholder {
 }
 /* Apply to all scrollable elements */
 ::-webkit-scrollbar {
-   width: 15px;
+   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -63,7 +63,7 @@ html.dark .input-default::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-   background-color: #1e2939d2; /* primary-dark */
+   background-color: #e0e1e6; /* primary-dark */
    border-radius: 15px;
 
    border: 2px solid transparent;

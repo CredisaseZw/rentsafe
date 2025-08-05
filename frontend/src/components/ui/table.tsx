@@ -45,7 +45,7 @@ function TableRow({ noHover, className, ...props }: React.ComponentProps<"tr"> &
          className={cn(
             "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
             noHover ? "hover:bg-transparent" : "",
-            "border-color py-4",
+            "border-foreground/25 py-4",
             className,
          )}
          {...props}
@@ -72,8 +72,8 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
       <td
          data-slot="table-cell"
          className={cn(
-            "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-            "px-2 py-1.5",
+            "align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+            "px-3 py-3.5",
             className,
          )}
          {...props}

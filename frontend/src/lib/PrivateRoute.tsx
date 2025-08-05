@@ -1,8 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { Outlet, useLocation } from "react-router";
+import { getCookie } from "typescript-cookie";
 
 export default function ProtectRoute() {
-   const userStr = localStorage.getItem("token");
+   const userStr = getCookie("token");
    let user: null | { access_token?: string } = null;
 
    try {

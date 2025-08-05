@@ -1,6 +1,6 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address } from "@/interfaces";
-import type { AddressPayload } from "@/interfaces/form-payloads";
+import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
 import type { NavLink, Route } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -132,7 +132,7 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
    const addressesCount = Object.keys(data).filter((key) => key.startsWith("city_id")).length;
    for (let i = 1; i < addressesCount + 1; i++) {
       const address: AddressPayload = {
-         is_primary: !!data[`is_primary${i}`],
+         is_primary: !!data[`is_primary_address${i}`],
          address_type: data[`address_type${i}`] as "physical" | "postal" | "billing" | "work" | "other",
          postal_code: data[`postal_code${i}`] as string,
          country_id: toIntElseUndefined(data[`country_id${i}`] as string),
@@ -147,6 +147,23 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
    return addresses;
 }
 
+export function extractContacts(data: { [k: string]: FormDataEntryValue }): ContactPayload[] {
+   const contacts: ContactPayload[] = [];
+   const contactsCount = Object.keys(data).filter((key) => key.startsWith("contact_type")).length;
+
+   for (let i = 1; i < contactsCount + 1; i++) {
+      const contact: ContactPayload = {
+         individual: toIntElseUndefined(data[`individual${i}`] as string)!,
+         position: data[`position${i}`] as string,
+         contact_type: data[`contact_type${i}`] as "email" | "phone" | "fax" | "other",
+         is_primary: !!data[`is_primary${i}`],
+      };
+      contacts.push(contact);
+   }
+
+   return contacts;
+}
+
 export function formatErrorMessage(error: unknown): string {
    if (error instanceof Error) {
       return error.message;
@@ -156,4 +173,19 @@ export function formatErrorMessage(error: unknown): string {
       return (error as { message: string }).message;
    }
    return JSON.stringify(error, null, 2) || "An unknown error occurred";
+}
+
+export function validateZimNationalId(idNumber: string): boolean {
+   //23155637M75
+   const regex = /^\d{8,9}[A-Za-z]{1}\d{2}$/;
+   return regex.test(idNumber);
+}
+
+export function stringifyAndFmt(val: unknown): string {
+   if (val === null || val === undefined) return "";
+   if (typeof val === "string") return val.replace(/^"|"$/g, "");
+   if (typeof val === "object") {
+      return JSON.stringify(val, (_, v) => (v === null || v === undefined ? undefined : v)).replace(/^"|"$/g, "");
+   }
+   return String(val);
 }

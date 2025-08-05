@@ -31,11 +31,6 @@ function usePropertyList() {
       }));
    };
 
-   const submitAddPropertyForm = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      console.log(addPropertyForm);
-   };
-
    const onSelectFilter = (filterOption: string) => {
       setSelectFilter(filterOption);
    };
@@ -71,7 +66,6 @@ function usePropertyList() {
       onChangeHandler,
       onSearchValue,
       onSelectFilter,
-      submitAddPropertyForm,
       openModal,
       closeModal,
       addPropertyForm,
