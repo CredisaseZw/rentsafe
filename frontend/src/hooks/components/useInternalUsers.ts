@@ -28,10 +28,11 @@ function useInternalUsers() {
       firstName: "",
       lastName: "",
       email: "",
+      password : "",
       accessLevel: "",
    });
    const openModal = () => setModalVisible(true);
-   const closeodal = () => setModalVisible(false);
+   const closeModal = () => setModalVisible(false);
 
    const handleUserSearch = (searchValue: string) => {
       console.log(searchValue);
@@ -50,7 +51,7 @@ function useInternalUsers() {
       headers,
       handleUserSearch,
       openModal,
-      closeodal,
+      closeModal,
       onChangeHandler,
       setAddInternalUsersFormData,
    };
