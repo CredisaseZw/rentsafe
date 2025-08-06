@@ -6,15 +6,14 @@ interface AddInternalUserProps {
    lastName: string;
    email: string;
    accessLevel: string;
-   password :string;
 }
 
 export default function useAddInternalUsersApi(userID: number) {
    return useMutation({
-      mutationFn: async ({ firstName, lastName, email, password ,accessLevel }: AddInternalUserProps) => {
+      mutationFn: async ({ firstName, lastName, email ,accessLevel }: AddInternalUserProps) => {
          const response = await api.post(`${import.meta.env.VITE_API_URL}/api/clients/${userID}/create-user/`,   {
           email,
-          password,       
+          password : "1234",       
           first_name: firstName,
           last_name: lastName,
           role_id: parseInt(accessLevel)

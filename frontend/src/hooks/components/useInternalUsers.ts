@@ -28,7 +28,6 @@ function useInternalUsers() {
       firstName: "",
       lastName: "",
       email: "",
-      password : "",
       accessLevel: "",
    });
    const openModal = () => setModalVisible(true);

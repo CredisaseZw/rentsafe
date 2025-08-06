@@ -11,6 +11,7 @@ import { Input } from "../ui/input";
 import useGetUserId from "@/hooks/components/useGetUserID";
 import ButtonSpinner from "../general/ButtonSpinner";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface props{
    successCallbackFN : (status:  boolean) => void;
@@ -29,14 +30,14 @@ function AddInternalUsersForm({successCallbackFN} : props) {
       e.preventDefault();
       setLoading(true);
       addInternalUser.mutate(addInternalUsersFormData, {
-         onSuccess: (data) => {
-            console.log("User added successfully:", data);
+         onSuccess: () => {
+            toast.success("User added successfully")
             queryClient.invalidateQueries({queryKey : ["clients_for", useGetUserId()]})
             successCallbackFN(true)
          },
          onError: (error) => {
-            
             console.error("Error adding user:", error);
+            toast.error("Error occured adding user")
          },
          onSettled: ()=> setLoading(false)
          
@@ -122,21 +123,6 @@ function AddInternalUsersForm({successCallbackFN} : props) {
                      </SelectContent>
                   </Select>
                </div>
-            </div>
-         </div>
-         <div className="w-full mt-6">
-         <div className="form-group">
-               <label htmlFor="" className="required">
-                  Password
-               </label>
-               <Input
-                  type="password"
-                  required
-                  onChange={onChangeHandler}
-                  value={addInternalUsersFormData.password}
-                  name="password"
-                  placeholder="Password"
-               />
             </div>
          </div>
          <div className="mt-6 flex w-full justify-end">
