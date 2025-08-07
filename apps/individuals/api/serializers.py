@@ -222,7 +222,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         id=address_id,
                         content_type=individual_ct,
                         object_id=individual.pk,
-                        is_primary=True
                     )
                     for key, val in addr.items():
                         setattr(address_obj, key, val)
@@ -233,14 +232,12 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
-                        is_primary=True
                     )
             else:
                 existing = Address.objects.filter(
                     content_type=individual_ct,
                     object_id=individual.pk,
                     address_type=addr.get('address_type'),
-                    is_primary=addr.get('is_primary', True)
                 ).first()
 
                 if existing:
@@ -253,7 +250,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
-                        is_primary=True
                     )
 
         for contact in contact_data:
@@ -429,7 +425,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
-                        is_primary=True
                     )
             else:
                 existing = Address.objects.filter(
@@ -448,7 +443,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
-                        is_primary=True
                     )
 
         for contact in contact_data:
