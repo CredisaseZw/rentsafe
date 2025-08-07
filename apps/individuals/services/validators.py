@@ -2,7 +2,7 @@ import re
 from django.core.exceptions import ValidationError
 
 
-def validate_national_id(national_id, country):
+def validate_national_id(national_id, country: str) -> bool:
     patterns = {
         "zimbabwe": r'\d{8,9}[a-zA-Z]+\d{2}',
         "south_africa": r'^\d{13}$',
@@ -23,9 +23,7 @@ def validate_national_id(national_id, country):
     
     national_id_clean = national_id.strip().upper().replace(" ", "").replace("-","")
 
-    if not re.match(pattern, national_id_clean):
-        raise ValidationError(f"Invalid national ID for {country}: {national_id_clean}")
-
+    return re.match(pattern, national_id_clean)
 
 def validate_phone_number(phone_number, country):
     patterns = {

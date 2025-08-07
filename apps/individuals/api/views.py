@@ -4,13 +4,19 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from apps.individuals.api.serializers import (IndividualSerializer , IndividualUpdateSerializer,
-                                              IndividualCreateSerializer, IndividualSearchSerializer,
-                                              IndividualMinimalSerializer)
+from apps.individuals.api.serializers import (
+    IndividualSerializer , 
+    IndividualUpdateSerializer,
+    IndividualCreateSerializer, 
+    IndividualSearchSerializer,
+    IndividualMinimalSerializer
+    )
 from apps.individuals.models import Individual
 from apps.common.api.views import BaseViewSet
 from apps.common.utils.caching import CacheService
 from apps.individuals.services.tasks import process_individuals_excel, process_individuals_csv
+from apps.individuals.services.validators import validate_national_id
+from rest_framework.exceptions import ValidationError
 import logging
 
 logger = logging.getLogger("individuals")
@@ -40,15 +46,26 @@ class IndividualViewSet(BaseViewSet):
 
     
     def create(self, request, *args, **kwargs):
+      
         try:
+            
             serializer = IndividualCreateSerializer(data=request.data)
+
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+        
+        except ValidationError as e:
+            return self._create_rendered_response(
+                {"error": "Validation failed", "details": e.detail},
+                status.HTTP_400_BAD_REQUEST
+            )     
         except Exception as e:
-            logger.error(f"Error creating individual: {str(e)}")
-            return Response({"error": "Failed to create individual"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"Error creating individual: {e}")
+            return self._create_rendered_response(
+                {'error': 'Failed to create individual', 'details':str(e)},
+                status.HTTP_400_BAD_REQUEST
+            )
 
     def update(self, request, *args, **kwargs):
         try:
@@ -73,7 +90,7 @@ class IndividualViewSet(BaseViewSet):
             if page is not None:
                 serializer = IndividualSearchSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
-            return Response({serializer.data },status=status.HTTP_200_OK)
+            return Response({serializer.data},status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Error listing individuals: {str(e)}")
             return Response(
