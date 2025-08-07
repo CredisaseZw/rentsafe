@@ -6,11 +6,11 @@ from django.urls import reverse
 
 @admin.register(Individual)
 class IndividualAdmin(admin.ModelAdmin):
-    list_display = ('id','last_name', 'first_name','get_mobile_phone','get_email', 'gender', 'identification_number', 'date_of_birth', 'is_verified','is_active','is_deleted')
+    list_display = ('id','last_name', 'first_name', 'identification_number','get_mobile_phone','get_email', 'gender', 'identification_number', 'date_of_birth', 'is_verified','is_active','is_deleted',"date_created")
     list_display_links = ('last_name', 'first_name','identification_number')
-    list_filter = ('gender', 'identification_type', 'is_active', 'is_verified','is_deleted')
+    list_filter = ('gender', 'identification_type', 'is_active', 'is_verified','is_deleted',"date_created")
     search_fields = ('first_name', 'last_name', 'identification_number')
-    ordering = ('last_name', 'first_name')
+    ordering = ( "-date_created",)
     
     def get_mobile_phone(self, obj):
         contact = obj.contact_details.order_by('-id').first()

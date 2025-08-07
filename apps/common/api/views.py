@@ -152,7 +152,6 @@ class LocationViewSet(BaseViewSet):
     
     @CacheService.cached(tag_prefix='locations:countries',timeout=CacheService.LONG_CACHE_TIMEOUT)
     def countries(self, request, pk=None):
-        print("hellowww ----")
         if pk is not None:
             return self.country_detail(request, pk)
         
