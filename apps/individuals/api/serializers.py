@@ -1,11 +1,11 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError as DjangoValidationError
-from apps.individuals.services.validators import validate_email
-from apps.individuals.utils.phone import normalize_phone_number
+from apps.individuals.services.validators import validate_email, normalize_zimbabwe_mobile
 
 from django.db import transaction
 import logging
@@ -26,7 +26,7 @@ class EmploymentDetailSerializer(serializers.ModelSerializer):
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValueError("Invalid employer email address provide")
+                raise ValidationError("Invalid employer email address provide")
             
         return data
 
@@ -49,7 +49,7 @@ class NextOfKinSerializer(serializers.ModelSerializer):
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValueError("Invalid email address provide")
+                raise ValidationError("Invalid email address provide")
             
         return data
 
@@ -73,12 +73,12 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
                 existing_qs = existing_qs.exclude(pk=self.instance.pk)
 
             if existing_qs.exists():
-                raise serializers.ValidationError({"email": "This email address is already registered"})
+                raise ValidationError("This email address is already registered")
 
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValueError("Invalid email address provide")
+                raise ValidationError("Invalid email address provide")
 
         
         phone = data.get("mobile_phone",[])
@@ -95,7 +95,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
                     pass
 
         if phone and country == "zimbabwe":
-            data["mobile_phone"] = normalize_phone_number(phone)
+            data["mobile_phone"] = normalize_zimbabwe_mobile(phone)
 
 
         return data
@@ -171,17 +171,15 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         
     def validate(self, data):
         identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
-        try:
-            existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
-            if existing:
-                if not existing.is_deleted:
-                    raise serializers.ValidationError(
-                        f"This identification number {identification_number} is already registered and active."
-                    )
-                self._existing_individual = existing 
-        except Exception as e:
-            logger.error(f"Error validating individual: {e}")
-            raise serializers.ValidationError(f'Failed to validate individual: {e}')
+
+        existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
+        if existing:
+            if not existing.is_deleted:
+                raise ValidationError(
+                    f"This identification number {identification_number} is already registered and active."
+                )
+            self._existing_individual = existing 
+        
         return data
 
     @transaction.atomic
