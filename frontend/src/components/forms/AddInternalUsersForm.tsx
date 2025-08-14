@@ -25,7 +25,7 @@ function AddInternalUsersForm({successCallbackFN} : props) {
    const addInternalUser = AddInternalUsersApi(useGetUserId());
    const { data, isLoading, isError } = useGetUserRoles();
 
-   // Function to handle form submission
+
    const submitAddInternalUsersForm = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setLoading(true);

@@ -18,6 +18,7 @@ from apps.companies.api.serializers import (
     CompanyBranchSearchSerializer, CompanyBranchSerializer,
     CompanyBranchDetailSerializer, CompanyBranchMinimalSerializer
 )
+from apps.common.utils import extract_error_message
 import logging
 from celery.result import AsyncResult 
 
@@ -67,7 +68,7 @@ class CompanyViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error creating company: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to create company', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
     
@@ -148,7 +149,7 @@ class CompanyViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error soft deleting company {kwargs.get('pk', 'unknown')}: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to delete company', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
     
@@ -210,7 +211,7 @@ class CompanyViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error fetching company branches: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to retrieve company branches', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
             
@@ -226,18 +227,24 @@ class CompanyViewSet(BaseViewSet):
     
     @action(detail=True, methods=['post'], url_path='add-documents')
     def add_document(self, request, pk=None):
-        company = self.get_object() 
-        serializer = DocumentSerializer(
-            data=request.data,
-            context={
-                'content_type': ContentType.objects.get_for_model(Company),
-                'object_id': company.id
-            }
-        )
-        if serializer.is_valid():
+        try:
+            company = self.get_object() 
+            serializer = DocumentSerializer(
+                data=request.data,
+                context={
+                    'content_type': ContentType.objects.get_for_model(Company),
+                    'object_id': company.id
+                }
+            )
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
-        return self._create_rendered_response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error adding document to company {pk}: {str(e)}")
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST
+            )
     
     @action(detail=False, methods=['get'], url_path='location-data')
     @CacheService.cached(tag_prefix='choices:location',timeout=CacheService.LONG_CACHE_TIMEOUT)
@@ -396,7 +403,7 @@ class CompanyBranchViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error creating branch: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to create branch', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
 
@@ -411,7 +418,7 @@ class CompanyBranchViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving branch {pk}: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to retrieve branch', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
     
@@ -433,7 +440,7 @@ class CompanyBranchViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error updating branch {pk}: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to update branch', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
             
@@ -449,7 +456,7 @@ class CompanyBranchViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error soft deleting branch {pk}: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to delete branch', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
             
@@ -463,7 +470,7 @@ class CompanyBranchViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error permanently deleting branch {pk}: {str(e)}")
             return self._create_rendered_response(
-                {'error': 'Failed to permanently delete branch', 'details': str(e)},
+                {'error': extract_error_message(e)},
                 status.HTTP_400_BAD_REQUEST
             )
 
