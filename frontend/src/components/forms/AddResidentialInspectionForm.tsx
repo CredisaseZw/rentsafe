@@ -6,7 +6,7 @@ import useAddResidentialInspection from "@/hooks/components/useAddResidentialIns
 import Checklist from "../general/Checklist";
 
 export default function AddResidentialInspectionForm(){
-    const {ExteriorColumns} = useAddResidentialInspection()
+    const {PropertyInspectionChecklists} = useAddResidentialInspection()
 
     return <div>
         <form action="">
@@ -24,30 +24,30 @@ export default function AddResidentialInspectionForm(){
             </div>
             <div className="flex flex-row mt-5 gap-5">
                 <div>
-                    <h6 className="flex flex-row text-gray-600">M - missing,</h6>
+                    <h6 className="flex flex-row text-gray-500">M - missing,</h6>
                 </div>
                   <div>
-                    <h6 className="flex flex-row text-gray-600">S - scratched,</h6>
+                    <h6 className="flex flex-row text-gray-500">S - scratched,</h6>
                 </div>
                   <div>
-                    <h6 className="flex flex-row text-gray-600">D - damaged,</h6>
+                    <h6 className="flex flex-row text-gray-500">D - damaged,</h6>
                 </div>
                   <div>
-                    <h6 className="flex flex-row text-gray-600">B - broken,</h6>
+                    <h6 className="flex flex-row text-gray-500">B - broken,</h6>
                 </div>
                   <div>
-                    <h6 className="flex flex-row text-gray-600">R - repair/replace,</h6>
+                    <h6 className="flex flex-row text-gray-500">R - repair/replace,</h6>
                 </div>
                  <div>
-                    <h6 className="flex flex-row text-gray-600">W - water damage,</h6>
+                    <h6 className="flex flex-row text-gray-500">W - water damage,</h6>
                 </div>
                  <div>
-                    <h6 className="flex flex-row text-gray-600">L - leaking,</h6>
+                    <h6 className="flex flex-row text-gray-500">L - leaking,</h6>
                 </div>
             </div>
-            <ColumnsContainer numberOfCols={2}>
+         <ColumnsContainer numberOfCols={2}>
             {
-                ExteriorColumns.map((column, index)=>
+                PropertyInspectionChecklists.map((column, index)=>
                     <Checklist key={index}
                     headerName={column.headerName}
                     captionLabel={column.captionLabel}
@@ -55,7 +55,8 @@ export default function AddResidentialInspectionForm(){
                     rows={column.rows}/>
                 )
             }
-            </ColumnsContainer>
+            </ColumnsContainer> 
+
         </form>
     </div>
 }

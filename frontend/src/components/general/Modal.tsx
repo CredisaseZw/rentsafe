@@ -35,11 +35,11 @@ function Modal({ children, onClose, size, modalHeader }: ModalProps) {
    return (
       <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 py-10 backdrop-blur-xs`}>
          <div
-            className={`modal bg-background relative mx-auto rounded-md border border-gray-300 p-10 dark:border-zinc-800 ${modal_sizes.current[size].width}`}
+            className={`modal bg-white dark:bg-zinc-950 relative mx-auto rounded-md border border-gray-300 p-10 dark:border-zinc-800 ${modal_sizes.current[size].width}`}
          >
             <div className="modal-container relative">
                <div className="modal-header relative mb-5">
-                  <h1 className="text-PRIMARY text-2xl font-bold">{modalHeader}</h1>
+                  <h1 className="text-PRIMARY text-2xl font-semibold">{modalHeader}</h1>
                   <div className="absolute top-0 right-0">
                      <X size={25} className="self-center text-gray-500 hover:text-red-800" onClick={onClose} />
                   </div>

@@ -1,7 +1,7 @@
 import type { Column } from "@/types";
 export default function useAddResidentialInspection(){
     
-    const ExteriorColumns: Column[] = [
+    const PropertyInspectionChecklists: Column[] = [
         {
             captionLabel: "Are things loose, cracked, damaged, rotted, bug infested",
             headerName: "Exterior",
@@ -145,10 +145,42 @@ export default function useAddResidentialInspection(){
                 },
 
             ]
+        },
+        {
+            captionLabel : "When was it replaced last? Are there encroaching trees?",
+            headerName : "Roof",
+            note: "",
+            rows : [
+                {
+                    rowName: "Chimney",
+                    status: {
+                        good: false,
+                        ok: false,
+                        bad: false
+                    }
+                },
+                {
+                    rowName: "Glutters",
+                    status: {
+                        good: false,
+                        ok: false,
+                        bad: false
+                    }
+                },
+                {
+                    rowName: "Soffits and fascia",
+                    status: {
+                        good: false,
+                        ok: false,
+                        bad: false
+                    }
+                },
+            ]
+
         }
     ];
 
     return {
-        ExteriorColumns
+        PropertyInspectionChecklists
     }
 }

@@ -43,7 +43,7 @@ function Inspections() {
          label: "Retail",
          content: <Retail/>,
       },
-         {
+      {
          icon: Menu,
          value: "other",
          label: "Other",

@@ -8,7 +8,7 @@ import MultiAddressInput from "@/components/general/MultiAddressInput";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
-export default function IndividualForm() {
+export default function diviIndividualForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useIndividualForm();
 
    return (

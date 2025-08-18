@@ -5,7 +5,7 @@ import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { IndividualFull, IndividualMinimal } from "@/interfaces";
-import { extractErrorMessage } from "@/lib/utils";
+//import { extractErrorMessage } from "@/lib/utils";
 
 export default function useCreateIndividual(successCallback?: () => void) {
    const client = useClient();
@@ -17,9 +17,9 @@ export default function useCreateIndividual(successCallback?: () => void) {
          if (isAxiosError(error)) {
             console.error("Full backend response:", error.response?.data);
             const errorDetails = error.response?.data.error;
-
-            const message = extractErrorMessage(errorDetails);
-            toast.error("Failed to create individual", { description: message });
+            
+            //const message = extractErrorMessage(errorDetails);
+            toast.error("Failed to create individual", { description: errorDetails });
             return;
          }
          toast.error("Failed to create individual. Please try again.");
