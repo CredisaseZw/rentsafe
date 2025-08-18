@@ -1,11 +1,11 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError as DjangoValidationError
-from apps.individuals.services.validators import validate_email
-from apps.individuals.utils.phone import normalize_phone_number
+from apps.individuals.services.validators import validate_email, normalize_zimbabwe_mobile
 
 from django.db import transaction
 import logging
@@ -23,10 +23,10 @@ class EmploymentDetailSerializer(serializers.ModelSerializer):
     
     def validate(self,data):
         if email:= data.get("email"):
-            try:
-                validate_email(email)
-            except Exception as e:
-                raise ValueError("Invalid employer email address provide")
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValidationError("Invalid employer email address provide")
             
         return data
 
@@ -44,14 +44,13 @@ class NextOfKinSerializer(serializers.ModelSerializer):
             'mobile_phone', 'email', 'physical_address'
         ]
         
-    def validate(self, data):
-        try:
-            if email := data.get("email",''):
-                validate_email(email)
-                
-        except Exception as e:
-            raise ValueError(f"Error while creating next of kin {e}")
-        
+    def validate(self,data):
+        if email:= data.get("email"):
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValidationError("Invalid email address provide")
+            
         return data
 
 class ContactDetailsSerializer(serializers.ModelSerializer):
@@ -74,12 +73,12 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
                 existing_qs = existing_qs.exclude(pk=self.instance.pk)
 
             if existing_qs.exists():
-                raise serializers.ValidationError({"email": "This email address is already registered"})
+                raise ValidationError("This email address is already registered")
 
-            try:
-                validate_email(email)
-            except DjangoValidationError as e:
-                raise serializers.ValidationError({'email': e.messages})
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValidationError("Invalid email address provide")
 
         
         phone = data.get("mobile_phone",[])
@@ -96,7 +95,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
                     pass
 
         if phone and country == "zimbabwe":
-            data["mobile_phone"] = normalize_phone_number(phone)
+            data["mobile_phone"] = normalize_zimbabwe_mobile(phone)
 
 
         return data
@@ -172,17 +171,15 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         
     def validate(self, data):
         identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
-        try:
-            existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
-            if existing:
-                if not existing.is_deleted:
-                    raise serializers.ValidationError(
-                        f"This identification number {identification_number} is already registered and active."
-                    )
-                self._existing_individual = existing 
-        except Exception as e:
-            logger.error(f"Error validating individual: {e}")
-            raise serializers.ValidationError(f'Failed to validate individual: {e}')
+
+        existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
+        if existing:
+            if not existing.is_deleted:
+                raise ValidationError(
+                    f"This identification number {identification_number} is already registered and active."
+                )
+            self._existing_individual = existing 
+        
         return data
 
     @transaction.atomic
@@ -225,7 +222,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         id=address_id,
                         content_type=individual_ct,
                         object_id=individual.pk,
-                        is_primary=True
                     )
                     for key, val in addr.items():
                         setattr(address_obj, key, val)
@@ -235,14 +231,12 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
-                        is_primary=True
                     )
             else:
                 existing = Address.objects.filter(
                     content_type=individual_ct,
                     object_id=individual.pk,
                     address_type=addr.get('address_type'),
-                    is_primary=addr.get('is_primary', True)
                 ).first()
 
                 if existing:
@@ -254,7 +248,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
-                        is_primary=True
                     )
 
         for contact in contact_data:
@@ -420,7 +413,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
-                        is_primary=True
                     )
             else:
                 existing = Address.objects.filter(
@@ -438,7 +430,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
-                        is_primary=True
                     )
 
         for contact in contact_data:
