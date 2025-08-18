@@ -228,7 +228,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     address_obj.save()
                 except Address.DoesNotExist:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
@@ -246,7 +245,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     existing.save()
                 else:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
@@ -266,7 +264,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     contact_obj.save()
                 except IndividualContactDetail.DoesNotExist:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=individual,
                         **contact
                     )
@@ -283,13 +280,11 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         IndividualContactDetail.objects.create(
-                            user=user, 
                             individual=individual,
                             **contact
                         )
                 else:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=individual, 
                         **contact
                     )
@@ -307,13 +302,11 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     emp_obj.save()
                 except EmploymentDetail.DoesNotExist:
                     EmploymentDetail.objects.create(
-                        user=user, 
                         individual=individual, 
                         **emp
                     )
             else:
                 EmploymentDetail.objects.create(
-                    user=user, 
                     individual=individual, 
                     **emp
                 )
@@ -321,7 +314,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         if kin_data: 
             for kin in kin_data:
                 NextOfKin.objects.create(
-                    user=user,
                     individual=individual, 
                     **kin
                 )
@@ -341,7 +333,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         doc_obj.save()
                     except Document.DoesNotExist:
                         Document.objects.create(
-                            user=user,
                             content_object = individual, 
                             **doc
                         )
@@ -358,7 +349,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         Document.objects.create(
-                            user=user,
                             content_object = individual, 
                             **doc
                         )
@@ -366,7 +356,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         if notes_data:
             for note in notes_data:
                 Note.objects.create(
-                    user=user,
                     content_object=individual,
                     **note
                 )
@@ -421,7 +410,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     address_obj.save()
                 except Address.DoesNotExist:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
@@ -439,7 +427,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     existing.save()
                 else:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
@@ -459,7 +446,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     contact_obj.save()
                 except IndividualContactDetail.DoesNotExist:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=instance,
                         **contact
                     )
@@ -476,13 +462,11 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         IndividualContactDetail.objects.create(
-                            user=user, 
                             individual=instance,
                             **contact
                         )
                 else:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=instance, 
                         **contact
                     )
@@ -500,13 +484,11 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     emp_obj.save()
                 except EmploymentDetail.DoesNotExist:
                     EmploymentDetail.objects.create(
-                        user=user, 
                         individual=instance, 
                         **emp
                     )
             else:
                 EmploymentDetail.objects.create(
-                    user=user, 
                     individual=instance, 
                     **emp
                 )
@@ -514,7 +496,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         if kin_data: 
             for kin in kin_data:
                 NextOfKin.objects.create(
-                    user=user,
                     individual=instance, 
                     **kin
                 )
@@ -534,7 +515,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         doc_obj.save()
                     except Document.DoesNotExist:
                         Document.objects.create(
-                            user=user,
                             content_object = instance, 
                             **doc
                         )
@@ -551,7 +531,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         Document.objects.create(
-                            user=user,
                             content_object = instance, 
                             **doc
                         )
@@ -559,7 +538,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         if notes_data:
             for note in notes_data:
                 Note.objects.create(
-                    user=user,
                     content_object=instance,
                     **note
                 )

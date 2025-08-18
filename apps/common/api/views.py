@@ -23,22 +23,22 @@ class BaseViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context.update({
             'request': self.request,
-            'user': self.request.user if self.request.user.is_authenticated else None,
+            'created_by': self.request.user if self.request.user.is_authenticated else None,
         })
         return context
     
     def perform_create(self, serializer):
-        if hasattr(serializer.Meta.model, 'user') and self.request.user.is_authenticated:
-            serializer.save(user=self.request.user) 
+        if hasattr(serializer.Meta.model, 'created_by') and self.request.user.is_authenticated:
+            serializer.save(created_by=self.request.user, updated_by=self.request.user)
         else:
             serializer.save()
             
-        if hasattr(serializer.Meta.model, 'user') and not self.request.user.is_authenticated:
+        if hasattr(serializer.Meta.model, 'created_by') and not self.request.user.is_authenticated:
             logger.warning(f"Creating {serializer.Meta.model.__name__} without authenticated user")
     
     def perform_update(self, serializer):
-        if hasattr(serializer.Meta.model, 'user') and self.request.user.is_authenticated:
-            serializer.save(user=self.request.user)
+        if hasattr(serializer.Meta.model, 'created_by') and self.request.user.is_authenticated:
+            serializer.save(updated_by=self.request.user)
         else:
             serializer.save()
     
@@ -77,8 +77,8 @@ class BaseSoftDeleteViewSet(BaseViewSet):
     def perform_destroy(self, instance):
         if hasattr(instance, 'is_active'):
             instance.is_active = False
-            if hasattr(instance, 'user') and self.request.user.is_authenticated:
-                instance.user = self.request.user
+            if hasattr(instance, 'created_by') and self.request.user.is_authenticated:
+                instance.created_by = self.request.user
             instance.save(request=self.request)
             logger.info(f"Soft deleted {instance.__class__.__name__} with id {instance.pk}")
         else:
@@ -137,8 +137,8 @@ class LocationViewSet(BaseViewSet):
     def delete_object_helper(self, obj):
         if hasattr(obj, 'is_active'):
             obj.is_active = False
-            if hasattr(obj, 'user') and self.request.user.is_authenticated:
-                obj.user = self.request.user
+            if hasattr(obj, 'created_by') and self.request.user.is_authenticated:
+                obj.created_by = self.request.user
             obj.save(request=self.request)
             logger.info(f"Soft deleted {obj.__class__.__name__} with id {obj.pk}")
         else:
