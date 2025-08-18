@@ -4,8 +4,8 @@ from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError as DjangoValidationError
-from apps.individuals.services.validators import validate_email, normalize_zimbabwe_mobile
+from django.core.exceptions import ValidationError
+from apps.common.utils.validators import validate_email, normalize_zimbabwe_mobile
 
 from django.db import transaction
 import logging
@@ -94,8 +94,11 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
                 except Address.DoesNotExist:
                     pass
 
-        if phone and country == "zimbabwe":
-            data["mobile_phone"] = normalize_zimbabwe_mobile(phone)
+        
+        if normalize_zimbabwe_mobile(phone):
+            data["mobile_phone"] = phone
+        else:
+            raise ValidationError("Invalid phone number provided")
 
 
         return data

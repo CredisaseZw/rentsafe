@@ -23,7 +23,7 @@ def validate_national_id(national_id, country: str) -> bool:
     
     national_id_clean = national_id.strip().upper().replace(" ", "").replace("-","")
 
-    return re.match(pattern, national_id_clean)
+    return bool(re.match(pattern, national_id_clean))
 
 def validate_phone_number(phone_number, country):
     patterns = {
@@ -77,7 +77,7 @@ def validate_passport_number(passport_number, country):
     
 def validate_email(email: str) -> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern,email)
+    return bool(re.match(pattern,email))
 
 
 def normalize_zimbabwe_mobile(phone):
@@ -88,6 +88,5 @@ def normalize_zimbabwe_mobile(phone):
         phone = phone[1:]
     if phone.startswith("263"):
         phone = phone[3:]
-    if re.match(r"^7\d{8}$", phone):
-        return f"+263{phone}"
-    return None
+        
+    return bool(re.match(r"^7\d{8}$", phone))
