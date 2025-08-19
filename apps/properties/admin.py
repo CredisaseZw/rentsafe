@@ -1,11 +1,12 @@
 from django.contrib import admin
 from apps.properties.models.models import Property, Unit, PropertyType
+from apps.leases.models import Landlord
 # Register your models here.
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','total_number_of_units','year_built')
-    search_fields = ('name','total_number_of_units','year_built')
+    list_display = ('id', 'name','total_number_of_units','year_built','get_address')
+    search_fields = ('name','total_number_of_units','year_built','addresses')
 
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
@@ -16,3 +17,8 @@ class UnitAdmin(admin.ModelAdmin):
 class PropertyTypeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('name',)
+
+@admin.register(Landlord)
+class LandlordAdmin(admin.ModelAdmin):
+    list_display = ('id', 'landlord_name', 'landlord_type','landlord_id')
+    search_fields = ('landlord_name', 'landlord_type')

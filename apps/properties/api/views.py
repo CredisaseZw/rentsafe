@@ -5,6 +5,9 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from apps.properties.models import Property, PropertyType, Unit
 from rest_framework.response import Response
+from rest_framework import status
+from apps.common.utils import extract_error_message
+from apps.common.api.views import BaseViewSet
 from apps.properties.api.serializers import (
     PropertyDetailSerializer, PropertyListSerializer,
     UnitDetailSerializer, UnitListSerializer,
@@ -19,7 +22,7 @@ class PropertyTypeViewSet(viewsets.ModelViewSet):
     serializer_class = PropertyTypeSerializer
     permission_classes = [permissions.IsAuthenticated] 
 
-class PropertyViewSet(viewsets.ModelViewSet):
+class PropertyViewSet(BaseViewSet):
     """
     API endpoint that allows properties to be viewed or edited.
     Provides list (minimal) and detail (full) views.
@@ -29,7 +32,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
     # Optimize database queries to prevent N+1 issues
     queryset = Property.objects.select_related('property_type').prefetch_related(
         'units', 'landlords', 'addresses', 'documents', 'notes'
-    ).all()
+    ).all().order_by('-date_created')
 
     def get_serializer_class(self):
         """
@@ -41,14 +44,36 @@ class PropertyViewSet(viewsets.ModelViewSet):
             return PropertyListSerializer
         return PropertyDetailSerializer
     
-    def perform_create(self, serializer):
-        """Assign the user on creation."""
+    def get_serializer(self, *args, **kwargs):
+        kwargs['partial'] = self.request.method == 'PATCH'
+        return super().get_serializer(*args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
         try:
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(user=self.request.user)
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except Exception as e:
             print(f"Error creating property: {e}")
-
+            return Response(
+                {"error": extract_error_message(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object() 
+            serializer = self.get_serializer(instance, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"Error updating property: {e}")
+            return Response(
+                {"error": extract_error_message(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     @action(detail=True, methods=['get', 'post'], url_path='units')
     def get_units(self, request, pk=None):
         if request.method == 'POST':

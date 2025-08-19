@@ -51,6 +51,10 @@ class Property(BaseModelWithUser):
     def __str__(self):
         return self.name
 
+    def get_address(self):
+        return self.addresses.first() if self.addresses.exists() else "No Address"
+    
+
 class Unit(BaseModelWithUser):
     UNIT_STATUS_CHOICES = (
         ('vacant', 'Vacant'),
