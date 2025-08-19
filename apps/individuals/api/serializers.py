@@ -4,7 +4,13 @@ from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
-from apps.common.utils.validators import validate_email, normalize_zimbabwe_mobile, validate_national_id, validate_passport_number
+from apps.common.utils.validators import (
+    validate_email,
+    normalize_zimbabwe_mobile, 
+    validate_national_id, 
+    validate_passport_number,
+    validate_future_dates
+)
 
 from django.db import transaction
 import logging
@@ -69,7 +75,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndividualContactDetail
         fields = ['id', 'individual_id', 'mobile_phone', 'email']
-
+    
     def validate(self, data):
         email = data.get('email', '').strip()
 
@@ -85,21 +91,28 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValidationError("Invalid email address provide")
-
+                raise ValidationError("Invalid email address provided")
         
         phone = data.get("mobile_phone",[])
         normalized_phone = []
+        existing_numbers = []
 
+        existing_numbers = set(
+            normalize_zimbabwe_mobile(n)
+            for phones in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
+            for n in phones if n
+        )
         for p in phone:
             formatted = normalize_zimbabwe_mobile(p)
+
             if formatted:
-                if existing_ph := IndividualContactDetail.objects.filter(mobile_phone__contains=[formatted]).exists():
-                    raise ValidationError(f"This Phone number is already registered {existing_ph}")
-                else:
-                    normalized_phone.append(p)
+                if formatted in existing_numbers:
+                    raise ValidationError(f"This phone number is already registered: {formatted}")
+                
+                normalized_phone.append(formatted)
             else:
-                raise ValidationError(f"Invalid Phone number {p}")
+                raise ValidationError(f"Invalid phone number: {p}")
+        data["mobile_phone"] = normalized_phone
 
         return data
         
@@ -117,7 +130,7 @@ class IndividualSerializer(serializers.ModelSerializer):
         model = Individual
         fields = [
             'id', 'first_name', 'last_name', 'full_name',
-            'date_of_birth', 'gender', 'gender_display',
+            'date_of_birth', 'gender', 'gender_display','marital_status',
             'identification_type', 'identification_type_display',
             'identification_number','contact_details', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin', 'documents', 
@@ -205,8 +218,12 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         if not data.get('last_name'):
             raise ValidationError("Last name is required")
         
-        if not data.get('date_of_birth'):
+        dob = data.get('date_of_birth')
+        if not dob:
             raise ValidationError("Date of birth is required")
+        
+        if validate_future_dates(dob):
+            raise ValidationError("Date of birth can not be in the future")
         
         if not data.get('gender'):
             raise ValidationError("Gender is required")

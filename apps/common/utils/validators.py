@@ -1,10 +1,11 @@
 import re
+import datetime
 from django.core.exceptions import ValidationError
 
 
 def validate_national_id(national_id, country: str) -> bool:
     patterns = {
-        "zimbabwe": r'\d{8,9}[a-zA-Z]+\d{2}',
+        "zimbabwe": r'\d{8}[a-zA-Z]\d{2}$',
         "south_africa": r'^\d{13}$',
         "namibia": r'^\d{13}$',
         "botswana": r'^\d{13}$',
@@ -86,14 +87,19 @@ def normalize_zimbabwe_mobile(phone):
     if phone.startswith("00263"):
         phone = phone[5:]
         
-    if phone.startswith("+263"):
+    elif phone.startswith("+263"):
         phone = phone[4:]
 
-    if phone.startswith("263"):
+    elif phone.startswith("263"):
         phone = phone[3:]
 
-    if phone.startswith("0"):
+    elif phone.startswith("0"):
         phone = phone[1:]
 
     if re.match(r"^(77|78|71|73)\d{7}$", phone):
         return f"+263{phone}"
+    
+    return None
+
+def validate_future_dates(date):
+    return date > datetime.date.today()
