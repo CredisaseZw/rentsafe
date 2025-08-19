@@ -4,8 +4,13 @@ from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from apps.common.utils.validators import validate_email, normalize_zimbabwe_mobile
+from apps.common.utils.validators import (
+    validate_email,
+    normalize_zimbabwe_mobile, 
+    validate_national_id, 
+    validate_passport_number,
+    validate_future_dates
+)
 
 from django.db import transaction
 import logging
@@ -45,11 +50,19 @@ class NextOfKinSerializer(serializers.ModelSerializer):
         ]
         
     def validate(self,data):
+        if mobile := data.get('mobile_phone'):
+            if formatted := normalize_zimbabwe_mobile(mobile):
+                data["mobile_phone"] = formatted
+            else:
+                raise ValidationError("Invalid phone number")
+        
         if email:= data.get("email"):
+
+            
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValidationError("Invalid email address provide")
+                raise ValidationError("Invalid email address provided")
             
         return data
 
@@ -62,7 +75,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndividualContactDetail
         fields = ['id', 'individual_id', 'mobile_phone', 'email']
-
+    
     def validate(self, data):
         email = data.get('email', '').strip()
 
@@ -78,28 +91,28 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValidationError("Invalid email address provide")
-
+                raise ValidationError("Invalid email address provided")
         
         phone = data.get("mobile_phone",[])
+        normalized_phone = []
+        existing_numbers = []
 
-        country = None
-        parent = self.parent
-        if hasattr(parent, 'initial_data'):
-            address_id = parent.initial_data.get("address")
-            if address_id:
-                try:
-                    address = Address.objects.get(pk=address_id)
-                    country = address.country.lower().strip()
-                except Address.DoesNotExist:
-                    pass
+        existing_numbers = set(
+            normalize_zimbabwe_mobile(n)
+            for phones in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
+            for n in phones if n
+        )
+        for p in phone:
+            formatted = normalize_zimbabwe_mobile(p)
 
-        
-        if normalize_zimbabwe_mobile(phone):
-            data["mobile_phone"] = phone
-        else:
-            raise ValidationError("Invalid phone number provided")
-
+            if formatted:
+                if formatted in existing_numbers:
+                    raise ValidationError(f"This phone number is already registered: {formatted}")
+                
+                normalized_phone.append(formatted)
+            else:
+                raise ValidationError(f"Invalid phone number: {p}")
+        data["mobile_phone"] = normalized_phone
 
         return data
         
@@ -117,7 +130,7 @@ class IndividualSerializer(serializers.ModelSerializer):
         model = Individual
         fields = [
             'id', 'first_name', 'last_name', 'full_name',
-            'date_of_birth', 'gender', 'gender_display',
+            'date_of_birth', 'gender', 'gender_display','marital_status',
             'identification_type', 'identification_type_display',
             'identification_number','contact_details', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin', 'documents', 
@@ -173,9 +186,50 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         ]
         
     def validate(self, data):
+        
+        id_type = data.get('identification_type')
         identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
-
+        
+        if not id_type:
+            raise ValidationError("Identification type is required")
+        
+        if id_type == 'national_id':
+            if not identification_number:
+                raise ValidationError("National id is required")
+            
+            if validate_national_id(identification_number, 'zimbabwe'):
+                data["identification_number"] = identification_number
+            else:
+                raise ValidationError("Invalid national id provided")
+        
+        elif id_type == 'passport':
+            if not identification_number:
+                raise ValidationError("Passport number is required")
+            if validate_passport_number(identification_number, 'zimbabwe'):
+                data["identification_number"] = identification_number
+            else:
+                raise ValidationError("Invalid passport number provided")
+        else:
+            raise ValidationError("Invalid identification type provided")
+        
+        if not data.get('first_name'):
+            raise ValidationError("First name is required")
+        
+        if not data.get('last_name'):
+            raise ValidationError("Last name is required")
+        
+        dob = data.get('date_of_birth')
+        if not dob:
+            raise ValidationError("Date of birth is required")
+        
+        if validate_future_dates(dob):
+            raise ValidationError("Date of birth can not be in the future")
+        
+        if not data.get('gender'):
+            raise ValidationError("Gender is required")
+        
         existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
+        
         if existing:
             if not existing.is_deleted:
                 raise ValidationError(
@@ -205,15 +259,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         else:
             individual = Individual.objects.create(**validated_data)
 
-        # Create addresses
-        # for address_data in address_data:
-        #     Address.objects.create(
-        #         user=user,
-        #         content_object=individual,
-        #         **address_data,
-        #         is_primary=True
-        #     )
-
         individual_ct = ContentType.objects.get_for_model(individual)
 
         for addr in address_data:
@@ -231,7 +276,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     address_obj.save()
                 except Address.DoesNotExist:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
@@ -249,7 +293,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     existing.save()
                 else:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=individual.pk,
                         **addr,
@@ -269,7 +312,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     contact_obj.save()
                 except IndividualContactDetail.DoesNotExist:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=individual,
                         **contact
                     )
@@ -286,13 +328,11 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         IndividualContactDetail.objects.create(
-                            user=user, 
                             individual=individual,
                             **contact
                         )
                 else:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=individual, 
                         **contact
                     )
@@ -310,13 +350,11 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     emp_obj.save()
                 except EmploymentDetail.DoesNotExist:
                     EmploymentDetail.objects.create(
-                        user=user, 
                         individual=individual, 
                         **emp
                     )
             else:
                 EmploymentDetail.objects.create(
-                    user=user, 
                     individual=individual, 
                     **emp
                 )
@@ -324,7 +362,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         if kin_data: 
             for kin in kin_data:
                 NextOfKin.objects.create(
-                    user=user,
                     individual=individual, 
                     **kin
                 )
@@ -344,7 +381,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         doc_obj.save()
                     except Document.DoesNotExist:
                         Document.objects.create(
-                            user=user,
                             content_object = individual, 
                             **doc
                         )
@@ -356,12 +392,11 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         document_type = doc.get('document_type')   
                     ).first()
                     if existing:
-                        for key, val in addr.items():
+                        for key, val in doc.items():
                             setattr(existing, key, val)
                         existing.save()
                     else:
                         Document.objects.create(
-                            user=user,
                             content_object = individual, 
                             **doc
                         )
@@ -369,7 +404,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         if notes_data:
             for note in notes_data:
                 Note.objects.create(
-                    user=user,
                     content_object=individual,
                     **note
                 )
@@ -424,7 +458,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     address_obj.save()
                 except Address.DoesNotExist:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
@@ -442,7 +475,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     existing.save()
                 else:
                     Address.objects.create(
-                        user=user,
                         content_type=individual_ct,
                         object_id=instance.pk,
                         **addr,
@@ -462,7 +494,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     contact_obj.save()
                 except IndividualContactDetail.DoesNotExist:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=instance,
                         **contact
                     )
@@ -479,13 +510,11 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         IndividualContactDetail.objects.create(
-                            user=user, 
                             individual=instance,
                             **contact
                         )
                 else:
                     IndividualContactDetail.objects.create(
-                        user=user, 
                         individual=instance, 
                         **contact
                     )
@@ -503,13 +532,11 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                     emp_obj.save()
                 except EmploymentDetail.DoesNotExist:
                     EmploymentDetail.objects.create(
-                        user=user, 
                         individual=instance, 
                         **emp
                     )
             else:
                 EmploymentDetail.objects.create(
-                    user=user, 
                     individual=instance, 
                     **emp
                 )
@@ -517,7 +544,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         if kin_data: 
             for kin in kin_data:
                 NextOfKin.objects.create(
-                    user=user,
                     individual=instance, 
                     **kin
                 )
@@ -537,7 +563,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         doc_obj.save()
                     except Document.DoesNotExist:
                         Document.objects.create(
-                            user=user,
                             content_object = instance, 
                             **doc
                         )
@@ -554,7 +579,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                         existing.save()
                     else:
                         Document.objects.create(
-                            user=user,
                             content_object = instance, 
                             **doc
                         )
@@ -562,7 +586,6 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         if notes_data:
             for note in notes_data:
                 Note.objects.create(
-                    user=user,
                     content_object=instance,
                     **note
                 )

@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 
-class DebtCase(BaseModel):
+class DebtCase(BaseModelWithUser):
     CASE_STATUS_CHOICES = (
         ('open', 'Open'),
         ('payment_plan', 'Payment Plan'),
@@ -25,7 +25,7 @@ class DebtCase(BaseModel):
     def __str__(self):
         return f"Debt Case for Lease {self.lease.id} - Status: {self.get_status_display()} - Balance: {self.current_balance}"
 
-class PaymentPlan(BaseModel):
+class PaymentPlan(BaseModelWithUser):
     debt_case = models.ForeignKey(DebtCase, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -43,7 +43,7 @@ class PaymentPlan(BaseModel):
     def __str__(self):
         return f"Payment Plan for Debt Case {self.debt_case.id} - Total: {self.total_amount} - Status: {self.status}"
 
-class CommunicationLog(BaseModel):
+class CommunicationLog(BaseModelWithUser):
     COMMUNICATION_TYPES = (
         ('phone', 'Phone Call'),
         ('email', 'Email'),

@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"; // optional: shadcn's className merger
 
 interface ColumnsContainerProps {
    marginClass?: string;
+   gapClass?: string;
    numberOfCols?: 1 | 2 | 3 | 4 | 5 | 6;
    children: React.ReactNode;
 }
@@ -16,10 +17,10 @@ const colClassMap: Record<number, string> = {
    6: "grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6",
 };
 
-const ColumnsContainer = ({ marginClass = "mt-5", numberOfCols = 3, children }: ColumnsContainerProps) => {
-   const gridCols = colClassMap[numberOfCols] || colClassMap[3]; // fallback
+const ColumnsContainer = ({ marginClass = "mt-5", numberOfCols = 3, gapClass = "gap-3",children }: ColumnsContainerProps) => {
+   const gridCols = colClassMap[numberOfCols] || colClassMap[3]; 
 
-   return <div className={cn(marginClass, "grid gap-3", gridCols)}>{children}</div>;
+   return <div className={cn(marginClass, "grid", gapClass,  gridCols)}>{children}</div>;
 };
 
 export default ColumnsContainer;

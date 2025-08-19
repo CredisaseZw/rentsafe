@@ -95,7 +95,7 @@ class CompanyAdmin(admin.ModelAdmin):
     actions = ['mark_as_verified', 'mark_as_unverified', 'activate_companies', 'deactivate_companies']
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('user').prefetch_related('branches')
+        return super().get_queryset(request).select_related('created_by').prefetch_related('branches')
     
     def branch_count(self, obj):
         count = obj.branches.count()
@@ -106,7 +106,7 @@ class CompanyAdmin(admin.ModelAdmin):
     branch_count.short_description = _('Branches')
     
     def created_by(self, obj):
-        return obj.user.get_full_name() or obj.user.username if obj.user else '-'
+        return obj.created_by.get_full_name() or obj.created_by.username if obj.created_by else '-'
     created_by.short_description = _('Created By')
     
     def mark_as_verified(self, request, queryset):
@@ -171,7 +171,7 @@ class CompanyBranchAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'company', 'user'
+            'company', 'created_by'
         ).prefetch_related('contacts')
     
     def company_link(self, obj):
@@ -188,7 +188,7 @@ class CompanyBranchAdmin(admin.ModelAdmin):
     contact_count.short_description = _('Contacts')
     
     def created_by(self, obj):
-        return obj.user.get_full_name() or obj.user.username if obj.user else '-'
+        return obj.created_by.get_full_name() or obj.created_by.username if obj.created_by else '-'
     created_by.short_description = _('Created By')
     
     def mark_as_headquarters(self, request, queryset):
@@ -243,7 +243,7 @@ class ContactPersonAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'individual', 'branch', 'branch__company', 'user'
+            'individual', 'branch', 'branch__company', 'created_by'
         )
     
     def individual_name(self, obj):
@@ -262,8 +262,8 @@ class ContactPersonAdmin(admin.ModelAdmin):
     branch_link.short_description = _('Branch')
     
     def created_by(self, obj):
-        if obj.user:
-            return obj.user.get_full_name() or obj.user.username
+        if obj.created_by:
+            return obj.created_by.get_full_name() or obj.created_by.username
         return '-'
     created_by.short_description = _('Created By')
     
@@ -361,7 +361,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'company', 'contact_person', 'user'
+            'company', 'contact_person', 'created_by'
         )
     
     def company_name(self, obj):
@@ -376,8 +376,8 @@ class CompanyProfileAdmin(admin.ModelAdmin):
     logo_preview.short_description = _('Logo Preview')
     
     def created_by(self, obj):
-        if obj.user:
-            return obj.user.get_full_name() or obj.user.username
+        if obj.created_by:
+            return obj.created_by.get_full_name() or obj.created_by.username
         return '-'
     created_by.short_description = _('Created By')
     
