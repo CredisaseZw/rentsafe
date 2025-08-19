@@ -4,8 +4,7 @@ from apps.common.models.models import Address
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from apps.common.utils.validators import validate_email, normalize_zimbabwe_mobile
+from apps.common.utils.validators import validate_email, normalize_zimbabwe_mobile, validate_national_id, validate_passport_number
 
 from django.db import transaction
 import logging
@@ -45,11 +44,19 @@ class NextOfKinSerializer(serializers.ModelSerializer):
         ]
         
     def validate(self,data):
+        if mobile := data.get('mobile_phone'):
+            if formatted := normalize_zimbabwe_mobile(mobile):
+                data["mobile_phone"] = formatted
+            else:
+                raise ValidationError("Invalid phone number")
+        
         if email:= data.get("email"):
+
+            
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValidationError("Invalid email address provide")
+                raise ValidationError("Invalid email address provided")
             
         return data
 
@@ -82,24 +89,17 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
 
         
         phone = data.get("mobile_phone",[])
+        normalized_phone = []
 
-        country = None
-        parent = self.parent
-        if hasattr(parent, 'initial_data'):
-            address_id = parent.initial_data.get("address")
-            if address_id:
-                try:
-                    address = Address.objects.get(pk=address_id)
-                    country = address.country.lower().strip()
-                except Address.DoesNotExist:
-                    pass
-
-        
-        if normalize_zimbabwe_mobile(phone):
-            data["mobile_phone"] = phone
-        else:
-            raise ValidationError("Invalid phone number provided")
-
+        for p in phone:
+            formatted = normalize_zimbabwe_mobile(p)
+            if formatted:
+                if existing_ph := IndividualContactDetail.objects.filter(mobile_phone__contains=[formatted]).exists():
+                    raise ValidationError(f"This Phone number is already registered {existing_ph}")
+                else:
+                    normalized_phone.append(p)
+            else:
+                raise ValidationError(f"Invalid Phone number {p}")
 
         return data
         
@@ -173,9 +173,46 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         ]
         
     def validate(self, data):
+        
+        id_type = data.get('identification_type')
         identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
-
+        
+        if not id_type:
+            raise ValidationError("Identification type is required")
+        
+        if id_type == 'national_id':
+            if not identification_number:
+                raise ValidationError("National id is required")
+            
+            if validate_national_id(identification_number, 'zimbabwe'):
+                data["identification_number"] = identification_number
+            else:
+                raise ValidationError("Invalid national id provided")
+        
+        elif id_type == 'passport':
+            if not identification_number:
+                raise ValidationError("Passport number is required")
+            if validate_passport_number(identification_number, 'zimbabwe'):
+                data["identification_number"] = identification_number
+            else:
+                raise ValidationError("Invalid passport number provided")
+        else:
+            raise ValidationError("Invalid identification type provided")
+        
+        if not data.get('first_name'):
+            raise ValidationError("First name is required")
+        
+        if not data.get('last_name'):
+            raise ValidationError("Last name is required")
+        
+        if not data.get('date_of_birth'):
+            raise ValidationError("Date of birth is required")
+        
+        if not data.get('gender'):
+            raise ValidationError("Gender is required")
+        
         existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
+        
         if existing:
             if not existing.is_deleted:
                 raise ValidationError(
@@ -204,15 +241,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             individual.save()
         else:
             individual = Individual.objects.create(**validated_data)
-
-        # Create addresses
-        # for address_data in address_data:
-        #     Address.objects.create(
-        #         user=user,
-        #         content_object=individual,
-        #         **address_data,
-        #         is_primary=True
-        #     )
 
         individual_ct = ContentType.objects.get_for_model(individual)
 
@@ -356,7 +384,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                         document_type = doc.get('document_type')   
                     ).first()
                     if existing:
-                        for key, val in addr.items():
+                        for key, val in doc.items():
                             setattr(existing, key, val)
                         existing.save()
                     else:

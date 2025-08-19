@@ -50,7 +50,7 @@ def validate_phone_number(phone_number, country):
         raise ValidationError(f"Invalid phone number for {country}: {phone_number}")
 
 
-def validate_passport_number(passport_number, country):
+def validate_passport_number(passport_number, country: str) -> bool:
     patterns = {
         "zimbabwe": r'^[A-Z]{2}\d{6}$',
         "south_africa": r'^\d{9}$',
@@ -72,8 +72,7 @@ def validate_passport_number(passport_number, country):
     
     passport_number = passport_number.strip().upper()
 
-    if not re.match(pattern, passport_number):
-        raise ValidationError(f"Invalid passport number for {country}: {passport_number}")
+    return bool(re.match(pattern, passport_number))
     
 def validate_email(email: str) -> bool:
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -81,12 +80,20 @@ def validate_email(email: str) -> bool:
 
 
 def normalize_zimbabwe_mobile(phone):
+
     phone = phone.strip().replace(" ", "").replace("-", "")
-    if phone.startswith("+"):
-        phone = phone[1:]
-    if phone.startswith("0"):
-        phone = phone[1:]
+
+    if phone.startswith("00263"):
+        phone = phone[5:]
+        
+    if phone.startswith("+263"):
+        phone = phone[4:]
+
     if phone.startswith("263"):
         phone = phone[3:]
-        
-    return bool(re.match(r"^7\d{8}$", phone))
+
+    if phone.startswith("0"):
+        phone = phone[1:]
+
+    if re.match(r"^(77|78|71|73)\d{7}$", phone):
+        return f"+263{phone}"
