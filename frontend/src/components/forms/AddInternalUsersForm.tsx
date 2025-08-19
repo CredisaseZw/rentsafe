@@ -8,24 +8,39 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import type { Roles } from "@/types";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Input } from "../ui/input";
-//import useGetUserId from "@/hooks/components/useGetUserID";
+import useGetUserId from "@/hooks/components/useGetUserID";
+import ButtonSpinner from "../general/ButtonSpinner";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-function AddInternalUsersForm() {
+interface props{
+   successCallbackFN : (status:  boolean) => void;
+}
+
+function AddInternalUsersForm({successCallbackFN} : props) {
+   const queryClient = useQueryClient()
    const { onChangeHandler, addInternalUsersFormData, setAddInternalUsersFormData } = useInternalUsers();
    const [userRoles, setUserRoles] = useState<Roles>([]);
-   const addInternalUser = AddInternalUsersApi(2);
-
+   const [loading, setLoading] = useState<boolean>(false);
+   const addInternalUser = AddInternalUsersApi(useGetUserId());
    const { data, isLoading, isError } = useGetUserRoles();
-   // Function to handle form submission
+
+
    const submitAddInternalUsersForm = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setLoading(true);
       addInternalUser.mutate(addInternalUsersFormData, {
-         onSuccess: (data) => {
-            console.log("User added successfully:", data);
+         onSuccess: () => {
+            toast.success("User added successfully")
+            queryClient.invalidateQueries({queryKey : ["clients_for", useGetUserId()]})
+            successCallbackFN(true)
          },
          onError: (error) => {
             console.error("Error adding user:", error);
+            toast.error("Error occured adding user")
          },
+         onSettled: ()=> setLoading(false)
+         
       });
    };
 
@@ -68,7 +83,7 @@ function AddInternalUsersForm() {
                   Email
                </label>
                <Input
-                  type="text"
+                  type="email"
                   required
                   onChange={onChangeHandler}
                   value={addInternalUsersFormData.email}
@@ -111,8 +126,11 @@ function AddInternalUsersForm() {
             </div>
          </div>
          <div className="mt-6 flex w-full justify-end">
-            <Button type="submit" asChild>
-               <Plus size={15} />
+            <Button type="submit" asChild disabled = {loading}>
+               {
+                  loading ? <ButtonSpinner/> :
+                  <Plus size={18}/>
+               }
                Register User
             </Button>
          </div>

@@ -7,6 +7,7 @@ import { formatAddress } from "@/lib/utils";
 export default function useIndividualPaymentStatusReport(individualId: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
    const [show, setShow] = React.useState(false);
+   const [fullMobile, setFullMobile] = React.useState(false);
    const [showFullAddress, setShowFullAddress] = React.useState(false);
    const { error, individual, isLoading, refetch } = useIndividual(individualId, false);
 
@@ -19,7 +20,6 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
          }
       }
    }
-
    const report: IndividualReport = {
       claims: [],
       active: [],
@@ -41,16 +41,18 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
          nationality: "n/a",
          maritalStatus: individual?.marital_status || "",
          dependants: [],
-         mobileNumber: individual?.contact_details[0]?.mobile_phone[0] || "",
+         mobileNumber:  individual?.contact_details[0]?.mobile_phone
+         ? individual?.contact_details[0]?.mobile_phone.join(", ")
+         : "",
          telephoneNumber: "n/a",
          email: individual?.contact_details[0]?.email || "",
          address: individual?.addresses?.map(formatAddress).join(" | ") || "",
       },
    };
-
+   
    const ratingColor =
       PAYMENT_STATUS_CLASSIFICATIONS.find((c) => c.label.toLowerCase() === report.rating.toLowerCase())?.className ||
       "bg-gray-500 text-white";
 
-   return { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress };
+   return { error, show, report, isLoading, ratingColor, showFullAddress, fullMobile, setFullMobile, handleOpenChange, setShowFullAddress };
 }

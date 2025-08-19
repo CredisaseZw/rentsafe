@@ -189,3 +189,16 @@ export function stringifyAndFmt(val: unknown): string {
    }
    return String(val);
 }
+
+export function extractErrorMessage(obj: string): string {
+   try{
+      const errorString = obj;
+      const match = errorString.match(/string='([^']+)'/);
+      const errorMessage = match ? match[1] : 'Unknown error';
+
+      return errorMessage
+   } catch (error){
+      return ""
+   }        
+}
+

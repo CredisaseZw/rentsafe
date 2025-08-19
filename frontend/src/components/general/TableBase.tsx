@@ -10,7 +10,7 @@ interface TableBaseProps {
    headerClass?: string;
 }
 
-export function TableBase({ isLoading, headers = [], children, headerClass, isError }: TableBaseProps) {
+export function TableBase({ isLoading, headers = [], children, headerClass, isError}: TableBaseProps) {
    return (
       <Table className="border-color rounded border">
          <TableHeader className={`bg-gray-100 dark:bg-zinc-900 ${headerClass}`}>
