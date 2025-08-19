@@ -17,7 +17,7 @@ function Searchbox({ handleSearch, placeholder }: SearchboxProps) {
    return (
       <div className="border-color flex items-center h-fit self-center justify-between rounded-sm border bg-white sm:w-full md:w-fit dark:bg-zinc-900">
          <Button onClick={clearSearch} className="h-full" type="button" variant="ghost" size="xs">
-            <X/>
+            <X className="text-gray-400"/>
          </Button>
          <Input
             value={searchValue}
@@ -28,6 +28,7 @@ function Searchbox({ handleSearch, placeholder }: SearchboxProps) {
          />
 
          <Button
+            className="text-gray-400"
             type="submit"
             onClick={() => {
                if (searchValue.trim()) handleSearch(searchValue.trim());

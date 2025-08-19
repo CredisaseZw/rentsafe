@@ -90,3 +90,56 @@ export type Column = {
    headerName: string;
    rows: Row[];
 };
+export type Header={
+   name : string,
+   className?: string,
+   colSpan?: number
+   textAlign?: "center"| "left" |"end"
+}
+export type IndividualLease = {
+   idPassportNumber: string;
+   leaseName: string;
+   leaseMobileNumber: string;
+   rentGuarantorId: string;
+   rentGuarantorName: string;
+   propertyType: string;
+   numberOfRooms: string;
+   otherPropertyDetails: string;
+   unitNumber: string;
+   buildingComplexName: string;
+   streetNumber: string;
+   streetName: string;
+   suburbArea: string;
+   cityTown: string;
+   province: string;
+   country: string;
+   areaCode: string;
+   leaseCurrency: string;
+   monthlyRent: string;
+   otherStandingCharge: string;
+   standingChargeNarration: string;
+   radiosHere: string;
+   leaseCopy: string;
+   depositDate: string;
+   depositCurrency: string;
+   depositAmount: string;
+   depositHolder: string;
+   leaseStartDate: string;
+   leaseEndDate: string;
+   subscriptionPeriodRemaining: string;
+   paymentPeriodStartDate: string;
+   paymentPeriodEndDate: string;
+   landlordType: string;
+   idRegName: string;
+   variableRent: boolean,
+   vatInclusive : boolean,
+   landlordName: string;
+   commissionPercentage: string;
+   operatingCostsIncluded: boolean;
+   landlordsOpeningBalance: string;
+   paymentDataMoreThan3Months: string;
+   paymentData07May25: string;
+   paymentData07Jun25: string;
+   paymentData07Jul25: string;
+   paymentData07Aug25: string;
+  };

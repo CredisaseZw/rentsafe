@@ -14,15 +14,18 @@ import { TableCell, TableRow } from "../ui/table";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import type { Header, IndividualLease } from "@/types";
+import type { Header } from "@/types";
 
-function AddIndividualLease() {
-  const [formData, setFormData] = useState<IndividualLease>({
-    idPassportNumber: "",
+function AddCompanyLease() {
+  const [formData, setFormData] = useState({
+    companyName : "",
+    accountNumber : "",
     leaseName: "",
     leaseMobileNumber: "",
+    email: "",
     rentGuarantorId: "",
     rentGuarantorName: "",
+    isGovernment : false, 
     propertyType: "",
     numberOfRooms: "",
     otherPropertyDetails: "",
@@ -47,14 +50,14 @@ function AddIndividualLease() {
     depositHolder: "",
     leaseStartDate: "",
     leaseEndDate: "",
+    variableRent : false,
+    vatInclusive : false,
     subscriptionPeriodRemaining: "",
     paymentPeriodStartDate: "",
     paymentPeriodEndDate: "",
     landlordType: "",
     idRegName: "",
     landlordName: "",
-    variableRent : false,
-    vatInclusive : false,
     commissionPercentage: "",
     operatingCostsIncluded: false,
     landlordsOpeningBalance : "",
@@ -82,32 +85,25 @@ function AddIndividualLease() {
 
   const headers:Header[] = [
     {
-      name: "Payment Data",
-      
+      name: "Payment Data"
     },
     {
-      name: "More than 3 months",
-      
+      name: "More than 3 months"
     },
     {
-      name: "07-May-25",
-      
+      name: "07-May-25"
     },
     {
-      name: "07-Jun-25",
-      
+      name: "07-Jun-25"
     },
     {
-      name: "07-Jul-25",
-      
+      name: "07-Jul-25"
     },
     {
-      name: "07-Aug-25",
-      
+      name: "07-Aug-25"
     },
     {
-      name: "Outstanding Balance",
-      
+      name: "Outstanding Balance"
     },
   ];
 
@@ -116,14 +112,27 @@ function AddIndividualLease() {
       <ColumnsContainer numberOfCols={3} gapClass="gap-7">
         <div className="flex flex-col gap-2">
           <Label className="px-2 font-normal required" htmlFor="idPassportNumber">
-            ID / Passport #
+           Company Name
           </Label>
           <Input
-            name="idPassportNumber"
-            id="idPassportNumber"
+            name="companyName"
+            id="companyName"
             required
             className="border-foreground/40 bg-white"
-            value={formData.idPassportNumber}
+            value={formData.companyName}
+            onChange={handleChange}
+          />
+        </div>
+          <div className="flex flex-col gap-2">
+          <Label className="px-2 font-normal required" htmlFor="idPassportNumber">
+           Account Number
+          </Label>
+          <Input
+            name="accountNumber"
+            id="accountNumber"
+            required
+            className="border-foreground/40 bg-white"
+            value={formData.accountNumber}
             onChange={handleChange}
           />
         </div>
@@ -137,6 +146,20 @@ function AddIndividualLease() {
             required
             className="border-foreground/40 bg-white"
             value={formData.leaseName}
+            onChange={handleChange}
+          />
+        </div>
+          <div className="flex flex-col gap-2">
+          <Label className="px-2 font-normal required" htmlFor="leaseName">
+            Email
+          </Label>
+          <Input
+            name="email"
+            id="email"
+            required
+            type="email"
+            className="border-foreground/40 bg-white"
+            value={formData.email}
             onChange={handleChange}
           />
         </div>
@@ -177,6 +200,18 @@ function AddIndividualLease() {
             value={formData.rentGuarantorName}
             onChange={handleChange}
           />
+        </div>
+       <div className="flex flex-row gap-2 self-center">
+          <Checkbox
+            className="self-center"
+            name="isGovernment"
+            id="isGovernment"
+            checked={formData.isGovernment}
+            onCheckedChange={(checked) => handleSelectChange("isGovernment", checked)}
+          />
+          <Label className="px-2 font-normal self-center" htmlFor="operatingCostsIncluded">
+            Government
+          </Label>
         </div>
       </ColumnsContainer>
       <FormSectionHeader title="Lease Address" />
@@ -395,29 +430,29 @@ function AddIndividualLease() {
           />
         </div>
         <div className="flex flex-row justify-between">
-          <div className="flex flex-row gap-2 self-center">
-              <Checkbox
-                className="self-center"
-                name="variableRent"
-                id="variableRent"
-                checked={formData.variableRent}
-                onCheckedChange={(checked) => handleSelectChange("variableRent", checked)}
+           <div className="flex flex-row gap-2 self-center">
+                <Checkbox
+                    className="self-center"
+                    name="variableRent"
+                    id="variableRent"
+                    checked={formData.variableRent}
+                    onCheckedChange={(checked) => handleSelectChange("variableRent", checked)}
                 />
                 <Label className="px-2 font-normal self-center" htmlFor="variableRent">
                     Variable Rent
                 </Label>
             </div>
             <div className="flex flex-row gap-2 self-center">
-              <Checkbox
-                  className="self-center"
-                  name="vatInclusive"
-                  id="vatInclusive"
-                  checked={formData.vatInclusive}
-                  onCheckedChange={(checked) => handleSelectChange("vatInclusive", checked)}
-              />
-              <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
-                  VAT Inclusive
-              </Label>
+                <Checkbox
+                    className="self-center"
+                    name="vatInclusive"
+                    id="vatInclusive"
+                    checked={formData.vatInclusive}
+                    onCheckedChange={(checked) => handleSelectChange("vatInclusive", checked)}
+                />
+                <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
+                    VAT Inclusive
+                </Label>
             </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -684,11 +719,12 @@ function AddIndividualLease() {
           </Label>
         </div>
       </ColumnsContainer>
-      <div className="flex justify-end">
-        <Button>Submit</Button> 
+      <div className="flex justify-end mt-3 gap-3">
+        <Button>Cancel</Button>
+        <Button variant={"outline"}>Submit</Button> 
       </div>
     </form>
   );
 }
 
-export default AddIndividualLease;
+export default AddCompanyLease;

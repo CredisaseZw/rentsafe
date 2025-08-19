@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Layers, Plus, UserRoundPlus } from "lucide-react";
 import useAddIndividualLease from "@/hooks/components/useAddIndividualLease";
-import AddIndividualLease from "@/components/forms/AddIndividualLease";
+import AddCompanyLease from "@/components/forms/AddCompanyLease";
 
-function ActiveIndividualLease() {
+function ActiveCompanyLease() {
     const {isOpen, setShowModal} = useAddIndividualLease();
     const tabs = [
         {
          icon: UserRoundPlus,
          value: "signle",
          label: "Single",
-         content: <AddIndividualLease/>,
+         content: <AddCompanyLease/>,
         },
         {
          icon: Layers,
@@ -28,13 +28,13 @@ function ActiveIndividualLease() {
             onOpenChange={setShowModal}
         >
         <DialogTrigger asChild>
-            <Button>
-                Activate Individuals <Plus />
+            <Button variant={"outline"}>
+                Activate Company <Plus />
             </Button>
         </DialogTrigger>
 
         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1150px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto pr-2`}>
-            <DialogTitle>Add Lease - Individual</DialogTitle>
+            <DialogTitle>Add Lease - Company</DialogTitle>
             <div className="mt-3">
                 <Tabs defaultValue={tabs[0].value}>
                     <TabsList>
@@ -64,4 +64,4 @@ function ActiveIndividualLease() {
   )
 }
 
-export default ActiveIndividualLease
+export default ActiveCompanyLease

@@ -56,13 +56,12 @@ export default function InternalUsers() {
                <TableBase headers={headers} isLoading={isLoading} isError={isError}>
                   {clients.length > 0
                      ? clients.map((row, index) => {
-                          const baseCellClass = "border-color border-r";
-                          return (
+                           return (
                              <TableRow key={index}>
-                                <TableCell className={baseCellClass}>{row.lastName}</TableCell>
-                                <TableCell className={baseCellClass}>{row.firstName}</TableCell>
-                                <TableCell className={baseCellClass}>{row.accessLevel}</TableCell>
-                                <TableCell className={baseCellClass}>{row.email}</TableCell>
+                                <TableCell >{row.lastName}</TableCell>
+                                <TableCell >{row.firstName}</TableCell>
+                                <TableCell >{row.accessLevel}</TableCell>
+                                <TableCell>{row.email}</TableCell>
                                 <TableCell>
                                    <div className="flex flex-row items-center justify-center gap-3">
                                       <Eye size={18} className="text-gray-800 dark:text-white" />
