@@ -10,12 +10,15 @@ export default function useIndividualPaymentStatusTab() {
    const searchRef = React.useRef<HTMLInputElement>(null);
    const { data, isLoading, searchQuery } = useMinimalIndividualsList();
 
-   const rows: BaseTableRow[] =
-      (data?.results as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => ({
+   const rows: BaseTableRow[] = (() => {
+      const individuals = Array.isArray(data) ? data : data?.results;
+      
+      return (individuals as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => ({
          ...cell,
          select: <IndividualPaymentStatusReport individualId={cell.id} />,
       })) || [];
-
+   })();
+   
    const headers: BaseTableColumn[] = [
       { name: "first_name", displayName: "First Name" },
       { name: "last_name", displayName: "Last Name" },

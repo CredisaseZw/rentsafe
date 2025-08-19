@@ -3,14 +3,14 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.accounting.models.models import Currency, PaymentMethod
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import Company
 
 User = get_user_model()
 
-class Disbursement(BaseModel):
+class Disbursement(BaseModelWithUser):
     PAYMENT_METHODS = (
         ('bank_transfer', 'Bank Transfer'),
         ('cash', 'Cash'),

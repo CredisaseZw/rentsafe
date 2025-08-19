@@ -2,11 +2,11 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.utils.translation import gettext_lazy as _
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel,BaseModelWithUser
 from apps.accounting.models.models import Currency
 from django.utils import timezone
 
-class MaintenanceRequest(BaseModel):
+class MaintenanceRequest(BaseModelWithUser):
     PRIORITY_CHOICES = (
         ('low', 'Low'),
         ('medium', 'Medium'),
@@ -39,7 +39,7 @@ class MaintenanceRequest(BaseModel):
         verbose_name_plural = _("Maintenance Requests")
         ordering = ['-requested_date']
 
-class WorkSchedule(BaseModel):
+class WorkSchedule(BaseModelWithUser):
     
     lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True,
                             related_name='work_schedules',
@@ -87,7 +87,7 @@ class WorkSchedule(BaseModel):
     def __str__(self):
         return f"Work Schedule: {self.title} for {self.property or self.lease}"
 
-class MaintenanceSchedule(BaseModel):
+class MaintenanceSchedule(BaseModelWithUser):
     maintenance_number = models.CharField(_('Maintenance Unique Number'), max_length=25, unique=True, blank=True, null=True)
     lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True,
             related_name='maintenance_schedules',

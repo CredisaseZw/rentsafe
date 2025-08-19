@@ -178,6 +178,8 @@ class Role(models.Model):
         }
 
 class UserSetting(BaseModel):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                related_name='user_settings')
     dark_mode_enabled = models.BooleanField(default=False,
                                             help_text=_("Enable dark mode for the user interface."))
     email_notifications_enabled = models.BooleanField(default=True,

@@ -3,9 +3,9 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from apps.common.models.base_models import BaseModel 
+from apps.common.models.base_models import BaseModel,BaseModelWithUser
 
-class AuditLog(BaseModel): 
+class AuditLog(BaseModelWithUser): 
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255, help_text=_("Description of the action performed."))
     ip_address = models.GenericIPAddressField(null=True, blank=True, help_text=_("IP address from which the action originated."))
@@ -21,5 +21,5 @@ class AuditLog(BaseModel):
         ordering = ['-timestamp']
 
     def __str__(self):
-        user_info = self.user.username if self.user else 'Anonymous'
+        user_info = self.created_by.username if self.created_by else 'Anonymous'
         return f"[{self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}] {user_info}: {self.action}"

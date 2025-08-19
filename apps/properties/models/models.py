@@ -4,7 +4,7 @@ from django.db import models
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.common.models.models import Address, Document, Note
 
 class PropertyType(BaseModel):
@@ -19,7 +19,7 @@ class PropertyType(BaseModel):
     def __str__(self):
         return self.name
 
-class Property(BaseModel):
+class Property(BaseModelWithUser):
     PROPERTY_STATUS_CHOICES = (
         ('active', 'Active'),
         ('inactive', 'Inactive'),
@@ -51,7 +51,7 @@ class Property(BaseModel):
     def __str__(self):
         return self.name
 
-class Unit(BaseModel):
+class Unit(BaseModelWithUser):
     UNIT_STATUS_CHOICES = (
         ('vacant', 'Vacant'),
         ('occupied', 'Occupied'),
