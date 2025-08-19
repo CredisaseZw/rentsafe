@@ -11,8 +11,10 @@ import useIndividualPaymentStatusReport from "@/hooks/pages/dashboard/useIndivid
 import LoadingIndicator from "@/components/general/LoadingIndicator";
 
 export default function IndividualPaymentStatusReport({ individualId }: { individualId: number }) {
-   const { error, show, report, isLoading, ratingColor, showFullAddress, handleOpenChange, setShowFullAddress } =
+   const { error, show, report, isLoading, ratingColor, showFullAddress, fullMobile, setFullMobile,  handleOpenChange, setShowFullAddress } =
       useIndividualPaymentStatusReport(individualId);
+
+
 
    return (
       <Dialog modal open={show} onOpenChange={handleOpenChange}>
@@ -128,8 +130,23 @@ export default function IndividualPaymentStatusReport({ individualId }: { indivi
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">
                               <div className="col-span-2">Mobile Number</div>
-
-                              <div className="col-span-3">{report.personalDetails.mobileNumber}</div>
+                               <div className="col-span-3 flex items-start gap-1">
+                                 <div className={fullMobile ? "grow" : "line-clamp-1 grow"}>
+                                    {report.personalDetails.mobileNumber}
+                                 </div>
+                                 {
+                                    report.personalDetails.mobileNumber.length >= 18 &&
+                                       <Button
+                                          onClick={() => setFullMobile((prev) => !prev)}
+                                          variant="outline"
+                                          className="py-0"
+                                          size="xs"
+                                       >
+                                          {fullMobile ? "-" : "+"}
+                                       </Button>
+                                 }
+                              </div>
+                                 
                            </div>
 
                            <div className="border-foreground/30 grid grid-cols-5 items-start gap-2 border-b px-3 py-1">

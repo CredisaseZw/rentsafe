@@ -67,3 +67,26 @@ export type Contact = {
 };
 export type Roles = Role[];
 export type IndividualMaritalStatus = "divorced" | "married" | "single";
+export type InspectionMode = {
+   key: string;
+   label: string;
+   Form: React.ComponentType;
+};
+
+export type Status = {
+   good: boolean;
+   ok: boolean;
+   bad: boolean;
+};
+
+export type Row = {
+   rowName: string;
+   status: Status;
+};
+
+export type Column = {
+   captionLabel : string,
+   note : string,
+   headerName: string;
+   rows: Row[];
+};
