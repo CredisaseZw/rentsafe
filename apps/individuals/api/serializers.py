@@ -8,7 +8,6 @@ from apps.common.utils.validators import (
     validate_email,
     normalize_zimbabwe_mobile, 
     validate_national_id, 
-    validate_passport_number,
     validate_future_dates
 )
 
@@ -93,17 +92,17 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
             else:
                 raise ValidationError("Invalid email address provided")
         
-        phone = data.get("mobile_phone",[])
+        mobile_phone_numbers = data.get("mobile_phone",[])
         normalized_phone = []
         existing_numbers = []
 
         existing_numbers = set(
-            normalize_zimbabwe_mobile(n)
-            for phones in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
-            for n in phones if n
+            normalize_zimbabwe_mobile(phone_number)
+            for phone_numbers in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
+            for phone_number in phone_numbers if phone_number
         )
-        for p in phone:
-            formatted = normalize_zimbabwe_mobile(p)
+        for phone in mobile_phone_numbers:
+            formatted = normalize_zimbabwe_mobile(phone)
 
             if formatted:
                 if formatted in existing_numbers:
@@ -111,7 +110,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
                 
                 normalized_phone.append(formatted)
             else:
-                raise ValidationError(f"Invalid phone number: {p}")
+                raise ValidationError(f"Invalid phone number: {phone}")
         data["mobile_phone"] = normalized_phone
 
         return data
@@ -184,57 +183,40 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             'identification_type', 'identification_number','contact_details',
             'addresses', 'employment_details', 'next_of_kin', 'documents','notes'
         ]
-        
     def validate(self, data):
-        
         id_type = data.get('identification_type')
-        identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
-        
+        id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
+        dob = data.get('date_of_birth')
+
         if not id_type:
             raise ValidationError("Identification type is required")
-        
         if id_type == 'national_id':
-            if not identification_number:
-                raise ValidationError("National id is required")
-            
-            if validate_national_id(identification_number, 'zimbabwe'):
-                data["identification_number"] = identification_number
-            else:
-                raise ValidationError("Invalid national id provided")
-        
+            if not id_number or not validate_national_id(id_number, 'zimbabwe'):
+                raise ValidationError("Invalid or missing national id")
         elif id_type == 'passport':
-            if not identification_number:
-                raise ValidationError("Passport number is required")
-            if validate_passport_number(identification_number, 'zimbabwe'):
-                data["identification_number"] = identification_number
-            else:
-                raise ValidationError("Invalid passport number provided")
+            if not id_number:
+                raise ValidationError("Invalid or missing passport number")
+            if (len(id_number) < 5 or len(id_number) > 15):
+                raise ValidationError("Invalid Passport number")
         else:
             raise ValidationError("Invalid identification type provided")
-        
-        if not data.get('first_name'):
-            raise ValidationError("First name is required")
-        
-        if not data.get('last_name'):
-            raise ValidationError("Last name is required")
-        
-        dob = data.get('date_of_birth')
+
+        for field in ['first_name', 'last_name', 'gender']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+
         if not dob:
             raise ValidationError("Date of birth is required")
-        
         if validate_future_dates(dob):
-            raise ValidationError("Date of birth can not be in the future")
+            raise ValidationError("Date of birth cannot be in the future")
+
+        existing = Individual.objects.filter(identification_number__iexact=id_number).first()
         
-        if not data.get('gender'):
-            raise ValidationError("Gender is required")
-        
-        existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
-        
-        if existing:
-            if not existing.is_deleted:
+        if existing and not existing.is_deleted:
                 raise ValidationError(
-                    f"This identification number {identification_number} is already registered and active."
+                    f"This identification number {id_number} is already registered and active."
                 )
+        else: 
             self._existing_individual = existing 
         
         return data
@@ -425,6 +407,35 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
             'employment_details', 'next_of_kin'
         ]
 
+    def validate(self, data):
+        id_type = data.get('identification_type')
+        id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
+        dob = data.get('date_of_birth')
+
+        if not id_type:
+            raise ValidationError("Identification type is required")
+        if id_type == 'national_id':
+            if not id_number or not validate_national_id(id_number, 'zimbabwe'):
+                raise ValidationError("Invalid or missing national id")
+        elif id_type == 'passport':
+            if not id_number:
+                raise ValidationError("Invalid or missing passport number")
+            if (len(id_number) < 5 or len(id_number) > 15):
+                raise ValidationError("Invalid Passport number")
+        else:
+            raise ValidationError("Invalid identification type provided")
+
+        for field in ['first_name', 'last_name', 'gender']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+
+        if not dob:
+            raise ValidationError("Date of birth is required")
+        if validate_future_dates(dob):
+            raise ValidationError("Date of birth cannot be in the future")
+    
+        return data
+    
     @transaction.atomic
     def update(self, instance, validated_data):
         address_data = validated_data.pop('addresses', [])
