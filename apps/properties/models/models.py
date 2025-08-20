@@ -51,6 +51,10 @@ class Property(BaseModelWithUser):
     def __str__(self):
         return self.name
 
+    def get_address(self):
+        return self.addresses.first() if self.addresses.exists() else "No Address"
+    
+
 class Unit(BaseModelWithUser):
     UNIT_STATUS_CHOICES = (
         ('vacant', 'Vacant'),
@@ -71,7 +75,6 @@ class Unit(BaseModelWithUser):
     unit_type = models.CharField(max_length=100,choices=UNIT_TYPE_CHOICES,default='OTHER')
     number_of_rooms = models.PositiveIntegerField(help_text="Number of rooms in the unit",default=0)
     status = models.CharField(max_length=20, choices=UNIT_STATUS_CHOICES, default='vacant')
-    monthly_rent = models.DecimalField(max_digits=12, decimal_places=2)
     features = models.JSONField(blank=True, null=True, help_text="Additional features of the unit")
     
     class Meta:
