@@ -143,3 +143,20 @@ export type IndividualLease = {
    paymentData07Jul25: string;
    paymentData07Aug25: string;
   };
+
+export type Property = {
+   id: number;
+   name: string;
+   property_type: string;
+   status: string;
+   description: string;
+   total_number_of_units: number;
+   address_summary: string;
+}
+
+export type PropertiesResponse = {
+   count: number;
+   next: string | null;
+   previous: string | null;
+   results: Property[];
+}
