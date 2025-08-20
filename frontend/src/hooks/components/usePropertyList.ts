@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { FilterOptionType, Header, Property, SummaryCardType } from "@/types";
+import type { AddPropertyForm, FilterOptionType, Header, Property, SummaryCardType } from "@/types";
 import type { PaginationData } from "@/interfaces";
 
 function usePropertyList() {
@@ -8,10 +8,11 @@ function usePropertyList() {
    const [filterOptions, setFilterOptions] = useState<FilterOptionType[]>([]);
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
-   const [addPropertyForm, setAddPropertyForm] = useState({
+   const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
+   const [addPropertyForm, setAddPropertyForm] = useState<AddPropertyForm>({
       property_type: "", unit_number: "", building_name: "", street_number: "", street_name: "",
       area: "", city_town: "", province: "", country: "", area_code: "",
-      lanlord_type: "", landlord_id: "", landlord_name: "", property_details: "",
+      landlord_type: "individual",landlord_id: "", landlord_name: "", property_details: "",
    });
 
    const headers: Header[] = [
@@ -24,14 +25,21 @@ function usePropertyList() {
       { name: "Actions" }
    ];
    const [properties, setProperties] = useState<Property[]>([]);
-   const [paginationData, setPaginationData] = useState<PaginationData | null>(null);
+   const [paginationData, setPaginationData] = useState<PaginationData | undefined>(undefined);
 
-   
-
-   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
-      setAddPropertyForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+   const onInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+   setAddPropertyForm(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+   }));
    };
 
+   const onSelectChange = (name: string, value: string) => {
+   setAddPropertyForm(prev => ({
+      ...prev,
+      [name]: value,
+   }));
+   };
    const onSelectFilter = (filterOption: string) => setSelectFilter(filterOption);
    const onSearchValue = (searchValue: string) => console.log("SEARCHING VALUE:", searchValue);
    const openModal = () => setAddPropertyModal(true);
@@ -62,10 +70,14 @@ function usePropertyList() {
       addPropertyForm,
       filterOptions,
       selectedFilter,
+      landlordIdentifier,
+      setLandlordIdentifier,
       setProperties,
+      setAddPropertyForm,
       setPaginationData,
       setStatus,
-      onChangeHandler,
+      onInputChange,
+      onSelectChange,
       onSearchValue,
       onSelectFilter,
       openModal,

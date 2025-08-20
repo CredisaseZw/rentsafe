@@ -2,216 +2,216 @@ import Button from "../general/Button";
 import { Plus } from "lucide-react";
 import usePropertyList from "@/hooks/components/usePropertyList";
 import FormSectionHeader from "../general/FormSectionHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "../ui/textarea";
+import type { Property } from "@/types";
+import React from "react";
+import AutoCompleteLandlord from "../general/AutoCompleteLandlord";
 
 function AddPropertyForm() {
-   const { addPropertyForm, onChangeHandler } = usePropertyList();
+   const { addPropertyForm,
+      landlordIdentifier,
+      onInputChange, 
+      onSelectChange, 
+      setAddPropertyForm,
+      setLandlordIdentifier } = usePropertyList();
 
-   const submitAddPropertyForm = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      console.log(addPropertyForm);
-   };
-   
-   return (
-      <form onSubmit={submitAddPropertyForm} method="post">
-         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  Property Type
-               </label>
-               <select
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.property_type}
-                  required
-                  name="property_type"
-                  className="input-default"
-                  id=""
-               >
-                  <option value="" disabled>
-                     Select ...{" "}
-                  </option>
-                  <option value="Residental House">Residental - House</option>
-                  <option value="Residental Cottage">Residental - Cottage</option>
-                  <option value="Residental Townhouse">Residental - Townhouse</option>
-                  <option value="Residental Flats">Residental - Flats</option>
-                  <option value="Residental Small Holdings">Residental - Small Holdings</option>
-                  <option value="Commercial Offices">Commercial - Offices</option>
-                  <option value="Commercial Industrial">Commercial - Industrial</option>
-                  <option value="Commercial Hospitality">Commercial - Hospitality</option>
-                  <option value="Agricultural Plot">Agricultural - Plot</option>
-                  <option value="Agricultural Small Farm">Agricultural - Small Farm</option>
-                  <option value="Agricultural Commercial Farm">Agricultural - Commercial Farm</option>
-                  <option value="Land Undeveloped">Land - Undeveloped</option>
-               </select>
-            </div>
-            <div className="form-group">
-               <label htmlFor="">Property Details</label>
-               <input
-                  type="text"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.property_details}
-                  className="input-default"
-                  name="property_details"
-                  placeholder="i.e Rooms, Size,"
-               />
-            </div>
-         </div>
-         <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div className="form-group">
-               <label htmlFor="">Unit Number</label>
-               <input
-                  type="text"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.unit_number}
-                  className="input-default"
-                  name="unit_number"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="">Building/Complex Name</label>
-               <input
-                  type="text"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.building_name}
-                  className="input-default"
-                  name="building_name"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  Street Number
-               </label>
-               <input
-                  type="text"
-                  required
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.street_number}
-                  className="input-default"
-                  name="street_number"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  Street Name
-               </label>
-               <input
-                  type="text"
-                  required
-                  className="input-default"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.street_name}
-                  name="street_name"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  Suburb/Area
-               </label>
-               <input
-                  type="text"
-                  required
-                  className="input-default"
-                  name="area"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.area}
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  City/Town
-               </label>
-               <input
-                  type="text"
-                  required
-                  className="input-default"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.city_town}
-                  name="city_town"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="">Province</label>
-               <input
-                  type="text"
-                  className="input-default"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.province}
-                  name="province"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="">Country</label>
-               <input
-                  type="text"
-                  className="input-default"
-                  name="country"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.country}
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="">Area Code</label>
-               <input
-                  type="text"
-                  className="input-default"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.area_code}
-                  name="area_code"
-               />
-            </div>
-         </div>
-      <FormSectionHeader title="Landlord"/>
-         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div className="form-group">
-               <label htmlFor="">Landlord type</label>
-               <select
-                  name="lanlord_type"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.lanlord_type}
-                  className="input-default"
-                  id=""
-               >
-                  <option value="" disabled>
-                     Select ..{" "}
-                  </option>
-                  <option value="Individual">Individual</option>
-                  <option value="Company">Company</option>
-               </select>
-            </div>
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  ID/Reg#
-               </label>
-               <input
-                  type="text"
-                  required
-                  className="input-default"
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.landlord_id}
-                  name="landlord_id"
-               />
-            </div>
-            <div className="form-group">
-               <label htmlFor="" className="required">
-                  Landlord Name
-               </label>
-               <input
-                  type="text"
-                  required
-                  onChange={onChangeHandler}
-                  value={addPropertyForm.landlord_name}
-                  className="input-default"
-                  name="landlord_name"
-               />
-            </div>
-         </div>
-         <div className="mt-5 flex w-full justify-end">
-            <Button type={"submit"} className="bg-PRIMARY flex flex-row gap-3">
-               <Plus size={15} className="self-center" />
-               <span>Submit</span>
-            </Button>
-         </div>
-      </form>
-   );
+  const submitAddPropertyForm = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(addPropertyForm);
+    const property:Property = {} 
+  };
+
+
+  return (
+    <form onSubmit={submitAddPropertyForm} method="post" className="space-y-6">
+       <div className="form-group">
+          <label className="required">Property Type</label>
+          <Select
+            value={addPropertyForm.property_type}
+            onValueChange={(val) => onSelectChange("property_type", val)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select ..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Residental House">Residental - House</SelectItem>
+              <SelectItem value="Residental Cottage">Residental - Cottage</SelectItem>
+              <SelectItem value="Residental Townhouse">Residental - Townhouse</SelectItem>
+              <SelectItem value="Residental Flats">Residental - Flats</SelectItem>
+              <SelectItem value="Residental Small Holdings">
+                Residental - Small Holdings
+              </SelectItem>
+              <SelectItem value="Commercial Offices">Commercial - Offices</SelectItem>
+              <SelectItem value="Commercial Industrial">Commercial - Industrial</SelectItem>
+              <SelectItem value="Commercial Hospitality">
+                Commercial - Hospitality
+              </SelectItem>
+              <SelectItem value="Agricultural Plot">Agricultural - Plot</SelectItem>
+              <SelectItem value="Agricultural Small Farm">
+                Agricultural - Small Farm
+              </SelectItem>
+              <SelectItem value="Agricultural Commercial Farm">
+                Agricultural - Commercial Farm
+              </SelectItem>
+              <SelectItem value="Land Undeveloped">Land - Undeveloped</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="form-group">
+          <label>Property Details</label>
+          <Textarea
+            onChange={onInputChange}
+            value={addPropertyForm.property_details}
+            name="property_details"
+            placeholder="i.e Rooms, Size,"
+          />
+        </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="form-group">
+          <label>Unit Number</label>
+          <Input
+            type="text"
+            onChange={onInputChange}
+            value={addPropertyForm.unit_number}
+            name="unit_number"
+          />
+        </div>
+        <div className="form-group">
+          <label>Building/Complex Name</label>
+          <Input
+            type="text"
+            onChange={onInputChange}
+            value={addPropertyForm.building_name}
+            name="building_name"
+          />
+        </div>
+        <div className="form-group">
+          <label className="required">Street Number</label>
+          <Input
+            type="text"
+            required
+            onChange={onInputChange}
+            value={addPropertyForm.street_number}
+            name="street_number"
+          />
+        </div>
+        <div className="form-group">
+          <label className="required">Street Name</label>
+          <Input
+            type="text"
+            required
+            onChange={onInputChange}
+            value={addPropertyForm.street_name}
+            name="street_name"
+          />
+        </div>
+        <div className="form-group">
+          <label className="required">Suburb/Area</label>
+          <Input
+            type="text"
+            required
+            name="area"
+            onChange={onInputChange}
+            value={addPropertyForm.area}
+          />
+        </div>
+        <div className="form-group">
+          <label className="required">City/Town</label>
+          <Input
+            type="text"
+            required
+            onChange={onInputChange}
+            value={addPropertyForm.city_town}
+            name="city_town"
+          />
+        </div>
+        <div className="form-group">
+          <label>Province</label>
+          <Input
+            type="text"
+            onChange={onInputChange}
+            value={addPropertyForm.province}
+            name="province"
+          />
+        </div>
+        <div className="form-group">
+          <label>Country</label>
+          <Input
+            type="text"
+            name="country"
+            onChange={onInputChange}
+            value={addPropertyForm.country}
+          />
+        </div>
+        <div className="form-group">
+          <label>Area Code</label>
+          <Input
+            type="text"
+            onChange={onInputChange}
+            value={addPropertyForm.area_code}
+            name="area_code"
+          />
+        </div>
+      </div>
+
+      <FormSectionHeader title="Landlord" />
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="form-group">
+          <label>Landlord type</label>
+          <Select
+              value={addPropertyForm.landlord_type}
+              onValueChange={(val: "individual" | "company") => {
+              setAddPropertyForm((prev) => ({
+                  ...prev,
+                  lanlord_type: val,
+                }));
+                setLandlordIdentifier(val === "individual" ? "National ID" : "Registration Number");
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select ..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="individual">Individual</SelectItem>
+                <SelectItem value="company">Company</SelectItem>
+              </SelectContent>
+          </Select>
+        </div>
+         <AutoCompleteLandlord
+            setAddPropertyForm = {setAddPropertyForm}
+            landlordIdentifier= {landlordIdentifier}
+            addPropertyForm={addPropertyForm}
+         />
+        <div className="form-group">
+          <label className="required">Landlord Name</label>
+          <Input
+            type="text"
+            required
+            disabled
+            value={addPropertyForm.landlord_name}
+            name="landlord_name"
+          />
+        </div>
+      </div>
+
+      <div className="mt-5 flex w-full justify-end">
+        <Button type="submit" className="bg-PRIMARY flex flex-row gap-3">
+          <Plus size={15} className="self-center" />
+          <span>Submit</span>
+        </Button>
+      </div>
+    </form>
+  );
 }
 
 export default AddPropertyForm;

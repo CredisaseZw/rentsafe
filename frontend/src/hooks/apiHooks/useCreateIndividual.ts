@@ -28,7 +28,7 @@ export default function useCreateIndividual(successCallback?: () => void) {
     onSuccess(individual) {
   try {
     client.setQueryData<IndividualFull>(["individual", individual.id], individual);
-client.invalidateQueries({
+    client.invalidateQueries({
       queryKey: ["individuals-minimal"]
     });
     client.getQueryCache().findAll({

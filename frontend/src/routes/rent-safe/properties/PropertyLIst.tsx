@@ -31,6 +31,7 @@ function PropertyLIst() {
       SummaryCards,
       addPropertyModal,
       status,
+      paginationData,
       onSearchValue,
       openModal,
       closeModal,
@@ -99,24 +100,23 @@ function PropertyLIst() {
                </div>
                </ColumnsContainer>
                <div className="mt-6">
-                  <TableBase headers={headers} isLoading = {status.loading} isError = {status.isError}>
+                  <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {status.loading} isError = {status.isError}>
                      {  
                         properties.length != 0 ?
                         properties.map((property: Property)=>{
-                           const address = property.address_summary.split(",")
+                           const address = property?.address_summary ? property?.address_summary.split(",") : []
                            const city = address[2]
                            const suburbArea = address[1]
                            const StreetName = address[0]
 
                            return(
                               <TableRow key={property.id}>
-                                 <TableCell>{property.id}</TableCell>
-                                 <TableCell>{property.name}</TableCell>
-                                 <TableCell>{city}</TableCell>
-                                 <TableCell>{suburbArea}</TableCell>
-                                 <TableCell>{StreetName}</TableCell>
-                                 <TableCell>{property.address_summary}</TableCell>
-                                 <TableCell>{property.property_type}</TableCell>
+                                 <TableCell className="text-center">{property.id}</TableCell>
+                                 <TableCell className="text-center">{property.name}</TableCell>
+                                 <TableCell className="text-center">{city}</TableCell>
+                                 <TableCell className="text-center">{suburbArea}</TableCell>
+                                 <TableCell className="text-center">{StreetName}</TableCell>
+                                 <TableCell className="text-center">{property.property_type}</TableCell>
                               </TableRow>
                            )}
                         ) :

@@ -144,19 +144,57 @@ export type IndividualLease = {
    paymentData07Aug25: string;
   };
 
-export type Property = {
-   id: number;
-   name: string;
-   property_type: string;
-   status: string;
-   description: string;
-   total_number_of_units: number;
-   address_summary: string;
-}
-
 export type PropertiesResponse = {
    count: number;
    next: string | null;
    previous: string | null;
    results: Property[];
 }
+export interface Features {
+  parking: string;
+  security: string;
+  backup_power: string;
+}
+export interface AddressInput {
+  suburb_id: number;
+  street_address: string;
+}
+
+export interface LandlordInput {
+  landlord_name: string;
+  landlord_type: "company" | "individual" | string;
+  landlord_id: string;
+}
+export interface Property {
+   id?: string;
+  name?: string;
+  description?: string;
+  status?: "active" | "inactive" | string; 
+  year_built?: number;
+  total_area?: string; 
+  is_furnished?: boolean;
+  total_number_of_units?: number;
+  features?: Features;
+  property_type_id?: number;
+  property_type?: string;
+  address_summary?: string;
+  addresses_input?: AddressInput;
+  landlords_input?: LandlordInput[];
+}
+
+export type AddPropertyForm = {
+  property_type: string;
+  unit_number: string;
+  building_name: string;
+  street_number: string;
+  street_name: string;
+  area: string;
+  city_town: string;
+  province: string;
+  country: string;
+  area_code: string;
+  landlord_type: "individual" | "company";
+  landlord_id: string;
+  landlord_name: string;
+  property_details: string;
+};
