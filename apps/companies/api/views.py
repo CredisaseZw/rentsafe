@@ -30,7 +30,7 @@ class CompanyViewSet(BaseViewSet):
     ViewSet for managing Company instances.
     Handles CRUD operations and company-specific actions.
     """
-    queryset = Company.objects.filter(is_deleted=False).prefetch_related('addresses', 'profile', 'branches')
+    queryset = Company.objects.filter(is_deleted=False).prefetch_related('addresses', 'profile', 'branches').order_by('-date_created')
     permission_classes = [IsAuthenticated]
     
     def get_serializer_class(self):
@@ -52,9 +52,8 @@ class CompanyViewSet(BaseViewSet):
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer) # This saves the company and its HQ branch via serializer logic
+            self.perform_create(serializer) 
             
-            # After creation, return the HQ branch details for the response
             company = serializer.instance
             hq_branch = company.branches.filter(is_headquarters=True).first()
             if hq_branch:
@@ -370,7 +369,7 @@ class CompanyBranchViewSet(BaseViewSet):
     ViewSet for managing CompanyBranch instances.
     Handles CRUD operations for branches.
     """
-    queryset = CompanyBranch.objects.filter(is_deleted=False, company__is_deleted=False).select_related('company')
+    queryset = CompanyBranch.objects.filter(is_deleted=False, company__is_deleted=False).select_related('company').order_by('-date_created')
     serializer_class = CompanyBranchSerializer
     permission_classes = [IsAuthenticated]
     

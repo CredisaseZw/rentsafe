@@ -28,7 +28,7 @@ class IndividualViewSet(BaseViewSet):
             'addresses','addresses__country', 'addresses__province', 
             'addresses__city', 'addresses__suburb', 'employment_details', 
             'next_of_kin', 'notes','documents','contact_details'
-        )
+        ).order_by('-date_created')
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -45,7 +45,6 @@ class IndividualViewSet(BaseViewSet):
 
     
     def create(self, request, *args, **kwargs):
-      
         try:
             
             serializer = IndividualCreateSerializer(data=request.data)

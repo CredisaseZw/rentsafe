@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from properties.models import PropertyType
+from apps.properties.models import PropertyType
 
 class Command(BaseCommand):
     help = 'Seed property types'
