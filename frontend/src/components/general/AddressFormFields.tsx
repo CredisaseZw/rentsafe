@@ -31,7 +31,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                value={location.countryId}
                onValueChange={(value) => dispatch({ type: "country-changed", value: value })}
             >
-               <SelectTrigger id={"country_id" + number} className="border-foreground/40 w-full bg-white">
+               <SelectTrigger id={"country_id" + number} className="border-color w-full bg-white">
                   <SelectValue placeholder={countriesLoading ? "Loading..." : "Select country"} />
                </SelectTrigger>
                <SelectContent>
@@ -54,7 +54,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                value={location.provinceId}
                onValueChange={(value) => dispatch({ type: "province-changed", value: value })}
             >
-               <SelectTrigger id={"province_id" + number} className="border-foreground/40 w-full bg-white">
+               <SelectTrigger id={"province_id" + number} className="border-color w-full bg-white">
                   <SelectValue placeholder={provincesLoading ? "Loading..." : "Select province"} />
                </SelectTrigger>
                <SelectContent>
@@ -78,7 +78,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                value={location.cityId}
                onValueChange={(value) => dispatch({ type: "city-changed", value: value })}
             >
-               <SelectTrigger id={"city_id" + number} className="border-foreground/40 w-full bg-white">
+               <SelectTrigger id={"city_id" + number} className="border-color w-full bg-white">
                   <SelectValue placeholder={citiesLoading ? "Loading..." : "Select city"} />
                </SelectTrigger>
                <SelectContent>
@@ -101,7 +101,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                value={location.suburbId}
                onValueChange={(value) => dispatch({ type: "suburb-changed", value: value })}
             >
-               <SelectTrigger id={"suburb_id" + number} className="border-foreground/40 w-full bg-white">
+               <SelectTrigger id={"suburb_id" + number} className="border-color w-full bg-white">
                   <SelectValue placeholder={suburbsLoading ? "Loading..." : "Select suburb"} />
                </SelectTrigger>
                <SelectContent>
@@ -122,7 +122,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                id={"street_address" + number}
                name={"street_address" + number}
                placeholder="e.g. 22 Cnr Sam Nujoma Str"
-               className="border-foreground/40 bg-white"
+               className="border-color bg-white"
             />
          </div>
 
@@ -133,7 +133,7 @@ export default function AddressFormFields({ number }: { number: number }) {
             <Input
                id={"postal_code" + number}
                name={"postal_code" + number}
-               className="border-foreground/40 bg-white"
+               className="border-color bg-white"
             />
          </div>
 
@@ -142,7 +142,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                Address Type
             </Label>
             <Select name={"address_type" + number} defaultValue={ALL_ADDRESS_TYPES[0]}>
-               <SelectTrigger id={"address_type" + number} className="border-foreground/40 w-full bg-white">
+               <SelectTrigger id={"address_type" + number} className="border-color w-full bg-white">
                   <SelectValue placeholder="Select address type" />
                </SelectTrigger>
                <SelectContent>
@@ -155,12 +155,12 @@ export default function AddressFormFields({ number }: { number: number }) {
             </Select>
          </div>
 
-         <div className="flex items-center justify-center gap-2">
+         <div className="flex flex-row self-center pt-4 gap-2">
             <Checkbox
                id={"is_primary_address" + number}
                name={"is_primary_address" + number}
                value="true"
-               className="border-foreground/40 bg-white"
+               className="border-color bg-white"
                checked={number === 1}
                disabled={number !== 1}
             />

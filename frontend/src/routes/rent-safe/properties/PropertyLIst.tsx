@@ -4,7 +4,7 @@ import Modal from "@/components/general/Modal";
 import Searchbox from "@/components/general/Searchbox";
 import SummaryCard from "@/components/general/SummaryCard";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
-import { Plus } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import SectionHeader from "@/components/general/SectionHeader";
 import {
   Select,
@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 
-
 function PropertyLIst() {
    const {
       headers,
@@ -40,11 +39,11 @@ function PropertyLIst() {
       setPaginationData,
       setStatus,
    } = usePropertyList();
+
    const [searchParams] = useSearchParams();
    const page = parseInt(searchParams.get("page") || "1");
-   const { error ,data, isLoading } = getPropertyList(page, true);
-
-
+   const { error ,data, isLoading, refetch } = getPropertyList(page, true);
+  
    useEffect(() => {
       if (error) {
          console.error(error);
@@ -59,11 +58,15 @@ function PropertyLIst() {
          setStatus({ loading: false, isError: false });
       }
    }, [data, error]);
+
    return (
       <div className="">
          {addPropertyModal && (
             <Modal onClose={closeModal} size={"lg"} modalHeader="Add Property" allowOverflow={false}>
-               <AddPropertyForm />
+               <AddPropertyForm successCallback ={()=>{
+                  refetch()
+                  closeModal();
+               }}/>
             </Modal>
          )}
          <div className="summary-container w-full">
@@ -76,8 +79,8 @@ function PropertyLIst() {
                <SectionHeader
                   title="Property Lists"
                   subTitle="property lists"
-                  total={70}
-                  subTotal={10}
+                  total={paginationData?.count ?? 0}
+                  subTotal={properties.length ?? 0}
                />
                <ColumnsContainer numberOfCols={2}>
                <div>
@@ -105,30 +108,31 @@ function PropertyLIst() {
                <div className="mt-6">
                   <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {isLoading} isError = {status.isError}>
                      {  
-                        properties.length != 0 ?
-                        properties.map((property: Property)=>{
-                           const address = property?.address_summary ? property?.address_summary.split(",") : []
-                           const city = address[2]
-                           const suburbArea = address[1]
-                           const StreetName = address[0]
-
-                           return(
+                        properties.length
+                           ? properties.map((property: Property) => (
                               <TableRow key={property.id}>
                                  <TableCell className="text-center">{property.id}</TableCell>
                                  <TableCell className="text-center">{property.name}</TableCell>
-                                 <TableCell className="text-center">{city}</TableCell>
-                                 <TableCell className="text-center">{suburbArea}</TableCell>
-                                 <TableCell className="text-center">{StreetName}</TableCell>
+                                 <TableCell className="text-center">{property.full_address?.[0]?.city?.name || "-"}</TableCell>
+                                 <TableCell className="text-center">{property.full_address?.[0]?.suburb?.name || "-"}</TableCell>
+                                 <TableCell className="text-center">{property.full_address?.[0]?.street_address || "-"}</TableCell>
                                  <TableCell className="text-center">{property.property_type}</TableCell>
+                                 <TableCell className="flex justify-center items-center">
+                                    <Button variant={"ghost"}>
+                                       <Eye className="h-4 w-4"/>
+                                    </Button>
+                                 </TableCell>
                               </TableRow>
-                           )}
-                        ) :
-                        <TableRow>
-                           <TableCell colSpan={headers.length}>
-                              <EmptyResults message="No properties enlisted yet"/>
-                           </TableCell>
-                        </TableRow>
+                              ))
+                           : (
+                              <TableRow>
+                              <TableCell colSpan={headers.length}>
+                                 <EmptyResults message="No properties enlisted yet" />
+                              </TableCell>
+                              </TableRow>
+                           )
                      }
+
 
                   </TableBase>
                </div>

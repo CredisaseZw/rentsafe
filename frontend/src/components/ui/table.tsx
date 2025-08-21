@@ -74,6 +74,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
          className={cn(
             "align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
             "px-3 py-4",
+            "text-zinc-700 dark:text-zinc-200",
          
             className,
          )}

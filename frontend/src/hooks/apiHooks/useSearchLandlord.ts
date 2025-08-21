@@ -15,6 +15,9 @@ export default function useSearchLandlord(
     queryKey: ["search_landlord", type, query],
     queryFn: async () => {
       const { data } = await api.get(`${url}${query}`);
+      if(type === "company"){
+        return data.results
+      }
       return data;
     },
     enabled: enabled && query.trim().length > 0

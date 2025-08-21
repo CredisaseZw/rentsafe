@@ -39,7 +39,6 @@ function AutoCompleteLandlord({ landlordIdentifier, addPropertyForm, setAddPrope
     setOpen(false);
   };
   
-  console.log(data)
   return (
     <div className="form-group relative">
       <label className="required">{landlordIdentifier}</label>
@@ -51,13 +50,16 @@ function AutoCompleteLandlord({ landlordIdentifier, addPropertyForm, setAddPrope
           setSearchItem(value);
           setOpen(!!value);
         }}
+        onFocus={()=>{
+
+        }}
         value={searchItem}
         onBlur={() => setTimeout(() => setOpen(false), 100)}
         name="landlord_id"
       />
 
       {open && (
-        <div className="border-color absolute top-full left-1/2 z-50 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
+        <div className="border-color absolute top-full left-1/2 z-100 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
           {isLoading ? (
             <div className="flex items-center justify-center py-5">
               <Loader2 className="text-foreground/60 animate-spin" />

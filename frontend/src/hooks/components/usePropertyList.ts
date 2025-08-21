@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { AddPropertyForm, FilterOptionType, Header, Property, SummaryCardType } from "@/types";
+import type { AddPropertyForm, FilterOptionType, Header, Property, PropertyType, SummaryCardType } from "@/types";
 import type { PaginationData } from "@/interfaces";
 
 function usePropertyList() {
@@ -10,10 +10,20 @@ function usePropertyList() {
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
    const [searchItem, setSearchItem] = useState("");
+   const [propertyTypes, setPropertyTypes] = useState<PropertyType[] | null>(null)
+   const [loading, setLoading] = useState(false);
    const [addPropertyForm, setAddPropertyForm] = useState<AddPropertyForm>({
-      property_type: "", unit_number: "", building_name: "", street_number: "", street_name: "",
-      area: "", city_town: "", province: "", country: "", area_code: "",
-      landlord_type: "individual",landlord_id: "", landlord_name: "", property_details: "",
+      property_type: "", 
+      landlord_type: "individual",
+      landlord_id: "", 
+      landlord_name: "",  
+      status : "", 
+      is_furnished : false, 
+      features : {
+         parking : "",
+         security: "",
+         backup_power: ""
+      }
    });
 
    const headers: Header[] = [
@@ -73,6 +83,10 @@ function usePropertyList() {
       selectedFilter,
       landlordIdentifier,
       searchItem,
+      propertyTypes,
+      loading,
+      setLoading,
+      setPropertyTypes,
       setSearchItem,
       setLandlordIdentifier,
       setProperties,

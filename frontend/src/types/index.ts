@@ -1,3 +1,5 @@
+import type { Address } from "@/interfaces";
+
 export type Route = {
    label: string;
    path: string;
@@ -150,6 +152,17 @@ export type PropertiesResponse = {
    previous: string | null;
    results: Property[];
 }
+export type PropertyType = {
+   id : number,
+   name: string,
+   description: string
+}
+export type PropertTypeResponse = {
+   count: number;
+   next: string | null;
+   previous: string | null;
+   results : PropertyType[]
+}
 export interface Features {
   parking: string;
   security: string;
@@ -166,7 +179,7 @@ export interface LandlordInput {
   landlord_id: string;
 }
 export interface Property {
-   id?: string;
+  id?: string;
   name?: string;
   description?: string;
   status?: "active" | "inactive" | string; 
@@ -180,21 +193,16 @@ export interface Property {
   address_summary?: string;
   addresses_input?: AddressInput;
   landlords_input?: LandlordInput[];
+  full_address?: Address[]
 }
 
 export type AddPropertyForm = {
   property_type: string;
-  unit_number: string;
-  building_name: string;
-  street_number: string;
-  street_name: string;
-  area: string;
-  city_town: string;
-  province: string;
-  country: string;
-  area_code: string;
+  status : string
   landlord_type: "individual" | "company";
   landlord_id: string;
+  is_furnished : boolean;
+  features : Features;
   landlord_name: string;
-  property_details: string;
+ 
 };
