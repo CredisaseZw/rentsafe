@@ -14,10 +14,13 @@ import { Textarea } from "../ui/textarea";
 import type { Property } from "@/types";
 import React from "react";
 import AutoCompleteLandlord from "../general/AutoCompleteLandlord";
+import MultiAddressInput from "../general/MultiAddressInput";
 
 function AddPropertyForm() {
    const { addPropertyForm,
       landlordIdentifier,
+      searchItem,
+      setSearchItem,
       onInputChange, 
       onSelectChange, 
       setAddPropertyForm,
@@ -35,6 +38,7 @@ function AddPropertyForm() {
        <div className="form-group">
           <label className="required">Property Type</label>
           <Select
+            name="property_type"
             value={addPropertyForm.property_type}
             onValueChange={(val) => onSelectChange("property_type", val)}
           >
@@ -75,7 +79,7 @@ function AddPropertyForm() {
           />
         </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="form-group">
           <label>Unit Number</label>
           <Input
@@ -94,86 +98,23 @@ function AddPropertyForm() {
             name="building_name"
           />
         </div>
-        <div className="form-group">
-          <label className="required">Street Number</label>
-          <Input
-            type="text"
-            required
-            onChange={onInputChange}
-            value={addPropertyForm.street_number}
-            name="street_number"
-          />
-        </div>
-        <div className="form-group">
-          <label className="required">Street Name</label>
-          <Input
-            type="text"
-            required
-            onChange={onInputChange}
-            value={addPropertyForm.street_name}
-            name="street_name"
-          />
-        </div>
-        <div className="form-group">
-          <label className="required">Suburb/Area</label>
-          <Input
-            type="text"
-            required
-            name="area"
-            onChange={onInputChange}
-            value={addPropertyForm.area}
-          />
-        </div>
-        <div className="form-group">
-          <label className="required">City/Town</label>
-          <Input
-            type="text"
-            required
-            onChange={onInputChange}
-            value={addPropertyForm.city_town}
-            name="city_town"
-          />
-        </div>
-        <div className="form-group">
-          <label>Province</label>
-          <Input
-            type="text"
-            onChange={onInputChange}
-            value={addPropertyForm.province}
-            name="province"
-          />
-        </div>
-        <div className="form-group">
-          <label>Country</label>
-          <Input
-            type="text"
-            name="country"
-            onChange={onInputChange}
-            value={addPropertyForm.country}
-          />
-        </div>
-        <div className="form-group">
-          <label>Area Code</label>
-          <Input
-            type="text"
-            onChange={onInputChange}
-            value={addPropertyForm.area_code}
-            name="area_code"
-          />
-        </div>
       </div>
-
+      <div>
+        <MultiAddressInput isMultiple = {false}/>
+      </div>
       <FormSectionHeader title="Landlord" />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="form-group">
           <label>Landlord type</label>
           <Select
-              value={addPropertyForm.landlord_type}
+              defaultValue={addPropertyForm.landlord_type}
               onValueChange={(val: "individual" | "company") => {
               setAddPropertyForm((prev) => ({
                   ...prev,
-                  lanlord_type: val,
+                  landlord_id : "",
+                  landlord_name : "",
+                  landlord_type: val,
                 }));
                 setLandlordIdentifier(val === "individual" ? "National ID" : "Registration Number");
               }}
@@ -188,6 +129,8 @@ function AddPropertyForm() {
           </Select>
         </div>
          <AutoCompleteLandlord
+            searchItem = {searchItem}
+            setSearchItem = {setSearchItem}
             setAddPropertyForm = {setAddPropertyForm}
             landlordIdentifier= {landlordIdentifier}
             addPropertyForm={addPropertyForm}

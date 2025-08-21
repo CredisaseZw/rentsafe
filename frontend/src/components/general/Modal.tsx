@@ -11,8 +11,8 @@ interface ModalProps {
 
 function Modal({ children, onClose, size, modalHeader }: ModalProps) {
    const modal_sizes = useRef({
-      md: { width: "w-[500px]" },
-      lg: { width: "w-[800px]" },
+      md: { width: "w-[750px]" },
+      lg: { width: "w-[900px]" },
       xl: { width: "w-[1140px]" },
    });
 

@@ -3,8 +3,8 @@ import type React from "react";
 import LoadingIndicator from "./LoadingIndicator";
 import { TriangleAlert } from "lucide-react";
 import type { Header } from "@/types";
-import TablePagination from "./TablePagination";
 import type { PaginationData } from "@/interfaces";
+import Paginator from "./Paginator";
 interface TableBaseProps {
    isError?: false | true;
    isLoading?: false | true;
@@ -58,7 +58,7 @@ export function TableBase({ paginationData, paginationName, isLoading, headers, 
          <div className="mt-4">
             {
                paginationData && paginationName &&
-               <TablePagination paginationData={paginationData} paginationName={paginationName}></TablePagination>
+               <Paginator paginationData={paginationData} paginationName={paginationName}></Paginator>
             }
          </div>
       </div>

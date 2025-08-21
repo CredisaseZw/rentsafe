@@ -9,6 +9,7 @@ function usePropertyList() {
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
+   const [searchItem, setSearchItem] = useState("");
    const [addPropertyForm, setAddPropertyForm] = useState<AddPropertyForm>({
       property_type: "", unit_number: "", building_name: "", street_number: "", street_name: "",
       area: "", city_town: "", province: "", country: "", area_code: "",
@@ -71,6 +72,8 @@ function usePropertyList() {
       filterOptions,
       selectedFilter,
       landlordIdentifier,
+      searchItem,
+      setSearchItem,
       setLandlordIdentifier,
       setProperties,
       setAddPropertyForm,

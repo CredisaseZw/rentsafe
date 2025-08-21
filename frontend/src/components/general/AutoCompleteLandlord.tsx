@@ -8,12 +8,13 @@ import type { Dispatch, SetStateAction } from "react";
 
 interface Props {
   landlordIdentifier: string;
+  searchItem : string,
+  setSearchItem : Dispatch<SetStateAction<string>>;
   addPropertyForm: AddPropertyForm;
   setAddPropertyForm: Dispatch<SetStateAction<AddPropertyForm>>;
 }
 
-function AutoCompleteLandlord({ landlordIdentifier, addPropertyForm, setAddPropertyForm }: Props) {
-  const [searchItem, setSearchItem] = useState("");
+function AutoCompleteLandlord({ landlordIdentifier, addPropertyForm, setAddPropertyForm, searchItem, setSearchItem }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
 
@@ -37,7 +38,8 @@ function AutoCompleteLandlord({ landlordIdentifier, addPropertyForm, setAddPrope
     setSearchItem(id); 
     setOpen(false);
   };
-
+  
+  console.log(data)
   return (
     <div className="form-group relative">
       <label className="required">{landlordIdentifier}</label>

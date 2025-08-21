@@ -22,6 +22,7 @@ import usePropertyList from "@/hooks/components/usePropertyList";
 import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { useSearchParams } from "react-router";
 
 
 function PropertyLIst() {
@@ -39,27 +40,29 @@ function PropertyLIst() {
       setPaginationData,
       setStatus,
    } = usePropertyList();
+   const [searchParams] = useSearchParams();
+   const page = parseInt(searchParams.get("page") || "1");
+   const { error ,data, isLoading } = getPropertyList(page, true);
 
-  const { data, error } = getPropertyList(1, true);
 
-  useEffect(() => {
-    if (error) {
-      console.error(error);
-      toast.error("Failed to fetch properties", { description: (error as any)?.error || "Something went wrong" });
-      setStatus({ loading: false, isError: true });
-      return;
-    }
+   useEffect(() => {
+      if (error) {
+         console.error(error);
+         toast.error("Failed to fetch properties", { description: (error as any)?.error || "Something went wrong" });
+         setStatus({ loading: false, isError: true });
+         return;
+      }
 
-    if (data) {
-      setProperties(data.results ?? []);
-      setPaginationData(data as PaginationData);
-      setStatus({ loading: false, isError: false });
-    }
-  }, [data, error]);
+      if (data) {
+         setProperties(data.results ?? []);
+         setPaginationData(data as PaginationData);
+         setStatus({ loading: false, isError: false });
+      }
+   }, [data, error]);
    return (
       <div className="">
          {addPropertyModal && (
-            <Modal onClose={closeModal} size={"xl"} modalHeader="Add Property" allowOverflow={false}>
+            <Modal onClose={closeModal} size={"lg"} modalHeader="Add Property" allowOverflow={false}>
                <AddPropertyForm />
             </Modal>
          )}
@@ -100,7 +103,7 @@ function PropertyLIst() {
                </div>
                </ColumnsContainer>
                <div className="mt-6">
-                  <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {status.loading} isError = {status.isError}>
+                  <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {isLoading} isError = {status.isError}>
                      {  
                         properties.length != 0 ?
                         properties.map((property: Property)=>{
