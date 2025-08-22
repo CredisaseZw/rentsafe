@@ -4,12 +4,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel,BaseModelWithUser
 from apps.accounting.models.models import Currency
     
 
 
-class SpecialPricing(BaseModel):
+class SpecialPricing(BaseModelWithUser):
     service = models.ForeignKey('subscriptions.Service', on_delete=models.CASCADE, related_name='special_pricing_options',
                                 help_text=_("The service this special pricing applies to."))
     
@@ -39,7 +39,7 @@ class SpecialPricing(BaseModel):
     def __str__(self):
         return f"Special Pricing for {self.service.service_name}"
 
-class StandardPricing(BaseModel):
+class StandardPricing(BaseModelWithUser):
     service = models.ForeignKey('subscriptions.Service', on_delete=models.CASCADE, related_name='standard_pricing_options',
                                 help_text=_("The service this standard pricing applies to."))
     

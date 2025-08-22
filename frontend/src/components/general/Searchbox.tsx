@@ -15,9 +15,9 @@ function Searchbox({ handleSearch, placeholder }: SearchboxProps) {
    };
 
    return (
-      <div className="border-color flex items-center justify-between rounded-sm border bg-white sm:w-full md:w-fit dark:bg-zinc-900">
+      <div className="border-color flex items-center h-fit self-center justify-between rounded-sm border bg-white sm:w-full md:w-fit dark:bg-zinc-900">
          <Button onClick={clearSearch} className="h-full" type="button" variant="ghost" size="xs">
-            <X />
+            <X/>
          </Button>
          <Input
             value={searchValue}

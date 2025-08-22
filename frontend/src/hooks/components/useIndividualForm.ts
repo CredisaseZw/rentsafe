@@ -61,6 +61,7 @@ export default function useIndividualForm() {
       if (individualPayload.date_of_birth) {
          individualPayload.date_of_birth = formatDateToPythonSLiking(individualPayload.date_of_birth);
       }
+
       for (const employment of individualPayload.employment_details || []) {
          if (employment.start_date) {
             employment.start_date = formatDateToPythonSLiking(employment.start_date);
@@ -70,7 +71,13 @@ export default function useIndividualForm() {
          }
       }
 
-      console.log({ individualPayload });
+      if (individualPayload.addresses) {
+         individualPayload.addresses = individualPayload.addresses.map(({ is_primary, ...addr }) => ({
+            ...addr,
+            postal_code: addr.postal_code ? addr.postal_code.toString() : undefined
+         }));
+      }
+     
       createIndividual(individualPayload);
    }
 

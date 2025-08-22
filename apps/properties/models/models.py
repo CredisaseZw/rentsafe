@@ -4,7 +4,7 @@ from django.db import models
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.common.models.models import Address, Document, Note
 
 class PropertyType(BaseModel):
@@ -19,7 +19,7 @@ class PropertyType(BaseModel):
     def __str__(self):
         return self.name
 
-class Property(BaseModel):
+class Property(BaseModelWithUser):
     PROPERTY_STATUS_CHOICES = (
         ('active', 'Active'),
         ('inactive', 'Inactive'),
@@ -51,7 +51,11 @@ class Property(BaseModel):
     def __str__(self):
         return self.name
 
-class Unit(BaseModel):
+    def get_address(self):
+        return self.addresses.first() if self.addresses.exists() else "No Address"
+    
+
+class Unit(BaseModelWithUser):
     UNIT_STATUS_CHOICES = (
         ('vacant', 'Vacant'),
         ('occupied', 'Occupied'),
@@ -71,7 +75,6 @@ class Unit(BaseModel):
     unit_type = models.CharField(max_length=100,choices=UNIT_TYPE_CHOICES,default='OTHER')
     number_of_rooms = models.PositiveIntegerField(help_text="Number of rooms in the unit",default=0)
     status = models.CharField(max_length=20, choices=UNIT_STATUS_CHOICES, default='vacant')
-    monthly_rent = models.DecimalField(max_digits=12, decimal_places=2)
     features = models.JSONField(blank=True, null=True, help_text="Additional features of the unit")
     
     class Meta:

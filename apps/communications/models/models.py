@@ -5,13 +5,13 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from apps.common.models.models import Note
 User = get_user_model()
 
-class Communication(BaseModel):
+class Communication(BaseModelWithUser):
     COMMUNICATION_TYPES = (
         ('email', 'Email'),
         ('sms', 'SMS'),
@@ -73,7 +73,7 @@ class CommunicationAttachment(BaseModel):
     def __str__(self):
         return self.file_name
 
-class Reminder(BaseModel):
+class Reminder(BaseModelWithUser):
     REMINDER_TYPES = (
         ('payment', 'Payment Reminder'),
         ('inspection', 'Inspection Reminder'),
@@ -146,7 +146,7 @@ class OTP(BaseModel):
 
     def __str__(self):
         return f"OTP {self.otp_code} for {self.requested_entity} ({self.otp_type})"
-class DebtorIntelligenceNote(BaseModel):
+class DebtorIntelligenceNote(BaseModelWithUser):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                 limit_choices_to=Q(app_label='individuals', model='individual') |
                 Q(app_label='companies', model='companybranch'),
@@ -166,9 +166,9 @@ class DebtorIntelligenceNote(BaseModel):
         ordering = ['-date_created']
 
     def __str__(self):
-        return f"Note for {self.client_object} by {self.user.username if self.user else 'System'}"
+        return f"Note for {self.client_object} by {self.created_by.username if self.created_by else 'System'}"
 
-class CommunicationHistoryReminder(BaseModel):
+class CommunicationHistoryReminder(BaseModelWithUser):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
             limit_choices_to=Q(app_label='individuals', model='individual') |
             Q(app_label='companies', model='companybranch'),
@@ -208,7 +208,7 @@ class CommunicationHistoryReminder(BaseModel):
     def __str__(self):
         return f"Reminder for {self.client_object} on {self.action_date}"
 
-class CommsHistMessage(BaseModel):
+class CommsHistMessage(BaseModelWithUser):
     client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                     limit_choices_to=Q(app_label='individuals', model='individual') |
                     Q(app_label='companies', model='companybranch'),

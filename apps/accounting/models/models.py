@@ -15,7 +15,7 @@ from datetime import datetime
 from apps.accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import Company
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 
 User = get_user_model()
 
@@ -43,7 +43,7 @@ class Currency(BaseModel):
     def __str__(self):
         return self.currency_code
 
-class SalesItem(BaseModel):
+class SalesItem(BaseModelWithUser):
     category = models.ForeignKey('SalesCategory', on_delete=models.CASCADE, related_name='items')
     item_id = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -63,7 +63,7 @@ class SalesCategory(BaseModel):
     def __str__(self):
         return self.name
 
-class VATSetting(BaseModel):
+class VATSetting(BaseModelWithUser):
     rate = models.DecimalField(max_digits=5, decimal_places=2)
     description = models.CharField(max_length=255)
     vat_applicable = models.BooleanField(default=True)
@@ -75,7 +75,7 @@ class TransactionType(BaseModel):
     transaction_type = models.CharField(max_length=30, unique=True)
     description = models.TextField(blank=True, null=True)
 
-class CashbookEntry(BaseModel):
+class CashbookEntry(BaseModelWithUser):
     transaction_date = models.DateTimeField(auto_now_add=True)
     transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, blank=True, null=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -97,7 +97,7 @@ class JournalEntry(BaseModel):
     def __str__(self):
         return f"Journal Entry {self.id} - {self.date}"
 
-class LedgerTransaction(BaseModel):
+class LedgerTransaction(BaseModelWithUser):
     entry = models.ForeignKey(JournalEntry, on_delete=models.CASCADE)
     account = models.ForeignKey(GeneralLedgerAccount, on_delete=models.CASCADE)
     debit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -106,7 +106,7 @@ class LedgerTransaction(BaseModel):
         return f"{self.account.account_name} - Debit: {self.debit} Credit: {self.credit}"
 
 
-class Invoice(BaseModel):
+class Invoice(BaseModelWithUser):
     INVOICE_TYPE_CHOICES = [
         ("fiscal", "Fiscal"),
         ("proforma", "Proforma"),
@@ -208,7 +208,7 @@ class Invoice(BaseModel):
             individual=self.individual,
             company=self.company,
             currency=self.currency,
-            user=self.user,
+            created_by=self.created_by,
             sale_date=new_invoice_date,
             status="pending",
             discount=self.discount,
@@ -220,7 +220,7 @@ class Invoice(BaseModel):
             TransactionLineItem.objects.create(
                 parent_document=new_invoice,
                 sales_item=line_item_template.sales_item,
-                user=new_invoice.user,
+                created_by=new_invoice.created_by,
                 quantity=line_item_template.quantity,
                 unit_price=line_item_template.unit_price,
                 vat_amount=line_item_template.vat_amount,
@@ -254,7 +254,7 @@ class Invoice(BaseModel):
         return f"{self.invoice_type.title()} {self.document_number} - {customer_id_str}"
 
 
-class CashSale(BaseModel):
+class CashSale(BaseModelWithUser):
     # core fieldds
     document_number = models.IntegerField(unique=True, blank=True, null=True)
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, default=1)
@@ -283,7 +283,7 @@ class CashSale(BaseModel):
     amount_received = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     
     def __str__(self):
-        user_display = self.user.user_id if self.user else "N/A"
+        user_display = self.created_by.username if self.created_by else "N/A"
         return f"Cash Sale {self.id} - User: {user_display}"
 
     def save(self, *args, **kwargs):
@@ -302,7 +302,7 @@ class CashSale(BaseModel):
         )
         super().save(*args, **kwargs)
 
-class CreditNote(BaseModel):
+class CreditNote(BaseModelWithUser):
     credit_date = models.DateField(default=now)
     document_number = models.CharField(max_length=20, unique=True, default=generate_credit_note_document_number)
     is_individual = models.BooleanField(default=True)
@@ -378,7 +378,7 @@ class PaymentMethod(BaseModel):
     def __str__(self):
         return self.payment_method_name
 
-class Payment(BaseModel):
+class Payment(BaseModelWithUser):
     """Stores payments made against invoices."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     payment_date = models.DateTimeField(default=now)
@@ -389,17 +389,17 @@ class Payment(BaseModel):
     def __str__(self):
         return f"Payment {self.invoice.document_number} - {self.amount}"
 
-class CurrencyRate(BaseModel):
+class CurrencyRate(BaseModelWithUser):
     current_rate = models.FloatField(default=0) 
     base_currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='base_currency',null= True, blank=True)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='target_currency',null= True, blank=True)
     # updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        user_display = self.user.user_id if self.user else "N/A"
+        user_display = self.created_by.username if self.created_by else "N/A"
         return f"User {user_display} Latest Rate {self.current_rate}"
 
-class CashBook(BaseModel):
+class CashBook(BaseModelWithUser):
     cashbook_id = models.CharField(max_length=255, unique=True)
     cashbook_name = models.CharField(max_length=255)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='cashbook_currency', null= True, blank=True)

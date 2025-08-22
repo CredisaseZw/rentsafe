@@ -12,9 +12,9 @@ from decimal import Decimal
 from apps.subscriptions.models.models import Subscription
 from apps.properties.models.models import Unit
 from apps.common.models.models import Document, Note
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 
-class Lease(BaseModel):
+class Lease(BaseModelWithUser):
     LEASE_STATUS_CHOICES = (
         ('DRAFT', 'Draft'),
         ('PENDING_APPROVAL', 'Pending Approval'),
@@ -135,6 +135,9 @@ class Lease(BaseModel):
             'landlord_id_at_log_time': self.landlord.id if self.landlord else None,
             'landlord_name_at_log_time': str(self.landlord) if self.landlord else None,
         }
+
+        if hasattr(self.unit, 'property'):
+            self.landlord = self.unit.property.landlords.first() or None
 
         super().save(*args, **kwargs)
 

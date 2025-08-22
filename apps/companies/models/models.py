@@ -3,13 +3,13 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from apps.common.models.models import Address, Document, Note
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.individuals.models.models import Individual
 from django.db.models import UniqueConstraint, Q
 from django.db.models.functions import Lower
 
 
-class Company(BaseModel):
+class Company(BaseModelWithUser):
     LEGAL_STATUS_CHOICES = (
         ('private', 'Private Limited'),
         ('public', 'Public Limited'),
@@ -98,7 +98,7 @@ class Company(BaseModel):
             return branch
         return None
     
-class CompanyBranch(BaseModel):
+class CompanyBranch(BaseModelWithUser):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='branches',
                                 help_text=_("The company this branch belongs to."))
     branch_name = models.CharField(max_length=255, help_text=_("The name of the branch."))

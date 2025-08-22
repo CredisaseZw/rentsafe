@@ -5,7 +5,7 @@ import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { IndividualFull, IndividualMinimal } from "@/interfaces";
-import { stringifyAndFmt } from "@/lib/utils";
+//import { extractErrorMessage } from "@/lib/utils";
 
 export default function useCreateIndividual(successCallback?: () => void) {
    const client = useClient();
@@ -14,59 +14,71 @@ export default function useCreateIndividual(successCallback?: () => void) {
       mutationFn: (individualPayload: IndividualPayload) =>
          api.post<IndividualFull>("/api/individuals/", individualPayload).then((res) => res.data),
       onError(error: AxiosError | Error | unknown) {
-         console.error("Error creating individual:", error);
          if (isAxiosError(error)) {
-            toast.error("Failed to create individual", {
-               description: stringifyAndFmt(error.response?.data.details || error.response?.data.error),
-            });
+            console.error("Full backend response:", error.response?.data);
+            const errorDetails = error.response?.data.error;
+            
+            //const message = extractErrorMessage(errorDetails);
+            toast.error("Failed to create individual", { description: errorDetails });
             return;
          }
-         toast.error("Failed to create individual. Please try again.", { description: stringifyAndFmt(error) });
+         toast.error("Failed to create individual. Please try again.");
+         return;
       },
-      onSuccess(individual) {
-         client.setQueryData<IndividualFull>(["individual", individual.id], individual);
+    onSuccess(individual) {
+  try {
+    client.setQueryData<IndividualFull>(["individual", individual.id], individual);
+client.invalidateQueries({
+      queryKey: ["individuals-minimal"]
+    });
+    client.getQueryCache().findAll({
+      predicate: (query) => query.queryKey[0] === "individuals-minimal"
+    }).forEach((query) => {
+      client.setQueryData(query.queryKey, (old: any) => {
+        console.log("Current cache data structure:", old);
+        
+        const minimalIndividual: IndividualMinimal = {
+          id: individual.id,
+          first_name: individual.first_name,
+          last_name: individual.last_name ?? "",
+          identification_number: individual.identification_number ?? "",
+          contact_details: individual.contact_details ? {
+            id: individual.contact_details[0].id,
+            individual_id: individual.id,
+            mobile_phone: individual.contact_details[0].mobile_phone ?? [],
+            email: individual.contact_details[0].email ?? "",
+          } : undefined,
+          is_active: true,
+        };
 
-         const matchingSearchQueries = client.getQueryCache().findAll({
-            queryKey: ["individuals-minimal"],
-            predicate(query) {
-               const key = query.queryKey;
-               return !!key.find((k) => {
-                  const q = String(k).trim().toLowerCase();
-                  const matchesFirstName = individual.first_name.trim().toLowerCase().includes(q);
-                  const matchesLastName = individual.last_name?.trim().toLowerCase().includes(q);
-                  const matchesIdNum = individual.identification_number.trim().toLowerCase().includes(q);
-                  return matchesFirstName || matchesLastName || matchesIdNum;
-               });
-            },
-         });
-         const keys = matchingSearchQueries.map((q) => q.queryKey);
-         keys.push(["individuals-minimal", null]);
+        if (old && old.results && Array.isArray(old.results)) {
+          const withoutDupes = old.results.filter((i: IndividualMinimal) => i.id !== individual.id);
+          return {
+            ...old,
+            results: [...withoutDupes, minimalIndividual],
+            count: old.count + 1 
+          };
+        } else {
+          console.warn("Unexpected cache data structure, creating new:", old);
+          return {
+            count: 1,
+            next: null,
+            previous: null,
+            results: [minimalIndividual]
+          };
+        }
+      });
+    });
 
-         keys.forEach((key) => {
-            client.setQueryData<IndividualMinimal[]>(key, (old) => {
-               const minimalIndividual: IndividualMinimal = {
-                  id: individual.id,
-                  first_name: individual.first_name,
-                  last_name: individual.last_name,
-                  identification_number: individual.identification_number,
-                  contact_details: [
-                     {
-                        id: individual.contact_details[0].id,
-                        individual_id: individual.id,
-                        mobile_phone: individual.contact_details[0].mobile_phone,
-                        email: individual.contact_details[0].email,
-                     },
-                  ],
-                  is_active: true,
-               };
-               return old ? [...old, minimalIndividual] : [minimalIndividual];
-            });
-         });
-
-         toast.success("Individual created successfully!");
-         if (successCallback) successCallback();
-      },
-   });
+    toast.success("Individual created successfully!");
+    if (successCallback) successCallback();
+    
+  } catch (error) {
+    console.error("Error in onSuccess callback:", error);
+    toast.error("Individual created but cache update failed. Please reload the page");
+  }
+}
+  });
 
    return { isPending, createIndividual: mutate };
 }

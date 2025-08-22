@@ -5,11 +5,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.common.models.models import Address, Document, Note
 from django.contrib.contenttypes.fields import GenericRelation
-from apps.common.models.base_models import BaseModel
+from apps.common.models.base_models import BaseModel, BaseModelWithUser
 import re
 
 
-class Individual(BaseModel):
+class Individual(BaseModelWithUser):
     IDENTIFICATION_TYPES = (
         ('national_id', 'National ID'),
         ('passport', 'Passport'),
@@ -103,8 +103,8 @@ class IndividualContactDetail(BaseModel):
     def __str__(self):
         if self.mobile_phone:
             return f"Phone: {self.mobile_phone} for {self.individual}"
-        elif self.contact_value:
-            return f"Email: {self.contact_value} for {self.individual}"
+        elif self.email:
+            return f"Email: {self.email} for {self.individual}"
         else:
             return f"Contact Detail for {self.individual}"
             

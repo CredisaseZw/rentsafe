@@ -190,7 +190,7 @@ export interface IndividualReport {
       nationality: string;
       maritalStatus: string;
       dependants: { name: string; age: number; relationship: string }[];
-      mobileNumber: string;
+      mobileNumber:string;
       telephoneNumber: string;
       email: string;
       address: string;
@@ -218,10 +218,9 @@ export interface IndividualMinimal {
       individual_id: number;
       mobile_phone: string[];
       email: string;
-   }[];
+   };
    is_active: boolean;
 }
-
 export interface IndividualFull {
    id: number;
    first_name: string;

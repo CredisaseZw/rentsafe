@@ -10,12 +10,12 @@ import { Eye, Plus, Trash } from "lucide-react";
 import { useGetInternalUserClients } from "@/hooks/apiHooks/useGetInternalClients";
 import { useEffect, useState } from "react";
 import type { Clients, DataInternalUser } from "@/types";
-//import useGetUserId from "@/hooks/components/useGetUserID";
+import useGetUserId from "@/hooks/components/useGetUserID";
 
 export default function InternalUsers() {
-   const { handleUserSearch, closeodal, openModal, headers, modalVisible } = useInternalUsers();
+   const { handleUserSearch, closeModal, openModal, headers, modalVisible } = useInternalUsers();
    const [clients, setClients] = useState<Clients>([]);
-   const { data, isLoading, isError } = useGetInternalUserClients(2);
+   const { data, isLoading, isError } = useGetInternalUserClients(useGetUserId());
 
    useEffect(() => {
       if (data && Array.isArray(data)) {
@@ -33,8 +33,8 @@ export default function InternalUsers() {
    return (
       <div className="relative">
          {modalVisible && (
-            <Modal size="lg" modalHeader="Add Internal User" onClose={closeodal}>
-               <AddInternalUsersForm />
+            <Modal size="lg" modalHeader="Add Internal User" onClose={closeModal}>
+               <AddInternalUsersForm successCallbackFN={(status: boolean) => { if (status) closeModal(); }} />
             </Modal>
          )}
 

@@ -1,6 +1,7 @@
 import Button from "../general/Button";
 import { Plus } from "lucide-react";
 import usePropertyList from "@/hooks/components/usePropertyList";
+import FormSectionHeader from "../general/FormSectionHeader";
 
 function AddPropertyForm() {
    const { addPropertyForm, onChangeHandler } = usePropertyList();
@@ -157,9 +158,7 @@ function AddPropertyForm() {
                />
             </div>
          </div>
-         <div className="mt-8 mb-8 w-full bg-blue-100 p-3 text-center">
-            <span className="font-semibold text-blue-700">Landlord</span>
-         </div>
+      <FormSectionHeader title="Landlord"/>
          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="form-group">
                <label htmlFor="">Landlord type</label>

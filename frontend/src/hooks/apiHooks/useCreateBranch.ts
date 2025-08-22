@@ -5,7 +5,7 @@ import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { BranchCreationResponse } from "@/interfaces";
-import { stringifyAndFmt } from "@/lib/utils";
+import { extractErrorMessage, stringifyAndFmt } from "@/lib/utils";
 
 export default function useCreateBranch(successCallback?: () => void) {
    const client = useClient();
@@ -17,7 +17,7 @@ export default function useCreateBranch(successCallback?: () => void) {
          console.error("Error creating branch:", error);
          if (isAxiosError(error))
             return toast.error("Failed to create branch", {
-               description: stringifyAndFmt(error.response?.data.details || error.response?.data.error),
+               description: extractErrorMessage(error.response?.data.details || error.response?.data.error),
             });
 
          toast.error("Failed to create branch. Please try again.", { description: stringifyAndFmt(error) });
