@@ -3,6 +3,7 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from apps.properties.models import Property, PropertyType, Unit
 from rest_framework.response import Response
 from rest_framework import status
@@ -33,6 +34,23 @@ class PropertyViewSet(BaseViewSet):
     queryset = Property.objects.select_related('property_type').prefetch_related(
         'units', 'landlords', 'addresses', 'documents', 'notes'
     ).all().order_by('-date_created')
+
+    def get_queryset(self):
+        search = self.request.query_params.get('search', None)
+        queryset = super().get_queryset()
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(description__icontains=search) |
+                Q(property_type__name__icontains=search) |
+                Q(addresses__street_address__icontains=search) |
+                Q(addresses__city__name__icontains=search) |  
+                Q(addresses__suburb__name__icontains=search) |
+                Q(addresses__province__name__icontains=search) |
+                Q(addresses__country__name__icontains=search) |
+                Q(addresses__postal_code__icontains=search)
+            ).distinct()
+        return queryset
 
     def get_serializer_class(self):
         """
