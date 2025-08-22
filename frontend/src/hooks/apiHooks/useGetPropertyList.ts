@@ -1,17 +1,17 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import type { PropertiesResponse } from "@/types";
 import { api } from "@/api/axios";
 
-export default function getPropertyList(page: number, enabled?: boolean) {
+export default function getPropertyList(page: number, search: string = "", enabled?: boolean) {
   const { data, isLoading, error, refetch } = useQuery<PropertiesResponse>({
-    queryKey: ["property_lists", page],
+    queryKey: ["property_lists", page, search], // add search to query key
     queryFn: () =>
       api
-        .get<PropertiesResponse>(`/api/properties/?page=${page}`)
-        .then((response) => response.data),
+        .get<PropertiesResponse>(`/api/properties/?page=${page}${search ? `&search=${search}` : ""}`)
+        .then((res) => res.data),
     enabled,
-    placeholderData: keepPreviousData, 
+    placeholderData: keepPreviousData,
   });
 
-  return { error, data, isLoading, refetch };
+  return { data, isLoading, error, refetch };
 }

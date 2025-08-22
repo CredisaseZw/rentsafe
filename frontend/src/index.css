@@ -109,16 +109,16 @@
 }
 
 .main-card {
-   @apply mt-10 min-h-[75vh] w-full rounded-xl border border-gray-300 bg-white p-5 shadow dark:border-zinc-800 dark:bg-zinc-950;
+   @apply mt-7 min-h-[75vh] w-full rounded-md border border-gray-300 bg-white p-5 shadow dark:border-zinc-800 dark:bg-zinc-950;
 }
 .main-sm-card {
-   @apply mt-10 h-fit w-full rounded-xl border border-gray-300 bg-white p-5 shadow dark:border-zinc-800 dark:bg-zinc-950;
+   @apply mt-5 h-fit w-full rounded-md border border-gray-300 bg-white p-5 shadow dark:border-zinc-800 dark:bg-zinc-950;
 }
 .dim-card {
-   @apply rounded-xl bg-white p-5 shadow dark:bg-zinc-950;
+   @apply rounded-md bg-white p-5 shadow dark:bg-zinc-950;
 }
 .card {
-   @apply rounded-xl border border-gray-300 bg-white p-5 shadow dark:border-zinc-800 dark:bg-zinc-900;
+   @apply rounded-bl-md border border-gray-300 bg-white p-5 shadow dark:border-zinc-800 dark:bg-zinc-900;
 }
 
 .side-main {

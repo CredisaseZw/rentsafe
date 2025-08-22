@@ -14,11 +14,6 @@ export type NavLink = {
    pageComponent?: React.FC;
 };
 
-export type SummaryCardType = {
-   subTitle: string;
-   value: number | string;
-};
-
 export type FilterOptionType = {
    label: string;
    value: string;

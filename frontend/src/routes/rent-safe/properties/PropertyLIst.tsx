@@ -2,7 +2,6 @@ import AddPropertyForm from "@/components/forms/AddPropertyForm";
 import Button from "@/components/general/Button";
 import Modal from "@/components/general/Modal";
 import Searchbox from "@/components/general/Searchbox";
-import SummaryCard from "@/components/general/SummaryCard";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
 import { Eye, Plus } from "lucide-react";
 import SectionHeader from "@/components/general/SectionHeader";
@@ -22,7 +21,7 @@ import usePropertyList from "@/hooks/components/usePropertyList";
 import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
 import { toast } from "sonner";
 import { useEffect } from "react";
-import { useSearchParams } from "react-router";
+import GlobalSummaryCard from "@/components/general/globalSummaryCard";
 
 function PropertyLIst() {
    const {
@@ -32,6 +31,9 @@ function PropertyLIst() {
       addPropertyModal,
       status,
       paginationData,
+      page, 
+      search,
+      onClearSearch,
       onSearchValue,
       openModal,
       closeModal,
@@ -40,9 +42,7 @@ function PropertyLIst() {
       setStatus,
    } = usePropertyList();
 
-   const [searchParams] = useSearchParams();
-   const page = parseInt(searchParams.get("page") || "1");
-   const { error ,data, isLoading, refetch } = getPropertyList(page, true);
+   const { error ,data, isLoading, refetch } = getPropertyList(page, search ,true);
   
    useEffect(() => {
       if (error) {
@@ -71,8 +71,11 @@ function PropertyLIst() {
          )}
          <div className="summary-container w-full">
             <ColumnsContainer numberOfCols={5}>
-               {SummaryCards.map((card, index) => (
-                  <SummaryCard key={index} subTitle={card.subTitle} value={card.value} />
+               {SummaryCards.map((card:any, index:number) => (
+                  <GlobalSummaryCard key={index} 
+                     subTitle={card.subTitle}
+                     value={String(card.value)}  
+                     layoutScheme={card.layout}/>
                ))}
             </ColumnsContainer>
             <div className="main-card">
@@ -84,7 +87,10 @@ function PropertyLIst() {
                />
                <ColumnsContainer numberOfCols={2}>
                <div>
-                  <Searchbox placeholder="By address, unit number or tenant" handleSearch={onSearchValue} />
+                  <Searchbox 
+                     placeholder="By address, unit number or tenant"
+                     handleSearch={onSearchValue}
+                     clearSearch = {onClearSearch} />
                </div>
                <div>
                   <div className="flex flex-row justify-end gap-3">

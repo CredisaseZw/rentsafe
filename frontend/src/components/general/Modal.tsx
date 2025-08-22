@@ -33,7 +33,7 @@ function Modal({ children, onClose, size, modalHeader }: ModalProps) {
    }, [onClose]);
 
    return (
-      <div className={`fixed inset-0 z-50 overflow-x-hidden flex items-center justify-center bg-black/50 py-10 backdrop-blur-xs`}>
+      <div className={`fixed inset-0 z-50 overflow-y-hidden flex items-center justify-center bg-black/50 py-10 backdrop-blur-xs`}>
          <div
             className={`modal bg-white dark:bg-zinc-950 relative mx-auto rounded-md border border-gray-300 p-10 dark:border-zinc-800 ${modal_sizes.current[size].width}`}
          >

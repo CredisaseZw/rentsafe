@@ -33,7 +33,7 @@ function ActiveIndividualLease() {
             </Button>
         </DialogTrigger>
 
-        <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1150px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto pr-2`}>
+        <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1000px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto pr-2`}>
             <DialogTitle>Add Lease - Individual</DialogTitle>
             <div className="mt-3">
                 <Tabs defaultValue={tabs[0].value}>

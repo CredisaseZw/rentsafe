@@ -122,7 +122,7 @@ function AddIndividualLease() {
             name="idPassportNumber"
             id="idPassportNumber"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.idPassportNumber}
             onChange={handleChange}
           />
@@ -135,7 +135,7 @@ function AddIndividualLease() {
             name="leaseName"
             id="leaseName"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.leaseName}
             onChange={handleChange}
           />
@@ -147,7 +147,7 @@ function AddIndividualLease() {
           <Input
             name="leaseMobileNumber"
             id="leaseMobileNumber"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.leaseMobileNumber}
             onChange={handleChange}
           />
@@ -160,7 +160,7 @@ function AddIndividualLease() {
             name="rentGuarantorId"
             id="rentGuarantorId"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.rentGuarantorId}
             onChange={handleChange}
           />
@@ -173,7 +173,7 @@ function AddIndividualLease() {
             name="rentGuarantorName"
             id="rentGuarantorName"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.rentGuarantorName}
             onChange={handleChange}
           />
@@ -207,7 +207,7 @@ function AddIndividualLease() {
           <Input
             name="numberOfRooms"
             id="numberOfRooms"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.numberOfRooms}
             onChange={handleChange}
           />
@@ -219,7 +219,7 @@ function AddIndividualLease() {
           <Input
             name="otherPropertyDetails"
             id="otherPropertyDetails"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.otherPropertyDetails}
             onChange={handleChange}
           />
@@ -231,7 +231,7 @@ function AddIndividualLease() {
           <Input
             name="unitNumber"
             id="unitNumber"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.unitNumber}
             onChange={handleChange}
           />
@@ -243,7 +243,7 @@ function AddIndividualLease() {
           <Input
             name="buildingComplexName"
             id="buildingComplexName"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.buildingComplexName}
             onChange={handleChange}
           />
@@ -256,7 +256,7 @@ function AddIndividualLease() {
             name="streetNumber"
             id="streetNumber"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.streetNumber}
             onChange={handleChange}
           />
@@ -269,7 +269,7 @@ function AddIndividualLease() {
             name="streetName"
             id="streetName"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.streetName}
             onChange={handleChange}
           />
@@ -282,7 +282,7 @@ function AddIndividualLease() {
             name="suburbArea"
             id="suburbArea"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.suburbArea}
             onChange={handleChange}
           />
@@ -295,7 +295,7 @@ function AddIndividualLease() {
             name="cityTown"
             id="cityTown"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.cityTown}
             onChange={handleChange}
           />
@@ -307,7 +307,7 @@ function AddIndividualLease() {
           <Input
             name="province"
             id="province"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.province}
             onChange={handleChange}
           />
@@ -320,7 +320,7 @@ function AddIndividualLease() {
             name="country"
             id="country"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.country}
             onChange={handleChange}
           />
@@ -332,7 +332,7 @@ function AddIndividualLease() {
           <Input
             name="areaCode"
             id="areaCode"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.areaCode}
             onChange={handleChange}
           />
@@ -365,7 +365,7 @@ function AddIndividualLease() {
           <Input
             name="monthlyRent"
             id="monthlyRent"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.monthlyRent}
             onChange={handleChange}
           />
@@ -377,7 +377,7 @@ function AddIndividualLease() {
           <Input
             name="otherStandingCharge"
             id="otherStandingCharge"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.otherStandingCharge}
             onChange={handleChange}
           />
@@ -389,7 +389,7 @@ function AddIndividualLease() {
           <Input
             name="standingChargeNarration"
             id="standingChargeNarration"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.standingChargeNarration}
             onChange={handleChange}
           />
@@ -427,7 +427,7 @@ function AddIndividualLease() {
           <Input
             name="leaseCopy"
             id="leaseCopy"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.leaseCopy}
             onChange={handleChange}
           />
@@ -440,7 +440,7 @@ function AddIndividualLease() {
             name="depositDate"
             id="depositDate"
             type="date"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.depositDate}
             onChange={handleChange}
           />
@@ -470,7 +470,7 @@ function AddIndividualLease() {
           <Input
             name="depositAmount"
             id="depositAmount"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.depositAmount}
             onChange={handleChange}
           />
@@ -501,7 +501,7 @@ function AddIndividualLease() {
             name="leaseStartDate"
             id="leaseStartDate"
             type="date"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.leaseStartDate}
             onChange={handleChange}
           />
@@ -514,7 +514,7 @@ function AddIndividualLease() {
             name="leaseEndDate"
             id="leaseEndDate"
             type="date"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.leaseEndDate}
             onChange={handleChange}
           />
@@ -526,7 +526,7 @@ function AddIndividualLease() {
           <Input
             name="subscriptionPeriodRemaining"
             id="subscriptionPeriodRemaining"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.subscriptionPeriodRemaining}
             onChange={handleChange}
           />
@@ -539,7 +539,7 @@ function AddIndividualLease() {
             name="paymentPeriodStartDate"
             id="paymentPeriodStartDate"
             type="date"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.paymentPeriodStartDate}
             onChange={handleChange}
           />
@@ -552,7 +552,7 @@ function AddIndividualLease() {
             name="paymentPeriodEndDate"
             id="paymentPeriodEndDate"
             type="date"
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.paymentPeriodEndDate}
             onChange={handleChange}
           />
@@ -614,7 +614,7 @@ function AddIndividualLease() {
             name="landlordType"
             id="landlordType"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.landlordType}
             onChange={handleChange}
           />
@@ -627,7 +627,7 @@ function AddIndividualLease() {
             name="idRegName"
             id="idRegName"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.idRegName}
             onChange={handleChange}
           />
@@ -640,7 +640,7 @@ function AddIndividualLease() {
             name="landlordName"
             id="landlordName"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.landlordName}
             onChange={handleChange}
           />
@@ -653,7 +653,7 @@ function AddIndividualLease() {
             name="commissionPercentage"
             id="commissionPercentage"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.commissionPercentage}
             onChange={handleChange}
           />
@@ -666,7 +666,7 @@ function AddIndividualLease() {
             name="landlordsOpeningBalance"
             id="landlordsOpeningBalance"
             required
-            className="border-foreground/40 bg-white"
+            className="border-color bg-white"
             value={formData.landlordsOpeningBalance}
             onChange={handleChange}
           />

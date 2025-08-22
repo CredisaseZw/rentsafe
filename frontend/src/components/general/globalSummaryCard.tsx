@@ -1,36 +1,37 @@
+import { Card, CardContent} from "@/components/ui/card";
 import type { LucideIcon } from "lucide-react";
 import React from "react";
 
 interface GSCProps {
-   value: string | React.ReactElement;
-   subTitle: string;
-   layoutScheme: {
-      icon: LucideIcon;
-      color: string;
-   };
-   valueAsChild?: React.ReactNode | false;
+  value: string | React.ReactElement;
+  subTitle: number | string | React.ReactElement;
+  layoutScheme: {
+    icon: LucideIcon;
+    color: string;
+  };
+  valueAsChild?: React.ReactNode | false;
 }
 
 function GlobalSummaryCard({ value, subTitle, layoutScheme, valueAsChild = false }: GSCProps) {
-   const Icon = layoutScheme.icon;
+  const Icon = layoutScheme.icon;
 
-   return (
-      <div className="rounded-xl border border-gray-300 bg-white px-5 py-8 shadow dark:border-zinc-800 dark:bg-zinc-950">
-         <div className="flex flex-row">
-            <div className={`mr-5 self-center rounded-full p-4 bg-${layoutScheme.color}-200`}>
-               <Icon className={`text-${layoutScheme.color}-800`} />
-            </div>
-            <div className="flex flex-col">
-               {valueAsChild ? (
-                  <>{value}</>
-               ) : (
-                  <h1 className="text-4xl font-semibold text-gray-700 dark:text-gray-100">{value}</h1>
-               )}
-               <span className="mt-2 text-sm uppercase">{subTitle}</span>
-            </div>
-         </div>
-      </div>
-   );
+  return (
+    <Card className="rounded-md border-color">
+      <CardContent className="flex flex-row items-center gap-4">
+        <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-${layoutScheme.color}-200`}>
+          <Icon className={`text-${layoutScheme.color}-800`} />
+        </div>
+        <div className="flex flex-col">
+          {valueAsChild ? (
+            <>{value}</>
+          ) : (
+            <h1 className="text-2xl font-semibold text-gray-700 dark:text-gray-100">{value}</h1>
+          )}
+          <span className="mt-1 text-sm uppercase text-gray-500">{subTitle}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default GlobalSummaryCard;
