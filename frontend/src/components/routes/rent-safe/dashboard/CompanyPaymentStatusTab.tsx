@@ -1,4 +1,3 @@
-import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
 import BaseTable from "@/components/general/BaseTable";
 import CompanyForm from "./CompanyForm";
@@ -24,20 +23,31 @@ export default function CompanyPaymentStatusTab() {
                <div className="flex items-center justify-between gap-2">
                   <form
                      onSubmit={handleSearch}
-                     className="border-foreground/40 flex items-center rounded-sm border bg-transparent"
+                     className="border-color flex items-center rounded-sm border bg-transparent"
                   >
-                     <Button onClick={clearSearch} type="button" variant="ghost" size="sm">
+                     <Button 
+                        onClick={clearSearch}
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400"
+                     >
                         <X />
                      </Button>
-                     <Input
+                     <input
                         ref={searchRef}
                         placeholder="Search by name or reg..."
                         name="company_q"
                         required
                         defaultValue={searchQuery}
-                        className="h-fit max-w-[400px] rounded-none border-none bg-transparent px-0 py-2 focus-visible:ring-0"
-                     />
-                     <Button type="submit" variant="ghost" size="sm">
+                        className="h-fit max-w-[400px] text-sm  rounded-none border-none bg-transparent px-3 py-3 text-gray-600 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
+                       />
+                     <Button
+                        type="submit"
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400"
+                     >
                         <Search />
                      </Button>
                   </form>

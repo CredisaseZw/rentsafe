@@ -4,6 +4,10 @@ import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads"
 import type { NavLink, Route } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { QueryClient } from "@tanstack/react-query";
+import type { PropertiesResponse, Property } from "@/types";
+
+
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
@@ -202,3 +206,31 @@ export function extractErrorMessage(obj: string): string {
    }        
 }
 
+export function updatePropertyListCache(
+    client: QueryClient,
+    property: Property
+  ) {
+    client.getQueryCache().findAll({
+      predicate: (query) => query.queryKey[0] === "property_lists"
+    }).forEach((query) => {
+      client.setQueryData<PropertiesResponse>(query.queryKey, (old) => {
+        if (old && old.results && Array.isArray(old.results)) {
+          const isNew = !old.results.some((p) => p.id === property.id);
+          const withoutDupes = old.results.filter((p) => p.id !== property.id);
+
+          return {
+            ...old,
+            results: [...withoutDupes, property],
+            count: isNew ? old.count + 1 : old.count
+          };
+        } else {
+          return {
+            count: 1,
+            next: null,
+            previous: null,
+            results: [property]
+          };
+        }
+      });
+    });
+  }
