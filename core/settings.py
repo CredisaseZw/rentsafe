@@ -60,7 +60,7 @@ ALLOWED_HOSTS = []
 if not DEBUG:
     ALLOWED_HOSTS = [
         '.credi-safe.com',
-        "rentsafe-iota.vercel.app",
+        ".rentsafe-iota.vercel.app",
         "rentsafe-backend.onrender.com"
     ]
 else:
