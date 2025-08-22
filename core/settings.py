@@ -61,6 +61,7 @@ if not DEBUG:
     ALLOWED_HOSTS = [
         '.credi-safe.com',
         "rentsafe-iota.vercel.app",
+        "rentsafe-backend.onrender.com"
     ]
 else:
     ALLOWED_HOSTS = [
@@ -225,6 +226,7 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "http://127.0.0.1:3000",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
+        "rentsafe-backend.onrender.com",
         "https://rentsafe-iota.vercel.app"
     ]
 
