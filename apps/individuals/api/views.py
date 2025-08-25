@@ -28,7 +28,7 @@ class IndividualViewSet(BaseViewSet):
             'addresses','addresses__country', 'addresses__province', 
             'addresses__city', 'addresses__suburb', 'employment_details', 
             'next_of_kin', 'notes','documents','contact_details'
-        )
+        ).order_by('-date_created')
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -45,7 +45,6 @@ class IndividualViewSet(BaseViewSet):
 
     
     def create(self, request, *args, **kwargs):
-      
         try:
             
             serializer = IndividualCreateSerializer(data=request.data)
@@ -63,7 +62,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error creating individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -76,7 +75,7 @@ class IndividualViewSet(BaseViewSet):
         
             self.perform_update(serializer)
 
-            return self._crete_rendered_response(serializer.data,status.HTTP_200_OK)
+            return self._create_rendered_response(serializer.data,status.HTTP_200_OK)
         
         except ValidationError as e:
             return self._create_rendered_response(
@@ -86,7 +85,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error updating individual: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     @CacheService.cached(tag_prefix='individual:list')
@@ -101,7 +100,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing individuals: {str(e)}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -118,7 +117,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Failed to retrieve individual: {str(e)} ")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -139,7 +138,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error deleting individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )   
 
@@ -158,7 +157,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error verifying individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -181,7 +180,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error activating individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -202,7 +201,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error Deleting individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     @action(detail=False, methods=['GET'], url_path='view-deleted')
@@ -216,7 +215,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error fetching deleted individuals: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -244,7 +243,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error searching individuals: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
@@ -264,7 +263,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error fetching individual full details: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

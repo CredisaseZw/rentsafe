@@ -6,12 +6,13 @@ from apps.common.models.base_models import BaseModel
 from apps.properties.models import Property
 
 class Landlord(BaseModel):
-    property  = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='landlords')
     landlord_name = models.CharField(max_length=255)
     landlord_type = models.CharField(max_length=100, choices=[
         ('individual', 'Individual'),
         ('company', 'Company'),
     ])
+    landlord_id = models.CharField(max_length=100, blank=True, null=True)
+    properties = models.ManyToManyField(Property, related_name='landlords')
     class Meta:
         app_label = 'leases'
         db_table = 'landlord'
