@@ -1,9 +1,11 @@
 # apps/leases/admin.py
 
 from django.contrib import admin
-from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseLog, Guarantor
+from apps.leases.models import (
+    Lease, LeaseTenant, LeaseCharge,
+    LeaseLog, Guarantor, LeaseOpeningBalance, LandlordOpeningBalance, LeaseDeposit
+)
 from django.contrib.contenttypes.admin import GenericTabularInline
-
 
 class LeaseTenantInline(admin.TabularInline):
     model = LeaseTenant
@@ -68,4 +70,23 @@ class LeaseLogAdmin(admin.ModelAdmin):
 @admin.register(Guarantor)
 class GuarantorAdmin(admin.ModelAdmin):
     list_display = ('guarantor_object', 'guarantee_amount')
+    readonly_fields = ('date_created', 'date_updated')
+
+@admin.register(LeaseOpeningBalance)
+class LeaseOpeningBalanceAdmin(admin.ModelAdmin):
+    list_display = ('lease', 'outstanding_balance','current_month_balance',
+                    'one_month_back_balance','two_months_back_balance',
+                    'three_months_back_balance','three_months_plus_balance')
+    list_display_links = ('lease','outstanding_balance')
+    readonly_fields = ('date_created', 'date_updated')
+
+
+@admin.register(LandlordOpeningBalance)
+class LandlordOpeningBalanceAdmin(admin.ModelAdmin):
+    list_display = ('landlord', 'amount', 'date_created')
+    readonly_fields = ('date_created', 'date_updated')
+
+@admin.register(LeaseDeposit)
+class LeaseDepositAdmin(admin.ModelAdmin):
+    list_display = ('lease', 'amount', 'currency', 'deposit_date', 'deposit_holder')
     readonly_fields = ('date_created', 'date_updated')
