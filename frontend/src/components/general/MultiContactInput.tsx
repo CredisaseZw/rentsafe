@@ -11,7 +11,7 @@ export default function MultiContactInput() {
          {contacts.map((_, index) => (
             <fieldset
                key={index}
-               className="border-foreground/30 relative mb-5 rounded-xl border bg-white/50 p-5 shadow-md dark:bg-transparent"
+               className="border-color relative mb-5 rounded-xl border  p-5 bg-transparent"
             >
                <legend className="px-4 font-bold">{`Contact ${index + 1}`}</legend>
 
@@ -31,7 +31,7 @@ export default function MultiContactInput() {
             </fieldset>
          ))}
 
-         <Button variant="SECONDARY" size="sm" type="button" onClick={addContact}>
+         <Button variant="outline" size="sm" type="button" onClick={addContact}>
             <Plus /> Add Contact
          </Button>
       </div>

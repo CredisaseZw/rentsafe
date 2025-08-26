@@ -3,14 +3,24 @@ import type { CountryWithProvinces, ProvinceMinimal } from "@/interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
+import { getPersistentData, savePersistentData } from "@/lib/utils";
 
 export default function useProvinces(countryId?: string) {
    const { data, isLoading, error } = useQuery<ProvinceMinimal[]>({
       queryKey: ["provinces", countryId],
-      queryFn: () =>
-         api
-            .get<CountryWithProvinces>(`/api/common/locations/countries/${countryId}/`)
-            .then((res) => res.data.provinces),
+      queryFn: async () => {
+         const persistentData = getPersistentData();
+         const cachedProvinces = persistentData[`provinces_${countryId}`]
+
+         if (cachedProvinces)  return cachedProvinces;
+
+         const response = await api.get<CountryWithProvinces>(
+            `/api/common/locations/countries/${countryId}/`
+         );
+
+         savePersistentData(`provinces_${countryId}`, response.data.provinces)
+         return response.data.provinces;
+      },
       enabled: !!countryId,
    });
 

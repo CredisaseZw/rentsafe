@@ -15,15 +15,15 @@ import {
 import { TableBase } from "@/components/general/TableBase";
 import { TableCell, TableRow } from "@/components/ui/table";
 import EmptyResults from "@/components/general/EmptyResults";
-import type { Property } from "@/types";
+import type { ApiError, DashboardCardProp, FilterOption, Property } from "@/types";
 import type{ PaginationData } from "@/interfaces";
 import usePropertyList from "@/hooks/components/usePropertyList";
 import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
 import { toast } from "sonner";
 import { useEffect } from "react";
-import GlobalSummaryCard from "@/components/general/globalSummaryCard";
+import DashboardCard from "@/components/general/DashboardCard";
 
-function PropertyLIst() {
+function PropertyList() {
    const {
       headers,
       properties,
@@ -33,6 +33,7 @@ function PropertyLIst() {
       paginationData,
       page, 
       search,
+      filterOptions,
       onClearSearch,
       onSearchValue,
       openModal,
@@ -46,8 +47,8 @@ function PropertyLIst() {
   
    useEffect(() => {
       if (error) {
-         console.error(error);
-         toast.error("Failed to fetch properties", { description: (error as any)?.error || "Something went wrong" });
+         console.error(error.message);
+         toast.error("Failed to fetch properties", { description: (error as ApiError)?.error || "Something went wrong" });
          setStatus({ loading: false, isError: true });
          return;
       }
@@ -71,11 +72,11 @@ function PropertyLIst() {
          )}
          <div className="summary-container w-full">
             <ColumnsContainer numberOfCols={5}>
-               {SummaryCards.map((card:any, index:number) => (
-                  <GlobalSummaryCard key={index} 
+               {SummaryCards.map((card:DashboardCardProp, index:number) => (
+                  <DashboardCard key={index} 
                      subTitle={card.subTitle}
                      value={String(card.value)}  
-                     layoutScheme={card.layout}/>
+                     layoutScheme={card.layoutScheme}/>
                ))}
             </ColumnsContainer>
             <div className="main-card">
@@ -98,14 +99,16 @@ function PropertyLIst() {
                         <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
                      </Button>
-                     <Select defaultValue="defualt">
+                     <Select defaultValue={filterOptions.current[0].value}>
                         <SelectTrigger className="w-[180px]">
                            <SelectValue placeholder="Filter" />
                         </SelectTrigger>
                         <SelectContent>
-                           <SelectItem value="defualt">Default</SelectItem>
-                           <SelectItem value="occupied">Occupied</SelectItem>
-                           <SelectItem value="vacant">Vacant</SelectItem>
+                           {
+                              filterOptions.current.map((filter:FilterOption, index:number) => (
+                                 <SelectItem key={index} value={filter.value}>{filter.label}</SelectItem>
+                           ))
+                           }
                         </SelectContent>
                      </Select>
                   </div>
@@ -138,8 +141,6 @@ function PropertyLIst() {
                               </TableRow>
                            )
                      }
-
-
                   </TableBase>
                </div>
             </div>
@@ -147,5 +148,4 @@ function PropertyLIst() {
       </div>
    );
 }
-
-export default PropertyLIst;
+export default PropertyList;

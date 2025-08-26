@@ -71,3 +71,30 @@ export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] 
    "ngo",
    "other",
 ];
+
+export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
+  slate:   { bg: "bg-slate-200", text: "text-slate-800" },
+  gray:    { bg: "bg-gray-200", text: "text-gray-800" },
+  zinc:    { bg: "bg-zinc-200", text: "text-zinc-800" },
+  neutral: { bg: "bg-neutral-200", text: "text-neutral-800" },
+  stone:   { bg: "bg-stone-200", text: "text-stone-800" },
+  red:     { bg: "bg-red-200", text: "text-red-800" },
+  orange:  { bg: "bg-orange-200", text: "text-orange-800" },
+  amber:   { bg: "bg-amber-200", text: "text-amber-800" },
+  yellow:  { bg: "bg-yellow-200", text: "text-yellow-800" },
+  lime:    { bg: "bg-lime-200", text: "text-lime-800" },
+  green:   { bg: "bg-green-200", text: "text-green-800" },
+  emerald: { bg: "bg-emerald-200", text: "text-emerald-800" },
+  teal:    { bg: "bg-teal-200", text: "text-teal-800" },
+  cyan:    { bg: "bg-cyan-200", text: "text-cyan-800" },
+  sky:     { bg: "bg-sky-200", text: "text-sky-800" },
+  blue:    { bg: "bg-blue-200", text: "text-blue-800" },
+  indigo:  { bg: "bg-indigo-200", text: "text-indigo-800" },
+  violet:  { bg: "bg-violet-200", text: "text-violet-800" },
+  purple:  { bg: "bg-purple-200", text: "text-purple-800" },
+  fuchsia: { bg: "bg-fuchsia-200", text: "text-fuchsia-800" },
+  pink:    { bg: "bg-pink-200", text: "text-pink-800" },
+  rose:    { bg: "bg-rose-200", text: "text-rose-800" },
+};
+
+

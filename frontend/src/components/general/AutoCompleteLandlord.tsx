@@ -46,7 +46,7 @@ function AutoCompleteLandlord({ landlordIdentifier, addPropertyForm, setAddPrope
         type="text"
         required
         onChange={(e) => {
-          const value = e.target.value;
+          const { value } = e.target;
           setSearchItem(value);
           setOpen(!!value);
         }}

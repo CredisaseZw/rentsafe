@@ -7,8 +7,6 @@ import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
 import type { PropertiesResponse, Property } from "@/types";
 
-
-
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
 }
@@ -234,3 +232,20 @@ export function updatePropertyListCache(
       });
     });
   }
+  export function getPersistentData<T = any>(): T | null {
+   const rawPersistentData = localStorage.getItem("persistentData");
+   if (!rawPersistentData) return null;
+
+   try {
+      return JSON.parse(rawPersistentData) as T;
+   } catch (error) {
+      console.error("Failed to parse persistentData from localStorage:", error);
+      return null;
+   }
+}
+
+  export function savePersistentData(name: string, data: any) {
+   const persistentData = getPersistentData() || {};
+   persistentData[name] = data;
+   localStorage.setItem("persistentData", JSON.stringify(persistentData));
+}

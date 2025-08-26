@@ -1,4 +1,5 @@
 import type { Address } from "@/interfaces";
+import type { LucideIcon } from "lucide-react";
 
 export type Route = {
    label: string;
@@ -14,11 +15,20 @@ export type NavLink = {
    pageComponent?: React.FC;
 };
 
-export type FilterOptionType = {
+export type FilterOption = {
    label: string;
    value: string;
 };
 
+export type DashboardCardProp = {
+   value: string  | number | React.ReactElement;
+   subTitle: number | string | React.ReactElement;
+   layoutScheme: {
+      icon: LucideIcon;
+      color: string;
+  };
+  valueAsChild?: boolean
+}
 export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
 
 export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";
@@ -152,7 +162,7 @@ export type PropertyType = {
    name: string,
    description: string
 }
-export type PropertTypeResponse = {
+export type PropertyTypeResponse = {
    count: number;
    next: string | null;
    previous: string | null;
@@ -199,5 +209,9 @@ export type AddPropertyForm = {
   is_furnished : boolean;
   features : Features;
   landlord_name: string;
- 
 };
+
+export type ApiError = {
+   message: string;
+   error?: string;
+}

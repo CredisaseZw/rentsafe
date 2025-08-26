@@ -1,4 +1,4 @@
-import GlobalSummaryCard from "@/components/general/globalSummaryCard";
+import DashboardCard from "@/components/general/DashboardCard";
 import { User, Building, BadgeCent, Send } from "lucide-react";
 import Button from "@/components/general/Button";
 import PropertyStatementContainer from "@/components/general/PropertyStatementContainer";
@@ -11,7 +11,7 @@ function LandlordStatements() {
    return (
       <div className="">
          <ColumnsContainer numberOfCols={3}>
-            <GlobalSummaryCard
+            <DashboardCard
                value="10"
                subTitle="Landlords"
                layoutScheme={{
@@ -19,7 +19,7 @@ function LandlordStatements() {
                   color: "green",
                }}
             />
-            <GlobalSummaryCard
+            <DashboardCard
                value="15"
                subTitle="Properties"
                layoutScheme={{
@@ -27,7 +27,7 @@ function LandlordStatements() {
                   color: "amber",
                }}
             />
-            <GlobalSummaryCard
+            <DashboardCard
                valueAsChild={true}
                value={
                   <div className="flex flex-col gap-2">
