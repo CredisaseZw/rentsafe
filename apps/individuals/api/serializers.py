@@ -1,15 +1,28 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from apps.common.models.models import Address
+from django.contrib.contenttypes.models import ContentType
+
+from apps.common.models.models import Country
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
 from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError as DjangoValidationError
-from apps.individuals.services.validators import validate_email, normalize_zimbabwe_mobile
-
+from apps.common.utils.validators import (
+    validate_email,
+    normalize_zimbabwe_mobile, 
+    validate_national_id, 
+    validate_future_dates
+)
+from apps.individuals.utils.helpers import(
+     individual_notes_helper,
+     individual_address_helper, 
+     individual_contact_helper, 
+     individual_documents_helper, 
+     individual_next_of_kin_helper,
+     individual_employment_details_helper
+)
 from django.db import transaction
 import logging
 import re
+
 
 logger = logging.getLogger('individuals')
 class EmploymentDetailSerializer(serializers.ModelSerializer):
@@ -45,11 +58,19 @@ class NextOfKinSerializer(serializers.ModelSerializer):
         ]
         
     def validate(self,data):
+        if mobile := data.get('mobile_phone'):
+            if formatted := normalize_zimbabwe_mobile(mobile):
+                data["mobile_phone"] = formatted
+            else:
+                raise ValidationError("Invalid phone number")
+        
         if email:= data.get("email"):
+
+            
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValidationError("Invalid email address provide")
+                raise ValidationError("Invalid email address provided")
             
         return data
 
@@ -62,7 +83,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndividualContactDetail
         fields = ['id', 'individual_id', 'mobile_phone', 'email']
-
+    
     def validate(self, data):
         email = data.get('email', '').strip()
 
@@ -78,25 +99,28 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
             if validate_email(email):
                 data["email"] = email.strip()
             else:
-                raise ValidationError("Invalid email address provide")
-
+                raise ValidationError("Invalid email address provided")
         
-        phone = data.get("mobile_phone",[])
+        mobile_phone_numbers = data.get("mobile_phone",[])
+        normalized_phone = []
+        existing_numbers = []
 
-        country = None
-        parent = self.parent
-        if hasattr(parent, 'initial_data'):
-            address_id = parent.initial_data.get("address")
-            if address_id:
-                try:
-                    address = Address.objects.get(pk=address_id)
-                    country = address.country.lower().strip()
-                except Address.DoesNotExist:
-                    pass
+        existing_numbers = set(
+            normalize_zimbabwe_mobile(phone_number)
+            for phone_numbers in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
+            for phone_number in phone_numbers if phone_number
+        )
+        for phone in mobile_phone_numbers:
+            formatted = normalize_zimbabwe_mobile(phone)
 
-        if phone and country == "zimbabwe":
-            data["mobile_phone"] = normalize_zimbabwe_mobile(phone)
-
+            if formatted:
+                if formatted in existing_numbers:
+                    raise ValidationError(f"This phone number is already registered: {formatted}")
+                
+                normalized_phone.append(formatted)
+            else:
+                raise ValidationError(f"Invalid phone number: {phone}")
+        data["mobile_phone"] = normalized_phone
 
         return data
         
@@ -114,7 +138,7 @@ class IndividualSerializer(serializers.ModelSerializer):
         model = Individual
         fields = [
             'id', 'first_name', 'last_name', 'full_name',
-            'date_of_birth', 'gender', 'gender_display',
+            'date_of_birth', 'gender', 'gender_display','marital_status',
             'identification_type', 'identification_type_display',
             'identification_number','contact_details', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin', 'documents', 
@@ -168,16 +192,55 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             'identification_type', 'identification_number','contact_details',
             'addresses', 'employment_details', 'next_of_kin', 'documents','notes'
         ]
-        
     def validate(self, data):
-        identification_number = re.sub(r'[-\s]', '', data.get('identification_number'))  
+        id_type = data.get('identification_type')
+        id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
+        dob = data.get('date_of_birth')
+        addresses = data.get('addresses', [])
 
-        existing = Individual.objects.filter(identification_number__iexact=identification_number).first()
-        if existing:
-            if not existing.is_deleted:
+        country_id = None
+        country_name = None
+        for address in addresses:
+            country_id = address.get('country_id')
+            if country_id:
+                break
+
+        if not id_type:
+            if country_id:
+                id_type = 'national_id'
+                country = Country.objects.filter(id=country_id).first()
+                country_name = country.name
+            else:
+                raise ValidationError("Identification type is required")
+        print("Defaulting to :...", country_id)
+        if id_type == 'national_id':
+            if not id_number or not validate_national_id(id_number, country_name or "zimbabwe"):
+                raise ValidationError("Invalid or missing national id")
+        elif id_type == 'passport':
+            if not id_number:
+                raise ValidationError("Invalid or missing passport number")
+            if (len(id_number) < 5 or len(id_number) > 15):
+                raise ValidationError("Invalid Passport number")
+        else:
+            raise ValidationError("Invalid identification type provided")
+
+        for field in ['first_name', 'last_name', 'gender']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+
+        if not dob:
+            raise ValidationError("Date of birth is required")
+        if validate_future_dates(dob):
+            data['date_of_birth']=dob
+        else:
+            raise ValidationError("Invalid date of birth")
+        existing = Individual.objects.filter(identification_number__iexact=id_number).first()
+        
+        if existing and not existing.is_deleted:
                 raise ValidationError(
-                    f"This identification number {identification_number} is already registered and active."
+                    f"This identification number {id_number} is already registered and active."
                 )
+        else: 
             self._existing_individual = existing 
         
         return data
@@ -202,163 +265,15 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         else:
             individual = Individual.objects.create(**validated_data)
 
-        # Create addresses
-        # for address_data in address_data:
-        #     Address.objects.create(
-        #         user=user,
-        #         content_object=individual,
-        #         **address_data,
-        #         is_primary=True
-        #     )
-
         individual_ct = ContentType.objects.get_for_model(individual)
+        
+        individual_address_helper(individual_ct, address_data, individual.pk)
+        individual_documents_helper(individual_ct, documents_data, individual.pk)
+        individual_notes_helper(individual_ct, notes_data, individual.pk)
 
-        for addr in address_data:
-            address_id = addr.get('id', None)
-
-            if address_id:
-                try:
-                    address_obj = Address.objects.get(
-                        id=address_id,
-                        content_type=individual_ct,
-                        object_id=individual.pk,
-                    )
-                    for key, val in addr.items():
-                        setattr(address_obj, key, val)
-                    address_obj.save()
-                except Address.DoesNotExist:
-                    Address.objects.create(
-                        content_type=individual_ct,
-                        object_id=individual.pk,
-                        **addr,
-                    )
-            else:
-                existing = Address.objects.filter(
-                    content_type=individual_ct,
-                    object_id=individual.pk,
-                    address_type=addr.get('address_type'),
-                ).first()
-
-                if existing:
-                    for key, val in addr.items():
-                        setattr(existing, key, val)
-                    existing.save()
-                else:
-                    Address.objects.create(
-                        content_type=individual_ct,
-                        object_id=individual.pk,
-                        **addr,
-                    )
-
-        for contact in contact_data:
-            contact_id = contact.get('id', None)
-
-            if contact_id:
-                try:
-                    contact_obj = IndividualContactDetail.objects.get(
-                        id=contact_id, 
-                        individual=individual
-                    )
-                    for key, val in contact.items():
-                        setattr(contact_obj, key, val)
-                    contact_obj.save()
-                except IndividualContactDetail.DoesNotExist:
-                    IndividualContactDetail.objects.create(
-                        individual=individual,
-                        **contact
-                    )
-            else:
-                email = contact.get('email', None)
-                if email:
-                    existing = IndividualContactDetail.objects.filter(
-                        individual=individual,
-                        email__iexact=email
-                    ).first()
-                    if existing:
-                        for key, val in contact.items():
-                            setattr(existing, key, val)
-                        existing.save()
-                    else:
-                        IndividualContactDetail.objects.create(
-                            individual=individual,
-                            **contact
-                        )
-                else:
-                    IndividualContactDetail.objects.create(
-                        individual=individual, 
-                        **contact
-                    )
-
-        for emp in employment_data:
-            emp_id = emp.get('id', None)
-            if emp_id:
-                try:
-                    emp_obj = EmploymentDetail.objects.get(
-                        id=emp_id, 
-                        individual=individual
-                    )
-                    for key, val in emp.items():
-                        setattr(emp_obj, key, val)
-                    emp_obj.save()
-                except EmploymentDetail.DoesNotExist:
-                    EmploymentDetail.objects.create(
-                        individual=individual, 
-                        **emp
-                    )
-            else:
-                EmploymentDetail.objects.create(
-                    individual=individual, 
-                    **emp
-                )
-
-        if kin_data: 
-            for kin in kin_data:
-                NextOfKin.objects.create(
-                    individual=individual, 
-                    **kin
-                )
-        if documents_data:
-            for doc in documents_data:
-                document_id = doc.get('id', None)
-                
-                if document_id:
-                    try:
-                        doc_obj = Document.objects.get(
-                            id = document_id,
-                            content_type = individual_ct,
-                            object_id = individual.pk
-                        )
-                        for key , val in doc.items():
-                            setattr(doc_obj, key , val)
-                        doc_obj.save()
-                    except Document.DoesNotExist:
-                        Document.objects.create(
-                            content_object = individual, 
-                            **doc
-                        )
-                else:
-                    existing = Document.objects.filter(
-                        content_type=individual_ct,
-                        object_id=individual.pk,
-                        file = doc.get('file'),
-                        document_type = doc.get('document_type')   
-                    ).first()
-                    if existing:
-                        for key, val in addr.items():
-                            setattr(existing, key, val)
-                        existing.save()
-                    else:
-                        Document.objects.create(
-                            content_object = individual, 
-                            **doc
-                        )
-
-        if notes_data:
-            for note in notes_data:
-                Note.objects.create(
-                    content_object=individual,
-                    **note
-                )
+        individual_contact_helper(individual, contact_data)
+        individual_employment_details_helper(individual, employment_data)
+        individual_next_of_kin_helper(individual, kin_data)
                 
         return individual
 
@@ -377,6 +292,34 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
             'employment_details', 'next_of_kin'
         ]
 
+    def validate(self, data):
+        id_type = data.get('identification_type')
+        id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
+        dob = data.get('date_of_birth')
+
+        if id_type:
+            if id_type == 'national_id':
+                if not id_number or not validate_national_id(re.sub(r'[-\s]', '', id_number), "zimbabwe"):
+                    raise ValidationError("Invalid or missing national id")
+            elif id_type == 'passport':
+                if not id_number:
+                    raise ValidationError("Invalid or missing passport number")
+                if not (5 <= len(id_number) <= 15):
+                    raise ValidationError("Passport number must be between 5 and 15 characters")
+            else:
+                raise ValidationError("Invalid identification type provided")
+
+        for field in ['first_name', 'last_name', 'gender']:
+            if field in data and not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} cannot be empty")
+
+        if dob is not None:
+            if not validate_future_dates(dob):
+                raise ValidationError("Invalid date of birth")
+            data['date_of_birth'] = dob
+        
+        return data
+    
     @transaction.atomic
     def update(self, instance, validated_data):
         address_data = validated_data.pop('addresses', [])
@@ -394,153 +337,15 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         
 
         individual_ct = ContentType.objects.get_for_model(instance)
+        
+        individual_address_helper(individual_ct, address_data, instance.pk)
+        individual_documents_helper(individual_ct, documents_data, instance.pk)
+        individual_notes_helper(individual_ct, notes_data, instance.pk)
 
-        for addr in address_data:
-            address_id = addr.get('id', None)
-
-            if address_id:
-                try:
-                    address_obj = Address.objects.get(
-                        id=address_id,
-                        content_type=individual_ct,
-                        object_id=instance.pk,
-                    )
-                    for key, val in addr.items():
-                        setattr(address_obj, key, val)
-                    address_obj.save()
-                except Address.DoesNotExist:
-                    Address.objects.create(
-                        content_type=individual_ct,
-                        object_id=instance.pk,
-                        **addr,
-                    )
-            else:
-                existing = Address.objects.filter(
-                    content_type=individual_ct,
-                    object_id=instance.pk,
-                    address_type=addr.get('address_type'),
-                ).first()
-
-                if existing:
-                    for key, val in addr.items():
-                        setattr(existing, key, val)
-                    existing.save()
-                else:
-                    Address.objects.create(
-                        content_type=individual_ct,
-                        object_id=instance.pk,
-                        **addr,
-                    )
-
-        for contact in contact_data:
-            contact_id = contact.get('id', None)
-
-            if contact_id:
-                try:
-                    contact_obj = IndividualContactDetail.objects.get(
-                        id=contact_id, 
-                        individual=instance
-                    )
-                    for key, val in contact.items():
-                        setattr(contact_obj, key, val)
-                    contact_obj.save()
-                except IndividualContactDetail.DoesNotExist:
-                    IndividualContactDetail.objects.create(
-                        individual=instance,
-                        **contact
-                    )
-            else:
-                email = contact.get('email', None)
-                if email:
-                    existing = IndividualContactDetail.objects.filter(
-                        individual=instance,
-                        email__iexact=email
-                    ).first()
-                    if existing:
-                        for key, val in contact.items():
-                            setattr(existing, key, val)
-                        existing.save()
-                    else:
-                        IndividualContactDetail.objects.create(
-                            individual=instance,
-                            **contact
-                        )
-                else:
-                    IndividualContactDetail.objects.create(
-                        individual=instance, 
-                        **contact
-                    )
-
-        for emp in employment_data:
-            emp_id = emp.get('id', None)
-            if emp_id:
-                try:
-                    emp_obj = EmploymentDetail.objects.get(
-                        id=emp_id, 
-                        individual=instance
-                    )
-                    for key, val in emp.items():
-                        setattr(emp_obj, key, val)
-                    emp_obj.save()
-                except EmploymentDetail.DoesNotExist:
-                    EmploymentDetail.objects.create(
-                        individual=instance, 
-                        **emp
-                    )
-            else:
-                EmploymentDetail.objects.create(
-                    individual=instance, 
-                    **emp
-                )
-
-        if kin_data: 
-            for kin in kin_data:
-                NextOfKin.objects.create(
-                    individual=instance, 
-                    **kin
-                )
-        if documents_data:
-            for doc in documents_data:
-                document_id = doc.get('id', None)
-                
-                if document_id:
-                    try:
-                        doc_obj = Document.objects.get(
-                            id = document_id,
-                            content_type = individual_ct,
-                            object_id = instance.pk
-                        )
-                        for key , val in doc.items():
-                            setattr(doc_obj, key , val)
-                        doc_obj.save()
-                    except Document.DoesNotExist:
-                        Document.objects.create(
-                            content_object = instance, 
-                            **doc
-                        )
-                else:
-                    existing = Document.objects.filter(
-                        content_type=individual_ct,
-                        object_id=instance.pk,
-                        file = doc.get('file'),
-                        document_type = doc.get('document_type')   
-                    ).first()
-                    if existing:
-                        for key, val in doc.items():
-                            setattr(existing, key, val)
-                        existing.save()
-                    else:
-                        Document.objects.create(
-                            content_object = instance, 
-                            **doc
-                        )
-
-        if notes_data:
-            for note in notes_data:
-                Note.objects.create(
-                    content_object=instance,
-                    **note
-                )
+        individual_contact_helper(instance, contact_data)
+        individual_employment_details_helper(instance, employment_data)
+        individual_next_of_kin_helper(instance, kin_data)
+        
                 
         return instance
 

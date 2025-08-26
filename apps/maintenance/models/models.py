@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.utils.translation import gettext_lazy as _
 from apps.common.models.base_models import BaseModel,BaseModelWithUser
+from apps.accounting.models.models import Currency
+from django.utils import timezone
 
 class MaintenanceRequest(BaseModelWithUser):
     PRIORITY_CHOICES = (
@@ -86,6 +88,7 @@ class WorkSchedule(BaseModelWithUser):
         return f"Work Schedule: {self.title} for {self.property or self.lease}"
 
 class MaintenanceSchedule(BaseModelWithUser):
+    maintenance_number = models.CharField(_('Maintenance Unique Number'), max_length=25, unique=True, blank=True, null=True)
     lease = models.ForeignKey('leases.Lease', on_delete=models.SET_NULL, null=True, blank=True,
             related_name='maintenance_schedules',
             help_text=_("The lease associated with this maintenance schedule, if property is leased."))
@@ -96,7 +99,7 @@ class MaintenanceSchedule(BaseModelWithUser):
             help_text=_("Detailed description of the maintenance to be done."))
     
     tradesman = models.CharField(_("Tradesman"), max_length=255, blank=True, null=True)
-    contractor = models.CharField(_("Contractor Company"), max_length=255, blank=True, null=True)
+    contractor = models.ForeignKey('Contractor', on_delete=models.SET_NULL, null=True, blank=True)
     
     required_materials = models.TextField(_("Required Materials"), blank=True, null=True)
     budget = models.DecimalField(_("Budget"), max_digits=12, decimal_places=2, blank=True, null=True)
@@ -132,6 +135,24 @@ class MaintenanceSchedule(BaseModelWithUser):
     )
     status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES, default="PENDING")
 
+    def save(self, *args, **kwargs):
+        if not self.maintenance_number:
+            year = timezone.now().year
+            last_maintenance = (
+                MaintenanceSchedule.objects.filter(maintenance_number__startswith=f"#MS-{year}-")
+                .order_by('-maintenance_number')
+                .first()
+            )
+
+            if last_maintenance:
+                last_number = int(last_maintenance.maintenance_number.split('-')[-1]) + 1
+            else:
+                last_number = 1  
+
+            
+            self.maintenance_number = f"#MS-{year}-{last_number:04}"
+
+        super().save(*args, **kwargs)
     class Meta(BaseModel.Meta):
         app_label = 'maintenance'
         verbose_name = _("Maintenance Schedule")
@@ -140,3 +161,46 @@ class MaintenanceSchedule(BaseModelWithUser):
 
     def __str__(self):
         return f"Maintenance Schedule: {self.title} for {self.lease} ({self.frequency})"
+
+class Industry(BaseModel):
+    name = models.CharField(_("Name"), max_length=255)
+    description = models.TextField(_("Description"), blank=True, null=True)
+
+    class Meta():
+        app_label = 'maintenance'
+        verbose_name = ('Industry')
+        verbose_name = ('Industries')
+        ordering = ['name',]
+
+    def __str__(self):
+        return self.name
+    
+class Contractor(BaseModel):
+    reg_number = models.CharField(_("Registration Number / ID Number"), max_length=255)
+    name = models.CharField(_("Name"), max_length=255)
+    phone = models.CharField(_("Phone"), max_length=20, blank=True, null=True)
+    email = models.EmailField(_("Email"), blank=True, null=True)
+    industry = models.ForeignKey(Industry, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # contact person if its a company
+
+    contact_person = models.CharField(_("Contact Person"), max_length=255, blank=True, null=True)
+    contact_phone = models.CharField(_("Contact Phone"), max_length=20, blank=True, null=True)
+    contact_email = models.EmailField(_("Contact Email"), blank=True, null=True)
+
+    charge_currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True, blank=True)
+    standard_rate = models.DecimalField(_("Standard Charge"), max_digits=12, decimal_places=2, blank=True, null=True)
+    emergency_rate = models.DecimalField(_("Standard Charge"), max_digits=12, decimal_places=2, blank=True, null=True)
+    license_number = models.CharField(_("License Number"), max_length=255, unique=True)
+
+    address = GenericRelation('common.Address', on_delete=models.SET_NULL)
+    is_active = models.BooleanField(_("Active Status"), default=True)
+
+    class Meta(BaseModel.Meta):
+        app_label = 'maintenance'
+        verbose_name = _("Contractor")
+        verbose_name_plural = _("Contractors")
+        ordering = ['id',]
+    
+    def __str__(self):
+        return f'{self.name} ({self.phone})'
