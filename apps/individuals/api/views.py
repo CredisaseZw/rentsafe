@@ -1,7 +1,6 @@
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 
@@ -63,7 +62,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error creating individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -76,7 +75,7 @@ class IndividualViewSet(BaseViewSet):
         
             self.perform_update(serializer)
 
-            return self._crete_rendered_response(serializer.data,status.HTTP_200_OK)
+            return self._create_rendered_response(serializer.data,status.HTTP_200_OK)
         
         except ValidationError as e:
             return self._create_rendered_response(
@@ -86,7 +85,7 @@ class IndividualViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error updating individual: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     @CacheService.cached(tag_prefix='individual:list')
@@ -98,11 +97,10 @@ class IndividualViewSet(BaseViewSet):
             if page is not None:
                 serializer = IndividualSearchSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
-            return Response({serializer.data},status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Error listing individuals: {str(e)}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -111,15 +109,15 @@ class IndividualViewSet(BaseViewSet):
         try:
             individual = self.get_object()
             serializer = IndividualMinimalSerializer(individual)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         except Individual.DoesNotExist:
             logger.error(f"Individual with ID {id} Does not exist")
-            return Response({"error": extract_error_message(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return self._create_rendered_response({"error": "Individual does not exist"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
             logger.error(f"Failed to retrieve individual: {str(e)} ")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -131,16 +129,16 @@ class IndividualViewSet(BaseViewSet):
             instance.is_active = False
             instance.save()
             logger.info(f"Individual {instance.pk} soft deleted by user {request.user}")
-            return Response({"message": "Individual deleted successfully"}, status=status.HTTP_200_OK)
+            return self._create_rendered_response({instance.data}, status.HTTP_200_OK)
         except Individual.DoesNotExist:
-            return Response(
+            return self._create_rendered_response(
                 {'error': 'Individual not found'},
-                status=status.HTTP_404_NOT_FOUND
+             status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             logger.error(f"Error deleting individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )   
 
@@ -150,16 +148,16 @@ class IndividualViewSet(BaseViewSet):
             individual = Individual.objects.get(pk=pk)
             individual.is_verified = not individual.is_verified
             individual.save()
-            return Response({
+            return self._create_rendered_response({
                 "message": f"Individual has been {'verified'  if individual.is_active else 'unverified'}"
             })
         except Individual.DoesNotExist:
-            return Response({"error": "Individual not found"}, status=status.HTTP_404_NOT_FOUND)
+            return self._create_rendered_response({"error": "Individual not found"}, status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             logger.error(f"Error verifying individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -171,18 +169,18 @@ class IndividualViewSet(BaseViewSet):
             individual.save()
             
             serializer = IndividualSearchSerializer(individual)
-            return Response({
+            return self._create_rendered_response({
                 "message": f"Individual has been {'activated'  if individual.is_active else 'deactivated'}"
             })
         except Individual.DoesNotExist:
-            return Response({
+            return self._create_rendered_response({
                 'error': 'Individual not found'},
-                status= status.HTTP_404_NOT_FOUND
+              status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             logger.error(f"Error activating individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -195,15 +193,15 @@ class IndividualViewSet(BaseViewSet):
                     individual.is_active= True
                     individual.save()
                     logger.info(f"Individual {pk} has been un deleted")
-                    return Response("Individual has been activated successfully")
+                    return self._create_rendered_response("Individual has been activated successfully")
                 else:
-                    return Response ("This Individual Is already active")
+                    return self._create_rendered_response ("This Individual Is already active")
             else:
-                return Response("Individual does not exist")
+                return self._create_rendered_response("Individual does not exist")
         except Exception as e:
             logger.error(f"Error Deleting individual: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     @action(detail=False, methods=['GET'], url_path='view-deleted')
@@ -211,13 +209,13 @@ class IndividualViewSet(BaseViewSet):
         try:
             if individuals := Individual.objects.filter(is_deleted=True):
                 serializer = IndividualSearchSerializer(individuals,many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
             else:
                 return self._create_rendered_response({"message": "No deleted individuals found"}, status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(f"Error fetching deleted individuals: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -227,7 +225,7 @@ class IndividualViewSet(BaseViewSet):
         """Search Individuals Returning minimal information."""
         query = request.query_params.get('q', '').strip()
         if not query:
-            return Response({"error": "Search query cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+            return self._create_rendered_response({"error": "Search query cannot be empty"}, status.HTTP_400_BAD_REQUEST)
         try:
             search_fields = ['first_name', 'last_name', 'identification_number']
             filter_conditions = Q()
@@ -235,15 +233,17 @@ class IndividualViewSet(BaseViewSet):
             for field in search_fields:
                 filter_conditions |= Q(**{f"{field}__icontains": query})
 
-            individuals = Individual.objects.filter(filter_conditions,is_active=True, is_deleted=False).prefetch_related('addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
+            individuals = Individual.objects.filter(
+                filter_conditions,is_active=True, is_deleted=False).prefetch_related(
+                'addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
             
             serializer = IndividualSearchSerializer(individuals, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         
         except Exception as e:
-            logger.error(f"Error serching individuals: {e}")
+            logger.error(f"Error searching individuals: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
@@ -254,16 +254,16 @@ class IndividualViewSet(BaseViewSet):
         try:
             individual = self.get_queryset().get(pk=pk)
             serializer = IndividualSerializer(individual)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         
         except Individual.DoesNotExist:
             logger.error(f"Individual with ID {pk} does not exist.")
-            return Response({"error": "Individual not found"}, status=status.HTTP_404_NOT_FOUND)
+            return self._create_rendered_response({"error": "Individual not found"}, status.HTTP_404_NOT_FOUND)
         
         except Exception as e:
             logger.error(f"Error fetching individual full details: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -277,11 +277,11 @@ class BulkUpload(BaseViewSet):
         import tempfile
 
         if not file:
-            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+            return self._create_rendered_response({'error': 'No file uploaded'}, status.HTTP_400_BAD_REQUEST)
 
         ext = file.name.split('.')[-1].lower()
         if ext != 'csv':
-            return Response({'error': 'Unsupported file type. Please upload .csv files'}, status=status.HTTP_400_BAD_REQUEST)
+            return self._create_rendered_response({'error': 'Unsupported file type. Please upload .csv files'}, status.HTTP_400_BAD_REQUEST)
 
         try:
             # Save the uploaded file to a temporary location
@@ -298,4 +298,4 @@ class BulkUpload(BaseViewSet):
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return Response({'message': 'File processing started successfully'}, status=status.HTTP_200_OK)
+        return self._create_rendered_response({'message': 'File processing started successfully'}, status.HTTP_200_OK)

@@ -414,6 +414,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'verbose',
         },
+        'file_maintenance':{
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'maintenance.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': { 
@@ -464,6 +472,11 @@ LOGGING = {
         'leases': {
             'handlers': ['console', 'leases_file'],
             'level': 'ERROR',
+            'propagate': False,
+        },
+        'maintenance': {
+            'handlers': ['console', 'file_maintenance'],
+            'level': 'DEBUG',
             'propagate': False,
         },
     'root': { 
