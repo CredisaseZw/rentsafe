@@ -4,50 +4,94 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseTermination, Guarantor
 from apps.leases.models.landlord import Landlord
 from apps.leases.api.serializers import (
     LeaseCreateUpdateSerializer,
     LeaseDetailSerializer,
-    LeaseSearchSerializer,
+    LeaseTenantSerializer,
     LeaseTerminationSerializer,
-    MinimalLeaseSerializer
+    LeaseListSerializer,
+    LandlordSerializer,
+    GuarantorSerializer
 )
-from apps.properties.models.models import Unit
-from apps.common.models.models import Address
+from apps.common.utils import extract_error_message
 from django.contrib.contenttypes.models import ContentType
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from apps.individuals.models import Individual
+from apps.companies.models import CompanyBranch
 import logging
+from rest_framework.exceptions import ValidationError
 logger = logging.getLogger('leases')
 
 class LeaseViewSet(viewsets.ModelViewSet):
     queryset = Lease.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'unit__property', 'landlord']
-    search_fields = ['lease_id', 'unit__unit_number', 'unit__property__name', 
-                    'lease_tenants__tenant_object__first_name',
-                    'lease_tenants__tenant_object__last_name',
-                    'lease_tenants__tenant_object__branch_name',
-                    'lease_tenants__tenant_object__company__registration_name']
+    filterset_fields = ['status', 'unit__property', 'landlord','start_date']
     ordering_fields = ['start_date', 'end_date', 'lease_id']
+    search_fields = ['lease_id','unit__unit_number','unit__property__name']
     ordering = ['-start_date']
-
+    lookup_field = 'lease_id'
     def get_serializer_class(self):
         if self.action == 'list':
-            return LeaseSearchSerializer
+            return LeaseListSerializer
         elif self.action in ['create', 'update', 'partial_update']:
             return LeaseCreateUpdateSerializer
         elif self.action == 'terminate':
             return LeaseTerminationSerializer
         return LeaseDetailSerializer
+    def get_queryset(self):
+        """
+        Custom queryset to filter leases based on the user's company,
+        unless the user is a superuser or staff member.
+        """
+        user = self.request.user
+        queryset = self.queryset
+        if not user.is_authenticated:
+            return queryset.none()  # Return no leases for unauthenticated users
+        if lease_status := self.request.query_params.get('status', None):
+            queryset = self.queryset.filter(status=lease_status)
+        if search_term := self.request.query_params.get('search'):
+            return queryset.filter(
+                Q(lease_id__icontains=search_term) |
+                Q(unit__unit_number__icontains=search_term) |
+                Q(unit__property__name__icontains=search_term)
+            )
+
+            # matching_leases = []
+            # for lease in queryset.prefetch_related('lease_tenants'):
+            #     for lt in lease.lease_tenants.all():
+            #         if to :=lt.tenant_object:
+            #             if (hasattr(to, 'first_name') and search_term.lower() in to.first_name.lower()) or \
+            #                 (hasattr(to, 'last_name') and search_term.lower() in to.last_name.lower()) or \
+            #                 (hasattr(to, 'branch_name') and search_term.lower() in to.branch_name.lower()) or \
+            #                 (hasattr(to, 'company') and hasattr(to.company, 'registration_name') and search_term.lower() in to.company.registration_name.lower()):
+            #                 matching_leases.append(lease)
+            #                 break  # no need to check more tenants for this lease
+            # queryset = queryset.filter(id__in=[l.id for l in matching_leases])
+
+        if user.is_staff or user.is_superuser:
+            return queryset.filter(created_by__client=user.client)
+        try:
+            if hasattr(user, 'client') and user.client:
+                return queryset.filter(created_by=user)
+            else:
+                return queryset.none()
+        except Exception as e:
+            logger.error(f"Error filtering queryset for user {user.id}: {e}")
+            return queryset.none()
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
+            
+            # Pass request context for user tracking
             serializer.context['request'] = request
+            
             lease = serializer.save()
             
             if lease.status == 'ACTIVE':
@@ -56,13 +100,17 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 
             return Response(LeaseDetailSerializer(lease).data, 
                         status=status.HTTP_201_CREATED)
-        
+        except ValidationError as ve:
+            logger.error(f"Lease creation failed: {str(ve)}", exc_info=True)
+            return Response(
+                {"error": extract_error_message(ve)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
-            # Log the full error for debugging
             logger.error(f"Lease creation failed: {str(e)}", exc_info=True)
             return Response(
-                {"error": "Lease creation failed", "details": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Lease creation failed"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     @transaction.atomic
     def update(self, request, *args, **kwargs):
@@ -86,41 +134,68 @@ class LeaseViewSet(viewsets.ModelViewSet):
         return Response(LeaseDetailSerializer(lease).data)
 
     @action(detail=True, methods=['post'])
-    def terminate(self, request, pk=None):
-        lease = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        termination = LeaseTermination.objects.create(
-            lease=lease,
-            **serializer.validated_data
-        )
-        
-        # Update lease status to terminated
-        lease.status = 'TERMINATED'
-        lease.save(request=request)
-        
-        # Update unit status to vacant
-        lease.unit.status = 'vacant'
-        lease.unit.save()
-        
-        return Response({'status': 'lease terminated'}, status=status.HTTP_200_OK)
+    def terminate(self, request, lease_id=None):
+        try:
+            lease = self.get_object()
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            termination = LeaseTermination.objects.create(
+                lease=lease,
+                **serializer.validated_data
+            )
+            
+            # Update lease status to terminated
+            lease.status = 'TERMINATED'
+            lease.save(request=request)
+            
+            # Update unit status to vacant
+            lease.unit.status = 'vacant'
+            lease.unit.save()
+            
+            return Response({'status': 'lease terminated'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error terminating lease {lease.id}: {str(e)}")
+            return Response({'error': extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'])
-    def add_tenant(self, request, pk=None):
+    
+    @action(detail=True, methods=['post'], url_path='add-tenant')
+    def add_tenant(self, request, lease_id=None):
         lease = self.get_object()
         serializer = LeaseTenantSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         
-        # Set the lease ID from the URL
-        serializer.validated_data['lease'] = lease
+        tenant_type = serializer.validated_data.pop('tenant_type', None)
+        tenant_id = serializer.validated_data.pop('tenant_id', None)
         
-        tenant = serializer.save()
+        if tenant_type == 'individual':
+            ModelClass = Individual
+            app_label = 'individuals'
+        elif tenant_type == 'company':
+            ModelClass = CompanyBranch
+            app_label = 'companies'
+        else:
+            return Response({"error": "Invalid tenant type."}, status=status.HTTP_400_BAD_REQUEST)
         
-        return Response(LeaseTenantSerializer(tenant).data, status=status.HTTP_201_CREATED)
-
-    @action(detail=True, methods=['post'])
-    def remove_tenant(self, request, pk=None):
+        try:
+            tenant_ct = ContentType.objects.get(app_label=app_label, model=ModelClass._meta.model_name)
+            if LeaseTenant.objects.filter(lease=lease, content_type=tenant_ct, object_id=tenant_id).exists():
+                return Response({"error": "This tenant is already associated with this lease."}, status=status.HTTP_400_BAD_REQUEST)
+            tenant_obj = get_object_or_404(ModelClass, id=tenant_id)
+                
+            tenant = LeaseTenant.objects.create(
+                lease=lease,
+                tenant_object=tenant_obj,
+                **serializer.validated_data
+            )
+            
+            return Response(LeaseTenantSerializer(tenant).data, status=status.HTTP_201_CREATED)
+        
+        except Exception as e:
+            return Response({"error": f"Failed to add tenant: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=True, methods=['post'], url_path='remove-tenant')
+    def remove_tenant(self, request, lease_id=None):
         lease = self.get_object()
         tenant_id = request.data.get('tenant_id')
         
@@ -140,8 +215,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
         
         return Response({'status': 'tenant removed'}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'])
-    def set_primary_tenant(self, request, pk=None):
+    @action(detail=True, methods=['post'], url_path='set-primary-tenant')
+    def set_primary_tenant(self, request, lease_id=None):
         lease = self.get_object()
         tenant_id = request.data.get('tenant_id')
         
@@ -159,8 +234,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
         
         return Response({'status': 'primary tenant set'}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
-    def available_tenants(self, request, pk=None):
+    @action(detail=True, methods=['get'], url_path='available-tenants')
+    def available_tenants(self, request, lease_id=None):
         """
         Returns a list of individuals and company branches that are not already tenants on this lease
         """
@@ -175,16 +250,14 @@ class LeaseViewSet(viewsets.ModelViewSet):
         
         # Get available individuals
         from apps.individuals.models.models import Individual
-        available_individuals = Individual.objects.exclude(
+        available_individuals = Individual.objects.filter(
             id__in=existing_tenant_ids,
-            lease_tenants__content_type=individual_ct
         ).values('id', 'first_name', 'last_name', 'identification_number')
         
         # Get available company branches
         from apps.companies.models.models import CompanyBranch
-        available_branches = CompanyBranch.objects.exclude(
+        available_branches = CompanyBranch.objects.filter(
             id__in=existing_tenant_ids,
-            lease_tenants__content_type=company_branch_ct
         ).values('id', 'branch_name', 'company__registration_name')
         
         return Response({
@@ -192,6 +265,70 @@ class LeaseViewSet(viewsets.ModelViewSet):
             'company_branches': list(available_branches)
         })
     
+    @action(detail=True, methods=['post'], url_path='set-landlord')
+    def set_landlord(self, request, lease_id=None):
+        lease = self.get_object()
+        serializer = LandlordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            landlord_instance = serializer.save()
+            
+            if lease.landlord and lease.landlord.id == landlord_instance.id:
+                return Response({"error": "This landlord is already assigned to this lease."}, status=status.HTTP_400_BAD_REQUEST)
+            lease.landlord = landlord_instance
+            lease.save(request=request)
+            
+            return Response(LeaseDetailSerializer(lease).data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Failed to set landlord: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['post'], url_path='remove-landlord')
+    def remove_landlord(self, request, lease_id=None):
+        lease = self.get_object()
+
+        if not lease.landlord:
+            return Response({"status": "No landlord to remove."}, status=status.HTTP_200_OK)
+        lease.landlord = None
+        lease.save()
+        
+        return Response({"status": "Landlord removed from lease."}, status=status.HTTP_200_OK)
+        
+    @action(detail=True, methods=['post'], url_path='set-guarantor')
+    def set_guarantor(self, request, lease_id=None):
+        lease = self.get_object()
+        serializer = GuarantorSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            # The serializer's create method now handles the GFK fields
+            guarantor_instance = serializer.save()
+            
+            # Update the lease's guarantor field
+            if lease.guarantor and lease.guarantor.id == guarantor_instance.id:
+                return Response({"error": "This guarantor is already assigned to this lease."}, status=status.HTTP_400_BAD_REQUEST)
+                
+            lease.guarantor = guarantor_instance
+            lease.save(request=request)
+            
+            return Response(LeaseDetailSerializer(lease).data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": f"Failed to set guarantor: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=True, methods=['post'], url_path='remove-guarantor')
+    def remove_guarantor(self, request, lease_id=None):
+        lease = self.get_object()
+
+        if not lease.guarantor:
+            return Response({"status": "No guarantor to remove."}, status=status.HTTP_200_OK)
+        
+        with transaction.atomic():
+            guarantor_instance = lease.guarantor
+            lease.guarantor = None
+            lease.save(request=request)
+            guarantor_instance.delete()
+        
+        return Response({"status": "Guarantor removed."}, status=status.HTTP_200_OK)
+        
     @action(detail=False, methods=['get'])
     def search(self, request):
         """
@@ -221,3 +358,16 @@ class LeaseViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='property-leases')
+    def get_property_leases(self, request):
+        slug = request.query_params.get('slug')
+        if slug:
+            queryset = self.get_queryset().filter(unit__property__slug=slug)
+            serializer = LeaseListSerializer(queryset, many=True)
+            return Response(serializer.data) 
+        else:
+            return Response(
+                {"error": "slug query parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )

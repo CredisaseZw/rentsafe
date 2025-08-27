@@ -13,6 +13,8 @@ from apps.subscriptions.models.models import Subscription
 from apps.properties.models.models import Unit
 from apps.common.models.models import Document, Note
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
+from apps.individuals.models import Individual
+from apps.companies.models import CompanyBranch
 
 class Lease(BaseModelWithUser):
     LEASE_STATUS_CHOICES = (
@@ -43,7 +45,6 @@ class Lease(BaseModelWithUser):
                                 help_text="Unique identifier for the lease (e.g., LSE-001).")
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT, related_name='leases',
                             help_text="The property unit being leased.")
-
     # Dates
     start_date = models.DateField(null=True, blank=True,
                                 help_text="The date when the lease officially starts.")
@@ -51,16 +52,12 @@ class Lease(BaseModelWithUser):
                                 help_text="The date when the lease is scheduled to end. Can be null for open-ended leases.")
     signed_date = models.DateField(blank=True, null=True,
                                 help_text="The actual date the lease agreement was signed.")
-    status = models.CharField(max_length=20, choices=LEASE_STATUS_CHOICES, default='DRAFT',
+    status = models.CharField(max_length=20, choices=LEASE_STATUS_CHOICES, default='ACTIVE',
                             help_text="Current operational status of the lease.")
 
     landlord = models.ForeignKey('leases.Landlord', on_delete=models.PROTECT, related_name='managed_leases',
+                                null=True, blank=True,
                                 help_text="The landlord responsible for this lease.")
-
-    deposit_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'),
-                                help_text="The total security/rental deposit amount for the lease.")
-    deposit_period = models.IntegerField(default=0,
-                                help_text="e.g., number of months rent equivalent for the deposit.")
     currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT,
                                 help_text="The primary currency in which the lease payments and charges are accounted for.",
                                 related_name='leases_as_primary_currency')
@@ -81,7 +78,8 @@ class Lease(BaseModelWithUser):
                                 help_text="The guarantor responsible for financial obligations under this lease.")
     account_number = models.CharField(max_length=50, blank=True, null=True,
                                 help_text="Optional bank account number or reference for tenant payments.")
-
+    is_rent_variable = models.BooleanField(default=False,
+                                help_text="Indicates if the rent amount is variable.")
     documents = GenericRelation(Document)
     notes = GenericRelation(Note)
 
@@ -116,16 +114,18 @@ class Lease(BaseModelWithUser):
                 original_lease = Lease.objects.get(pk=self.pk)
                 original_status = original_lease.status
                 original_landlord = original_lease.landlord
-                original_deposit_amount = original_lease.deposit_amount
             except Lease.DoesNotExist:
                 pass 
-
+        
+        # This part needs to be here to ensure a lease_id exists before save
         if not self.pk and not self.lease_id:
             self.lease_id = self._generate_unique_lease_id()
 
-        status_changed_to_active = (self.status == 'ACTIVE' and original_status != 'ACTIVE')
-        status_changed_from_active = (original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED'])
 
+        # Call super().save() first to ensure the object has a PK
+        super().save(*args, **kwargs)
+
+        # All logic that requires a primary key or accesses related objects must come AFTER this line
         current_lease_details = {
             'lease_id_at_log_time': self.lease_id,
             'unit_id_at_log_time': self.unit.id if self.unit else None,
@@ -136,11 +136,11 @@ class Lease(BaseModelWithUser):
             'landlord_name_at_log_time': str(self.landlord) if self.landlord else None,
         }
 
-        if hasattr(self.unit, 'property'):
-            self.landlord = self.unit.property.landlords.first() or None
-
-        super().save(*args, **kwargs)
-
+        # Handle logging and subscription changes
+        status_changed_to_active = (self.status == 'ACTIVE' and original_status != 'ACTIVE')
+        status_changed_from_active = (original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED'])
+        
+        # Check for new lease and log creation
         if is_new:
             log_details = current_lease_details.copy()
             log_details.update({'initial_status': self.status})
@@ -150,24 +150,24 @@ class Lease(BaseModelWithUser):
                 user=user,
                 details=log_details
             )
+        # Check for updates and log changes
         else:
-            log_details = current_lease_details.copy()
-
+            # Check for status changes
             if self.status != original_status:
-                log_details |= {
+                log_details = current_lease_details.copy()
+                log_details.update({
                     'old_status': original_status,
                     'new_status': self.status,
-                }
+                })
                 LeaseLog.objects.create(
                     lease=self,
                     log_type='LEASE_STATUS_CHANGED',
                     user=user,
                     details=log_details
                 )
-                log_details = current_lease_details.copy()
-
             # Check for landlord changes
             if self.landlord != original_landlord:
+                log_details = current_lease_details.copy()
                 log_details.update({
                     'field': 'landlord',
                     'old_landlord_id': original_landlord.id if original_landlord else None,
@@ -181,74 +181,35 @@ class Lease(BaseModelWithUser):
                     user=user,
                     details=log_details
                 )
-                log_details = current_lease_details.copy()
 
-            if self.deposit_amount != original_deposit_amount:
-                log_details.update({
-                    'old_deposit_amount': str(original_deposit_amount),
-                    'new_deposit_amount': str(self.deposit_amount)
-                })
-                LeaseLog.objects.create(
-                    lease=self,
-                    log_type='DEPOSIT_UPDATED',
-                    user=user,
-                    details=log_details
-                )
-                log_details = current_lease_details.copy()
+        # Handle subscription slot logic
         if status_changed_to_active:
-            with transaction.atomic():
-                if not self._try_decrement_subscription_slot(request=request): 
-                    LeaseLog.objects.create(
-                        lease=self,
-                        log_type='OTHER',
-                        user=user,
-                        details={
-                            'event': 'Subscription Slot Decrement Failed',
-                            'lease_status_attempted': 'ACTIVE',
-                            **current_lease_details
-                        }
-                    )
-                    print("WARNING: Lease activated but subscription slot decrement failed.")
-
-        elif status_changed_from_active:
-            with transaction.atomic():
-                self._try_increment_subscription_slot(request=request) 
+            # Subscription logic for activating a lease
+            if not self._try_decrement_subscription_slot(request=request): 
                 LeaseLog.objects.create(
                     lease=self,
                     log_type='OTHER',
                     user=user,
                     details={
-                        'event': 'Subscription Slot Incremented',
-                        'lease_status_changed_from': original_status,
+                        'event': 'Subscription Slot Decrement Failed',
+                        'lease_status_attempted': 'ACTIVE',
                         **current_lease_details
                     }
                 )
-        if not self.pk and not self.lease_id:
-            self.lease_id = self._generate_unique_lease_id()
-
-        original_status = None
-        if self.pk:
-            try:
-                original_status = Lease.objects.get(pk=self.pk).status
-            except Lease.DoesNotExist:
-                pass
-
-        if self.status == 'ACTIVE' and original_status != 'ACTIVE':
-            with transaction.atomic():
-                if not self._try_decrement_subscription_slot(request=kwargs.get('request')):
-                    raise ValueError(_("Cannot activate lease: No active subscription with available slots found for the landlord's associated entity."))
-        elif original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED']:
-            with transaction.atomic():
-                self._try_increment_subscription_slot(request=kwargs.get('request'))
-
-        # super().save(*args, **kwargs)
-        if not self._try_decrement_subscription_slot(request=kwargs.get('request')):
-            raise ValueError(_("Cannot activate lease: No active subscription with available slots found for the landlord's associated entity."))
-        elif original_status == 'ACTIVE' and self.status not in ['ACTIVE', 'SUSPENDED']:
-            with transaction.atomic():
-                self._try_increment_subscription_slot(request=kwargs.get('request'))
-
-        super().save(*args, **kwargs)
+                print("WARNING: Lease activated but subscription slot decrement failed.")
+        elif status_changed_from_active:
+            # Subscription logic for deactivating a lease
+            self._try_increment_subscription_slot(request=request) 
+            LeaseLog.objects.create(
+                lease=self,
+                log_type='OTHER',
+                user=user,
+                details={
+                    'event': 'Subscription Slot Incremented',
+                    'lease_status_changed_from': original_status,
+                    **current_lease_details
+                }
+            )
 
     def _generate_unique_lease_id(self):
         today = date.today()
@@ -274,15 +235,13 @@ class Lease(BaseModelWithUser):
         """
         today = timezone.now().date()
         overdue_invoices = self.invoices.filter(
-            due_date__lt=today,
             status__in=['pending', 'partially_paid', 'draft']
-        ).order_by('due_date')
+        ).order_by('date_created')
         outstanding_periods = {
-            (invoice.due_date.year, invoice.due_date.month)
+            (invoice.date_created.year, invoice.date_created.month)
             for invoice in overdue_invoices
         }
-        return len(outstanding_periods)
-
+        return len(outstanding_periods) if overdue_invoices.exists() else 0
     @property
     def risk_level(self):
         """
@@ -301,7 +260,12 @@ class Lease(BaseModelWithUser):
         elif outstanding_months >= 4:
             return 'NON_PAYER'
         return 'LOW'
-
+    
+    @property
+    def get_latest_balance(self):
+        if self.invoices.exists():
+            return self.invoices.latest('date_created').balance
+        return Decimal('0.00')
 
     def _get_landlord_subscriber_entity(self):
         """
@@ -446,6 +410,24 @@ class LeaseTenant(BaseModel):
                 object_id=self.pk
             )
 
+    def tenant_info(self):
+        if self.tenant_object:
+            if isinstance(self.tenant_object, Individual):
+                return {
+                    'type': 'individual',
+                    'id': self.tenant_object.id,
+                    'name': self.tenant_object.full_name,
+                    'identification_number': self.tenant_object.identification_number
+                }
+            elif isinstance(self.tenant_object, CompanyBranch):
+                return {
+                    'type': 'company_branch',
+                    'id': self.tenant_object.id,
+                    'name': self.tenant_object.full_name,
+                    'company_name': self.tenant_object.company.registration_name
+                }
+        return None
+
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
@@ -470,6 +452,26 @@ class LeaseTenant(BaseModel):
             details={**lease_details_for_log, 'was_primary': self.is_primary_tenant}
         )
         super().delete(*args, **kwargs)
+
+class LeaseDeposit(BaseModel):
+    DEPOSIT_HOLDER_CHOICES=[
+        ('agent', 'Agent'),
+        ('landlord', 'Landlord'),
+        ('tenant', 'Tenant'),
+    ]
+    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='deposits')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT)
+    deposit_date = models.DateField(blank=True, null=True)
+    deposit_holder = models.CharField(max_length=255, choices=DEPOSIT_HOLDER_CHOICES,default='agent')
+    
+    class Meta:
+        app_label = 'leases'
+        db_table = 'lease_deposit'
+        verbose_name = _('lease deposit')
+        verbose_name_plural = _('lease deposits')
+    def __str__(self):
+        return f"Lease: {self.lease.lease_id if self.lease else 'N/A'} Deposit: {self.currency.currency_code if self.currency else 'N/A'} {self.amount}"
 
 class Guarantor(BaseModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
@@ -510,7 +512,7 @@ class LeaseCharge(BaseModel):
     )
 
     lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='charges')
-    charge_type = models.CharField(max_length=20, choices=CHARGE_TYPE_CHOICES, default='RENT')
+    charge_type = models.CharField(max_length=20, choices=CHARGE_TYPE_CHOICES, default='OTHER')
     description = models.CharField(max_length=255, blank=True, null=True,
                                 help_text="A brief description of the charge (e.g., 'Monthly Rent - Jan 2024', 'Water Bill').")
     amount = models.DecimalField(max_digits=12, decimal_places=2,
@@ -525,6 +527,8 @@ class LeaseCharge(BaseModel):
                                 help_text="The date this charge stops being applied (e.g., for rent increases/discounts).")
     is_active = models.BooleanField(default=True,
                                     help_text="Indicates if this charge is currently active and should be applied.")
+    vat_inclusive = models.BooleanField(default=False,
+                                help_text="Indicates if the charge amount includes VAT.")
 
     class Meta:
         app_label = 'leases'
@@ -534,7 +538,7 @@ class LeaseCharge(BaseModel):
         ordering = ['lease', 'effective_date', 'charge_type']
 
     def __str__(self):
-        return f"{self.charge_type.replace('_', ' ').title()} of {self.amount} {self.currency.code} for Lease {self.lease.lease_id} ({self.frequency})"
+        return f"{self.charge_type.replace('_', ' ').title()} of {self.amount} {self.currency.currency_code} for Lease {self.lease.lease_id} ({self.frequency})"
 
     def save(self, *args, **kwargs):
         if self.frequency == 'ONE_TIME' and self.end_date:
@@ -573,7 +577,7 @@ class LeaseCharge(BaseModel):
                     **lease_details_for_log,
                     'charge_type': self.charge_type,
                     'amount': str(self.amount),
-                    'currency_code': self.currency.code if self.currency else None,
+                    'currency_code': self.currency.currency_code if self.currency else None,
                     'frequency': self.frequency,
                     'description': self.description
                 },

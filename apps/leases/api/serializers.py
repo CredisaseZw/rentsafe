@@ -2,14 +2,39 @@
 from rest_framework import serializers
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
-from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseTermination, Guarantor
+from django.utils.text import slugify
+
+from apps.leases.models import (
+    Lease, LeaseTenant, LeaseCharge, 
+    LeaseTermination, Guarantor, LeaseOpeningBalance, 
+    LandlordOpeningBalance, LeaseDeposit
+)
 from apps.leases.models.landlord import Landlord
 from apps.properties.models.models import Property, Unit, PropertyType
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
 from apps.common.models.models import Address
+from apps.accounting.models import Currency
 from apps.common.api.serializers import AddressSerializer
-from decimal import Decimal
+from apps.leases.utils.helpers import create_lease_with_dependencies
+from apps.properties.utils.helpers import process_address_data
+
+# Helper serializers for related objects
+class IndividualSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Individual
+        fields = ['id', 'full_name', 'identification_number']
+
+class CompanyBranchSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='company.registration_name', read_only=True)
+    class Meta:
+        model = CompanyBranch
+        fields = ['id', 'full_name', 'company_name']
+
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ['id', 'currency_code', 'currency_name']
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
     unit = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all())
@@ -35,19 +60,9 @@ class LeaseTenantSerializer(serializers.ModelSerializer):
     def get_tenant_object(self, obj):
         if obj.tenant_object:
             if isinstance(obj.tenant_object, Individual):
-                return {
-                    'type': 'individual',
-                    'id': obj.tenant_object.id,
-                    'name': obj.tenant_object.full_name,
-                    'identification_number': obj.tenant_object.identification_number
-                }
+                return IndividualSerializer(obj.tenant_object).data
             elif isinstance(obj.tenant_object, CompanyBranch):
-                return {
-                    'type': 'company_branch',
-                    'id': obj.tenant_object.id,
-                    'name': obj.tenant_object.full_name,
-                    'company_name': obj.tenant_object.company.registration_name
-                }
+                return CompanyBranchSerializer(obj.tenant_object).data
         return None
     
     def validate(self, data):
@@ -72,7 +87,7 @@ class LeaseTenantSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Tenant not found: {str(e)}")
         
         # Check if this tenant is already on the lease
-        if LeaseTenant.objects.filter(
+        if lease and LeaseTenant.objects.filter(
             lease=lease,
             content_type=content_type,
             object_id=tenant_id
@@ -89,7 +104,17 @@ class LeaseChargeSerializer(serializers.ModelSerializer):
             'lease': {'required': False}
         }
 
+class LeaseChargeListSerializer(serializers.ModelSerializer):
+    currency = serializers.CharField(source='currency.currency_code', read_only=True)
+    class Meta:
+        model = LeaseCharge
+        fields = ['id', 'amount', 'currency', 'charge_type']
+        extra_kwargs = {
+            'lease': {'required': False}
+        }
+
 class LeaseTerminationSerializer(serializers.ModelSerializer):
+    lease = serializers.CharField(required=False)
     class Meta:
         model = LeaseTermination
         fields = '__all__'
@@ -107,19 +132,9 @@ class GuarantorSerializer(serializers.ModelSerializer):
     def get_guarantor_object(self, obj):
         if obj.guarantor_object:
             if isinstance(obj.guarantor_object, Individual):
-                return {
-                    'type': 'individual',
-                    'id': obj.guarantor_object.id,
-                    'name': obj.guarantor_object.full_name,
-                    'identification_number': obj.guarantor_object.identification_number
-                }
+                return IndividualSerializer(obj.guarantor_object).data
             elif isinstance(obj.guarantor_object, CompanyBranch):
-                return {
-                    'type': 'company_branch',
-                    'id': obj.guarantor_object.id,
-                    'name': obj.guarantor_object.full_name,
-                    'company_name': obj.guarantor_object.company.registration_name
-                }
+                return CompanyBranchSerializer(obj.guarantor_object).data
         return None
     
     def validate(self, data):
@@ -141,108 +156,141 @@ class GuarantorSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Invalid content type for {guarantor_type}.")
         except Exception as e:
             raise serializers.ValidationError(f"Guarantor not found: {str(e)}")
-        
         return data
+    def create(self, validated_data):
+        content_type = validated_data.pop('content_type')
+        object_id = validated_data.pop('object_id')
+        
+        validated_data.pop('guarantor_type', None)
+        validated_data.pop('guarantor_id', None)
+
+        return Guarantor.objects.create(
+            content_type=content_type, 
+            object_id=object_id, 
+            **validated_data
+        )
 
 class LandlordSerializer(serializers.ModelSerializer):
-    landlord_object = serializers.SerializerMethodField()
-    landlord_type = serializers.CharField(write_only=True)
-    landlord_id = serializers.IntegerField(write_only=True)
-    
+
     class Meta:
         model = Landlord
-        fields = ['id', 'landlord_object', 'landlord_type', 'landlord_id']
-        read_only_fields = ['landlord_object']
-    
-    def get_landlord_object(self, obj):
-        if obj.landlord_object:
-            if isinstance(obj.landlord_object, Individual):
-                return {
-                    'type': 'individual',
-                    'id': obj.landlord_object.id,
-                    'name': obj.landlord_object.full_name,
-                    'identification_number': obj.landlord_object.identification_number
-                }
-            elif isinstance(obj.landlord_object, CompanyBranch):
-                return {
-                    'type': 'company_branch',
-                    'id': obj.landlord_object.id,
-                    'name': obj.landlord_object.full_name,
-                    'company_name': obj.landlord_object.company.registration_name
-                }
-        return None
-    
-    def validate(self, data):
-        landlord_type = data.get('landlord_type')
-        landlord_id = data.get('landlord_id')
-        
-        if landlord_type not in ['individual', 'company']:
-            raise serializers.ValidationError("Invalid landlord type. Must be 'individual' or 'company'.")
-        
-        try:
-            content_type = ContentType.objects.get(
-                app_label='individuals' if landlord_type == 'individual' else 'companies',
-                model='individual' if landlord_type == 'individual' else 'companybranch'
-            )
-            # Check if the referenced object exists
-            model_class = content_type.model_class()
-            if not model_class.objects.filter(id=landlord_id).exists():
-                raise serializers.ValidationError(f"{landlord_type.capitalize()} with ID {landlord_id} does not exist.")
-            
-            data['content_type'] = content_type
-            data['object_id'] = landlord_id
-        except ContentType.DoesNotExist:
-            raise serializers.ValidationError(f"Invalid content type for {landlord_type}.")
-        except Exception as e:
-            raise serializers.ValidationError(f"Landlord validation failed: {str(e)}")
-        
-        return data
-    
-    def create(self, validated_data):
-        try:
-            # Check if landlord already exists for this object
-            landlord = Landlord.objects.filter(
-                content_type=validated_data['content_type'],
-                object_id=validated_data['object_id']
-            ).first()
-            
-            if not landlord:
-                landlord = Landlord.objects.create(
-                    content_type=validated_data['content_type'],
-                    object_id=validated_data['object_id']
-                )
-            
-            return landlord
-        except Exception as e:
-            raise serializers.ValidationError(f"Failed to create landlord: {str(e)}")
+        fields = ['id', 'landlord_name', 'landlord_type', 'landlord_id']
+        read_only_fields = ['id']
 
+class LeaseDepositSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the LeaseDeposit model.
+    This serializer handles the nested deposit data within the lease payload.
+    """
+    class Meta:
+        model = LeaseDeposit
+        fields = ['id', 'amount', 'currency', 'deposit_date', 'deposit_holder']
+        read_only_fields = ['id']
+
+class LeaseOpeningBalanceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the LeaseOpeningBalance model.
+    """
+    class Meta:
+        model = LeaseOpeningBalance
+        exclude = ['lease', 'created_by', 'updated_by','date_created','date_updated']
+        read_only_fields = ['id', 'date_created', 'date_updated']
+
+class LandlordOpeningBalanceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the LandlordOpeningBalance model.
+    It uses write_only fields for debtor identification.
+    """
+    landlord = LandlordSerializer(read_only=True)
+    class Meta:
+        model = LandlordOpeningBalance
+        exclude = ['debtor', 'created_by', 'updated_by','date_created','date_updated','lease_id']
+        read_only_fields = ['id']
+
+    def validate(self, data):
+        return data
 
 class LeaseDetailSerializer(serializers.ModelSerializer):
-    tenants = LeaseTenantSerializer(many=True, read_only=True)
-    charges = LeaseChargeSerializer(many=True, read_only=True)
-    landlord = LandlordSerializer(read_only=True)
+    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    charges = LeaseChargeListSerializer(many=True, read_only=True)
     guarantor = GuarantorSerializer(read_only=True)
+    deposits = LeaseDepositSerializer(many=True, read_only=True)
     unit = serializers.SerializerMethodField()
+    currency = CurrencySerializer(read_only=True)
+    risk_level_class = serializers.SerializerMethodField()
+    owing = serializers.SerializerMethodField()
+    lease_opening_balance_data = serializers.SerializerMethodField()
+    landlord_opening_balances_data = serializers.SerializerMethodField()
     
+
     class Meta:
         model = Lease
-        fields = '__all__'
+        exclude = ['landlord', 'created_by', 'updated_by']
+        # fields = '__all__'
+
+    def get_risk_level_class(self, obj):
+        return obj.risk_level
     
+    def get_owing(self,obj):
+        return obj.get_latest_balance
+
+    def get_lease_opening_balance_data(self, obj):
+        if hasattr(obj, 'opening_balance'):
+            return LeaseOpeningBalanceSerializer(obj.opening_balance).data
+        return None
+    
+    def get_landlord_opening_balances_data(self, obj):
+        if hasattr(obj.landlord, 'opening_balances'):
+            user = self.context.get('request').user if self.context.get('request') else None
+            landlord_balances = LandlordOpeningBalance.objects.filter(landlord=obj.landlord, lease_id=obj.lease_id)
+            return LandlordOpeningBalanceSerializer(landlord_balances, many=True).data
+        return None
+
     def get_unit(self, obj):
         return {
             'id': obj.unit.id,
             'unit_number': obj.unit.unit_number,
             'property': {
                 'id': obj.unit.property.id,
-                'name': obj.unit.property.name
+                'name': obj.unit.property.name,
+                'slug': obj.unit.property.slug,
+                'addresses': AddressSerializer(obj.unit.property.addresses.all(), many=True).data,
+            }
+        }
+
+class LeaseListSerializer(serializers.ModelSerializer):
+    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    landlord = LandlordSerializer(read_only=True)
+    unit = serializers.SerializerMethodField()
+    currency = CurrencySerializer(read_only=True)
+    risk_level_class = serializers.SerializerMethodField()
+    owing = serializers.FloatField(source='get_latest_balance', read_only=True)
+
+    class Meta:
+        model = Lease
+        fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'landlord', 'unit', 'currency', 'risk_level_class', 'owing']
+
+    def get_risk_level_class(self, obj):
+        return obj.risk_level
+
+    def get_unit(self, obj):
+        return {
+            'id': obj.unit.id,
+            'unit_number': obj.unit.unit_number,
+            'property': {
+                'id': obj.unit.property.id,
+                'name': obj.unit.property.name,
+                'type': obj.unit.property.property_type.name if obj.unit.property.property_type else None,
+                'slug': obj.unit.property.slug,
+                'addresses': AddressSerializer(obj.unit.property.addresses.all(), many=True).data,
             }
         }
 
 class LeaseSearchSerializer(serializers.ModelSerializer):
     tenants = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
-    landlord = serializers.SerializerMethodField()
-    
+    landlord = LandlordSerializer(read_only=True)
+
     class Meta:
         model = Lease
         fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'unit', 'landlord']
@@ -260,15 +308,9 @@ class LeaseSearchSerializer(serializers.ModelSerializer):
             'property_name': obj.unit.property.name
         }
     
-    def get_landlord(self, obj):
-        if obj.landlord and obj.landlord.landlord_object:
-            return {
-                'name': obj.landlord.landlord_object.full_name if hasattr(obj.landlord.landlord_object, 'full_name') else str(obj.landlord.landlord_object),
-                'id': obj.landlord.id
-            }
-        return None
+
 class PropertyCreateSerializer(serializers.ModelSerializer):
-    addresses = AddressSerializer(required=True)
+    addresses = AddressSerializer(required=False)
     property_type_name = serializers.CharField(write_only=True)
     
     class Meta:
@@ -277,19 +319,18 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
                 'is_furnished', 'total_number_of_units', 'addresses', 'property_type_name','features']
     
     def validate(self, data):
-        address_data = data.get('addresses', {})
         required_fields = ['street_address', 'city']
-        
-        for field in required_fields:
-            if field not in address_data:
-                raise serializers.ValidationError(
-                    f"Address data must include '{field}'"
-                )
+        if address_data := data.get('addresses'):
+            for field in required_fields:
+                if field not in address_data:
+                    raise serializers.ValidationError(
+                        f"Address data must include '{field}'"
+                    )
         
         return data
     
     def create(self, validated_data):
-        address_data = validated_data.pop('addresses')
+        address_data = validated_data.pop('addresses', {})
         property_type_name = validated_data.pop('property_type_name')
         
         # Get or create property type
@@ -336,25 +377,30 @@ class UnitCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Unit
         fields = ['unit_number', 'unit_type', 'number_of_rooms', 
-                'status', 'monthly_rent', 'features']
+                'status', 'features']
 
 class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
     tenants = LeaseTenantSerializer(many=True, required=False)
     charges = LeaseChargeSerializer(many=True, required=False)
+    deposits = LeaseDepositSerializer(many=True, required=False)
     landlord_data = LandlordSerializer(required=False)
     guarantor_data = GuarantorSerializer(required=False)
     property_data = PropertyCreateSerializer(required=False)
     unit_data = UnitCreateSerializer(required=False)
     address_data = serializers.JSONField(required=False)
+    lease_opening_balance_data = LeaseOpeningBalanceSerializer(required=False, allow_null=True)
+    landlord_opening_balances_data = LandlordOpeningBalanceSerializer(many=True, required=False, allow_null=True)
+    
     
     class Meta:
         model = Lease
         fields = [
             'lease_id', 'unit', 'start_date', 'end_date', 'signed_date', 'status',
-            'landlord', 'landlord_data', 'deposit_amount', 'deposit_period', 'currency',
+            'landlord', 'landlord_data', 'deposits', 'currency',
             'payment_frequency', 'due_day_of_month', 'grace_period_days',
             'includes_utilities', 'utilities_details', 'guarantor', 'guarantor_data',
-            'account_number', 'tenants', 'charges', 'property_data', 'unit_data', 'address_data'
+            'account_number', 'tenants', 'charges', 'property_data', 'unit_data','is_rent_variable',
+            'address_data', 'lease_opening_balance_data', 'landlord_opening_balances_data'
         ]
         extra_kwargs = {
             'lease_id': {'read_only': True},
@@ -364,164 +410,56 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
         }
     
     def validate(self, data):
+        user = self.context.get('request').user if self.context.get('request') else None
         # Either unit or property_data + unit_data must be provided
         if not data.get('unit') and not (data.get('property_data') and data.get('unit_data')):
             raise serializers.ValidationError(
                 "Either provide an existing unit or property_data + unit_data to create a new one."
             )
-        
+
+        if not user.client:
+            raise serializers.ValidationError("User should be associated with a client, request to join one to the admins.")
+
+        # New validation to prevent duplicate property creation
+        if data.get('property_data'):
+            if property_name := data['property_data'].get('name'):
+                # Assuming the slug is generated from the name
+                property_slug = slugify(property_name)
+                if Lease.objects.filter(
+                    unit__property__slug=property_slug, 
+                    unit__unit_number=data['unit_data'].get('unit_number'), 
+                    status='ACTIVE'
+                ).exists():
+                    raise serializers.ValidationError(
+                        "This unit is already associated with an active lease."
+                    )
+
         # Remove lease field from tenants and charges if present
         tenants_data = data.get('tenants', [])
         for tenant in tenants_data:
             tenant.pop('lease', None)
-        
+
         charges_data = data.get('charges', [])
         for charge in charges_data:
             charge.pop('lease', None)
-        
+
+        deposits_data = data.get('deposits', [])
+        for deposit in deposits_data:
+            deposit.pop('lease', None)
+
         return data
     
     @transaction.atomic
     def create(self, validated_data):
-        tenants_data = validated_data.pop('tenants', [])
-        charges_data = validated_data.pop('charges', [])
-        landlord_data = validated_data.pop('landlord_data', None)
-        guarantor_data = validated_data.pop('guarantor_data', None)
-        property_data = validated_data.pop('property_data', None)
-        unit_data = validated_data.pop('unit_data', None)
-        address_data = validated_data.pop('address_data', None)
-        
-        # Handle property and unit creation if needed
-        if property_data and unit_data:
-            property_serializer = PropertyCreateSerializer(data=property_data)
-            property_serializer.is_valid(raise_exception=True)
-            property = property_serializer.save()
-            
-            unit_serializer = UnitCreateSerializer(data=unit_data)
-            unit_serializer.is_valid(raise_exception=True)
-            unit = unit_serializer.save(property=property)
-            
-            validated_data['unit'] = unit
-            
-            # Create address for unit if not provided
-            if not address_data and property.addresses.exists():
-                prop_address = property.addresses.first()
-                address_data = {
-                    'street_address': prop_address.street_address,
-                    'city': prop_address.city,
-                    'country': prop_address.country,
-                    'postal_code': prop_address.postal_code,
-                }
-        
-        # Handle address creation for property/unit if needed
-        if address_data:
-            self._handle_address_creation(validated_data['unit'], address_data)
-        
-        # Handle landlord creation if needed
-        landlord = None
-        if landlord_data:
-            try:
-                # First try to get existing landlord
-                content_type = ContentType.objects.get(
-                    app_label='individuals' if landlord_data['landlord_type'] == 'individual' else 'companies',
-                    model=landlord_data['landlord_type']
-                )
-                landlord = Landlord.objects.filter(
-                    content_type=content_type,
-                    object_id=landlord_data['landlord_id']
-                ).first()
-                
-                if not landlord:
-                    # Create new landlord if doesn't exist
-                    landlord_serializer = LandlordSerializer(data=landlord_data)
-                    landlord_serializer.is_valid(raise_exception=True)
-                    landlord = landlord_serializer.save()
-                
-                validated_data['landlord'] = landlord
-            except Exception as e:
-                raise serializers.ValidationError(f"Failed to process landlord: {str(e)}")
-        
-        # Handle guarantor creation if needed
-        if guarantor_data:
-            try:
-                content_type = ContentType.objects.get(
-                    app_label='individuals' if guarantor_data['guarantor_type'] == 'individual' else 'companies',
-                    model=guarantor_data['guarantor_type']
-                )
-                guarantor = Guarantor.objects.filter(
-                    content_type=content_type,
-                    object_id=guarantor_data['guarantor_id']
-                ).first()
-                
-                if not guarantor:
-                    guarantor_serializer = GuarantorSerializer(data=guarantor_data)
-                    guarantor_serializer.is_valid(raise_exception=True)
-                    guarantor = guarantor_serializer.save()
-                
-                validated_data['guarantor'] = guarantor
-            except Exception as e:
-                raise serializers.ValidationError(f"Failed to process guarantor: {str(e)}")
-        
-        # Create lease (lease_id will be auto-generated in the model's save method)
-        lease = Lease.objects.create(**validated_data)
-        
-        # Create tenants
-        for tenant_data in tenants_data:
-            LeaseTenant.objects.create(lease=lease, **tenant_data)
-        
-        # Create charges
-        for charge_data in charges_data:
-            LeaseCharge.objects.create(lease=lease, **charge_data)
-        
-        return lease
-    def _handle_address_creation(self, unit, address_data):
-        """
-        Helper method to create addresses for property and unit if they don't exist
-        """
-        from apps.common.models.models import Country, City, Suburb 
-        
+        # Use the helper function instead of manual processing
         try:
-            # Process country
-            country_id = address_data.pop('country', None)
-            if country_id:
-                country = Country.objects.get(id=country_id)
-                address_data['country'] = country
-            
-            # Process city
-            city_id = address_data.pop('city', None)
-            if city_id:
-                city = City.objects.get(id=city_id)
-                address_data['city'] = city
-            
-            # Process suburb
-            suburb_id = address_data.pop('suburb', None)
-            if suburb_id:
-                suburb = Suburb.objects.get(id=suburb_id)
-                address_data['suburb'] = suburb
-            
-            # Check if property has address, if not create one
-            property_ob = unit.property
-            if not property_ob.addresses.exists():
-                Address.objects.create(
-                    content_type=ContentType.objects.get_for_model(Property),
-                    object_id=property_ob.id,
-                    **address_data
-                )
-            
-            # Check if unit has address, if not create one
-            if not unit.addresses.exists():
-                Address.objects.create(
-                    content_type=ContentType.objects.get_for_model(Unit),
-                    object_id=unit.id,
-                    **address_data
-                )
-                
-        except Country.DoesNotExist:
-            raise serializers.ValidationError("Invalid country ID provided")
-        except City.DoesNotExist:
-            raise serializers.ValidationError("Invalid city ID provided")
-        except Suburb.DoesNotExist:
-            raise serializers.ValidationError("Invalid suburb ID provided")
+            if address_data := validated_data.pop('address_data', None):
+                address_data = process_address_data(address_data)
+                validated_data['address_data'] = address_data
+
+            # Get user from context
+            user = self.context.get('request').user if self.context.get('request') else None
+
+            return create_lease_with_dependencies(validated_data, user)
         except Exception as e:
-            raise serializers.ValidationError(f"Address creation failed: {str(e)}")
-        
+            raise serializers.ValidationError(f"Lease creation failed: {str(e)}")
