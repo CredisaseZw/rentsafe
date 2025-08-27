@@ -249,3 +249,14 @@ export function updatePropertyListCache(
    persistentData[name] = data;
    localStorage.setItem("persistentData", JSON.stringify(persistentData));
 }
+export function summarizeAddress(address: Address): string {
+   return [
+      address.street_address,
+      address.suburb?.name,
+      address.city?.name,
+      address.province?.name,
+      address.country?.code,
+   ]
+   .filter(Boolean)
+   .join(", ");
+}

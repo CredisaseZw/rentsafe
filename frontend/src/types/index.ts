@@ -157,16 +157,12 @@ export type PropertiesResponse = {
    previous: string | null;
    results: Property[];
 }
-export type PropertyType = {
-   id : number,
-   name: string,
-   description: string
-}
+
 export type PropertyTypeResponse = {
    count: number;
    next: string | null;
    previous: string | null;
-   results : PropertyType[]
+   results : Property[]
 }
 export interface Features {
   parking: string;
@@ -195,6 +191,8 @@ export interface Property {
   features?: Features;
   property_type_id?: number;
   property_type?: string;
+  type?: string,
+  addresses:Address[]
   address_summary?: string;
   addresses_input?: AddressInput;
   landlords_input?: LandlordInput[];
@@ -214,4 +212,56 @@ export type AddPropertyForm = {
 export type ApiError = {
    message: string;
    error?: string;
+   detail? : string
+}
+
+export interface Lease {
+  id: number;
+  lease_id: string;
+  start_date: string;
+  end_date: string;
+  status: "ACTIVE" | "INACTIVE" | "TERMINATED";
+  tenants: Tenant[];
+  landlord: Landlord;
+  unit: Unit;
+  currency: Currency;
+  risk_level_class: "LOW" | "MEDIUM" | "HIGH"; 
+  owing: number;
+}
+
+export interface Tenant {
+  id: number;
+  lease: number;
+  tenant_object: {
+    id: number;
+    full_name: string;
+    identification_number: string;
+  };
+  is_primary_tenant: boolean;
+}
+
+export interface Landlord {
+  id: number;
+  landlord_name: string;
+  landlord_type: "individual" | "company";
+  landlord_id: string;
+}
+
+export interface Unit {
+  id: number;
+  unit_number: string;
+  property: Property;
+}
+
+export interface Currency {
+  id: number;
+  currency_code: string;
+  currency_name: string;
+}
+
+export interface LeaseResponse {
+   count: number;
+   next: string | null;
+   previous: string | null;
+   results: Lease[]
 }

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import type { AddPropertyForm, DashboardCardProp, FilterOption, Header, Property, PropertyType } from "@/types";
+import type { AddPropertyForm, DashboardCardProp, FilterOption, Header, Property } from "@/types";
 import type { PaginationData } from "@/interfaces";
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
@@ -75,7 +75,7 @@ function usePropertyList() {
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
    const [searchItem, setSearchItem] = useState("");
-   const [propertyTypes, setPropertyTypes] = useState<PropertyType[] | null>(null)
+   const [propertyTypes, setPropertyTypes] = useState<Property[] | null>(null)
    const [loading, setLoading] = useState(false);
    const [searchParams, setSearchParams] = useSearchParams();
    const page = parseInt(searchParams.get("page") || "1");
