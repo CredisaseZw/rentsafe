@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseTermination, Guarantor
 from apps.leases.models.landlord import Landlord
 from apps.leases.api.serializers import (
@@ -28,13 +29,9 @@ logger = logging.getLogger('leases')
 class LeaseViewSet(viewsets.ModelViewSet):
     queryset = Lease.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'unit__property', 'landlord']
-    search_fields = ['lease_id', 'unit__unit_number', 'unit__property__name', 
-                    'lease_tenants__tenant_object__first_name',
-                    'lease_tenants__tenant_object__last_name',
-                    'lease_tenants__tenant_object__branch_name',
-                    'lease_tenants__tenant_object__company__registration_name']
+    filterset_fields = ['status', 'unit__property', 'landlord','start_date']
     ordering_fields = ['start_date', 'end_date', 'lease_id']
+    search_fields = ['lease_id','unit__unit_number','unit__property__name']
     ordering = ['-start_date']
     lookup_field = 'lease_id'
     def get_serializer_class(self):
@@ -50,13 +47,33 @@ class LeaseViewSet(viewsets.ModelViewSet):
         Custom queryset to filter leases based on the user's company,
         unless the user is a superuser or staff member.
         """
-        queryset = self.queryset
         user = self.request.user
+        queryset = self.queryset
         if not user.is_authenticated:
             return queryset.none()  # Return no leases for unauthenticated users
+        if lease_status := self.request.query_params.get('status', None):
+            queryset = self.queryset.filter(status=lease_status)
+        if search_term := self.request.query_params.get('search'):
+            return queryset.filter(
+                Q(lease_id__icontains=search_term) |
+                Q(unit__unit_number__icontains=search_term) |
+                Q(unit__property__name__icontains=search_term)
+            )
+
+            # matching_leases = []
+            # for lease in queryset.prefetch_related('lease_tenants'):
+            #     for lt in lease.lease_tenants.all():
+            #         if to :=lt.tenant_object:
+            #             if (hasattr(to, 'first_name') and search_term.lower() in to.first_name.lower()) or \
+            #                 (hasattr(to, 'last_name') and search_term.lower() in to.last_name.lower()) or \
+            #                 (hasattr(to, 'branch_name') and search_term.lower() in to.branch_name.lower()) or \
+            #                 (hasattr(to, 'company') and hasattr(to.company, 'registration_name') and search_term.lower() in to.company.registration_name.lower()):
+            #                 matching_leases.append(lease)
+            #                 break  # no need to check more tenants for this lease
+            # queryset = queryset.filter(id__in=[l.id for l in matching_leases])
 
         if user.is_staff or user.is_superuser:
-            return queryset.filter(created_by__client=user.client) 
+            return queryset.filter(created_by__client=user.client)
         try:
             if hasattr(user, 'client') and user.client:
                 return queryset.filter(created_by=user)
@@ -117,25 +134,29 @@ class LeaseViewSet(viewsets.ModelViewSet):
         return Response(LeaseDetailSerializer(lease).data)
 
     @action(detail=True, methods=['post'])
-    def terminate(self, request, pk=None):
-        lease = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        termination = LeaseTermination.objects.create(
-            lease=lease,
-            **serializer.validated_data
-        )
-        
-        # Update lease status to terminated
-        lease.status = 'TERMINATED'
-        lease.save(request=request)
-        
-        # Update unit status to vacant
-        lease.unit.status = 'vacant'
-        lease.unit.save()
-        
-        return Response({'status': 'lease terminated'}, status=status.HTTP_200_OK)
+    def terminate(self, request, lease_id=None):
+        try:
+            lease = self.get_object()
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            termination = LeaseTermination.objects.create(
+                lease=lease,
+                **serializer.validated_data
+            )
+            
+            # Update lease status to terminated
+            lease.status = 'TERMINATED'
+            lease.save(request=request)
+            
+            # Update unit status to vacant
+            lease.unit.status = 'vacant'
+            lease.unit.save()
+            
+            return Response({'status': 'lease terminated'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error terminating lease {lease.id}: {str(e)}")
+            return Response({'error': extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     
     @action(detail=True, methods=['post'], url_path='add-tenant')
@@ -337,3 +358,16 @@ class LeaseViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='property-leases')
+    def get_property_leases(self, request):
+        slug = request.query_params.get('slug')
+        if slug:
+            queryset = self.get_queryset().filter(unit__property__slug=slug)
+            serializer = LeaseListSerializer(queryset, many=True)
+            return Response(serializer.data) 
+        else:
+            return Response(
+                {"error": "slug query parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )

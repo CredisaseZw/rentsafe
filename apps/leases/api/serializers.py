@@ -114,6 +114,7 @@ class LeaseChargeListSerializer(serializers.ModelSerializer):
         }
 
 class LeaseTerminationSerializer(serializers.ModelSerializer):
+    lease = serializers.CharField(required=False)
     class Meta:
         model = LeaseTermination
         fields = '__all__'
