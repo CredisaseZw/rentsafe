@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 from apps.common.models.models import Address, Suburb
 from apps.common.services.tasks import send_notification
 from django.contrib.contenttypes.models import ContentType
-from apps.individuals.services.validators import validate_email, validate_national_id, normalize_zimbabwe_mobile
+from apps.common.utils.validators import validate_email, validate_national_id, normalize_zimbabwe_mobile
 from apps.individuals.models.models import Individual, IndividualContactDetail,NextOfKin,EmploymentDetail
 
 logger = logging.getLogger('individuals')
@@ -194,11 +194,9 @@ def process_individuals_csv(file_path):
                 valid_national_id = True
             else:
                 errors.append("Invalid identification type")
-                errors.append(f"Invalid mobile number: {phone}")
             #validate phone 
-            normalized_phone = normalize_zimbabwe_mobile(phone)
-            if normalized_phone:
-                phone = normalized_phone
+            if normalize_zimbabwe_mobile(phone):
+                phone = phone
             else:
                 errors.append(f"Invalid mobile number: {phone}")
 

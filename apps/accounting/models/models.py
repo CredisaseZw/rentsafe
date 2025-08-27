@@ -131,7 +131,7 @@ class Invoice(BaseModelWithUser):
     document_number = models.CharField(max_length=20, unique=True, editable=False, default=generate_invoice_document_number)
     is_individual = models.BooleanField(default=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
-    lease = models.ForeignKey('leases.Lease', on_delete=models.CASCADE, null=True, blank=True)
+    lease = models.ForeignKey('leases.Lease', on_delete=models.CASCADE, null=True, blank=True, related_name='invoices')
     reference_number = models.CharField(max_length=20, blank=True, null=True)
 
     # Customer Relationship

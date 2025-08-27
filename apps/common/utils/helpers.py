@@ -2,17 +2,22 @@ from rest_framework.exceptions import ValidationError
 
 def extract_error_message(error):
     """
-    Extracts the first error message string from a DRF ValidationError or other exception.
+    Recursively extract the first human-readable error message 
+    from the Validation Error.
     """
     if isinstance(error, ValidationError):
         detail = error.detail
+    else:
+        detail = error
 
-        if isinstance(detail, list):
-            return str(detail[0])
+    # Dict: go into the first value
+    if isinstance(detail, dict):
+        for value in detail.values():
+            return extract_error_message(value)
 
-        elif isinstance(detail, dict):
-            for key, value in detail.items():
-                return str(value[0]) if isinstance(value, list) and value else str(value)
-        else:
-            return str(detail)
-    return str(error)
+    # List: go into the first item
+    if isinstance(detail, list) and detail:
+        return extract_error_message(detail[0])
+
+    # ErrorDetail or string
+    return str(detail)

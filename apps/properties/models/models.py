@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
 from django.contrib.contenttypes.fields import GenericRelation
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.common.models.models import Address, Document, Note
@@ -29,6 +30,7 @@ class Property(BaseModelWithUser):
     
     property_type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True,null = True)
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=PROPERTY_STATUS_CHOICES, default='active')
     year_built = models.PositiveIntegerField(blank=True, null=True)
@@ -53,7 +55,11 @@ class Property(BaseModelWithUser):
 
     def get_address(self):
         return self.addresses.first() if self.addresses.exists() else "No Address"
-    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
 
 class Unit(BaseModelWithUser):
     UNIT_STATUS_CHOICES = (
