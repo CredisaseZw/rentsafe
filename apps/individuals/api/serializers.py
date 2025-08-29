@@ -162,7 +162,7 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
         if primary_address := obj.addresses.filter(is_primary=True).first():
             return AddressSerializer(primary_address).data
         # fallback: return first address if no primary is set
-        if latest_address := obj.addresses.order_by('id').first():
+        if latest_address := obj.addresses.order_by('-id').first():
             return AddressSerializer(latest_address).data
         return None
     
@@ -364,11 +364,27 @@ class IndividualSearchSerializer(serializers.ModelSerializer):
         return None
 
 class IndividualAddressSerializer(serializers.ModelSerializer):
-    addresses = AddressSerializer(many=True, required=False)
-    contact_details = ContactDetailsSerializer(many=True, required=False)
+    contact_details = serializers.SerializerMethodField()
+    addresses = serializers.SerializerMethodField()
 
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
                   'contact_details','addresses', 'is_active']
 
+    def get_addresses(self, obj):
+        if primary_address := obj.addresses.filter(is_primary=True, address_type="physical").first():
+            return AddressSerializer(primary_address).data
+        # fallback: return first address if no primary, physical is set
+        if latest_address := obj.addresses.order_by('-id').first():
+            return AddressSerializer(latest_address).data
+        return None
+    
+    def get_contact_details(self, obj):
+        contact = obj.contact_details.order_by('-id').first()
+        if contact:
+            return {
+                'mobile_phone': contact.mobile_phone[-1] if contact.mobile_phone else None,
+                'email': contact.email
+            }
+        return None
