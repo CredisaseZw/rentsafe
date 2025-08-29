@@ -15,10 +15,12 @@ from apps.leases.models import (
 )
 from apps.properties.utils.helpers import process_address_data
 from apps.properties.utils.helpers import create_property_and_unit
-import logging
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import Company
 from apps.clients.models import Client
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -95,13 +97,13 @@ def create_lease_with_dependencies(lease_data, user=None):
             # Create opening balance records
             if lease_opening_balance_data:
                 LeaseOpeningBalance.objects.create(lease=lease, **lease_opening_balance_data, created_by=user)
+                lease.determine_initial_risk_status()
             
             if landlord_opening_balances_data and landlord_instance:
                 for balance_data in landlord_opening_balances_data:
-                    debtor_instance = Client.objects.get(id=user.client.id)
                     LandlordOpeningBalance.objects.create(
                         landlord=landlord_instance,
-                        debtor=debtor_instance,
+                        debtor=user.client,
                         created_by=user,
                         lease_id=lease.lease_id,
                         **balance_data
@@ -290,3 +292,19 @@ def create_lease_deposit(lease, deposit_data):
         raise ValidationError(f"Currency with ID {currency_id} not found.")
     except Exception as e:
         raise ValidationError(f"Failed to create lease deposit: {str(e)}")
+
+
+def get_opening_balance_oldest(opening_balance):
+    today = date.today()
+    sale_date = today 
+    if opening_balance.three_months_plus_balance > 0:
+        sale_date = today - relativedelta(months=4)
+    elif opening_balance.three_months_back_balance > 0:
+        sale_date = today - relativedelta(months=3)
+    elif opening_balance.two_months_back_balance > 0:
+        sale_date = today - relativedelta(months=2)
+    elif opening_balance.one_month_back_balance > 0:
+        sale_date = today - relativedelta(months=1)
+    elif opening_balance.current_month_balance > 0:
+        sale_date = today 
+    return sale_date

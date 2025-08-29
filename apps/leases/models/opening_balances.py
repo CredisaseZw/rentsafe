@@ -69,6 +69,7 @@ class LeaseOpeningBalance(BaseModelWithUser):
     def __str__(self):
         return f"Opening Balance for Lease {self.lease.lease_id}"
 
+
 class LandlordOpeningBalance(BaseModelWithUser):
     """
     Tracks the opening balance owed by or to a landlord from a specific debtor.

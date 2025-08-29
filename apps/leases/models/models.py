@@ -1,20 +1,23 @@
 import contextlib
+import logging
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q, F
+from django.db.models import Q, F, Sum, DecimalField
 from django.db import transaction
 from django.conf import settings
 from django.utils import timezone
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 from apps.subscriptions.models.models import Subscription
 from apps.properties.models.models import Unit
 from apps.common.models.models import Document, Note
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
+logger = logging.getLogger(__name__)
 
 class Lease(BaseModelWithUser):
     LEASE_STATUS_CHOICES = (
@@ -33,12 +36,12 @@ class Lease(BaseModelWithUser):
         ('ANNUALLY', 'Annually'),
     )
 
-    LEASE_RISK_CHOICES = {
-        0: 'LOW',
-        1: 'MEDIUM',
-        2: 'HIGH',
-        3: 'HIGH HIGH',
-        4: 'NON_PAYER',
+    RISK_COLORS = {
+        'NON_PAYER': 'black',
+        'HIGH_HIGH': 'red', 
+        'HIGH': 'pink',
+        'MEDIUM': 'orange',
+        'LOW': 'green'
     }
 
     lease_id = models.CharField(max_length=50, unique=True,
@@ -227,45 +230,198 @@ class Lease(BaseModelWithUser):
             new_number = 1
 
         return f"{prefix}-{new_number:04d}"
+    
+    @property
+    def risk_color(self):
+        """Return the color code for the current risk level"""
+        return self.RISK_COLORS.get(self.risk_level, 'green')
 
     def _get_outstanding_invoice_months(self):
         """
-        Calculates the number of distinct months with overdue invoices for this lease.
-        An invoice is considered overdue if its `due_date` is in the past AND its `status` is not 'paid'.
+        Calculates the number of months since the oldest unpaid invoice's sale date.
+        Only considers unpaid or partially paid invoices.
         """
         today = timezone.now().date()
-        overdue_invoices = self.invoices.filter(
+        
+        # Get all unpaid invoices
+        unpaid_invoices = self.invoices.filter(
             status__in=['pending', 'partially_paid', 'draft']
-        ).order_by('date_created')
-        outstanding_periods = {
-            (invoice.date_created.year, invoice.date_created.month)
-            for invoice in overdue_invoices
-        }
-        return len(outstanding_periods) if overdue_invoices.exists() else 0
+        )
+        
+        if not unpaid_invoices.exists():
+            return 0
+        
+        # Find the oldest invoice by sale_date
+        oldest_invoice = unpaid_invoices.order_by('sale_date').first()
+        
+        if not oldest_invoice or not oldest_invoice.sale_date:
+            return 0
+        
+        # Calculate months difference between today and the oldest invoice sale date
+        if isinstance(oldest_invoice.sale_date, datetime):
+            sale_date = oldest_invoice.sale_date.date()
+        else:
+            sale_date = oldest_invoice.sale_date
+        
+        # Calculate months difference
+        months_diff = (today.year - sale_date.year) * 12 + (today.month - sale_date.month)
+        
+        # Ensure at least 1 month if invoice is overdue
+        return max(1, months_diff)
+    
+    def determine_initial_risk_status(self):
+        """
+        Enhanced to use both opening balance and create initial invoice
+        """
+        risk_status = 'LOW'
+        
+        if hasattr(self, 'opening_balance'):
+            opening_balance = self.opening_balance
+            
+            if opening_balance.three_months_plus_balance > 0:
+                risk_status = 'NON_PAYER'
+            elif opening_balance.three_months_back_balance > 0:
+                risk_status = 'HIGH_HIGH'
+            elif opening_balance.two_months_back_balance > 0:
+                risk_status = 'HIGH'
+            elif opening_balance.one_month_back_balance > 0:
+                risk_status = 'MEDIUM'
+            
+            if opening_balance.outstanding_balance > 0:
+                from apps.leases.services.invoice_service import LeaseInvoiceService
+                LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
+        
+        return risk_status
+    
+    def apply_payment(self, amount, payment_date, method, reference=None, request=None):
+        """
+        Apply a payment to the lease, allocating to the oldest debts first
+        """
+        from apps.accounting.models import Payment
+        from django.db.models import Sum
+        from decimal import Decimal
+        
+        remaining_amount = Decimal(amount)
+        payments_made = []
+        
+        # Get all unpaid invoices ordered by due date (oldest first)
+        unpaid_invoices = self.invoices.filter(
+            status__in=['pending', 'partially_paid']
+        ).order_by('due_date')
+        
+        for invoice in unpaid_invoices:
+            if remaining_amount <= 0:
+                break
+                
+            # Calculate invoice balance properly (handle None values)
+            total_paid_result = invoice.payments.aggregate(
+                total_paid=Sum('amount')
+            )
+            total_paid = total_paid_result['total_paid'] or Decimal('0.00')
+            
+            invoice_balance = invoice.total_inclusive - total_paid
+            
+            payment_amount = min(remaining_amount, invoice_balance)
+            
+            if payment_amount > 0:
+                # Create payment
+                payment = Payment.objects.create(
+                    invoice=invoice,
+                    payment_date=payment_date,
+                    amount=payment_amount,
+                    method=method,
+                    reference=reference,
+                    created_by=request.user if request and hasattr(request, 'user') else None
+                )
+                
+                payments_made.append(payment)
+                remaining_amount -= payment_amount
+                
+                # Update invoice status
+                if payment_amount >= invoice_balance:
+                    invoice.status = 'paid'
+                else:
+                    invoice.status = 'partially_paid'
+                invoice.save()
+        
+        # Log the payment
+        if payments_made:
+            LeaseLog.objects.create(
+                lease=self,
+                log_type='PAYMENT_RECEIVED',
+                user=request.user if request and hasattr(request, 'user') else None,
+                details={
+                    'total_amount': str(amount),
+                    'payment_method': str(method),
+                    'reference': reference,
+                    'applied_to_invoices': [p.invoice.document_number for p in payments_made]
+                }
+            )
+        
+        return payments_made, remaining_amount
+    
     @property
     def risk_level(self):
         """
-        Calculates the risk level based on the number of outstanding invoice months.
+        Calculates risk level based on both opening balance age and invoice aging.
+        Opening balance takes precedence, then unpaid invoices.
         """
+        from decimal import Decimal
         outstanding_months = self._get_outstanding_invoice_months()
-
-        if outstanding_months == 0:
-            return 'LOW'
-        elif outstanding_months == 1:
-            return 'MEDIUM'
-        elif outstanding_months == 2:
-            return 'HIGH'
+        
+        if outstanding_months >= 4:
+            return 'NON_PAYER'
         elif outstanding_months == 3:
             return 'HIGH HIGH'
-        elif outstanding_months >= 4:
-            return 'NON_PAYER'
-        return 'LOW'
-    
+        elif outstanding_months == 2:
+            return 'HIGH'
+        elif outstanding_months == 1:
+            return 'MEDIUM'
+        else:
+            return 'LOW'
     @property
     def get_latest_balance(self):
-        if self.invoices.exists():
-            return self.invoices.latest('date_created').balance
-        return Decimal('0.00')
+        """
+        Calculate the real-time outstanding balance including opening balance.
+        Returns negative values for overpayments.
+        """
+        try:
+            # Initialize totals
+            total_invoice_amount = Decimal('0.00')
+            total_payments = Decimal('0.00')
+            
+            # Calculate from invoices if they exist
+            if self.invoices.exists():
+                # Get all invoices with their line items and payments
+                for invoice in self.invoices.all().prefetch_related('line_items', 'payments'):
+                    # Sum line item totals for this invoice
+                    invoice_total = sum(
+                        line_item.total_price 
+                        for line_item in invoice.line_items.all()
+                    )
+                    total_invoice_amount += invoice_total
+                    
+                    # Sum payments for this invoice
+                    invoice_payments = sum(
+                        payment.amount 
+                        for payment in invoice.payments.all()
+                    )
+                    total_payments += invoice_payments
+                return total_invoice_amount - total_payments
+            else:
+                # Add opening balance if it exists
+                opening_balance = Decimal('0.00')
+                if hasattr(self, 'opening_balance'):
+                    opening_balance = self.opening_balance.outstanding_balance or Decimal('0.00')
+                
+                # Calculate total outstanding balance (can be negative for overpayments)
+                outstanding_balance = (total_invoice_amount + opening_balance) - total_payments
+                
+                return outstanding_balance
+            
+        except Exception as e:
+            logger.error(f"Error calculating latest balance for lease {self.lease_id}: {str(e)}")
+            return Decimal('0.00')
 
     def _get_landlord_subscriber_entity(self):
         """
@@ -453,47 +609,6 @@ class LeaseTenant(BaseModel):
         )
         super().delete(*args, **kwargs)
 
-class LeaseDeposit(BaseModel):
-    DEPOSIT_HOLDER_CHOICES=[
-        ('agent', 'Agent'),
-        ('landlord', 'Landlord'),
-        ('tenant', 'Tenant'),
-    ]
-    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='deposits')
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT)
-    deposit_date = models.DateField(blank=True, null=True)
-    deposit_holder = models.CharField(max_length=255, choices=DEPOSIT_HOLDER_CHOICES,default='agent')
-    
-    class Meta:
-        app_label = 'leases'
-        db_table = 'lease_deposit'
-        verbose_name = _('lease deposit')
-        verbose_name_plural = _('lease deposits')
-    def __str__(self):
-        return f"Lease: {self.lease.lease_id if self.lease else 'N/A'} Deposit: {self.currency.currency_code if self.currency else 'N/A'} {self.amount}"
-
-class Guarantor(BaseModel):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
-                                    limit_choices_to=Q(app_label='individuals', model='individual') |
-                                                    Q(app_label='companies', model='companybranch'))
-    object_id = models.PositiveIntegerField(null=True, blank=True)
-    guarantor_object = GenericForeignKey('content_type', 'object_id')
-
-    guarantee_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
-                                        help_text="The maximum amount guaranteed by this guarantor, if specified.")
-    
-    class Meta:
-        app_label = 'leases'
-        db_table = 'guarantor'
-        verbose_name = _('guarantor')
-        verbose_name_plural = _('guarantors')
-        unique_together = ('content_type', 'object_id')
-
-    def __str__(self):
-        guarantor_name = self.guarantor_object.__str__() if self.guarantor_object else "N/A"
-        return f"Guarantor: {guarantor_name}"
-
 class LeaseCharge(BaseModel):
     CHARGE_TYPE_CHOICES = (
         ('RENT', 'Rent'),
@@ -636,6 +751,47 @@ class LeaseCharge(BaseModel):
             }
         )
         super().delete(*args, **kwargs)
+
+class LeaseDeposit(BaseModel):
+    DEPOSIT_HOLDER_CHOICES=[
+        ('agent', 'Agent'),
+        ('landlord', 'Landlord'),
+        ('tenant', 'Tenant'),
+    ]
+    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='deposits')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT)
+    deposit_date = models.DateField(blank=True, null=True)
+    deposit_holder = models.CharField(max_length=255, choices=DEPOSIT_HOLDER_CHOICES,default='agent')
+    
+    class Meta:
+        app_label = 'leases'
+        db_table = 'lease_deposit'
+        verbose_name = _('lease deposit')
+        verbose_name_plural = _('lease deposits')
+    def __str__(self):
+        return f"Lease: {self.lease.lease_id if self.lease else 'N/A'} Deposit: {self.currency.currency_code if self.currency else 'N/A'} {self.amount}"
+
+class Guarantor(BaseModel):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                    limit_choices_to=Q(app_label='individuals', model='individual') |
+                                                    Q(app_label='companies', model='companybranch'))
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    guarantor_object = GenericForeignKey('content_type', 'object_id')
+
+    guarantee_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
+                                        help_text="The maximum amount guaranteed by this guarantor, if specified.")
+    
+    class Meta:
+        app_label = 'leases'
+        db_table = 'guarantor'
+        verbose_name = _('guarantor')
+        verbose_name_plural = _('guarantors')
+        unique_together = ('content_type', 'object_id')
+
+    def __str__(self):
+        guarantor_name = self.guarantor_object.__str__() if self.guarantor_object else "N/A"
+        return f"Guarantor: {guarantor_name}"
 
 class LeaseTermination(BaseModel):
     lease = models.OneToOneField(Lease, on_delete=models.CASCADE, related_name='termination')

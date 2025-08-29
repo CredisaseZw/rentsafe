@@ -1,1 +1,1 @@
-from .models import Currency
+from .models import Currency, Payment, PaymentMethod
