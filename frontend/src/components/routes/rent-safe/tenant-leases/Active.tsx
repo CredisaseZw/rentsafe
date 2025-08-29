@@ -14,12 +14,12 @@ import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
 import type { PaginationData } from "@/interfaces"
 import { summarizeAddress } from "@/lib/utils"
-import type { ApiError, Lease } from "@/types"
 import { isAxiosError } from "axios"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import TerminateLeaseDialog from "./TerminateLeaseDialog"
 import SectionHeader from "@/components/general/SectionHeader"
+import type { Lease } from "@/types"
 
 
 function Active() {
@@ -38,8 +38,9 @@ function Active() {
 
   useEffect(()=>{
     if(isAxiosError(error)){
-      console.error(error.message);
-      toast.error("Failed to fetch active leases", { description: (error as ApiError)?.error || "Something went wrong" });
+      console.error(error);
+      const message = error.response?.data.detail ?? error.response?.data.detail  ?? "Something went wrong"
+      toast.error("Failed to fetch active leases", { description: message });
       return; 
     }
 

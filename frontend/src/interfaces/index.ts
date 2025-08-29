@@ -52,6 +52,7 @@ export interface Contact {
    id: number;
    full_contact: string;
 }
+
 export interface Profile {
    trading_status: string | null;
    trading_status_display: string | null;
@@ -207,18 +208,20 @@ export interface AddressLocation {
    cityName?: string;
    suburbName?: string;
 }
-
+export interface IndividualContact {
+      id ?: number;
+      individual_id ?: number;
+      mobile_phone?: string[];
+      email? : string;
+}
 export interface IndividualMinimal {
    id: number;
    first_name: string;
    last_name: string;
    identification_number: string;
-   contact_details?: {
-      id: number;
-      individual_id: number;
-      mobile_phone: string[];
-      email: string;
-   };
+   addresses? : Address,
+   search_value? : string,
+   contact_details?: IndividualContact
    is_active: boolean;
 }
 export interface IndividualFull {

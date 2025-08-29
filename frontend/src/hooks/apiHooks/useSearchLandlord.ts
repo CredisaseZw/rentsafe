@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 
 export default function useSearchLandlord(
-  type: "individual" | "company",
+  type: "individual" | "company" |string,
   query: string,
   enabled: boolean
 ) {

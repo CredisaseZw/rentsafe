@@ -15,13 +15,14 @@ import {
 import { TableBase } from "@/components/general/TableBase";
 import { TableCell, TableRow } from "@/components/ui/table";
 import EmptyResults from "@/components/general/EmptyResults";
-import type { ApiError, DashboardCardProp, FilterOption, Property } from "@/types";
+import type { ApiError, DashboardCardProp, Option, Property } from "@/types";
 import type{ PaginationData } from "@/interfaces";
 import usePropertyList from "@/hooks/components/usePropertyList";
 import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import DashboardCard from "@/components/general/DashboardCard";
+import { isAxiosError } from "axios";
 
 function PropertyList() {
    const {
@@ -33,7 +34,7 @@ function PropertyList() {
       paginationData,
       page, 
       search,
-      filterOptions,
+      Options,
       onClearSearch,
       onSearchValue,
       openModal,
@@ -46,9 +47,9 @@ function PropertyList() {
    const { error ,data, isLoading, refetch } = getPropertyList(page, search ,true);
   
    useEffect(() => {
-      if (error) {
-         console.error(error.message);
-         toast.error("Failed to fetch properties", { description: (error as ApiError)?.error || "Something went wrong" });
+      if (isAxiosError(error)) {
+         const message = error.response?.data.detail ?? error.response?.data.detail  ?? "Something went wrong"
+         toast.error("Failed to fetch properties", { description: message });
          setStatus({ loading: false, isError: true });
          return;
       }
@@ -95,17 +96,18 @@ function PropertyList() {
                </div>
                <div>
                   <div className="flex flex-row justify-end gap-3">
+                     <Button variant={"outline"}>Create Unit</Button>
                      <Button onClick={openModal} className="flex flex-row gap-3">
                         <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
                      </Button>
-                     <Select defaultValue={filterOptions.current[0].value}>
+                     <Select defaultValue={Options.current[0].value}>
                         <SelectTrigger className="w-[180px]">
                            <SelectValue placeholder="Filter" />
                         </SelectTrigger>
                         <SelectContent>
                            {
-                              filterOptions.current.map((filter:FilterOption, index:number) => (
+                              Options.current.map((filter:Option, index:number) => (
                                  <SelectItem key={index} value={filter.value}>{filter.label}</SelectItem>
                            ))
                            }

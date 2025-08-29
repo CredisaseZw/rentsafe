@@ -6,12 +6,11 @@ export default function useGetLeases(page:number, status: string, search: string
     const {data, isLoading, error, refetch}= useQuery<LeaseResponse>({
         queryKey :["leases", page, status],
         queryFn: async ()=>{
-             const URL = !search
+            const URL = !search
             ? `/api/leases/?status=${status === "ACTIVE" || status === "RENEW" ? "ACTIVE" : "TERMINATED"}&&page=${page}`
             : `/api/leases/search/?q=${search}&&status=${status}`;
             console.log(URL)
             const response = await api.get<LeaseResponse>(URL) 
-            console.log(response.data)
             return response.data
         }
     })    

@@ -15,7 +15,7 @@ import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
 import type { PaginationData } from "@/interfaces"
 import { summarizeAddress } from "@/lib/utils"
-import type { ApiError, Lease } from "@/types"
+import type { Lease } from "@/types"
 import { isAxiosError } from "axios"
 import { useEffect } from "react"
 import { toast } from "sonner"
@@ -37,8 +37,9 @@ function Terminated() {
 
   useEffect(()=>{
     if(isAxiosError(error)){
-      console.error(error.message);
-      toast.error("Failed to fetch leases", { description: (error as ApiError)?.error || "Something went wrong" });
+      console.error(error);
+      const message = error.response?.data.detail ?? error.response?.data.detail  ?? "Something went wrong"
+      toast.error("Failed to fetch leases", { description: message });
       return; 
     }
 

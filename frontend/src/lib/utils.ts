@@ -260,3 +260,34 @@ export function summarizeAddress(address: Address): string {
    .filter(Boolean)
    .join(", ");
 }
+export function getThreeMonthsBack(dateStr: string): string[] {
+  const baseDate = dateStr ? new Date(dateStr) : new Date(); 
+  const inputDay = baseDate.getDate() || 31;
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const result: string[] = [];
+
+  const currentMonth = baseDate.getMonth();
+  const currentYear = baseDate.getFullYear();
+
+  for (let i = 3; i >= 0; i--) {
+    let month = currentMonth - i;
+    let year = currentYear;
+
+    if (month < 0) {
+      month += 12;
+      year -= 1;
+    }
+
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    const day = Math.min(inputDay, lastDayOfMonth);
+
+    result.push(`${String(day).padStart(2, "0")}-${monthNames[month]}-${String(year).slice(-2)}`);
+  }
+
+  return result;
+}
+
+export function capitalizeFirstLetter(str : string) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

@@ -21,7 +21,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import useCreateProperty from "@/hooks/apiHooks/useCreateProperty";
 import { toast } from "sonner"
 import ButtonSpinner from "../general/ButtonSpinner";
-import type { ApiError, FilterOption } from "@/types";
+import type { ApiError, Option } from "@/types";
+import Fieldset from "../general/Fieldset";
 interface props{
   successCallback : ()=>void
 }
@@ -35,6 +36,8 @@ function AddPropertyForm({successCallback}:props) {
       securityOptions,
       parkingOptions,
       backupPowerOptions,
+      statusOptions,
+      onSelectValue,
       handleFeatureChange,
       handleAddProperty,
       setPropertyTypes,
@@ -73,8 +76,7 @@ function AddPropertyForm({successCallback}:props) {
               {
                 propertyTypes &&
                 propertyTypes.map((property_type)=>
-                  <SelectItem value={property_type.id.toString()} key={property_type.id}>{property_type.name}</SelectItem>
-              
+                  <SelectItem value={property_type.id && property_type.id.toString() || ""} key={property_type.id}>{property_type.name}</SelectItem>
                 )
               }
               { 
@@ -139,8 +141,11 @@ function AddPropertyForm({successCallback}:props) {
                 <SelectValue placeholder="Select ..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                {
+                  statusOptions.current.map((option:Option, index:number)=>(
+                    <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                  ))
+                }
               </SelectContent>
           </Select>
         </div>   
@@ -162,66 +167,65 @@ function AddPropertyForm({successCallback}:props) {
         </div>
       </div>
       <div>
-        <fieldset className="border-color relative w-full mb-5 rounded-xl border bg-white/50 p-5 dark:bg-transparent" >
-            <legend className="px-4 font-semibold text-zinc-800 dark:text-gray-50"> Features  </legend>
-            <div>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="parking">Parking</Label>
-                  <Select
-                    value={addPropertyForm.features.parking}
-                    onValueChange={(val) => handleFeatureChange("parking", val)}>
-                  <SelectTrigger id="parking" className="w-full">
-                      <SelectValue placeholder="Select parking type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {
-                        parkingOptions.current.map((option:FilterOption, index:number)=>(
-                          <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                        ))
-                      }
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="security">Security</Label>
-                  <Select
-                    value={addPropertyForm.features.security}
-                    onValueChange={(val) => handleFeatureChange("security", val)}
+        <Fieldset legendTitle="Features">
+          <div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="parking">Parking</Label>
+                <Select
+                  value={addPropertyForm.features.parking}
+                  onValueChange={(val) => handleFeatureChange("parking", val)}>
+                <SelectTrigger id="parking" className="w-full">
+                    <SelectValue placeholder="Select parking type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {
+                      parkingOptions.current.map((option:Option, index:number)=>(
+                        <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="security">Security</Label>
+                <Select
+                  value={addPropertyForm.features.security}
+                  onValueChange={(val) => handleFeatureChange("security", val)}
+                >
+                  <SelectTrigger id="security" className="w-full">
+                    <SelectValue placeholder="Select security level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {
+                      securityOptions.current.map((option:Option, index:number)=>(
+                        <SelectItem value= {option.value} key={index}>{option.label}</SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="backup_power">Backup Power</Label>
+                <Select
+                  value={addPropertyForm.features.backup_power}
+                  onValueChange={(val) => handleFeatureChange("backup_power", val)}
                   >
-                    <SelectTrigger id="security" className="w-full">
-                      <SelectValue placeholder="Select security level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {
-                        securityOptions.current.map((option:FilterOption, index:number)=>(
-                          <SelectItem value= {option.value} key={index}>{option.label}</SelectItem>
-                        ))
-                      }
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="backup_power">Backup Power</Label>
-                  <Select
-                    value={addPropertyForm.features.backup_power}
-                    onValueChange={(val) => handleFeatureChange("backup_power", val)}
-                    >
-                    <SelectTrigger id="backup_power" className="w-full">
-                      <SelectValue placeholder="Select power backup" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {
-                        backupPowerOptions.current.map((option: FilterOption, index: number)=> (
-                          <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                        ))
-                      }
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <SelectTrigger id="backup_power" className="w-full">
+                    <SelectValue placeholder="Select power backup" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {
+                      backupPowerOptions.current.map((option: Option, index: number)=> (
+                        <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </fieldset>
+          </div>
+        </Fieldset>
       </div>
       <div>
         <MultiAddressInput isMultiple = {false}/>
@@ -255,9 +259,9 @@ function AddPropertyForm({successCallback}:props) {
          <AutoCompleteLandlord
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
-            setAddPropertyForm = {setAddPropertyForm}
+            landlord_type = {addPropertyForm.landlord_type}
             landlordIdentifier= {landlordIdentifier}
-            addPropertyForm={addPropertyForm}
+            onSelectValue = {onSelectValue}
          />
         <div className="form-group">
           <label className="required">Landlord Name</label>

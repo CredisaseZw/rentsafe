@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import type { AddPropertyForm, DashboardCardProp, FilterOption, Header, Property } from "@/types";
-import type { PaginationData } from "@/interfaces";
+import type { AddPropertyForm, DashboardCardProp, Option, Header, Property, PropertyType } from "@/types";
+import type { CompanyMinimal, IndividualMinimal, PaginationData } from "@/interfaces";
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
 import type { UseMutationResult } from "@tanstack/react-query";
@@ -51,31 +51,35 @@ function usePropertyList() {
       ]
    );
    
-   const parkingOptions = useRef<FilterOption[]>([
+   const parkingOptions = useRef<Option[]>([
       { label: "Underground", value: "underground" },
       { label: "Open", value: "open" },
       { label: "Street", value: "street" },
    ])
-   const securityOptions = useRef<FilterOption[]>([
+   const securityOptions = useRef<Option[]>([
       { label: "24/7", value: "24/7" },
       { label: "Daytime", value: "daytime" },
       { label: "None", value: "none" },
    ])
-   const backupPowerOptions = useRef<FilterOption[]>([
+   const backupPowerOptions = useRef<Option[]>([
       { label: "Generator", value: "generator" },
       { label: "Solar", value: "solar" },
       { label: "None", value: "none" },
    ])
-   const filterOptions = useRef<FilterOption[]>([
+   const Options = useRef<Option[]>([
       { label: "Default", value: "default" },
       { label: "Occupied", value: "occupied" },
       { label: "Vacant", value: "vacant" },
    ]);
+   const statusOptions = useRef<Option[]>([
+      {label : "Active", value : "active"},
+      {label : "In-active", value : "inactive"}
+   ])
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
    const [searchItem, setSearchItem] = useState("");
-   const [propertyTypes, setPropertyTypes] = useState<Property[] | null>(null)
+   const [propertyTypes, setPropertyTypes] = useState<PropertyType[] | null>(null)
    const [loading, setLoading] = useState(false);
    const [searchParams, setSearchParams] = useSearchParams();
    const page = parseInt(searchParams.get("page") || "1");
@@ -119,7 +123,7 @@ function usePropertyList() {
       [name]: value,
    }));
    };
-   const onSelectFilter = (filterOption: string) => setSelectFilter(filterOption);
+   const onSelectFilter = (Option: string) => setSelectFilter(Option);
    const onSearchValue = (searchValue: string) => {
       setSearchParams((prev) => {
          const params = new URLSearchParams(prev);
@@ -204,7 +208,23 @@ function usePropertyList() {
       toast.error("Failed to create property. Internal Error.");
       }
      };
-   
+      
+      const onSelectValue = (item: IndividualMinimal | CompanyMinimal)=>{
+         if ("first_name" in item) {
+            setAddPropertyForm((prev) => ({
+            ...prev,
+            landlord_id: item.identification_number,
+            landlord_name: `${item.first_name} ${item.last_name}`,
+            }));
+            return;
+         }
+
+         setAddPropertyForm((prev) => ({
+            ...prev,
+            landlord_id: item.registration_number,
+            landlord_name: item.registration_name,
+         }));
+      }
    return {
       headers,
       properties,
@@ -213,7 +233,7 @@ function usePropertyList() {
       addPropertyModal,
       status,
       addPropertyForm,
-      filterOptions,
+      Options,
       selectedFilter,
       landlordIdentifier,
       searchItem,
@@ -224,6 +244,8 @@ function usePropertyList() {
       securityOptions,
       parkingOptions,
       backupPowerOptions,
+      statusOptions,
+      onSelectValue,
       handleAddProperty,
       handleFeatureChange,
       setSummaryCards,

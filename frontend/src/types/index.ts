@@ -15,7 +15,7 @@ export type NavLink = {
    pageComponent?: React.FC;
 };
 
-export type FilterOption = {
+export type Option = {
    label: string;
    value: string;
 };
@@ -162,7 +162,7 @@ export type PropertyTypeResponse = {
    count: number;
    next: string | null;
    previous: string | null;
-   results : Property[]
+   results : PropertyType[]
 }
 export interface Features {
   parking: string;
@@ -197,6 +197,11 @@ export interface Property {
   addresses_input?: AddressInput;
   landlords_input?: LandlordInput[];
   full_address?: Address[]
+}
+export interface PropertyType {
+   id: number,
+   name: string,
+   description: string
 }
 
 export type AddPropertyForm = {
@@ -239,7 +244,6 @@ export interface Tenant {
   };
   is_primary_tenant: boolean;
 }
-
 export interface Landlord {
   id: number;
   landlord_name: string;
@@ -265,3 +269,4 @@ export interface LeaseResponse {
    previous: string | null;
    results: Lease[]
 }
+
