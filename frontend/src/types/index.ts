@@ -16,9 +16,6 @@ export type NavLink = {
 };
 
 export type Option = {
-   label: string;
-   value: string;
-};
 
 export type DashboardCardProp = {
    value: string  | number | React.ReactElement;

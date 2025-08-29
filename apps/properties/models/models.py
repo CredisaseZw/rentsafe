@@ -68,17 +68,17 @@ class Unit(BaseModelWithUser):
         ('maintenance', 'Under Maintenance'),
     )
     UNIT_TYPE_CHOICES = (
-        ('APARTMENT', _('Apartment')),
-        ('HOUSE', _('House')),
-        ('OFFICE', _('Office')),
-        ('RETAIL', _('Retail Space')),
-        ('WAREHOUSE', _('Warehouse')),
-        ('OTHER', _('Other')),
+        ('apartment', _('Apartment')),
+        ('house', _('House')),
+        ('office', _('Office')),
+        ('retail', _('Retail Space')),
+        ('warehouse', _('Warehouse')),
+        ('other', _('Other')),
     )
     
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='units')
     unit_number = models.CharField(max_length=50,default=0)
-    unit_type = models.CharField(max_length=100,choices=UNIT_TYPE_CHOICES,default='OTHER')
+    unit_type = models.CharField(max_length=100,choices=UNIT_TYPE_CHOICES,default='other')
     number_of_rooms = models.PositiveIntegerField(help_text="Number of rooms in the unit",default=0)
     status = models.CharField(max_length=20, choices=UNIT_STATUS_CHOICES, default='vacant')
     features = models.JSONField(blank=True, null=True, help_text="Additional features of the unit")
