@@ -347,3 +347,24 @@ class CompanyBranchDetailSerializer(serializers.ModelSerializer):
             return CompanyProfileSerializer(obj.company.profile).data
         except CompanyProfile.DoesNotExist:
             return None
+
+
+class CompanyBranchLeaseDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for full branch data"""
+    company = CompanyMinimalSerializer(read_only=True)
+    contacts = MinimalContactPersonSerializer(many=True, read_only=True)
+    primary_address = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CompanyBranch
+        fields = [
+            'id', 'branch_name', 'is_headquarters',
+            'company', 'contacts', 'primary_address',
+        ]
+    
+    def get_primary_address(self, obj):
+        """Get the primary address for this branch"""
+        primary_address = obj.addresses.filter(
+            address_type='physical', 
+        ).first()
+        return AddressSerializer(primary_address).data if primary_address else None
