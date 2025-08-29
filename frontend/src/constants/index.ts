@@ -1,5 +1,5 @@
-import type { AddressType, CompanyLegalStatus, Route } from "@/types";
-import type { IndividualMinimal, Service } from "@/interfaces";
+import type { AddressType, CompanyLegalStatus, Route, TenantSelection } from "@/types";
+import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
 
@@ -97,11 +97,11 @@ export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
   rose:    { bg: "bg-rose-200", text: "text-rose-800" },
 };
 
-export const MINIMAL_INDIVIDUAL_OBJECT: IndividualMinimal = {
+export const MINIMAL_TENANT_OBJECT: TenantSelection = {
    id : 0,
    search_value : "",
-   first_name : "",
-   last_name : "",
+   full_name : "",
    identification_number : "", 
-   is_active : true
+   mobile_number : "",
+   address : null
 }

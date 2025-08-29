@@ -37,7 +37,7 @@ function ForRenewal() {
 
   useEffect(()=>{
     if(isAxiosError(error)){
-      const message = error.response?.data.detail ?? error.response?.data.detail  ?? "Something went wrong"
+      const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
       toast.error("Failed to fetch leases", { description: message});
       return; 
     }

@@ -38,7 +38,7 @@ function Terminated() {
   useEffect(()=>{
     if(isAxiosError(error)){
       console.error(error);
-      const message = error.response?.data.detail ?? error.response?.data.detail  ?? "Something went wrong"
+      const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
       toast.error("Failed to fetch leases", { description: message });
       return; 
     }

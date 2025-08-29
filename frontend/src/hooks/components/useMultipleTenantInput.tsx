@@ -1,10 +1,12 @@
-import { MINIMAL_INDIVIDUAL_OBJECT } from "@/constants";
-import type { IndividualMinimal } from "@/interfaces";
+import { MINIMAL_TENANT_OBJECT } from "@/constants";
+import type { BranchFull, IndividualMinimal, IndividualTenantContact } from "@/interfaces";
+import { extractTenantBranchContact } from "@/lib/utils";
+import type { TenantSelection } from "@/types";
 import { useState } from "react"
 
 export default function useMultiTenantInput(){
-    const [tenants, setTenants] = useState<IndividualMinimal[]>([MINIMAL_INDIVIDUAL_OBJECT])
-    const addTenant = () => setTenants((p)=>[...p, MINIMAL_INDIVIDUAL_OBJECT])
+    const [tenants, setTenants] = useState<TenantSelection[]>([MINIMAL_TENANT_OBJECT])
+    const addTenant = () => setTenants((p)=>[...p, MINIMAL_TENANT_OBJECT])
 
     const removeTenant = (index: number) => setTenants(p => p.filter((_, i) => i !== index));
 
@@ -24,18 +26,54 @@ export default function useMultiTenantInput(){
             i === index
                 ? {
                     ...tenant,
-                    contact_details: {
-                    ...(tenant.contact_details ?? {}),
-                    mobile_phone: value,
-                    },
+                    mobile_number: value,
                 }
                 : tenant
             )
         );
     };
 
+   const onSelectTenant = (selectedTenant: IndividualMinimal | BranchFull, index :number | undefined) =>{
+        
+    if ("first_name" in selectedTenant){
+        setTenants((prev) =>
+            prev.map((tenant, i) =>
+                i === index
+                    ? {
+                        ...tenant,
+                        id : selectedTenant.id,
+                        full_name : `${selectedTenant.first_name} ${selectedTenant.last_name}`,
+                        identification_number : selectedTenant.identification_number,
+                        mobile_number: Array.isArray(selectedTenant.contact_details?.mobile_phone)
+                        ? selectedTenant.contact_details?.mobile_phone?.[0] ?? ""
+                        : (selectedTenant.contact_details?.mobile_phone as IndividualTenantContact)?.mobile_phone ?? "",
+                        address : selectedTenant.primary_address ?? null
+                    }   
+                    : tenant
+                )
+        );
+        return
+    }
+    setTenants((prev) =>
+        prev.map((tenant, i) =>
+            i === index
+                ? {
+                    ...tenant,
+                    id : selectedTenant.id,
+                    full_name : selectedTenant.branch_name,
+                    identification_number : selectedTenant.company.registration_number,
+                    mobile_number: extractTenantBranchContact(selectedTenant.contacts)
+                }   
+                : tenant
+            )
+        );
+
+        
+   }
+
     return{
         tenants,
+        onSelectTenant,
         updateTenant,
         updateMobile,
         addTenant,

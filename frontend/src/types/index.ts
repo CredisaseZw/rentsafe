@@ -16,7 +16,9 @@ export type NavLink = {
 };
 
 export type Option = {
-
+   label : string,
+   value :string
+}
 export type DashboardCardProp = {
    value: string  | number | React.ReactElement;
    subTitle: number | string | React.ReactElement;
@@ -230,15 +232,21 @@ export interface Lease {
   risk_level_class: "LOW" | "MEDIUM" | "HIGH"; 
   owing: number;
 }
+export interface TenantMinimal {
+   id: number;
+   full_name: string;
+   identification_number: string;
+}
 
+export type TenantSelection = TenantMinimal &{
+   search_value: string,
+   mobile_number: string,
+   address : Address | null
+}
 export interface Tenant {
   id: number;
   lease: number;
-  tenant_object: {
-    id: number;
-    full_name: string;
-    identification_number: string;
-  };
+  tenant_object: TenantMinimal;
   is_primary_tenant: boolean;
 }
 export interface Landlord {
@@ -266,4 +274,3 @@ export interface LeaseResponse {
    previous: string | null;
    results: Lease[]
 }
-

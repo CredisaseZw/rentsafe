@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import useSearchLandlord from "@/hooks/apiHooks/useSearchLandlord";
 import { Loader2 } from "lucide-react";
-import type { CompanyMinimal, IndividualMinimal } from "@/interfaces";
+import type { BranchFull, IndividualMinimal } from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
+import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 
 interface Props {
   index? : number;
-  landlordIdentifier: string;
+  clientLabel: string;
   searchItem : string,
-  landlord_type : string,
-  onSelectValue? : (item: IndividualMinimal | CompanyMinimal) => void;
+  clientType : string,
+  onSelectValue? : (item: IndividualMinimal | BranchFull, index? : number) => void;
   setSearchItem? : Dispatch<SetStateAction<string>>;
   multiSetSearchItem? : (index: number, key:string, value: string) => void;
 }
 
-function AutoCompleteLandlord({ index, landlordIdentifier, landlord_type, onSelectValue, searchItem, setSearchItem, multiSetSearchItem }: Props) {
+function AutoCompleteClient({ index, clientLabel, clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
 
@@ -24,18 +24,19 @@ function AutoCompleteLandlord({ index, landlordIdentifier, landlord_type, onSele
     return () => clearTimeout(handler);
   }, [searchItem]);
 
-  const { data, isLoading } = useSearchLandlord(
-    landlord_type,
+  const { data, isLoading } = useSearchClient(
+    clientType,
     debouncedSearch,
     !!debouncedSearch 
   );
 
   return (
     <div className="form-group relative">
-      <label className="required">{landlordIdentifier}</label>
+      <label className="required">{clientLabel}</label>
       <Input
         type="text"
         required
+        name = "search_client"
         autoComplete="off"
         onChange={(e) => {
           const { value } = e.target;
@@ -45,7 +46,6 @@ function AutoCompleteLandlord({ index, landlordIdentifier, landlord_type, onSele
         }}
         value={searchItem}
         onBlur={() => setTimeout(() => setOpen(false), 100)}
-        name="landlord_id"
       />
 
       {open && (
@@ -55,12 +55,18 @@ function AutoCompleteLandlord({ index, landlordIdentifier, landlord_type, onSele
               <Loader2 className="text-foreground/60 animate-spin" />
             </div>
           ) : !data?.length ? (
-            <div className="p-2 text-gray-800">No results found</div>
+            <div className="p-2 text-gray-800 ">
+              No results found
+            </div>
           ) : (
-           data.slice(0, 7).map((item: IndividualMinimal | CompanyMinimal) => {
-              const fullname = "first_name" in item 
+           data.map((item: IndividualMinimal | BranchFull) => {
+              const clientName = "first_name" in item 
                 ? `${item.first_name} ${item.last_name}` 
-                : item.registration_name; 
+                : item.company.registration_name; 
+
+                const identificationNumber  = "first_name" in item ?
+                item.identification_number:
+                item.company.registration_number
 
               return (
                 <button
@@ -69,12 +75,13 @@ function AutoCompleteLandlord({ index, landlordIdentifier, landlord_type, onSele
                   className="border-color w-full border-b px-2 py-3 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
-                    if (onSelectValue) onSelectValue(item);
-                    if (setSearchItem) setSearchItem(fullname); 
-                    if (multiSetSearchItem) multiSetSearchItem(index ?? 0, "search_value", fullname,);
+                    if (onSelectValue) onSelectValue(item, index ?? 0);
+                    if (setSearchItem) setSearchItem(clientType === "individual" ? (identificationNumber || "") : clientName); 
+                    if (multiSetSearchItem) multiSetSearchItem(index ?? 0, "search_value", identificationNumber);
+                    setOpen(false)
                   }}
                 >
-                  {fullname}
+                  {clientName}
                 </button>
               );
             })                    
@@ -85,4 +92,4 @@ function AutoCompleteLandlord({ index, landlordIdentifier, landlord_type, onSele
   );
 }
 
-export default AutoCompleteLandlord;
+export default AutoCompleteClient;

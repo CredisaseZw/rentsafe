@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import type { AddPropertyForm, DashboardCardProp, Option, Header, Property, PropertyType } from "@/types";
-import type { CompanyMinimal, IndividualMinimal, PaginationData } from "@/interfaces";
+import type { BranchFull, IndividualMinimal, PaginationData } from "@/interfaces";
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
 import type { UseMutationResult } from "@tanstack/react-query";
@@ -209,7 +209,7 @@ function usePropertyList() {
       }
      };
       
-      const onSelectValue = (item: IndividualMinimal | CompanyMinimal)=>{
+      const onSelectValue = (item: IndividualMinimal | BranchFull)=>{
          if ("first_name" in item) {
             setAddPropertyForm((prev) => ({
             ...prev,
@@ -221,8 +221,8 @@ function usePropertyList() {
 
          setAddPropertyForm((prev) => ({
             ...prev,
-            landlord_id: item.registration_number,
-            landlord_name: item.registration_name,
+            landlord_id: item.company.registration_number,
+            landlord_name: item.company.registration_name,
          }));
       }
    return {

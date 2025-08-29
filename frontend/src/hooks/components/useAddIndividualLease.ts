@@ -1,4 +1,4 @@
-import type { Address, CompanyMinimal, IndividualMinimal } from "@/interfaces";
+import type { Address, BranchFull, IndividualMinimal } from "@/interfaces";
 import { getThreeMonthsBack } from "@/lib/utils";
 import type { Header, Option, Property, PropertyType } from "@/types";
 import { useEffect, useState } from "react"
@@ -73,17 +73,9 @@ function useAddIndividualLease() {
     }));
   };
 
-  const onSelectLeaseNameValue = (item : IndividualMinimal | CompanyMinimal) => {
-      if ("first_name" in item) {
-        setFormData((p)=> ({...p, 
-          tenant_id: item.id,
-          tenant_name: `${item.first_name} ${item.last_name}`,
-          //tenant_mobile : item.contact_details?.mobile_phone?[0] || ""
-        }))
-      }
-  }
+
   
-  const onSelectLandlord = (item: IndividualMinimal | CompanyMinimal)=>{
+  const onSelectLandlord = (item: IndividualMinimal | BranchFull)=>{
     if ("first_name" in item) {
       setFormData((prev) => ({
       ...prev,
@@ -94,8 +86,8 @@ function useAddIndividualLease() {
     }
     setFormData((prev) => ({
       ...prev,
-      landlord_id: item.registration_number,
-      landlord_name: item.registration_name,
+      landlord_id: item.company.registration_number,
+      landlord_name: item.company.registration_name,
     }));
     return
   }
@@ -122,7 +114,6 @@ function useAddIndividualLease() {
     onSelectProperty,
     setPropertyTypes,
     setPropertyName,
-    onSelectLeaseNameValue,
     onSelectLandlord,
     setLandlordIdentifier,
     setSearchItem,

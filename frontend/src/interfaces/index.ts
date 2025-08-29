@@ -6,7 +6,10 @@ export interface Service {
    icon: LucideIcon;
    href: string;
 }
-
+export interface IndividualTenantContact  {
+   mobile_phone: string,
+   email :  string
+}
 export interface CompanyMinimal {
    id: number;
    registration_number: string;
@@ -175,7 +178,18 @@ export interface CompanyReport {
       address: string;
    };
 }
-
+export interface BranchContact {
+   id: number;
+   full_contact: string;
+}
+export interface BranchFull {
+   id: number;
+   branch_name: string;
+   is_headquarters: boolean;
+   company: CompanyMinimal;
+   contacts: BranchContact[];
+   primary_address: Address ;
+}
 export interface IndividualReport {
    employmentHistory: { employer: string; position: string; startDate: string }[];
    claims: { claimant: string; type: string; currency: string; amount: number; dateOfClaim: string }[];
@@ -211,7 +225,7 @@ export interface AddressLocation {
 export interface IndividualContact {
       id ?: number;
       individual_id ?: number;
-      mobile_phone?: string[];
+      mobile_phone?: string[] | IndividualTenantContact;
       email? : string;
 }
 export interface IndividualMinimal {
@@ -220,6 +234,7 @@ export interface IndividualMinimal {
    last_name: string;
    identification_number: string;
    addresses? : Address,
+   primary_address? :Address,
    search_value? : string,
    contact_details?: IndividualContact
    is_active: boolean;

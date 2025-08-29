@@ -15,7 +15,7 @@ import {
 import { TableBase } from "@/components/general/TableBase";
 import { TableCell, TableRow } from "@/components/ui/table";
 import EmptyResults from "@/components/general/EmptyResults";
-import type { ApiError, DashboardCardProp, Option, Property } from "@/types";
+import type { DashboardCardProp, Option, Property } from "@/types";
 import type{ PaginationData } from "@/interfaces";
 import usePropertyList from "@/hooks/components/usePropertyList";
 import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
@@ -48,7 +48,7 @@ function PropertyList() {
   
    useEffect(() => {
       if (isAxiosError(error)) {
-         const message = error.response?.data.detail ?? error.response?.data.detail  ?? "Something went wrong"
+         const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
          toast.error("Failed to fetch properties", { description: message });
          setStatus({ loading: false, isError: true });
          return;

@@ -1,5 +1,5 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
-import type { Address } from "@/interfaces";
+import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
 import type { NavLink, Route } from "@/types";
 import { clsx, type ClassValue } from "clsx";
@@ -291,3 +291,11 @@ export function capitalizeFirstLetter(str : string) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function extractTenantBranchContact(contacts : BranchContact[]){
+   return contacts
+      .map(c => c.full_contact.split(" - ").pop() ?? "")
+      .filter(num => num !== "")
+      .join(", ");
+}
+

@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import React, { useEffect } from "react";
-import AutoCompleteLandlord from "../general/AutoCompleteLandlord";
 import MultiAddressInput from "../general/MultiAddressInput";
 import getPropertyTypes from "@/hooks/apiHooks/useGetPropertyTypes";
 import LoadingIndicator from "../general/LoadingIndicator";
@@ -23,6 +22,7 @@ import { toast } from "sonner"
 import ButtonSpinner from "../general/ButtonSpinner";
 import type { ApiError, Option } from "@/types";
 import Fieldset from "../general/Fieldset";
+import AutoCompleteClient from "../general/AutoCompleteClient";
 interface props{
   successCallback : ()=>void
 }
@@ -256,11 +256,11 @@ function AddPropertyForm({successCallback}:props) {
               </SelectContent>
           </Select>
         </div>
-         <AutoCompleteLandlord
+         <AutoCompleteClient
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
-            landlord_type = {addPropertyForm.landlord_type}
-            landlordIdentifier= {landlordIdentifier}
+            clientType = {addPropertyForm.landlord_type}
+            clientLabel= {landlordIdentifier}
             onSelectValue = {onSelectValue}
          />
         <div className="form-group">

@@ -14,7 +14,6 @@ import { TableCell, TableRow } from "../ui/table";
 import { Checkbox } from "../ui/checkbox";
 import Button from "@/components/general/Button";
 import useAddIndividualLease from "@/hooks/components/useAddIndividualLease";
-import AutoCompleteLandlord from "../general/AutoCompleteLandlord";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteProperty from "../general/AutoCompleteProperty";
 import { useEffect } from "react";
@@ -24,8 +23,13 @@ import type { ApiError, Option } from "@/types";
 import LoadingIndicator from "../general/LoadingIndicator";
 import { Plus } from "lucide-react";
 import MultipleTenantInput from "../general/MultipleTenantInput";
+import AutoCompleteClient from "../general/AutoCompleteClient";
 
-function AddLeaseForm() {
+interface props {
+  clientType : string
+}
+
+function AddLeaseForm({clientType} :props) {
   const {
     formData,
     headers,
@@ -61,7 +65,7 @@ function AddLeaseForm() {
   return (
     <form className="w-full">
       <div className="mt-5">
-        <MultipleTenantInput/>
+        <MultipleTenantInput clientType = {clientType}/>
       </div>
       <div className="mt-5">
         <Fieldset legendTitle = {"Unit Details"}>
@@ -363,11 +367,11 @@ function AddLeaseForm() {
               </SelectContent>
           </Select>
         </div>
-         <AutoCompleteLandlord
+         <AutoCompleteClient
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
-            landlord_type = {formData.landlord_type}
-            landlordIdentifier= {landlordIdentifier}
+            clientType = {formData.landlord_type}
+            clientLabel= {landlordIdentifier}
             onSelectValue = {onSelectLandlord}
          />
         <div className="form-group">
