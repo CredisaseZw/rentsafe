@@ -383,8 +383,9 @@ class IndividualAddressSerializer(serializers.ModelSerializer):
     def get_contact_details(self, obj):
         contact = obj.contact_details.order_by('-id').first()
         if contact:
+            mobile_phones = contact.mobile_phone[-2:] if len(contact.mobile_phone) > 1 else [contact.mobile_phone[-1]] if contact.mobile_phone else []
             return {
-                'mobile_phone': contact.mobile_phone[-1] if contact.mobile_phone else None,
+                'mobile_phone': mobile_phones,
                 'email': contact.email
             }
         return None
