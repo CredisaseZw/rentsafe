@@ -9,12 +9,15 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.core.exceptions import ValidationError
+from apps.clients.models.models import Client
 from apps.common.models.base_models import BaseModel
 from apps.accounting.models.models import Currency, PaymentMethod
 
 class Services(BaseModel): 
     service_name = models.CharField(max_length=55, unique=True,
                                     help_text=_("The name of the service provided."))
+    code = models.CharField(max_length=15, null=True, blank=True, unique=True,
+                            help_text=_("Short code for the product)."))
     class Meta:
         app_label = 'subscriptions'
         db_table = "services"
@@ -29,6 +32,7 @@ class SubscriptionPeriod(BaseModel):
                             help_text=_("Descriptive name of the subscription period (e.g., 'Monthly', 'Annual')."))
     code = models.CharField(max_length=255, null=True, blank=True, unique=True,
                             help_text=_("Short code for the period (e.g., 'M', 'A')."))
+    
     period_length_days = models.IntegerField(
         null=True, blank=True,
         help_text=_("The duration of this subscription period in days (e.g., 30, 365).")
@@ -46,6 +50,17 @@ class SubscriptionPeriod(BaseModel):
 
     def __str__(self) -> str:
         return self.name
+    
+    def duration(self):
+        if self.period_length_months and not self.period_length_days:
+            return self.period_length_months * 30 
+        elif self.period_length_days and not self.period_length_months:
+            return self.period_length_days / 30
+        return 0
+
+    def save(self,*args,**kwargs):
+        self.duration()
+        return super().save(*args,**kwargs)
 
 class Subscription(BaseModel):
     SUB_CLASS_CHOICES = [
@@ -53,16 +68,8 @@ class Subscription(BaseModel):
         ("COMPANY", "Company"),
         ("COMBINED", "Combined"),
     ]
-    
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
-                                    limit_choices_to=Q(app_label='individuals', model='individual') |
-                                    Q(app_label='companies', model='companybranch'),
-                                    related_name='subscriptions',
-                                    help_text=_("The type of entity subscribing (Individual or Company)."))
-    object_id = models.PositiveIntegerField(
-        help_text=_("The ID of the subscribing entity (Individual or Company)."))
-    subscriber_object = GenericForeignKey('content_type', 'object_id')
 
+    client = models.ForeignKey(Client, on_delete=models.PROTECT, related_name='subscriptions')
     service = models.ForeignKey(Services, on_delete=models.PROTECT, related_name='subscriptions',
                                 help_text=_("The service provided by this subscription (e.g., RentSafe)."))
     
@@ -99,19 +106,22 @@ class Subscription(BaseModel):
         db_table = "subscriptions"
         verbose_name = _('subscription')
         verbose_name_plural = _('subscriptions')
-        ordering = ['-start_date']
+        ordering = ['-date_created']
         constraints = [
             models.CheckConstraint(check=models.Q(used_slots__lte=models.F('total_slots')), name='used_lte_total_slots')
         ]
 
     def __str__(self) -> str:
-        subscriber_name = str(self.subscriber_object) if self.subscriber_object else "N/A Subscriber"
+        subscriber_name = str(self.client) if self.client else "N/A Subscriber"
         return f"Subscription {self.pk} for {subscriber_name} ({self.service.service_name})"
 
     @property
     def has_available_slots(self):
         """Checks if there are any available slots remaining on this subscription."""
         return self.used_slots < self.total_slots
+    @property
+    def status(self):
+        return "active" if self.is_activated else "inactive"
 
     def calculate_end_date(self):
         """

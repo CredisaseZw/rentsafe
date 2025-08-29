@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from accounting.models.models import *
+from apps.accounting.models.models import *
 from decimal import Decimal, ROUND_HALF_UP 
-from rentsafe.models import CompanyProfile, Individual, Company 
-
+from apps.companies.models.models import CompanyProfile, Company 
+from apps.individuals.models.models import Individual
 class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
