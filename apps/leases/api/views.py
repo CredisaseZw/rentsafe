@@ -10,7 +10,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseTermination, Guarantor
-from apps.leases.models.landlord import Landlord
+from apps.accounting.models import Payment
 from decimal import Decimal
 from apps.leases.api.serializers import (
     LeaseCreateUpdateSerializer,
@@ -19,7 +19,8 @@ from apps.leases.api.serializers import (
     LeaseTerminationSerializer,
     LeaseListSerializer,
     LandlordSerializer,
-    GuarantorSerializer
+    GuarantorSerializer,
+    PaymentSerializer
 )
 from apps.common.utils import extract_error_message
 from apps.individuals.models import Individual
