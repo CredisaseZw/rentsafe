@@ -365,14 +365,14 @@ class IndividualSearchSerializer(serializers.ModelSerializer):
 
 class IndividualAddressSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
-    addresses = serializers.SerializerMethodField()
+    primary_address = serializers.SerializerMethodField()
 
     class Meta:
         model = Individual
-        fields = ['id', 'first_name', 'last_name', 'identification_number',
-                  'contact_details','addresses', 'is_active']
+        fields = ['id', 'first_name', 'last_name', 'identification_type','identification_number',
+                  'contact_details','primary_address', 'is_active']
 
-    def get_addresses(self, obj):
+    def get_primary_address(self, obj):
         if primary_address := obj.addresses.filter(is_primary=True, address_type="physical").first():
             return AddressSerializer(primary_address).data
         # fallback: return first address if no primary, physical is set
@@ -383,7 +383,7 @@ class IndividualAddressSerializer(serializers.ModelSerializer):
     def get_contact_details(self, obj):
         contact = obj.contact_details.order_by('-id').first()
         if contact:
-            mobile_phones = contact.mobile_phone[-2:] if len(contact.mobile_phone) > 1 else [contact.mobile_phone[-1]] if contact.mobile_phone else []
+            mobile_phones = contact.mobile_phone[0] if contact.mobile_phone else None
             return {
                 'mobile_phone': mobile_phones,
                 'email': contact.email
