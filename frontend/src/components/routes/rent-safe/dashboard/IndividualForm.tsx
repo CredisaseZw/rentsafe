@@ -32,14 +32,14 @@ export default function diviIndividualForm() {
                      <Label className="px-2 font-normal" htmlFor="lastName">
                         Last Name <span className="text-PRIMARY">*</span>
                      </Label>
-                     <Input id="lastName" name="lastName" required className="border-foreground/40 bg-white" />
+                     <Input id="lastName" name="lastName" required className="border-color bg-white" />
                   </div>
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="firstName">
                         First Name <span className="text-PRIMARY">*</span>
                      </Label>
-                     <Input id="firstName" name="firstName" required className="border-foreground/40 bg-white" />
+                     <Input id="firstName" name="firstName" required className="border-color bg-white" />
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -47,7 +47,7 @@ export default function diviIndividualForm() {
                         Identification Type <span className="text-PRIMARY">*</span>
                      </Label>
                      <Select name="identificationType" required>
-                        <SelectTrigger id="identificationType" className="border-foreground/40 w-full bg-white">
+                        <SelectTrigger id="identificationType" className="border-color w-full bg-white">
                            <SelectValue placeholder="Identification type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -65,7 +65,7 @@ export default function diviIndividualForm() {
                         id="identificationNumber"
                         name="identificationNumber"
                         required
-                        className="border-foreground/40 bg-white"
+                        className="border-color bg-white"
                      />
                   </div>
 
@@ -74,7 +74,7 @@ export default function diviIndividualForm() {
                         Gender <span className="text-PRIMARY">*</span>
                      </Label>
                      <Select name="gender" required>
-                        <SelectTrigger id="gender" className="border-foreground/40 w-full bg-white">
+                        <SelectTrigger id="gender" className="border-color w-full bg-white">
                            <SelectValue placeholder="Gender" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-zinc-900">
@@ -94,7 +94,7 @@ export default function diviIndividualForm() {
                         name="dateOfBirth"
                         required
                         type="date"
-                        className="border-foreground/40 bg-white"
+                        className="border-color bg-white"
                      />
                   </div>
 
@@ -103,7 +103,7 @@ export default function diviIndividualForm() {
                         Marital Status <span className="text-PRIMARY">*</span>
                      </Label>
                      <Select name="maritalStatus" required>
-                        <SelectTrigger id="maritalStatus" className="border-foreground/40 w-full bg-white">
+                        <SelectTrigger id="maritalStatus" className="border-color w-full bg-white">
                            <SelectValue placeholder="Marital Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -123,7 +123,7 @@ export default function diviIndividualForm() {
                         name="mobilePhone"
                         required
                         placeholder="e.g. +263 712 345678"
-                        className="border-foreground/40 bg-white"
+                        className="border-color bg-white"
                      />
                   </div>
 
@@ -136,7 +136,7 @@ export default function diviIndividualForm() {
                         name="email"
                         type="email"
                         placeholder="e.g. info@company.com"
-                        className="border-foreground/40 bg-white"
+                        className="border-color bg-white"
                      />
                   </div>
 
@@ -159,7 +159,7 @@ export default function diviIndividualForm() {
                                  id="employerName"
                                  name="employerName"
                                  placeholder="e.g. ABC Corp"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -171,7 +171,7 @@ export default function diviIndividualForm() {
                                  id="jobTitle"
                                  name="jobTitle"
                                  placeholder="e.g. Software Engineer"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -184,7 +184,7 @@ export default function diviIndividualForm() {
                                  name="startDate"
                                  type="date"
                                  max={new Date().toISOString().split("T")[0]}
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -196,7 +196,7 @@ export default function diviIndividualForm() {
                                  id="endDate"
                                  name="endDate"
                                  type="date"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -208,7 +208,7 @@ export default function diviIndividualForm() {
                                  id="employerEmail"
                                  name="employerEmail"
                                  type="email"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -220,7 +220,7 @@ export default function diviIndividualForm() {
                                  id="monthlyIncome"
                                  name="monthlyIncome"
                                  type="number"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
                         </div>

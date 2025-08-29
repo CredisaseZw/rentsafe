@@ -11,3 +11,4 @@ export default function useIndividual(individualId: number, enabled?: boolean) {
 
    return { error, individual: data, isLoading, refetch };
 }
+  

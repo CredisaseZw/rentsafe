@@ -1,7 +1,8 @@
+import type { Header } from "@/types";
 import React, { useState } from "react";
 
 function useInternalUsers() {
-   const headers = [
+   const headers:Header[] = [
       {
          name: "First Name",
          textAlign: "left",
@@ -20,7 +21,6 @@ function useInternalUsers() {
       },
       {
          name: "Actions",
-         textAlign: "center",
       },
    ];
    const [modalVisible, setModalVisible] = useState<boolean>(false);

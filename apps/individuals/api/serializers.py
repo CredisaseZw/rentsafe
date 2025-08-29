@@ -162,7 +162,7 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
         if primary_address := obj.addresses.filter(is_primary=True).first():
             return AddressSerializer(primary_address).data
         # fallback: return first address if no primary is set
-        if latest_address := obj.addresses.order_by('id').first():
+        if latest_address := obj.addresses.order_by('-id').first():
             return AddressSerializer(latest_address).data
         return None
     
@@ -212,7 +212,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                 country_name = country.name
             else:
                 raise ValidationError("Identification type is required")
-        print("Defaulting to :...", country_id)
         if id_type == 'national_id':
             if not id_number or not validate_national_id(id_number, country_name or "zimbabwe"):
                 raise ValidationError("Invalid or missing national id")
@@ -282,6 +281,8 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
     employment_details = EmploymentDetailSerializer(many=True, required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
     contact_details = ContactDetailsSerializer(many=True, required=False)
+    notes = NoteSerializer(many=True, required=False)
+    documents = DocumentSerializer(many=True, required=False)
 
 
     class Meta:
@@ -289,7 +290,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         fields = [
             'first_name', 'last_name', 'date_of_birth', 'gender',
             'contact_details', 'is_active', 'addresses',
-            'employment_details', 'next_of_kin'
+            'employment_details', 'next_of_kin', 'notes', 'documents'
         ]
 
     def validate(self, data):
@@ -360,4 +361,31 @@ class IndividualSearchSerializer(serializers.ModelSerializer):
     def get_contact_details(self, obj):
         if contact := obj.contact_details.order_by('-id').first():
             return ContactDetailsSerializer(contact).data
+        return None
+
+class IndividualAddressSerializer(serializers.ModelSerializer):
+    contact_details = serializers.SerializerMethodField()
+    primary_address = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Individual
+        fields = ['id', 'first_name', 'last_name', 'identification_type','identification_number',
+                  'contact_details','primary_address', 'is_active']
+
+    def get_primary_address(self, obj):
+        if primary_address := obj.addresses.filter(is_primary=True, address_type="physical").first():
+            return AddressSerializer(primary_address).data
+        # fallback: return first address if no primary, physical is set
+        if latest_address := obj.addresses.order_by('-id').first():
+            return AddressSerializer(latest_address).data
+        return None
+    
+    def get_contact_details(self, obj):
+        contact = obj.contact_details.order_by('-id').first()
+        if contact:
+            mobile_phones = contact.mobile_phone[0] if contact.mobile_phone else None
+            return {
+                'mobile_phone': mobile_phones,
+                'email': contact.email
+            }
         return None

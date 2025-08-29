@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 
 from apps.individuals.api.serializers import (
+    IndividualAddressSerializer,
     IndividualSerializer , 
     IndividualUpdateSerializer,
     IndividualCreateSerializer, 
@@ -22,11 +23,20 @@ logger = logging.getLogger("individuals")
 
 class IndividualViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
-    
+    queryset = Individual.objects.filter(is_active=True, is_deleted=False)
     def get_queryset(self):
-        return Individual.objects.filter(is_active=True, is_deleted=False).prefetch_related(
-            'addresses','addresses__country', 'addresses__province', 
-            'addresses__city', 'addresses__suburb', 'employment_details', 
+        search_key = self.request.query_params.get('search', '').strip()
+        if search_key:
+            return self.queryset.filter(
+                Q(first_name__icontains=search_key) |
+                Q(last_name__icontains=search_key) |
+                Q(identification_number__icontains=search_key)
+            ).prefetch_related(
+                'addresses', 'employment_details', 
+                'next_of_kin', 'notes','documents','contact_details'
+            )
+        return self.queryset.prefetch_related(
+            'addresses', 'employment_details', 
             'next_of_kin', 'notes','documents','contact_details'
         ).order_by('-date_created')
 
@@ -41,7 +51,9 @@ class IndividualViewSet(BaseViewSet):
             return IndividualSerializer
         elif self.action == 'list':
             return IndividualSearchSerializer
-        return IndividualMinimalSerializer  # fallback
+        elif self.action == "search":  
+            return IndividualAddressSerializer
+        return IndividualMinimalSerializer
 
     
     def create(self, request, *args, **kwargs):
@@ -142,6 +154,13 @@ class IndividualViewSet(BaseViewSet):
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )   
 
+    @action(detail=False, methods=["get"])
+    def search(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+    
     @action(detail=True, methods=['PUT', 'PATCH'], url_path='verify')
     def verify_individual(self, request, pk=None):
         try:
@@ -219,33 +238,6 @@ class IndividualViewSet(BaseViewSet):
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-    @action(detail=False, methods=['GET'], url_path='search')
-    @CacheService.cached(tag_prefix= 'individual:search')
-    def search_individuals(self, request):
-        """Search Individuals Returning minimal information."""
-        query = request.query_params.get('q', '').strip()
-        if not query:
-            return self._create_rendered_response({"error": "Search query cannot be empty"}, status.HTTP_400_BAD_REQUEST)
-        try:
-            search_fields = ['first_name', 'last_name', 'identification_number']
-            filter_conditions = Q()
-            
-            for field in search_fields:
-                filter_conditions |= Q(**{f"{field}__icontains": query})
-
-            individuals = Individual.objects.filter(
-                filter_conditions,is_active=True, is_deleted=False).prefetch_related(
-                'addresses','employment_details', 'next_of_kin','contact_details','documents').distinct()
-            
-            serializer = IndividualSearchSerializer(individuals, many=True)
-            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
-        
-        except Exception as e:
-            logger.error(f"Error searching individuals: {e}")
-            return self._create_rendered_response(
-                {'error': "Something went wrong"},
-                status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
     
     @CacheService.cached(tag_prefix='individual:{pk}:full-details')    
     @action(detail=True, methods=['GET'], url_path='full-details')

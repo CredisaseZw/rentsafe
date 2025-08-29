@@ -38,7 +38,7 @@ export default function CompanyForm() {
                            id="registration_name"
                            name="registration_name"
                            required
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                            placeholder="e.g. ABC Holdings Ltd"
                         />
                      </div>
@@ -50,7 +50,7 @@ export default function CompanyForm() {
                         <Input
                            id="trading_name"
                            name="trading_name"
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                            placeholder="e.g. ABC Rentals"
                         />
                      </div>
@@ -63,7 +63,7 @@ export default function CompanyForm() {
                            id="registration_number"
                            name="registration_number"
                            required
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                         />
                      </div>
 
@@ -75,7 +75,7 @@ export default function CompanyForm() {
                            id="registration_date"
                            name="registration_date"
                            type="date"
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                         />
                      </div>
 
@@ -89,7 +89,7 @@ export default function CompanyForm() {
                            required
                            type="email"
                            placeholder="e.g. info@company.com"
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                         />
                      </div>
 
@@ -98,7 +98,7 @@ export default function CompanyForm() {
                            Legal Status
                         </Label>
                         <Select name="legal_status">
-                           <SelectTrigger id="legal_status" className="border-foreground/40 w-full bg-white">
+                           <SelectTrigger id="legal_status" className="border-color w-full bg-white">
                               <SelectValue placeholder="Select legal status" />
                            </SelectTrigger>
                            <SelectContent>
@@ -119,7 +119,7 @@ export default function CompanyForm() {
                            id="mobile_phone"
                            name="mobile_phone"
                            placeholder="e.g. +263 712 345678"
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                         />
                      </div>
 
@@ -131,7 +131,7 @@ export default function CompanyForm() {
                            id="landline_phone"
                            name="landline_phone"
                            placeholder="e.g. 020 1234567"
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                         />
                      </div>
 
@@ -139,14 +139,14 @@ export default function CompanyForm() {
                         <Label className="px-2 font-normal" htmlFor="tin_number">
                            TIN Number
                         </Label>
-                        <Input id="tin_number" name="tin_number" className="border-foreground/40 bg-white" />
+                        <Input id="tin_number" name="tin_number" className="border-color bg-white" />
                      </div>
 
                      <div className="flex flex-col gap-2">
                         <Label className="px-2 font-normal" htmlFor="vat_number">
                            VAT Number
                         </Label>
-                        <Input id="vat_number" name="vat_number" className="border-foreground/40 bg-white" />
+                        <Input id="vat_number" name="vat_number" className="border-color bg-white" />
                      </div>
 
                      <div className="flex flex-col gap-2">
@@ -154,7 +154,7 @@ export default function CompanyForm() {
                            Industry
                         </Label>
                         <Select name="industry">
-                           <SelectTrigger id="industry" className="border-foreground/40 w-full bg-white">
+                           <SelectTrigger id="industry" className="border-color w-full bg-white">
                               <SelectValue placeholder="Select industry" />
                            </SelectTrigger>
                            <SelectContent>
@@ -176,7 +176,7 @@ export default function CompanyForm() {
                            name="website"
                            type="url"
                            placeholder="e.g. https://company.com"
-                           className="border-foreground/40 bg-white"
+                           className="border-color bg-white"
                         />
                      </div>
                   </>
@@ -200,7 +200,7 @@ export default function CompanyForm() {
                                  type="number"
                                  id="number_of_employees"
                                  name="number_of_employees"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -212,7 +212,7 @@ export default function CompanyForm() {
                                  id="date_of_incorporation"
                                  name="date_of_incorporation"
                                  type="date"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -223,7 +223,7 @@ export default function CompanyForm() {
                               <Input
                                  id="operations"
                                  name="operations"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                                  placeholder="e.g. Manufacturing, Distribution"
                               />
                            </div>
@@ -235,7 +235,7 @@ export default function CompanyForm() {
                               <Input
                                  id="account_number"
                                  name="account_number"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -243,7 +243,7 @@ export default function CompanyForm() {
                               <Label className="px-2 font-normal" htmlFor="twitter">
                                  Twitter
                               </Label>
-                              <Input type="url" id="twitter" name="twitter" className="border-foreground/40 bg-white" />
+                              <Input type="url" id="twitter" name="twitter" className="border-color bg-white" />
                            </div>
 
                            <div className="flex flex-col gap-2">
@@ -254,7 +254,7 @@ export default function CompanyForm() {
                                  type="url"
                                  id="facebook"
                                  name="facebook"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -266,7 +266,7 @@ export default function CompanyForm() {
                                  type="url"
                                  id="instagram"
                                  name="instagram"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -278,7 +278,7 @@ export default function CompanyForm() {
                                  type="url"
                                  id="linkedin"
                                  name="linkedin"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                               />
                            </div>
 
@@ -289,7 +289,7 @@ export default function CompanyForm() {
                               <Input
                                  id="notes"
                                  name="notes"
-                                 className="border-foreground/40 bg-white"
+                                 className="border-color bg-white"
                                  placeholder="Important remarks"
                               />
                            </div>

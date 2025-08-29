@@ -1,65 +1,146 @@
 import AddPropertyForm from "@/components/forms/AddPropertyForm";
 import Button from "@/components/general/Button";
-import { Filter } from "@/components/general/Filter";
 import Modal from "@/components/general/Modal";
-import PropertyListTableRow from "@/components/general/PropertyListTableRow";
 import Searchbox from "@/components/general/Searchbox";
-import SummaryCard from "@/components/general/SummaryCard";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
+import { Eye, Plus } from "lucide-react";
+import SectionHeader from "@/components/general/SectionHeader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { TableBase } from "@/components/general/TableBase";
+import { TableCell, TableRow } from "@/components/ui/table";
+import EmptyResults from "@/components/general/EmptyResults";
+import type { Property } from "@/types";
+import type{ PaginationData } from "@/interfaces";
 import usePropertyList from "@/hooks/components/usePropertyList";
-import { Plus } from "lucide-react";
+import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
+import { toast } from "sonner";
+import { useEffect } from "react";
+import GlobalSummaryCard from "@/components/general/globalSummaryCard";
 
 function PropertyLIst() {
    const {
+      headers,
+      properties,
       SummaryCards,
-      filterOptions,
-      selectedFilter,
       addPropertyModal,
-      onSelectFilter,
+      status,
+      paginationData,
+      page, 
+      search,
+      onClearSearch,
       onSearchValue,
       openModal,
       closeModal,
+      setProperties,
+      setPaginationData,
+      setStatus,
    } = usePropertyList();
+
+   const { error ,data, isLoading, refetch } = getPropertyList(page, search ,true);
+  
+   useEffect(() => {
+      if (error) {
+         console.error(error);
+         toast.error("Failed to fetch properties", { description: (error as any)?.error || "Something went wrong" });
+         setStatus({ loading: false, isError: true });
+         return;
+      }
+
+      if (data) {
+         setProperties(data.results ?? []);
+         setPaginationData(data as PaginationData);
+         setStatus({ loading: false, isError: false });
+      }
+   }, [data, error]);
 
    return (
       <div className="">
          {addPropertyModal && (
-            <Modal onClose={closeModal} size={"xl"} modalHeader="Add Property" allowOverflow={false}>
-               <AddPropertyForm />
+            <Modal onClose={closeModal} size={"lg"} modalHeader="Add Property" allowOverflow={false}>
+               <AddPropertyForm successCallback ={()=>{
+                  refetch()
+                  closeModal();
+               }}/>
             </Modal>
          )}
          <div className="summary-container w-full">
             <ColumnsContainer numberOfCols={5}>
-               {SummaryCards.map((card, index) => (
-                  <SummaryCard key={index} subTitle={card.subTitle} value={card.value} />
+               {SummaryCards.map((card:any, index:number) => (
+                  <GlobalSummaryCard key={index} 
+                     subTitle={card.subTitle}
+                     value={String(card.value)}  
+                     layoutScheme={card.layout}/>
                ))}
             </ColumnsContainer>
             <div className="main-card">
-               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  <div className="start aligh-center">
-                     <div className="flex w-full flex-row items-center p-4">
-                        <Filter onFilter={onSelectFilter} activeFilter={selectedFilter} filterOptions={filterOptions} />
-                     </div>
-                  </div>
-                  <div className="center flex p-4">
-                     <Searchbox placeholder="By address, unit number or tenant" handleSearch={onSearchValue} />
-                  </div>
-                  <div className="flex flex-row justify-end p-4">
+               <SectionHeader
+                  title="Property Lists"
+                  subTitle="property lists"
+                  total={paginationData?.count ?? 0}
+                  subTotal={properties.length ?? 0}
+               />
+               <ColumnsContainer numberOfCols={2}>
+               <div>
+                  <Searchbox 
+                     placeholder="By address, unit number or tenant"
+                     handleSearch={onSearchValue}
+                     clearSearch = {onClearSearch} />
+               </div>
+               <div>
+                  <div className="flex flex-row justify-end gap-3">
                      <Button onClick={openModal} className="flex flex-row gap-3">
                         <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
                      </Button>
+                     <Select defaultValue="defualt">
+                        <SelectTrigger className="w-[180px]">
+                           <SelectValue placeholder="Filter" />
+                        </SelectTrigger>
+                        <SelectContent>
+                           <SelectItem value="defualt">Default</SelectItem>
+                           <SelectItem value="occupied">Occupied</SelectItem>
+                           <SelectItem value="vacant">Vacant</SelectItem>
+                        </SelectContent>
+                     </Select>
                   </div>
                </div>
-               <div className="mt-6 overflow-x-auto rounded border-gray-300">
-                  <table className="w-full table-auto border-collapse text-left">
-                     <tbody className="">
-                        <PropertyListTableRow />
-                        <PropertyListTableRow />
-                        <PropertyListTableRow />
-                        <PropertyListTableRow />
-                     </tbody>
-                  </table>
+               </ColumnsContainer>
+               <div className="mt-6">
+                  <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {isLoading} isError = {status.isError}>
+                     {  
+                        properties.length
+                           ? properties.map((property: Property) => (
+                              <TableRow key={property.id}>
+                                 <TableCell className="text-center">{property.id}</TableCell>
+                                 <TableCell className="text-center">{property.name}</TableCell>
+                                 <TableCell className="text-center">{property.full_address?.[0]?.city?.name || "-"}</TableCell>
+                                 <TableCell className="text-center">{property.full_address?.[0]?.suburb?.name || "-"}</TableCell>
+                                 <TableCell className="text-center">{property.full_address?.[0]?.street_address || "-"}</TableCell>
+                                 <TableCell className="text-center">{property.property_type}</TableCell>
+                                 <TableCell className="flex justify-center items-center">
+                                    <Button variant={"ghost"}>
+                                       <Eye className="h-4 w-4"/>
+                                    </Button>
+                                 </TableCell>
+                              </TableRow>
+                              ))
+                           : (
+                              <TableRow>
+                              <TableCell colSpan={headers.length}>
+                                 <EmptyResults message="No properties enlisted yet" />
+                              </TableCell>
+                              </TableRow>
+                           )
+                     }
+
+
+                  </TableBase>
                </div>
             </div>
          </div>
