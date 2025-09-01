@@ -117,6 +117,7 @@ class Invoice(BaseModelWithUser):
         ("draft", "Draft"),
         ("pending", "Pending"),
         ("paid", "Paid"),
+        ("partially_paid", "Partially Paid"),
         ("cancelled", "Cancelled"),
     ]
 
@@ -129,14 +130,12 @@ class Invoice(BaseModelWithUser):
     # Core Fields
     invoice_type = models.CharField(max_length=20, choices=INVOICE_TYPE_CHOICES, default="fiscal")
     document_number = models.CharField(max_length=20, unique=True, editable=False, default=generate_invoice_document_number)
-    is_individual = models.BooleanField(default=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     lease = models.ForeignKey('leases.Lease', on_delete=models.CASCADE, null=True, blank=True, related_name='invoices')
     reference_number = models.CharField(max_length=20, blank=True, null=True)
 
     # Customer Relationship
-    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey('leases.LeaseTenant', on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
 
     # Financial Details
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
@@ -149,6 +148,7 @@ class Invoice(BaseModelWithUser):
     original_invoice = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,related_name='child_invoices')
 
     # Timestamps
+    due_date = models.DateField(null=True, blank=True)
     sale_date = models.DateTimeField(default=now)
     line_items = GenericRelation('TransactionLineItem', related_query_name='invoices')
 
@@ -182,13 +182,6 @@ class Invoice(BaseModelWithUser):
     def save(self, *args, **kwargs):
         if not self.pk and not self.document_number:
             self.document_number = generate_invoice_document_number()
-        if self.individual and self.company:
-            raise ValidationError("An invoice cannot be linked to both an individual and a company.")
-        elif self.individual:
-            self.is_individual = True
-        elif self.company:
-            self.is_individual = False
-
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -204,9 +197,7 @@ class Invoice(BaseModelWithUser):
 
         new_invoice = Invoice.objects.create(
             invoice_type="fiscal",
-            is_individual=self.is_individual,
-            individual=self.individual,
-            company=self.company,
+            customer=self.customer,
             currency=self.currency,
             created_by=self.created_by,
             sale_date=new_invoice_date,
@@ -244,13 +235,7 @@ class Invoice(BaseModelWithUser):
         return None
 
     def __str__(self):
-        customer_id_str = ""
-        if self.is_individual and self.individual:
-            customer_id_str = f"Individual: {self.individual.firstname} {self.individual.surname}"
-        elif not self.is_individual and self.company:
-            customer_id_str = f"Company: {self.company.name}"
-        else:
-            customer_id_str = "No Customer"
+        customer_id_str = self.lease.get_tenant_names() or "No Customer"
         return f"{self.invoice_type.title()} {self.document_number} - {customer_id_str}"
 
 
@@ -383,6 +368,7 @@ class Payment(BaseModelWithUser):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     payment_date = models.DateTimeField(default=now)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name="payments")
     reference = models.CharField(max_length=255, blank=True, null=True)
 

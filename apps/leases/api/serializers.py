@@ -14,10 +14,23 @@ from apps.properties.models.models import Property, Unit, PropertyType
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
 from apps.common.models.models import Address
-from apps.accounting.models import Currency
+from apps.accounting.models import Currency,Payment, PaymentMethod
 from apps.common.api.serializers import AddressSerializer
 from apps.leases.utils.helpers import create_lease_with_dependencies
 from apps.properties.utils.helpers import process_address_data
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = ['id', 'payment_method_name']
+
+class PaymentSerializer(serializers.ModelSerializer):
+    method = PaymentMethodSerializer()
+    invoice_number = serializers.CharField(source='invoice.document_number')
+    
+    class Meta:
+        model = Payment
+        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference']
+
 
 # Helper serializers for related objects
 class IndividualSerializer(serializers.ModelSerializer):
