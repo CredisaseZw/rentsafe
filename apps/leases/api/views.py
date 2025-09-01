@@ -2,11 +2,16 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.contenttypes.models import ContentType
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseTermination, Guarantor
-from apps.leases.models.landlord import Landlord
+from apps.accounting.models import Payment
+from decimal import Decimal
 from apps.leases.api.serializers import (
     LeaseCreateUpdateSerializer,
     LeaseDetailSerializer,
@@ -14,16 +19,14 @@ from apps.leases.api.serializers import (
     LeaseTerminationSerializer,
     LeaseListSerializer,
     LandlordSerializer,
-    GuarantorSerializer
+    GuarantorSerializer,
+    PaymentSerializer
 )
 from apps.common.utils import extract_error_message
-from django.contrib.contenttypes.models import ContentType
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
+from apps.accounting.models import PaymentMethod
 import logging
-from rest_framework.exceptions import ValidationError
 logger = logging.getLogger('leases')
 
 class LeaseViewSet(viewsets.ModelViewSet):
@@ -88,16 +91,16 @@ class LeaseViewSet(viewsets.ModelViewSet):
         try:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            
+
             # Pass request context for user tracking
             serializer.context['request'] = request
-            
+
             lease = serializer.save()
-            
+                
             if lease.status == 'ACTIVE':
                 lease.unit.status = 'occupied'
                 lease.unit.save()
-                
+
             return Response(LeaseDetailSerializer(lease).data, 
                         status=status.HTTP_201_CREATED)
         except ValidationError as ve:
@@ -371,3 +374,72 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 {"error": "slug query parameter is required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+    @action(detail=True, methods=['post'], url_path='make-payment')
+    def make_payment(self, request, lease_id=None):
+        lease = self.get_object()
+        
+        # Validate payment data
+        try:
+            amount = Decimal(request.data.get('amount', 0))
+            method_id = request.data.get('payment_method_id')
+            reference = request.data.get('reference', '')
+            payment_date = request.data.get('payment_date') or timezone.now().date()
+            
+            if amount <= 0:
+                return Response(
+                    {'error': 'Payment amount must be positive'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                method = PaymentMethod.objects.get(id=method_id)
+            except PaymentMethod.DoesNotExist:
+                return Response(
+                    {'error': 'Invalid payment method'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Apply payment
+            payments_made, remaining_amount = lease.apply_payment(
+                amount, payment_date, method, reference, request
+            )
+            
+            response_data = {
+                'payments_made': len(payments_made),
+                'remaining_amount': str(remaining_amount),
+                'invoice_payments': [
+                    {
+                        'invoice_number': p.invoice.document_number,
+                        'amount': str(p.amount)
+                    } for p in payments_made
+                ]
+            }
+            
+            if remaining_amount > 0:
+                response_data['warning'] = f'${remaining_amount} was not applied to any invoice'
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error processing payment for lease {lease.id}: {e}")
+            return Response(
+                {'error': 'An error occurred while processing the payment'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['get'], url_path='payment-history')
+    def payment_history(self, request, lease_id=None):
+        lease = self.get_object()
+        
+        payments = Payment.objects.filter(
+            invoice__lease=lease
+        ).select_related('invoice', 'method').order_by('-payment_date')
+        
+        page = self.paginate_queryset(payments)
+        if page is not None:
+            serializer = PaymentSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = PaymentSerializer(payments, many=True)
+        return Response(serializer.data)
+    
+    
