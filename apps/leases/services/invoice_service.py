@@ -1,14 +1,29 @@
-# apps/leases/services/invoice_service.py
 from django.utils import timezone
 from datetime import datetime, date
 from decimal import Decimal
 from django.db import transaction
-from apps.accounting.models.models import Invoice, TransactionLineItem, SalesItem, SalesCategory, VATSetting,SalesAccount
-from apps.leases.models import Lease, LeaseCharge
+from dateutil.relativedelta import relativedelta
+from apps.accounting.models.models import Invoice, TransactionLineItem, SalesItem, SalesCategory, VATSetting, SalesAccount
+from apps.leases.models import Lease
 from django.contrib.contenttypes.models import ContentType
-from apps.leases.utils.helpers import get_opening_balance_oldest
+from apps.leases.utils.helpers import get_opening_balance_oldest_date
 
 class LeaseInvoiceService:
+    @staticmethod
+    def _shift_opening_balances(lease):
+        """
+        Shifts the opening balances back one month if the grace period has passed.
+        """
+        today = timezone.now().date()
+        if hasattr(lease, 'grace_period_days') and today.day > lease.grace_period_days and opening_balance.current_month_balance > 0:
+            opening_balance = lease.opening_balance
+            opening_balance.three_months_plus_balance += opening_balance.three_months_back_balance
+            opening_balance.three_months_back_balance = opening_balance.two_months_back_balance
+            opening_balance.two_months_back_balance = opening_balance.one_month_back_balance
+            opening_balance.one_month_back_balance = opening_balance.current_month_balance
+            opening_balance.current_month_balance = Decimal('0.00')
+            opening_balance.save()
+
     @staticmethod
     def generate_monthly_invoices():
         """
@@ -85,79 +100,121 @@ class LeaseInvoiceService:
                         vat_amount=Decimal('0.00'),
                         total_price=charge.amount,
                     )
-                
+                # This call assumes you have the update_totals() method on your Invoice model as discussed previously.
+                invoice.update_totals()
                 return invoice
 
     @staticmethod
     def generate_initial_invoice_for_opening_balance(lease):
         """
-        Generate an initial invoice for opening balance when a lease is created
+        Generates invoices for each aged balance in the lease's opening balance.
+        If the outstanding balance is zero or less, a single paid invoice is created.
         """
         if not hasattr(lease, 'opening_balance'):
-            return None
-        
+            return []
+            
+        # First, check if balances need to be shifted based on grace period
+        LeaseInvoiceService._shift_opening_balances(lease)
         opening_balance = lease.opening_balance
-        total_balance = opening_balance.outstanding_balance
-        sales_account = SalesAccount.objects.first()
-
-        if total_balance <= 0:
-            return None
+        created_invoices = []
         
         with transaction.atomic():
             primary_tenant = lease.get_primary_tenant()
-            tenant_object = primary_tenant.tenant_object if primary_tenant else None
+            sales_account = SalesAccount.objects.first()
             
-            invoice = Invoice.objects.create(
-                invoice_type="fiscal",
-                status="pending",
-                lease=lease,
-                currency=lease.currency,
-                customer=primary_tenant,
-                sale_date= get_opening_balance_oldest(opening_balance)
-            )
-            
-            # Get or create required related models
+            # Get or create required related models once
             sales_category, _ = SalesCategory.objects.get_or_create(
                 name="Opening Balances",
                 defaults={'code': 'OPENBAL'}
             )
-            
             vat_setting, _ = VATSetting.objects.get_or_create(
                 rate=Decimal('0.00'),
-                defaults={
-                    'description': 'No VAT for opening balances',
-                    'vat_applicable': False
-                }
+                defaults={'description': 'No VAT for opening balances', 'vat_applicable': False}
             )
-            
-            # Create or get sales item for opening balance
+
             sales_item, created = SalesItem.objects.get_or_create(
                 name="Opening Balance",
                 defaults={
                     'category': sales_category,
                     'item_id': f"OPENBAL_{lease.lease_id}",
                     'unit_price_currency': lease.currency,
-                    'price': total_balance,
+                    'price': Decimal('0.00'),
                     'unit_name': 'Balance',
                     'tax_configuration': vat_setting,
-                    'sales_account': sales_account, 
+                    'sales_account': sales_account,
                 }
             )
-            
-            # If the sales item already exists, update the price
-            if not created:
-                sales_item.price = total_balance
-                sales_item.unit_price_currency = lease.currency
-                sales_item.save()
-            
-            TransactionLineItem.objects.create(
-                content_type=ContentType.objects.get_for_model(Invoice),
-                object_id=invoice.id,
-                sales_item=sales_item,
-                quantity=1,
-                unit_price=total_balance,
-                vat_amount=Decimal('0.00'),
-                total_price=total_balance,
-            )
-            
-            return invoice
+
+            if opening_balance.outstanding_balance <= Decimal('0.00'):
+                # Create a single paid invoice for the non-positive outstanding balance
+                invoice = Invoice.objects.create(
+                    invoice_type="fiscal",
+                    status="paid",
+                    lease=lease,
+                    currency=lease.currency,
+                    customer=primary_tenant,
+                    sale_date=get_opening_balance_oldest_date(lease),
+                )
+                
+                TransactionLineItem.objects.create(
+                    content_type=ContentType.objects.get_for_model(Invoice),
+                    object_id=invoice.id,
+                    sales_item=sales_item,
+                    quantity=1,
+                    unit_price=opening_balance.outstanding_balance,
+                    vat_amount=Decimal('0.00'),
+                    total_price=opening_balance.outstanding_balance,
+                )
+                
+                invoice.update_totals()
+                created_invoices.append(invoice)
+            else:
+                balance_fields = [
+                    ('three_months_plus_balance', 4),
+                    ('three_months_back_balance', 3),
+                    ('two_months_back_balance', 2),
+                    ('one_month_back_balance', 1),
+                    ('current_month_balance', 0)
+                ]
+                
+                # Determine the base date for sales dates
+                today = timezone.now().date()
+                if today.day < 25:
+                    base_date = today - relativedelta(months=1)
+                    base_date = base_date.replace(day=25)
+                else:
+                    base_date = today
+
+                for field_name, months_ago in balance_fields:
+                    balance_amount = getattr(opening_balance, field_name)
+                    
+                    if balance_amount > Decimal('0.00'):
+                        sale_date = base_date - relativedelta(months=months_ago)
+
+                        # Create the invoice
+                        invoice = Invoice.objects.create(
+                            invoice_type="fiscal",
+                            status="pending",
+                            lease=lease,
+                            currency=lease.currency,
+                            customer=primary_tenant,
+                            sale_date=sale_date,
+                        )
+                        
+                        # Create a single line item for this specific balance
+                        TransactionLineItem.objects.create(
+                            content_type=ContentType.objects.get_for_model(Invoice),
+                            object_id=invoice.id,
+                            sales_item=sales_item,
+                            quantity=1,
+                            unit_price=balance_amount,
+                            vat_amount=Decimal('0.00'),
+                            total_price=balance_amount,
+                        )
+                        
+                        # Update the invoice totals
+                        invoice.update_totals()
+                        
+                        created_invoices.append(invoice)
+        
+        return created_invoices

@@ -1,7 +1,31 @@
+from django.db import transaction
 from rest_framework import serializers
-from accounting.models.models import *
+from apps.accounting.models.models import (
+    SalesAccount, SalesCategory,SalesItem,
+    CashSale,Invoice,CreditNote,Currency,
+    CurrencyRate,VATSetting,CashBook,
+    CashbookEntry,TransactionLineItem, TransactionType,
+    AccountSector, LedgerTransaction,GeneralLedgerAccount,
+    JournalEntry, PaymentMethod,Payment
+)
+from apps.accounting.models.disbursements import Disbursement
 from decimal import Decimal, ROUND_HALF_UP 
-from rentsafe.models import CompanyProfile, Individual, Company 
+from apps.companies.models import CompanyProfile, Company 
+from apps.individuals.models import Individual
+
+class DisbursementSerializer(serializers.ModelSerializer):
+    landlord_name = serializers.CharField(source='landlord.landlord_name', read_only=True)
+    payment_method_name = serializers.CharField(source='payment_method.payment_method_name', read_only=True)
+    currency_code = serializers.CharField(source='currency.currency_code', read_only=True)
+    
+    class Meta:
+        model = Disbursement
+        fields = [
+            'id', 'landlord', 'landlord_name', 'amount', 'currency', 'currency_code',
+            'payment_method', 'payment_method_name', 'reference', 'status',
+            'payment_date', 'date_created', 'date_updated'
+        ]
+        read_only_fields = ['date_created', 'date_updated']
 
 class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
