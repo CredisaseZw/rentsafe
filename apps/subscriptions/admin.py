@@ -3,7 +3,7 @@ from django.contrib import admin
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'client', 'service', 'subscription_class',
+    list_display = ['subscription_id', 'client', 'service', 'subscription_class',
                     'period', 'total_slots', 'used_slots', 'currency',
                     'payment_method', 'total_amount', 'monthly_amount',
                     'start_date','end_date', 'is_activated'
@@ -12,7 +12,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = ['client',]
     list_display_links = ['client']
     ordering =['-date_created',]
-    readonly_fields = ['id', 'date_created', 'date_updated']
+    readonly_fields = ['subscription_id', 'date_created', 'date_updated']
     def subscriber_object(self, obj):
         return f"{obj.content_type} - {obj.object_id}"
 

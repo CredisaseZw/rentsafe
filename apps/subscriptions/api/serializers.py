@@ -29,12 +29,7 @@ class SubscriptionViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ['id','client','service','period','subscription_class', 
-                  'total_slots', 'used_slots', 'currency',
-                  'total_amount', 'monthly_amount', 'payment_method', 
-                  'start_date', 'end_date',  'is_activated'
-                ]
-        
+        exclude = ['date_created', 'date_updated']
 class SubscriptionCreateSerializer(serializers.ModelSerializer):
     client = MinimalClientSerializer(read_only=True)
     client_id = serializers.PrimaryKeyRelatedField(
@@ -76,7 +71,6 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
         fields = [
             'client', 'client_id',
             'service', 'service_id',
-            'subscription_class',
             'period_id', 'period',
             'total_slots',
             'currency_id', 'currency',
@@ -85,12 +79,59 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
+        client = data.get('client')
+        service = data.get('service')
+
         for field in ['client', 'service', 'payment_method', 'total_slots', 'period']:
             if not data.get(field):
                 raise ValidationError(f"{field.replace('_', ' ').title()} is required")
 
+        # if client and service:
+        #     existing_subscription = Subscription.objects.filter(client=client, service=service, is_activated=True).exists()
+        #     if existing_subscription:
+        #         raise ValidationError("Subscription for this client and service already exists.")
+
         return data
 
     def create(self, validated_data):
-        return super().create(validated_data)
+        client = validated_data.pop('client')
+        service = validated_data.pop('service')
 
+        existing_subscription = Subscription.objects.filter(
+            client=client,
+            service=service,
+            is_activated=True
+        ).first()
+
+        if existing_subscription:
+            existing_subscription.total_slots += validated_data.get('total_slots', 0)
+
+            for key, value in validated_data.items():
+                if key != 'total_slots': 
+                    setattr(existing_subscription, key, value)
+
+            existing_subscription.save()  
+            return existing_subscription
+
+        validated_data['client'] = client
+        validated_data['service'] = service
+        return Subscription.objects.create(**validated_data)
+
+class ClientMinimalSubscriptionSerializer(serializers.ModelSerializer):
+    period = serializers.ReadOnlyField(source="period.period_length_months")
+    class Meta:
+        model = Subscription
+        fields = ['id', 'period', 'total_slots', 'used_slots', 'start_date', 'end_date']
+        read_only_fields = ['used_slots','id']
+
+    def to_representation(self, instance):
+        start_date = instance.start_date.strftime("%d-%B-%Y") if instance.start_date else None
+        end_date = instance.end_date.strftime("%d-%B-%Y") if instance.end_date else None
+        return {
+            "id": instance.id,
+            "period": instance.period.period_length_months,
+            "start_date": start_date,
+            "end_date": end_date,
+            "total_slots": instance.total_slots,
+            "used_slots": instance.used_slots,
+        }

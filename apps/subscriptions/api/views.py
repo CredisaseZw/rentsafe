@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 from apps.common.api.views import BaseViewSet
 from apps.common.utils import CacheService,extract_error_message
-from apps.subscriptions.api.serializers import SubscriptionCreateSerializer, SubscriptionViewSerializer
+from apps.subscriptions.api.serializers import ClientMinimalSubscriptionSerializer, SubscriptionCreateSerializer, SubscriptionViewSerializer
 from apps.subscriptions.models.models import Subscription
 
 import logging
@@ -15,12 +15,13 @@ logger = logging.getLogger('subscriptions')
 
 class SubscriptionAdminViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Subscription.objects.filter(is_activated=True).select_related(
+    queryset = Subscription.objects.select_related(
         'client', 'currency', 'payment_method', 'service', 'period'
     )
 
     def get_queryset(self):
-        qs = Subscription.objects.filter(is_activated=True).select_related(
+        qs = self.queryset
+        qs = qs.select_related(
             'client', 'currency', 'payment_method', 'service', 'period'
         )
         search_key = self.request.query_params.get("search", "").strip()
@@ -130,7 +131,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
             )
 
 class SubscriptionClientViewSet(BaseViewSet):
-    permissions = [IsAuthenticated, IsClient]
+    permissions = [IsAuthenticated]
 
     def get_queryset(self):
         return Subscription.objects.filter(
@@ -139,3 +140,7 @@ class SubscriptionClientViewSet(BaseViewSet):
         ).select_related(
             'client', 'currency', 'payment_method', 'service', 'period'
         )
+
+    def get_serializer_class(self):
+        return ClientMinimalSubscriptionSerializer
+    

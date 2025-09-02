@@ -12,7 +12,6 @@ from django.core.exceptions import ValidationError
 from apps.clients.models.models import Client
 from apps.common.models.base_models import BaseModel
 from apps.accounting.models.models import Currency, PaymentMethod
-from apps.leases.models.models import Lease
 
 class Services(BaseModel): 
     service_name = models.CharField(max_length=55, unique=True,
@@ -65,11 +64,9 @@ class SubscriptionPeriod(BaseModel):
 
 class Subscription(BaseModel):
     SUB_CLASS_CHOICES = [
-        ("INDIVIDUAL", "Individual"),
-        ("COMPANY", "Company"),
         ("COMBINED", "Combined"),
     ]
-
+    subscription_id = models.CharField(max_length=20, unique=True, default=None)
     client = models.ForeignKey(Client, on_delete=models.PROTECT, related_name='subscriptions')
     service = models.ForeignKey(Services, on_delete=models.PROTECT, related_name='subscriptions',
                                 help_text=_("The service provided by this subscription (e.g., RentSafe)."))
@@ -81,7 +78,7 @@ class Subscription(BaseModel):
     end_date = models.DateTimeField(null=True, blank=True,
                                     help_text=_("The date and time when the subscription is scheduled to end."))
     
-    subscription_class = models.CharField(max_length=10, choices=SUB_CLASS_CHOICES,
+    subscription_class = models.CharField(max_length=10, choices=SUB_CLASS_CHOICES, default='COMBINED',
                                         help_text=_("The classification of the subscriber (e.g., Individual, Company)."))
     
     period = models.ForeignKey(SubscriptionPeriod, on_delete=models.PROTECT, related_name='subscriptions',
@@ -106,17 +103,17 @@ class Subscription(BaseModel):
         verbose_name = _('subscription')
         verbose_name_plural = _('subscriptions')
         ordering = ['-date_created']
-        constraints = [
-            models.CheckConstraint(check=models.Q(used_slots__lte=models.F('total_slots')), name='used_lte_total_slots')
-        ]
 
     def __str__(self) -> str:
         subscriber_name = str(self.client) if self.client else "N/A Subscriber"
         return f"Subscription {self.pk} for {subscriber_name} ({self.service.service_name})"
 
+    
     @property
     def used_slots(self):
         """Returns the number of slots currently in use by active leases under this subscription."""
+        from apps.leases.models.models import Lease
+
         active_leases = Lease.objects.filter(managing_client=self.client, status='ACTIVE')
         return active_leases.count()
     
@@ -139,11 +136,19 @@ class Subscription(BaseModel):
         elif self.start_date and self.period and self.period.period_length_days:
             self.end_date = self.start_date + timedelta(days=self.period.period_length_days)
 
-    def save(self, *args, **kwargs):
-        if not self.end_date and self.start_date and self.period:
-            self.calculate_end_date()
-
+    def clean(self):
         if self.used_slots > self.total_slots:
             raise ValidationError(_("Subscription exhausted, please upgrade your plan."))
+        
+    def generate_subscription_id(self):
+        return f"SUB-{int(timezone.now().timestamp())}-{self.client.id}"
+    def save(self, *args, **kwargs):
+        if not self.subscription_id:
+            self.subscription_id = self.generate_subscription_id()
 
+        if not self.end_date and self.start_date and self.period:
+            self.calculate_end_date()
+        self.full_clean()
         super().save(*args, **kwargs)
+    
+
