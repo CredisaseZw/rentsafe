@@ -17,13 +17,13 @@ function ActiveLease() {
 
     ])
     const [clientType, setClientType] = useState("individual")
-
+    const successCallback = ()=>{ setShowModal(false)}    
     const tabs = [
         {
          icon: UserRoundPlus,
          value: "single",
          label: "Single",
-         content: <AddLeaseForm clientType= {clientType}/>,
+         content: <AddLeaseForm clientType= {clientType} successCallback = {successCallback}/>,
         },
         {
          icon: Layers,

@@ -22,6 +22,8 @@ import SectionHeader from "@/components/general/SectionHeader"
 import type { Lease } from "@/types"
 
 
+
+
 function Active() {
   const {
     activeHeaders,

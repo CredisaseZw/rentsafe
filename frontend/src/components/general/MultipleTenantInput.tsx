@@ -7,6 +7,7 @@ import { Input } from "../ui/input"
 import { Plus, Trash } from "lucide-react"
 import AutoCompleteClient from "./AutoCompleteClient"
 import type { TenantSelection } from "@/types"
+import { Checkbox } from "../ui/checkbox"
 
 interface props {
     clientType : string
@@ -20,7 +21,12 @@ function MultipleTenantInput({clientType}:props) {
             tenants.map((user: TenantSelection, index: number)=>(
                <Fieldset legendTitle = {index  === 0 ? "Primary Tenant Details" : "Tenant Details"} key={index}>
                     <div className="relative">
-                        <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6">
+                        <Input
+                            type="hidden"
+                            name={`tenants[${index}]`}
+                            value={user.id || ""}
+                        />
+                        <ColumnsContainer numberOfCols={4} marginClass="mt-0" gapClass="gap-6">
                             <AutoCompleteClient
                                 index = {index}
                                 searchItem = {user.search_value || ""}
@@ -32,7 +38,7 @@ function MultipleTenantInput({clientType}:props) {
                                 }
                                 onSelectValue={onSelectTenant}
                             />
-                            <div className="form-group">
+                            <div className="form-group mt-1">
                                 <Label className="px-2 font-normal required" htmlFor="tenantName">
                                     {
                                         clientType === "individual" ? "Tenant Name" : "Branch Name"
@@ -41,42 +47,33 @@ function MultipleTenantInput({clientType}:props) {
                                 <Input
                                     disabled
                                     value={`${user.full_name}`}
-                                    name="tenantName"
+                                    name = {`tenantName[${index}]`}
                                     id="tenantName"
                                     required            
                                 />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group mt-1">
                             <Label className="px-2 font-normal" htmlFor="leaseMobileNumber">
                                 Tenant Mobile Number
                             </Label>
-                            <Input
-                                value={user.mobile_number}
-                                name="tenant_mobile"
-                                id="tenant_mobile"
-                                onChange={(e)=> updateMobile(index, e.target.value)}            
-                            />
+                                <Input
+                                    value={user.mobile_number}
+                                    name={`tenantMobile[${index}]`}
+                                    id="tenantMobile"
+                                    onChange={(e)=> updateMobile(index, e.target.value)}            
+                                />
                             </div>
-                            <div className="form-group">
-                            <Label className="px-2 font-normal" htmlFor="rentGuarantorId">
-                                Rent Guarantor ID
-                            </Label>
-                            <Input
-                                name="rentGuarantorId"
-                                id="rentGuarantorId"        
-                            />
-                            </div>
-                            <div className="form-group">
-                            <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
-                                Rent Guarantor Name
-                            </Label>
-                            <Input
-                                disabled
-                                name="rentGuarantorName"
-                                id="rentGuarantorName"
-                                        
-                                
-                            />
+                            <div className="flex mt-1 flex-row gap-2 items-center justify-center">
+                                <Checkbox
+                                    className="self-center"
+                                    name={`isPrimary[${index}]`}
+                                    id={`isPrimary${index}`}
+                                    defaultChecked = {index === 0}
+
+                                />
+                                <Label className="px-2 font-normal self-center" htmlFor={`rentVariable-${index}`}>
+                                    Is primary
+                                </Label>
                             </div>
                         </ColumnsContainer>
                         <div className="absolute right-0 bottom-0 translate-x-1/3 translate-y-1/3 transform">

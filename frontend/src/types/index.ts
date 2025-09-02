@@ -176,7 +176,7 @@ export interface AddressInput {
 export interface LandlordInput {
   landlord_name: string;
   landlord_type: "company" | "individual" | string;
-  landlord_id: string;
+  landlord_id: string | number;
 }
 export interface Property {
   id?: string;
@@ -249,6 +249,18 @@ export interface Tenant {
   tenant_object: TenantMinimal;
   is_primary_tenant: boolean;
 }
+export type TenantPayload = {
+  tenant_id: string;
+  tenant_type: string;
+  is_primary_tenant: boolean;
+};
+
+export type guarantorPayload = {
+   guarantor_type: "individual" | "company";
+   guarantor_id: number;
+   guarantee_amount: string;
+};
+
 export interface Landlord {
   id: number;
   landlord_name: string;
@@ -273,4 +285,79 @@ export interface LeaseResponse {
    next: string | null;
    previous: string | null;
    results: Lease[]
+}
+export type ShortPropertyData =  {
+   name: string;
+   description: string;
+   status: string;
+   year_built?: number;
+   total_area?: string | number;
+   is_furnished?: boolean;
+   total_number_of_units: number;
+   features?: Record<string, boolean | string>;
+   property_type_name: string;
+  };
+
+export type LeasePayload = {
+  start_date: string;
+  end_date: string;
+  signed_date: string;
+  status: string;
+  currency: number;
+  payment_frequency: string;
+  due_day_of_month: number;
+  grace_period_days: number;
+  is_rent_variable: boolean;
+  includes_utilities: boolean;
+  property_data : ShortPropertyData,
+  unit_data: {
+    unit_number: string;
+    unit_type: string;
+    number_of_rooms: number;
+  };
+
+  address_data: ShortSuburbAddressData
+  landlord_data: LandlordInput
+  guarantor_data: guarantorPayload 
+  tenants: TenantPayload[];
+
+  charges: {
+   charge_type: "RENT" | "UTILITY" | "OTHER";
+   description: string;
+   amount: string;
+   currency: number;
+   frequency: "MONTHLY" | "QUARTERLY" | "ANNUALLY" | "ONCE";
+   effective_date: string;
+   end_date: string;
+   vat_inclusive: boolean;
+  }[];
+
+  deposits: {
+   amount: number;
+   currency: number;
+   deposit_date: string;
+   deposit_holder: "agent" | "landlord" | "other";
+  }[];
+
+  lease_opening_balance_data: {
+   current_month_balance: string;
+   one_month_back_balance: string;
+   two_months_back_balance: string;
+   three_months_back_balance: string;
+   three_months_plus_balance: string;
+   outstanding_balance: string;
+  };
+
+  landlord_opening_balances_data: {
+   amount: string;
+   commission_percentage: string;
+   operating_costs_inclusive: boolean;
+  }[];
+};
+
+
+export interface ShortSuburbAddressData{
+   street_address: string;
+   suburb_id: number;
+   postal_code: string | number;
 }

@@ -32,14 +32,16 @@ function TerminateLeaseDialog({tenantName, id, refetch}:props) {
         <AlertDialog open = {open} onOpenChange={setOpen}>
             <AlertDialogTrigger>
                 <div className="flex items-center justify-center">
-                    <Button variant={"ghost"} className="text-white">Terminate</Button>
+                    <span className="text-white">Terminate</span>
                 </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-gray-800">Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription className="text-gray-600">
+                    <p>
                         Are you sure you want to terminate lease for {tenantName}? This action cannot be undone.
+                    </p>
                     <div className="form-group mt-1">
                         <Textarea placeholder="Reason of termination"></Textarea>
                     </div>

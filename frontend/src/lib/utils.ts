@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { NavLink, Route } from "@/types";
+import type { NavLink, Route, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -166,6 +166,26 @@ export function extractContacts(data: { [k: string]: FormDataEntryValue }): Cont
    return contacts;
 }
 
+export function extractTenants(data: { [k: string]: FormDataEntryValue }, type : string): TenantPayload[] {
+  const tenants: TenantPayload[] = [];
+
+  const tenantKeys = Object.keys(data).filter((key) => key.startsWith("tenants["));
+  const tenantCount = tenantKeys.length;
+
+  for (let i = 0; i < tenantCount; i++) {
+    const tenant: TenantPayload = {
+      tenant_id: data[`tenants[${i}]`] as string,
+      tenant_type : type,
+      is_primary_tenant: data[`isPrimary[${i}]`] === "on",
+    };
+
+    tenants.push(tenant);
+  }
+
+  return tenants;
+}
+
+
 export function formatErrorMessage(error: unknown): string {
    if (error instanceof Error) {
       return error.message;
@@ -260,14 +280,14 @@ export function summarizeAddress(address: Address): string {
    .filter(Boolean)
    .join(", ");
 }
-export function getThreeMonthsBack(dateStr: string): string[] {
-  const baseDate = dateStr ? new Date(dateStr) : new Date(); 
-  const inputDay = baseDate.getDate() || 31;
+export function getThreeMonthsBack(dayStr: string): string[] {
+  const today = new Date();
+  const inputDay = parseInt(dayStr, 10) || today.getDate();
   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const result: string[] = [];
 
-  const currentMonth = baseDate.getMonth();
-  const currentYear = baseDate.getFullYear();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
 
   for (let i = 3; i >= 0; i--) {
     let month = currentMonth - i;
@@ -287,6 +307,7 @@ export function getThreeMonthsBack(dateStr: string): string[] {
   return result;
 }
 
+
 export function capitalizeFirstLetter(str : string) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -298,4 +319,7 @@ export function extractTenantBranchContact(contacts : BranchContact[]){
       .filter(num => num !== "")
       .join(", ");
 }
-
+export const normalizeBalance = (val: any) => {
+  const str = val?.toString().trim();
+  return str && str.length > 0 ? str : "0.00";
+};

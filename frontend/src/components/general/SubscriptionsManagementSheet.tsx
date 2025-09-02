@@ -16,26 +16,26 @@ import type { Header } from "@/types"
 export function SubscriptionSheet() {
     const [open, setOpen] = useState(false)
     const headers:Header[] = [
-        {
-            name: "No",
-            
-        },
-        {
-            name: "Open Slots",
-            
-        },
-        {
-            name: "Period (Months)",
-            
-        },
-        {
-            name: "Start Date",
-            
-        },
-        {
-            name: "End Date",
-            
-        },
+      {
+          name: "No",
+          
+      },
+      {
+          name: "Open Slots",
+          
+      },
+      {
+          name: "Period (Months)",
+          
+      },
+      {
+          name: "Start Date",
+          
+      },
+      {
+          name: "End Date",
+          
+      },
     ]
   return (
     <Sheet open = {open} onOpenChange={setOpen}>

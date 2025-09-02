@@ -67,8 +67,6 @@ export default function useMultiTenantInput(){
                 : tenant
             )
         );
-
-        
    }
 
     return{
