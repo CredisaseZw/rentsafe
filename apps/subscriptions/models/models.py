@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from apps.clients.models.models import Client
 from apps.common.models.base_models import BaseModel
 from apps.accounting.models.models import Currency, PaymentMethod
+from apps.leases.models.models import Lease
 
 class Services(BaseModel): 
     service_name = models.CharField(max_length=55, unique=True,
@@ -88,8 +89,6 @@ class Subscription(BaseModel):
     
     total_slots = models.IntegerField(default=1,
                                             help_text=_("The total number of lease slots this subscription provides for RentSafe service."))
-    used_slots = models.IntegerField(default=0,
-                                        help_text=_("The number of lease slots currently in use by active leases under this subscription."))
 
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, related_name='subscriptions_currency',
                                 help_text=_("The currency in which this subscription is paid."))
@@ -116,12 +115,19 @@ class Subscription(BaseModel):
         return f"Subscription {self.pk} for {subscriber_name} ({self.service.service_name})"
 
     @property
+    def used_slots(self):
+        """Returns the number of slots currently in use by active leases under this subscription."""
+        active_leases = Lease.objects.filter(managing_client=self.client, status='ACTIVE')
+        return active_leases.count()
+    
+    @property
     def has_available_slots(self):
         """Checks if there are any available slots remaining on this subscription."""
         return self.used_slots < self.total_slots
     @property
     def status(self):
         return "active" if self.is_activated else "inactive"
+
 
     def calculate_end_date(self):
         """

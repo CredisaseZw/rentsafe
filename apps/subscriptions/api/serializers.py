@@ -22,16 +22,17 @@ class SubscriptionPeriodSerializer(serializers.ModelSerializer):
 
 class SubscriptionViewSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only=True)
-    payment_method = PaymentMethodSerializer(read_only=True)
-    service = ServicesSerializer(read_only=True)
-    period = SubscriptionPeriodSerializer(read_only=True)
-    client = MinimalClientSerializer(read_only=True)
+    payment_method = serializers.ReadOnlyField(source="payment_method.payment_method_name")
+    service = serializers.ReadOnlyField(source="service.service_name")
+    period = serializers.ReadOnlyField(source="period.name")
+    client = serializers.ReadOnlyField(source="client.name")
 
     class Meta:
         model = Subscription
-        fields = ['id','client','service', 'start_date', 'end_date', 'subscription_class',
-                  'period', 'total_slots', 'used_slots', 'currency',
-                  'payment_method', 'total_amount', 'monthly_amount', 'is_activated'
+        fields = ['id','client','service','period','subscription_class', 
+                  'total_slots', 'used_slots', 'currency',
+                  'total_amount', 'monthly_amount', 'payment_method', 
+                  'start_date', 'end_date',  'is_activated'
                 ]
         
 class SubscriptionCreateSerializer(serializers.ModelSerializer):
@@ -88,11 +89,6 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
             if not data.get(field):
                 raise ValidationError(f"{field.replace('_', ' ').title()} is required")
 
-            for model in [Client, Services, PaymentMethod, SubscriptionPeriod]:
-                model_id = data.get(f"{model.__name__.lower()}_id")
-                if not model.objects.filter(pk=model_id).exists():
-                    raise ValidationError({f"{model.__name__.lower()}_id": f"{model.__name__} does not exist."})
-            
         return data
 
     def create(self, validated_data):

@@ -76,7 +76,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
                 {"error": extract_error_message(e)},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+    
     def list(self, request):
         try:
             queryset = self.get_queryset()
@@ -128,3 +128,14 @@ class SubscriptionAdminViewSet(BaseViewSet):
                 {"error": extract_error_message(e)},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class SubscriptionClientViewSet(BaseViewSet):
+    permissions = [IsAuthenticated, IsClient]
+
+    def get_queryset(self):
+        return Subscription.objects.filter(
+            is_activated=True,
+            client_id=self.request.user.client.id
+        ).select_related(
+            'client', 'currency', 'payment_method', 'service', 'period'
+        )
