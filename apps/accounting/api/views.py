@@ -1,53 +1,42 @@
+from django.utils.timezone import now
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q, Sum
+from django.shortcuts import get_object_or_404
 from urllib import request
 from django.http import JsonResponse
 from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
 from apps.accounting.models.models import (
-    SalesItem,
-    VATSetting,
-    SalesCategory,
-    SalesAccount,
-    CashSale,
-    CashbookEntry,
-    GeneralLedgerAccount,
-    JournalEntry,
-    LedgerTransaction,
-    AccountSector,
-    Invoice,
-    Payment,
-    CurrencyRate,
-    PaymentMethod,
-    TransactionType,
-    CashBook,
-    Currency,
-    CreditNote, 
+    SalesItem,VATSetting, SalesCategory,
+    SalesAccount,CashSale,CashbookEntry,
+    GeneralLedgerAccount,JournalEntry,
+    LedgerTransaction,AccountSector,
+    Invoice, Payment,CurrencyRate,
+    PaymentMethod,TransactionType,
+    CashBook,Currency,CreditNote,
 )
 from apps.accounting.api.serializers.serializers import (
-    SalesItemSerializer,
-    VATSettingSerializer,
-    SalesCategorySerializer,
-    SalesAccountSerializer,
-    CashSaleSerializer,
-    CashbookEntrySerializer,
-    GeneralLedgerAccountSerializer,
-    JournalEntrySerializer,
-    LedgerTransactionSerializer,
-    AccountSectorSerializer,
-    InvoiceSerializer,
-    PaymentSerializer,
-    CurrencyRateSerializer,
-    PaymentMethodSerializer,
-    TransactionTypeSerializer,
-    CashBookSerializer,
-    CurrencySerializer,
-    CreditNoteSerializer, # Import the new CreditNoteSerializer
+    SalesItemSerializer,VATSettingSerializer,
+    SalesCategorySerializer,SalesAccountSerializer,
+    CashSaleSerializer, CashbookEntrySerializer,
+    GeneralLedgerAccountSerializer, JournalEntrySerializer,
+    LedgerTransactionSerializer, AccountSectorSerializer,
+    InvoiceSerializer, PaymentSerializer,
+    CurrencyRateSerializer,PaymentMethodSerializer,
+    TransactionTypeSerializer,CashBookSerializer,
+    CurrencySerializer,CreditNoteSerializer, DisbursementSerializer
 )
-from django.shortcuts import render
-from rest_framework import status
-from rest_framework.response import Response
-from django.contrib.auth.decorators import login_required
-from rest_framework.decorators import action
-from django.utils.timezone import now
+from apps.leases.models import Landlord
+from apps.clients.models import Client
+from accounting.models.disbursements import Disbursement
+import logging
+
+logger = logging.getLogger('accounting')
+
 
 class BaseCompanyViewSet(viewsets.ModelViewSet):
     """
@@ -311,33 +300,67 @@ class TransactionTypeViewSet(BaseCompanyViewSet):
     queryset = TransactionType.objects.all()
     serializer_class = TransactionTypeSerializer
 
-# Inertia.js rendering functions
-def detailed_general_ledger(request):
-    return inertia_render(request, "Client/Accounting/DetailedGeneralLedgerAccount")
+class DisbursementViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A ViewSet for viewing disbursement history and generating creditor statements.
+    """
+    queryset = Disbursement.objects.all().select_related('landlord', 'payee', 'currency', 'payment_method')
+    serializer_class = DisbursementSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['status', 'landlord', 'payee', 'payment_method']
+    search_fields = ['reference', 'payee__client_name']
+    ordering_fields = ['payment_date', 'amount']
+    ordering = ['-payment_date']
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        
+        if not user.is_staff and not user.is_superuser:
+            if hasattr(user, 'client'):
+                # Assumes the user is an agent and can only see disbursements
+                # made to landlords or to their own agency (the payee).
+                return queryset.filter(Q(landlord__isnull=False) | Q(payee=user.client))
+            else:
+                return queryset.none()
+        return queryset
 
-def cash_books_list(request):
-    return inertia_render(request, "Client/Accounting/CashBooksList")
+    @action(detail=False, methods=['get'], url_path='creditor-statements')
+    def get_creditor_statement(self, request):
+        """
+        Generates a statement for a specific creditor (Landlord or other Client).
+        Expects a `creditor_id` and an optional `creditor_type` (e.g., 'landlord', 'agency').
+        """
+        creditor_id = request.query_params.get('creditor_id')
+        creditor_type = request.query_params.get('creditor_type')
 
-def credit_note(request):
-    return inertia_render(request, "Client/Accounting/CreditNote")
+        if not creditor_id:
+            return Response({'error': 'creditor_id query parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-def creditor_invoice(request):
-    return inertia_render(request, "Client/Accounting/CreditorInvoice")
+        # Handle landlord statements separately for a clear link
+        if creditor_type == 'landlord':
+            landlord = get_object_or_404(Landlord, id=creditor_id)
+            disbursements = self.get_queryset().filter(landlord=landlord).order_by('payment_date')
+            creditor_name = landlord.landlord_name
+        else:
+            # Handle all other clients (e.g., the agency itself)
+            payee_client = get_object_or_404(Client, id=creditor_id)
+            disbursements = self.get_queryset().filter(payee=payee_client).order_by('payment_date')
+            creditor_name = payee_client.client_name
 
-def rate_audit_trail(request):
-    return inertia_render(request, "Client/Accounting/RateAuditTrail")
-
-def general_journal(request):
-    return inertia_render(request, "Client/Accounting/GeneralJournal")
-
-def cashbook_receipts(request):
-    return inertia_render(request, "Client/Accounting/CashbookReceipts")
-
-def cashbook_payments(request):
-    return inertia_render(request, "Client/Accounting/CashBookPayments")
-
-def accounts_sectors(request):
-    return inertia_render(request, "Client/Accounting/AccountsSectors")
-
-def payment_types(request):
-    return inertia_render(request, "Client/Accounting/PaymentTypes")
+        # Calculate totals
+        totals = disbursements.aggregate(
+            total_processed=Sum('amount', filter=Q(status='processed')),
+            total_pending=Sum('amount', filter=Q(status='pending'))
+        )
+        total_paid = totals['total_processed'] or 0
+        total_pending = totals['total_pending'] or 0
+        
+        serializer = self.get_serializer(disbursements, many=True)
+        
+        return Response({
+            'creditor_name': creditor_name,
+            'total_paid': total_paid,
+            'total_pending': total_pending,
+            'transactions': serializer.data
+        })
