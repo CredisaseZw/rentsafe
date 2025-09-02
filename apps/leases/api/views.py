@@ -8,9 +8,10 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from apps.leases.models.models import Lease, LeaseTenant, LeaseCharge, LeaseTermination, Guarantor
-from apps.accounting.models import Payment
+from django.db.models import Q,Sum
+from django.utils import timezone
+from apps.leases.models.models import Lease, LeaseTenant, LeaseTermination
+from apps.accounting.models import Payment,PaymentMethod
 from decimal import Decimal
 from apps.leases.api.serializers import (
     LeaseCreateUpdateSerializer,
@@ -25,7 +26,8 @@ from apps.leases.api.serializers import (
 from apps.common.utils import extract_error_message
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
-from apps.accounting.models import PaymentMethod
+from apps.leases.utils.commissions import CommissionHandler
+from apps.accounting.api.serializers.serializers import DisbursementSerializer
 import logging
 logger = logging.getLogger('leases')
 
@@ -377,20 +379,18 @@ class LeaseViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='make-payment')
     def make_payment(self, request, lease_id=None):
         lease = self.get_object()
-        
-        # Validate payment data
         try:
             amount = Decimal(request.data.get('amount', 0))
             method_id = request.data.get('payment_method_id')
             reference = request.data.get('reference', '')
             payment_date = request.data.get('payment_date') or timezone.now().date()
-            
+
             if amount <= 0:
                 return Response(
                     {'error': 'Payment amount must be positive'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             try:
                 method = PaymentMethod.objects.get(id=method_id)
             except PaymentMethod.DoesNotExist:
@@ -398,26 +398,33 @@ class LeaseViewSet(viewsets.ModelViewSet):
                     {'error': 'Invalid payment method'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             # Apply payment
-            payments_made, remaining_amount = lease.apply_payment(
+            payments_made, overpayment_amount = lease.apply_payment(
                 amount, payment_date, method, reference, request
             )
-            
+
+            # Get current balance after payment
+            current_balance = lease.current_balance
+
             response_data = {
                 'payments_made': len(payments_made),
-                'remaining_amount': str(remaining_amount),
+                'overpayment_amount': str(overpayment_amount),
+                'current_balance': str(current_balance),
                 'invoice_payments': [
                     {
                         'invoice_number': p.invoice.document_number,
-                        'amount': str(p.amount)
-                    } for p in payments_made
-                ]
+                        'amount': str(p.amount),
+                    }
+                    for p in payments_made
+                ],
+                'message': (
+                    f'Payment processed. ${overpayment_amount} applied as overpayment. Current balance: ${current_balance}'
+                    if overpayment_amount > 0
+                    else f'Payment processed successfully. Current balance: ${current_balance}'
+                ),
             }
-            
-            if remaining_amount > 0:
-                response_data['warning'] = f'${remaining_amount} was not applied to any invoice'
-            
+
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Error processing payment for lease {lease.id}: {e}")
@@ -442,4 +449,100 @@ class LeaseViewSet(viewsets.ModelViewSet):
         serializer = PaymentSerializer(payments, many=True)
         return Response(serializer.data)
     
+    @action(detail=True, methods=['get'], url_path='landlord-statement')
+    def landlord_statement(self, request, lease_id=None):
+        """
+        Get statement for the landlord associated with this lease
+        """
+        lease = self.get_object()
+        
+        if not lease.landlord:
+            return Response(
+                {'error': 'No landlord associated with this lease'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get date range from query params
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date') or timezone.now().date()
+        
+        if start_date:
+            try:
+                start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid start_date format. Use YYYY-MM-DD'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        disbursements = CommissionHandler.get_landlord_statement(
+            lease.landlord, start_date, end_date
+        )
+        
+        # Calculate totals
+        total_disbursements = disbursements.aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+        
+        current_balance = CommissionHandler.get_landlord_balance(lease.landlord)
+        
+        serializer = DisbursementSerializer(disbursements, many=True)
+        
+        return Response({
+            'landlord': {
+                'id': lease.landlord.id,
+                'name': str(lease.landlord),
+                'commission_percentage': getattr(lease.landlord, 'commission_percentage', 0)
+            },
+            'statement_period': {
+                'start_date': start_date,
+                'end_date': end_date
+            },
+            'current_balance': str(current_balance),
+            'total_disbursements': str(total_disbursements),
+            'disbursements': serializer.data
+        })
+
+    @action(detail=True, methods=['get'], url_path='lease-commissions')
+    def get_lease_commissions(self, request, lease_id=None):
+        """
+        Get all lease commissions
+        """
+        # Implementation for fetching lease commissions
+        return Response({"message": "Fetching lease commissions"})
+
+    @action(detail=False, methods=['get'], url_path='all-landlords-statement')
+    def all_landlords_statement(self, request):
+        """
+        Get statement for all landlords
+        """
+        from apps.leases.models import Landlord
+        
+        landlords = Landlord.objects.all()
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date') or timezone.now().date()
+        
+        result = []
+        for landlord in landlords:
+            disbursements = CommissionHandler.get_landlord_statement(
+                landlord, start_date, end_date
+            )
+            
+            total_disbursements = disbursements.aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0.00')
+            
+            current_balance = CommissionHandler.get_landlord_balance(landlord)
+            
+            result.append({
+                'landlord_id': landlord.id,
+                'landlord_name': str(landlord),
+                'commission_percentage': getattr(landlord, 'commission_percentage', 0),
+                'current_balance': str(current_balance),
+                'total_disbursements_period': str(total_disbursements),
+                'disbursement_count': disbursements.count()
+            })
+        
+        return Response(result)
+
     

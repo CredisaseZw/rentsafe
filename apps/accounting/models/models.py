@@ -1,17 +1,13 @@
-from django.db import models, transaction
-from django.utils import timezone
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import now, timedelta
 from django.db.models import F, Sum, Q
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from dateutil.relativedelta import relativedelta
-import uuid
 from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime
+from django.utils.timezone import now
 from apps.accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import Company
@@ -146,7 +142,7 @@ class Invoice(BaseModelWithUser):
     frequency = models.CharField(max_length=20,choices=FREQUENCY_CHOICES,default="monthly", blank=True, null=True)
     next_invoice_date = models.DateField(null=True, blank=True)
     original_invoice = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,related_name='child_invoices')
-
+    total_inclusive = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     # Timestamps
     due_date = models.DateField(null=True, blank=True)
     sale_date = models.DateTimeField(default=now)
@@ -167,10 +163,32 @@ class Invoice(BaseModelWithUser):
         )['sum_vat'] or Decimal('0.00')
         return total.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
 
-    @property
-    def total_inclusive(self):
-        return (self.total_excluding_vat + self.vat_total).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+    def _calculate_total_inclusive(self):
+        # Your existing calculation logic
+        from decimal import Decimal
+        
+        total_excl_vat = Decimal('0.00')
+        vat_total = Decimal('0.00')
+        
+        # Calculate manually
+        for line_item in self.line_items.all():
+            line_total = line_item.quantity * line_item.unit_price
+            total_excl_vat += line_total
+            vat_total += line_item.vat_amount or Decimal('0.00')
+        
+        total_excl_vat = (total_excl_vat - self.discount).quantize(Decimal('0.00'))
+        return (total_excl_vat + vat_total).quantize(Decimal('0.00'))
 
+    def update_totals(self):
+        """
+        Updates the total_inclusive field based on current line items.
+        """
+        self.total_inclusive = self._calculate_total_inclusive()
+        self.save(update_fields=['total_inclusive'])
+
+    @property
+    def total_inclusive_property(self):
+        return self.total_inclusive
     def convert_to_fiscal(self):
         if self.invoice_type == "proforma":
             self.invoice_type = "fiscal"
@@ -182,6 +200,8 @@ class Invoice(BaseModelWithUser):
     def save(self, *args, **kwargs):
         if not self.pk and not self.document_number:
             self.document_number = generate_invoice_document_number()
+        if not self.total_inclusive:
+            self.total_inclusive = self._calculate_total_inclusive()
         self.full_clean()
         super().save(*args, **kwargs)
 
