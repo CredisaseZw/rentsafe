@@ -34,7 +34,7 @@ class Property(BaseModelWithUser):
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=PROPERTY_STATUS_CHOICES, default='active')
     year_built = models.PositiveIntegerField(blank=True, null=True)
-    total_area = models.DecimalField(max_digits=10, decimal_places=2, help_text="In square meters")
+    total_area = models.DecimalField(max_digits=10, decimal_places=2, help_text="In square meters", default=0)
     is_furnished = models.BooleanField(default=False)
     total_number_of_units = models.PositiveIntegerField(default=0, help_text="Total number of units in the property")
     features = models.JSONField(blank=True, null=True, help_text="Additional features of the property")
