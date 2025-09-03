@@ -118,6 +118,11 @@ class Subscription(BaseModel):
         return active_leases.count()
     
     @property
+    def open_slots(self):
+        """Returns the number of slots currently available for use under this subscription."""
+        return self.total_slots - self.used_slots
+
+    @property
     def has_available_slots(self):
         """Checks if there are any available slots remaining on this subscription."""
         return self.used_slots < self.total_slots
