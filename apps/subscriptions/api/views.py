@@ -27,8 +27,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         search_key = self.request.query_params.get("search", "").strip()
         if search_key:
             return qs.filter(
-                Q(name__icontains=search_key) |
-                Q(description__icontains=search_key)
+                Q(subscription_id__icontains=search_key)
             )
         return qs
 
