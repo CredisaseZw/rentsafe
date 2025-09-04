@@ -40,5 +40,6 @@ urlpatterns = [
     path('api/credit-control/', include('apps.credit_control.api.urls')),
     path('api/clients/', include('apps.clients.api.urls')),
     path('api/properties/', include('apps.properties.api.urls')),
-    path('api/subscriptions/', include('apps.subscriptions.api.urls'))
+    path('api/subscriptions/', include('apps.subscriptions.api.urls')),
+    path('api/accounting/', include('apps.accounting.api.urls'))
 ]

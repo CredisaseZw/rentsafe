@@ -108,7 +108,9 @@ class Subscription(BaseModel):
         subscriber_name = str(self.client) if self.client else "N/A Subscriber"
         return f"Subscription {self.pk} for {subscriber_name} ({self.service.service_name})"
 
-    
+    @property
+    def get_service_name(self):
+        return self.service.service_name if self.service else "N/A Service"
     @property
     def used_slots(self):
         """Returns the number of slots currently in use by active leases under this subscription."""

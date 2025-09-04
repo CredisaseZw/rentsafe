@@ -105,11 +105,8 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
         return Subscription.objects.create(**validated_data)
 
 class ClientMinimalSubscriptionSerializer(serializers.ModelSerializer):
-    period = serializers.ReadOnlyField(source="period.period_length_months")
     class Meta:
         model = Subscription
-        fields = ['id', 'period', 'total_slots', 'used_slots', 'open_slots', 'start_date', 'end_date']
-        read_only_fields = ['used_slots','id', 'open_slots']
 
     def to_representation(self, instance):
         start_date = instance.start_date.strftime("%d-%B-%Y") if instance.start_date else None
@@ -119,6 +116,7 @@ class ClientMinimalSubscriptionSerializer(serializers.ModelSerializer):
             "period": instance.period.period_length_months,
             "start_date": start_date,
             "end_date": end_date,
+            "sub_type": instance.get_service_name,
             "total_slots": instance.total_slots,
             "used_slots": instance.used_slots,
             "open_slots": instance.open_slots,

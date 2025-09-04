@@ -32,7 +32,7 @@ from apps.accounting.api.serializers.serializers import (
 )
 from apps.leases.models import Landlord
 from apps.clients.models import Client
-from accounting.models.disbursements import Disbursement
+from apps.accounting.models.disbursements import Disbursement
 import logging
 
 logger = logging.getLogger('accounting')
@@ -283,6 +283,9 @@ class CurrencyViewSet(BaseCompanyViewSet):
 class PaymentMethodViewSet(BaseCompanyViewSet):
     queryset = PaymentMethod.objects.all()
     serializer_class = PaymentMethodSerializer
+    
+    def get_queryset(self):
+        return self.queryset
     
     def create(self, request,*args,**kwargs):
         company = request.user.company
