@@ -33,7 +33,6 @@ from apps.accounting.api.serializers.serializers import (
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
-from apps.accounting.models.disbursements import Disbursement
 import logging
 
 logger = logging.getLogger('accounting')
