@@ -1,10 +1,11 @@
 # apps/common/api/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from apps.common.api.views import LocationViewSet
+from apps.common.api.views import LocationViewSet,SuburbViewSet
 
 router = DefaultRouter()
 router.register(r'locations', LocationViewSet, basename='location')
+router.register(r'suburbs', SuburbViewSet, basename='suburb')
 
 urlpatterns = [
     

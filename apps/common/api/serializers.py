@@ -44,6 +44,19 @@ class SuburbSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'city', 'city_id', 'slug', 'is_active'] 
         read_only_fields = ['slug']
 
+class SuburbViewSerializer(serializers.ModelSerializer):
+    city = serializers.CharField(source='city.name', read_only=True)
+    province = serializers.CharField(source='city.province.name', read_only=True)
+    country = serializers.CharField(
+        source='city.province.country.name', read_only=True
+    )
+
+    class Meta:
+        model = Suburb
+        fields = ['id', 'name', 'city','province', 'country'] 
+        read_only_fields = ['id']
+
+
 class CitySerializer(serializers.ModelSerializer):
     province = serializers.CharField(source='province.name', read_only=True)
     province_id = serializers.PrimaryKeyRelatedField(

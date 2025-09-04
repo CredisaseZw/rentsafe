@@ -102,11 +102,11 @@ class LogoutView(APIView):
 
 
 class RefreshTokenView(APIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            from users.utils.cookies import get_tokens_from_request
+            from apps.users.utils.cookies import get_tokens_from_request
 
             tokens = get_tokens_from_request(request)
             refresh_token = tokens["refresh_token"]
@@ -136,8 +136,6 @@ class RefreshTokenView(APIView):
             return Response(
                 {"error": "Invalid refresh token"}, status=status.HTTP_401_UNAUTHORIZED
             )
-
-
 
 class CurrentUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]

@@ -123,6 +123,22 @@ class Subscription(BaseModel):
         return self.total_slots - self.used_slots
 
     @property
+    def get_service_name(self):
+        return self.service.service_name if self.service else "N/A Service"
+    @property
+    def used_slots(self):
+        """Returns the number of slots currently in use by active leases under this subscription."""
+        from apps.leases.models.models import Lease
+
+        active_leases = Lease.objects.filter(managing_client=self.client, status='ACTIVE')
+        return active_leases.count()
+    
+    @property
+    def open_slots(self):
+        """Returns the number of slots currently available for use under this subscription."""
+        return self.total_slots - self.used_slots
+
+    @property
     def has_available_slots(self):
         """Checks if there are any available slots remaining on this subscription."""
         return self.used_slots < self.total_slots
