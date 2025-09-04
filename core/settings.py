@@ -407,6 +407,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'verbose',
             },
+        'file_subscriptions': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'subscriptions.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
         'db_audit': { 
             'level': 'INFO',
             'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
@@ -482,6 +490,11 @@ LOGGING = {
         },
         'maintenance': {
             'handlers': ['console', 'file_maintenance'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'subscriptions': {
+            'handlers': ['console', 'file_subscriptions'],
             'level': 'DEBUG',
             'propagate': False,
         },
