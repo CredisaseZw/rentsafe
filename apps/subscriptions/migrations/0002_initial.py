@@ -107,11 +107,5 @@ class Migration(migrations.Migration):
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
-        migrations.AddConstraint(
-            model_name="subscription",
-            constraint=models.CheckConstraint(
-                check=models.Q(("used_slots__lte", models.F("total_slots"))),
-                name="used_lte_total_slots",
-            ),
-        ),
+        
     ]

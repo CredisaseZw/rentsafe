@@ -8,12 +8,15 @@ from apps.common.models.models import Country, Province, City, Suburb, Address
 from apps.individuals.models.models import Individual, IndividualContactDetail, NextOfKin, EmploymentDetail
 import logging
 
+from apps.subscriptions.models.models import Services, Subscription, SubscriptionPeriod
+
 logger = logging.getLogger('cache')
 
 MONITORED_MODELS = (
     Company, CompanyBranch,
     Country, Province, City, Suburb, Address,
-    Individual, NextOfKin, EmploymentDetail, IndividualContactDetail
+    Individual, NextOfKin, EmploymentDetail, IndividualContactDetail,
+    SubscriptionPeriod, Services, Subscription
 )
 
 def invalidate_location_caches(instance):
@@ -114,6 +117,20 @@ def invalidate_address_caches(instance):
         CacheService.invalidate_tag(f'{model_name}:{instance.content_object.pk}')
         CacheService.invalidate_tag(f'{model_name}:{instance.content_object.pk}:addresses')
 
+def invalidate_subscription_caches(instance):
+    """Handle invalidation for subscription-related models"""
+    model_name = instance._meta.model_name.lower()
+    
+    CacheService.invalidate_tag('subscription:list')
+    CacheService.invalidate_tag('subscription:search')
+    CacheService.invalidate_tag('services:list')
+    CacheService.invalidate_tag('period:list')
+    
+    if hasattr(instance, 'pk') and instance.pk:
+        CacheService.invalidate_tag(f'subscription:{model_name}:{instance.pk}')
+        CacheService.invalidate_tag(f'subscription:{instance.pk}') 
+
+    CacheService.invalidate_tag('choices:subscription')
 @receiver([post_save, post_delete])
 def invalidate_model_cache(sender, instance, **kwargs):
     """
@@ -132,6 +149,8 @@ def invalidate_model_cache(sender, instance, **kwargs):
             invalidate_individual_caches(instance)
         elif sender == Address:
             invalidate_address_caches(instance)
+        elif sender in (Subscription, Services, SubscriptionPeriod):
+            invalidate_subscription_caches(instance)
             
         logger.debug(f"Successfully invalidated caches for {sender.__name__} ID {getattr(instance, 'pk', 'new')}")
         

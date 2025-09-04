@@ -246,7 +246,16 @@ def create_property_with_address(property_data, address_data, user=None):
             if user:
                 property_instance.created_by = user
                 property_instance.save()
-            
+            if address_data:
+                property_ctype = ContentType.objects.get_for_model(Property)
+                Address.objects.create(
+                    content_type=property_ctype,
+                    object_id=property_instance.id,
+                    postal_code=address_data.get('postal_code', ''),
+                    street_address=address_data.get('street_address', ''),
+                    suburb_id=address_data.get('suburb_id')
+                )
+
             return property_instance
             
     except Exception as e:
@@ -370,6 +379,7 @@ def process_address_data(address_data):
                 raise ValidationError(f"City with ID {processed_data['city']} not found")
     
     return processed_data
+
 # BASIC USAGE
 
 # property_data = {

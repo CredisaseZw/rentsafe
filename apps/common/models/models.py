@@ -192,7 +192,7 @@ class Address(BaseModel):
 
     country = models.ForeignKey(Country, on_delete=models.PROTECT, related_name="addresses", null=True, blank=True)
     province = models.ForeignKey(Province, on_delete=models.PROTECT, related_name="addresses", null=True, blank=True)
-    city = models.ForeignKey(City, on_delete=models.PROTECT, related_name="addresses")
+    city = models.ForeignKey(City, on_delete=models.PROTECT, related_name="addresses", blank=True, null=True)
     suburb = models.ForeignKey(Suburb, on_delete=models.PROTECT, related_name="addresses", null=True, blank=True)
 
     # Address Components 

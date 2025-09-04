@@ -69,7 +69,7 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-            'name', 'description', 'status', 'year_built', 'total_area',
+            'name', 'description','status', 'year_built', 'total_area',
             'is_furnished', 'total_number_of_units', 'features', 'property_type_id'
         ]
 
