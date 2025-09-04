@@ -130,7 +130,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
-    @CacheService.cached(tag_prefix="services:list", timeout=86400)
+    @CacheService.cached(tag_prefix="services:list", timeout=CacheService.VERSION_TIMEOUT)
     @action(detail=False, methods=['GET'], url_path='services')
     def services(self, request):
         try:
