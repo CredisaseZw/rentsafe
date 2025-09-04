@@ -15,8 +15,7 @@ export default function useLoginAuth() {
          return {
             id: response.data.user.id,
             username: response.data.user.username,
-            access_token: response.data.access,
-            refresh_token: response.data.refresh,
+            is_verified :  response.data.user.is_verified,
             user_type: response.data.user.user_type,
          };
       },

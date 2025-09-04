@@ -15,7 +15,8 @@ function SidebarFooterContent({ username }: SDFooter) {
       localStorage.clear();
       removeCookie("token");
       navigate("/");
-   }
+   } // LOGOUT TO BACKEND
+
    return (
       <HoverCard openDelay={0} closeDelay={100}>
          <HoverCardTrigger>

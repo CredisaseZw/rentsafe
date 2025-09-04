@@ -241,7 +241,8 @@ export interface TenantMinimal {
 export type TenantSelection = TenantMinimal &{
    search_value: string,
    mobile_number: string,
-   address : Address | null
+   address : Address | null,
+   is_primary : false
 }
 export interface Tenant {
   id: number;
@@ -253,6 +254,7 @@ export type TenantPayload = {
   tenant_id: string;
   tenant_type: string;
   is_primary_tenant: boolean;
+  address? : Address | undefined
 };
 
 export type guarantorPayload = {
@@ -293,7 +295,7 @@ export type ShortPropertyData =  {
    year_built?: number;
    total_area?: string | number;
    is_furnished?: boolean;
-   total_number_of_units: number;
+   total_number_of_units?: number;
    features?: Record<string, boolean | string>;
    property_type_name: string;
   };
@@ -354,8 +356,6 @@ export type LeasePayload = {
    operating_costs_inclusive: boolean;
   }[];
 };
-
-
 export interface ShortSuburbAddressData{
    street_address: string;
    suburb_id: number;

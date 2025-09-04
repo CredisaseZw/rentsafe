@@ -10,7 +10,7 @@ import { ChevronUp } from "lucide-react"
 import { TableBase } from "./TableBase"
 import { TableCell, TableRow } from "../ui/table"
 import { useState } from "react"
-import ActiveLease from "../routes/rent-safe/tenant-leases/ActiveLease"
+import ActivateLease from "../routes/rent-safe/tenant-leases/ActivateLease"
 import type { Header } from "@/types"
 
 export function SubscriptionSheet() {
@@ -55,7 +55,7 @@ export function SubscriptionSheet() {
                 <TableCell className=" text-center">22-May-25</TableCell>
                 <TableCell className=" text-center">22-May-26</TableCell>
                 <TableCell className=" flex justify-center items-center flex-row gap-3.5">
-                    <ActiveLease />
+                    <ActivateLease />
                 </TableCell>
             </TableRow>
         </TableBase>

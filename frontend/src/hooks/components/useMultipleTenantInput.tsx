@@ -2,12 +2,16 @@ import { MINIMAL_TENANT_OBJECT } from "@/constants";
 import type { BranchFull, IndividualMinimal, IndividualTenantContact } from "@/interfaces";
 import { extractTenantBranchContact } from "@/lib/utils";
 import type { TenantSelection } from "@/types";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-export default function useMultiTenantInput(){
+export default function useMultiTenantInput(clientType: string){
     const [tenants, setTenants] = useState<TenantSelection[]>([MINIMAL_TENANT_OBJECT])
-    const addTenant = () => setTenants((p)=>[...p, MINIMAL_TENANT_OBJECT])
 
+    useEffect(()=>{
+        setTenants([MINIMAL_TENANT_OBJECT])
+    }, [clientType])
+    
+    const addTenant = () => setTenants((p)=>[...p, MINIMAL_TENANT_OBJECT])
     const removeTenant = (index: number) => setTenants(p => p.filter((_, i) => i !== index));
 
     const updateTenant = (index: number, key: string, value: any) => {
@@ -34,7 +38,7 @@ export default function useMultiTenantInput(){
     };
 
    const onSelectTenant = (selectedTenant: IndividualMinimal | BranchFull, index :number | undefined) =>{
-        
+
     if ("first_name" in selectedTenant){
         setTenants((prev) =>
             prev.map((tenant, i) =>
@@ -67,7 +71,7 @@ export default function useMultiTenantInput(){
                 : tenant
             )
         );
-   }
+    }
 
     return{
         tenants,

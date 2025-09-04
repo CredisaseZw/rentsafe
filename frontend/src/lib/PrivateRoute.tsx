@@ -1,18 +1,31 @@
 import { Navigate } from "react-router-dom";
 import { Outlet, useLocation } from "react-router";
 import { getCookie } from "typescript-cookie";
+import useRefreshToken from "@/hooks/apiHooks/useRefreshToken";
+import { isAxiosError } from "axios";
+import { useEffect, useState } from "react";
 
 export default function ProtectRoute() {
-   const userStr = getCookie("token");
-   let user: null | { access_token?: string } = null;
+   const refreshToken = useRefreshToken();
+   const [isValid, setIsValid] = useState<boolean>(true); 
+   const location = useLocation();
 
-   try {
-      user = userStr ? JSON.parse(userStr) : null;
-   } catch (error) {
-      user = null;
-      console.log(error);
-   }
+   useEffect(() => {
+      const accessToken = getCookie("access_token");
+      console.log("Access Token:", accessToken);
+      /* if (!accessToken) {
+         refreshToken.mutate(undefined, {
+            onSuccess: () => {
+               setIsValid(true);
+            },
+            onError: (error) => {
+               if (isAxiosError(error) && error.response?.status === 401) {
+                  setIsValid(false);
+               }
+            },
+         });
+      }       */
+   }, []);
 
-   const path = useLocation();
-   return user?.access_token ? <Outlet /> : <Navigate to={`/login?next=${path.pathname}`} replace={true} />;
+   return isValid ? <Outlet /> : <Navigate to={`/login?next=${location.pathname}`} replace={true} />;
 }

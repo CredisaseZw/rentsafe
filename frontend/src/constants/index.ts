@@ -2,6 +2,7 @@ import type { AddressType, CompanyLegalStatus, Route, TenantSelection } from "@/
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
+import type {Option} from "@/types/index"
 
 import {
    RENT_ADMIN_PANEL_NAVLINKS,
@@ -103,5 +104,52 @@ export const MINIMAL_TENANT_OBJECT: TenantSelection = {
    full_name : "",
    identification_number : "", 
    mobile_number : "",
-   address : null
+   address : null,
+   is_primary : false
+
 }
+
+export const IN_LEASE_CLIENT_TYPES: Option[] = [
+   { label: "Individual", value: "individual" },
+   { label: "Company", value: "company" },
+];
+
+export const CURRENCY_OPTIONS: Option[] = [
+   { label: "US", value: "1" }, // UPDATE AFTER CURRENCY MANAGEMENT WORKS
+   { label: "ZWG", value: "2" },
+];
+
+export const STATUS_OPTIONS: Option[] = [
+   { label: "Occupied", value: "occupied" },
+   { label: "Vacant", value: "vacant" },
+];
+
+export const LEASE_STATUS_OPTIONS: Option[] = [
+   { label: "Active", value: "ACTIVE" },
+   { label: "Draft", value: "DRAFT" },
+   { label: "Pending Approval", value: "PENDING_APPROVAL" },
+   { label: "Terminated", value: "TERMINATED" },
+   { label: "Expired", value: "EXPIRED" },
+   { label: "Renewed", value: "RENEWED" },
+   { label: "Suspended", value: "SUSPENDED" },
+];
+
+export const PAYMENT_FREQUENCY_OPTIONS: Option[] = [
+   { label: "Monthly", value: "MONTHLY" },
+   { label: "Quarterly", value: "QUARTERLY" },
+   { label: "Annually", value: "ANNUALLY" },
+];
+
+export const DEPOSIT_HOLDER_OPTIONS: Option[] = [
+   { label: "Agent", value: "agent" },
+   { label: "Landlord", value: "landlord" },
+];
+
+export const UNIT_TYPES: Option[] = [
+   { label: "Apartment", value: "apartment" },
+   { label: "House", value: "house" },
+   { label: "Office", value: "office" },
+   { label: "Retail Space", value: "retail space" },
+   { label: "Warehouse", value: "warehouse" },
+   { label: "Other", value: "other" },
+];

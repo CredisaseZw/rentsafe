@@ -16,13 +16,18 @@ import Button from "@/components/general/Button";
 import useAddIndividualLease from "@/hooks/components/useAddIndividualLease";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteProperty from "../general/AutoCompleteProperty";
-import type {  Option } from "@/types";
+import type {  ApiError, Option } from "@/types";
 import { Plus } from "lucide-react";
 import MultipleTenantInput from "../general/MultipleTenantInput";
 import AutoCompleteClient from "../general/AutoCompleteClient";
 import ButtonSpinner from "../general/ButtonSpinner";
 import useCreateLease from "@/hooks/apiHooks/useCreateLease";
-import type { FormEvent } from "react";
+import { useEffect, type FormEvent } from "react";
+import { toast } from "sonner";
+import getPropertyTypes from "@/hooks/apiHooks/useGetPropertyTypes";
+import LoadingIndicator from "../general/LoadingIndicator";
+import { Textarea } from "../ui/textarea";
+import { CURRENCY_OPTIONS, DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
 
 interface props {
   clientType : string,
@@ -34,21 +39,18 @@ function AddLeaseForm({clientType, successCallback} :props) {
     headers,
     loading,
     formData,
-    unitTypes,
     searchItem,
     propertyName,
-    statusOptions,
+    propertyType, 
     guaranteeItem,
-    guarantorTypes,
-    currencyOptions,
-    inLeaseClientTypes,
+    manualLogProperty,
     outstandingBalance,
     landlordIdentifier,
-    leaseStatusOptions,
-    depositHolderOptions,
+    primaryTenantAddress,
     tenantsOpeningBalance,
-    paymentFrequencyOptions,
     changeTenantsOpeningBalances,
+    switchToPropertyContext,
+    setPrimaryTenantAddress,
     setLandlordIdentifier,
     onSelectGuarantor,
     handleLeaseSubmit,
@@ -56,55 +58,39 @@ function AddLeaseForm({clientType, successCallback} :props) {
     setGuaranteeItem,
     handleUpdateForm,
     onSelectProperty,
+    setPropertyTypes,
     setPropertyName,
     setSearchItem,
     setFormData,
   } = useAddIndividualLease();
   const useMutate = useCreateLease();
- 
+  const {data, isLoading, error} = getPropertyTypes();
+  
+
+  useEffect(()=>{
+    if(error){
+      console.error(error.message)
+      toast.error("Failed to fetch property types", { description: (error as ApiError)?.error || "Something went wrong" });
+      return;
+    }
+    if (data) { setPropertyTypes(data.results ?? []); }
+  }, [data, error])
 
   return (
     <form className="w-full" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback)}>
       <div className="mt-5">
-        <MultipleTenantInput clientType = {clientType}/>
+        <MultipleTenantInput
+          clientType = {clientType}
+          setPrimaryTenantAddress = {setPrimaryTenantAddress}/>
       </div>
       <div className="mt-5">
         <Fieldset legendTitle="Rent Guarantor">
           <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
-           <div className="form-group flex self-baseline-last">
-              <Label className="px-2 font-normal" htmlFor="">Guarantor Type</Label>
-              <Select
-                onValueChange={(val: "individual" | "company") => {
-                  setSearchItem("")
-                  setFormData((prev) => ({
-                    ...prev,
-                    guarantor_id : "",
-                    guarantor_name : "",
-                    guarantor_type: val,
-                    }));
-                  }
-              
-                }
-                name="guarantorType"
-                defaultValue={guarantorTypes[0].value}>
-                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select ..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {
-                      guarantorTypes.length &&
-                      guarantorTypes.map((status: Option, index: number)=>
-                        <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
-                      )
-                    }
-                  </SelectContent>
-              </Select>
-            </div>
             <div className="form-group">
               <AutoCompleteClient
                 searchItem = {guaranteeItem}
                 setSearchItem = {setGuaranteeItem}
-                clientType = {formData.guarantor_type}
+                clientType = {"individual"}
                 clientLabel= {"Rent Guarantor ID"}
                 onSelectValue = {onSelectGuarantor}
               />
@@ -121,10 +107,11 @@ function AddLeaseForm({clientType, successCallback} :props) {
               />
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
+              <Label className="px-2 font-normal required" htmlFor="rentGuarantorName">
                   Guarantee Amount 
               </Label>
-              <Input
+              <Input 
+                  required
                   name={`rentGuaranteeAmount`}
                   id="rentGuaranteeAmount"
               />
@@ -135,13 +122,16 @@ function AddLeaseForm({clientType, successCallback} :props) {
       <div className="mt-5">
         <Fieldset legendTitle = {"Unit Details"}>
           <ColumnsContainer gapClass="gap-6" marginClass="mt-0" numberOfCols={3}>
-            <div>
+            {
+              manualLogProperty === false &&
               <AutoCompleteProperty
                 searchItem= {propertyName}
                 setSearchItem={setPropertyName}
                 onSelectValue={onSelectProperty}
+                alternativeOption={switchToPropertyContext}
               />
-            </div>
+            }
+            
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber" >Unit Number </Label>
               <Input id="unitNumber" required name="unitNumber"/>
@@ -160,8 +150,8 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      unitTypes.length &&
-                      unitTypes.map((u:Option, index: number )=>
+                      UNIT_TYPES.length &&
+                      UNIT_TYPES.map((u:Option, index: number )=>
                         <SelectItem value={u.value} key={index}>{u.label}</SelectItem>
                       )
                     }
@@ -169,23 +159,87 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   </SelectContent>
                 </Select>
             </div>
-            <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="unitNumber">Status</Label>
-              <Select name="status">
-                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select ..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {
-                      statusOptions.length &&
-                      statusOptions.map((status: Option, index: number)=>
-                        <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
-                      )
-                    }
-                  </SelectContent>
-              </Select>
-            </div>
           </ColumnsContainer>
+           {
+              manualLogProperty && primaryTenantAddress !== undefined && <>
+              <ColumnsContainer numberOfCols={3} marginClass="mt-6" gapClass="gap-6">
+                  <div className="flex flex-col justify-baseline form-group">
+                    <Label className="px-2 font-normal required" htmlFor="">
+                      Property Type
+                    </Label>
+                    <Select
+                      name="propertyTypeName"
+                      required
+                    >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select ..." />
+                    </SelectTrigger>
+                      <SelectContent>
+                        {
+                          propertyType &&
+                          propertyType.map((property_type)=>
+                            <SelectItem value={property_type.name || ""} key={property_type.id}>{property_type.name}</SelectItem>
+                          )
+                        }
+                        { 
+                          !propertyType &&
+                          isLoading &&
+                          <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                              <LoadingIndicator />
+                            </SelectItem>
+                        }
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="form-group">
+                    <Label className="px-2 font-normal required" htmlFor="propertyName">
+                        Building/Complex Name
+                      </Label>
+                    <Input name="propertyName"  id="propertyName" required />
+                  </div>
+                  <div className="form-group">
+                      <Label className="px-2 font-normal"  htmlFor="streetAddress">
+                        Street Address
+                      </Label>
+                      <Input name="streetAddress" value={primaryTenantAddress.street_address} disabled  id="streetAddress" />
+                  </div>
+                  <div className="form-group">
+                      <Label className="px-2 font-normal" htmlFor="">
+                       Suburb
+                      </Label>
+                      <Input name="suburb" value={primaryTenantAddress.suburb?.name} disabled id="suburb" />
+                  </div>
+                  <div className="form-group">
+                      <Label className="px-2 font-normal" htmlFor="">
+                        City
+                      </Label>
+                      <Input name="city" value={primaryTenantAddress.city?.name} disabled id="city" />
+                  </div>
+                  <div className="form-group">
+                      <Label className="px-2 font-normal" htmlFor="">
+                        Province
+                      </Label>
+                      <Input name="province" value = {primaryTenantAddress.province?.name} disabled id="province" />
+                  </div>
+                   <div className="form-group">
+                      <Label className="px-2 font-normal" htmlFor="">
+                        Country
+                      </Label>
+                      <Input name="province" value = {primaryTenantAddress.country?.name} disabled id="province" />
+                  </div>
+                   <div className="form-group">
+                      <Label className="px-2 font-normal" htmlFor="">
+                        Area Code
+                      </Label>
+                      <Input name="province" value={primaryTenantAddress.postal_code?.toString()} disabled id="province" />
+                  </div>
+              </ColumnsContainer>
+              <div className="form-group mt-6">
+                  <Label className="px-2 font-normal required" htmlFor="">Property Details</Label>
+                  <Textarea name = "propertyDetails" required placeholder=""></Textarea>
+              </div>
+              </>
+            }
         </Fieldset>
       </div>
       <div className="mt-5">
@@ -201,14 +255,14 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="">Lease Status</Label>
-              <Select name="leaseStatus" defaultValue={leaseStatusOptions[0].value}>
+              <Select name="leaseStatus" defaultValue={LEASE_STATUS_OPTIONS[0].value}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      leaseStatusOptions.length &&
-                      leaseStatusOptions.map((status: Option, index: number)=>
+                      LEASE_STATUS_OPTIONS.length &&
+                      LEASE_STATUS_OPTIONS.map((status: Option, index: number)=>
                         <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
                       )
                     }
@@ -217,14 +271,14 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor=""> Currency</Label>
-              <Select name="currencyType" defaultValue={currencyOptions[0].value}>
+              <Select name="currencyType" defaultValue={CURRENCY_OPTIONS[0].value}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      currencyOptions.length &&
-                      currencyOptions.map((status: Option, index: number)=>
+                      CURRENCY_OPTIONS.length &&
+                      CURRENCY_OPTIONS.map((status: Option, index: number)=>
                         <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
                       )
                     }
@@ -233,14 +287,14 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="">Payment frequency</Label>
-              <Select name="paymentFrequency" defaultValue={paymentFrequencyOptions[0].value}>
+              <Select name="paymentFrequency" defaultValue={PAYMENT_FREQUENCY_OPTIONS[0].value}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      paymentFrequencyOptions.length &&
-                      paymentFrequencyOptions.map((status: Option, index: number)=>
+                      PAYMENT_FREQUENCY_OPTIONS.length &&
+                      PAYMENT_FREQUENCY_OPTIONS.map((status: Option, index: number)=>
                         <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
                       )
                     }
@@ -258,15 +312,16 @@ function AddLeaseForm({clientType, successCallback} :props) {
                 <Input name="otherStandingCharging" id = "otherStandingCharging"/>
             </div>
             <div className="form-group">
-                <Label className="px-2 font-normal required" htmlFor=""> Effective Start Date</Label>
+                <Label className="px-2 font-normal required" htmlFor=""> Payment Start Date</Label>
                 <Input name="effectiveStartDate" required id = "effectiveStartDate" value={25} readOnly/>
             </div>
             <div className="form-group">
-                <Label className="px-2 required font-normal" htmlFor=""> Effective end Date</Label>
+                <Label className="px-2 required font-normal" htmlFor=""> Payment end Date</Label>
                 <Input
                   name="effectiveEndDate"
                   required
                   id = "effectiveEndDate" type={"number"}
+                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   value={formData.effectiveEndDate}
                   onChange={(e)=> handleUpdateForm("effectiveEndDate", e.target.value)}/>
             </div>
@@ -307,15 +362,15 @@ function AddLeaseForm({clientType, successCallback} :props) {
               <Select
                 required
                 name="depositCurrency"
-                defaultValue={currencyOptions[0].value}
+                defaultValue={CURRENCY_OPTIONS[0].value}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Deposit Currency" />
                 </SelectTrigger>
                 <SelectContent>
                  {
-                  currencyOptions.length &&
-                  currencyOptions.map((status: Option, index: number)=>
+                  CURRENCY_OPTIONS.length &&
+                  CURRENCY_OPTIONS.map((status: Option, index: number)=>
                     <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
                   )
                     }
@@ -345,8 +400,8 @@ function AddLeaseForm({clientType, successCallback} :props) {
                 </SelectTrigger>
                 <SelectContent>
                    {
-                      depositHolderOptions.length &&
-                      depositHolderOptions.map((status: Option, index: number)=>
+                      DEPOSIT_HOLDER_OPTIONS.length &&
+                      DEPOSIT_HOLDER_OPTIONS.map((status: Option, index: number)=>
                         <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
                       )
                     }
@@ -430,7 +485,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </SelectTrigger>
               <SelectContent>
                 {
-                  inLeaseClientTypes.map((option:Option, index : number)=>
+                  IN_LEASE_CLIENT_TYPES.map((option:Option, index : number)=>
                     <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                   )
                 }

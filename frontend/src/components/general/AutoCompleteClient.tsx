@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import type { BranchFull, IndividualMinimal } from "@/interfaces";
+import type { Address, BranchFull, IndividualMinimal } from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 
@@ -10,12 +10,13 @@ interface Props {
   clientLabel: string;
   searchItem : string,
   clientType : string,
+  setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>
   onSelectValue? : (item: IndividualMinimal | BranchFull, index? : number) => void;
   setSearchItem? : Dispatch<SetStateAction<string>>;
   multiSetSearchItem? : (index: number, key:string, value: string) => void;
 }
 
-function AutoCompleteClient({ index, clientLabel, clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem }: Props) {
+function AutoCompleteClient({ index, clientLabel, setPrimaryTenantAddress ,clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
 
@@ -61,13 +62,15 @@ function AutoCompleteClient({ index, clientLabel, clientType, onSelectValue, sea
           ) : (
            data.map((item: IndividualMinimal | BranchFull) => {
               const clientName = "first_name" in item 
-                ? `${item.first_name} ${item.last_name}` 
-                : item.company.registration_name; 
+                ? `${item.identification_number} - ${item.first_name} ${item.last_name}` 
+                : `${item.company.registration_number} - ${item.company.registration_name}`; 
 
-                const identificationNumber  = "first_name" in item ?
-                item.identification_number:
-                item.company.registration_number
+              const identificationNumber  = "first_name" in item ?
+              item.identification_number:
+              item.company.registration_number
 
+              if (index  === 0 && setPrimaryTenantAddress) setPrimaryTenantAddress(item.primary_address);
+                
               return (
                 <button
                   key={item.id}

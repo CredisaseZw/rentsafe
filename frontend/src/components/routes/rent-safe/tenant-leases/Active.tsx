@@ -13,16 +13,13 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
 import type { PaginationData } from "@/interfaces"
-import { summarizeAddress } from "@/lib/utils"
+import { riskLevelColorCode, summarizeAddress } from "@/lib/utils"
 import { isAxiosError } from "axios"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import TerminateLeaseDialog from "./TerminateLeaseDialog"
 import SectionHeader from "@/components/general/SectionHeader"
 import type { Lease } from "@/types"
-
-
-
 
 function Active() {
   const {
@@ -90,7 +87,7 @@ function Active() {
                 <TableCell className="text-center">{lease.landlord.landlord_name}</TableCell>
                 <TableCell className="text-center">{lease.unit.property.type}</TableCell>
                 <TableCell className="text-center whitespace-normal break-words max-w-[250px]">{summarizeAddress(lease.unit.property.addresses[0])}</TableCell>
-                <TableCell className="bg-yellow-400 text-center text-white font-semibold">${lease.owing}</TableCell>
+                <TableCell className={`${riskLevelColorCode(lease.risk_level_class)} text-center text-white font-semibold`}>${lease.owing}</TableCell>
                 <TableCell className="bg-blue-600 text-center text-white font-semibold">
                   <div className="flex items-center justify-center">
                     <Button variant={"ghost"}>Receipt</Button>

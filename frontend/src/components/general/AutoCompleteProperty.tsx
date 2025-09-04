@@ -6,14 +6,16 @@ import useSearchProperty from "@/hooks/apiHooks/useSearchProperty";
 import type { ApiError, Property } from "@/types";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 
 interface Props {
   searchItem: string;
   onSelectValue?: (item: Property) => void;
   setSearchItem: Dispatch<SetStateAction<string>>;
+  alternativeOption? : ()=> void;
 }
 
-function AutoCompleteProperty({ onSelectValue, searchItem, setSearchItem }: Props) {
+function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, alternativeOption }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
 
@@ -63,7 +65,20 @@ function AutoCompleteProperty({ onSelectValue, searchItem, setSearchItem }: Prop
               <Loader2 className="text-foreground/60 animate-spin" />
             </div>
           ) : !data?.results?.length ? (
-            <div className="p-2 text-gray-800">No results found</div>
+            <div className="p-4 text-gray-800 text-center flex flex-col items-center">
+              No results found
+              <Button 
+                size={"sm"}
+                variant={"outline"}
+                className="mt-2"
+                onMouseDown={(e) => e.preventDefault()} 
+                onClick={()=> {
+                  setOpen(false)
+                  alternativeOption?.();
+                  console.log("manual")
+              
+                }}>Use Primary Tenants Address</Button>
+              </div>
           ) : (
             data.results.slice(0, 7).map((item: Property) => {
               const fullname = item.name;
@@ -73,7 +88,7 @@ function AutoCompleteProperty({ onSelectValue, searchItem, setSearchItem }: Prop
                   type="button"
                   role="option"
                   className="border-color w-full border-b px-2 py-3 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
-                  onMouseDown={(e) => e.preventDefault()} // prevents input blur
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     onSelectValue?.(item);
                     setSearchItem(fullname ?? "");

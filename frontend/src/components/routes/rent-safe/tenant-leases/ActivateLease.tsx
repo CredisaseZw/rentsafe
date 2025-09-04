@@ -9,7 +9,7 @@ import type { Option } from "@/types";
 import AddLeaseForm from "@/components/forms/AddLeaseForm";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
-function ActiveLease() {
+function ActivateLease() {
     const {isOpen, setShowModal} = useAddIndividualLease();
     const leaseModes = useRef<Option[]>([
         {label : "Individual", value : "individual"},
@@ -50,7 +50,7 @@ function ActiveLease() {
                     <Tabs defaultValue={tabs[0].value} className="w-full">
                         <TabsList className="flex gap-3">
                             <div className="flex gap-3">
-                                <span className="text-sm text-gray-500 self-center">Active:</span>
+                                <span className="text-sm text-gray-500 self-center w-[170px]">Tenant Type:</span>
                                 <Select name="leaseStatus" defaultValue={leaseModes.current[0].value} onValueChange={(val)=> setClientType(val)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select ..." />
@@ -91,4 +91,4 @@ function ActiveLease() {
   )
 }
 
-export default ActiveLease
+export default ActivateLease

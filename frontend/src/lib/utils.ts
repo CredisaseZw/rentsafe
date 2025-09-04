@@ -252,7 +252,7 @@ export function updatePropertyListCache(
       });
     });
   }
-  export function getPersistentData<T = any>(): T | null {
+export function getPersistentData<T = any>(): T | null {
    const rawPersistentData = localStorage.getItem("persistentData");
    if (!rawPersistentData) return null;
 
@@ -264,7 +264,7 @@ export function updatePropertyListCache(
    }
 }
 
-  export function savePersistentData(name: string, data: any) {
+export function savePersistentData(name: string, data: any) {
    const persistentData = getPersistentData() || {};
    persistentData[name] = data;
    localStorage.setItem("persistentData", JSON.stringify(persistentData));
@@ -323,3 +323,14 @@ export const normalizeBalance = (val: any) => {
   const str = val?.toString().trim();
   return str && str.length > 0 ? str : "0.00";
 };
+
+export function riskLevelColorCode(level: "HIGH HIGH" | "NON_PAYER" | "HIGH" | "MEDIUM" | "LOW"):string {
+   const colorCodes  ={
+      "HIGH HIGH" : "bg-red-600",
+      "NON_PAYER" : "bg-black",
+      "HIGH" : "bg-red-500",
+      "MEDIUM" : "bg-yellow-400",
+      "LOW" : "bg-green-600"
+   }
+   return colorCodes[level as keyof typeof colorCodes]
+}
