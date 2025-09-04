@@ -14,6 +14,9 @@ export default function useTerminateLeaseHook(refetch : ()=>void){
     function terminateLease(terminate: UseMutationResult<any, Error, any, unknown>){
       const today = new Date();
       const formatted = today.toISOString().split("T")[0];
+      
+      if(reason.trim().length === 0) return toast.error("Failed to terminate lease", {description : "Reason for termination required"})
+     
       setTerminateStatus((p)=> ({...p, loading: true}))
       terminate.mutate({
         "termination_date": formatted,
@@ -27,7 +30,7 @@ export default function useTerminateLeaseHook(refetch : ()=>void){
       onError : (error)=>{
         console.error(error)
         if(isAxiosError(error)){
-          const message = error.response?.data.error
+          const message = error.response?.data.error ?? error.response?.data.detail
           toast.error("Failed to terminate lease", {description : message || "Something went wrong"} )
         }
       },

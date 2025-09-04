@@ -33,6 +33,7 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
                             <AutoCompleteClient
                                 index = {index}
                                 searchItem = {user.search_value || ""}
+                                createClient = {true}
                                 multiSetSearchItem  = {updateTenant}
                                 setPrimaryTenantAddress = {setPrimaryTenantAddress}
                                 clientType = {clientType}

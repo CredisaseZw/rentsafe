@@ -9,34 +9,14 @@ import { Button } from "@/components/ui/button"
 import { ChevronUp } from "lucide-react"
 import { TableBase } from "./TableBase"
 import { TableCell, TableRow } from "../ui/table"
-import { useState } from "react"
 import ActivateLease from "../routes/rent-safe/tenant-leases/ActivateLease"
-import type { Header } from "@/types"
+import useSubscriptionsSheets from "@/hooks/components/useSubscriptionSheets"
 
 export function SubscriptionSheet() {
-    const [open, setOpen] = useState(false)
-    const headers:Header[] = [
-      {
-          name: "No",
-          
-      },
-      {
-          name: "Open Slots",
-          
-      },
-      {
-          name: "Period (Months)",
-          
-      },
-      {
-          name: "Start Date",
-          
-      },
-      {
-          name: "End Date",
-          
-      },
-    ]
+    const {  
+      open,
+      setOpen,
+      headers} = useSubscriptionsSheets()
   return (
     <Sheet open = {open} onOpenChange={setOpen}>
       <SheetTrigger asChild>

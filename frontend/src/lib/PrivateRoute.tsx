@@ -12,8 +12,7 @@ export default function ProtectRoute() {
 
    useEffect(() => {
       const accessToken = getCookie("access_token");
-      console.log("Access Token:", accessToken);
-      /* if (!accessToken) {
+      if (!accessToken) {
          refreshToken.mutate(undefined, {
             onSuccess: () => {
                setIsValid(true);
@@ -24,7 +23,7 @@ export default function ProtectRoute() {
                }
             },
          });
-      }       */
+      }     
    }, []);
 
    return isValid ? <Outlet /> : <Navigate to={`/login?next=${location.pathname}`} replace={true} />;

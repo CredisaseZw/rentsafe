@@ -57,7 +57,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
 
       {open && (
         <div
-          className="border-color absolute top-full left-1/2 z-[100] mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col overflow-y-auto rounded-sm border bg-white text-sm shadow-xl"
+          className="border-color absolute top-full left-1/2 z-[100] mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col overflow-y-auto rounded-sm border bg-white dark:bg-zinc-900 text-sm shadow-xl"
           role="listbox"
         >
           {isLoading ? (
@@ -65,18 +65,17 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
               <Loader2 className="text-foreground/60 animate-spin" />
             </div>
           ) : !data?.results?.length ? (
-            <div className="p-4 text-gray-800 text-center flex flex-col items-center">
+            <div className="p-4 text-gray-800 dark:text-white text-center flex flex-col items-center">
               No results found
               <Button 
                 size={"sm"}
+                type="button"
                 variant={"outline"}
                 className="mt-2"
                 onMouseDown={(e) => e.preventDefault()} 
                 onClick={()=> {
                   setOpen(false)
                   alternativeOption?.();
-                  console.log("manual")
-              
                 }}>Use Primary Tenants Address</Button>
               </div>
           ) : (

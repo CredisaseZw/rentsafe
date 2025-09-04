@@ -99,7 +99,7 @@ function Active() {
                   </div>
                 </TableCell>
                 <TableCell className="bg-red-600 text-center text-white font-semibold">
-                 <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} id={lease.id}/>
+                 <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} lease_id={lease.lease_id}/>
                 </TableCell>
               </TableRow>
             )) : 

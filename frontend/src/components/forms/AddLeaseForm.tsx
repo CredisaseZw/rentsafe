@@ -66,7 +66,6 @@ function AddLeaseForm({clientType, successCallback} :props) {
   const useMutate = useCreateLease();
   const {data, isLoading, error} = getPropertyTypes();
   
-
   useEffect(()=>{
     if(error){
       console.error(error.message)

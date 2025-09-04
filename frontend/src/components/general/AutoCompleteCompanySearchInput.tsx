@@ -62,13 +62,13 @@ export default function AutoCompleteCompanySearchInput({ elementName }: { elemen
          </div>
 
          {open && (
-            <div className="border-color absolute top-full left-1/2 z-50 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col overflow-y-auto rounded-sm border bg-white text-sm shadow-xl">
+            <div className="border-color absolute top-full left-1/2 z-50 mt-1 flex max-h-[200px] min-h-[50px] w-full -translate-x-1/2 flex-col overflow-y-auto rounded-sm border bg-white dark:bg-zinc-900 text-sm shadow-xl">
                {isLoading ? (
                   <div className="flex items-center justify-center py-5">
                      <Loader2 className="text-foreground/60 animate-spin" />
                   </div>
                ) : !companies?.results?.length ? (
-                  <div className="p-2 text-gray-800">No results found</div>
+                  <div className="p-2 text-gray-800 dark:text-white">No results found</div>
                ) : (
                   companies.results.map((result) => (
                      <button

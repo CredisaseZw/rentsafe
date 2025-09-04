@@ -94,7 +94,7 @@ function ForRenewal() {
                   </TableCell>
                   <TableCell className="bg-red-600 text-center text-white font-semibold">
                     <div className="flex items-center justify-center">
-                      <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} id={lease.id}/>
+                      <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} lease_id={lease.lease_id}/>
                     </div>
                   </TableCell>
                 </TableRow>

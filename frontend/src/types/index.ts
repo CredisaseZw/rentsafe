@@ -361,3 +361,21 @@ export interface ShortSuburbAddressData{
    suburb_id: number;
    postal_code: string | number;
 }
+
+export interface LeaseSubscription {
+  id: number;
+  period: number;
+  start_date: string; 
+  end_date: string;   
+  sub_type: string;
+  total_slots: number;
+  used_slots: number;
+  open_slots: number;
+}
+
+export interface LeaseSubscriptionResponse {
+   count: number,
+   next: string | null,
+   previous: string |null,
+   results: LeaseSubscription[]
+}
