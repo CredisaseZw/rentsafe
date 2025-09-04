@@ -73,7 +73,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving subscription: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
@@ -87,7 +87,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing subscriptions: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -102,7 +102,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing deactivated subscriptions: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -126,7 +126,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error {'activating' if subscription.is_activated else 'deactivating'} subscription: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
@@ -140,7 +140,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing services: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
@@ -154,7 +154,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing subscription periods: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
