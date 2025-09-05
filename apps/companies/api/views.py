@@ -205,7 +205,7 @@ class CompanyViewSet(BaseViewSet):
         """Get all branches for all companies."""
         company = request.query_params.get('company_id')
         try:
-            branches = CompanyBranch.objects.filter(company__id=company, is_deleted=False).select_related('company')
+            branches = CompanyBranch.objects.filter(company__id=company, is_deleted=False).select_related('company').order_by('-date_created')
             serializer = CompanyBranchSearchSerializer(branches, many=True)
             return self._create_rendered_response(serializer.data)
         except Exception as e:

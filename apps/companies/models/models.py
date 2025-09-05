@@ -102,6 +102,10 @@ class CompanyBranch(BaseModelWithUser):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='branches',
                                 help_text=_("The company this branch belongs to."))
     branch_name = models.CharField(max_length=255, help_text=_("The name of the branch."))
+    email = models.EmailField(max_length=255, blank=True, null=True,
+                help_text=_("General email address for the branch."))
+    phone = models.CharField(max_length=20, blank=True, null=True,
+                help_text=_("General phone number for the branch."))
     addresses = GenericRelation(Address, related_query_name='branch_address')
     is_deleted = models.BooleanField(default=False, help_text=_("Indicates if the branch is deleted."))
     is_headquarters = models.BooleanField(default=False, help_text=_("Indicates if this branch is the headquarters."))
@@ -122,6 +126,7 @@ class CompanyBranch(BaseModelWithUser):
     @property
     def full_name(self):
         return f"{self.branch_name}" if self.branch_name else self.company.registration_name
+    
 
 class ContactPerson(BaseModel):
     CONTACT_TYPES = (
@@ -180,6 +185,10 @@ class ContactPerson(BaseModel):
         position = self.position or ''
         mobile = self.individual.contact_details.first().first_mobile_phone if self.individual else ''
         return f"{name} - {position} - {mobile}".strip()
+
+    @property
+    def phone(self):
+        return self.individual.contact_details.first().first_mobile_phone if self.individual else None
 
     def clean(self):
         super().clean()
