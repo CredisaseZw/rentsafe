@@ -6,8 +6,8 @@ from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 from apps.common.api.views import BaseViewSet
 from apps.common.utils import CacheService,extract_error_message
-from apps.subscriptions.api.serializers import ClientMinimalSubscriptionSerializer, SubscriptionCreateSerializer, SubscriptionViewSerializer
-from apps.subscriptions.models.models import Subscription
+from apps.subscriptions.api.serializers import ClientMinimalSubscriptionSerializer, ServicesSerializer, SubscriptionCreateSerializer, SubscriptionPeriodSerializer, SubscriptionViewSerializer
+from apps.subscriptions.models.models import Services, Subscription, SubscriptionPeriod
 
 import logging
 
@@ -59,7 +59,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
                 {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+    @CacheService.cached(tag_prefix="subscription:{pk}")
     def retrieve(self, request, pk=None):
         try:
             subscription = self.get_queryset().get(pk=pk)
@@ -73,10 +73,11 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving subscription: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
+    @CacheService.cached(tag_prefix="subscription:list")
     def list(self, request):
         try:
             queryset = self.get_queryset()
@@ -86,7 +87,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing subscriptions: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -101,7 +102,7 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error listing deactivated subscriptions: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -125,7 +126,35 @@ class SubscriptionAdminViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error {'activating' if subscription.is_activated else 'deactivating'} subscription: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"error": extract_error_message(e)},
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @CacheService.cached(tag_prefix="services:list", timeout=CacheService.VERSION_TIMEOUT)
+    @action(detail=False, methods=['GET'], url_path='services')
+    def services(self, request):
+        try:
+            services = Services.objects.all()
+            serializer = ServicesSerializer(services, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error listing services: {extract_error_message(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @CacheService.cached(tag_prefix="subscription_periods", timeout=86400)
+    @action(detail=False, methods=['GET'], url_path='periods')
+    def periods(self, request):
+        try:
+            periods = SubscriptionPeriod.objects.all()
+            serializer = SubscriptionPeriodSerializer(periods, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error listing subscription periods: {extract_error_message(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

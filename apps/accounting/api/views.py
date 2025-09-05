@@ -285,7 +285,7 @@ class PaymentMethodViewSet(BaseCompanyViewSet):
     serializer_class = PaymentMethodSerializer
     
     def get_queryset(self):
-        return self.queryset
+        return self.queryset.all()
     
     def create(self, request,*args,**kwargs):
         company = request.user.company
