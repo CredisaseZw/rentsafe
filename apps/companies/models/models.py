@@ -69,12 +69,14 @@ class Company(BaseModelWithUser):
                 content_type=ContentType.objects.get_for_model(Company),
                 object_id=self.id,
                 address_type='physical',
-                is_primary=True
+                is_primary=True,
             ).first()
             branch = CompanyBranch.objects.create(
                 company=self,
                 branch_name=self.registration_name,
                 is_headquarters=True,
+                email=self.profile.email if hasattr(self, 'profile') else None,
+                phone=self.profile.mobile_phone if hasattr(self, 'profile') else None,
                 # addresses=company_address if company_address else None
             )
 
