@@ -1,6 +1,7 @@
 import EmptyResults from "@/components/general/EmptyResults"
 import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
+import StaticBadge from "@/components/general/StaticBadge"
 import { TableBase } from "@/components/general/TableBase"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +15,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
 import type { PaginationData } from "@/interfaces"
-import { summarizeAddress } from "@/lib/utils"
+import { riskLevelColorCode, summarizeAddress } from "@/lib/utils"
 import type { Lease } from "@/types"
 import { isAxiosError } from "axios"
 import { useEffect } from "react"
@@ -28,6 +29,8 @@ function Terminated() {
     search,
     paginationData,
     leases,
+    onClearSearch,
+    handleOnSearchValue,
     setLeases,
     setPaginationData
   } = useLeases("TERMINATED");
@@ -56,7 +59,8 @@ function Terminated() {
       <div className="flex mt-8 flex-row justify-between">
         <Searchbox
           placeholder="Search by Name"
-          handleSearch={()=>{}}
+          handleSearch={handleOnSearchValue}
+          clearSearch = {onClearSearch}
         />
         <div className="flex flex-row gap-3">
           <p className="m-0 self-center text-gray-600 dark:text-gray-100 font-medium">Sort by</p>
@@ -82,20 +86,25 @@ function Terminated() {
               <TableRow>      
                 <TableCell className="text-center">{lease.lease_id}</TableCell>
                 <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
-                <TableCell className="text-center">{lease.landlord.landlord_name}</TableCell>
-                <TableCell className="text-center">{lease.unit.property.type}</TableCell>
+                <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>
+                <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
                 <TableCell className="text-center whitespace-normal break-words max-w-[250px]">{summarizeAddress(lease.unit.property.addresses[0])}</TableCell>
-                <TableCell className="bg-yellow-400 text-center text-white font-semibold">${lease.owing}</TableCell>
-                <TableCell className="text-center">{"DATE OF TERMINTATION"}</TableCell>
-                <TableCell className="bg-blue-600 text-center text-white font-semibold">
-                  <div className="flex items-center justify-center">
-                    <Button variant={"ghost"}>Receipt</Button>
-                  </div>
+                <TableCell>
+                  <StaticBadge bgColor={riskLevelColorCode(lease.risk_level_class)}>
+                    <span className="text-white font-semibold text-sm py-2"><i>({lease.currency.currency_code})</i> {lease.owing}</span>
+                  </StaticBadge>
                 </TableCell>
-                <TableCell className="bg-amber-500 text-center text-white font-semibold">
-                  <div className="flex items-center justify-center">
+                <TableCell className="text-center">{"DATE OF TERMINTATION"}</TableCell>
+                <TableCell >
+                  <StaticBadge bgColor="bg-blue-600">
+                    <Button variant={"ghost"}>Receipt</Button>
+                  </StaticBadge>
+                </TableCell>
+
+               <TableCell>
+                  <StaticBadge bgColor="bg-amber-500">
                     <Button variant={"ghost"}>Renew</Button>
-                  </div>
+                  </StaticBadge>
                 </TableCell>
               
               </TableRow>

@@ -9,7 +9,10 @@ import type { Option } from "@/types";
 import AddLeaseForm from "@/components/forms/AddLeaseForm";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
-function ActivateLease() {
+interface props {
+    isDisabled :  boolean
+}
+function ActivateLease({isDisabled}: props) {
     const {isOpen, setShowModal} = useAddIndividualLease();
     const leaseModes = useRef<Option[]>([
         {label : "Individual", value : "individual"},
@@ -39,7 +42,7 @@ function ActivateLease() {
             onOpenChange={setShowModal}
         >
             <DialogTrigger asChild>
-                <Button asChild>
+                <Button asChild disabled = {isDisabled}>
                     Activate a new lease <Plus size={18} />
                 </Button>
             </DialogTrigger>

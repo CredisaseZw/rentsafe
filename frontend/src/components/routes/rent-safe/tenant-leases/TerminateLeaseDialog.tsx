@@ -33,7 +33,7 @@ function TerminateLeaseDialog({tenantName, lease_id, refetch}:props) {
     return (
         <AlertDialog open = {open} onOpenChange={setOpen}>
             <AlertDialogTrigger>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center py-2">
                     <span className="text-white">Terminate</span>
                 </div>
             </AlertDialogTrigger>

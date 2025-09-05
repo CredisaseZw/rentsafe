@@ -20,6 +20,7 @@ import { useEffect } from "react"
 import { toast } from "sonner"
 import TerminateLeaseDialog from "./TerminateLeaseDialog"
 import type { Lease } from "@/types"
+import StaticBadge from "@/components/general/StaticBadge"
 
 function ForRenewal() {
   const {
@@ -29,6 +30,8 @@ function ForRenewal() {
     search,
     paginationData,
     leases,
+    handleOnSearchValue,
+    onClearSearch,
     setLeases,
     setPaginationData
   } = useLeases("RENEW")
@@ -56,7 +59,8 @@ function ForRenewal() {
       <div className="flex mt-8 flex-row justify-between">
         <Searchbox
           placeholder="Search by Name"
-          handleSearch={()=>{}}
+          handleSearch={handleOnSearchValue}
+          clearSearch = {onClearSearch}
         />
         <div className="flex flex-row gap-3">
           <p className="m-0 self-center text-gray-600 dark:text-gray-100 font-medium">Sort by</p>
@@ -82,20 +86,20 @@ function ForRenewal() {
                 <TableRow>      
                   <TableCell className="text-center">{lease.lease_id}</TableCell>
                   <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
-                  <TableCell className="text-center">{lease.landlord.landlord_name}</TableCell>
-                  <TableCell className="text-center">{lease.unit.property.type}</TableCell>
+                  <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>
+                  <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
                   <TableCell className="text-center whitespace-normal break-words max-w-[200px]">{summarizeAddress(lease.unit.property.addresses[0])}</TableCell>
                   <TableCell className="text-center">{lease.start_date} </TableCell>
                   <TableCell className="text-center">{lease.end_date}</TableCell>
-                  <TableCell className="bg-amber-500 text-center text-white font-semibold">
-                    <div className="flex items-center justify-center">
+                  <TableCell>
+                    <StaticBadge bgColor="bg-amber-500">
                       <Button variant={"ghost"}>Renew</Button>
-                    </div>
+                    </StaticBadge>
                   </TableCell>
-                  <TableCell className="bg-red-600 text-center text-white font-semibold">
-                    <div className="flex items-center justify-center">
+                  <TableCell>
+                    <StaticBadge bgColor="bg-red-600">
                       <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} lease_id={lease.lease_id}/>
-                    </div>
+                    </StaticBadge>
                   </TableCell>
                 </TableRow>
             )) :

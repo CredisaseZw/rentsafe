@@ -131,15 +131,12 @@ export function formatAddress(addr: Address): string {
 
 export function extractAddresses(data: { [k: string]: FormDataEntryValue }): AddressPayload[] {
    const addresses: AddressPayload[] = [];
-   const addressesCount = Object.keys(data).filter((key) => key.startsWith("city_id")).length;
+   const addressesCount = Object.keys(data).filter((key) => key.startsWith("suburb_id")).length;
    for (let i = 1; i < addressesCount + 1; i++) {
       const address: AddressPayload = {
          is_primary: !!data[`is_primary_address${i}`],
          address_type: data[`address_type${i}`] as "physical" | "postal" | "billing" | "work" | "other",
          postal_code: data[`postal_code${i}`] as string,
-         country_id: toIntElseUndefined(data[`country_id${i}`] as string),
-         province_id: toIntElseUndefined(data[`province_id${i}`] as string),
-         city_id: toIntElseUndefined(data[`city_id${i}`] as string)!,
          suburb_id: toIntElseUndefined(data[`suburb_id${i}`] as string),
          street_address: data[`street_address${i}`] as string,
       };

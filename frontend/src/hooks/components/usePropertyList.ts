@@ -160,6 +160,7 @@ function usePropertyList() {
       const data = Object.fromEntries(formData.entries());
       const addresses = extractAddresses(data);
       
+      console.log(addresses)
       const property = {
          name: data.building_name,
          description: data.property_details,

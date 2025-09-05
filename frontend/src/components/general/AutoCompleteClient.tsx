@@ -65,18 +65,18 @@ function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantA
               No results found
               {
                 createClient &&
-<Button 
-                size={"sm"}
-                type="button"
-                variant={"outline"}
-                className="mt-2"
-                onMouseDown={(e) => e.preventDefault()} 
-                onClick={()=> {
-                  navigate(`/services/rent-safe/?${clientType === "individual" ? "addIndividual" : "addCompany"}=true&&next=${path.pathname}`)
-                  setOpen(false)
-                }}>Create {clientType === "individual" ? "Individual" : "Company"}</Button>
-              }
-              </div>
+                <Button 
+                  size={"sm"}
+                  type="button"
+                  variant={"outline"}
+                  className="mt-2"
+                  onMouseDown={(e) => e.preventDefault()} 
+                  onClick={()=> {
+                    navigate(`/services/rent-safe/?${clientType === "individual" ? "addIndividual" : "addCompany"}=true&&next=${path.pathname}`)
+                    setOpen(false)
+                  }}>Create {clientType === "individual" ? "Individual" : "Company"}</Button>
+                }
+                </div>
           ) : (
            data.map((item: IndividualMinimal | BranchFull) => {
               const clientName = "first_name" in item 

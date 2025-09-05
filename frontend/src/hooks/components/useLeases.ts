@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useSearchParams } from "react-router"
 
 export default function useLeases(defaultStatus: string) {
+    const [total, setTotal] = useState(0)
     const commonHeaders:Header[] = [
         {
             name  :"Lease ID",
@@ -76,7 +77,25 @@ export default function useLeases(defaultStatus: string) {
     const status = searchParams.get("status")?.toUpperCase() || defaultStatus
     const search = searchParams.get("search") || null
 
+    const handleOnSearchValue = (searchValue: string) =>{
+        setSearchParams((prev) => {
+            const params = new URLSearchParams(prev);
+            if (searchValue) params.set("search", searchValue);
+            else params.delete("search");
+            return params;
+      }); 
+    }
+    const onClearSearch = () => {
+      setSearchParams((prev) => {
+         const params = new URLSearchParams(prev);
+         if (params.get("search")) params.delete("search");
+         return params;
+      });
+   };
+
   return {
+    total,
+    setTotal,
     renewalHeaders,
     terminatedHeaders,
     activeHeaders,
@@ -85,6 +104,8 @@ export default function useLeases(defaultStatus: string) {
     search,
     paginationData, 
     leases,
+    onClearSearch,
+    handleOnSearchValue,
     setLeases,
     setPaginationData,
     setSearchParams

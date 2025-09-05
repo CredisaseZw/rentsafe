@@ -231,6 +231,14 @@ export interface Lease {
   currency: Currency;
   risk_level_class: "LOW" | "MEDIUM" | "HIGH"; 
   owing: number;
+  landlord_opening_balances_data?: [{
+   id: 7,
+   landlord: Landlord
+   amount: Number,
+   commission_percentage: string,
+   operating_costs_inclusive: boolean
+
+  }]
 }
 export interface TenantMinimal {
    id: number;
@@ -378,4 +386,24 @@ export interface LeaseSubscriptionResponse {
    next: string | null,
    previous: string |null,
    results: LeaseSubscription[]
+}
+
+export interface SuburbPayload {
+   id: number,
+   name: string,
+   city: string,
+   province: string,
+   country: string
+}
+
+export interface PaymentMethod {
+   id: number,
+   payment_method_name: string
+}
+
+export interface PaymentMethodResponse {
+   count: number,
+   next: string,
+   previous: string,
+   results : PaymentMethod[]
 }

@@ -1,8 +1,9 @@
-import type { Header } from "@/types"
+import type { Header, LeaseSubscription } from "@/types"
 import { useState } from "react"
 
 export default function useSubscriptionsSheets(){
     const [open, setOpen] = useState(false)
+    const [subscription, setSubscription] = useState<LeaseSubscription | null>(null)
     const headers:Header[] = [
       {
           name: "No",
@@ -27,8 +28,10 @@ export default function useSubscriptionsSheets(){
     ]
     return {
         open,
-        setOpen,
+        headers,
+        subscription,
+        setSubscription,
         useState,
-        headers
+        setOpen,
     }
 }

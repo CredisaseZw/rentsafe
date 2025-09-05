@@ -89,25 +89,28 @@ function AddPropertyForm({successCallback}:props) {
             </SelectContent>
           </Select>
         </div>
-        <div className="form-group">
-          <label>Property Details</label>
+        <div className="form-group"> 
+          <label className="required">Property Details</label>
           <Textarea
             name="property_details"
+            required
             placeholder="i.e Rooms, Size,"
           />
         </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="form-group">
-          <label>Total number of units</label>
+        <div className=" form-group">
+          <label className="required">Total number of units</label>
           <Input
+            required
             type="text"
             name="total_number_of_units"
           />
         </div>
-        <div className="form-group">
-          <label>Building/Complex Name</label>
+        <div className=" form-group">
+          <label className="required">Building/Complex Name</label>
           <Input
+            required
             type="text"
             name="building_name"
           />

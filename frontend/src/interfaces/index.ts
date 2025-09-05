@@ -212,16 +212,6 @@ export interface IndividualReport {
    };
 }
 
-export interface AddressLocation {
-   countryId?: string;
-   provinceId?: string;
-   cityId?: string;
-   suburbId?: string;
-   countryName?: string;
-   provinceName?: string;
-   cityName?: string;
-   suburbName?: string;
-}
 export interface IndividualContact {
       id ?: number;
       individual_id ?: number;

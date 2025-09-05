@@ -2,20 +2,18 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
-import useSearchProperty from "@/hooks/apiHooks/useSearchProperty";
-import type { Property } from "@/types";
+import type {  SuburbPayload } from "@/types";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
+import useSearchSuburb from "@/hooks/apiHooks/useSearchSuburb";
 
 interface Props {
   searchItem: string;
-  onSelectValue?: (item: Property) => void;
+  onSelectValue?: (item: SuburbPayload) => void;
   setSearchItem: Dispatch<SetStateAction<string>>;
-  alternativeOption? : ()=> void;
 }
 
-function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, alternativeOption }: Props) {
+function AutoCompleteSuburb({ searchItem, setSearchItem, onSelectValue }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
 
@@ -24,7 +22,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
     return () => clearTimeout(handler);
   }, [searchItem]);
 
-  const { data, isLoading, error } = useSearchProperty(
+  const { data, isLoading, error } = useSearchSuburb(
     debouncedSearch,
     !!debouncedSearch
   );
@@ -38,10 +36,9 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
     }
   }, [error]);
 
-
   return (
     <div className="form-group relative">
-      <label className="required">Property Name</label>
+      <label className="required">Suburb Name</label>
       <Input
         type="text"
         required
@@ -53,7 +50,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
           setOpen(!!value);
         }}
         onBlur={() => setTimeout(() => setOpen(false), 100)}
-        name="property_name"
+        name="suburb_name"
       />
 
       {open && (
@@ -65,22 +62,12 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
             <div className="flex items-center justify-center py-5">
               <Loader2 className="text-foreground/60 animate-spin" />
             </div>
-          ) : !data?.results?.length ? (
+          ) : !data?.length ? (
             <div className="p-4 text-gray-800 dark:text-white text-center flex flex-col items-center">
               No results found
-              <Button 
-                size={"sm"}
-                type="button"
-                variant={"outline"}
-                className="mt-2"
-                onMouseDown={(e) => e.preventDefault()} 
-                onClick={()=> {
-                  setOpen(false)
-                  alternativeOption?.();
-                }}>Use Primary Tenants Address</Button>
               </div>
           ) : (
-            data.results.slice(0, 7).map((item: Property) => {
+            data?.slice(0, 7).map((item: SuburbPayload) => {
               const fullname = item.name;
               return (
                 <button
@@ -106,4 +93,4 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
   );
 }
 
-export default AutoCompleteProperty;
+export default AutoCompleteSuburb;
