@@ -1,3 +1,4 @@
+import { getCurrentDate } from "@/lib/utils";
 import type { UseMutationResult } from "@tanstack/react-query"
 import { isAxiosError } from "axios";
 import { useState } from "react"
@@ -12,9 +13,7 @@ export default function useTerminateLeaseHook(refetch : ()=>void){
     })
 
     function terminateLease(terminate: UseMutationResult<any, Error, any, unknown>){
-      const today = new Date();
-      const formatted = today.toISOString().split("T")[0];
-      
+      const formatted = getCurrentDate();
       if(reason.trim().length === 0) return toast.error("Failed to terminate lease", {description : "Reason for termination required"})
      
       setTerminateStatus((p)=> ({...p, loading: true}))

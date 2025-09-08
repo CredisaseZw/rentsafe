@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { NavLink, Route, TenantPayload } from "@/types";
+import type { LeaseOpeningBalanceData, NavLink, Route, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -316,10 +316,6 @@ export function extractTenantBranchContact(contacts : BranchContact[]){
       .filter(num => num !== "")
       .join(", ");
 }
-export const normalizeBalance = (val: any) => {
-  const str = val?.toString().trim();
-  return str && str.length > 0 ? str : "0.00";
-};
 
 export function riskLevelColorCode(level: "HIGH HIGH" | "NON_PAYER" | "HIGH" | "MEDIUM" | "LOW"):string {
    const colorCodes  ={
@@ -331,3 +327,57 @@ export function riskLevelColorCode(level: "HIGH HIGH" | "NON_PAYER" | "HIGH" | "
    }
    return colorCodes[level as keyof typeof colorCodes]
 }
+
+export function clearPersistentData() {
+   localStorage.removeItem("persistentData");
+}
+
+export function validateBalances(
+  data: LeaseOpeningBalanceData
+): { valid: boolean; message?: string | null} {
+  const order = [
+      "three_months_plus_balance",
+      "three_months_back_balance",
+      "two_months_back_balance",
+      "one_month_back_balance",
+      "current_month_balance",
+  ] as const;
+
+   const balances = order.map((key) => ({
+      key,
+      value: data[key] || 0,
+   }));
+   let valid = true;
+   let message  = null;
+   for (let i = 0; i < balances.length - 1; i++) {
+      if (balances[i].value > 0) {
+         for(let j = i + 1; j < balances.length - 1; j++){
+            if(balances[j].value === 0){
+               valid = false;
+               message = `Invalid sequence: "${balances[j].key.replaceAll("_", " ")}" is requires a balance.`
+            }
+        }
+    }
+  }
+
+  const total = balances.reduce((sum, b) => sum + b.value, 0);
+  const outstanding = data.outstanding_balance || 0;
+  if (total !== outstanding) {
+      return {
+         valid: false,
+         message: `Outstanding balance (${outstanding}) does not match sum of balances (${total}).`,
+      };
+  }
+
+  return { valid: valid, message : message };
+};
+
+export const getCurrentDate = ():string => {
+   const today = new Date();  
+   return today.toISOString().split("T")[0];   
+}
+export const validateAmounts = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (["e", "E", "+", "-"].includes(e.key)) {
+      e.preventDefault();
+    }
+  };

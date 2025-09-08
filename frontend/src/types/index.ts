@@ -213,18 +213,13 @@ export type AddPropertyForm = {
   landlord_name: string;
 };
 
-export type ApiError = {
-   message: string;
-   error?: string;
-   detail? : string
-}
-
 export interface Lease {
   id: number;
   lease_id: string;
   start_date: string;
   end_date: string;
   status: "ACTIVE" | "INACTIVE" | "TERMINATED";
+
   tenants: Tenant[];
   landlord: Landlord;
   unit: Unit;
@@ -334,7 +329,7 @@ export type LeasePayload = {
   charges: {
    charge_type: "RENT" | "UTILITY" | "OTHER";
    description: string;
-   amount: string;
+   amount: number;
    currency: number;
    frequency: "MONTHLY" | "QUARTERLY" | "ANNUALLY" | "ONCE";
    effective_date: string;
@@ -350,12 +345,12 @@ export type LeasePayload = {
   }[];
 
   lease_opening_balance_data: {
-   current_month_balance: string;
-   one_month_back_balance: string;
-   two_months_back_balance: string;
-   three_months_back_balance: string;
-   three_months_plus_balance: string;
-   outstanding_balance: string;
+   current_month_balance: number;
+   one_month_back_balance: number;
+   two_months_back_balance: number;
+   three_months_back_balance: number;
+   three_months_plus_balance: number;
+   outstanding_balance: number;
   };
 
   landlord_opening_balances_data: {
@@ -406,4 +401,25 @@ export interface PaymentMethodResponse {
    next: string,
    previous: string,
    results : PaymentMethod[]
+}
+
+export interface Currency{
+   id: number,
+   currency_code: string,
+   currency_name: string 
+}
+
+export interface CurrencyResponse{
+   count: number,
+   next: string | null,
+   previous: string | null,
+   results: Currency[]
+}
+export interface LeaseOpeningBalanceData {
+  current_month_balance: number;
+  one_month_back_balance: number;
+  two_months_back_balance: number;
+  three_months_back_balance: number;
+  three_months_plus_balance: number;
+  outstanding_balance: number;
 }

@@ -16,7 +16,7 @@ import Button from "@/components/general/Button";
 import useAddIndividualLease from "@/hooks/components/useAddIndividualLease";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteProperty from "../general/AutoCompleteProperty";
-import type {  ApiError, Option } from "@/types";
+import type { Currency, Option } from "@/types";
 import { Plus } from "lucide-react";
 import MultipleTenantInput from "../general/MultipleTenantInput";
 import AutoCompleteClient from "../general/AutoCompleteClient";
@@ -27,7 +27,10 @@ import { toast } from "sonner";
 import getPropertyTypes from "@/hooks/apiHooks/useGetPropertyTypes";
 import LoadingIndicator from "../general/LoadingIndicator";
 import { Textarea } from "../ui/textarea";
-import { CURRENCY_OPTIONS, DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
+import { DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
+import { isAxiosError } from "axios";
+import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
+import { validateAmounts } from "@/lib/utils";
 
 interface props {
   clientType : string,
@@ -43,6 +46,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
     propertyName,
     propertyType, 
     guaranteeItem,
+    CURRENCY_OPTIONS,
     manualLogProperty,
     outstandingBalance,
     landlordIdentifier,
@@ -52,6 +56,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
+    SET_CURRENCY_OPTIONS,
     onSelectGuarantor,
     handleLeaseSubmit,
     onSelectLandlord,
@@ -65,15 +70,25 @@ function AddLeaseForm({clientType, successCallback} :props) {
   } = useAddIndividualLease();
   const useMutate = useCreateLease();
   const {data, isLoading, error} = getPropertyTypes();
-  
+  const {currencyData, currencyLoading, currencyError} = useGetCurrencies();
+
   useEffect(()=>{
-    if(error){
-      console.error(error.message)
-      toast.error("Failed to fetch property types", { description: (error as ApiError)?.error || "Something went wrong" });
+    if(isAxiosError(error)){
+      const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong"
+      toast.error("Failed to fetch property types", { description: message });
       return;
     }
     if (data) { setPropertyTypes(data.results ?? []); }
   }, [data, error])
+
+  useEffect(()=>{
+    if(isAxiosError(currencyError)){
+      const message = currencyError.response?.data.error ?? currencyError.response?.data.details ?? "Something went wrong"
+      toast.error("Failed to fetch currencies", { description: message });
+      return;
+    }
+    if (currencyData) { SET_CURRENCY_OPTIONS(currencyData.results ?? []) }
+  }, [currencyData, currencyData])
 
   return (
     <form className="w-full" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback)}>
@@ -110,6 +125,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   Guarantee Amount 
               </Label>
               <Input 
+                  type= "number" 
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
                   required
                   name={`rentGuaranteeAmount`}
                   id="rentGuaranteeAmount"
@@ -269,17 +288,23 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </Select>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor=""> Currency</Label>
-              <Select name="currencyType" defaultValue={CURRENCY_OPTIONS[0].value}>
+              <Label className="px-2 font-normal required" htmlFor=""> Currency</Label>
+              <Select name="currencyType" required>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      CURRENCY_OPTIONS.length &&
-                      CURRENCY_OPTIONS.map((status: Option, index: number)=>
-                        <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
+                      CURRENCY_OPTIONS.map((c:Currency)=>
+                        <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>
                       )
+                    }
+                    { 
+                      CURRENCY_OPTIONS.length === 0 &&
+                      currencyLoading &&
+                      <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                          <LoadingIndicator />
+                        </SelectItem>
                     }
                   </SelectContent>
               </Select>
@@ -301,14 +326,27 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </Select>
             </div>
              <div className="form-group">
-                <Label className="px-2 font-normal" htmlFor="monthlyRent">
+                <Label className="px-2 font-normal required" htmlFor="monthlyRent">
                   Monthly Rent (Excl. VAT)
                 </Label>
-                <Input name="monthlyRent"  id="monthlyRent" />
+                <Input 
+                  name="monthlyRent"
+                  id="monthlyRent"
+                  type= "number"
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
+                  required/>
             </div>
             <div className="form-group">
                 <Label className="px-2  font-normal" htmlFor="">Other standing Charges</Label>
-                <Input name="otherStandingCharging" id = "otherStandingCharging"/>
+                <Input 
+                  name="otherStandingCharging"
+                  id = "otherStandingCharging"
+                  type= "number"
+                  step={0.01} 
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}/>
             </div>
             <div className="form-group">
                 <Label className="px-2 font-normal required" htmlFor=""> Payment Start Date</Label>
@@ -320,7 +358,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   name="effectiveEndDate"
                   required
                   id = "effectiveEndDate" type={"number"}
-                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   value={formData.effectiveEndDate}
                   onChange={(e)=> handleUpdateForm("effectiveEndDate", e.target.value)}/>
             </div>
@@ -361,19 +399,24 @@ function AddLeaseForm({clientType, successCallback} :props) {
               <Select
                 required
                 name="depositCurrency"
-                defaultValue={CURRENCY_OPTIONS[0].value}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Deposit Currency" />
                 </SelectTrigger>
                 <SelectContent>
-                 {
-                  CURRENCY_OPTIONS.length &&
-                  CURRENCY_OPTIONS.map((status: Option, index: number)=>
-                    <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
-                  )
+                    {
+                      CURRENCY_OPTIONS.map((c:Currency)=>
+                        <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>
+                      )
                     }
-                </SelectContent>
+                    { 
+                      CURRENCY_OPTIONS.length === 0 &&
+                      currencyLoading &&
+                      <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                          <LoadingIndicator />
+                        </SelectItem>
+                    }
+                  </SelectContent>
               </Select>
             </div>
             <div className="form-group">
@@ -381,6 +424,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
                 Deposit Amount 
               </Label>
               <Input
+                type= "number" 
+                step={0.01}
+                onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                onKeyDown={validateAmounts}
                 required
                 name="depositAmount"
                 id="depositAmount"
@@ -416,14 +463,28 @@ function AddLeaseForm({clientType, successCallback} :props) {
             <TableRow>
               <TableCell className=" text-center">Amount</TableCell>
               <TableCell className = {tenantsOpeningBalance.three_months_back_plus_balance.colorCode}>
-                <Input
+               <Input
+                  type="number"
+                  step="0.01"
                   name="paymentDataMoreThan3Months"
                   value={tenantsOpeningBalance.three_months_back_plus_balance.value}
-                  onChange={(val) => changeTenantsOpeningBalances("three_months_back_plus_balance", val.target.value)}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  onKeyDown={validateAmounts} 
+                  onChange={(e) =>
+                    changeTenantsOpeningBalances(
+                      "three_months_back_plus_balance",
+                      e.currentTarget.value
+                    )
+                  }
                 />
+
               </TableCell>
               <TableCell className={tenantsOpeningBalance.three_months_back_balance.colorCode}>
                 <Input
+                  type= "number" 
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
                   name="three_months_back_balance"
                   value={tenantsOpeningBalance.three_months_back_balance.value}
                   onChange={(val) => changeTenantsOpeningBalances("three_months_back_balance", val.target.value)}
@@ -432,6 +493,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </TableCell>
               <TableCell className={tenantsOpeningBalance.two_months_back_balance.colorCode}>
                 <Input
+                  type= "number" 
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
                   name="two_months_back_balance"
                   onChange={(val) => changeTenantsOpeningBalances("two_months_back_balance", val.target.value)}
                   value={tenantsOpeningBalance.two_months_back_balance.value}
@@ -439,6 +504,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </TableCell>
               <TableCell className={tenantsOpeningBalance.one_month_back_balance.colorCode}>
                 <Input
+                  type= "number" 
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
                   value={tenantsOpeningBalance.one_month_back_balance.value}
                   onChange={(val) => changeTenantsOpeningBalances("one_month_back_balance", val.target.value)}
                   name="one_month_back_balance"
@@ -446,6 +515,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </TableCell>
               <TableCell className={tenantsOpeningBalance.current_month_balance.colorCode}>
                 <Input
+                  type= "number" 
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
                   onChange={(val) => changeTenantsOpeningBalances("current_month_balance", val.target.value)}
                   value={tenantsOpeningBalance.current_month_balance.value}
                   name="current_month_balance"                
@@ -454,7 +527,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
               <TableCell className={`text-center text-white ${outstandingBalance.colorCode}`}>
                 {
                 outstandingBalance.value.length ?
-                `$${outstandingBalance.value}.00` : 
+                `$${outstandingBalance.value}` : 
                 "$0.00"
                 }
               </TableCell>
@@ -514,6 +587,12 @@ function AddLeaseForm({clientType, successCallback} :props) {
             Commission %
           </Label>
           <Input
+            type= "number" 
+            step={0.01}
+            min = {0}
+            max = {100}
+            onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+            onKeyDown={validateAmounts}
             name="commissionPercentage"
             id="commissionPercentage"
             required            
@@ -524,6 +603,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
             Landlords Opening Balance
           </Label>
           <Input
+            type= "number" 
+            step={0.01}
+            onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+            onKeyDown={validateAmounts}
             name="landlordsOpeningBalance"
             id="landlordsOpeningBalance"
             required

@@ -1,7 +1,7 @@
 import { IN_LEASE_CLIENT_TYPES } from "@/constants";
 import type { Address, BranchFull, IndividualMinimal } from "@/interfaces";
-import { extractTenants, getThreeMonthsBack, normalizeBalance } from "@/lib/utils";
-import type {LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
+import { extractTenants, getThreeMonthsBack, validateBalances } from "@/lib/utils";
+import type {Currency, LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
 import { useQueryClient, type UseMutationResult } from "@tanstack/react-query";
 import { isAxiosError, type AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react"
@@ -14,6 +14,7 @@ function useAddIndividualLease() {
   const [loading,setLoading] = useState(false);
   const [propertyName, setPropertyName] = useState("");
   const [searchItem, setSearchItem] = useState("");  
+  const [CURRENCY_OPTIONS, SET_CURRENCY_OPTIONS] = useState<Currency[]>([]);
   const [guaranteeItem, setGuaranteeItem] = useState("");
   const [propertyType, setPropertyTypes] = useState<PropertyType[]>([])
   const [landlordIdentifier, setLandlordIdentifier] = useState("National ID");
@@ -29,7 +30,7 @@ function useAddIndividualLease() {
 
     landlord_id: "" as string | number,
     landlord_name: "",
-    effectiveEndDate : "",
+    effectiveEndDate : "7",
 
     address_object : {} as Address,
     property : {} as ShortPropertyData,
@@ -97,8 +98,6 @@ function useAddIndividualLease() {
     });
   
   }, [tenantsOpeningBalance]);
-
-
   const changeTenantsOpeningBalances = (field: keyof typeof tenantsOpeningBalance, value: string) => {
     setTenantsOpeningBalance((prev) => ({
       ...prev,
@@ -108,21 +107,18 @@ function useAddIndividualLease() {
       },
     }));
   };
-
   const headers = useMemo(() => ([
     { name: "Payment Data" },
     { name: "More than 3 months" },
     ...getThreeMonthsBack(formData.effectiveEndDate).map(h => ({ name: h })),
     { name: "Outstanding Balance" }
   ]), [formData.effectiveEndDate]);
-  
   const handleUpdateForm = (name:any, value:any) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
     }));
   };
-
   const onSelectGuarantor = (item: IndividualMinimal | BranchFull)=>{
     if ("first_name" in item) {
       setFormData((prev) => ({
@@ -139,7 +135,6 @@ function useAddIndividualLease() {
     }));
     return
   }
-
   const onSelectLandlord = (item: IndividualMinimal | BranchFull)=>{
     if ("first_name" in item) {
       setFormData((prev) => ({
@@ -156,7 +151,6 @@ function useAddIndividualLease() {
     }));
     return
   }
-
   const onSelectProperty = (item: Property) => {
     setFormData((p) => ({
       ...p,
@@ -201,11 +195,20 @@ function useAddIndividualLease() {
       status : String("active")
     } :  formData.property
 
-    const address_data = {
-      street_address: source?.street_address ?? "",
-      suburb_id: source?.suburb?.id || 0,
-      postal_code: source?.postal_code ?? ""
-    };
+    const lease_opening_balance_data = {
+        current_month_balance: Number(data.current_month_balance),
+        one_month_back_balance: Number(data.one_month_back_balance),
+        two_months_back_balance: Number(data.two_months_back_balance),
+        three_months_back_balance: Number(data.three_months_back_balance),
+        three_months_plus_balance: Number(data.paymentDataMoreThan3Months),
+        outstanding_balance: Number(outstandingBalance.value)
+    }
+
+    const { valid, message } = validateBalances(lease_opening_balance_data);
+    if (!valid) {
+      toast.error("Lease opening balances not valid", { description: message });
+      return setLoading(false)
+    }
 
     const PAYLOAD: LeasePayload = {
       start_date: String(data.leaseStartDate),
@@ -224,7 +227,11 @@ function useAddIndividualLease() {
         unit_type: String(data.unitType) as LeasePayload["unit_data"]["unit_type"],
         number_of_rooms: Number(data.unitNumberOfRooms),
       },
-      address_data: address_data, 
+      address_data: {
+        street_address: source?.street_address ?? "",
+        suburb_id: source?.suburb?.id || 0,
+        postal_code: source?.postal_code ?? ""
+      }, 
       landlord_data: {
         landlord_type: String(formData.landlord_type) as LeasePayload["landlord_data"]["landlord_type"],
         landlord_name: String(formData.landlord_name),
@@ -240,7 +247,7 @@ function useAddIndividualLease() {
         {
           charge_type: "RENT",
           description: "Monthly Rent",
-          amount: String(data.monthlyRent),
+          amount: Number(data.monthlyRent),
           currency: Number(data.currencyType),
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
           effective_date: String(data.leaseStartDate),
@@ -250,7 +257,7 @@ function useAddIndividualLease() {
         {
           charge_type: "UTILITY",
           description: "Utility Charge",
-          amount: String(data.otherStandingCharging),
+          amount: Number(data.otherStandingCharging),
           currency: Number(data.currencyType),
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
           effective_date: String(data.leaseStartDate),
@@ -266,14 +273,7 @@ function useAddIndividualLease() {
           deposit_holder: String(data.depositHolder) as LeasePayload["deposits"][0]["deposit_holder"]
         }
       ],
-      lease_opening_balance_data: {
-        current_month_balance: normalizeBalance(data.current_month_balance),
-        one_month_back_balance: normalizeBalance(data.one_month_back_balance),
-        two_months_back_balance: normalizeBalance(data.two_months_back_balance),
-        three_months_back_balance: normalizeBalance(data.three_months_back_balance),
-        three_months_plus_balance: normalizeBalance(data.paymentDataMoreThan3Months),
-        outstanding_balance: String(outstandingBalance.value)
-      },
+      lease_opening_balance_data,
       landlord_opening_balances_data: [
         {
           amount: String(data.landlordsOpeningBalance),
@@ -282,23 +282,23 @@ function useAddIndividualLease() {
         }
       ]
     };
-    console.log(PAYLOAD)
-   useMutate.mutate(PAYLOAD, {
-      onError: (error: AxiosError |Error | unknown) => {
-        if (isAxiosError(error)) {
-          console.error("Full backend response:", error.response?.data);
-          const errorDetails = error.response?.data?.error || error.response?.data?.detail || "Something went wrong";
-          toast.error("Failed to create new lease", { description: errorDetails });
-          return;
-          }
-        toast.error("Failed to create property. Please try again.");
-      },
-      onSuccess :() => {
-        toast.success("Lease successfully created")
-        queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
-        successCallback()
-      }, 
-      onSettled: () => setLoading(false),         
+  
+    useMutate.mutate(PAYLOAD, {
+        onError: (error: AxiosError |Error | unknown) => {
+          if (isAxiosError(error)) {
+            console.error("Full backend response:", error.response?.data);
+            const errorDetails = error.response?.data?.error || error.response?.data?.detail || "Something went wrong";
+            toast.error("Failed to create new lease", { description: errorDetails });
+            return;
+            }
+          toast.error("Failed to create property. Please try again.");
+        },
+        onSuccess :() => {
+          toast.success("Lease successfully created")
+          queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
+          successCallback()
+        }, 
+        onSettled: () => setLoading(false),         
     }) 
   };
 
@@ -311,6 +311,7 @@ function useAddIndividualLease() {
     propertyName,
     propertyType,
     guaranteeItem,
+    CURRENCY_OPTIONS,
     manualLogProperty,
     outstandingBalance,
     landlordIdentifier,
@@ -321,6 +322,7 @@ function useAddIndividualLease() {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
+    SET_CURRENCY_OPTIONS,
     setManualLogProperty,
     onSelectGuarantor,
     handleLeaseSubmit,

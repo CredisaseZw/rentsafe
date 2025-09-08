@@ -90,7 +90,7 @@ function Active() {
           {
             leases?.length
             ? leases.map((lease:Lease)=>(
-              <TableRow>      
+              <TableRow key={lease.lease_id}>      
                 <TableCell className="text-center">{lease.lease_id}</TableCell>
                 <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
                 <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>

@@ -20,9 +20,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import useCreateProperty from "@/hooks/apiHooks/useCreateProperty";
 import { toast } from "sonner"
 import ButtonSpinner from "../general/ButtonSpinner";
-import type { ApiError, Option } from "@/types";
+import type { Option } from "@/types";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteClient from "../general/AutoCompleteClient";
+import { isAxiosError } from "axios";
 interface props{
   successCallback : ()=>void
 }
@@ -49,9 +50,9 @@ function AddPropertyForm({successCallback}:props) {
   const {data, isLoading, error} = getPropertyTypes();
 
   useEffect(()=>{
-    if(error){
-      console.error(error.message)
-      toast.error("Failed to fetch property types", { description: (error as ApiError)?.error || "Something went wrong" });
+    if(isAxiosError(error)){
+      const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong"
+      toast.error("Failed to fetch property types", { description: message });
       return;
     }
     if (data) { setPropertyTypes(data.results ?? []); }

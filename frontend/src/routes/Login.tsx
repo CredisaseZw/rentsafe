@@ -8,7 +8,7 @@ import Alert from "@/components/general/Alerts";
 import { useState } from "react";
 import ButtonSpinner from "@/components/general/ButtonSpinner";
 import Button from "@/components/general/Button";
-import { setCookie } from "typescript-cookie";
+import { getCookie, setCookie } from "typescript-cookie";
 import { isAxiosError } from "axios";
 
 export default function Login() {
@@ -27,7 +27,7 @@ export default function Login() {
       login.mutate(loginForm, {
          onSuccess: (data) => {
             if(data.is_verified){
-               setCookie("token", JSON.stringify(data), { expires: 4 });
+               if(!getCookie("token")) setCookie("token", JSON.stringify(data), { expires: 4 });
                const next = new URLSearchParams(location.search).get("next");
                navigate(next || "/services/rent-safe", { replace: true });
             } else{

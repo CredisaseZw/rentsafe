@@ -1,30 +1,37 @@
 import { Navigate } from "react-router-dom";
 import { Outlet, useLocation } from "react-router";
-import { getCookie } from "typescript-cookie";
-import useRefreshToken from "@/hooks/apiHooks/useRefreshToken";
-import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
-
+import axios from "axios";
 export default function ProtectRoute() {
-   const refreshToken = useRefreshToken();
-   const [isValid, setIsValid] = useState<boolean>(true); 
    const location = useLocation();
+   const [isChecking, setIsChecking] = useState(true);
+   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
    useEffect(() => {
-      const accessToken = getCookie("access_token");
-      if (!accessToken) {
-         refreshToken.mutate(undefined, {
-            onSuccess: () => {
-               setIsValid(true);
-            },
-            onError: (error) => {
-               if (isAxiosError(error) && error.response?.status === 401) {
-                  setIsValid(false);
-               }
-            },
+      axios
+         .get("/api/check-csrf/", {withCredentials: true})
+         .then(() => setIsAuthenticated(true))
+         .catch((error) => {
+            if (
+               axios.isAxiosError(error) &&
+               (error.response?.status === 401 || error.response?.status === 403)
+            ) {
+               setIsAuthenticated(false);
+            } else {
+               console.error("Unexpected error checking auth status:", error);
+               setIsAuthenticated(false);
+            }
+         })
+         .finally(() => {
+            setIsChecking(false);
          });
-      }     
    }, []);
 
-   return isValid ? <Outlet /> : <Navigate to={`/login?next=${location.pathname}`} replace={true} />;
+   if (isChecking) {
+      return <div>Loading...</div>;
+   }
+   if (!isAuthenticated) {
+      return <Navigate to={`/login?next=${location.pathname}`} replace />;
+   }
+   return <Outlet />;
 }

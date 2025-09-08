@@ -114,11 +114,6 @@ export const IN_LEASE_CLIENT_TYPES: Option[] = [
    { label: "Company", value: "company" },
 ];
 
-export const CURRENCY_OPTIONS: Option[] = [
-   { label: "US", value: "1" }, // UPDATE AFTER CURRENCY MANAGEMENT WORKS
-   { label: "ZWG", value: "2" },
-];
-
 export const STATUS_OPTIONS: Option[] = [
    { label: "Occupied", value: "occupied" },
    { label: "Vacant", value: "vacant" },
