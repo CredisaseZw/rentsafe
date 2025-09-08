@@ -20,6 +20,7 @@ from apps.accounting.models.models import (
     GeneralLedgerAccount,
     Payment
 )
+from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
 
 admin.site.register(ContentType)
 admin.site.site_header = "CountSafe Admin"
@@ -290,3 +291,19 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ("invoice",)
     ordering = ("-payment_date",)
     list_per_page = 25
+
+@admin.register(ServiceSpecialPricing)
+class ServiceSpecialPricingInline(admin.ModelAdmin):
+    list_display = ('id', 'service', 'client_customer', 'individual_charge', 'company_charge', 'currency')
+    list_display_links = ('service', 'client_customer')
+    search_fields = ('service__service_name', 'client_customer__name')
+    list_filter = ('currency',)
+    ordering = ('service__service_name', 'client_customer__name')   
+
+@admin.register(ServiceStandardPricing)
+class ServiceStandardPricingInline(admin.ModelAdmin):
+    list_display = ('id', 'service', 'individual_charge', 'company_charge', 'currency', 'current_rate')
+    list_display_links = ('service',)
+    search_fields = ('service__service_name',)
+    list_filter = ('currency',)
+    ordering = ('service__service_name',)   

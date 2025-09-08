@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
@@ -9,19 +7,12 @@ from apps.accounting.models.models import Currency
     
 
 
-class SpecialPricing(BaseModelWithUser):
-    service = models.ForeignKey('subscriptions.Service', on_delete=models.CASCADE, related_name='special_pricing_options',
+class ServiceSpecialPricing(BaseModelWithUser):
+    service = models.ForeignKey('subscriptions.Services', on_delete=models.CASCADE, related_name='special_pricing_options',
                                 help_text=_("The service this special pricing applies to."))
     
-    client_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
-                    limit_choices_to=Q(app_label='individuals', model='individual') |
-                    Q(app_label='companies', model='companybranch'),
-                    related_name='special_pricing_as_client',
-                    help_text=_("The type of entity this special pricing is for."))
-    client_object_id = models.PositiveIntegerField(
-        help_text=_("The ID of the client entity (Individual or Company).")
-    )
-    client_customer = GenericForeignKey('client_content_type', 'client_object_id')
+    client_customer = models.OneToOneField('clients.Client', on_delete=models.CASCADE, related_name='special_pricing',
+                help_text=_("The specific client this special pricing is for."))
 
     individual_charge = models.DecimalField(_("Individual Charge"), max_digits=12, decimal_places=2,
                     help_text=_("Special charge amount for individuals."))
@@ -34,13 +25,13 @@ class SpecialPricing(BaseModelWithUser):
     class Meta(BaseModel.Meta):
         verbose_name = _("Special Pricing")
         verbose_name_plural = _("Special Pricing")
-        unique_together = ('service', 'client_content_type', 'client_object_id')
+        unique_together = ('service', 'client_customer')
 
     def __str__(self):
         return f"Special Pricing for {self.service.service_name}"
 
-class StandardPricing(BaseModelWithUser):
-    service = models.ForeignKey('subscriptions.Service', on_delete=models.CASCADE, related_name='standard_pricing_options',
+class ServiceStandardPricing(BaseModelWithUser):
+    service = models.ForeignKey('subscriptions.Services', on_delete=models.CASCADE, related_name='standard_pricing_options',
                                 help_text=_("The service this standard pricing applies to."))
     
     individual_charge = models.DecimalField(_("Individual Charge"), max_digits=12, decimal_places=2)
