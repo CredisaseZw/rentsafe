@@ -142,6 +142,8 @@ def send_notification(
         return {"success": False, "error": str(exc)}
 
 
+
+@shared_task
 def send_sms(phone_number: str, message: str) -> bool:
     """Send SMS using the configured SMS service"""
     try:

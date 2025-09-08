@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from apps.common.models.base_models import BaseModel
 from apps.individuals.models.models import Individual
-from apps.companies.models.models import Company
+from apps.companies.models.models import CompanyBranch
 from uuid import uuid4
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -74,8 +74,8 @@ class Client(models.Model):
         if not self.name and self.client_object:
             if isinstance(self.client_object, Individual):
                 self.name = f"{self.client_object.full_name}"
-            elif isinstance(self.client_object, Company):
-                self.name = f"{self.client_object.registration_name}"
+            elif isinstance(self.client_object, CompanyBranch):
+                self.name = f"{self.client_object.branch_name}"
             else:
                 self.name = f"Client {self.client_content_type.model}-{self.client_object_id}"
 

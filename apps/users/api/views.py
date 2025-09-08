@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions, viewsets
-from rest_framework_simplejwt.views import TokenObtainPairView
+from apps.users.api.authentication import CookieJWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -145,6 +145,14 @@ class CurrentUserView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+class CheckCSRFView(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        if not request.user or not request.user.is_authenticated:
+            return Response({"error": "User not authenticated"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"message": "CSRF token is valid"}, status=status.HTTP_200_OK)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

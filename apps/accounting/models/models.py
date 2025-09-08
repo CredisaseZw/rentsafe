@@ -392,6 +392,7 @@ class Payment(BaseModelWithUser):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     payment_date = models.DateTimeField(default=now)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name="payments")
     reference = models.CharField(max_length=255, blank=True, null=True)

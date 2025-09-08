@@ -1,12 +1,11 @@
 # apps/companies/api/serializers.py
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.contenttypes.models import ContentType
 from apps.companies.models.models import Company, CompanyBranch, ContactPerson, CompanyProfile
 from apps.common.models.models import Address, Document, Note
-from apps.individuals.api.serializers import IndividualSerializer 
 from apps.common.api.serializers import AddressSerializer, DocumentSerializer, NoteSerializer
-from apps.individuals.models.models import Individual
+from apps.common.utils import normalize_zimbabwe_mobile, validate_email
+from django.db.models import Q
 import logging
 from django.db import transaction
 
@@ -49,21 +48,31 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'company', 'branch_name', 'addresses', 'contacts', 'is_headquarters']
+        fields = ['id', 'company', 'branch_name', 'addresses', 'contacts', 'is_headquarters', 'email', 'phone']
     
+    def validate(self, attrs):
+        if attrs.get('phone') and not normalize_zimbabwe_mobile(attrs.get('phone')):
+            raise serializers.ValidationError("Invalid Zimbabwean phone number format.")
+        if attrs.get('email') and not validate_email(attrs.get('email')):
+            raise serializers.ValidationError("Invalid email format.")
+        if CompanyBranch.objects.filter(Q(phone=attrs.get('phone')) | Q(email=attrs.get('email')), is_deleted=False).exists():
+            raise serializers.ValidationError("A branch with this phone number or email already exists.")
+        return super().validate(attrs)
+
+
     def create(self, validated_data):
         addresses_data = validated_data.pop('addresses', [])
         contacts_data = validated_data.pop('contacts', []) 
         request = self.context.get('request')
-        user = request.user if request and hasattr(request, 'user') else None
+        validated_data['phone'] = normalize_zimbabwe_mobile(validated_data.get('phone', None))
         
+
         with transaction.atomic():
             branch = CompanyBranch.objects.create(**validated_data)
             company_branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
             
             for address_data in addresses_data:
                 Address.objects.create(
-                    user=user,
                     content_type=company_branch_content_type,
                     object_id=branch.id,
                     **address_data
@@ -85,8 +94,6 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
         contacts_data = validated_data.pop('contacts', None) 
 
         request = self.context.get('request')
-        user = request.user if request and hasattr(request, 'user') else None
-
         instance = super().update(instance, validated_data)
 
         if addresses_data is not None:
@@ -94,7 +101,6 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
             company_branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
             for address_data in addresses_data:
                 Address.objects.create(
-                    user=user,
                     content_type=company_branch_content_type,
                     object_id=instance.id,
                     **address_data
@@ -297,7 +303,7 @@ class CompanyBranchMinimalSerializer(serializers.ModelSerializer):
     company = CompanyMinimalSerializer(read_only=True)
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'branch_name', 'is_headquarters', 'company']
+        fields = ['id', 'branch_name', 'is_headquarters', 'company', 'email', 'phone']
 
 
 class CompanyBranchSearchSerializer(serializers.ModelSerializer):
@@ -332,7 +338,7 @@ class CompanyBranchDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'branch_name', 'is_headquarters', 'is_deleted',
             'company', 'contacts', 'primary_address', 'profile',
-            'date_created', 'date_updated'
+            'date_created', 'date_updated', 'email', 'phone'
         ]
     
     def get_primary_address(self, obj):
@@ -359,7 +365,7 @@ class CompanyBranchLeaseDetailSerializer(serializers.ModelSerializer):
         model = CompanyBranch
         fields = [
             'id', 'branch_name', 'is_headquarters',
-            'company', 'contacts', 'primary_address',
+            'company', 'contacts', 'primary_address', 'email', 'phone'
         ]
     
     def get_primary_address(self, obj):

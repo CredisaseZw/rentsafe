@@ -293,8 +293,8 @@ class Lease(BaseModelWithUser):
                 LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
         
         return risk_status
-    
-    def apply_payment(self, amount, payment_date, method, reference=None, request=None):
+
+    def apply_payment(self, amount, payment_date, method, reference=None, request=None, description=None):
         """
         Apply a payment to the lease, allocating to the oldest debts first.
         Allows overpayments which will create a negative balance.
@@ -330,6 +330,7 @@ class Lease(BaseModelWithUser):
                         invoice=invoice,
                         payment_date=payment_date,
                         amount=payment_amount,
+                        description=description,
                         method=method,
                         reference=reference,
                         created_by=request.user if request and hasattr(request, 'user') else None
@@ -597,6 +598,18 @@ class LeaseTenant(BaseModel):
                 }
         return None
 
+    @property
+    def phone(self):
+        if self.tenant_object and isinstance(self.tenant_object, (Individual, CompanyBranch)):
+            return self.tenant_object.phone[0]
+        return None
+
+    @property
+    def email(self):
+        if self.tenant_object and isinstance(self.tenant_object, CompanyBranch):
+            return self.tenant_object.email
+        return None
+    
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None

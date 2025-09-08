@@ -24,20 +24,20 @@ from apps.leases.api.serializers import (
     PaymentSerializer
 )
 from apps.common.utils import extract_error_message
+from apps.common.services.tasks import send_sms,send_email
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
-from apps.leases.utils.commissions import CommissionHandler
+from apps.leases.utils import CommissionHandler,get_lease_payment_message_for_sms
 from apps.accounting.api.serializers.serializers import DisbursementSerializer
 import logging
 logger = logging.getLogger('leases')
 
 class LeaseViewSet(viewsets.ModelViewSet):
-    queryset = Lease.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['status', 'unit__property', 'landlord','start_date']
-    ordering_fields = ['start_date', 'end_date', 'lease_id']
+    ordering_fields = ['start_date', 'end_date', 'lease_id', 'date_created']
     search_fields = ['lease_id','unit__unit_number','unit__property__name']
-    ordering = ['-start_date']
+    ordering = ['-date_created']
     lookup_field = 'lease_id'
     def get_serializer_class(self):
         if self.action == 'list':
@@ -53,32 +53,30 @@ class LeaseViewSet(viewsets.ModelViewSet):
         unless the user is a superuser or staff member.
         """
         user = self.request.user
-        queryset = self.queryset
+        queryset = Lease.objects.all().prefetch_related(
+            'lease_tenants__tenant_object',
+            'unit__property',
+            'landlord',
+            'guarantor'
+        )
+
         if not user.is_authenticated:
-            return queryset.none()  # Return no leases for unauthenticated users
-        if lease_status := self.request.query_params.get('status', None):
-            queryset = self.queryset.filter(status=lease_status)
+            return queryset.none()
+
+        if lease_status := self.request.query_params.get('status'):
+            queryset = queryset.filter(status=lease_status)
+
         if search_term := self.request.query_params.get('search'):
-            return queryset.filter(
+            queryset = queryset.filter(
                 Q(lease_id__icontains=search_term) |
                 Q(unit__unit_number__icontains=search_term) |
                 Q(unit__property__name__icontains=search_term)
             )
-
-            # matching_leases = []
-            # for lease in queryset.prefetch_related('lease_tenants'):
-            #     for lt in lease.lease_tenants.all():
-            #         if to :=lt.tenant_object:
-            #             if (hasattr(to, 'first_name') and search_term.lower() in to.first_name.lower()) or \
-            #                 (hasattr(to, 'last_name') and search_term.lower() in to.last_name.lower()) or \
-            #                 (hasattr(to, 'branch_name') and search_term.lower() in to.branch_name.lower()) or \
-            #                 (hasattr(to, 'company') and hasattr(to.company, 'registration_name') and search_term.lower() in to.company.registration_name.lower()):
-            #                 matching_leases.append(lease)
-            #                 break  # no need to check more tenants for this lease
-            # queryset = queryset.filter(id__in=[l.id for l in matching_leases])
-
+        # Filter by staff/admin
         if user.is_staff or user.is_superuser:
             return queryset.filter(created_by__client=user.client)
+
+        # Filter by client user
         try:
             if hasattr(user, 'client') and user.client:
                 return queryset.filter(created_by=user)
@@ -163,7 +161,6 @@ class LeaseViewSet(viewsets.ModelViewSet):
             logger.error(f"Error terminating lease {lease.id}: {str(e)}")
             return Response({'error': extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    
     @action(detail=True, methods=['post'], url_path='add-tenant')
     def add_tenant(self, request, lease_id=None):
         lease = self.get_object()
@@ -339,28 +336,28 @@ class LeaseViewSet(viewsets.ModelViewSet):
         """
         Enhanced search with filters
         """
-        queryset = self.filter_queryset(self.get_queryset())
-        
-        # Additional filters
+        queryset = Lease.objects.filter(managing_client=request.user.client).prefetch_related('lease_tenants__tenant_object','unit__property')
+
+        # Apply DB-side filters
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
-        min_deposit = request.query_params.get('min_deposit')
-        max_deposit = request.query_params.get('max_deposit')
-        
+        tenant_name = request.query_params.get('search')
         if start_date:
             queryset = queryset.filter(start_date__gte=start_date)
         if end_date:
             queryset = queryset.filter(end_date__lte=end_date)
-        if min_deposit:
-            queryset = queryset.filter(deposit_amount__gte=min_deposit)
-        if max_deposit:
-            queryset = queryset.filter(deposit_amount__lte=max_deposit)
-        
+        if tenant_name:
+            tenant_name = tenant_name.lower()
+            queryset = [lease for lease in queryset if any(
+                tenant_name in str(lt.tenant_object.full_name).lower()
+                for lt in lease.lease_tenants.all()
+            )]
+        # Pagination and serialization
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        
+
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -380,29 +377,51 @@ class LeaseViewSet(viewsets.ModelViewSet):
     def make_payment(self, request, lease_id=None):
         lease = self.get_object()
         try:
-            amount = Decimal(request.data.get('amount', 0))
-            method_id = request.data.get('payment_method_id')
-            reference = request.data.get('reference', '')
-            payment_date = request.data.get('payment_date') or timezone.now().date()
+            with transaction.atomic():
+                amount = Decimal(request.data.get('amount', 0))
+                method_id = request.data.get('payment_method_id')
+                reference = request.data.get('reference', '')
+                description = request.data.get('description', '')
+                payment_date = request.data.get('payment_date') or timezone.now().date()
 
-            if amount <= 0:
-                return Response(
-                    {'error': 'Payment amount must be positive'},
-                    status=status.HTTP_400_BAD_REQUEST
+                primary_tenant = lease.lease_tenants.filter(is_primary_tenant=True).first() if lease.lease_tenants else None
+
+                if amount <= 0:
+                    return Response(
+                        {'error': 'Payment amount must be positive'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                try:
+                    method = PaymentMethod.objects.get(id=method_id)
+                except PaymentMethod.DoesNotExist:
+                    return Response(
+                        {'error': 'Invalid payment method'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                # Apply payment
+                payments_made, overpayment_amount = lease.apply_payment(
+                    amount, payment_date, method, reference, request, description
                 )
-
-            try:
-                method = PaymentMethod.objects.get(id=method_id)
-            except PaymentMethod.DoesNotExist:
-                return Response(
-                    {'error': 'Invalid payment method'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            # Apply payment
-            payments_made, overpayment_amount = lease.apply_payment(
-                amount, payment_date, method, reference, request
-            )
+                if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
+                    try:
+                        send_sms.delay(
+                            phone_number=primary_tenant.phone,
+                            message=get_lease_payment_message_for_sms(lease, amount, payment_date)
+                        )
+                    except Exception as e:
+                        raise Exception(f"SMS sending failed: {e}") from e
+                else:
+                    try:
+                        send_email(
+                            email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
+                            subject="Lease Payment Received",
+                            message=f"Payment of ${amount} received for your lease.",
+                            is_html=False
+                        )
+                    except Exception as e:
+                        raise Exception(f"Email sending failed: {e}") from e
 
             # Get current balance after payment
             current_balance = lease.current_balance
@@ -432,6 +451,63 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 {'error': 'An error occurred while processing the payment'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+    @action(detail=False, methods=['post'], url_path='bulk-payments')
+    def bulk_make_payment(self, request):
+        results = []
+        errors = []
+        for payment_data in request.data.get("payments", []):
+            lease_id = payment_data.get("lease_id")
+            amount = Decimal(payment_data.get("amount", 0))
+            method_id = payment_data.get("payment_method_id")
+            description = payment_data.get("description", "")
+            reference = payment_data.get("reference", "")
+            payment_date = payment_data.get("payment_date") or timezone.now().date()
+            try:
+                with transaction.atomic():
+                    lease = Lease.objects.get(lease_id=lease_id)
+                    if not lease:
+                        errors.append({"error": f"Lease with ID {lease_id} not found"})
+                        continue
+                    primary_tenant = lease.lease_tenants.filter(is_primary_tenant=True).first() if lease.lease_tenants else None
+                    if amount <= 0:
+                        raise ValueError("Payment amount must be positive")
+
+                    method = PaymentMethod.objects.get(id=method_id)
+
+                    payments_made, overpayment = lease.apply_payment(
+                        amount, payment_date, method, reference, request, description=description
+                    )
+                    current_balance = lease.current_balance
+
+                    if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
+                        send_sms.delay(
+                            phone_number=primary_tenant.phone,
+                            message=get_lease_payment_message_for_sms(lease, amount, payment_date)
+                        )
+                    else:
+                        send_email(
+                            email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
+                            subject="Lease Payment Received",
+                            message=f"Payment of ${amount} received for your lease.",
+                            is_html=False
+                        )
+
+                results.append({
+                    "lease_id": lease_id,
+                    "status": "success",
+                    "payments_made": len(payments_made),
+                    "overpayment": str(overpayment),
+                    "current_balance": str(current_balance)
+                })
+
+            except Exception as e:
+                logger.error(f"Bulk payment failed for lease {lease_id}: {e}")
+                errors.append({"error": str(e)})
+        return Response({
+            "results": results,
+            "errors": errors
+        }, status=status.HTTP_207_MULTI_STATUS)
 
     @action(detail=True, methods=['get'], url_path='payment-history')
     def payment_history(self, request, lease_id=None):
