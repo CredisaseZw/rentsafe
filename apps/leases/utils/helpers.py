@@ -59,7 +59,8 @@ def create_lease_with_dependencies(lease_data, user=None):
                 logger.debug("Using existing unit")
             
             data_for_lease_creation['unit'] = unit_instance
-            data_for_lease_creation['managing_client'] = user.client
+            if not data_for_lease_creation.get('managing_client'):
+                data_for_lease_creation['managing_client'] = user.client
 
             # Handle landlord
             landlord_instance = data_for_lease_creation.pop('landlord', None)

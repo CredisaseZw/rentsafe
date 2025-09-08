@@ -24,12 +24,13 @@ from apps.leases.api.serializers import (
     PaymentSerializer
 )
 from apps.common.utils import extract_error_message
-from apps.common.services.tasks import send_sms,send_email
+from apps.common.services.tasks import send_notification
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
 from apps.leases.utils import CommissionHandler,get_lease_payment_message_for_sms
 from apps.accounting.api.serializers.serializers import DisbursementSerializer
 import logging
+from django.conf import settings
 logger = logging.getLogger('leases')
 
 class LeaseViewSet(viewsets.ModelViewSet):
@@ -100,7 +101,9 @@ class LeaseViewSet(viewsets.ModelViewSet):
             if lease.status == 'ACTIVE':
                 lease.unit.status = 'occupied'
                 lease.unit.save()
-
+                
+            self._send_lease_creation_notification(lease, request)
+            
             return Response(LeaseDetailSerializer(lease).data, 
                         status=status.HTTP_201_CREATED)
         except ValidationError as ve:
@@ -138,12 +141,13 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def terminate(self, request, lease_id=None):
+        lease = self.get_object()
+        notify_tenant = request.data.get('notify_tenant',False)
         try:
-            lease = self.get_object()
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            
-            termination = LeaseTermination.objects.create(
+
+            termination, created = LeaseTermination.objects.get_or_create(
                 lease=lease,
                 **serializer.validated_data
             )
@@ -155,7 +159,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
             # Update unit status to vacant
             lease.unit.status = 'vacant'
             lease.unit.save()
-            
+            if notify_tenant:
+                self._send_lease_status_notification(lease, 'TERMINATED', termination.reason)
             return Response({'status': 'lease terminated'}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"Error terminating lease {lease.id}: {str(e)}")
@@ -404,24 +409,26 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 payments_made, overpayment_amount = lease.apply_payment(
                     amount, payment_date, method, reference, request, description
                 )
-                if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
-                    try:
-                        send_sms.delay(
-                            phone_number=primary_tenant.phone,
-                            message=get_lease_payment_message_for_sms(lease, amount, payment_date)
-                        )
-                    except Exception as e:
-                        raise Exception(f"SMS sending failed: {e}") from e
-                else:
-                    try:
-                        send_email(
-                            email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
-                            subject="Lease Payment Received",
-                            message=f"Payment of ${amount} received for your lease.",
-                            is_html=False
-                        )
-                    except Exception as e:
-                        raise Exception(f"Email sending failed: {e}") from e
+                
+                self._send_payment_notification(lease, amount, payment_date, primary_tenant)
+                # if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
+                #     try:
+                #         send_sms.delay(
+                #             phone_number=primary_tenant.phone,
+                #             message=get_lease_payment_message_for_sms(lease, amount, payment_date)
+                #         )
+                #     except Exception as e:
+                #         raise Exception(f"SMS sending failed: {e}") from e
+                # else:
+                #     try:
+                #         send_email(
+                #             email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
+                #             subject="Lease Payment Received",
+                #             message=f"Payment of ${amount} received for your lease.",
+                #             is_html=False
+                #         )
+                #     except Exception as e:
+                #         raise Exception(f"Email sending failed: {e}") from e
 
             # Get current balance after payment
             current_balance = lease.current_balance
@@ -479,19 +486,19 @@ class LeaseViewSet(viewsets.ModelViewSet):
                         amount, payment_date, method, reference, request, description=description
                     )
                     current_balance = lease.current_balance
-
-                    if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
-                        send_sms.delay(
-                            phone_number=primary_tenant.phone,
-                            message=get_lease_payment_message_for_sms(lease, amount, payment_date)
-                        )
-                    else:
-                        send_email(
-                            email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
-                            subject="Lease Payment Received",
-                            message=f"Payment of ${amount} received for your lease.",
-                            is_html=False
-                        )
+                    self._send_payment_notification(lease, amount, payment_date, primary_tenant)
+                    # if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
+                    #     send_sms.delay(
+                    #         phone_number=primary_tenant.phone,
+                    #         message=get_lease_payment_message_for_sms(lease, amount, payment_date)
+                    #     )
+                    # else:
+                    #     send_email(
+                    #         email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
+                    #         subject="Lease Payment Received",
+                    #         message=f"Payment of ${amount} received for your lease.",
+                    #         is_html=False
+                    #     )
 
                 results.append({
                     "lease_id": lease_id,
@@ -620,5 +627,183 @@ class LeaseViewSet(viewsets.ModelViewSet):
             })
         
         return Response(result)
+    
+    def _send_lease_creation_notification(self, lease, request):
+        """Send lease creation notification to all tenants"""
+        from apps.common.utils.messages import prepare_lease_creation_context
+        from apps.leases.utils.notification_utils import determine_recipient_info
+        
+        for tenant_relation in lease.lease_tenants.all():
+            tenant = tenant_relation.tenant_object
+            
+            # Determine recipient type and ID
+            recipient_type, recipient_id, recipient_name = determine_recipient_info(tenant)
+            
+            # Prepare context for both email and SMS
+            context = prepare_lease_creation_context(lease, tenant, for_email=True)
+            context.update({
+                'platform_name': getattr(settings, 'PLATFORM_NAME', 'Fincheck'),
+                'portal_url': f"{request.build_absolute_uri('/')}tenant-portal",
+            })
+            
+            # Send notification - force email for lease creation details
+            send_notification.delay(
+                recipient_type=recipient_type,
+                recipient_id=recipient_id,
+                notification_type=settings.LEASE_CREATED,
+                context=context,
+                template_name='lease_created',
+                sms_template_name='LEASE_CREATED',
+                subject=f"New Lease Created - {lease.lease_id}",
+                force_method='email' if recipient_type == 'company' else 'sms'
+            )
+
+
+    def _send_payment_notification(self, lease, amount, payment_date, primary_tenant=None):
+        """Send payment confirmation notification"""
+        from apps.common.utils.messages import prepare_lease_payment_context
+        from apps.leases.utils.notification_utils import determine_recipient_info, get_primary_tenant, get_any_tenant
+        
+        # Determine recipient
+        if primary_tenant:
+            tenant = primary_tenant.tenant_object
+        else:
+            tenant = get_primary_tenant(lease) or get_any_tenant(lease)
+        
+        if not tenant:
+            return  # No tenants to notify
+        
+        # Determine recipient type and ID
+        recipient_type, recipient_id, recipient_name = determine_recipient_info(tenant)
+        
+        # Prepare context
+        context = prepare_lease_payment_context(lease, amount, payment_date, tenant)
+        context.update({
+            'platform_name': getattr(settings, 'PLATFORM_NAME', 'Fincheck'),
+            'portal_url': f"{self.request.build_absolute_uri('/')}tenant-portal",
+        })
+        
+        # Send notification
+        send_notification.delay(
+            recipient_type=recipient_type,
+            recipient_id=recipient_id,
+            notification_type=settings.PAYMENT_RECEIVED,
+            context=context,
+            template_name='payment_received',
+            sms_template_name='PAYMENT_RECEIVED',
+            subject=f"Payment Received - {lease.lease_id}"
+        )
+
+
+    def _send_lease_status_notification(self, lease, new_status, reason=None):
+        """Send lease status update notification"""
+        from apps.common.utils.messages import prepare_lease_status_context
+        from apps.leases.utils.notification_utils import determine_recipient_info
+        
+        # Status display mapping
+        status_display = {
+            'ACTIVE': 'Active',
+            'TERMINATED': 'Terminated',
+            'EXPIRED': 'Expired',
+            'DRAFT': 'Draft',
+            'PENDING_APPROVAL': 'Pending Approval',
+            'RENEWED': 'Renewed',
+            'SUSPENDED': 'Suspended',
+        }
+        
+        for tenant_relation in lease.lease_tenants.all():
+            tenant = tenant_relation.tenant_object
+            
+            # Determine recipient type and ID
+            recipient_type, recipient_id, recipient_name = determine_recipient_info(tenant)
+            
+            # Prepare context
+            context = prepare_lease_status_context(lease, new_status, status_display, reason, tenant)
+            context.update({
+                'platform_name': getattr(settings, 'PLATFORM_NAME', 'Fincheck'),
+                'portal_url': f"{self.request.build_absolute_uri('/')}tenant-portal",
+            })
+            
+            # Send notification
+            send_notification.delay(
+                recipient_type=recipient_type,
+                recipient_id=recipient_id,
+                notification_type=settings.LEASE_STATUS,
+                context=context,
+                template_name='lease_status_update',
+                sms_template_name='LEASE_STATUS',
+                subject=f"Lease Status Update - {lease.lease_id}"
+            )
+
+
+    def _send_risk_status_notification(self, lease, old_risk_status):
+        """Send risk status update notification"""
+        from apps.common.utils.messages import prepare_risk_status_context
+        from apps.leases.utils.notification_utils import determine_recipient_info
+        
+        # Get the last payment date
+        last_payment = Payment.objects.filter(
+            invoice__lease=lease
+        ).order_by('-payment_date').first()
+        
+        last_payment_date = last_payment.payment_date if last_payment else None
+        
+        # Determine if risk improved
+        risk_levels = ['NON_PAYER', 'HIGH_HIGH', 'HIGH', 'MEDIUM', 'LOW']
+        risk_improved = (risk_levels.index(lease.risk_level) < risk_levels.index(old_risk_status))
+        
+        for tenant_relation in lease.lease_tenants.all():
+            tenant = tenant_relation.tenant_object
+            
+            # Determine recipient type and ID
+            recipient_type, recipient_id, recipient_name = determine_recipient_info(tenant)
+            
+            # Prepare context
+            context = prepare_risk_status_context(lease, old_risk_status, last_payment_date, risk_improved, tenant)
+            context.update({
+                'platform_name': getattr(settings, 'PLATFORM_NAME', 'Fincheck'),
+                'portal_url': f"{self.request.build_absolute_uri('/')}tenant-portal",
+            })
+            
+            # Send notification
+            send_notification.delay(
+                recipient_type=recipient_type,
+                recipient_id=recipient_id,
+                notification_type=settings.RISK_STATUS_UPDATED,
+                context=context,
+                template_name='risk_status_update',
+                sms_template_name='RISK_STATUS_UPDATED',
+                subject=f"Risk Status Update - {lease.lease_id}"
+            )
+
+
+    def _send_lease_renewal_notification(self, lease, days_until_expiry):
+        """Send lease renewal reminder notification"""
+        from apps.common.utils.messages import prepare_lease_renewal_context
+        from apps.leases.utils.notification_utils import determine_recipient_info
+        
+        for tenant_relation in lease.lease_tenants.all():
+            tenant = tenant_relation.tenant_object
+            
+            # Determine recipient type and ID
+            recipient_type, recipient_id, recipient_name = determine_recipient_info(tenant)
+            
+            # Prepare context
+            context = prepare_lease_renewal_context(lease, days_until_expiry, tenant)
+            context.update({
+                'platform_name': getattr(settings, 'PLATFORM_NAME', 'Fincheck'),
+                'portal_url': f"{self.request.build_absolute_uri('/')}tenant-portal",
+            })
+            
+            # Send notification
+            send_notification.delay(
+                recipient_type=recipient_type,
+                recipient_id=recipient_id,
+                notification_type=settings.LEASE_RENEWAL_REMINDER,
+                context=context,
+                template_name='lease_renewal_reminder',
+                sms_template_name='LEASE_RENEWAL_REMINDER',
+                subject=f"Lease Renewal Reminder - {lease.lease_id}"
+            )
 
     

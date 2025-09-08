@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Received - {{ platform_name }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .header {
+            background-color: #10b981;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .payment-details {
+            background-color: #f0fdf4;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            margin: 20px 0;
+        }
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .payment-label {
+            font-weight: 600;
+            color: #475569;
+        }
+        .payment-value {
+            font-weight: bold;
+        }
+        .risk-flag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .risk-NON_PAYER { background-color: #000000; }
+        .risk-HIGH_HIGH { background-color: #dc2626; }
+        .risk-HIGH { background-color: #ef4444; }
+        .risk-MEDIUM { background-color: #f59e0b; }
+        .risk-LOW { background-color: #10b981; }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4a6fa5;
+            color: white !important;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Payment Received</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear {{ tenant_name|default:"Tenant" }},</p>
+            
+            <p>Thank you for your payment. We have successfully processed your transaction with the following details:</p>
+            
+            <div class="payment-details">
+                <div class="payment-item">
+                    <span class="payment-label">Lease ID:</span>
+                    <span class="payment-value">{{ lease_id|default:"N/A" }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="payment-label">Property:</span>
+                    <span class="payment-value">{{ property|default:"N/A" }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="payment-label">Unit:</span>
+                    <span class="payment-value">{{ unit|default:"N/A" }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="payment-label">Amount Paid:</span>
+                    <span class="payment-value">{{ currency|default:"USD" }} {{ amount|default:"0.00" }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="payment-label">Payment Date:</span>
+                    <span class="payment-value">{{ payment_date|default:"N/A" }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="payment-label">Remaining Balance:</span>
+                    <span class="payment-value">{{ currency|default:"USD" }} {{ balance|default:"0.00" }}</span>
+                </div>
+                <div class="payment-item">
+                    <span class="payment-label">Risk Status:</span>
+                    <span class="payment-value">
+                        <span class="risk-flag risk-{{ risk_status|upper }}">{{ risk_status|default:"N/A" }}</span>
+                    </span>
+                </div>
+            </div>
+            
+            {% if risk_status != "LOW" %}
+            <div style="background-color: #fffbeb; padding: 15px; border-radius: 6px; border-left: 4px solid #f59e0b; margin: 20px 0;">
+                <p><strong>Notice:</strong> Your account has an outstanding balance. Please make a payment to improve your risk status and avoid potential penalties.</p>
+            </div>
+            {% endif %}
+            
+            <p>This payment has been applied to your account. You can view your payment history and current balance through your tenant portal.</p>
+            
+            <center>
+                <a href="{{ portal_url|default:'#' }}" class="button">View Payment History</a>
+            </center>
+            
+            <p>If you have any questions about this payment or your account, please contact our property management team.</p>
+            
+            <p>Best regards,<br>The {{ platform_name|default:"Property Management" }} Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {% now "Y" %} {{ platform_name|default:"Property Management" }}. All rights reserved.</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

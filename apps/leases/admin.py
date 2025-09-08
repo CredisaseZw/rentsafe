@@ -3,7 +3,8 @@
 from django.contrib import admin
 from apps.leases.models import (
     Lease, LeaseTenant, LeaseCharge,
-    LeaseLog, Guarantor, LeaseOpeningBalance, LandlordOpeningBalance, LeaseDeposit
+    LeaseLog, Guarantor, LeaseOpeningBalance, 
+    LandlordOpeningBalance, LeaseDeposit, LeaseTermination
 )
 from django.contrib.contenttypes.admin import GenericTabularInline
 
@@ -89,4 +90,9 @@ class LandlordOpeningBalanceAdmin(admin.ModelAdmin):
 @admin.register(LeaseDeposit)
 class LeaseDepositAdmin(admin.ModelAdmin):
     list_display = ('lease', 'amount', 'currency', 'deposit_date', 'deposit_holder')
+    readonly_fields = ('date_created', 'date_updated')
+
+@admin.register(LeaseTermination)
+class LeaseTerminationAdmin(admin.ModelAdmin):
+    list_display = ('lease', 'termination_date', 'reason')
     readonly_fields = ('date_created', 'date_updated')

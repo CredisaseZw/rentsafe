@@ -60,7 +60,7 @@ class Individual(BaseModelWithUser):
     @property
     def phone(self):
         contact = self.contact_details.filter(mobile_phone__isnull=False).exclude(mobile_phone='').first()
-        return contact.mobile_phone if contact else None
+        return contact.mobile_phone[0] if contact else None
 
     @property
     def email(self):

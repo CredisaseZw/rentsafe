@@ -271,27 +271,26 @@ class Lease(BaseModelWithUser):
         return max(1, months_diff)
     
     def determine_initial_risk_status(self):
-        """
-        Enhanced to use both opening balance and create initial invoice
-        """
         risk_status = 'LOW'
-        
-        if hasattr(self, 'opening_balance'):
+
+        try:
             opening_balance = self.opening_balance
-            
-            if opening_balance.three_months_plus_balance > 0:
-                risk_status = 'NON_PAYER'
-            elif opening_balance.three_months_back_balance > 0:
-                risk_status = 'HIGH_HIGH'
-            elif opening_balance.two_months_back_balance > 0:
-                risk_status = 'HIGH'
-            elif opening_balance.one_month_back_balance > 0:
-                risk_status = 'MEDIUM'
-            
-            if opening_balance.outstanding_balance > 0:
-                from apps.leases.services.invoice_service import LeaseInvoiceService
-                LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
-        
+        except Exception as e:
+            return risk_status 
+
+        if opening_balance.three_months_plus_balance > 0:
+            risk_status = 'NON_PAYER'
+        elif opening_balance.three_months_back_balance > 0:
+            risk_status = 'HIGH_HIGH'
+        elif opening_balance.two_months_back_balance > 0:
+            risk_status = 'HIGH'
+        elif opening_balance.one_month_back_balance > 0:
+            risk_status = 'MEDIUM'
+
+        if opening_balance.outstanding_balance > 0:
+            from apps.leases.services.invoice_service import LeaseInvoiceService
+            LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
+
         return risk_status
 
     def apply_payment(self, amount, payment_date, method, reference=None, request=None, description=None):
@@ -416,6 +415,24 @@ class Lease(BaseModelWithUser):
     def get_latest_balance(self):
         return self.current_balance
 
+    @property
+    def payment_status(self):
+        """Returns a human-readable payment status based on risk level."""
+        risk = self.risk_level
+        if risk == 'NON_PAYER':
+            return "Non-Payer"
+        elif risk in ['HIGH HIGH', 'HIGH']:
+            return "High-Risk"
+        elif risk == 'MEDIUM':
+            return "Medium-Risk"
+        else:
+            return "Low-Risk"
+     
+    @property
+    def client_name(self):
+        """Get the managing client's name"""
+        return self.managing_client.name if self.managing_client else "N/A"
+    
     @property
     def current_balance(self):
         """

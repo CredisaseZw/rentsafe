@@ -7,9 +7,9 @@ from django.utils.text import slugify
 from apps.leases.models import (
     Lease, LeaseTenant, LeaseCharge, 
     LeaseTermination, Guarantor, LeaseOpeningBalance, 
-    LandlordOpeningBalance, LeaseDeposit
+    LandlordOpeningBalance, LeaseDeposit, Landlord
 )
-from apps.leases.models.landlord import Landlord
+from apps.subscriptions.models import Subscription
 from apps.properties.models.models import Property, Unit, PropertyType
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
@@ -423,6 +423,7 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
         }
     
     def validate(self, data):
+        from apps.common.utils.subscriptions import check_rentsafe_subscription
         user = self.context.get('request').user if self.context.get('request') else None
         # Either unit or property_data + unit_data must be provided
         if not data.get('unit') and not (data.get('property_data') and data.get('unit_data')):
@@ -432,7 +433,8 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
 
         if not user.client:
             raise serializers.ValidationError("User should be associated with a client, request to join one to the admins.")
-
+        if not check_rentsafe_subscription(user.client, 'rentsafe'):
+            raise serializers.ValidationError("No active Rentsafe subscription found or the subscription has expired.")
         # New validation to prevent duplicate property creation
         if data.get('property_data'):
             if property_name := data['property_data'].get('name'):
