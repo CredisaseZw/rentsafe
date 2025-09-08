@@ -875,7 +875,7 @@ class ServiceStandardPricingSerializer(serializers.ModelSerializer):
         model = ServiceStandardPricing
         fields = ['id', 'service', 'individual_charge', 'company_charge', 
                 'currency', 'currency_id', 'current_rate', 'service_id',
-                'date_updated', 'service'
+                'date_updated'
                 ]
         
     def to_representation(self, instance):

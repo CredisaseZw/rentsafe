@@ -389,7 +389,7 @@ class ServiceSpecialPricingViewSet(BaseViewSet):
     
     def create(self, request, *args, **kwargs):
        try:
-           serializer=self.get_serializer(data=request.data)
+           serializer = self.get_serializer(data=request.data)
            serializer.is_valid(raise_exception=True)
            self.perform_create(serializer)
            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
@@ -417,13 +417,13 @@ class ServiceStandardPricingViewSet(BaseViewSet):
         return queryset
     
     def create(self, request, *args, **kwargs):
-         try:
-              serializer=self.get_serializer(data=request.data)
-              serializer.is_valid(raise_exception=True)
-              self.perform_create(serializer)
-              return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
-         except ValidationError as e:
-              return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
-         except Exception as e:
-              logger.error(f"Error creating standard pricing: {e}")
-              return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error creating standard pricing: {e}")
+            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)

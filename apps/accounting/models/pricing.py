@@ -8,7 +8,7 @@ from apps.accounting.models.models import Currency
 
 
 class ServiceSpecialPricing(BaseModelWithUser):
-    service = models.ForeignKey('subscriptions.Services', on_delete=models.CASCADE, related_name='special_pricing_options',
+    service = models.ForeignKey('subscriptions.services', on_delete=models.CASCADE, related_name='special_pricing_options',
                                 help_text=_("The service this special pricing applies to."))
     
     client_customer = models.OneToOneField('clients.Client', on_delete=models.CASCADE, related_name='special_pricing',
@@ -31,7 +31,7 @@ class ServiceSpecialPricing(BaseModelWithUser):
         return f"Special Pricing for {self.service.service_name}"
 
 class ServiceStandardPricing(BaseModelWithUser):
-    service = models.ForeignKey('subscriptions.Services', on_delete=models.CASCADE, related_name='standard_pricing_options',
+    service = models.ForeignKey('subscriptions.services', on_delete=models.CASCADE, related_name='standard_pricing_options',
                                 help_text=_("The service this standard pricing applies to."))
     
     individual_charge = models.DecimalField(_("Individual Charge"), max_digits=12, decimal_places=2)
