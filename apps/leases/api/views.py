@@ -487,10 +487,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='payment-history')
     def payment_history(self, request, lease_id=None):
-        from apps.leases.utils.notification_utils import  get_primary_tenant
-        
         lease = self.get_object()
-        tenant = get_primary_tenant(lease)
         payments = Payment.objects.filter(
             invoice__lease=lease
         ).select_related('invoice', 'method').order_by('-payment_date')
@@ -544,7 +541,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='tenant-statements-summary')
     def tenant_statement(self, request):
         queryset = self.get_queryset()
-        serializer = TenantStatementsListSerializer(queryset, many=True)
+        serializer = TenantStatementsListSerializer(self.paginate_queryset(queryset), many=True)
         return Response(serializer.data)
     @action(detail=True, methods=['get'], url_path='landlord-statement')
     def landlord_statement(self, request, lease_id=None):
