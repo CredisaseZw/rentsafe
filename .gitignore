@@ -15,3 +15,7 @@ node_modules/
 .vscode/tasks.json
 settings.json
 .idea/
+.vscode/tasks.json
+staticfiles/
+static/
+media/
