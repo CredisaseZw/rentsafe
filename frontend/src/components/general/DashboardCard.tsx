@@ -1,4 +1,5 @@
 import { Card, CardContent} from "@/components/ui/card";
+import { COLOR_CLASSES } from "@/constants";
 import type { LucideIcon } from "lucide-react";
 import React from "react";
 
@@ -12,14 +13,17 @@ interface GSCProps {
   valueAsChild?: React.ReactNode | false;
 }
 
-function GlobalSummaryCard({ value, subTitle, layoutScheme, valueAsChild = false }: GSCProps) {
+
+
+function DashboardCard({ value, subTitle, layoutScheme, valueAsChild = false }: GSCProps) {
   const Icon = layoutScheme.icon;
+  const color = COLOR_CLASSES[layoutScheme.color] ?? COLOR_CLASSES["blue"];
 
   return (
     <Card className="rounded-md border-color">
       <CardContent className="flex flex-row items-center gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-${layoutScheme.color}-200`}>
-          <Icon className={`text-${layoutScheme.color}-800`} />
+        <div className={`flex h-12 w-12 items-center justify-center rounded-full ${color.bg}`}>
+          <Icon className={color.text} />
         </div>
         <div className="flex flex-col">
           {valueAsChild ? (
@@ -34,4 +38,4 @@ function GlobalSummaryCard({ value, subTitle, layoutScheme, valueAsChild = false
   );
 }
 
-export default GlobalSummaryCard;
+export default DashboardCard;

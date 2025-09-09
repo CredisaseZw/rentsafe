@@ -1,13 +1,80 @@
-import { useState, useEffect } from "react";
-import type { AddPropertyForm, FilterOptionType, Header, Property, PropertyType } from "@/types";
-import type { PaginationData } from "@/interfaces";
+import { useState, useRef } from "react";
+import type { AddPropertyForm, DashboardCardProp, Option, Header, Property, PropertyType } from "@/types";
+import type { BranchFull, IndividualMinimal, PaginationData } from "@/interfaces";
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
+import type { UseMutationResult } from "@tanstack/react-query";
+import { extractAddresses } from "@/lib/utils";
+import { isAxiosError, type AxiosError } from "axios";
+import { toast } from "sonner";
 
 function usePropertyList() {
    const [addPropertyModal, setAddPropertyModal] = useState(false);
-   const [SummaryCards, setSummaryCards] = useState<any>([]);
-   const [filterOptions, setFilterOptions] = useState<FilterOptionType[]>([]);
+   const [SummaryCards, setSummaryCards] = useState<DashboardCardProp[]>(
+      [
+         {  subTitle: "Total Properties", 
+            value: 35,
+            layoutScheme : {
+               icon: HouseIcon,
+               color: "blue",
+            }
+         },
+         {  subTitle: "Occupied",
+            value: 28,
+            layoutScheme : {
+               icon: Users,
+               color: "red",
+            }
+
+          },
+         {  subTitle: "Vacant",
+            value: 5,
+            layoutScheme :{
+               icon: DoorOpen,
+               color : "purple"
+            }
+          },
+         { subTitle: "Maintenance",
+            value: 2,
+            layoutScheme : {
+               icon : Wrench,
+               color : "amber"
+            }
+          },
+         {  subTitle: "Monthly Revenue",
+            value: "$8,500",
+            layoutScheme : {
+               icon : BadgeCent,
+               color : "green"
+            }
+         },
+      ]
+   );
+   
+   const parkingOptions = useRef<Option[]>([
+      { label: "Underground", value: "underground" },
+      { label: "Open", value: "open" },
+      { label: "Street", value: "street" },
+   ])
+   const securityOptions = useRef<Option[]>([
+      { label: "24/7", value: "24/7" },
+      { label: "Daytime", value: "daytime" },
+      { label: "None", value: "none" },
+   ])
+   const backupPowerOptions = useRef<Option[]>([
+      { label: "Generator", value: "generator" },
+      { label: "Solar", value: "solar" },
+      { label: "None", value: "none" },
+   ])
+   const Options = useRef<Option[]>([
+      { label: "Default", value: "default" },
+      { label: "Occupied", value: "occupied" },
+      { label: "Vacant", value: "vacant" },
+   ]);
+   const statusOptions = useRef<Option[]>([
+      {label : "Active", value : "active"},
+      {label : "In-active", value : "inactive"}
+   ])
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
@@ -17,7 +84,6 @@ function usePropertyList() {
    const [searchParams, setSearchParams] = useSearchParams();
    const page = parseInt(searchParams.get("page") || "1");
    const search = searchParams.get("search") || "";
-
    const [addPropertyForm, setAddPropertyForm] = useState<AddPropertyForm>({
       property_type: "", 
       landlord_type: "individual",
@@ -57,7 +123,7 @@ function usePropertyList() {
       [name]: value,
    }));
    };
-   const onSelectFilter = (filterOption: string) => setSelectFilter(filterOption);
+   const onSelectFilter = (Option: string) => setSelectFilter(Option);
    const onSearchValue = (searchValue: string) => {
       setSearchParams((prev) => {
          const params = new URLSearchParams(prev);
@@ -74,56 +140,92 @@ function usePropertyList() {
          return params;
       });
    };
+     const handleFeatureChange = (feature: string, value: string) => {
+         setAddPropertyForm((prev) => ({
+            ...prev,
+            features: {
+            ...prev.features,
+            [feature]: value,
+         },
+      }))
+   };
 
    const openModal = () => setAddPropertyModal(true);
    const closeModal = () => setAddPropertyModal(false);
 
-   useEffect(() => {
-      setSummaryCards([
-         {  subTitle: "Total Properties", 
-            value: 35,
-            layout : {
-               icon: HouseIcon,
-               color: "blue",
-            }
+   const handleAddProperty = (newProperty:  UseMutationResult<any, Error, any, unknown>, e: React.FormEvent<HTMLFormElement>, successCallback:()=>void) => {
+      e.preventDefault();      
+      setLoading(true)
+      const formData = new FormData(e.currentTarget);
+      const data = Object.fromEntries(formData.entries());
+      const addresses = extractAddresses(data);
+      
+      console.log(addresses)
+      const property = {
+         name: data.building_name,
+         description: data.property_details,
+         status: addPropertyForm.status,
+         year_built: parseInt(data.year_built as string),
+         total_area: data.total_area,
+         is_furnished: addPropertyForm.is_furnished,
+         total_number_of_units: parseInt(data.total_number_of_units as string),
+         features: {
+            parking: addPropertyForm.features.parking,
+            security: addPropertyForm.features.security,
+            backup_power: addPropertyForm.features.backup_power
          },
-         {  subTitle: "Occupied",
-            value: 28,
-            layout : {
-               icon: Users,
-               color: "indigo",
+         property_type_id: parseInt(addPropertyForm.property_type),
+         addresses_input: addresses[0],
+         landlords_input: [
+            {
+               landlord_name: addPropertyForm.landlord_name,
+               landlord_type: addPropertyForm.landlord_type,
+               landlord_id: addPropertyForm.landlord_id
             }
+         ]
+      };
 
-          },
-         {  subTitle: "Vacant",
-            value: 5,
-            layout :{
-               icon: DoorOpen,
-               color : "purple"
+      try{
+      newProperty.mutate(property, {
+         onError: (error: AxiosError |Error | unknown) => {
+            if (isAxiosError(error)) {
+            console.error("Full backend response:", error.response?.data);
+            const errorDetails = error.response?.data?.error || "Unknown error";
+            toast.error("Failed to create property", { description: errorDetails });
+            return;
             }
-          },
-         { subTitle: "Maintenance",
-            value: 2,
-            layout : {
-               icon : Wrench,
-               color : "amber"
-            }
-          },
-         {  subTitle: "Monthly Revenue",
-            value: "$8,500",
-            layout : {
-               icon : BadgeCent,
-               color : "green"
-            }
+            toast.error("Failed to create property. Please try again.");
          },
-      ]);
-      setFilterOptions([
-         { label: "All Properties", value: "all_properties" },
-         { label: "Occupied", value: "occupied" },
-         { label: "Vacant", value: "vacant" },
-      ]);
-   }, []);
+         onSuccess: () => {
+            setLoading(false);
+            toast.success("Property successfully created")
+            successCallback()
+         },
+         onSettled: () => setLoading(false),
+      });
+      } catch (error ){
+      console.error(error)
+      setLoading(false)
+      toast.error("Failed to create property. Internal Error.");
+      }
+     };
+      
+      const onSelectValue = (item: IndividualMinimal | BranchFull)=>{
+         if ("first_name" in item) {
+            setAddPropertyForm((prev) => ({
+            ...prev,
+            landlord_id: item.identification_number,
+            landlord_name: `${item.first_name} ${item.last_name}`,
+            }));
+            return;
+         }
 
+         setAddPropertyForm((prev) => ({
+            ...prev,
+            landlord_id: item.company.registration_number,
+            landlord_name: item.company.registration_name,
+         }));
+      }
    return {
       headers,
       properties,
@@ -132,7 +234,7 @@ function usePropertyList() {
       addPropertyModal,
       status,
       addPropertyForm,
-      filterOptions,
+      Options,
       selectedFilter,
       landlordIdentifier,
       searchItem,
@@ -140,6 +242,14 @@ function usePropertyList() {
       loading,
       page,
       search,
+      securityOptions,
+      parkingOptions,
+      backupPowerOptions,
+      statusOptions,
+      onSelectValue,
+      handleAddProperty,
+      handleFeatureChange,
+      setSummaryCards,
       onClearSearch,
       setLoading,
       setPropertyTypes,

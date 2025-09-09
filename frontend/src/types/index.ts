@@ -1,4 +1,5 @@
 import type { Address } from "@/interfaces";
+import type { LucideIcon } from "lucide-react";
 
 export type Route = {
    label: string;
@@ -14,11 +15,19 @@ export type NavLink = {
    pageComponent?: React.FC;
 };
 
-export type FilterOptionType = {
-   label: string;
-   value: string;
-};
-
+export type Option = {
+   label : string,
+   value :string
+}
+export type DashboardCardProp = {
+   value: string  | number | React.ReactElement;
+   subTitle: number | string | React.ReactElement;
+   layoutScheme: {
+      icon: LucideIcon;
+      color: string;
+  };
+  valueAsChild?: boolean
+}
 export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
 
 export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";
@@ -147,12 +156,8 @@ export type PropertiesResponse = {
    previous: string | null;
    results: Property[];
 }
-export type PropertyType = {
-   id : number,
-   name: string,
-   description: string
-}
-export type PropertTypeResponse = {
+
+export type PropertyTypeResponse = {
    count: number;
    next: string | null;
    previous: string | null;
@@ -171,7 +176,7 @@ export interface AddressInput {
 export interface LandlordInput {
   landlord_name: string;
   landlord_type: "company" | "individual" | string;
-  landlord_id: string;
+  landlord_id: string | number;
 }
 export interface Property {
   id?: string;
@@ -185,10 +190,17 @@ export interface Property {
   features?: Features;
   property_type_id?: number;
   property_type?: string;
+  type?: string,
+  addresses:Address[]
   address_summary?: string;
   addresses_input?: AddressInput;
   landlords_input?: LandlordInput[];
   full_address?: Address[]
+}
+export interface PropertyType {
+   id: number,
+   name: string,
+   description: string
 }
 
 export type AddPropertyForm = {
@@ -199,5 +211,251 @@ export type AddPropertyForm = {
   is_furnished : boolean;
   features : Features;
   landlord_name: string;
- 
 };
+
+export interface Lease {
+  id: number;
+  lease_id: string;
+  start_date: string;
+  end_date: string;
+  status: "ACTIVE" | "INACTIVE" | "TERMINATED";
+
+  tenants: Tenant[];
+  landlord: Landlord;
+  unit: Unit;
+  currency: Currency;
+  risk_level_class: "LOW" | "MEDIUM" | "HIGH"; 
+  owing: number;
+  landlord_opening_balances_data?: [{
+   id: 7,
+   landlord: Landlord
+   amount: Number,
+   commission_percentage: string,
+   operating_costs_inclusive: boolean
+
+  }]
+}
+export interface TenantMinimal {
+   id: number;
+   full_name: string;
+   identification_number: string;
+}
+
+export type TenantSelection = TenantMinimal &{
+   search_value: string,
+   mobile_number: string,
+   address : Address | null,
+   is_primary : false
+}
+export interface Tenant {
+  id: number;
+  lease: number;
+  tenant_object: TenantMinimal;
+  is_primary_tenant: boolean;
+}
+export type TenantPayload = {
+  tenant_id: string;
+  tenant_type: string;
+  is_primary_tenant: boolean;
+  address? : Address | undefined
+};
+
+export type guarantorPayload = {
+   guarantor_type: "individual" | "company";
+   guarantor_id: number;
+   guarantee_amount: string;
+};
+
+export interface Landlord {
+  id: number;
+  landlord_name: string;
+  landlord_type: "individual" | "company";
+  landlord_id: string;
+}
+
+export interface Unit {
+  id: number;
+  unit_number: string;
+  property: Property;
+}
+
+export interface Currency {
+  id: number;
+  currency_code: string;
+  currency_name: string;
+}
+
+export interface LeaseResponse {
+   count: number;
+   next: string | null;
+   previous: string | null;
+   results: Lease[]
+}
+export type ShortPropertyData =  {
+   name: string;
+   description: string;
+   status: string;
+   year_built?: number;
+   total_area?: string | number;
+   is_furnished?: boolean;
+   total_number_of_units?: number;
+   features?: Record<string, boolean | string>;
+   property_type_name: string;
+  };
+
+export type LeasePayload = {
+  start_date: string;
+  end_date: string;
+  signed_date: string;
+  status: string;
+  currency: number;
+  payment_frequency: string;
+  due_day_of_month: number;
+  grace_period_days: number;
+  is_rent_variable: boolean;
+  includes_utilities: boolean;
+  property_data : ShortPropertyData,
+  unit_data: {
+    unit_number: string;
+    unit_type: string;
+    number_of_rooms: number;
+  };
+
+  address_data: ShortSuburbAddressData
+  landlord_data: LandlordInput
+  guarantor_data: guarantorPayload 
+  tenants: TenantPayload[];
+
+  charges: {
+   charge_type: "RENT" | "UTILITY" | "OTHER";
+   description: string;
+   amount: number;
+   currency: number;
+   frequency: "MONTHLY" | "QUARTERLY" | "ANNUALLY" | "ONCE";
+   effective_date: string;
+   end_date: string;
+   vat_inclusive: boolean;
+  }[];
+
+  deposits: {
+   amount: number;
+   currency: number;
+   deposit_date: string;
+   deposit_holder: "agent" | "landlord" | "other";
+  }[];
+
+  lease_opening_balance_data: {
+   current_month_balance: number;
+   one_month_back_balance: number;
+   two_months_back_balance: number;
+   three_months_back_balance: number;
+   three_months_plus_balance: number;
+   outstanding_balance: number;
+  };
+
+  landlord_opening_balances_data: {
+   amount: string;
+   commission_percentage: string;
+   operating_costs_inclusive: boolean;
+  }[];
+};
+export interface ShortSuburbAddressData{
+   street_address: string;
+   suburb_id: number;
+   postal_code: string | number;
+}
+
+export interface LeaseSubscription {
+  id: number;
+  period: number;
+  start_date: string; 
+  end_date: string;   
+  sub_type: string;
+  total_slots: number;
+  used_slots: number;
+  open_slots: number;
+}
+
+export interface LeaseSubscriptionResponse {
+   count: number,
+   next: string | null,
+   previous: string |null,
+   results: LeaseSubscription[]
+}
+
+export interface SuburbPayload {
+   id: number,
+   name: string,
+   city: string,
+   province: string,
+   country: string
+}
+
+export interface PaymentMethod {
+   id: number,
+   payment_method_name: string
+}
+
+export interface PaymentMethodResponse {
+   count: number,
+   next: string,
+   previous: string,
+   results : PaymentMethod[]
+}
+
+export interface Currency{
+   id: number,
+   currency_code: string,
+   currency_name: string 
+}
+
+export interface CurrencyResponse{
+   count: number,
+   next: string | null,
+   previous: string | null,
+   results: Currency[]
+}
+export interface LeaseOpeningBalanceData {
+  current_month_balance: number;
+  one_month_back_balance: number;
+  two_months_back_balance: number;
+  three_months_back_balance: number;
+  three_months_plus_balance: number;
+  outstanding_balance: number;
+}
+
+export type ReceiptLease =  {
+   lease_id: string,
+   id : number,
+   rentOwing : Number ,
+   customerName : string,
+   currentRentOwing? :  Number,
+   payment_date?: string,
+   payment_method_id? : number,
+   reference? :  string,
+   amount? : string,
+   description? : string
+}
+export interface PaymentHistory{
+   id : number,
+   invoice_number : string,
+   amount : string,
+   method: PaymentMethod,
+   payment_date : string,
+   reference : string   
+   description : string
+}
+
+export interface PaymentStatementInformation {
+   opening_balance: string,
+   primary_tenant: string ,
+   address: string,
+   total_invoiced: string,
+   current_balance: string
+}
+export type PaymentHistoryResponse = PaymentStatementInformation & {
+   count : number,
+   next : string | null,
+   previous : string | null,
+   results : PaymentHistory[]
+}  

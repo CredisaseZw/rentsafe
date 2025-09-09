@@ -39,7 +39,7 @@ export default function BranchForm() {
                      <Label className="required px-2 font-normal" htmlFor="branch_name">
                         Branch Name
                      </Label>
-                     <Input id="branch_name" name="branch_name" required className="border-foreground/40 bg-white" />
+                     <Input id="branch_name" name="branch_name" required className="border-color bg-white" />
                   </div>
 
                   <div className="col-span-3 pt-5">
