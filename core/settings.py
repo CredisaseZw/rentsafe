@@ -566,6 +566,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "/"
+SILENCED_SYSTEM_CHECKS = ["staticfiles.E002"]  # Disables the warning for not using HTTPS in development
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -65,7 +65,7 @@ def check_seeding_needed():
         print(f"Error checking PaymentMethods table: {e}")
 
 def main():
-    if len(sys.argv) > 1 and sys.argv[1] == "gunicorn":
+    if "gunicorn" in sys.argv:
         # Wait for database
         db_ready()
         

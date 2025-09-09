@@ -487,18 +487,6 @@ class LeaseViewSet(viewsets.ModelViewSet):
                     )
                     current_balance = lease.current_balance
                     self._send_payment_notification(lease, amount, payment_date, primary_tenant)
-                    # if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
-                    #     send_sms.delay(
-                    #         phone_number=primary_tenant.phone,
-                    #         message=get_lease_payment_message_for_sms(lease, amount, payment_date)
-                    #     )
-                    # else:
-                    #     send_email(
-                    #         email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
-                    #         subject="Lease Payment Received",
-                    #         message=f"Payment of ${amount} received for your lease.",
-                    #         is_html=False
-                    #     )
 
                 results.append({
                     "lease_id": lease_id,
@@ -524,13 +512,47 @@ class LeaseViewSet(viewsets.ModelViewSet):
             invoice__lease=lease
         ).select_related('invoice', 'method').order_by('-payment_date')
         
-        page = self.paginate_queryset(payments)
-        if page is not None:
-            serializer = PaymentSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        # Calculate cumulative balances
+        total_invoiced = lease.invoices.filter(
+            invoice_type__in=['fiscal', 'proforma']
+        ).aggregate(total=Sum('total_inclusive'))['total'] or Decimal('0.00')
         
-        serializer = PaymentSerializer(payments, many=True)
-        return Response(serializer.data)
+        # Get opening balance if exists
+        opening_balance = Decimal('0.00')
+        if hasattr(lease, 'opening_balance'):
+            opening_balance = lease.opening_balance.outstanding_balance
+        
+        # Calculate running balance for each payment
+        payments_list = list(payments)
+        remaining_balances = {}
+        current_balance = total_invoiced + opening_balance
+        
+        # Process payments in chronological order (oldest first)
+        chronological_payments = sorted(payments_list, key=lambda x: x.payment_date)
+        
+        for payment in chronological_payments:
+            current_balance -= payment.amount
+            remaining_balances[payment.id] = str(current_balance)
+        
+        # Paginate the payments (in reverse chronological order)
+        page = self.paginate_queryset(payments_list)
+        if page is not None:
+            serializer = PaymentSerializer(page, many=True, context={'remaining_balances': remaining_balances})
+            response = self.get_paginated_response(serializer.data)
+            # Add opening balance to the response
+            response.data['opening_balance'] = str(opening_balance)
+            response.data['total_invoiced'] = str(total_invoiced)
+            response.data['current_balance'] = str(lease.current_balance)
+            return response
+        
+        serializer = PaymentSerializer(payments_list, many=True, context={'remaining_balances': remaining_balances})
+        response_data = {
+            'opening_balance': str(opening_balance),
+            'total_invoiced': str(total_invoiced),
+            'current_balance': str(lease.current_balance),
+            'payments': serializer.data
+        }
+        return Response(response_data)
     
     @action(detail=True, methods=['get'], url_path='landlord-statement')
     def landlord_statement(self, request, lease_id=None):
@@ -654,7 +676,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 context=context,
                 template_name='lease_created',
                 sms_template_name='LEASE_CREATED',
-                subject=f"New Lease Created - {lease.lease_id}",
+                subject=f"New Lease Created - {lease.client_name}",
                 force_method='email' if recipient_type == 'company' else 'sms'
             )
 
@@ -691,7 +713,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
             context=context,
             template_name='payment_received',
             sms_template_name='PAYMENT_RECEIVED',
-            subject=f"Payment Received - {lease.lease_id}"
+            subject=f"Payment Received - {lease.client_name}"
         )
 
 
