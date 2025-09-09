@@ -76,6 +76,14 @@ else:
 ALLOWED_HOSTS = ['*']
 # Application definition
 
+CSRF_TRUSTED_ORIGINS = [
+        'https://credi-safe.com',
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "https://rentsafe-backend.onrender.com",
+        "https://rentsafe-iota.vercel.app"
+    ]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
