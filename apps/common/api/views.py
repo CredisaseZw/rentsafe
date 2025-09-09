@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from apps.common.models.models import Country, Province, City, Suburb
 from apps.common.api.serializers import (
     CountrySerializer, ProvinceSerializer,
-    CitySerializer, SuburbSerializer
+    CitySerializer, SuburbSerializer, SuburbViewSerializer
 )
 from rest_framework.renderers import JSONRenderer 
 from apps.common.utils.caching import CacheService
@@ -282,3 +282,13 @@ class LocationViewSet(BaseViewSet):
             'countries': country_serializer.data,
         }
         return self._create_rendered_response(data)
+
+class SuburbViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Suburb.objects.filter(is_active=True)
+    serializer_class = SuburbViewSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+    def get_queryset(self):
+        if search := self.request.query_params.get('search'):
+            return self.queryset.filter(name__icontains=search)
+        return self.queryset

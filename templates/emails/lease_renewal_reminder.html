@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lease Renewal Reminder - {{ platform_name }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .header {
+            background-color: #3b82f6;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .urgent {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+        }
+        .risk-flag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .risk-NON_PAYER { background-color: #000000; }
+        .risk-HIGH_HIGH { background-color: #dc2626; }
+        .risk-HIGH { background-color: #ef4444; }
+        .risk-MEDIUM { background-color: #f59e0b; }
+        .risk-LOW { background-color: #10b981; }
+        .details-box {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #475569;
+            width: 160px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #3b82f6;
+            color: white !important;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button-secondary {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #64748b;
+            color: white !important;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lease Renewal Reminder</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear {{ tenant_name }},</p>
+            
+            <p>This is a reminder that your lease agreement for {{ lease.unit.property.name }} - {{ lease.unit.unit_number }} is scheduled to expire on <strong>{{ lease.end_date }}</strong>.</p>
+            
+            {% if days_until_expiry <= 30 %}
+            <div class="urgent">
+                <p><strong>Your lease expires in {{ days_until_expiry }} days.</strong> Please take action to renew or make arrangements to vacate the property.</p>
+            </div>
+            {% endif %}
+            
+            <div class="details-box">
+                <div class="detail-item">
+                    <span class="detail-label">Lease ID:</span>
+                    <span>{{ lease.lease_id }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Property:</span>
+                    <span>{{ lease.unit.property.name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Unit:</span>
+                    <span>{{ lease.unit.unit_number }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Current End Date:</span>
+                    <span>{{ lease.end_date }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Current Balance:</span>
+                    <span>{{ lease.currency.currency_code }} {{ lease.owing }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Risk Status:</span>
+                    <span>
+                        <span class="risk-flag risk-{{ lease.risk_level_class|upper }}">{{ lease.risk_level_class }}</span>
+                    </span>
+                </div>
+            </div>
+            
+            <p>To continue your tenancy, we encourage you to:</p>
+            <ol>
+                <li>Clear any outstanding balance on your account</li>
+                <li>Review and sign the renewal agreement</li>
+                <li>Submit any required documentation</li>
+            </ol>
+            
+            {% if lease.risk_level_class != "LOW" %}
+            <div style="background-color: #fef2f2; padding: 15px; border-radius: 6px; border-left: 4px solid #ef4444; margin: 20px 0;">
+                <p><strong>Important:</strong> Your account has an outstanding balance of {{ lease.currency.currency_code }} {{ lease.owing }}. Lease renewal may not be approved until this balance is cleared.</p>
+            </div>
+            {% endif %}
+            
+            <center>
+                <a href="{{ renewal_url }}" class="button">Renew Lease Now</a>
+                <a href="{{ portal_url }}" class="button-secondary">View Account</a>
+            </center>
+            
+            <p>If you do not wish to renew your lease, please notify our office at least {{ notice_period_days }} days before the expiration date as required by your lease agreement.</p>
+            
+            <p>If you have any questions about the renewal process, please contact our property management team.</p>
+            
+            <p>Best regards,<br>The {{ platform_name }} Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {% now "Y" %} {{ platform_name }}. All rights reserved.</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

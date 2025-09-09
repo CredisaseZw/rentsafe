@@ -1,17 +1,13 @@
-from django.db import models, transaction
-from django.utils import timezone
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import now, timedelta
 from django.db.models import F, Sum, Q
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from dateutil.relativedelta import relativedelta
-import uuid
 from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime
+from django.utils.timezone import now
 from apps.accounting.utils.helpers import generate_invoice_document_number, generate_credit_note_document_number
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import Company
@@ -117,6 +113,7 @@ class Invoice(BaseModelWithUser):
         ("draft", "Draft"),
         ("pending", "Pending"),
         ("paid", "Paid"),
+        ("partially_paid", "Partially Paid"),
         ("cancelled", "Cancelled"),
     ]
 
@@ -129,14 +126,12 @@ class Invoice(BaseModelWithUser):
     # Core Fields
     invoice_type = models.CharField(max_length=20, choices=INVOICE_TYPE_CHOICES, default="fiscal")
     document_number = models.CharField(max_length=20, unique=True, editable=False, default=generate_invoice_document_number)
-    is_individual = models.BooleanField(default=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     lease = models.ForeignKey('leases.Lease', on_delete=models.CASCADE, null=True, blank=True, related_name='invoices')
     reference_number = models.CharField(max_length=20, blank=True, null=True)
 
     # Customer Relationship
-    individual = models.ForeignKey(Individual, on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey('leases.LeaseTenant', on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
 
     # Financial Details
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
@@ -147,8 +142,9 @@ class Invoice(BaseModelWithUser):
     frequency = models.CharField(max_length=20,choices=FREQUENCY_CHOICES,default="monthly", blank=True, null=True)
     next_invoice_date = models.DateField(null=True, blank=True)
     original_invoice = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,related_name='child_invoices')
-
+    total_inclusive = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     # Timestamps
+    due_date = models.DateField(null=True, blank=True)
     sale_date = models.DateTimeField(default=now)
     line_items = GenericRelation('TransactionLineItem', related_query_name='invoices')
 
@@ -167,10 +163,32 @@ class Invoice(BaseModelWithUser):
         )['sum_vat'] or Decimal('0.00')
         return total.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
 
-    @property
-    def total_inclusive(self):
-        return (self.total_excluding_vat + self.vat_total).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+    def _calculate_total_inclusive(self):
+        # Your existing calculation logic
+        from decimal import Decimal
+        
+        total_excl_vat = Decimal('0.00')
+        vat_total = Decimal('0.00')
+        
+        # Calculate manually
+        for line_item in self.line_items.all():
+            line_total = line_item.quantity * line_item.unit_price
+            total_excl_vat += line_total
+            vat_total += line_item.vat_amount or Decimal('0.00')
+        
+        total_excl_vat = (total_excl_vat - self.discount).quantize(Decimal('0.00'))
+        return (total_excl_vat + vat_total).quantize(Decimal('0.00'))
 
+    def update_totals(self):
+        """
+        Updates the total_inclusive field based on current line items.
+        """
+        self.total_inclusive = self._calculate_total_inclusive()
+        self.save(update_fields=['total_inclusive'])
+
+    @property
+    def total_inclusive_property(self):
+        return self.total_inclusive
     def convert_to_fiscal(self):
         if self.invoice_type == "proforma":
             self.invoice_type = "fiscal"
@@ -182,13 +200,8 @@ class Invoice(BaseModelWithUser):
     def save(self, *args, **kwargs):
         if not self.pk and not self.document_number:
             self.document_number = generate_invoice_document_number()
-        if self.individual and self.company:
-            raise ValidationError("An invoice cannot be linked to both an individual and a company.")
-        elif self.individual:
-            self.is_individual = True
-        elif self.company:
-            self.is_individual = False
-
+        if not self.total_inclusive:
+            self.total_inclusive = self._calculate_total_inclusive()
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -204,9 +217,7 @@ class Invoice(BaseModelWithUser):
 
         new_invoice = Invoice.objects.create(
             invoice_type="fiscal",
-            is_individual=self.is_individual,
-            individual=self.individual,
-            company=self.company,
+            customer=self.customer,
             currency=self.currency,
             created_by=self.created_by,
             sale_date=new_invoice_date,
@@ -244,13 +255,7 @@ class Invoice(BaseModelWithUser):
         return None
 
     def __str__(self):
-        customer_id_str = ""
-        if self.is_individual and self.individual:
-            customer_id_str = f"Individual: {self.individual.firstname} {self.individual.surname}"
-        elif not self.is_individual and self.company:
-            customer_id_str = f"Company: {self.company.name}"
-        else:
-            customer_id_str = "No Customer"
+        customer_id_str = self.lease.get_tenant_names() or "No Customer"
         return f"{self.invoice_type.title()} {self.document_number} - {customer_id_str}"
 
 
@@ -375,6 +380,10 @@ class TransactionLineItem(BaseModel):
 class PaymentMethod(BaseModel):
     payment_method_name = models.CharField(max_length=255)
 
+    class Meta:
+        app_label = 'accounting'
+        verbose_name = _('payment method')
+        verbose_name_plural = _('payment methods')
     def __str__(self):
         return self.payment_method_name
 
@@ -383,6 +392,8 @@ class Payment(BaseModelWithUser):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
     payment_date = models.DateTimeField(default=now)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name="payments")
     reference = models.CharField(max_length=255, blank=True, null=True)
 

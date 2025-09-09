@@ -18,6 +18,7 @@ from apps.accounting.models.models import (
     PaymentMethod,
     TransactionType,
     GeneralLedgerAccount,
+    Payment
 )
 
 admin.site.register(ContentType)
@@ -137,13 +138,13 @@ class CurrencyAdmin(admin.ModelAdmin): # Corrected class name
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
     list_display = ("id", "document_number", "invoice_type", "status", "sale_date",
-                    "customer_display", "total_inclusive", "currency", "is_recurring", "created_by")
+                    "total_inclusive", "currency", "is_recurring", "created_by")
     list_display_links = ("document_number",)
-    search_fields = ("document_number", "individual__firstname", "individual__surname", "company__name", "reference_number")
-    list_filter = ("invoice_type", "status", "sale_date", "is_individual", "currency", "is_recurring")
+    search_fields = ("document_number","reference_number")
+    list_filter = ("invoice_type", "status", "sale_date", "currency", "is_recurring")
     ordering = ("-sale_date", "document_number")
     inlines = [TransactionLineItemInline] # Add inline for line items
-    raw_id_fields = ('created_by', 'individual', 'company', 'lease', 'currency', 'original_invoice')
+    raw_id_fields = ('created_by', 'customer', 'lease', 'currency', 'original_invoice')
     list_per_page = 25
 
     fieldsets = (
@@ -151,8 +152,8 @@ class InvoiceAdmin(admin.ModelAdmin):
             'fields': ('invoice_type', 'document_number', 'status', 'sale_date', 'reference_number')
         }),
         ('Customer Details', {
-            'fields': ('is_individual', 'individual', 'company', 'lease'),
-            'description': 'Select either an individual or a company customer.'
+            'fields': ('lease', 'customer'),
+            'description': 'Select a customer.'
         }),
         ('Financials', {
             'fields': ('currency', 'discount', 'total_excluding_vat', 'vat_total', 'total_inclusive')
@@ -170,10 +171,8 @@ class InvoiceAdmin(admin.ModelAdmin):
     readonly_fields = ('document_number', 'total_excluding_vat', 'vat_total', 'total_inclusive')
 
     def customer_display(self, obj):
-        if obj.is_individual and obj.individual:
-            return f"{obj.individual.firstname} {obj.individual.surname}"
-        elif not obj.is_individual and obj.company:
-            return obj.company.name
+        if obj.get_tenant_names():
+            return f"{obj.get_tenant_names()}"
         return "N/A"
     customer_display.short_description = "Customer"
 
@@ -281,3 +280,13 @@ class GeneralLedgerAccountAdmin(admin.ModelAdmin): # Corrected class name
         return obj.account_sector.name if obj.account_sector else None
     account_sector_name.short_description = "Sector Name"
     account_sector_name.admin_order_field = "account_sector__name" # Allows sorting by this field
+
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ("id", "invoice", "amount", "payment_date")
+    list_display_links = ("id", "invoice")
+    search_fields = ("invoice__document_number", "payment_method__payment_method_name")
+    list_filter = ("invoice",)
+    ordering = ("-payment_date",)
+    list_per_page = 25

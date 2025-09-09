@@ -11,29 +11,31 @@ import { TableBase } from "./TableBase"
 import { TableCell, TableRow } from "../ui/table"
 import { useState } from "react"
 import ActiveIndividualLease from "../routes/rent-safe/tenant-leases/ActiveIndividualLease"
+import ActiveCompanyLease from "../routes/rent-safe/tenant-leases/ActivateCompanyLeases"
+import type { Header } from "@/types"
 
 export function SubscriptionSheet() {
     const [open, setOpen] = useState(false)
-    const headers = [
+    const headers:Header[] = [
         {
             name: "No",
-            textAlign: "center"
+            
         },
         {
             name: "Open Slots",
-            textAlign: "center"
+            
         },
         {
             name: "Period (Months)",
-            textAlign: "center"
+            
         },
         {
             name: "Start Date",
-            textAlign: "center"
+            
         },
         {
             name: "End Date",
-            textAlign: "center"
+            
         },
     ]
   return (
@@ -48,14 +50,14 @@ export function SubscriptionSheet() {
         <div className="mt-4 px-4">
         <TableBase headers={headers}>
             <TableRow>
-                <TableCell className="baseCellClass text-center">1</TableCell>
-                <TableCell className="baseCellClass text-center">2</TableCell>
-                <TableCell className="baseCellClass text-center">12</TableCell>
-                <TableCell className="baseCellClass text-center">22-May-25</TableCell>
-                <TableCell className="baseCellClass text-center">22-May-26</TableCell>
-                <TableCell className="baseCellClass flex justify-center items-center flex-row gap-3.5">
+                <TableCell className=" text-center">1</TableCell>
+                <TableCell className=" text-center">2</TableCell>
+                <TableCell className=" text-center">12</TableCell>
+                <TableCell className=" text-center">22-May-25</TableCell>
+                <TableCell className=" text-center">22-May-26</TableCell>
+                <TableCell className=" flex justify-center items-center flex-row gap-3.5">
                     <ActiveIndividualLease />
-                    <Button variant={"SUCCESS"}>Activate Company</Button>
+                    <ActiveCompanyLease />
                 </TableCell>
             </TableRow>
         </TableBase>

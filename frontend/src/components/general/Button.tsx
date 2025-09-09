@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface ButtonProps {
    asChild?: false | true;
    children: React.ReactNode;
-   variant?: "primary" | "outline" | "success" | "danger";
+   variant?: "primary" | "outline" | "success" | "danger" | "ghost";
    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
    className?: string;
    disabled?: boolean;
@@ -12,11 +12,12 @@ interface ButtonProps {
    type?: "button" | "submit" | "reset";
 }
 
-const variants: Record<"primary" | "success" | "danger" | "outline", string> = {
+const variants: Record<"primary" | "success" | "danger" | "outline" | "ghost", string> = {
    primary: "text-white bg-gray-800 hover:bg-gray-600 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-black",
    success: "text-white bg-green-600 hover:bg-green-800",
    danger: "text-white bg-red-600 hover:bg-red-700",
    outline: "border border-color text-gray-800 dark:text-gray-100",
+   ghost : "text-gray-800 dark:text-gray-100 bg-transparent"
 };
 
 const sizes: Record<"sm" | "md" | "lg", string> = {

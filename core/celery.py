@@ -2,6 +2,7 @@
 import os
 from celery import Celery
 from django import setup
+from celery.schedules import crontab
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 setup()
 app = Celery('core')
@@ -14,6 +15,14 @@ app.autodiscover_tasks([
     'apps.properties.services.tasks',
     'apps.leases.services.tasks',
 ])
+
+
+# app.conf.beat_schedule = {
+#     'generate-monthly-invoices': {
+#         'task': 'apps.leases.tasks.generate_monthly_lease_invoices',
+#         'schedule': crontab(day_of_month=25, hour=0, minute=0),
+#     },
+# }
 
 app.conf.beat_schedule = {
     'cleanup-expired-otps': {

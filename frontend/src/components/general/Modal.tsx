@@ -11,8 +11,8 @@ interface ModalProps {
 
 function Modal({ children, onClose, size, modalHeader }: ModalProps) {
    const modal_sizes = useRef({
-      md: { width: "w-[500px]" },
-      lg: { width: "w-[800px]" },
+      md: { width: "w-[750px]" },
+      lg: { width: "w-[900px]" },
       xl: { width: "w-[1140px]" },
    });
 
@@ -33,7 +33,7 @@ function Modal({ children, onClose, size, modalHeader }: ModalProps) {
    }, [onClose]);
 
    return (
-      <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 py-10 backdrop-blur-xs`}>
+      <div className={`fixed inset-0 z-50 overflow-y-hidden flex items-center justify-center bg-black/50 py-10 backdrop-blur-xs`}>
          <div
             className={`modal bg-white dark:bg-zinc-950 relative mx-auto rounded-md border border-gray-300 p-10 dark:border-zinc-800 ${modal_sizes.current[size].width}`}
          >

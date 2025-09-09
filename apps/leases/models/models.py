@@ -1,20 +1,24 @@
 import contextlib
+import logging
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q, F
-from django.db import transaction
+from django.db.models import Q, F, Sum
 from django.conf import settings
 from django.utils import timezone
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
+from apps.accounting.models import Payment
 from apps.subscriptions.models.models import Subscription
 from apps.properties.models.models import Unit
 from apps.common.models.models import Document, Note
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.individuals.models import Individual
 from apps.companies.models import CompanyBranch
+from django.db import transaction
+
+logger = logging.getLogger(__name__)
 
 class Lease(BaseModelWithUser):
     LEASE_STATUS_CHOICES = (
@@ -33,12 +37,12 @@ class Lease(BaseModelWithUser):
         ('ANNUALLY', 'Annually'),
     )
 
-    LEASE_RISK_CHOICES = {
-        0: 'LOW',
-        1: 'MEDIUM',
-        2: 'HIGH',
-        3: 'HIGH HIGH',
-        4: 'NON_PAYER',
+    RISK_COLORS = {
+        'NON_PAYER': 'black',
+        'HIGH_HIGH': 'red', 
+        'HIGH': 'pink',
+        'MEDIUM': 'orange',
+        'LOW': 'green'
     }
 
     lease_id = models.CharField(max_length=50, unique=True,
@@ -61,7 +65,8 @@ class Lease(BaseModelWithUser):
     currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT,
                                 help_text="The primary currency in which the lease payments and charges are accounted for.",
                                 related_name='leases_as_primary_currency')
-
+    managing_client = models.ForeignKey('clients.Client', on_delete=models.PROTECT, related_name='managed_leases', null=True, blank=True,
+                                help_text="The client responsible for managing this lease.")
     payment_frequency = models.CharField(max_length=20, choices=PAYMENT_FREQUENCY_CHOICES, default='MONTHLY',
                                 help_text="The default payment frequency for recurring charges.")
     due_day_of_month = models.SmallIntegerField(default=25,
@@ -227,45 +232,227 @@ class Lease(BaseModelWithUser):
             new_number = 1
 
         return f"{prefix}-{new_number:04d}"
+    
+    @property
+    def risk_color(self):
+        """Return the color code for the current risk level"""
+        return self.RISK_COLORS.get(self.risk_level, 'green')
 
     def _get_outstanding_invoice_months(self):
         """
-        Calculates the number of distinct months with overdue invoices for this lease.
-        An invoice is considered overdue if its `due_date` is in the past AND its `status` is not 'paid'.
+        Calculates the number of months since the oldest unpaid invoice's sale date.
+        Only considers unpaid or partially paid invoices.
         """
         today = timezone.now().date()
-        overdue_invoices = self.invoices.filter(
+        
+        # Get all unpaid invoices
+        unpaid_invoices = self.invoices.filter(
             status__in=['pending', 'partially_paid', 'draft']
-        ).order_by('date_created')
-        outstanding_periods = {
-            (invoice.date_created.year, invoice.date_created.month)
-            for invoice in overdue_invoices
-        }
-        return len(outstanding_periods) if overdue_invoices.exists() else 0
+        )
+        
+        if not unpaid_invoices.exists():
+            return 0
+        
+        # Find the oldest invoice by sale_date
+        oldest_invoice = unpaid_invoices.order_by('sale_date').first()
+        
+        if not oldest_invoice or not oldest_invoice.sale_date:
+            return 0
+        
+        # Calculate months difference between today and the oldest invoice sale date
+        if isinstance(oldest_invoice.sale_date, datetime):
+            sale_date = oldest_invoice.sale_date.date()
+        else:
+            sale_date = oldest_invoice.sale_date
+        
+        # Calculate months difference
+        months_diff = (today.year - sale_date.year) * 12 + (today.month - sale_date.month)
+        # Ensure at least 1 month if invoice is overdue
+        return max(1, months_diff)
+    
+    def determine_initial_risk_status(self):
+        risk_status = 'LOW'
+
+        try:
+            opening_balance = self.opening_balance
+        except Exception as e:
+            return risk_status 
+
+        if opening_balance.three_months_plus_balance > 0:
+            risk_status = 'NON_PAYER'
+        elif opening_balance.three_months_back_balance > 0:
+            risk_status = 'HIGH_HIGH'
+        elif opening_balance.two_months_back_balance > 0:
+            risk_status = 'HIGH'
+        elif opening_balance.one_month_back_balance > 0:
+            risk_status = 'MEDIUM'
+
+        if opening_balance.outstanding_balance > 0:
+            from apps.leases.services.invoice_service import LeaseInvoiceService
+            LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
+
+        return risk_status
+
+    def apply_payment(self, amount, payment_date, method, reference=None, request=None, description=None):
+        """
+        Apply a payment to the lease, allocating to the oldest debts first.
+        Allows overpayments which will create a negative balance.
+        Handles landlord commissions for each payment allocation.
+        """        
+        from apps.leases.utils.commissions import CommissionHandler
+        remaining_amount = Decimal(amount)
+        payments_made = []
+        
+        # Get all unpaid invoices ordered by due date (oldest first)
+        unpaid_invoices = self.invoices.filter(
+            status__in=['pending', 'partially_paid']
+        ).order_by('due_date')
+        with transaction.atomic():
+            # Apply payment to unpaid invoices first
+            for invoice in unpaid_invoices:
+                if remaining_amount <= 0:
+                    break
+                    
+                # Calculate invoice balance properly (handle None values)
+                total_paid_result = invoice.payments.aggregate(
+                    total_paid=Sum('amount')
+                )
+                total_paid = total_paid_result['total_paid'] or Decimal('0.00')
+                
+                invoice_balance = invoice.total_inclusive - total_paid
+                
+                payment_amount = min(remaining_amount, invoice_balance)
+                
+                if payment_amount > 0:
+                    # Create payment
+                    payment = Payment.objects.create(
+                        invoice=invoice,
+                        payment_date=payment_date,
+                        amount=payment_amount,
+                        description=description,
+                        method=method,
+                        reference=reference,
+                        created_by=request.user if request and hasattr(request, 'user') else None
+                    )
+                    
+                    payments_made.append(payment)
+                    remaining_amount -= payment_amount
+                    #def handle_payment_commission(lease, payment_amount, payment_date, payment_reference, request=None):
+                    # Handle landlord commission for this specific payment allocation
+                    CommissionHandler.handle_payment_commission(
+                        lease=self, 
+                        payment_amount=payment_amount, 
+                        payment_date=payment_date, 
+                        payment_reference=f"{reference or 'Payment'} for invoice {invoice.document_number}",
+                        request=request
+                    )
+                    
+                    # Update invoice status
+                    if payment_amount >= invoice_balance:
+                        invoice.status = 'paid'
+                    else:
+                        invoice.status = 'partially_paid'
+                    invoice.save()
+            
+            # Handle overpayment by adding to the last payment
+            if remaining_amount > 0 and payments_made:
+                # Add overpayment to the last payment made
+                last_payment = payments_made[-1]
+                last_payment.amount += remaining_amount
+                last_payment.save()
+                
+                # Handle commission for the overpayment portion
+                CommissionHandler.handle_payment_commission(
+                    lease=self, 
+                    payment_amount=remaining_amount, 
+                    payment_date=payment_date, 
+                    payment_reference=f"{reference or 'Payment'} overpayment",
+                    payment_instance=last_payment,
+                    request=request
+                )
+                
+                remaining_amount = Decimal('0.00')
+            
+            # Log the payment
+            if payments_made or remaining_amount > 0:
+                log_details = {
+                    'total_amount': str(amount),
+                    'payment_method': str(method),
+                    'reference': reference,
+                    'applied_to_invoices': [p.invoice.document_number for p in payments_made],
+                    'overpayment_amount': str(remaining_amount) if remaining_amount > 0 else '0.00'
+                }
+                
+                LeaseLog.objects.create(
+                    lease=self,
+                    log_type='PAYMENT_RECEIVED',
+                    user=request.user if request and hasattr(request, 'user') else None,
+                    details=log_details
+                )
+            
+            return payments_made, remaining_amount
+        return [], remaining_amount
+
     @property
     def risk_level(self):
         """
-        Calculates the risk level based on the number of outstanding invoice months.
+        Calculates risk level based on both opening balance age and invoice aging.
+        Opening balance takes precedence, then unpaid invoices.
         """
         outstanding_months = self._get_outstanding_invoice_months()
-
-        if outstanding_months == 0:
-            return 'LOW'
-        elif outstanding_months == 1:
-            return 'MEDIUM'
-        elif outstanding_months == 2:
-            return 'HIGH'
-        elif outstanding_months == 3:
-            return 'HIGH HIGH'
-        elif outstanding_months >= 4:
+        
+        if outstanding_months > 4:
             return 'NON_PAYER'
-        return 'LOW'
-    
+        elif outstanding_months == 4:
+            return 'HIGH HIGH'
+        elif outstanding_months == 3:
+            return 'HIGH'
+        elif outstanding_months == 2:
+            return 'MEDIUM'
+        else:
+            return 'LOW'
     @property
     def get_latest_balance(self):
-        if self.invoices.exists():
-            return self.invoices.latest('date_created').balance
-        return Decimal('0.00')
+        return self.current_balance
+
+    @property
+    def payment_status(self):
+        """Returns a human-readable payment status based on risk level."""
+        risk = self.risk_level
+        if risk == 'NON_PAYER':
+            return "Non-Payer"
+        elif risk in ['HIGH HIGH', 'HIGH']:
+            return "High-Risk"
+        elif risk == 'MEDIUM':
+            return "Medium-Risk"
+        else:
+            return "Low-Risk"
+     
+    @property
+    def client_name(self):
+        """Get the managing client's name"""
+        return self.managing_client.name if self.managing_client else "N/A"
+    
+    @property
+    def current_balance(self):
+        """
+        Calculate the current balance of the lease.
+        Positive = amount owed, Negative = credit balance (overpayment)
+        """
+        total_invoiced = self.invoices.filter(
+            invoice_type__in=['fiscal', 'proforma']
+        ).aggregate(
+            total=Sum('total_inclusive')
+        )['total'] or Decimal('0.00')
+        
+        # Calculate total payments
+        total_paid = Payment.objects.filter(
+            invoice__lease=self
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+        
+        return total_invoiced - total_paid
 
     def _get_landlord_subscriber_entity(self):
         """
@@ -428,6 +615,18 @@ class LeaseTenant(BaseModel):
                 }
         return None
 
+    @property
+    def phone(self):
+        if self.tenant_object and isinstance(self.tenant_object, (Individual, CompanyBranch)):
+            return self.tenant_object.phone[0]
+        return None
+
+    @property
+    def email(self):
+        if self.tenant_object and isinstance(self.tenant_object, CompanyBranch):
+            return self.tenant_object.email
+        return None
+    
     def delete(self, *args, **kwargs):
         request = kwargs.pop('request', None)
         user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
@@ -452,47 +651,6 @@ class LeaseTenant(BaseModel):
             details={**lease_details_for_log, 'was_primary': self.is_primary_tenant}
         )
         super().delete(*args, **kwargs)
-
-class LeaseDeposit(BaseModel):
-    DEPOSIT_HOLDER_CHOICES=[
-        ('agent', 'Agent'),
-        ('landlord', 'Landlord'),
-        ('tenant', 'Tenant'),
-    ]
-    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='deposits')
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT)
-    deposit_date = models.DateField(blank=True, null=True)
-    deposit_holder = models.CharField(max_length=255, choices=DEPOSIT_HOLDER_CHOICES,default='agent')
-    
-    class Meta:
-        app_label = 'leases'
-        db_table = 'lease_deposit'
-        verbose_name = _('lease deposit')
-        verbose_name_plural = _('lease deposits')
-    def __str__(self):
-        return f"Lease: {self.lease.lease_id if self.lease else 'N/A'} Deposit: {self.currency.currency_code if self.currency else 'N/A'} {self.amount}"
-
-class Guarantor(BaseModel):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
-                                    limit_choices_to=Q(app_label='individuals', model='individual') |
-                                                    Q(app_label='companies', model='companybranch'))
-    object_id = models.PositiveIntegerField(null=True, blank=True)
-    guarantor_object = GenericForeignKey('content_type', 'object_id')
-
-    guarantee_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
-                                        help_text="The maximum amount guaranteed by this guarantor, if specified.")
-    
-    class Meta:
-        app_label = 'leases'
-        db_table = 'guarantor'
-        verbose_name = _('guarantor')
-        verbose_name_plural = _('guarantors')
-        unique_together = ('content_type', 'object_id')
-
-    def __str__(self):
-        guarantor_name = self.guarantor_object.__str__() if self.guarantor_object else "N/A"
-        return f"Guarantor: {guarantor_name}"
 
 class LeaseCharge(BaseModel):
     CHARGE_TYPE_CHOICES = (
@@ -636,6 +794,47 @@ class LeaseCharge(BaseModel):
             }
         )
         super().delete(*args, **kwargs)
+
+class LeaseDeposit(BaseModel):
+    DEPOSIT_HOLDER_CHOICES=[
+        ('agent', 'Agent'),
+        ('landlord', 'Landlord'),
+        ('tenant', 'Tenant'),
+    ]
+    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='deposits')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT)
+    deposit_date = models.DateField(blank=True, null=True)
+    deposit_holder = models.CharField(max_length=255, choices=DEPOSIT_HOLDER_CHOICES,default='agent')
+    
+    class Meta:
+        app_label = 'leases'
+        db_table = 'lease_deposit'
+        verbose_name = _('lease deposit')
+        verbose_name_plural = _('lease deposits')
+    def __str__(self):
+        return f"Lease: {self.lease.lease_id if self.lease else 'N/A'} Deposit: {self.currency.currency_code if self.currency else 'N/A'} {self.amount}"
+
+class Guarantor(BaseModel):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                    limit_choices_to=Q(app_label='individuals', model='individual') |
+                                                    Q(app_label='companies', model='companybranch'))
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    guarantor_object = GenericForeignKey('content_type', 'object_id')
+
+    guarantee_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
+                                        help_text="The maximum amount guaranteed by this guarantor, if specified.")
+    
+    class Meta:
+        app_label = 'leases'
+        db_table = 'guarantor'
+        verbose_name = _('guarantor')
+        verbose_name_plural = _('guarantors')
+        unique_together = ('content_type', 'object_id')
+
+    def __str__(self):
+        guarantor_name = self.guarantor_object.__str__() if self.guarantor_object else "N/A"
+        return f"Guarantor: {guarantor_name}"
 
 class LeaseTermination(BaseModel):
     lease = models.OneToOneField(Lease, on_delete=models.CASCADE, related_name='termination')

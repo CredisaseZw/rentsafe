@@ -30,6 +30,8 @@ EMAIL_HOST = os.environ["EMAIL_HOST"]
 EMAIL_PORT = os.environ["EMAIL_PORT"]
 EMAIL_USE_SSL = os.environ["EMAIL_USE_SSL"]
 EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_REPLY_TO_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
 SMS_USERNAME = os.environ["SMS_USERNAME"]
 SMS_PASSWORD = os.environ["SMS_PASSWORD"]
@@ -60,6 +62,8 @@ ALLOWED_HOSTS = []
 if not DEBUG:
     ALLOWED_HOSTS = [
         '.credi-safe.com',
+        ".rentsafe-iota.vercel.app",
+        "rentsafe-backend.onrender.com"
     ]
 else:
     ALLOWED_HOSTS = [
@@ -68,8 +72,8 @@ else:
         '[::1]',
         # '192.168.1.10',
     ]
-
-
+    
+ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
@@ -224,6 +228,8 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "http://127.0.0.1:3000",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
+        "rentsafe-backend.onrender.com",
+        "https://rentsafe-iota.vercel.app"
     ]
 
 CORS_ALLOW_METHODS = [
@@ -248,23 +254,20 @@ CRON_CLASSES = [
 # https://www.django-rest-framework.org/api-guide/settings/
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication', # For JWT
-        'rest_framework.authentication.SessionAuthentication', 
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "apps.users.api.authentication.CookieJWTAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', 
-    ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ),
-    'DEFAULT_RENDERER_CLASSES': [
-            'rest_framework.renderers.JSONRenderer',
-            'rest_framework.renderers.BrowsableAPIRenderer',
-        ],
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
 }
+
 REDIS_CACHE_LOCATION = "redis://127.0.0.1:6379/1" if DEVELOPMENT else os.getenv('REDIS_CACHE_LOCATION')
 
 # CACHES = {
@@ -279,13 +282,13 @@ REDIS_CACHE_LOCATION = "redis://127.0.0.1:6379/1" if DEVELOPMENT else os.getenv(
 #     }
 # }
 # Celery Configuration
-# CELERY_BROKER_URL = 'redis://localhost:6379/0' if DEVELOPMENT else os.getenv('CELERY_BROKER_URL')
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0' if DEVELOPMENT else os.getenv('CELERY_RESULT_BACKEND')
 
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = TIME_ZONE
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
 
 
 
@@ -293,34 +296,39 @@ REDIS_CACHE_LOCATION = "redis://127.0.0.1:6379/1" if DEVELOPMENT else os.getenv(
 # SIMPLE JWT SETTINGS
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=4),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': True,
-
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY, 
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-    'JWK_URL': None,
-    'LEEWAY': 0,
-
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
-
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
-
-    'JTI_CLAIM': 'jti',
-
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=4),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+    # Cookie settings
+    "AUTH_COOKIE": "access_token",
+    "AUTH_COOKIE_REFRESH": "refresh_token",
+    "AUTH_COOKIE_DOMAIN": None,
+    "AUTH_COOKIE_SECURE": DEBUG is False,  # Set to True in production (HTTPS)
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_PATH": "/",
+    "AUTH_COOKIE_SAMESITE": "Lax",  # or 'Strict' or 'None'
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    # Token classes
+    "TOKEN_BLACKLIST_ENABLED": True,
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    "JTI_CLAIM": "jti",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
 # Create the logs directory if it doesn't exist
@@ -401,6 +409,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'verbose',
             },
+        'file_subscriptions': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'subscriptions.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
         'db_audit': { 
             'level': 'INFO',
             'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
@@ -479,6 +495,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'subscriptions': {
+            'handlers': ['console', 'file_subscriptions'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     'root': { 
         'handlers': ['console', 'file_django'],
         'level': 'WARNING',
@@ -487,7 +508,12 @@ LOGGING = {
 }
 
 
-
+LEASE_CREATED = 'LEASE_CREATED'
+LEASE_UPDATED = 'LEASE_UPDATED'
+LEASE_TERMINATED = 'LEASE_TERMINATED'
+PAYMENT_RECEIVED = 'PAYMENT_RECEIVED'
+RISK_STATUS_UPDATED = 'RISK_STATUS_UPDATED'
+LEASE_RENEWAL_REMINDER = 'LEASE_RENEWAL_REMINDER'
 
 ADD_INDIVIDUAL = "ADD_INDIVIDUAL"
 ADD_INDIVIDUAL_USER = "ADD_INDIVIDUAL_USER"
@@ -501,7 +527,6 @@ ADD_COMP_LEASE = "COMPANY_LEASE"
 MAKE_AGENT = "MAKE_AGENT"
 FORGOT_PASSWORD = "FORGOT_PASSWORD"
 ADD_SUBSCRIPTION = "ADD_SUBSCRIPTION"
-PAYMENT_RECEIPT = "PAYMENT_RECEIPT"
 LEASE_STATUS = "LEASE_STATUS"
 
 

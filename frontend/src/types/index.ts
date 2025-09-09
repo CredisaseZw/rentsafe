@@ -1,3 +1,5 @@
+import type { Address } from "@/interfaces";
+
 export type Route = {
    label: string;
    path: string;
@@ -10,11 +12,6 @@ export type NavLink = {
    path?: string;
    subLinks?: NavLink[];
    pageComponent?: React.FC;
-};
-
-export type SummaryCardType = {
-   subTitle: string;
-   value: number | string;
 };
 
 export type FilterOptionType = {
@@ -89,4 +86,118 @@ export type Column = {
    note : string,
    headerName: string;
    rows: Row[];
+};
+export type Header={
+   name : string,
+   className?: string,
+   colSpan?: number
+   textAlign?: "center"| "left" |"end"
+}
+export type IndividualLease = {
+   idPassportNumber: string;
+   leaseName: string;
+   leaseMobileNumber: string;
+   rentGuarantorId: string;
+   rentGuarantorName: string;
+   propertyType: string;
+   numberOfRooms: string;
+   otherPropertyDetails: string;
+   unitNumber: string;
+   buildingComplexName: string;
+   streetNumber: string;
+   streetName: string;
+   suburbArea: string;
+   cityTown: string;
+   province: string;
+   country: string;
+   areaCode: string;
+   leaseCurrency: string;
+   monthlyRent: string;
+   otherStandingCharge: string;
+   standingChargeNarration: string;
+   radiosHere: string;
+   leaseCopy: string;
+   depositDate: string;
+   depositCurrency: string;
+   depositAmount: string;
+   depositHolder: string;
+   leaseStartDate: string;
+   leaseEndDate: string;
+   subscriptionPeriodRemaining: string;
+   paymentPeriodStartDate: string;
+   paymentPeriodEndDate: string;
+   landlordType: string;
+   idRegName: string;
+   variableRent: boolean,
+   vatInclusive : boolean,
+   landlordName: string;
+   commissionPercentage: string;
+   operatingCostsIncluded: boolean;
+   landlordsOpeningBalance: string;
+   paymentDataMoreThan3Months: string;
+   paymentData07May25: string;
+   paymentData07Jun25: string;
+   paymentData07Jul25: string;
+   paymentData07Aug25: string;
+  };
+
+export type PropertiesResponse = {
+   count: number;
+   next: string | null;
+   previous: string | null;
+   results: Property[];
+}
+export type PropertyType = {
+   id : number,
+   name: string,
+   description: string
+}
+export type PropertTypeResponse = {
+   count: number;
+   next: string | null;
+   previous: string | null;
+   results : PropertyType[]
+}
+export interface Features {
+  parking: string;
+  security: string;
+  backup_power: string;
+}
+export interface AddressInput {
+  suburb_id: number;
+  street_address: string;
+}
+
+export interface LandlordInput {
+  landlord_name: string;
+  landlord_type: "company" | "individual" | string;
+  landlord_id: string;
+}
+export interface Property {
+  id?: string;
+  name?: string;
+  description?: string;
+  status?: "active" | "inactive" | string; 
+  year_built?: number;
+  total_area?: string; 
+  is_furnished?: boolean;
+  total_number_of_units?: number;
+  features?: Features;
+  property_type_id?: number;
+  property_type?: string;
+  address_summary?: string;
+  addresses_input?: AddressInput;
+  landlords_input?: LandlordInput[];
+  full_address?: Address[]
+}
+
+export type AddPropertyForm = {
+  property_type: string;
+  status : string
+  landlord_type: "individual" | "company";
+  landlord_id: string;
+  is_furnished : boolean;
+  features : Features;
+  landlord_name: string;
+ 
 };

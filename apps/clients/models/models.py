@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from apps.common.models.base_models import BaseModel
 from apps.individuals.models.models import Individual
-from apps.companies.models.models import Company
+from apps.companies.models.models import CompanyBranch
 from uuid import uuid4
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -74,8 +74,8 @@ class Client(models.Model):
         if not self.name and self.client_object:
             if isinstance(self.client_object, Individual):
                 self.name = f"{self.client_object.full_name}"
-            elif isinstance(self.client_object, Company):
-                self.name = f"{self.client_object.registration_name}"
+            elif isinstance(self.client_object, CompanyBranch):
+                self.name = f"{self.client_object.branch_name}"
             else:
                 self.name = f"Client {self.client_content_type.model}-{self.client_object_id}"
 
@@ -117,16 +117,14 @@ class Client(models.Model):
     @property
     def is_company_client(self):
         """Returns True if the client is a Company."""
-        return isinstance(self.client_object, Company)
+        return isinstance(self.client_object, CompanyBranch)
     @property
     def email(self):
         """Get email from linked entity"""
         if self.is_individual_client:
-            return self.linked_individual.first_name or None
+            return self.linked_individual.email or None
         elif self.is_company_client:
-            primary_contact = self.linked_company_branch.contacts.filter(is_primary=True).first()
-            if primary_contact and primary_contact.individual:
-                return primary_contact.individual.first_name or None
+            return self.linked_company_branch.email
         return None
 
     @property

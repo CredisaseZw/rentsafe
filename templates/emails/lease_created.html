@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Lease Created - {{ platform_name }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4a6fa5;
+            color: white !important;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+        .label {
+            font-weight: 600;
+            color: #475569;
+            display: inline-block;
+            width: 160px;
+        }
+        .risk-flag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .risk-Non_Payer { background-color: #000000; }
+        .risk-High-Risk { background-color: #dc2626; }
+        .risk-HIGH { background-color: #ef4444; }
+        .risk-Medium-Risk { background-color: #f59e0b; }
+        .risk-Low-Risk { background-color: #10b981; }
+        .tenant-list {
+            margin-left: 20px;
+        }
+        .tenant-item {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4a6fa5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Lease Created - 
+                    <span class="risk-flag risk-{{ lease_status|default:'LOW' }}">
+                        {{ lease_status|default:"LOW" }}
+                    </span>
+                </h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear {{ tenant_name|default:"Tenant" }},</p>
+            
+            <p>A new lease has been created for you by {{ client_name|default:"Admin" }} with the following details:</p>
+            
+            <div class="section">
+                <h3>Lease Information</h3>
+                <p><span class="label">Lease ID:</span> {{ lease_id|default:"N/A" }}</p>
+                <p><span class="label">Property:</span> {{ property|default:"N/A" }}</p>
+                <p><span class="label">Unit:</span> {{ unit|default:"N/A" }}</p>
+                <p><span class="label">Start Date:</span> {{ start_date|default:"N/A" }}</p>
+                <p><span class="label">End Date:</span> {{ end_date|default:"N/A" }}</p>
+                <p><span class="label">Opening Balance:</span>{{ currency|default:"USD" }} {{ opening_balance|default:"0.00" }}</p>
+                <p><span class="label">Lease Status:</span> 
+                    <span class="risk-flag risk-{{ lease_status|default:'LOW' }}">
+                        {{ lease_status|default:"LOW" }}
+                    </span>
+                </p>
+                <p><span class="label">Rent Amount:</span> {{ currency|default:"USD" }} {{ rent_amount|default:"0.00" }}</p>
+                <p><span class="label">Payment Frequency:</span> {{ payment_frequency|default:"Monthly" }}</p>
+                <p><span class="label">Due Day:</span> {{ due_day|default:"1" }}th of each month</p>
+            </div>
+            
+            <div class="highlight">
+                <p><strong>Payment Instructions:</strong></p>
+                <p>Please make payments by the <strong>{{ due_day|default:"1" }}th</strong> of each month.</p>
+                {% comment %} <p>Payment methods: Bank transfer, Mobile money, or Cash at our offices</p> {% endcomment %}
+            </div>
+            
+            {% comment %} <p>You can view your lease details and make payments through your tenant portal.</p>
+            
+            <center>
+                <a href="{{ portal_url|default:'#' }}" class="button">Access Tenant Portal</a>
+            </center> {% endcomment %}
+
+            <p>If you have any questions about your lease, please contact us here <a href='mailto:{{ client_email|default:"info@credi-safe.com" }}'>{{ client_email|default:"info@credi-safe.com" }}</a>.</p>
+
+            <p>Best regards,<br>The {{ platform_name|default:"Property Management" }} Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {% now "Y" %} {{ platform_name|default:"Property Management" }}. All rights reserved.</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

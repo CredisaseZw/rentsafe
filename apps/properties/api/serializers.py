@@ -59,7 +59,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Property
-        fields = ('id', 'name', 'property_type', 'status','description', 'total_number_of_units', 'address_summary', 'full_address')
+        fields = ('id', 'name','slug', 'property_type', 'status','description', 'total_number_of_units', 'address_summary', 'full_address')
 
 class PropertyCreateSerializer(serializers.ModelSerializer):
     property_type_id = serializers.PrimaryKeyRelatedField(
@@ -69,7 +69,7 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-            'name', 'description', 'status', 'year_built', 'total_area',
+            'name', 'description','status', 'year_built', 'total_area',
             'is_furnished', 'total_number_of_units', 'features', 'property_type_id'
         ]
 

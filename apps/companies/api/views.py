@@ -16,7 +16,8 @@ from apps.companies.api.serializers import (
     CompanyCreateSerializer, CompanyUpdateSerializer, CompanyDetailSerializer,
     CompanyMinimalSerializer,
     CompanyBranchSearchSerializer, CompanyBranchSerializer,
-    CompanyBranchDetailSerializer, CompanyBranchMinimalSerializer
+    CompanyBranchDetailSerializer, CompanyBranchMinimalSerializer,
+    CompanyBranchLeaseDetailSerializer
 )
 from apps.common.utils import extract_error_message
 import logging
@@ -204,7 +205,7 @@ class CompanyViewSet(BaseViewSet):
         """Get all branches for all companies."""
         company = request.query_params.get('company_id')
         try:
-            branches = CompanyBranch.objects.filter(company__id=company, is_deleted=False).select_related('company')
+            branches = CompanyBranch.objects.filter(company__id=company, is_deleted=False).select_related('company').order_by('-date_created')
             serializer = CompanyBranchSearchSerializer(branches, many=True)
             return self._create_rendered_response(serializer.data)
         except Exception as e:
@@ -373,8 +374,15 @@ class CompanyBranchViewSet(BaseViewSet):
     serializer_class = CompanyBranchSerializer
     permission_classes = [IsAuthenticated]
     
+    def get_queryset(self):
+        search = self.request.query_params.get('search', '')
+        queryset = super().get_queryset()
+        if search:
+            queryset = queryset.filter(Q(branch_name__icontains=search) | Q(company__trading_name__icontains=search) | Q(company__registration_number__icontains=search), is_deleted=False, company__is_deleted=False)
+        return queryset
     def get_serializer_class(self):
         """Return appropriate serializer based on action"""
+        print('self action:', self.action)
         if self.action == 'list':
             return CompanyBranchMinimalSerializer
         elif self.action == 'retrieve':
@@ -382,10 +390,11 @@ class CompanyBranchViewSet(BaseViewSet):
         elif self.action in ['create', 'update', 'partial_update']:
             return CompanyBranchSerializer
         elif self.action == 'search':
-            return CompanyBranchMinimalSerializer
+            return CompanyBranchLeaseDetailSerializer
         elif self.action == 'branches_by_company':
             return CompanyBranchSerializer 
         return CompanyBranchMinimalSerializer
+    
 
     def create(self, request, *args, **kwargs):
         """Create a new branch."""
