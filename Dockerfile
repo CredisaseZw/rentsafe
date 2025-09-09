@@ -49,6 +49,6 @@ EXPOSE 8000
 # ENTRYPOINT ["/bin/sh", "-c", "./entrypoint.sh"]
 
 # Default command to run
-ENTRYPOINT ["python", "/app/entrypoint.py"]
+ENTRYPOINT ["python", "/app/entrypoint.py", "gunicorn"]
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
 

@@ -24,12 +24,12 @@ app.autodiscover_tasks([
 #     },
 # }
 
-app.conf.beat_schedule = {
-    'cleanup-expired-otps': {
-        'task': 'apps.common.tasks.cleanup_expired_otps',
-        'schedule': 3600.0,
-    },
-}
+# app.conf.beat_schedule = {
+#     'cleanup-expired-otps': {
+#         'task': 'apps.common.tasks.cleanup_expired_otps',
+#         'schedule': 3600.0,
+#     },
+# }
 
 @app.task(bind=True)
 def debug_task(self):
