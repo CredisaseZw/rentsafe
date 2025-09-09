@@ -13,3 +13,5 @@ node_modules/
 .venv/
 .vscode*
 .vscode/tasks.json
+settings.json
+.idea/
