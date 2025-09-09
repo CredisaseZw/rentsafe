@@ -110,7 +110,16 @@ def prepare_lease_payment_context(lease, amount, payment_date=None, tenant=None,
     """
     from apps.leases.utils.utils import get_tenant_display
     from apps.leases.api.serializers import LeaseDetailSerializer
-    
+
+    if isinstance(payment_date, str):
+        try:
+            payment_date = datetime.fromisoformat(payment_date)
+        except ValueError:
+            payment_date = datetime.strptime(payment_date, "%Y-%m-%d")
+
+    if not payment_date:
+        payment_date = timezone.now()
+
     context = {
         'tenant_name': get_tenant_display(tenant) if tenant else 'Tenant',
         'lease_id': getattr(lease, 'lease_id', 'N/A'),
@@ -119,16 +128,17 @@ def prepare_lease_payment_context(lease, amount, payment_date=None, tenant=None,
         'amount': f"{float(amount):.2f}",
         'currency': getattr(getattr(lease, 'currency', None), 'currency_code', 'USD'),
         'balance': f"{getattr(lease, 'current_balance', 0):.2f}",
-        'risk_status': getattr(lease, 'risk_level', 'N/A'),
-        'payment_date': payment_date.strftime("%d-%b-%Y") if payment_date else timezone.now().strftime("%d-%b-%Y"),
+        'payment_status': getattr(lease, 'payment_status', 'N/A'),
+        'payment_date': payment_date.strftime("%d-%b-%Y"),
+        'created_by': getattr(lease, 'client_name', 'Admin'),
+        'client_email': getattr(getattr(lease, 'managing_client', None), 'email', 'N/A'),
         'due_day': getattr(lease, 'due_day_of_month', 1)
     }
-    
+
     if for_email:
         context['lease'] = LeaseDetailSerializer(lease).data
-        
-    return context
 
+    return context
 
 def prepare_lease_status_context(lease, new_status, status_display, reason=None, tenant=None):
     """Prepare context for lease status update messages"""

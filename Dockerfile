@@ -1,23 +1,54 @@
-FROM python:3.10-slim-buster
+FROM python:3.12-slim
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
 WORKDIR /app
 
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i '/stretch-updates/d' /etc/apt/sources.list && \
-    apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     postgresql-client \
-    gcc \
     libpq-dev \
+    libgdal-dev \
+    python3-dev \
+    libffi-dev \
+    libssl-dev \
+    netcat-openbsd \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/requirements.txt
+# Install Python dependencies in a single layer
+COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . /app/
 
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt --no-cache-dir
+
+# Copy application code
+COPY . .
+
+# Copy entrypoint and set permissions
+COPY --chmod=755 entrypoint.py /app/entrypoint.py
+RUN dos2unix /app/entrypoint.py
+
+# Create necessary directories
+RUN mkdir -p /app/static /app/media /app/logs
+
+# Set environment variables
+ENV DJANGO_SETTINGS_MODULE=core.settings
+ENV PYTHONPATH=/app
+
+# Expose port
 EXPOSE 8000
 
-CMD ["/bin/bash", "-c", "python manage.py collectstatic --noinput && python manage.py migrate --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000"]
+
+
+# Use exec form for ENTRYPOINT to ensure proper signal handling
+# ENTRYPOINT ["/bin/sh", "-c", "./entrypoint.sh"]
+
+# Default command to run
+ENTRYPOINT ["python", "/app/entrypoint.py"]
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
 

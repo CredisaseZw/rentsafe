@@ -13,6 +13,8 @@ COMMANDS=(
     "seed_accounts"
     "payment_methods"
     "seed_currencies"
+    "services_and_periods"
+    "seed_roles"
 )
 
 # Function to run a Django management command
