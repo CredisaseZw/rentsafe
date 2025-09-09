@@ -83,7 +83,7 @@ function Terminated() {
           {
             leases?.length
             ? leases.map((lease:Lease)=>(
-              <TableRow>      
+              <TableRow key={lease.lease_id}>      
                 <TableCell className="text-center">{lease.lease_id}</TableCell>
                 <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
                 <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>
@@ -94,7 +94,7 @@ function Terminated() {
                     <span className="text-white font-semibold text-sm py-2"><i>({lease.currency.currency_code})</i> {lease.owing}</span>
                   </StaticBadge>
                 </TableCell>
-                <TableCell className="text-center">{"DATE OF TERMINTATION"}</TableCell>
+                <TableCell className="text-center">{"DATE OF TERMINATION"}</TableCell>
                 <TableCell >
                   <StaticBadge bgColor="bg-blue-600">
                     <Button variant={"ghost"}>Receipt</Button>

@@ -182,6 +182,28 @@ export function extractTenants(data: { [k: string]: FormDataEntryValue }, type :
   return tenants;
 }
 
+export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[] {
+  const receipts: any[] = [];
+
+  const receiptKeys = Object.keys(data).filter((key) => key.startsWith("lease_id_"));
+  const receiptCount = receiptKeys.length;
+
+  for (let i = 0; i < receiptCount; i++) {
+    const receipt = {
+      lease_id: data[`lease_id_${i}`] as string,
+      amount: data[`received_${i}`] as string,
+      payment_method_id: Number(data[`paymentMethod_${i}`] as string),
+      reference: data[`receipt_${i}`] as string,
+      description: data[`description`] as string,
+      payment_date: data[`date_${i}`] as string,
+    };
+
+    receipts.push(receipt);
+  }
+
+  return receipts;
+}
+
 
 export function formatErrorMessage(error: unknown): string {
    if (error instanceof Error) {

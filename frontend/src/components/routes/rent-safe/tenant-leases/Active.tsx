@@ -1,7 +1,6 @@
 import EmptyResults from "@/components/general/EmptyResults"
 import Searchbox from "@/components/general/Searchbox"
 import { TableBase } from "@/components/general/TableBase"
-import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -13,15 +12,12 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
 import type { PaginationData } from "@/interfaces"
-import { riskLevelColorCode, summarizeAddress } from "@/lib/utils"
 import { isAxiosError } from "axios"
 import { useEffect } from "react"
 import { toast } from "sonner"
-import TerminateLeaseDialog from "./TerminateLeaseDialog"
 import SectionHeader from "@/components/general/SectionHeader"
 import type { Lease } from "@/types"
-import StaticBadge from "@/components/general/StaticBadge"
-import ReceiptDialog from "./ReceiptDialog"
+import LeaseRow from "@/components/general/LeaseRow"
 
 function Active() {
   const {
@@ -90,31 +86,7 @@ function Active() {
           {
             leases?.length
             ? leases.map((lease:Lease)=>(
-              <TableRow key={lease.lease_id}>      
-                <TableCell className="text-center">{lease.lease_id}</TableCell>
-                <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
-                <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>
-                <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
-                <TableCell className="text-center whitespace-normal break-words max-w-[250px]">{summarizeAddress(lease.unit.property.addresses[0])}</TableCell>
-                <TableCell>
-                  <StaticBadge bgColor={riskLevelColorCode(lease.risk_level_class)}>
-                    <span className="text-white font-semibold text-sm py-2"><i>({lease.currency.currency_code})</i> {lease.owing}</span>
-                  </StaticBadge>
-                </TableCell>
-                <TableCell >
-                  <ReceiptDialog/>
-                </TableCell>
-                <TableCell>
-                  <StaticBadge bgColor="bg-amber-500">
-                    <Button variant={"ghost"}>Renew</Button>
-                  </StaticBadge>
-                </TableCell>
-                <TableCell>
-                  <StaticBadge bgColor="bg-red-600">
-                    <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} lease_id={lease.lease_id}/>
-                  </StaticBadge>
-                </TableCell>
-              </TableRow>
+              <LeaseRow lease={lease} key={lease.lease_id} refetch={refetch}/>
             )) : 
             <TableRow>
               <TableCell colSpan={activeHeaders.length}>

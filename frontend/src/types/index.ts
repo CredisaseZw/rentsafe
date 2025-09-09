@@ -423,3 +423,16 @@ export interface LeaseOpeningBalanceData {
   three_months_plus_balance: number;
   outstanding_balance: number;
 }
+
+export type ReceiptLease =  {
+   lease_id: string,
+   id : number,
+   rentOwing : Number ,
+   customerName : string,
+   currentRentOwing? :  Number,
+   payment_date?: string,
+   payment_method_id? : number,
+   reference? :  string,
+   amount? : string,
+   description? : string
+}

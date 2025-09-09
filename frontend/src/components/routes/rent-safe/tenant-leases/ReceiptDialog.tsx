@@ -7,20 +7,32 @@ import { useEffect } from 'react'
 import { isAxiosError } from 'axios'
 import useGetPaymentMethods from '@/hooks/apiHooks/useGetPaymentMethods'
 import { toast } from 'sonner'
-import type { PaymentMethod } from '@/types'
+import type { PaymentMethod, ReceiptLease } from '@/types'
 import ReceiptRow from '@/components/general/ReceiptRow'
 import { Plus, Send } from 'lucide-react'
+import useCreateReceipt from '@/hooks/apiHooks/useCreateReceipt'
 
+interface props {
+  lease : ReceiptLease
+}
 
-function ReceiptDialog() {
+function ReceiptDialog({lease}: props) {
   const { 
     isOpen,
     receipts,
     paymentMethods,
     setPaymentMethods,
-    setIsOpen } = useReceipt();  
+    submitReceipts,
+    removeReceipt,
+    updateReceipt,
+    onSelectLease,
+    checkReceipt,
+    addReceipt,
+    setIsOpen 
+  } = useReceipt(lease);  
   const {data, error} = useGetPaymentMethods();
-
+  const createReceipt = useCreateReceipt();
+  
   useEffect(()=>{
       if(isAxiosError(error)){
         console.log(error)
@@ -39,34 +51,43 @@ function ReceiptDialog() {
       open = {isOpen}
       onOpenChange={setIsOpen}
     >
-        <DialogTrigger asChild>
-           <StaticBadge bgColor="bg-blue-600">   
-                <Button variant={"ghost"} onClick={()=> setIsOpen(true)}>Receipt</Button>
-            </StaticBadge>  
-        </DialogTrigger>
-        <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1100px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto overflow-x-auto`}>
-            <DialogTitle><h6 className='font-semibold'>Rent receipt</h6></DialogTitle>
-            <form action="">
-                {
-                  receipts.map((_, index: number)=>
-                    <ReceiptRow paymentMethods={paymentMethods} index={index} key={index}/>
-                  )
-                }
-                <div className='mt-6 flex flex-row gap-3 justify-end'>
-                  <Button
-                    variant={"outline"}
-                    type='button'
-                    >
-                    <Plus />
-                    Add Another
-                  </Button>
-                  <Button type='submit'>
-                    <Send/>
-                    Submit
-                  </Button>
-                </div>
-            </form>
-        </DialogContent>
+      <DialogTrigger asChild>
+          <StaticBadge bgColor="bg-blue-600">   
+              <Button variant={"ghost"} onClick={()=> setIsOpen(true)}>Receipt</Button>
+          </StaticBadge>  
+      </DialogTrigger>
+      <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto overflow-x-auto`}>
+          <DialogTitle><h6 className='font-semibold'>Rent receipt</h6></DialogTitle>
+          <form onSubmit={submitReceipts}>
+              {
+                receipts.map((lease, index: number)=>
+                  <ReceiptRow
+                    removeReceipt = {removeReceipt}
+                    onSelectLease = {onSelectLease}
+                    updateReceipt = {updateReceipt}
+                    checkReceipt = {checkReceipt}
+                    lease = {lease}
+                    paymentMethods={paymentMethods}
+                    index={index}
+                    key={index}/>
+                )
+              }
+              <div className='mt-8 flex flex-row gap-3 justify-end'>
+                <Button
+                  variant={"outline"}
+                  type='button'
+                  onClick={()=> addReceipt()}
+                  >
+                  <Plus />
+                  Add Another
+                </Button>
+                <Button type='submit'>
+                  <Send/>
+                  Submit
+                </Button>
+              </div>
+          </form>
+      </DialogContent>
     </Dialog>
   )
 }

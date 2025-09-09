@@ -8,7 +8,7 @@ export default function useGetLeases(page:number, status: string, search: string
         queryFn: async ()=>{
             const URL = !search
             ? `/api/leases/?status=${status === "ACTIVE" || status === "RENEW" ? "ACTIVE" : "TERMINATED"}&&page=${page}`
-            : `/api/leases/search/?q=${search}&&status=${status}`;
+            : `/api/leases/search/?search=${search}&&status=${status}`;
             const response = await api.get<LeaseResponse>(URL) 
             return response.data
         }
