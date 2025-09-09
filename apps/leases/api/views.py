@@ -487,10 +487,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='payment-history')
     def payment_history(self, request, lease_id=None):
-        from apps.leases.utils.notification_utils import  get_primary_tenant
-        
         lease = self.get_object()
-        tenant = get_primary_tenant(lease)
         payments = Payment.objects.filter(
             invoice__lease=lease
         ).select_related('invoice', 'method').order_by('-payment_date')
