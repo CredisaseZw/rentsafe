@@ -26,9 +26,13 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     method = PaymentMethodSerializer()
     invoice_number = serializers.CharField(source='invoice.document_number')
+    type = serializers.SerializerMethodField()
     class Meta:
         model = Payment
-        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference']
+        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type']
+    
+    def get_type(self, obj):
+        return 'Payment'
 
 # Helper serializers for related objects
 class IndividualSerializer(serializers.ModelSerializer):

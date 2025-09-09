@@ -541,7 +541,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='tenant-statements-summary')
     def tenant_statement(self, request):
         queryset = self.get_queryset()
-        serializer = TenantStatementsListSerializer(queryset, many=True)
+        serializer = TenantStatementsListSerializer(self.paginate_queryset(queryset), many=True)
         return Response(serializer.data)
     @action(detail=True, methods=['get'], url_path='landlord-statement')
     def landlord_statement(self, request, lease_id=None):
