@@ -21,7 +21,8 @@ from apps.leases.api.serializers import (
     LeaseListSerializer,
     LandlordSerializer,
     GuarantorSerializer,
-    PaymentSerializer
+    PaymentSerializer,
+    TenantStatementsListSerializer
 )
 from apps.common.utils import extract_error_message
 from apps.common.services.tasks import send_notification
@@ -411,26 +412,6 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 )
                 
                 self._send_payment_notification(lease, amount, payment_date, primary_tenant)
-                # if primary_tenant and isinstance(primary_tenant.tenant_object, Individual):
-                #     try:
-                #         send_sms.delay(
-                #             phone_number=primary_tenant.phone,
-                #             message=get_lease_payment_message_for_sms(lease, amount, payment_date)
-                #         )
-                #     except Exception as e:
-                #         raise Exception(f"SMS sending failed: {e}") from e
-                # else:
-                #     try:
-                #         send_email(
-                #             email=primary_tenant.email if primary_tenant else 'gtkandeya@gmail.com',
-                #             subject="Lease Payment Received",
-                #             message=f"Payment of ${amount} received for your lease.",
-                #             is_html=False
-                #         )
-                #     except Exception as e:
-                #         raise Exception(f"Email sending failed: {e}") from e
-
-            # Get current balance after payment
             current_balance = lease.current_balance
 
             response_data = {
@@ -506,8 +487,10 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='payment-history')
     def payment_history(self, request, lease_id=None):
-        lease = self.get_object()
+        from apps.leases.utils.notification_utils import  get_primary_tenant
         
+        lease = self.get_object()
+        tenant = get_primary_tenant(lease)
         payments = Payment.objects.filter(
             invoice__lease=lease
         ).select_related('invoice', 'method').order_by('-payment_date')
@@ -541,6 +524,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
             response = self.get_paginated_response(serializer.data)
             # Add opening balance to the response
             response.data['opening_balance'] = str(opening_balance)
+            response.data['primary_tenant'] = str(lease.get_tenant_names())
+            response.data['address'] = str(lease.unit.property.get_address())
             response.data['total_invoiced'] = str(total_invoiced)
             response.data['current_balance'] = str(lease.current_balance)
             return response
@@ -550,10 +535,17 @@ class LeaseViewSet(viewsets.ModelViewSet):
             'opening_balance': str(opening_balance),
             'total_invoiced': str(total_invoiced),
             'current_balance': str(lease.current_balance),
+            'primary_tenant': str(lease.get_tenant_names()),
+            'address': str(lease.unit.property.get_address()),
             'payments': serializer.data
         }
         return Response(response_data)
     
+    @action(detail=False, methods=['get'], url_path='tenant-statements-summary')
+    def tenant_statement(self, request):
+        queryset = self.get_queryset()
+        serializer = TenantStatementsListSerializer(queryset, many=True)
+        return Response(serializer.data)
     @action(detail=True, methods=['get'], url_path='landlord-statement')
     def landlord_statement(self, request, lease_id=None):
         """
@@ -797,7 +789,6 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 sms_template_name='RISK_STATUS_UPDATED',
                 subject=f"Risk Status Update - {lease.lease_id}"
             )
-
 
     def _send_lease_renewal_notification(self, lease, days_until_expiry):
         """Send lease renewal reminder notification"""

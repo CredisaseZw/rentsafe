@@ -297,6 +297,33 @@ class LeaseListSerializer(serializers.ModelSerializer):
             }
         }
 
+class TenantStatementsListSerializer(serializers.ModelSerializer):
+    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    unit = serializers.SerializerMethodField()
+    currency = serializers.CharField(source='currency.currency_code', read_only=True)
+    risk_level_class = serializers.SerializerMethodField()
+    owing = serializers.FloatField(source='get_latest_balance', read_only=True)
+
+    class Meta:
+        model = Lease
+        fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'unit', 'currency', 'risk_level_class', 'owing']
+
+    def get_risk_level_class(self, obj):
+        return obj.risk_level
+
+    def get_unit(self, obj):
+        return {
+            'id': obj.unit.id,
+            'unit_number': obj.unit.unit_number,
+            'property': {
+                'id': obj.unit.property.id,
+                'name': obj.unit.property.name,
+                'type': obj.unit.property.property_type.name if obj.unit.property.property_type else None,
+                'slug': obj.unit.property.slug,
+                'addresses': AddressSerializer(obj.unit.property.addresses.all(), many=True).data,
+            }
+        }
+
 class LeaseSearchSerializer(serializers.ModelSerializer):
     tenants = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
