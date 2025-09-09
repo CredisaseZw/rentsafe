@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { LeaseOpeningBalanceData, NavLink, Route, TenantPayload } from "@/types";
+import type { LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -402,4 +402,9 @@ export const validateAmounts = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (["e", "E", "+", "-"].includes(e.key)) {
       e.preventDefault();
     }
-  };
+};
+
+export const getPrimaryTenantName = (tenants: Tenant[]) => {
+   const name = tenants.find((t) => t.is_primary_tenant)?.tenant_object.full_name ?? "";
+   return name
+}

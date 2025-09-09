@@ -6,6 +6,8 @@ import ProtectRoute from "./lib/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
 import { ThemeProvider } from "next-themes";
+import { RENTSAFE_PRE_SEG } from "./constants/navlinks";
+import TenantStatement from "./routes/rent-safe/tenants/TenantStatement";
 
 export default function App() {
    return (
@@ -22,6 +24,10 @@ export default function App() {
                            {RENTSAFE_ROUTES.map((route) => (
                               <Route key={route.path} path={route.path} element={<route.pageComponent />} />
                            ))}
+                          <Route 
+                              path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
+                              element={<TenantStatement />} 
+                              />
                         </Route>
                      </Route>
                   </Route>
@@ -32,4 +38,4 @@ export default function App() {
          </ReactQueryProvider>
       </ThemeProvider>
    );
-}
+} 

@@ -55,7 +55,7 @@ export const ROOT_NAVLINKS: NavLink[] = [
    },
 ];
 
-const RENTSAFE_PRE_SEG = "/services/rent-safe";
+export const RENTSAFE_PRE_SEG = "/services/rent-safe";
 export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
       label: "Dashboard",

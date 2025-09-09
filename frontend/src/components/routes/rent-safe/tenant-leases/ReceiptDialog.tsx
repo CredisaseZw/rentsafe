@@ -11,6 +11,7 @@ import type { PaymentMethod, ReceiptLease } from '@/types'
 import ReceiptRow from '@/components/general/ReceiptRow'
 import { Plus, Send } from 'lucide-react'
 import useCreateReceipt from '@/hooks/apiHooks/useCreateReceipt'
+import ButtonSpinner from '@/components/general/ButtonSpinner'
 
 interface props {
   lease : ReceiptLease
@@ -19,6 +20,7 @@ interface props {
 function ReceiptDialog({lease}: props) {
   const { 
     isOpen,
+    loading,
     receipts,
     paymentMethods,
     setPaymentMethods,
@@ -32,7 +34,7 @@ function ReceiptDialog({lease}: props) {
   } = useReceipt(lease);  
   const {data, error} = useGetPaymentMethods();
   const createReceipt = useCreateReceipt();
-  
+
   useEffect(()=>{
       if(isAxiosError(error)){
         console.log(error)
@@ -58,7 +60,7 @@ function ReceiptDialog({lease}: props) {
       </DialogTrigger>
       <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto overflow-x-auto`}>
           <DialogTitle><h6 className='font-semibold'>Rent receipt</h6></DialogTitle>
-          <form onSubmit={submitReceipts}>
+          <form onSubmit={(e) =>submitReceipts(e, createReceipt)}>
               {
                 receipts.map((lease, index: number)=>
                   <ReceiptRow
@@ -81,8 +83,12 @@ function ReceiptDialog({lease}: props) {
                   <Plus />
                   Add Another
                 </Button>
-                <Button type='submit'>
-                  <Send/>
+                <Button type='submit' disabled = {loading}>
+                  {
+                    loading ?
+                    <ButtonSpinner/> :
+                    <Send/>
+                  }
                   Submit
                 </Button>
               </div>

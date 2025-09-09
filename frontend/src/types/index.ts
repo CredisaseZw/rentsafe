@@ -436,3 +436,26 @@ export type ReceiptLease =  {
    amount? : string,
    description? : string
 }
+export interface PaymentHistory{
+   id : number,
+   invoice_number : string,
+   amount : string,
+   method: PaymentMethod,
+   payment_date : string,
+   reference : string   
+   description : string
+}
+
+export interface PaymentStatementInformation {
+   opening_balance: string,
+   primary_tenant: string ,
+   address: string,
+   total_invoiced: string,
+   current_balance: string
+}
+export type PaymentHistoryResponse = PaymentStatementInformation & {
+   count : number,
+   next : string | null,
+   previous : string | null,
+   results : PaymentHistory[]
+}  

@@ -1,7 +1,9 @@
 import { extractReceipts, getCurrentDate } from "@/lib/utils";
 import type { Lease, PaymentMethod, ReceiptLease } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function useReceipt(initialLease?: ReceiptLease) {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[] | null>(null);
@@ -70,25 +72,31 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         return receipts.some((r) => r.lease_id === lease_id);
     };
 
-    const submitReceipts = (e: React.FormEvent<HTMLFormElement>, createReceipt:UseMutationResult<any, Error, void, unknown>)=>{
+    const submitReceipts = (e: React.FormEvent<HTMLFormElement>, createReceipt: UseMutationResult< any,Error,{ payments: ReceiptLease[] },unknown>) => {
         e.preventDefault()
-
+        setLoading(true)
         const FORM = new FormData(e.currentTarget);
         const data = Object.fromEntries(FORM.entries())
         const receipts: ReceiptLease[] = extractReceipts(data);;
         console.log(receipts)
         
-        const payments : {payments :ReceiptLease[]} = {
-            payments : receipts
-        }
-        createReceipt.mutate(payments,{
-            onError : (error) => {
+        const payments: { payments: ReceiptLease[] } = { payments: receipts };
 
-            },
-            onSuccess: (data) =>{
-                
+        createReceipt.mutate(payments, {
+        onError: (error) => {
+            if(isAxiosError(error)){
+                const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong";
+                toast.error("Error creating a receipt", {description : message})
             }
-        })
+        },
+        onSuccess: (data) => {
+            if(data) {
+                toast.success("Receipt created successfully")
+                setIsOpen(false);
+            }
+        },
+        onSettled : () => setLoading(false)
+        });
     }
 
     return {

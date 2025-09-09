@@ -4,12 +4,9 @@ import type { ReceiptLease } from "@/types";
 
 export default function useCreateReceipt(){
     return useMutation({
-        mutationFn : async (payload: {
-            payments : ReceiptLease[]
-        }) =>{
-            const response = await api.post("/api/leases/bulk-payments/", payload);
+        mutationFn : async (payments:{ payments: ReceiptLease[] }) =>{
+            const response = await api.post("/api/leases/bulk-payments/", payments);
             return response.data
-
         }
     })
 }

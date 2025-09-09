@@ -1,4 +1,4 @@
-import type { AddressType, CompanyLegalStatus, Route, TenantSelection } from "@/types";
+import type { AddressType, CompanyLegalStatus, Header, Route, TenantSelection } from "@/types";
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
@@ -148,3 +148,19 @@ export const UNIT_TYPES: Option[] = [
    { label: "Warehouse", value: "warehouse" },
    { label: "Other", value: "other" },
 ];
+
+export const TENANT_STATEMENTS_HEADERS: Header[] = [
+   {name : "Lease ID"},
+   {name : "Customer name"},
+   {name : "Address"},
+   {name : "Rent Owing"},
+   {name : "Action"}
+]
+
+export const TENANT_STATEMENT_HEADERS: Header[] = [
+   {name : "Date"},
+   {name : "Description", textAlign : "left"},
+   {name : "Reference"},
+   {name : "Amount", textAlign: "end"},
+   {name : "Balance", textAlign :"end"}
+]
