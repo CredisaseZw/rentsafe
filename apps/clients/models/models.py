@@ -117,16 +117,14 @@ class Client(models.Model):
     @property
     def is_company_client(self):
         """Returns True if the client is a Company."""
-        return isinstance(self.client_object, Company)
+        return isinstance(self.client_object, CompanyBranch)
     @property
     def email(self):
         """Get email from linked entity"""
         if self.is_individual_client:
-            return self.linked_individual.first_name or None
+            return self.linked_individual.email or None
         elif self.is_company_client:
-            primary_contact = self.linked_company_branch.contacts.filter(is_primary=True).first()
-            if primary_contact and primary_contact.individual:
-                return primary_contact.individual.first_name or None
+            return self.linked_company_branch.email
         return None
 
     @property

@@ -27,9 +27,11 @@ class IndividualViewSet(BaseViewSet):
     def get_queryset(self):
         search_key = self.request.query_params.get('search', '').strip()
         if search_key:
+            first_name, *last_name_parts = search_key.split()
+            last_name = ' '.join(last_name_parts) if last_name_parts else first_name
             return self.queryset.filter(
-                Q(first_name__icontains=search_key) |
-                Q(last_name__icontains=search_key) |
+                Q(first_name__icontains=first_name) |
+                Q(last_name__icontains=last_name) |
                 Q(identification_number__icontains=search_key)
             ).prefetch_related(
                 'addresses', 'employment_details', 

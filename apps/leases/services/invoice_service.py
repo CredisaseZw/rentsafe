@@ -14,9 +14,9 @@ class LeaseInvoiceService:
         """
         Shifts the opening balances back one month if the grace period has passed.
         """
+        opening_balance = lease.opening_balance
         today = timezone.now().date()
         if hasattr(lease, 'grace_period_days') and today.day > lease.grace_period_days and opening_balance.current_month_balance > 0:
-            opening_balance = lease.opening_balance
             opening_balance.three_months_plus_balance += opening_balance.three_months_back_balance
             opening_balance.three_months_back_balance = opening_balance.two_months_back_balance
             opening_balance.two_months_back_balance = opening_balance.one_month_back_balance

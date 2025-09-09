@@ -151,6 +151,8 @@ class CompanyBranchAdmin(admin.ModelAdmin):
             'fields': (
                 'company',
                 'branch_name',
+                'email',
+                'phone',
                 ('is_headquarters', 'is_deleted'),
             )
         }),
