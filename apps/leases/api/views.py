@@ -473,7 +473,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
                     "lease_id": lease_id,
                     "status": "success",
                     "payments_made": len(payments_made),
-                    "overpayment": str(overpayment),
+                    "lease_status": lease.risk_level,
                     "current_balance": str(current_balance)
                 })
 

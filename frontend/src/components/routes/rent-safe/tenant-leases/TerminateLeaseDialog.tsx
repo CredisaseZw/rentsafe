@@ -15,11 +15,12 @@ import useTerminateLeaseHook from "@/hooks/components/useTerminateLease"
 import { XCircle } from "lucide-react"
 
 interface props{
+    optional? : boolean
     refetch : ()=> void;
     tenantName: string,
     lease_id : string 
 }
-function TerminateLeaseDialog({tenantName, lease_id, refetch}:props) {
+function TerminateLeaseDialog({tenantName, lease_id, refetch, optional}:props) {
     const {
         terminateStatus,
         reason,
@@ -34,7 +35,7 @@ function TerminateLeaseDialog({tenantName, lease_id, refetch}:props) {
         <AlertDialog open = {open} onOpenChange={setOpen}>
             <AlertDialogTrigger>
                 <div className="flex items-center justify-center py-2">
-                    <span className="text-white">Terminate</span>
+                    <span className={optional ? "text-red-600 text-sm" :"text-white"}>Terminate</span>
                 </div>
             </AlertDialogTrigger>
             <AlertDialogContent>

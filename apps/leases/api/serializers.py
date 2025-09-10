@@ -24,7 +24,7 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
         fields = ['id', 'payment_method_name']
 
 class PaymentSerializer(serializers.ModelSerializer):
-    method = PaymentMethodSerializer()
+    method = serializers.SerializerMethodField()
     invoice_number = serializers.CharField(source='invoice.document_number')
     type = serializers.SerializerMethodField()
     class Meta:
@@ -33,6 +33,8 @@ class PaymentSerializer(serializers.ModelSerializer):
     
     def get_type(self, obj):
         return 'Payment'
+    def get_method(self, obj):
+        return obj.invoice.currency.symbol if obj.invoice else '$'
 
 # Helper serializers for related objects
 class IndividualSerializer(serializers.ModelSerializer):
@@ -49,7 +51,7 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['id', 'currency_code', 'currency_name']
+        fields = ['id', 'currency_code', 'currency_name', 'symbol']
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
     unit = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all())

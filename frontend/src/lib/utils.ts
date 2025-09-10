@@ -408,3 +408,19 @@ export const getPrimaryTenantName = (tenants: Tenant[]) => {
    const name = tenants.find((t) => t.is_primary_tenant)?.tenant_object.full_name ?? "";
    return name
 }
+
+export function getSummaryDate(dateString: string): string {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function parseListString(s : string) : string{
+   const fixed = s.replace(/'/g, '"');
+   const arr = JSON.parse(fixed);
+   return arr[0];
+}
