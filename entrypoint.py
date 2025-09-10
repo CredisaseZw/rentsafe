@@ -62,7 +62,7 @@ def check_seeding_needed():
             else:
                 print(f"Seed script not found at {seed_script}")
     except Exception as e:
-        print(f"Error checking PaymentMethods table: {e}")
+        print(f"Error checking Country table: {e}")
 
 def main():
     if "gunicorn" in sys.argv:

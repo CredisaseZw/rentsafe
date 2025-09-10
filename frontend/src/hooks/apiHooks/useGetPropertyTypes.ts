@@ -1,16 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
+import type { PropertyTypeResponse } from "@/types";
 import { api } from "@/api/axios";
-import type { PropertTypeResponse } from "@/types";
+import { getPersistentData, savePersistentData } from "@/lib/utils";
 
 export default function getPropertyTypes() {
-  const { data, isLoading, error, refetch } = useQuery<PropertTypeResponse>({
+  const persistentData = getPersistentData();
+  const cachedPropertyTypes = persistentData?.propertyTypes;
+
+  const { data, isLoading, error } = useQuery<PropertyTypeResponse>({
     queryKey: ["property_types"],
-    queryFn: () =>
-      api
-        .get<PropertTypeResponse>("/api/properties/property-types/")
-        .then((response) => response.data),
-    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+
+      if (cachedPropertyTypes) return cachedPropertyTypes;
+      const response = await api.get<PropertyTypeResponse>("/api/properties/property-types/");
+      savePersistentData("propertyTypes", response.data); 
+      return response.data;
+    },
   });
 
-  return { data, isLoading, error, refetch };
+  return { data, isLoading, error };
 }

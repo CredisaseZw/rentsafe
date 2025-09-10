@@ -1,13 +1,11 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
-import type { Address } from "@/interfaces";
+import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { NavLink, Route } from "@/types";
+import type { LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
 import type { PropertiesResponse, Property } from "@/types";
-
-
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
@@ -133,15 +131,12 @@ export function formatAddress(addr: Address): string {
 
 export function extractAddresses(data: { [k: string]: FormDataEntryValue }): AddressPayload[] {
    const addresses: AddressPayload[] = [];
-   const addressesCount = Object.keys(data).filter((key) => key.startsWith("city_id")).length;
+   const addressesCount = Object.keys(data).filter((key) => key.startsWith("suburb_id")).length;
    for (let i = 1; i < addressesCount + 1; i++) {
       const address: AddressPayload = {
          is_primary: !!data[`is_primary_address${i}`],
          address_type: data[`address_type${i}`] as "physical" | "postal" | "billing" | "work" | "other",
          postal_code: data[`postal_code${i}`] as string,
-         country_id: toIntElseUndefined(data[`country_id${i}`] as string),
-         province_id: toIntElseUndefined(data[`province_id${i}`] as string),
-         city_id: toIntElseUndefined(data[`city_id${i}`] as string)!,
          suburb_id: toIntElseUndefined(data[`suburb_id${i}`] as string),
          street_address: data[`street_address${i}`] as string,
       };
@@ -167,6 +162,48 @@ export function extractContacts(data: { [k: string]: FormDataEntryValue }): Cont
 
    return contacts;
 }
+
+export function extractTenants(data: { [k: string]: FormDataEntryValue }, type : string): TenantPayload[] {
+  const tenants: TenantPayload[] = [];
+
+  const tenantKeys = Object.keys(data).filter((key) => key.startsWith("tenants["));
+  const tenantCount = tenantKeys.length;
+
+  for (let i = 0; i < tenantCount; i++) {
+    const tenant: TenantPayload = {
+      tenant_id: data[`tenants[${i}]`] as string,
+      tenant_type : type,
+      is_primary_tenant: data[`isPrimary[${i}]`] === "on",
+    };
+
+    tenants.push(tenant);
+  }
+
+  return tenants;
+}
+
+export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[] {
+  const receipts: any[] = [];
+
+  const receiptKeys = Object.keys(data).filter((key) => key.startsWith("lease_id_"));
+  const receiptCount = receiptKeys.length;
+
+  for (let i = 0; i < receiptCount; i++) {
+    const receipt = {
+      lease_id: data[`lease_id_${i}`] as string,
+      amount: data[`received_${i}`] as string,
+      payment_method_id: Number(data[`paymentMethod_${i}`] as string),
+      reference: data[`receipt_${i}`] as string,
+      description: data[`description`] as string,
+      payment_date: data[`date_${i}`] as string,
+    };
+
+    receipts.push(receipt);
+  }
+
+  return receipts;
+}
+
 
 export function formatErrorMessage(error: unknown): string {
    if (error instanceof Error) {
@@ -234,3 +271,140 @@ export function updatePropertyListCache(
       });
     });
   }
+export function getPersistentData<T = any>(): T | null {
+   const rawPersistentData = localStorage.getItem("persistentData");
+   if (!rawPersistentData) return null;
+
+   try {
+      return JSON.parse(rawPersistentData) as T;
+   } catch (error) {
+      console.error("Failed to parse persistentData from localStorage:", error);
+      return null;
+   }
+}
+
+export function savePersistentData(name: string, data: any) {
+   const persistentData = getPersistentData() || {};
+   persistentData[name] = data;
+   localStorage.setItem("persistentData", JSON.stringify(persistentData));
+}
+export function summarizeAddress(address: Address): string {
+   return [
+      address.street_address,
+      address.suburb?.name,
+      address.city?.name,
+      address.province?.name,
+      address.country?.code,
+   ]
+   .filter(Boolean)
+   .join(", ");
+}
+export function getThreeMonthsBack(dayStr: string): string[] {
+  const today = new Date();
+  const inputDay = parseInt(dayStr, 10) || today.getDate();
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const result: string[] = [];
+
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  for (let i = 3; i >= 0; i--) {
+    let month = currentMonth - i;
+    let year = currentYear;
+
+    if (month < 0) {
+      month += 12;
+      year -= 1;
+    }
+
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    const day = Math.min(inputDay, lastDayOfMonth);
+
+    result.push(`${String(day).padStart(2, "0")}-${monthNames[month]}-${String(year).slice(-2)}`);
+  }
+
+  return result;
+}
+
+
+export function capitalizeFirstLetter(str : string) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function extractTenantBranchContact(contacts : BranchContact[]){
+   return contacts
+      .map(c => c.full_contact.split(" - ").pop() ?? "")
+      .filter(num => num !== "")
+      .join(", ");
+}
+
+export function riskLevelColorCode(level: "HIGH HIGH" | "NON_PAYER" | "HIGH" | "MEDIUM" | "LOW"):string {
+   const colorCodes  ={
+      "HIGH HIGH" : "bg-red-600",
+      "NON_PAYER" : "bg-black",
+      "HIGH" : "bg-red-500",
+      "MEDIUM" : "bg-yellow-400",
+      "LOW" : "bg-green-600"
+   }
+   return colorCodes[level as keyof typeof colorCodes]
+}
+
+export function clearPersistentData() {
+   localStorage.removeItem("persistentData");
+}
+
+export function validateBalances(
+  data: LeaseOpeningBalanceData
+): { valid: boolean; message?: string | null} {
+  const order = [
+      "three_months_plus_balance",
+      "three_months_back_balance",
+      "two_months_back_balance",
+      "one_month_back_balance",
+      "current_month_balance",
+  ] as const;
+
+   const balances = order.map((key) => ({
+      key,
+      value: data[key] || 0,
+   }));
+   let valid = true;
+   let message  = null;
+   for (let i = 0; i < balances.length - 1; i++) {
+      if (balances[i].value > 0) {
+         for(let j = i + 1; j < balances.length - 1; j++){
+            if(balances[j].value === 0){
+               valid = false;
+               message = `Invalid sequence: "${balances[j].key.replaceAll("_", " ")}" is requires a balance.`
+            }
+        }
+    }
+  }
+
+  const total = balances.reduce((sum, b) => sum + b.value, 0);
+  const outstanding = data.outstanding_balance || 0;
+  if (total !== outstanding) {
+      return {
+         valid: false,
+         message: `Outstanding balance (${outstanding}) does not match sum of balances (${total}).`,
+      };
+  }
+
+  return { valid: valid, message : message };
+};
+
+export const getCurrentDate = ():string => {
+   const today = new Date();  
+   return today.toISOString().split("T")[0];   
+}
+export const validateAmounts = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (["e", "E", "+", "-"].includes(e.key)) {
+      e.preventDefault();
+    }
+};
+
+export const getPrimaryTenantName = (tenants: Tenant[]) => {
+   const name = tenants.find((t) => t.is_primary_tenant)?.tenant_object.full_name ?? "";
+   return name
+}

@@ -1,13 +1,28 @@
 import type { IndividualPayload } from "@/interfaces/form-payloads";
-import React from "react";
+import React, { useEffect } from "react";
 import { extractAddresses, formatDateToPythonSLiking, validateZimNationalId } from "@/lib/utils";
 import type { IndividualMaritalStatus } from "@/types";
 import useCreateIndividual from "../apiHooks/useCreateIndividual";
 import { toast } from "sonner";
+import { useNavigate, useSearchParams } from "react-router";
 
 export default function useIndividualForm() {
    const [showForm, setShowForm] = React.useState(false);
-   const { isPending, createIndividual } = useCreateIndividual(() => setShowForm(false));
+   const [params] = useSearchParams();
+   const router = useNavigate();
+   const { isPending, createIndividual } = useCreateIndividual(successCallback);
+
+   useEffect(()=>{
+      if (params.get("addIndividual")) setShowForm(true); 
+   }, [])
+
+   function successCallback(){
+      const nextParam = params.get("next");
+      if (params.get("addIndividual") && nextParam) {
+         router(nextParam.trim());
+      }
+      setShowForm(false)
+   }
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();

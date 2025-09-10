@@ -32,7 +32,7 @@ export default function ContactFormFields({ number }: { number: number }) {
                <SelectTrigger
                   id={"contact_type" + number}
                   name={"contact_type" + number}
-                  className="border-foreground/40 w-[180px] bg-white"
+                  className="border-color w-[180px] bg-white"
                >
                   <SelectValue placeholder="Select contact type" />
                </SelectTrigger>
@@ -52,7 +52,7 @@ export default function ContactFormFields({ number }: { number: number }) {
             <Input
                id={"position" + number}
                name={"position" + number}
-               className="border-foreground/40 bg-white"
+               className="border-color bg-white"
                placeholder="e.g. Administrator"
             />
          </div>
@@ -62,7 +62,7 @@ export default function ContactFormFields({ number }: { number: number }) {
                id={"is_primary" + number}
                name={"is_primary" + number}
                value="true"
-               className="border-foreground/40 bg-white"
+               className="border-color bg-white"
             />
             <Label className="px-2 font-normal" htmlFor={"is_primary" + number}>
                Is Primary

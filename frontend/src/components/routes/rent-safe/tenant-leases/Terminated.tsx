@@ -1,4 +1,7 @@
+import EmptyResults from "@/components/general/EmptyResults"
 import Searchbox from "@/components/general/Searchbox"
+import SectionHeader from "@/components/general/SectionHeader"
+import StaticBadge from "@/components/general/StaticBadge"
 import { TableBase } from "@/components/general/TableBase"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,48 +12,55 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { TableCell, TableRow } from "@/components/ui/table"
-import type { Header } from "@/types"
-function Terminated() {
+import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
+import useLeases from "@/hooks/components/useLeases"
+import type { PaginationData } from "@/interfaces"
+import { riskLevelColorCode, summarizeAddress } from "@/lib/utils"
+import type { Lease } from "@/types"
+import { isAxiosError } from "axios"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
-  const headers:Header[] = [
-    {
-      name  :"Lease ID",
-    },
-    {
-      name : "Tenant",
-    },
-    {
-      name : "Landlord",
-    }, 
-    {
-      name : "Property Type"
-    },
-    {
-      name : "Address"
-    },
-    {
-      name : "Rent owing"
-    },
-    {
-      name : "Actions",
-      colSpan : 2
-    },
-    {
-      name : "Date of termination"
+function Terminated() {
+  const {
+    terminatedHeaders,
+    page,
+    status,
+    search,
+    paginationData,
+    leases,
+    onClearSearch,
+    handleOnSearchValue,
+    setLeases,
+    setPaginationData
+  } = useLeases("TERMINATED");
+
+
+  const {data, isLoading, error} = useGetLeases(page, status, search);
+
+  useEffect(()=>{
+    if(isAxiosError(error)){
+      console.error(error);
+      const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
+      toast.error("Failed to fetch leases", { description: message });
+      return; 
     }
 
-  ]
-  
+    if(data){
+      setLeases(data.results ?? [])
+      setPaginationData(data as PaginationData)
+    }
+  }, [page, search, status, data, error])
   return (
     <div className="w-full">
       <div>
-        <h3 className="pb-1 font-bold text-2xl text-gray-800 dark:text-gray-50 ">Active Leases</h3>
-        <p className="m-0 self-center text-gray-500 dark:text-gray-100 text-sm">Showing 10 of 65 leases</p>
+        <SectionHeader title="Terminated Leases" subTotal={leases?.length || paginationData?.count || 0} total={paginationData?.count || 0} subTitle="terminated leases"/>
       </div>
       <div className="flex mt-8 flex-row justify-between">
         <Searchbox
           placeholder="Search by Name"
-          handleSearch={()=>{}}
+          handleSearch={handleOnSearchValue}
+          clearSearch = {onClearSearch}
         />
         <div className="flex flex-row gap-3">
           <p className="m-0 self-center text-gray-600 dark:text-gray-100 font-medium">Sort by</p>
@@ -68,68 +78,43 @@ function Terminated() {
           </Select>
         </div>
       </div>
-      <div className="mt-3">
-        <TableBase headers={headers}>
-          <TableRow>      
-            <TableCell className="text-center">1</TableCell>
-            <TableCell className="text-center">Fincheck</TableCell>
-            <TableCell className="text-center">Southview Holdings</TableCell>
-            <TableCell className="text-center">Office Complex</TableCell>
-            <TableCell className="text-center">8th Floor, West Wing, Club Chambers, 128
-              Nelson Mandela Avenue, CBD, Harare,
-              Zimbabwe</TableCell>
-            <TableCell className="bg-yellow-400 text-center text-white font-semibold">USD100.00</TableCell>
-            <TableCell className="bg-blue-600 text-center text-white font-semibold">
-              <div className="flex items-center justify-center">
-                <Button variant={"ghost"}>Receipt</Button>
-              </div>
-            </TableCell>
-            <TableCell className="bg-amber-500 text-center text-white font-semibold">
-              <div className="flex items-center justify-center">
-                <Button variant={"ghost"}>Renew</Button>
-              </div>
-            </TableCell>
-            <TableCell className="bg-red-600 text-center text-white font-semibold">
-              <div className="flex items-center justify-center">
-                <Button variant={"ghost"}>Terminate</Button>
-              </div>
-            </TableCell>
-          </TableRow>
-           <TableRow>      
-            <TableCell className="text-center">1</TableCell>
-            <TableCell className="text-center">Fincheck</TableCell>
-            <TableCell className="text-center">Southview Holdings</TableCell>
-            <TableCell className="text-center">Office Complex</TableCell>
-            <TableCell className="text-center">8th Floor, West Wing, Club Chambers, 128
-              Nelson Mandela Avenue, CBD, Harare,
-              Zimbabwe</TableCell>
-            <TableCell className="bg-yellow-400 text-center text-white font-semibold">USD100.00</TableCell>
-            <TableCell className="bg-blue-600 text-center text-white font-semibold">
-              <div className="flex items-center justify-center">
-                <Button variant={"ghost"}>Receipt</Button>
-              </div>
-            </TableCell>
-            <TableCell className="bg-amber-500 text-center text-white font-semibold">
-              <div className="flex items-center justify-center">
-                <Button variant={"ghost"}>Renew</Button>
-              </div>
-            </TableCell>
-            <TableCell className="bg-red-600 text-center text-white font-semibold">
-              <div className="flex items-center justify-center">
-                <Button variant={"ghost"}>Terminate</Button>
-              </div>
-            </TableCell>
-          </TableRow>
+      <div className="mt-3 mb-15">
+        <TableBase headers={terminatedHeaders} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
+          {
+            leases?.length
+            ? leases.map((lease:Lease)=>(
+              <TableRow key={lease.lease_id}>      
+                <TableCell className="text-center">{lease.lease_id}</TableCell>
+                <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
+                <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>
+                <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
+                <TableCell className="text-center whitespace-normal break-words max-w-[250px]">{summarizeAddress(lease.unit.property.addresses[0])}</TableCell>
+                <TableCell>
+                  <StaticBadge bgColor={riskLevelColorCode(lease.risk_level_class)}>
+                    <span className="text-white font-semibold text-sm py-2"><i>({lease.currency.currency_code})</i> {lease.owing}</span>
+                  </StaticBadge>
+                </TableCell>
+                <TableCell className="text-center">{"DATE OF TERMINATION"}</TableCell>
+                <TableCell >
+                  <StaticBadge bgColor="bg-blue-600">
+                    <Button variant={"ghost"}>Receipt</Button>
+                  </StaticBadge>
+                </TableCell>
 
-          {/* TOTALS ROW */}
-          <TableRow>
-            <TableCell colSpan={5}/>
-            <TableCell className="text-center flex flex-col gap-1">
-              USD700.00
-            <i>rate : 36</i>  
-            </TableCell>
-
-          </TableRow>
+               <TableCell>
+                  <StaticBadge bgColor="bg-amber-500">
+                    <Button variant={"ghost"}>Renew</Button>
+                  </StaticBadge>
+                </TableCell>
+              
+              </TableRow>
+            )) : 
+            <TableRow>
+              <TableCell colSpan={terminatedHeaders.length}>
+                <EmptyResults message="No leases registered."/>
+              </TableCell>
+            </TableRow>
+          }
         </TableBase>
       </div>
     </div>
@@ -137,3 +122,5 @@ function Terminated() {
 }
 
 export default Terminated
+
+

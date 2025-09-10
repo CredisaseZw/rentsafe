@@ -8,10 +8,11 @@ import Alert from "@/components/general/Alerts";
 import { useState } from "react";
 import ButtonSpinner from "@/components/general/ButtonSpinner";
 import Button from "@/components/general/Button";
-import { setCookie } from "typescript-cookie";
+import { getCookie, setCookie } from "typescript-cookie";
+import { isAxiosError } from "axios";
 
 export default function Login() {
-   const { loginForm, validateForm, handleChange, status, onError } = useAuth();
+   const { loginForm, validateForm, handleChange, error, setError } = useAuth();
    const login = useLoginAuth();
    const [isLogin, setIsLogin] = useState(false);
    const navigate = useNavigate();
@@ -25,13 +26,19 @@ export default function Login() {
 
       login.mutate(loginForm, {
          onSuccess: (data) => {
-            setCookie("token", JSON.stringify(data), { expires: 3 });
-            const next = new URLSearchParams(location.search).get("next");
-            navigate(next || "/services/rent-safe", { replace: true });
+            if(data.is_verified){
+               if(!getCookie("token")) setCookie("token", JSON.stringify(data), { expires: 4 });
+               const next = new URLSearchParams(location.search).get("next");
+               navigate(next || "/services/rent-safe", { replace: true });
+            } else{
+               setError("Account is Not verified")
+            }
          },
          onError: (error) => {
+            if(isAxiosError(error)){
+               setError(error.response?.data.error ?? error.response?.data.detail);
+            }
             console.log(error);
-            onError("isAccount");
          },
          onSettled: () => setIsLogin(false),
       });
@@ -68,9 +75,9 @@ export default function Login() {
                      onChange={handleChange}
                   />
                </div>
-               {status.isAccount && (
+               {error && (
                   <div className="mt-7">
-                     <Alert type="danger" message="Invalid account." />
+                     <Alert type="danger" message={error} />
                   </div>
                )}
 
