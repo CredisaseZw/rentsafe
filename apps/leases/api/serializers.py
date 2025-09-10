@@ -51,7 +51,7 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['id', 'currency_code', 'currency_name']
+        fields = ['id', 'currency_code', 'currency_name', 'symbol']
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
     unit = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all())

@@ -3,15 +3,24 @@ import StaticBadge from "./StaticBadge";
 import ReceiptDialog from "../routes/rent-safe/tenant-leases/ReceiptDialog";
 import { Button } from "../ui/button";
 import TerminateLeaseDialog from "../routes/rent-safe/tenant-leases/TerminateLeaseDialog";
-import type { Lease } from "@/types";
+import type { Lease, LeaseReceiptPayload } from "@/types";
 import { getCurrentDate, riskLevelColorCode, summarizeAddress } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { EllipsisVertical, } from "lucide-react";
+import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
+import { Link } from "react-router";
 
 interface Props {
   lease: Lease;
+  onSuccessCallback : (payload?: LeaseReceiptPayload[] ) => void
   refetch: () => void;
 }
 
-function LeaseRow({ lease, refetch }: Props) {
+function LeaseRow({ lease, refetch, onSuccessCallback }: Props) {
   const primaryFullname =
     lease.tenants.find((t) => t.is_primary_tenant)?.tenant_object.full_name ?? "";
 
@@ -34,12 +43,13 @@ function LeaseRow({ lease, refetch }: Props) {
       <TableCell>
         <StaticBadge bgColor={riskLevelColorCode(lease.risk_level_class)}>
           <span className="text-white font-semibold text-sm py-2">
-            <i>({lease.currency.currency_code})</i> {lease.owing}
+            <i>({lease.currency.symbol})</i> {lease.owing}
           </span>
         </StaticBadge>
       </TableCell>
       <TableCell>
         <ReceiptDialog
+          onSuccessCallback={onSuccessCallback}
           lease={{
             lease_id: lease.lease_id,
             id: lease.id,
@@ -55,13 +65,23 @@ function LeaseRow({ lease, refetch }: Props) {
         </StaticBadge>
       </TableCell>
       <TableCell>
-        <StaticBadge bgColor="bg-red-600">
-          <TerminateLeaseDialog
-            refetch={refetch}
-            tenantName={primaryFullname}
-            lease_id={lease.lease_id}
-          />
-        </StaticBadge>
+        <Popover>
+          <PopoverTrigger>
+            <EllipsisVertical size={18}/>
+          </PopoverTrigger>
+          <PopoverContent>
+            <Link to={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/${lease.lease_id}`} className="flex flex-row gap-3 justify-center items-center hover:text-green-600 mb-3">
+              <span className="text-sm dark:text-white text-gray-600">View More</span>
+            </Link>
+            <TerminateLeaseDialog
+                optional = {true}
+                refetch={refetch}
+                tenantName={primaryFullname}
+                lease_id={lease.lease_id}
+              />
+          </PopoverContent>
+      </Popover>
+
       </TableCell>
     </TableRow>
   );
