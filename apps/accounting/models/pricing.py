@@ -23,8 +23,8 @@ class ServiceSpecialPricing(BaseModelWithUser):
                 help_text=_("The currency of the special charges."))
     
     class Meta(BaseModel.Meta):
-        verbose_name = _("Special Pricing")
-        verbose_name_plural = _("Special Pricing")
+        verbose_name = _("Service Special Pricing")
+        verbose_name_plural = _("Services Special Pricing")
         unique_together = ('service', 'client_customer')
 
     def __str__(self):
@@ -44,9 +44,9 @@ class ServiceStandardPricing(BaseModelWithUser):
                     help_text=_("The current conversion rate if this pricing involves currency conversion."))
     
     class Meta(BaseModel.Meta):
-        verbose_name = _("Standard Pricing")
-        verbose_name_plural = _("Standard Pricing")
+        verbose_name = _("Service Standard Pricing")
+        verbose_name_plural = _("Services Standard Pricing")
         unique_together = ('service', 'currency')
 
     def __str__(self):
-        return f"Standard Pricing for {self.service.service_name} ({self.currency.code})"
+        return f"Standard Pricing for {self.service.service_name} ({self.currency.currency_code})"
