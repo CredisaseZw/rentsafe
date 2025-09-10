@@ -227,6 +227,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://credi-safe.com",
     "http://localhost:5173",
     "https://rentsafe-iota.vercel.app", 
+    "https://rentsafe-backend.onrender.com"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -248,7 +249,7 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "http://127.0.0.1:3000",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
-        "rentsafe-backend.onrender.com",
+        "https://rentsafe-backend.onrender.com",
         "https://rentsafe-iota.vercel.app"
     ]
 
