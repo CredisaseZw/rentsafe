@@ -235,6 +235,12 @@ export interface Lease {
 
   }]
 }
+export interface LeaseReceiptPayload {
+  lease_id: string;
+  current_balance: string;
+  lease_status : string;
+  risk_level_class?: string;
+}
 export interface TenantMinimal {
    id: number;
    full_name: string;
@@ -282,6 +288,7 @@ export interface Unit {
 export interface Currency {
   id: number;
   currency_code: string;
+  symbol: string;
   currency_name: string;
 }
 
@@ -395,14 +402,6 @@ export interface PaymentMethod {
    id: number,
    payment_method_name: string
 }
-
-export interface PaymentMethodResponse {
-   count: number,
-   next: string,
-   previous: string,
-   results : PaymentMethod[]
-}
-
 export interface Currency{
    id: number,
    currency_code: string,
@@ -424,6 +423,7 @@ export interface LeaseOpeningBalanceData {
   outstanding_balance: number;
 }
 
+
 export type ReceiptLease =  {
    lease_id: string,
    id : number,
@@ -440,14 +440,16 @@ export interface PaymentHistory{
    id : number,
    invoice_number : string,
    amount : string,
-   method: PaymentMethod,
+   method: string,
    payment_date : string,
    reference : string   
    description : string
+   type : "Payment" | string
 }
 
 export interface PaymentStatementInformation {
-   opening_balance: string,
+   opening_balance_date : string | undefined
+   opening_balance: number,
    primary_tenant: string ,
    address: string,
    total_invoiced: string,

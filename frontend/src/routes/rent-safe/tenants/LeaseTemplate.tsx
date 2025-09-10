@@ -29,7 +29,6 @@ import { TENANT_STATEMENTS_HEADERS } from "@/constants";
 function LeaseTemplate() {
    const {
       page,
-      status,
       search,  
       paginationData,
       leases,
@@ -51,10 +50,10 @@ function LeaseTemplate() {
 
       if(data){
 
-         setLeases(data ?? [])
+         setLeases(search ? data.results : data ?? [])
          setPaginationData(data as PaginationData)
       }
-  }, [page, search, status, data, error])
+  }, [page, search, data, error])
 
   
   return (
@@ -112,9 +111,9 @@ function LeaseTemplate() {
                   </TableRow>
                   )) : 
                   <TableRow>
-                  <TableCell colSpan={TENANT_STATEMENTS_HEADERS.length}>
-                     <EmptyResults message="No statements created yet."/>
-                  </TableCell>
+                     <TableCell colSpan={TENANT_STATEMENTS_HEADERS.length}>
+                        <EmptyResults message="No statements created yet."/>
+                     </TableCell>
                   </TableRow>
                }
             </TableBase>

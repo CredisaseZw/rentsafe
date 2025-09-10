@@ -7,17 +7,19 @@ import { useEffect } from 'react'
 import { isAxiosError } from 'axios'
 import useGetPaymentMethods from '@/hooks/apiHooks/useGetPaymentMethods'
 import { toast } from 'sonner'
-import type { PaymentMethod, ReceiptLease } from '@/types'
+import type { LeaseReceiptPayload, PaymentMethod, ReceiptLease } from '@/types'
 import ReceiptRow from '@/components/general/ReceiptRow'
 import { Plus, Send } from 'lucide-react'
 import useCreateReceipt from '@/hooks/apiHooks/useCreateReceipt'
 import ButtonSpinner from '@/components/general/ButtonSpinner'
 
 interface props {
+  onSuccessCallback? : (payload?: LeaseReceiptPayload[] ) => void
+  isButtonOutlined? :boolean
   lease : ReceiptLease
 }
 
-function ReceiptDialog({lease}: props) {
+function ReceiptDialog({lease ,isButtonOutlined, onSuccessCallback}: props) {
   const { 
     isOpen,
     loading,
@@ -43,7 +45,7 @@ function ReceiptDialog({lease}: props) {
       }
 
       if(data){
-        setPaymentMethods(data.results as PaymentMethod[])
+        setPaymentMethods(data as PaymentMethod[])
       }
   }, [data, error])
 
@@ -54,13 +56,16 @@ function ReceiptDialog({lease}: props) {
       onOpenChange={setIsOpen}
     >
       <DialogTrigger asChild>
-          <StaticBadge bgColor="bg-blue-600">   
-              <Button variant={"ghost"} onClick={()=> setIsOpen(true)}>Receipt</Button>
-          </StaticBadge>  
+          {isButtonOutlined ?
+            <Button variant={"outline"} onClick={()=> setIsOpen(true)}>Receipt</Button>:
+            <StaticBadge bgColor="bg-blue-600">   
+                <Button variant={"ghost"} onClick={()=> setIsOpen(true)}>Receipt</Button>
+            </StaticBadge> 
+          }
       </DialogTrigger>
       <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto overflow-x-auto`}>
           <DialogTitle><h6 className='font-semibold'>Rent receipt</h6></DialogTitle>
-          <form onSubmit={(e) =>submitReceipts(e, createReceipt)}>
+          <form onSubmit={(e) =>submitReceipts(e, createReceipt, onSuccessCallback)}>
               {
                 receipts.map((lease, index: number)=>
                   <ReceiptRow
