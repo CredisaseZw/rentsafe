@@ -48,12 +48,12 @@ def check_seeding_needed():
     """Check if database seeding is needed."""
     print("Checking if seeding is needed...")
     try:
-        from apps.accounting.models import PaymentMethod
+        from apps.common.models.models import Country
 
-        if PaymentMethod.objects.exists():
-            print(f"PaymentMethods table contains {PaymentMethod.objects.count()} records - skipping seeding")
+        if Country.objects.exists():
+            print(f"Country table contains {Country.objects.count()} records - skipping seeding")
         else:
-            print("PaymentMethods table is empty - running seeding script...")
+            print("Country table is empty - running seeding script...")
             seed_script = "/app/seed_db.sh"
             dos2unix_cmd = "dos2unix /app/seed_db.sh"
             if os.path.exists(seed_script):
@@ -62,7 +62,7 @@ def check_seeding_needed():
             else:
                 print(f"Seed script not found at {seed_script}")
     except Exception as e:
-        print(f"Error checking PaymentMethods table: {e}")
+        print(f"Error checking Country table: {e}")
 
 def main():
     if "gunicorn" in sys.argv:

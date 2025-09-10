@@ -302,7 +302,7 @@ class Lease(BaseModelWithUser):
         from apps.leases.utils.commissions import CommissionHandler
         remaining_amount = Decimal(amount)
         payments_made = []
-        
+
         # Get all unpaid invoices ordered by due date (oldest first)
         unpaid_invoices = self.invoices.filter(
             status__in=['pending', 'partially_paid']
@@ -312,18 +312,18 @@ class Lease(BaseModelWithUser):
             for invoice in unpaid_invoices:
                 if remaining_amount <= 0:
                     break
-                    
+
                 # Calculate invoice balance properly (handle None values)
                 total_paid_result = invoice.payments.aggregate(
                     total_paid=Sum('amount')
                 )
                 total_paid = total_paid_result['total_paid'] or Decimal('0.00')
-                
+
                 invoice_balance = invoice.total_inclusive - total_paid
-                
+
                 payment_amount = min(remaining_amount, invoice_balance)
-                
-                if payment_amount > 0:
+
+                if payment_amount > 0 or invoice_balance <= 0:
                     # Create payment
                     payment = Payment.objects.create(
                         invoice=invoice,
@@ -334,7 +334,7 @@ class Lease(BaseModelWithUser):
                         reference=reference,
                         created_by=request.user if request and hasattr(request, 'user') else None
                     )
-                    
+
                     payments_made.append(payment)
                     remaining_amount -= payment_amount
                     #def handle_payment_commission(lease, payment_amount, payment_date, payment_reference, request=None):
@@ -346,33 +346,38 @@ class Lease(BaseModelWithUser):
                         payment_reference=f"{reference or 'Payment'} for invoice {invoice.document_number}",
                         request=request
                     )
-                    
+
                     # Update invoice status
                     if payment_amount >= invoice_balance:
                         invoice.status = 'paid'
                     else:
                         invoice.status = 'partially_paid'
                     invoice.save()
-            
+
             # Handle overpayment by adding to the last payment
-            if remaining_amount > 0 and payments_made:
+            if remaining_amount > 0:
                 # Add overpayment to the last payment made
-                last_payment = payments_made[-1]
-                last_payment.amount += remaining_amount
-                last_payment.save()
-                
-                # Handle commission for the overpayment portion
+                if payments_made:
+                    last_payment = payments_made[-1]
+                    last_payment.amount += remaining_amount
+                    last_payment.save()
+                elif (
+                    last_payment := Payment.objects.filter(invoice__lease=self)
+                    .order_by('-payment_date', '-id')
+                    .first()
+                ):
+                    last_payment.amount += remaining_amount
+                    last_payment.save()
                 CommissionHandler.handle_payment_commission(
                     lease=self, 
                     payment_amount=remaining_amount, 
                     payment_date=payment_date, 
                     payment_reference=f"{reference or 'Payment'} overpayment",
-                    payment_instance=last_payment,
                     request=request
                 )
-                
+
                 remaining_amount = Decimal('0.00')
-            
+
             # Log the payment
             if payments_made or remaining_amount > 0:
                 log_details = {
@@ -382,14 +387,14 @@ class Lease(BaseModelWithUser):
                     'applied_to_invoices': [p.invoice.document_number for p in payments_made],
                     'overpayment_amount': str(remaining_amount) if remaining_amount > 0 else '0.00'
                 }
-                
+
                 LeaseLog.objects.create(
                     lease=self,
                     log_type='PAYMENT_RECEIVED',
                     user=request.user if request and hasattr(request, 'user') else None,
                     details=log_details
                 )
-            
+
             return payments_made, remaining_amount
         return [], remaining_amount
 
