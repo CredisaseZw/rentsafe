@@ -35,6 +35,7 @@ class SalesAccount(BaseModel):
 class Currency(BaseModel):
     currency_code = models.CharField(max_length=3, unique=True)
     currency_name = models.CharField(max_length=50)
+    symbol = models.CharField(max_length=10, blank=True, null=True)
 
     def __str__(self):
         return self.currency_code
@@ -379,6 +380,7 @@ class TransactionLineItem(BaseModel):
 
 class PaymentMethod(BaseModel):
     payment_method_name = models.CharField(max_length=255)
+    currency = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         app_label = 'accounting'
