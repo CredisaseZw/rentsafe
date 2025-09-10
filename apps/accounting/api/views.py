@@ -279,7 +279,7 @@ class CashBookViewSet(BaseCompanyViewSet):
 class CurrencyViewSet(BaseCompanyViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
-    
+    pagination_class = None
     # overide the base get queryset
     def get_queryset(self):
         return self.queryset.all()
@@ -287,7 +287,7 @@ class CurrencyViewSet(BaseCompanyViewSet):
 class PaymentMethodViewSet(BaseCompanyViewSet):
     queryset = PaymentMethod.objects.all()
     serializer_class = PaymentMethodSerializer
-    
+    pagination_class = None
     def get_queryset(self):
         return self.queryset.all()
     

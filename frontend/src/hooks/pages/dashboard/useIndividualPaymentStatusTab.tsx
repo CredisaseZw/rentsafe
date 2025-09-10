@@ -12,11 +12,14 @@ export default function useIndividualPaymentStatusTab() {
 
    const rows: BaseTableRow[] = (() => {
       const individuals = Array.isArray(data) ? data : data?.results;
-      
-      return (individuals as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => ({
-         ...cell,
-         select: <IndividualPaymentStatusReport individualId={cell.id} />,
-      })) || [];
+
+      return (individuals as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => {
+         const { addresses, primary_address, ...rest } = cell;
+         return {
+            ...rest,
+            select: <IndividualPaymentStatusReport individualId={cell.id} />,
+         };
+      }) || [];
    })();
    
    const headers: BaseTableColumn[] = [

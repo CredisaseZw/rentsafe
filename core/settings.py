@@ -30,6 +30,8 @@ EMAIL_HOST = os.environ["EMAIL_HOST"]
 EMAIL_PORT = os.environ["EMAIL_PORT"]
 EMAIL_USE_SSL = os.environ["EMAIL_USE_SSL"]
 EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_REPLY_TO_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
 SMS_USERNAME = os.environ["SMS_USERNAME"]
 SMS_PASSWORD = os.environ["SMS_PASSWORD"]
@@ -73,6 +75,14 @@ else:
     
 ALLOWED_HOSTS = ['*']
 # Application definition
+
+CSRF_TRUSTED_ORIGINS = [
+        'https://credi-safe.com',
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "https://rentsafe-backend.onrender.com",
+        "https://rentsafe-iota.vercel.app"
+    ]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -238,9 +248,6 @@ CORS_ALLOW_METHODS = [
     'DELETE',
     'OPTIONS',
 ]
-
-
-
 
 # CRON JOBS
 # https://django-cron.readthedocs.io/en/latest/installation.html#installation
@@ -519,7 +526,12 @@ LOGGING = {
 }
 
 
-
+LEASE_CREATED = 'LEASE_CREATED'
+LEASE_UPDATED = 'LEASE_UPDATED'
+LEASE_TERMINATED = 'LEASE_TERMINATED'
+PAYMENT_RECEIVED = 'PAYMENT_RECEIVED'
+RISK_STATUS_UPDATED = 'RISK_STATUS_UPDATED'
+LEASE_RENEWAL_REMINDER = 'LEASE_RENEWAL_REMINDER'
 
 ADD_INDIVIDUAL = "ADD_INDIVIDUAL"
 ADD_INDIVIDUAL_USER = "ADD_INDIVIDUAL_USER"
@@ -533,7 +545,6 @@ ADD_COMP_LEASE = "COMPANY_LEASE"
 MAKE_AGENT = "MAKE_AGENT"
 FORGOT_PASSWORD = "FORGOT_PASSWORD"
 ADD_SUBSCRIPTION = "ADD_SUBSCRIPTION"
-PAYMENT_RECEIPT = "PAYMENT_RECEIPT"
 LEASE_STATUS = "LEASE_STATUS"
 
 
@@ -570,9 +581,13 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "/"
+SILENCED_SYSTEM_CHECKS = ["staticfiles.E002"]  # Disables the warning for not using HTTPS in development
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

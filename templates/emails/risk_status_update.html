@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Status Update - {{ platform_name }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 13px;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            margin: 15px 0;
+        }
+        .risk-NON_PAYER { background-color: #000000; }
+        .risk-HIGH_HIGH { background-color: #dc2626; }
+        .risk-HIGH { background-color: #ef4444; }
+        .risk-MEDIUM { background-color: #f59e0b; }
+        .risk-LOW { background-color: #10b981; }
+        .details-box {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #475569;
+            width: 160px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4a6fa5;
+            color: white !important;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .improved { background-color: #f0fdf4; padding: 15px; border-radius: 6px; border-left: 4px solid #10b981; margin: 20px 0; }
+        .worsened { background-color: #fef2f2; padding: 15px; border-radius: 6px; border-left: 4px solid #ef4444; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Risk Status Update</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear {{ tenant_name|default:"Tenant" }},</p>
+            
+            <p>Your account risk status has been updated based on your payment history:</p>
+            
+            <div style="text-align: center; margin: 25px 0;">
+                <div class="risk-badge risk-{{ new_risk_status|default:'LOW' }}">{{ new_risk_status_display|default:"LOW" }}</div>
+                <p>Previous status: {{ old_risk_status_display|default:"LOW" }}</p>
+            </div>
+            
+            <div class="details-box">
+                <div class="detail-item">
+                    <span class="detail-label">Lease ID:</span>
+                    <span>{{ lease_id|default:"N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Property:</span>
+                    <span>{{ property|default:"N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Unit:</span>
+                    <span>{{ unit|default:"N/A" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Current Balance:</span>
+                    <span>{{ currency|default:"USD" }} {{ balance|default:"0.00" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Payment Date:</span>
+                    <span>{{ last_payment_date|default:"No payments yet" }}</span>
+                </div>
+            </div>
+            
+            {% if risk_improved %}
+            <div class="improved">
+                <p><strong>Congratulations!</strong> Your risk status has improved due to recent payments. Keep up the good payment history to maintain or further improve your status.</p>
+            </div>
+            {% else %}
+            <div class="worsened">
+                <p><strong>Notice:</strong> Your risk status has changed due to outstanding payments. To improve your status, please make a payment towards your outstanding balance.</p>
+                
+                <p>Risk status implications:</p>
+                <ul>
+                    {% if new_risk_status == "NON_PAYER" %}
+                    <li>Legal action may be initiated</li>
+                    <li>Lease renewal may be denied</li>
+                    <li>Additional fees may apply</li>
+                    {% elif new_risk_status == "HIGH_HIGH" %}
+                    <li>Lease renewal may be at risk</li>
+                    <li>Additional late fees apply</li>
+                    {% elif new_risk_status == "HIGH" %}
+                    <li>Additional late fees apply</li>
+                    <li>Credit reporting may be affected</li>
+                    {% elif new_risk_status == "MEDIUM" %}
+                    <li>Payment reminder fees may apply</li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <p>You can make a payment and view your account details through your tenant portal.</p>
+            
+            <center>
+                <a href="{{ portal_url|default:'#' }}" class="button">Make a Payment</a>
+            </center>
+            
+            <p>If you have any questions about your risk status or payment options, please contact our property management team.</p>
+            
+            <p>Best regards,<br>The {{ platform_name|default:"Property Management" }} Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {% now "Y" %} {{ platform_name|default:"Property Management" }}. All rights reserved.</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

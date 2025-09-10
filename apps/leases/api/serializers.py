@@ -7,9 +7,9 @@ from django.utils.text import slugify
 from apps.leases.models import (
     Lease, LeaseTenant, LeaseCharge, 
     LeaseTermination, Guarantor, LeaseOpeningBalance, 
-    LandlordOpeningBalance, LeaseDeposit
+    LandlordOpeningBalance, LeaseDeposit, Landlord
 )
-from apps.leases.models.landlord import Landlord
+from apps.subscriptions.models import Subscription
 from apps.properties.models.models import Property, Unit, PropertyType
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
@@ -26,11 +26,13 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     method = PaymentMethodSerializer()
     invoice_number = serializers.CharField(source='invoice.document_number')
-    
+    type = serializers.SerializerMethodField()
     class Meta:
         model = Payment
-        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference']
-
+        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type']
+    
+    def get_type(self, obj):
+        return 'Payment'
 
 # Helper serializers for related objects
 class IndividualSerializer(serializers.ModelSerializer):
@@ -299,6 +301,33 @@ class LeaseListSerializer(serializers.ModelSerializer):
             }
         }
 
+class TenantStatementsListSerializer(serializers.ModelSerializer):
+    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    unit = serializers.SerializerMethodField()
+    currency = serializers.CharField(source='currency.currency_code', read_only=True)
+    risk_level_class = serializers.SerializerMethodField()
+    owing = serializers.FloatField(source='get_latest_balance', read_only=True)
+
+    class Meta:
+        model = Lease
+        fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'unit', 'currency', 'risk_level_class', 'owing']
+
+    def get_risk_level_class(self, obj):
+        return obj.risk_level
+
+    def get_unit(self, obj):
+        return {
+            'id': obj.unit.id,
+            'unit_number': obj.unit.unit_number,
+            'property': {
+                'id': obj.unit.property.id,
+                'name': obj.unit.property.name,
+                'type': obj.unit.property.property_type.name if obj.unit.property.property_type else None,
+                'slug': obj.unit.property.slug,
+                'addresses': AddressSerializer(obj.unit.property.addresses.all(), many=True).data,
+            }
+        }
+
 class LeaseSearchSerializer(serializers.ModelSerializer):
     tenants = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
@@ -423,6 +452,7 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
         }
     
     def validate(self, data):
+        from apps.common.utils.subscriptions import check_rentsafe_subscription
         user = self.context.get('request').user if self.context.get('request') else None
         # Either unit or property_data + unit_data must be provided
         if not data.get('unit') and not (data.get('property_data') and data.get('unit_data')):
@@ -432,7 +462,8 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
 
         if not user.client:
             raise serializers.ValidationError("User should be associated with a client, request to join one to the admins.")
-
+        if not check_rentsafe_subscription(user.client, 'rentsafe'):
+            raise serializers.ValidationError("No active Rentsafe subscription found or the subscription has expired.")
         # New validation to prevent duplicate property creation
         if data.get('property_data'):
             if property_name := data['property_data'].get('name'):

@@ -1,12 +1,28 @@
 import type { CompanyPayload } from "@/interfaces/form-payloads";
-import React from "react";
+import React, { useEffect } from "react";
 import useCreateCompany from "../apiHooks/useCreateCompany";
 import { extractAddresses, formatDateToPythonSLiking } from "@/lib/utils";
 import type { CompanyLegalStatus } from "@/types";
+import { useNavigate, useSearchParams } from "react-router";
 
 export default function useCompanyForm() {
    const [showForm, setShowForm] = React.useState(false);
-   const { isPending, createCompany } = useCreateCompany(() => setShowForm(false));
+   const { isPending, createCompany } = useCreateCompany(successCallback);
+   const [params] = useSearchParams();
+   const router = useNavigate()
+
+   useEffect(()=>{
+      if (params.get("addCompany")) setShowForm(true); 
+   }, [])
+
+   function successCallback(){
+      const nextParam = params.get("next");
+      if (params.get("addCompany") && nextParam) {
+         router(nextParam.trim());
+      }
+      setShowForm(false)
+   }
+
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();

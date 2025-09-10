@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
 import Header from "@/components/general/Header";
-import GlobalSummaryCard from "@/components/general/globalSummaryCard";
+import DashboardCard from "@/components/general/DashboardCard";
 import Combined from "@/components/routes/rent-safe/inspections/combined";
 import Industrial from "@/components/routes/rent-safe/inspections/industrial";
 import Office from "@/components/routes/rent-safe/inspections/office";
@@ -53,7 +53,7 @@ function Inspections() {
    return <div>
          <Header title="Property Insecptions" />
          <ColumnsContainer numberOfCols={6}>
-            <GlobalSummaryCard
+            <DashboardCard
                value={"15"}
                subTitle="Combined"
                layoutScheme={{
@@ -61,7 +61,7 @@ function Inspections() {
                   color: "red",
                }}
             />
-            <GlobalSummaryCard
+            <DashboardCard
                value={"10"}
                subTitle="Residental"
                layoutScheme={{
@@ -69,7 +69,7 @@ function Inspections() {
                   color: "blue",
                }}
             />
-            <GlobalSummaryCard
+            <DashboardCard
                value={"10"}
                subTitle="Office"
                layoutScheme={{
@@ -77,7 +77,7 @@ function Inspections() {
                   color: "amber",
                }}
             />
-            <GlobalSummaryCard
+            <DashboardCard
                value={"10"}
                subTitle="Retail"
                layoutScheme={{
@@ -85,7 +85,7 @@ function Inspections() {
                   color: "purple",
                }}
             />
-            <GlobalSummaryCard
+            <DashboardCard
                value={"10"}
                subTitle="Industrial"
                layoutScheme={{
@@ -93,7 +93,7 @@ function Inspections() {
                   color: "green",
                }}
             /> 
-             <GlobalSummaryCard
+             <DashboardCard
                value={"10"}
                subTitle="Other"
                layoutScheme={{

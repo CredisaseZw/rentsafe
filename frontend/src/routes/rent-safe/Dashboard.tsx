@@ -3,6 +3,7 @@ import OverviewTab from "@/components/routes/rent-safe/dashboard/OverviewTab";
 import IndividualPaymentStatusTab from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building2, ChartLine, User } from "lucide-react";
+import { useSearchParams } from "react-router";
 
 export default function Dashboard() {
    const tabs = [
@@ -20,9 +21,12 @@ export default function Dashboard() {
          content: <CompanyPaymentStatusTab />,
       },
    ];
+   const [params] = useSearchParams();
+   const currentTab = params.get("addIndividual") ? tabs[1].value :
+   params.get("addCompany") ? tabs[2].value :tabs[0].value
 
    return (
-      <Tabs defaultValue={tabs[0].value}>
+      <Tabs defaultValue={currentTab}>
          <TabsList className="border-color dim-card mx-auto mb-5 h-fit gap-3 rounded-md border p-3 shadow-md">
             {tabs.map((tab) => (
                <TabsTrigger
