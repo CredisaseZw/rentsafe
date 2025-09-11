@@ -1,5 +1,5 @@
 import type { PaginationData } from "@/interfaces"
-import type { Header, Lease } from "@/types"
+import type { Header, Lease, LeaseReceiptPayload } from "@/types"
 import { useState } from "react"
 import { useSearchParams } from "react-router"
 
@@ -85,29 +85,49 @@ export default function useLeases(defaultStatus: string) {
             return params;
       }); 
     }
+
     const onClearSearch = () => {
       setSearchParams((prev) => {
          const params = new URLSearchParams(prev);
          if (params.get("search")) params.delete("search");
          return params;
       });
-   };
+    };
 
-  return {
-    total,
-    setTotal,
-    renewalHeaders,
-    terminatedHeaders,
-    activeHeaders,
-    page, 
-    status,
-    search,
-    paginationData, 
-    leases,
-    onClearSearch,
-    handleOnSearchValue,
-    setLeases,
-    setPaginationData,
-    setSearchParams
-}
+    const onSuccessCallback = (payload: LeaseReceiptPayload[] | undefined) => {
+        if (!payload )return null;
+        setLeases((prevLeases) => {
+            if (!prevLeases) return null;
+
+            return prevLeases.map((lease) => {
+                const update = payload.find((u) => u.lease_id === lease.lease_id);
+                if (!update) return lease;
+                return {
+                ...lease,
+                owing: parseFloat(update.current_balance),
+                ...(update.lease_status && { risk_level_class: update.lease_status }),
+                };
+        }) as Lease[];
+    });
+    };
+
+    return {
+        page, 
+        total,
+        status,
+        search,
+        leases,
+        activeHeaders,
+        paginationData, 
+        renewalHeaders,
+        terminatedHeaders,
+        handleOnSearchValue,
+        onSuccessCallback,
+        setPaginationData,
+        setSearchParams,
+        onClearSearch,
+        setLeases,
+        setTotal,
+
+    }
 }

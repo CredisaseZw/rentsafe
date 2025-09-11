@@ -30,6 +30,7 @@ function Active() {
     setLeases,
     setPaginationData,
     total,
+    onSuccessCallback,
     setTotal,
     onClearSearch,
     handleOnSearchValue
@@ -86,7 +87,12 @@ function Active() {
           {
             leases?.length
             ? leases.map((lease:Lease)=>(
-              <LeaseRow lease={lease} key={lease.lease_id} refetch={refetch}/>
+              <LeaseRow 
+                lease={lease}
+                key={lease.lease_id}
+                refetch={refetch}
+                onSuccessCallback = {onSuccessCallback}
+              />
             )) : 
             <TableRow>
               <TableCell colSpan={activeHeaders.length}>

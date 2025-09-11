@@ -1,12 +1,12 @@
 import { extractReceipts, getCurrentDate } from "@/lib/utils";
-import type { Lease, PaymentMethod, ReceiptLease } from "@/types";
+import type { Lease, LeaseReceiptPayload, PaymentMethod, ReceiptLease } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function useReceipt(initialLease?: ReceiptLease) {
-    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[] | null>(null);
+    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [receipts, setReceipts] = useState<ReceiptLease[]>([]);
     const [loading, setLoading] = useState(false);
@@ -72,13 +72,20 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         return receipts.some((r) => r.lease_id === lease_id);
     };
 
-    const submitReceipts = (e: React.FormEvent<HTMLFormElement>, createReceipt: UseMutationResult< any,Error,{ payments: ReceiptLease[] },unknown>) => {
+    const submitReceipts = (
+        e: React.FormEvent<HTMLFormElement>, 
+        createReceipt: UseMutationResult< any,Error,{ payments: ReceiptLease[] },unknown>,
+        onSuccessCallback? : (payload?: LeaseReceiptPayload[] )=> void 
+    ) => {
         e.preventDefault()
         setLoading(true)
         const FORM = new FormData(e.currentTarget);
         const data = Object.fromEntries(FORM.entries())
         const receipts: ReceiptLease[] = extractReceipts(data);;
-        console.log(receipts)
+        
+        // VALIDATE BY LEASE_ID { FILTER FOR EMPTY OBJECTS }
+        const invalid = receipts.filter((r) => !r.lease_id || r.lease_id.trim() === '');
+        if (invalid.length > 0) return toast.error("Fill in all receipts", {description:"Empty receipt body detected"})
         
         const payments: { payments: ReceiptLease[] } = { payments: receipts };
 
@@ -86,13 +93,16 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         onError: (error) => {
             if(isAxiosError(error)){
                 const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong";
-                toast.error("Error creating a receipt", {description : message})
+                toast.error("Error occurred creating a receipt", {description : message})
             }
         },
         onSuccess: (data) => {
+            console.log(data)
             if(data) {
+                if(data.errors.length > 0) return toast.error("Error occurred creating a receipt", )
                 toast.success("Receipt created successfully")
                 setIsOpen(false);
+                if (onSuccessCallback) onSuccessCallback(data.results)
             }
         },
         onSettled : () => setLoading(false)
