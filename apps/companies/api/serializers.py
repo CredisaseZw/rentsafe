@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
 from apps.companies.models.models import Company, CompanyBranch, ContactPerson, CompanyProfile
 from apps.common.models.models import Address, Document, Note
-from apps.common.api.serializers import AddressSerializer, DocumentSerializer, NoteSerializer
+from apps.common.api.serializers import AddressSerializer, DocumentSerializer, NoteSerializer, AddressCreateSerializer
 from apps.common.utils import normalize_zimbabwe_mobile, validate_email
 from django.db.models import Q
 import logging
@@ -145,7 +145,6 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-
 class CompanyMinimalSerializer(serializers.ModelSerializer):
     """Minimal serializer for company data in branch context"""
     legal_status_display = serializers.CharField(source='get_legal_status_display', read_only=True)
@@ -156,8 +155,6 @@ class CompanyMinimalSerializer(serializers.ModelSerializer):
             'id', 'registration_number', 'registration_name', 'trading_name',
             'legal_status', 'legal_status_display', 'is_verified'
         ]
-
-
 
 class CompanyDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for full company data"""
@@ -175,10 +172,9 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
             'profile', 'date_created', 'date_updated'
         ]
 
-
 class CompanyCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating companies with addresses and profile"""
-    addresses = AddressSerializer(many=True, required=False)
+    addresses = AddressCreateSerializer(many=True, required=False)
     documents = DocumentSerializer(many=True, required=False)
     notes = NoteSerializer(many=True, required=False)
     profile = CompanyProfileSerializer(required=False)
@@ -192,6 +188,9 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     
     @transaction.atomic
     def create(self, validated_data):
+        from apps.individuals.utils.helpers import(
+            create_address_helper
+        )
         addresses_data = validated_data.pop('addresses', [])
         profile_data = validated_data.pop('profile', None)
         documents_data = validated_data.pop('documents', [])
@@ -200,25 +199,11 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         company = Company.objects.create(**validated_data)
         company_content_type = ContentType.objects.get_for_model(Company)
 
-        for address_data in addresses_data:
-            
-            address_data['is_primary'] = False if Address.objects.filter(
-                    user=user,
-                    content_type=company_content_type,
-                    object_id=company.id,
-                    address_type=address_data['address_type'],
-                    is_primary=True
-                ).exists() else True
-            Address.objects.create(
-                user=user,
-                content_type=company_content_type,
-                object_id=company.id,
-                **address_data
-            )
+        # Creating addresses
+        create_address_helper(company_content_type, addresses_data, company.id)
         # Creating documents
         for document_data in documents_data:
             Document.objects.create(
-                user=user,
                 content_type=company_content_type,
                 object_id=company.id,
                 **document_data
@@ -227,7 +212,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         # Creating notes
         for note_data in notes_data:
             Note.objects.create(
-                user=user,
+                author=user,
                 content_type=company_content_type,
                 object_id=company.id,
                 **note_data
@@ -235,7 +220,6 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
 
         if profile_data:
             CompanyProfile.objects.create(
-                user=user,
                 company=company,
                 **profile_data
             )
@@ -275,7 +259,6 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
             
             for address_data in addresses_data:
                 Address.objects.create(
-                    user=user,
                     content_type=company_content_type,
                     object_id=instance.id,
                     **address_data
@@ -291,7 +274,6 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
                 
             except CompanyProfile.DoesNotExist:
                 CompanyProfile.objects.create(
-                    user=user,
                     company=instance,
                     **profile_data
                 )
