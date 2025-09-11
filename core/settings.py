@@ -226,10 +226,22 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://credi-safe.com",
     "http://localhost:5173",
+    "https://rentsafe-iota.vercel.app", 
+    "https://rentsafe-backend.onrender.com"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG 
+CORS_ALLOW_ALL_ORIGINS = False 
+CORS_SUPPORTS_CREDENTIALS = True
+
+# Cookie settings for cross-origin
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+
+# If using custom cookies
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 if not CORS_ALLOW_ALL_ORIGINS:
     CORS_ALLOWED_ORIGINS = [
@@ -237,7 +249,7 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "http://127.0.0.1:3000",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
-        "rentsafe-backend.onrender.com",
+        "https://rentsafe-backend.onrender.com",
         "https://rentsafe-iota.vercel.app"
     ]
 
@@ -318,10 +330,10 @@ SIMPLE_JWT = {
     "AUTH_COOKIE": "access_token",
     "AUTH_COOKIE_REFRESH": "refresh_token",
     "AUTH_COOKIE_DOMAIN": None,
-    "AUTH_COOKIE_SECURE": DEBUG is False,  # Set to True in production (HTTPS)
     "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_SAMESITE": "None",
+    "AUTH_COOKIE_SECURE": True,
     "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "Lax",  # or 'Strict' or 'None'
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
