@@ -66,7 +66,7 @@ class IndividualViewSet(BaseViewSet):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
-        
+
         except ValidationError as e:
             return self._create_rendered_response(
                 {"error": extract_error_message(e)},
