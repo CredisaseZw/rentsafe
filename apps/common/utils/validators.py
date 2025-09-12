@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 def validate_national_id(national_id, country: str= "zimbabwe") -> bool:
     patterns = {
-        "zimbabwe": r'\d{8,9}[a-zA-Z]+\d{2}$',
+        "zimbabwe": r'\d{8,9}[a-zA-Z]\d{2}$',
         "angola":       r'^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{7}$',
         "south_africa": r'^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{7}$',
         "namibia":      r'^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{7}$',

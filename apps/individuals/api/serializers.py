@@ -77,7 +77,14 @@ class NextOfKinSerializer(serializers.ModelSerializer):
 class ContactDetailsSerializer(serializers.ModelSerializer):
     mobile_phone = serializers.ListField(
         child=serializers.CharField(max_length=15),
-        allow_empty=False
+        allow_empty=False,
+        required=True,
+        min_length=1,
+        error_messages={
+            'required': 'Phone number is required',
+            'null': 'Phone number is required',
+            'blank': 'Phone number is required',
+        }
     )
 
     class Meta:
@@ -104,7 +111,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
         mobile_phone_numbers = data.get("mobile_phone",[])
         normalized_phone = []
         existing_numbers = []
-
+    
         existing_numbers = set(
             normalize_zimbabwe_mobile(phone_number)
             for phone_numbers in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
@@ -201,16 +208,24 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
 
             if not street or not hasattr(suburb, 'id') or not suburb.id:
                 raise ValidationError("Each address must have a street address and suburb_id")
-        if not id_type:
-            raise ValidationError("Identification type is required")
+        if id_type:
+            if id_type == 'national_id':
+                if not id_number or not validate_national_id( id_number):
+                    raise ValidationError("Invalid or missing national id")
+            elif id_type == 'passport':
+                if not id_number:
+                    raise ValidationError("Invalid or missing passport number")
+                if not (5 <= len(id_number) <= 15):
+                    raise ValidationError("Passport number must be between 5 and 15 characters")
+            else:
+                raise ValidationError("Invalid identification type provided")
 
-        for field in ['first_name', 'last_name', 'gender']:
+
+        for field in ['first_name', 'last_name', 'identification_number', 'identification_type']:
             if not data.get(field):
                 raise ValidationError(f"{field.replace('_', ' ').title()} is required")
 
-        if not dob:
-            raise ValidationError("Date of birth is required")
-        if validate_future_dates(dob):
+        if dob and validate_future_dates(dob):
             data['date_of_birth']=dob
         else:
             raise ValidationError("Invalid date of birth, Individual must be at least 18 years old.")
@@ -282,7 +297,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
 
         if id_type:
             if id_type == 'national_id':
-                if not id_number or not validate_national_id(re.sub(r'[-\s]', '', id_number), "zimbabwe"):
+                if not id_number or not validate_national_id(id_number):
                     raise ValidationError("Invalid or missing national id")
             elif id_type == 'passport':
                 if not id_number:
@@ -292,7 +307,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
             else:
                 raise ValidationError("Invalid identification type provided")
 
-        for field in ['first_name', 'last_name', 'gender']:
+        for field in ['first_name', 'last_name', 'identification_number', 'identification_type']:
             if field in data and not data.get(field):
                 raise ValidationError(f"{field.replace('_', ' ').title()} cannot be empty")
 
