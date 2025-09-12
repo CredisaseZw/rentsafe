@@ -377,15 +377,8 @@ class ServiceSpecialPricingViewSet(BaseViewSet):
     serializer_class = ServiceSpecialPricingSerializer
 
     def get_queryset(self):
-        """
-        Optionally restricts the returned special pricing to a given service,
-        by filtering against a `service_id` query parameter in the URL.
-        """
-        queryset = super().get_queryset()
-        service_id = self.request.query_params.get('service_id')
-        if service_id is not None:
-            queryset = queryset.filter(service__id=service_id)
-        return queryset
+        return super().get_queryset()
+
     
     def create(self, request, *args, **kwargs):
        try:
