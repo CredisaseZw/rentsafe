@@ -27,9 +27,9 @@ class Property(BaseModelWithUser):
         ('maintenance', 'Under Maintenance'),
         ('sold', 'Sold'),
     )
-    
+    managing_client = models.ForeignKey('clients.Client', on_delete=models.SET_NULL, related_name='properties', null=True, blank=True)
     property_type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True,null = True)
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=PROPERTY_STATUS_CHOICES, default='active')
@@ -51,13 +51,15 @@ class Property(BaseModelWithUser):
         verbose_name_plural = _('properties')
     
     def __str__(self):
-        return self.name
+        string_ =f"{self.name}" if self.name else f"{self.get_address()}"
+        return string_
 
     def get_address(self):
         return self.addresses.first() if self.addresses.exists() else "No Address"
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            word_to_slug = self.name if self.name else (self.addresses.first().street_address if self.addresses.exists() else "property")
+            self.slug = slugify(word_to_slug)
         super().save(*args, **kwargs)
 
 

@@ -6,6 +6,16 @@ from apps.leases.models import Landlord
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ('id', 'name','total_number_of_units','year_built','get_address')
+    fieldsets = (
+        (None, {
+            'fields': ('managing_client','property_type', 'name', 'description', 'status', 'year_built', 'total_area', 'is_furnished', 'total_number_of_units', 'features')
+        }),
+        ('Timestamps', {
+            'fields': ('date_created', 'date_updated'),
+            'classes': ('collapse',),
+        }),
+    )
+    readonly_fields = ('date_created', 'date_updated')
     search_fields = ('name','total_number_of_units','year_built','addresses')
 
 @admin.register(Unit)
