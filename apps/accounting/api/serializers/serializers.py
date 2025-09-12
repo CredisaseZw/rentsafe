@@ -858,6 +858,13 @@ class ServiceSpecialPricingSerializer(serializers.ModelSerializer):
                 'client_customer_id', 'service_id'
                 ]
     
+    def validate(self, data):
+
+        for field in ['service', 'client_customer', 'individual_charge', 'company_charge', 'currency']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+            
+        return data
 class ServiceStandardPricingSerializer(serializers.ModelSerializer):
     service = serializers.ReadOnlyField(source="service.service_name")
     service_id = serializers.PrimaryKeyRelatedField(
@@ -878,6 +885,19 @@ class ServiceStandardPricingSerializer(serializers.ModelSerializer):
                 'date_updated'
                 ]
         
+    def validate(self, data):
+        if self.instance:
+            return data
+        
+        for field in ['service', 'individual_charge', 'company_charge', 'currency']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+            
+        if ServiceStandardPricing.objects.filter(service=data.get('service'), currency=data.get('currency')).exists():
+            raise ValidationError("Standard pricing for this service and currency already exists.")
+        
+        return data
+
     def to_representation(self, instance):
         date_updated = instance.date_updated.strftime("%d-%B-%Y") if instance.date_updated else None
         

@@ -11,7 +11,7 @@ class ServiceSpecialPricing(BaseModelWithUser):
     service = models.ForeignKey('subscriptions.services', on_delete=models.CASCADE, related_name='special_pricing_options',
                                 help_text=_("The service this special pricing applies to."))
     
-    client_customer = models.OneToOneField('clients.Client', on_delete=models.CASCADE, related_name='special_pricing',
+    client_customer = models.ForeignKey('clients.Client', on_delete=models.CASCADE, related_name='special_pricing',
                 help_text=_("The specific client this special pricing is for."))
 
     individual_charge = models.DecimalField(_("Individual Charge"), max_digits=12, decimal_places=2,

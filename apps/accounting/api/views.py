@@ -401,20 +401,11 @@ class ServiceSpecialPricingViewSet(BaseViewSet):
 
 
 class ServiceStandardPricingViewSet(BaseViewSet):
-    queryset = ServiceStandardPricing.objects.select_related('service', 'currency')
+    queryset = ServiceStandardPricing.objects.select_related('service', 'currency').all()
     serializer_class = ServiceStandardPricingSerializer
 
     def get_queryset(self):
-        """
-        Optionally restricts the returned standard pricing to a given service,
-        by filtering against a `service_id` query parameter in the URL.
-        """
-        logger.info("Fetching standard pricing queryset")
-        queryset = super().get_queryset()
-        service_id = self.request.query_params.get('service_id')
-        if service_id is not None:
-            queryset = queryset.filter(service__id=service_id)
-        return queryset
+        return super().get_queryset()
     
     def create(self, request, *args, **kwargs):
         try:
@@ -426,4 +417,18 @@ class ServiceStandardPricingViewSet(BaseViewSet):
             return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(f"Error creating standard pricing: {e}")
+            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except ValidationError as e:
+            return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error updating standard pricing: {e}")
             return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
