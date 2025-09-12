@@ -24,13 +24,17 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
         fields = ['id', 'payment_method_name']
 
 class PaymentSerializer(serializers.ModelSerializer):
-    method = PaymentMethodSerializer()
+    method = serializers.SerializerMethodField()
     invoice_number = serializers.CharField(source='invoice.document_number')
-    
+    type = serializers.SerializerMethodField()
     class Meta:
         model = Payment
-        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference']
+        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type', 'description']
 
+    def get_type(self, obj):
+        return 'Payment'
+    def get_method(self, obj):
+        return obj.invoice.currency.symbol if obj.invoice else '$'
 
 # Helper serializers for related objects
 class IndividualSerializer(serializers.ModelSerializer):
@@ -47,7 +51,7 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['id', 'currency_code', 'currency_name']
+        fields = ['id', 'currency_code', 'currency_name', 'symbol']
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
     unit = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all())
@@ -282,6 +286,33 @@ class LeaseListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lease
         fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'landlord', 'unit', 'currency', 'risk_level_class', 'owing']
+
+    def get_risk_level_class(self, obj):
+        return obj.risk_level
+
+    def get_unit(self, obj):
+        return {
+            'id': obj.unit.id,
+            'unit_number': obj.unit.unit_number,
+            'property': {
+                'id': obj.unit.property.id,
+                'name': obj.unit.property.name,
+                'type': obj.unit.property.property_type.name if obj.unit.property.property_type else None,
+                'slug': obj.unit.property.slug,
+                'addresses': AddressSerializer(obj.unit.property.addresses.all(), many=True).data,
+            }
+        }
+
+class TenantStatementsListSerializer(serializers.ModelSerializer):
+    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    unit = serializers.SerializerMethodField()
+    currency = serializers.CharField(source='currency.currency_code', read_only=True)
+    risk_level_class = serializers.SerializerMethodField()
+    owing = serializers.FloatField(source='get_latest_balance', read_only=True)
+
+    class Meta:
+        model = Lease
+        fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'unit', 'currency', 'risk_level_class', 'owing']
 
     def get_risk_level_class(self, obj):
         return obj.risk_level

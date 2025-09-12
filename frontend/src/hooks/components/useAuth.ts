@@ -2,10 +2,7 @@ import React from "react";
 import { useState } from "react";
 
 export default function useAuth() {
-   const [status, setStatus] = useState({
-      error: false,
-      isAccount: false,
-   });
+   const [error, setError] = useState<string | null>(null)
    const [loginForm, setLoginForm] = useState({
       username: "",
       password: "",
@@ -23,18 +20,11 @@ export default function useAuth() {
       }));
    };
 
-   const onError = (key: "error" | "isAccount") => {
-      setStatus((prev) => ({
-         ...prev,
-         [key]: !prev[key],
-      }));
-   };
-
    return {
       loginForm,
-      status,
+      error,
       validateForm,
       handleChange,
-      onError,
+      setError,
    };
 }

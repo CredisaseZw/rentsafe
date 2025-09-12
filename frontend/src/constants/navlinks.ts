@@ -16,7 +16,7 @@ import SubscriptionManagement from "@/routes/rent-safe/SubscriptionManagement";
 import Login from "@/routes/Login";
 import Leases from "@/routes/rent-safe/tenants/Leases";
 import LeaseTemplate from "@/routes/rent-safe/tenants/LeaseTemplate";
-import PropertyLIst from "@/routes/rent-safe/properties/PropertyLIst";
+import PropertyList from "@/routes/rent-safe/properties/PropertyList";
 import Sandbox from "@/routes/Sandbox";
 import LandlordStatements from "@/routes/rent-safe/landlords/LandlordStatements";
 import Claim from "@/routes/rent-safe/data/claim";
@@ -55,7 +55,7 @@ export const ROOT_NAVLINKS: NavLink[] = [
    },
 ];
 
-const RENTSAFE_PRE_SEG = "/services/rent-safe";
+export const RENTSAFE_PRE_SEG = "/services/rent-safe";
 export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
       label: "Dashboard",
@@ -101,7 +101,7 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
             label: "Property List",
             path: RENTSAFE_PRE_SEG + "/property-list",
             segment: RENTSAFE_PRE_SEG + "/properties/property-list",
-            pageComponent: PropertyLIst,
+            pageComponent: PropertyList,
          }
       ],
    },

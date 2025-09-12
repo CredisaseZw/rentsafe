@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from apps.common.models.models import Country
 from apps.individuals.models.models import Individual, EmploymentDetail, NextOfKin, Note, Document, IndividualContactDetail
-from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer
+from apps.common.api.serializers import AddressSerializer, NoteSerializer, DocumentSerializer,AddressCreateSerializer
 from apps.common.utils.validators import (
     validate_email,
     normalize_zimbabwe_mobile, 
@@ -13,7 +13,7 @@ from apps.common.utils.validators import (
 )
 from apps.individuals.utils.helpers import(
      individual_notes_helper,
-     individual_address_helper, 
+     create_address_helper, 
      individual_contact_helper, 
      individual_documents_helper, 
      individual_next_of_kin_helper,
@@ -179,49 +179,30 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
 
     
 class IndividualCreateSerializer(serializers.ModelSerializer):
-    addresses = AddressSerializer(many=True, required=True)
+    addresses = AddressCreateSerializer(many=True, required=True)
     employment_details = EmploymentDetailSerializer(many=True, required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
     contact_details = ContactDetailsSerializer(many=True, required=False)
-    notes = NoteSerializer(many=True, required=False)
-    documents = DocumentSerializer(many=True, required=False)
     class Meta:
         model = Individual
         fields = [
             'id','first_name', 'last_name', 'date_of_birth', 'gender','marital_status',
             'identification_type', 'identification_number','contact_details',
-            'addresses', 'employment_details', 'next_of_kin', 'documents','notes'
+            'addresses', 'employment_details', 'next_of_kin'
         ]
     def validate(self, data):
         id_type = data.get('identification_type')
         id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
         dob = data.get('date_of_birth')
         addresses = data.get('addresses', [])
-
-        country_id = None
-        country_name = None
         for address in addresses:
-            country_id = address.get('country_id')
-            if country_id:
-                break
+            street = address.get('street_address')
+            suburb = address.get('suburb') 
 
+            if not street or not hasattr(suburb, 'id') or not suburb.id:
+                raise ValidationError("Each address must have a street address and suburb_id")
         if not id_type:
-            if country_id:
-                id_type = 'national_id'
-                country = Country.objects.filter(id=country_id).first()
-                country_name = country.name
-            else:
-                raise ValidationError("Identification type is required")
-        if id_type == 'national_id':
-            if not id_number or not validate_national_id(id_number, country_name or "zimbabwe"):
-                raise ValidationError("Invalid or missing national id")
-        elif id_type == 'passport':
-            if not id_number:
-                raise ValidationError("Invalid or missing passport number")
-            if (len(id_number) < 5 or len(id_number) > 15):
-                raise ValidationError("Invalid Passport number")
-        else:
-            raise ValidationError("Invalid identification type provided")
+            raise ValidationError("Identification type is required")
 
         for field in ['first_name', 'last_name', 'gender']:
             if not data.get(field):
@@ -232,27 +213,32 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         if validate_future_dates(dob):
             data['date_of_birth']=dob
         else:
-            raise ValidationError("Invalid date of birth")
+            raise ValidationError("Invalid date of birth, Individual must be at least 18 years old.")
         existing = Individual.objects.filter(identification_number__iexact=id_number).first()
-        
+
         if existing and not existing.is_deleted:
                 raise ValidationError(
                     f"This identification number {id_number} is already registered and active."
                 )
         else: 
             self._existing_individual = existing 
-        
+
         return data
 
     @transaction.atomic
     def create(self, validated_data):
-        address_data = validated_data.pop('addresses', [])
+        address_data  = [
+            {
+                'street_address': addr.get('street_address'),
+                'address_type': addr.get('address_type'),
+                'line_2': addr.get('line_2'),
+                'suburb': addr.get('suburb').instance if hasattr(addr.get('suburb'), 'instance') else addr.get('suburb'),
+            }
+            for addr in validated_data.pop('addresses', [])
+        ]
         employment_data = validated_data.pop('employment_details', [])
         kin_data = validated_data.pop('next_of_kin', [])
         contact_data= validated_data.pop('contact_details', [])
-        documents_data = validated_data.pop('documents',[])
-        notes_data = validated_data.pop('notes', [])
-        user = self.context.get('user')
         
         individual = getattr(self,'_existing_individual', None)
         if individual:
@@ -265,11 +251,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             individual = Individual.objects.create(**validated_data)
 
         individual_ct = ContentType.objects.get_for_model(individual)
-        
-        individual_address_helper(individual_ct, address_data, individual.pk)
-        individual_documents_helper(individual_ct, documents_data, individual.pk)
-        individual_notes_helper(individual_ct, notes_data, individual.pk)
-
+        create_address_helper(individual_ct, address_data, individual.pk)
         individual_contact_helper(individual, contact_data)
         individual_employment_details_helper(individual, employment_data)
         individual_next_of_kin_helper(individual, kin_data)

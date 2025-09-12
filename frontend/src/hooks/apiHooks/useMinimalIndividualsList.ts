@@ -11,7 +11,7 @@ export default function useMinimalIndividualsList(individualQuery?: string) {
    const { data, isLoading, error } = useQuery({
       queryKey: ["individuals-minimal", q, page],
       queryFn: () => {
-         const query = q ? `search/?q=${encodeURIComponent(q)}` : "";
+         const query = q ? `?search=${encodeURIComponent(q)}` : "";
          return api
             .get(`/api/individuals/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`)
             .then((res) => res.data);

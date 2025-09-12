@@ -1,7 +1,8 @@
-import type { AddressType, CompanyLegalStatus, Route } from "@/types";
+import type { AddressType, CompanyLegalStatus, Header, Route, TenantSelection } from "@/types";
 import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
+import type {Option} from "@/types/index"
 
 import {
    RENT_ADMIN_PANEL_NAVLINKS,
@@ -71,3 +72,95 @@ export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] 
    "ngo",
    "other",
 ];
+
+export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
+  slate:   { bg: "bg-slate-200", text: "text-slate-800" },
+  gray:    { bg: "bg-gray-200", text: "text-gray-800" },
+  zinc:    { bg: "bg-zinc-200", text: "text-zinc-800" },
+  neutral: { bg: "bg-neutral-200", text: "text-neutral-800" },
+  stone:   { bg: "bg-stone-200", text: "text-stone-800" },
+  red:     { bg: "bg-red-200", text: "text-red-800" },
+  orange:  { bg: "bg-orange-200", text: "text-orange-800" },
+  amber:   { bg: "bg-amber-200", text: "text-amber-800" },
+  yellow:  { bg: "bg-yellow-200", text: "text-yellow-800" },
+  lime:    { bg: "bg-lime-200", text: "text-lime-800" },
+  green:   { bg: "bg-green-200", text: "text-green-800" },
+  emerald: { bg: "bg-emerald-200", text: "text-emerald-800" },
+  teal:    { bg: "bg-teal-200", text: "text-teal-800" },
+  cyan:    { bg: "bg-cyan-200", text: "text-cyan-800" },
+  sky:     { bg: "bg-sky-200", text: "text-sky-800" },
+  blue:    { bg: "bg-blue-200", text: "text-blue-800" },
+  indigo:  { bg: "bg-indigo-200", text: "text-indigo-800" },
+  violet:  { bg: "bg-violet-200", text: "text-violet-800" },
+  purple:  { bg: "bg-purple-200", text: "text-purple-800" },
+  fuchsia: { bg: "bg-fuchsia-200", text: "text-fuchsia-800" },
+  pink:    { bg: "bg-pink-200", text: "text-pink-800" },
+  rose:    { bg: "bg-rose-200", text: "text-rose-800" },
+};
+
+export const MINIMAL_TENANT_OBJECT: TenantSelection = {
+   id : 0,
+   search_value : "",
+   full_name : "",
+   identification_number : "", 
+   mobile_number : "",
+   address : null,
+   is_primary : false
+
+}
+
+export const IN_LEASE_CLIENT_TYPES: Option[] = [
+   { label: "Individual", value: "individual" },
+   { label: "Company", value: "company" },
+];
+
+export const STATUS_OPTIONS: Option[] = [
+   { label: "Occupied", value: "occupied" },
+   { label: "Vacant", value: "vacant" },
+];
+
+export const LEASE_STATUS_OPTIONS: Option[] = [
+   { label: "Active", value: "ACTIVE" },
+   { label: "Draft", value: "DRAFT" },
+   { label: "Pending Approval", value: "PENDING_APPROVAL" },
+   { label: "Terminated", value: "TERMINATED" },
+   { label: "Expired", value: "EXPIRED" },
+   { label: "Renewed", value: "RENEWED" },
+   { label: "Suspended", value: "SUSPENDED" },
+];
+
+export const PAYMENT_FREQUENCY_OPTIONS: Option[] = [
+   { label: "Monthly", value: "MONTHLY" },
+   { label: "Quarterly", value: "QUARTERLY" },
+   { label: "Annually", value: "ANNUALLY" },
+];
+
+export const DEPOSIT_HOLDER_OPTIONS: Option[] = [
+   { label: "Agent", value: "agent" },
+   { label: "Landlord", value: "landlord" },
+];
+
+export const UNIT_TYPES: Option[] = [
+   { label: "Apartment", value: "apartment" },
+   { label: "House", value: "house" },
+   { label: "Office", value: "office" },
+   { label: "Retail Space", value: "retail space" },
+   { label: "Warehouse", value: "warehouse" },
+   { label: "Other", value: "other" },
+];
+
+export const TENANT_STATEMENTS_HEADERS: Header[] = [
+   {name : "Lease ID"},
+   {name : "Customer name"},
+   {name : "Address"},
+   {name : "Rent Owing"},
+   {name : "Action"}
+]
+
+export const TENANT_STATEMENT_HEADERS: Header[] = [
+   {name : "Date"},
+   {name : "Description", textAlign : "left"},
+   {name : "Reference"},
+   {name : "Amount", textAlign: "end"},
+   {name : "Balance", textAlign :"end"}
+]

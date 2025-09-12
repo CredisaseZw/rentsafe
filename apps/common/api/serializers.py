@@ -224,75 +224,29 @@ class AddressSerializer(serializers.ModelSerializer):
         """
         raise NotImplementedError("Address update should be handled by the parent serializer")
 
-class AddressSerializers(serializers.ModelSerializer):
+class AddressCreateSerializer(serializers.ModelSerializer):
     """Serializer for Address model with nested location data"""
-    country_name = serializers.CharField(source='country.name', read_only=True)
-    province_name = serializers.CharField(source='province.name', read_only=True)
-    city_name = serializers.CharField(source='city.name', read_only=True)
-    suburb_name = serializers.CharField(source='suburb.name', read_only=True)
-    address_type_display = serializers.CharField(source='get_address_type_display', read_only=True)
-
-    country = serializers.PrimaryKeyRelatedField(
-        queryset=Country.objects.all(), write_only=True, allow_null=True, required=False
+    suburb_id = serializers.PrimaryKeyRelatedField(
+        queryset=Suburb.objects.filter(is_active=True),
+        source='suburb',
+        write_only=True,
+        required=True
     )
-    province = serializers.PrimaryKeyRelatedField(
-        queryset=Province.objects.all(), write_only=True, allow_null=True, required=False
-    )
-    city = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.all(), write_only=True
-    )
-    suburb = serializers.PrimaryKeyRelatedField(
-        queryset=Suburb.objects.all(), write_only=True, allow_null=True, required=False
-    )
-    
     class Meta:
         model = Address
         fields = [
-            'id', 'address_type', 'address_type_display', 'is_primary',
-            'country', 'country_name', 'province', 'province_name', 
-            'city', 'city_name', 'suburb', 'suburb_name',
-            'street_address', 'line_2', 'postal_code',
-            'latitude', 'longitude', 'date_created', 'date_updated'
+            'id',
+            'address_type',
+            'is_primary',
+            'street_address',
+            'line_2',
+            'postal_code',
+            'latitude',
+            'longitude',
+            'suburb_id',
+            'date_created', 'date_updated'
         ]
-        read_only_fields = ['date_created', 'date_updated','city_name', 'province_name', 'country_name', 'suburb_name', 'address_type_display']
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Address.objects.all(),
-                fields=['content_type', 'object_id', 'address_type', 'is_primary'],
-                message="An address with this combination of content type, object ID, address type, and primary status already exists."
-            )
-        ]
-
-    def validate(self, data):
-        city_instance = data.get('city')
-        province_instance = data.get('province')
-        country_instance = data.get('country')
-        suburb_instance = data.get('suburb')
-
-        if suburb_instance and city_instance and suburb_instance.city != city_instance:
-            raise serializers.ValidationError({"suburb": f"Suburb '{suburb_instance.name}' does not belong to city '{city_instance.name}'."})
-        
-        if city_instance and province_instance and city_instance.province != province_instance:
-            raise serializers.ValidationError({"city": f"City '{city_instance.name}' does not belong to province '{province_instance.name}'."})
-        
-        if province_instance and country_instance and province_instance.country != country_instance:
-            raise serializers.ValidationError({"province": f"Province '{province_instance.name}' does not belong to country '{country_instance.name}'."})
-
-        return data
-
-    def create(self, validated_data):
-        print("Creating address with data:", validated_data)
-        content_type = self.context.get('content_type')
-        
-        object_id = self.context.get('object_id')
-        if not content_type or not object_id:
-            raise serializers.ValidationError("Content type and object ID are required for address creation.")
-        validated_data['content_type'] = content_type
-        validated_data['object_id'] = object_id
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
+        read_only_fields = ['id', 'date_created', 'date_updated']
 
 
 class DocumentSerializer(serializers.ModelSerializer):

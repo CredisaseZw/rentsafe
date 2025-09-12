@@ -9,7 +9,7 @@ interface SearchboxProps {
 
 function Searchbox({ handleSearch, placeholder, clearSearch }: SearchboxProps) {
    const [searchValue, setSearchValue] = useState("");
-
+ 
    const onClearSearch = () => {
       setSearchValue("");
       clearSearch?.()
@@ -31,7 +31,7 @@ function Searchbox({ handleSearch, placeholder, clearSearch }: SearchboxProps) {
             name="search_value "
             className="h-fit max-w-[400px] text-sm  rounded-none border-none bg-transparent px-3 py-3 text-gray-600 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
          />
-
+      
          <Button
             className="text-gray-400"
             type="submit"
