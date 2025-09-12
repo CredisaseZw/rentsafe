@@ -76,14 +76,14 @@ class LeaseViewSet(viewsets.ModelViewSet):
             )
         # Filter by staff/admin
         if user.is_staff or user.is_superuser:
-            return queryset.filter(created_by__client=user.client)
+            return queryset.filter(managing_client=user.client)
 
         # Filter by client user
         try:
             if hasattr(user, 'client') and user.client:
-                return queryset.filter(created_by=user)
+                return queryset.filter(managing_client=user.client)
             else:
-                return queryset.none()
+                return queryset.filter(created_by=user)
         except Exception as e:
             logger.error(f"Error filtering queryset for user {user.id}: {e}")
             return queryset.none()

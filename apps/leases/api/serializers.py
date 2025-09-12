@@ -1,6 +1,7 @@
 # apps/leases/serializers.py
 from rest_framework import serializers
 from django.db import transaction
+from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
 
@@ -468,17 +469,15 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("No active Rentsafe subscription found or the subscription has expired.")
         # New validation to prevent duplicate property creation
         if data.get('property_data'):
-            if property_name := data['property_data'].get('name'):
-                # Assuming the slug is generated from the name
-                property_slug = slugify(property_name)
-                if Lease.objects.filter(
-                    unit__property__slug=property_slug, 
-                    unit__unit_number=data['unit_data'].get('unit_number'), 
-                    status='ACTIVE'
-                ).exists():
-                    raise serializers.ValidationError(
-                        "This unit is already associated with an active lease."
-                    )
+            # Assuming the slug is generated from the name
+            if Lease.objects.filter(
+                unit__property__addresses__street_address=data['address_data'].get('street_address'), 
+                unit__unit_number=data['unit_data'].get('unit_number'),
+                status='ACTIVE'
+            ).exists():
+                raise serializers.ValidationError(
+                    "This unit is already associated with an active lease."
+                )
 
         # Remove lease field from tenants and charges if present
         tenants_data = data.get('tenants', [])
