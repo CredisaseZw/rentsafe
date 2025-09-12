@@ -225,10 +225,11 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             if not data.get(field):
                 raise ValidationError(f"{field.replace('_', ' ').title()} is required")
 
-        if dob and validate_future_dates(dob):
-            data['date_of_birth']=dob
-        else:
-            raise ValidationError("Invalid date of birth, Individual must be at least 18 years old.")
+        if dob is not None:
+            if validate_future_dates(dob):
+                data['date_of_birth'] = dob
+            else:
+                raise ValidationError("Invalid date of birth, Individual must be at least 18 years old.")
         existing = Individual.objects.filter(identification_number__iexact=id_number).first()
 
         if existing and not existing.is_deleted:
