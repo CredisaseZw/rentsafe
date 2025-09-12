@@ -7,6 +7,8 @@ from django.utils.text import slugify
 from django.contrib.contenttypes.fields import GenericRelation
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.common.models.models import Address, Document, Note
+import random
+import string
 
 class PropertyType(BaseModel):
     name = models.CharField(max_length=255)
@@ -54,12 +56,15 @@ class Property(BaseModelWithUser):
         string_ =f"{self.name}" if self.name else f"{self.get_address()}"
         return string_
 
+    def generate_unique_slug(self):
+        random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+        return slugify(self.name) if self.name else slugify(random_string)
+    
     def get_address(self):
         return self.addresses.first() if self.addresses.exists() else "No Address"
     def save(self, *args, **kwargs):
         if not self.slug:
-            word_to_slug = self.name if self.name else (self.addresses.first().street_address if self.addresses.exists() else "property")
-            self.slug = slugify(word_to_slug)
+            self.slug = self.generate_unique_slug()
         super().save(*args, **kwargs)
 
 
