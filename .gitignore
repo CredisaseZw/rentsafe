@@ -11,6 +11,10 @@ __pycache__/
 *.pot
 node_modules/
 .venv/
+.vscode*
+.vscode/tasks.json
+settings.json
+.idea/
 .vscode/tasks.json
 staticfiles/
 static/
