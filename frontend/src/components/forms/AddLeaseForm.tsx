@@ -87,7 +87,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
       toast.error("Failed to fetch currencies", { description: message });
       return;
     }
-    if (currencyData) { SET_CURRENCY_OPTIONS(currencyData.results ?? []) }
+    if (currencyData) { SET_CURRENCY_OPTIONS(currencyData ?? []) }
   }, [currencyData, currencyData])
 
   return (
@@ -97,46 +97,49 @@ function AddLeaseForm({clientType, successCallback} :props) {
           clientType = {clientType}
           setPrimaryTenantAddress = {setPrimaryTenantAddress}/>
       </div>
-      <div className="mt-5">
-        <Fieldset legendTitle="Rent Guarantor">
-          <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
-            <div className="form-group">
-              <AutoCompleteClient
-                searchItem = {guaranteeItem}
-                setSearchItem = {setGuaranteeItem}
-                clientType = {"individual"}
-                clientLabel= {"Rent Guarantor ID"}
-                onSelectValue = {onSelectGuarantor}
-              />
-            </div>
-            <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
-                  Rent Guarantor Name
-              </Label>
-              <Input
-                  name={`rentGuarantorName`}
-                  id="rentGuarantorName"
-                  readOnly
-                  value={formData.guarantor_name}
-              />
-            </div>
-            <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="rentGuarantorName">
-                  Guarantee Amount 
-              </Label>
-              <Input 
-                  type= "number" 
-                  step={0.01}
-                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
-                  onKeyDown={validateAmounts}
-                  required
-                  name={`rentGuaranteeAmount`}
-                  id="rentGuaranteeAmount"
-              />
-            </div>
-          </ColumnsContainer>
-        </Fieldset>
-      </div>
+      {
+        clientType === "company" &&
+        <div className="mt-5">
+          <Fieldset legendTitle="Rent Guarantor">
+            <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
+              <div className="form-group">
+                <AutoCompleteClient
+                  isRequired = {false}
+                  searchItem = {guaranteeItem}
+                  setSearchItem = {setGuaranteeItem}
+                  clientType = {"individual"}
+                  clientLabel= {"Rent Guarantor ID"}
+                  onSelectValue = {onSelectGuarantor}
+                />
+              </div>
+              <div className="form-group">
+                <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
+                    Rent Guarantor Name
+                </Label>
+                <Input
+                    name={`rentGuarantorName`}
+                    id="rentGuarantorName"
+                    readOnly
+                    value={formData.guarantor_name}
+                />
+              </div>
+              <div className="form-group">
+                <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
+                    Guarantee Amount 
+                </Label>
+                <Input 
+                    type= "number" 
+                    step={0.01}
+                    onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                    onKeyDown={validateAmounts}
+                    name={`rentGuaranteeAmount`}
+                    id="rentGuaranteeAmount"
+                />
+              </div>
+            </ColumnsContainer>
+          </Fieldset>
+        </div>
+      }
       <div className="mt-5">
         <Fieldset legendTitle = {"Unit Details"}>
           <ColumnsContainer gapClass="gap-6" marginClass="mt-0" numberOfCols={3}>

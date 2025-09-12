@@ -12,6 +12,7 @@ interface Props {
   clientLabel: string;
   searchItem : string,
   clientType : string,
+  isRequired?: boolean,
   createClient?: boolean,
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>
   onSelectValue? : (item: IndividualMinimal | BranchFull, index? : number) => void;
@@ -19,13 +20,14 @@ interface Props {
   multiSetSearchItem? : (index: number, key:string, value: string) => void;
 }
 
-function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantAddress ,clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem }: Props) {
+function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantAddress ,clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem, isRequired}: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
   const path = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
+    console.log(isRequired);
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
     return () => clearTimeout(handler);
   }, [searchItem]);
@@ -38,10 +40,12 @@ function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantA
 
   return (
     <div className="form-group relative">
-      <label className="required">{clientLabel}</label>
+      <label className={isRequired === false ?  "": "required"}>
+          {clientLabel}
+        </label>
       <Input
         type="text"
-        required
+        required = {isRequired === false  ? false : true}
         name = "search_client"
         autoComplete="off"
         onChange={(e) => {

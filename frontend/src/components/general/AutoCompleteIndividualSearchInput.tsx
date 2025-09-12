@@ -66,10 +66,10 @@ export default function AutoCompleteIndividualSearchInput({ number }: { number: 
                   <div className="flex items-center justify-center py-5">
                      <Loader2 className="text-foreground/60 animate-spin" />
                   </div>
-               ) : !individuals?.length ? (
+               ) : !individuals.results?.length ? (
                   <div className="p-2 text-gray-800 dark:text-white">No results found</div>
                ) : (
-                  individuals?.map((individual: IndividualMinimal) => (
+                  individuals.results?.map((individual: IndividualMinimal) => (
                      <button
                         key={individual.id}
                         type="button"

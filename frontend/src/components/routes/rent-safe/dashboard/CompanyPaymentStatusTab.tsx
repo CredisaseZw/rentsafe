@@ -20,12 +20,12 @@ export default function CompanyPaymentStatusTab() {
             paginationName="company_page"
             isLoading={isLoading}
             tableActions={
-               <div className="flex items-center justify-between gap-2">
+               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
                   <form
                      onSubmit={handleSearch}
-                     className="border-color flex items-center rounded-sm border bg-transparent"
+                     className="border-color flex w-full sm:w-auto items-center rounded-sm border bg-transparent"
                   >
-                     <Button 
+                     <Button
                         onClick={clearSearch}
                         type="button"
                         variant="ghost"
@@ -40,8 +40,8 @@ export default function CompanyPaymentStatusTab() {
                         name="company_q"
                         required
                         defaultValue={searchQuery}
-                        className="h-fit max-w-[400px] text-sm  rounded-none border-none bg-transparent px-3 py-3 text-gray-600 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
-                       />
+                        className="flex-1 min-w-0 w-full sm:max-w-[400px] text-sm rounded-none border-none bg-transparent px-3 py-3 text-gray-600 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 active:ring-0 active:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
+                     />
                      <Button
                         type="submit"
                         variant="ghost"
@@ -52,7 +52,7 @@ export default function CompanyPaymentStatusTab() {
                      </Button>
                   </form>
 
-                  <div className="flex flex-row gap-3">
+                  <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-between lg:justify-end">
                      <BranchForm />
                      <CompanyForm />
                   </div>

@@ -32,6 +32,7 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
                         <ColumnsContainer numberOfCols={4} marginClass="mt-0" gapClass="gap-6">
                             <AutoCompleteClient
                                 index = {index}
+                                isRequired = {false}
                                 searchItem = {user.search_value || ""}
                                 createClient = {true}
                                 multiSetSearchItem  = {updateTenant}

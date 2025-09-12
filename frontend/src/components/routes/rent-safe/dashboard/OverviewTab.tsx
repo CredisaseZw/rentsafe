@@ -4,17 +4,25 @@ import OverviewCard from "./OverviewCard";
 
 export default function OverviewTab() {
    return (
-      <div>
+      <div className="w-full">
          <SectionHeading>Your Payment Status</SectionHeading>
 
-         <div className="mb-5 flex items-center gap-5">
-            <OverviewCard label="Risk Level" value="Low Risk" valueClassName="bg-green-700 text-white" />
-            <OverviewCard label="Oldest Creditor" value="Jerad Spiwe" valueClassName="bg-red-600 text-white" />
+         <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-5">
+            <OverviewCard
+               label="Risk Level"
+               value="Low Risk"
+               valueClassName="bg-green-700 text-white"
+            />
+            <OverviewCard
+               label="Oldest Creditor"
+               value="Jerad Spiwe"
+               valueClassName="bg-red-600 text-white"
+            />
          </div>
 
          <SectionHeading>Credit Summary</SectionHeading>
 
-         <div className="grid grid-cols-2 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CreditSummary
                title="Credit Given"
                amounts={{

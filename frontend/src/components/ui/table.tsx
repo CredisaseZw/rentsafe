@@ -1,10 +1,11 @@
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
    return (
-      <div data-slot="table-container" className="relative w-full overflow-x-auto">
+      <div data-slot="table-container" className="table-container w-full overflow-auto">
          <table data-slot="table" className={cn("w-full caption-bottom text-sm", className)} {...props} />
       </div>
    );
@@ -77,6 +78,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
             "text-zinc-700 dark:text-zinc-200",
          
             className,
+            
          )}
          {...props}
       />

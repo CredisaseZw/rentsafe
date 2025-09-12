@@ -69,6 +69,8 @@ export interface IndividualPayload {
 export interface BranchPayload {
    company: number;
    branch_name: string;
+   email : string,
+   phone:  string,
    addresses: AddressPayload[];
    contacts: ContactPayload[];
 }
