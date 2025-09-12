@@ -27,19 +27,16 @@ def individual_contact_helper(instance, contact_data):
             update_upsert(IndividualContactDetail, lookup, contact) 
     return None
 
-def individual_address_helper(content_type, address_data, object_id):
-    for address in address_data:  
-        address_id = address.get('id')  
-        lookup = {  
-            'id': address_id,  
-            'content_type': content_type,  
-            'object_id': object_id 
-        } if address_id else {  
-            'content_type': content_type,  
-            'object_id': object_id,  
-            'address_type': address.get('address_type')  
-        }  
-        update_upsert(Address, lookup, address) 
+def create_address_helper(content_type, address_data, object_id):
+    for address in address_data: 
+        Address.objects.create(
+            content_type=content_type,
+            object_id=object_id,
+            suburb=address.get('suburb'),
+            street_address=address.get('street_address'),
+            address_type=address.get('address_type', 'physical'),
+            is_primary=address.get('is_primary', False),
+        )
     return None
 
 def individual_employment_details_helper(instance, employment_data):

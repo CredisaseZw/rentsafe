@@ -160,7 +160,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
 DB_USERNAME = os.getenv('DB_USERNAME' , None)
 DB_PASS     = os.getenv('DB_PASS'     , None)
-DB_HOST     = os.getenv('DB_HOST'     , None)
+DB_HOST     = os.getenv('DB_HOST'     , 'db')
 DB_PORT     = os.getenv('DB_PORT'     , None)
 DB_NAME     = os.getenv('DB_NAME'     , None)
 
@@ -261,6 +261,9 @@ CORS_ALLOW_METHODS = [
     'DELETE',
     'OPTIONS',
 ]
+
+
+
 
 # CRON JOBS
 # https://django-cron.readthedocs.io/en/latest/installation.html#installation
@@ -580,9 +583,8 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = "login"

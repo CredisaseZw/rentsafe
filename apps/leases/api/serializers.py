@@ -29,8 +29,8 @@ class PaymentSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     class Meta:
         model = Payment
-        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type']
-    
+        fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type', 'description']
+
     def get_type(self, obj):
         return 'Payment'
     def get_method(self, obj):
