@@ -321,7 +321,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
 
         individual_ct = ContentType.objects.get_for_model(instance)
         
-        individual_address_helper(individual_ct, address_data, instance.pk)
+        create_address_helper(individual_ct, address_data, instance.pk)
         individual_documents_helper(individual_ct, documents_data, instance.pk)
         individual_notes_helper(individual_ct, notes_data, instance.pk)
 
