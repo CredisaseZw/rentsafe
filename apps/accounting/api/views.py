@@ -375,8 +375,14 @@ class DisbursementViewSet(viewsets.ReadOnlyModelViewSet):
 class ServiceSpecialPricingViewSet(BaseViewSet):
     queryset = ServiceSpecialPricing.objects.select_related('service', 'client_customer', 'currency').all()
     serializer_class = ServiceSpecialPricingSerializer
-
+    lookup_field ='client_customer'
     def get_queryset(self):
+        if search := self.request.query_params.get('search'):
+            return super().get_queryset().filter(
+                Q(service__service_name__icontains=search) |
+                Q(client_customer__name__icontains=search) |
+                Q(currency__currency_code__icontains=search)
+            )
         return super().get_queryset()
 
     
@@ -391,6 +397,16 @@ class ServiceSpecialPricingViewSet(BaseViewSet):
        except Exception as e:
            logger.error(f"Error creating special pricing: {e}")
            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def retrieve(self, request, client_customer=None, *args, **kwargs):
+        try:
+            instance = Client.objects.get(id=client_customer)
+            instance = self.get_queryset().filter(client_customer=instance)
+            serializer = self.get_serializer(instance, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving special pricing: {e}")
+            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ServiceStandardPricingViewSet(BaseViewSet):
