@@ -267,7 +267,7 @@ export type TenantPayload = {
 };
 
 export type guarantorPayload = {
-   guarantor_type: "individual" | "company";
+   guarantor_type: string;
    guarantor_id: number;
    guarantee_amount: string;
 };
@@ -330,7 +330,7 @@ export type LeasePayload = {
 
   address_data: ShortSuburbAddressData
   landlord_data: LandlordInput
-  guarantor_data: guarantorPayload 
+  guarantor_data?: guarantorPayload 
   tenants: TenantPayload[];
 
   charges: {

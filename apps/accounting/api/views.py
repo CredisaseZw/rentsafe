@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.exceptions import ValidationError
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404
 from urllib import request
@@ -20,7 +21,7 @@ from apps.accounting.models.models import (
     CashBook,Currency,CreditNote,
 )
 from apps.accounting.api.serializers.serializers import (
-    SalesItemSerializer,VATSettingSerializer,
+    SalesItemSerializer, ServiceSpecialPricingSerializer, ServiceStandardPricingSerializer,VATSettingSerializer,
     SalesCategorySerializer,SalesAccountSerializer,
     CashSaleSerializer, CashbookEntrySerializer,
     GeneralLedgerAccountSerializer, JournalEntrySerializer,
@@ -30,6 +31,9 @@ from apps.accounting.api.serializers.serializers import (
     TransactionTypeSerializer,CashBookSerializer,
     CurrencySerializer,CreditNoteSerializer, DisbursementSerializer
 )
+from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
+from apps.common.api.views import BaseViewSet
+from apps.common.utils.helpers import extract_error_message
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
@@ -367,3 +371,73 @@ class DisbursementViewSet(viewsets.ReadOnlyModelViewSet):
             'total_pending': total_pending,
             'transactions': serializer.data
         })
+
+class ServiceSpecialPricingViewSet(BaseViewSet):
+    queryset = ServiceSpecialPricing.objects.select_related('service', 'client_customer', 'currency').all()
+    serializer_class = ServiceSpecialPricingSerializer
+    lookup_field ='client_customer'
+    def get_queryset(self):
+        if search := self.request.query_params.get('search'):
+            return super().get_queryset().filter(
+                Q(service__service_name__icontains=search) |
+                Q(client_customer__name__icontains=search) |
+                Q(currency__currency_code__icontains=search)
+            )
+        return super().get_queryset()
+
+    
+    def create(self, request, *args, **kwargs):
+       try:
+           serializer = self.get_serializer(data=request.data)
+           serializer.is_valid(raise_exception=True)
+           self.perform_create(serializer)
+           return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+       except ValidationError as e:
+           return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
+       except Exception as e:
+           logger.error(f"Error creating special pricing: {e}")
+           return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def retrieve(self, request, client_customer=None, *args, **kwargs):
+        try:
+            instance = Client.objects.get(id=client_customer)
+            instance = self.get_queryset().filter(client_customer=instance)
+            serializer = self.get_serializer(instance, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving special pricing: {e}")
+            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ServiceStandardPricingViewSet(BaseViewSet):
+    queryset = ServiceStandardPricing.objects.select_related('service', 'currency').all()
+    serializer_class = ServiceStandardPricingSerializer
+
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error creating standard pricing: {e}")
+            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except ValidationError as e:
+            return self._create_rendered_response({'error': extract_error_message(e)}, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error updating standard pricing: {e}")
+            return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)

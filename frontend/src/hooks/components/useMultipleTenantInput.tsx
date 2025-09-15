@@ -1,5 +1,5 @@
 import { MINIMAL_TENANT_OBJECT } from "@/constants";
-import type { BranchFull, IndividualMinimal, IndividualTenantContact } from "@/interfaces";
+import type { BranchFull, IndividualMinimal } from "@/interfaces";
 import { extractTenantBranchContact } from "@/lib/utils";
 import type { TenantSelection } from "@/types";
 import { useEffect, useState } from "react"
@@ -48,9 +48,7 @@ export default function useMultiTenantInput(clientType: string){
                         id : selectedTenant.id,
                         full_name : `${selectedTenant.first_name} ${selectedTenant.last_name}`,
                         identification_number : selectedTenant.identification_number,
-                        mobile_number: Array.isArray(selectedTenant.contact_details?.mobile_phone)
-                        ? selectedTenant.contact_details?.mobile_phone?.[0] ?? ""
-                        : (selectedTenant.contact_details?.mobile_phone as IndividualTenantContact)?.mobile_phone ?? "",
+                        mobile_number: selectedTenant.contact_details?.mobile_phone as unknown as string || "-",
                         address : selectedTenant.primary_address ?? null
                     }   
                     : tenant

@@ -17,7 +17,7 @@ interface TableBaseProps {
 
 export function TableBase({ paginationData, paginationName, isLoading, headers, children, headerClass, isError}: TableBaseProps) {
    return (
-      <div>
+     <div>
          <Table className="border-color rounded border">
             <TableHeader className={`bg-gray-100 dark:bg-zinc-900 ${headerClass}`}>
                <TableRow>
@@ -46,7 +46,7 @@ export function TableBase({ paginationData, paginationName, isLoading, headers, 
                      <TableCell colSpan={headers && headers.length}>
                         <div className="flex flex-row items-center justify-center gap-3 py-4 text-red-600">
                            <TriangleAlert size={18} />
-                           An error occured.
+                           An error occurred.
                         </div>
                      </TableCell>
                   </TableRow>

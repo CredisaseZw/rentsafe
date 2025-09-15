@@ -238,9 +238,9 @@ function useAddIndividualLease() {
         landlord_id: Number(formData.landlord_id)
       },
       guarantor_data: {
-        guarantor_type: String("individual") as LeasePayload["guarantor_data"]["guarantor_type"],
-        guarantor_id: Number(formData.guarantor_id),
-        guarantee_amount: String(data.rentGuaranteeAmount)
+        guarantor_type: String("individual"),
+        guarantor_id: Number(formData.guarantor_id ?? 0),
+        guarantee_amount: String(data.rentGuaranteeAmount ?? "0"),
       },
       tenants : tenants,
       charges: [
@@ -282,6 +282,7 @@ function useAddIndividualLease() {
         }
       ]
     };
+    if(Number(formData.guarantor_id ?? 0) === 0) delete PAYLOAD.guarantor_data
   
     useMutate.mutate(PAYLOAD, {
         onError: (error: AxiosError |Error | unknown) => {

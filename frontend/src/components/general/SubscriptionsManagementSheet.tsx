@@ -50,7 +50,7 @@ export function SubscriptionSheet() {
           View Subscriptions <ChevronUp />
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[25vh]">
+      <SheetContent side="bottom" className="h-fit 2xl:bottom-0 xl:bottom-0 md:bottom-[0px] sm:bottom-[18px]">
         <SheetHeader>
           <SheetTitle>Available Subscriptions</SheetTitle>
         </SheetHeader>

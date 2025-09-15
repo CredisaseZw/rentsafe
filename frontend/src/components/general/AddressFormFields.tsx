@@ -5,6 +5,7 @@ import { ALL_ADDRESS_TYPES } from "@/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useAddressFormFields from "@/hooks/components/useAddressFormFields";
 import AutoCompleteSuburb from "./AutoCompleteSuburb";
+import ColumnsContainer from "./ColumnsContainer";
 
 export default function AddressFormFields({ number }: { number: number }) {
    const {
@@ -15,7 +16,7 @@ export default function AddressFormFields({ number }: { number: number }) {
    } = useAddressFormFields();
 
    return (
-      <div className="mt-5 grid grid-cols-3 items-center gap-5">
+      <ColumnsContainer  numberOfCols={3} gapClass="gap-5"> 
          <div className="flex flex-col gap-2">
             <Input hidden value={suburb?.id} required name={"suburb_id" + number}/>
             <AutoCompleteSuburb
@@ -112,6 +113,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                Is Primary
             </Label>
          </div>
-      </div>
+    </ColumnsContainer>
+
    );
 }

@@ -7,6 +7,7 @@ import useIndividualForm from "@/hooks/components/useIndividualForm";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import ColumnsContainer from "@/components/general/ColumnsContainer";
 
 export default function diviIndividualForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useIndividualForm();
@@ -23,11 +24,11 @@ export default function diviIndividualForm() {
             </Button>
          </DialogTrigger>
 
-         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
+         <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1000px] sm:max-w-[default]`}>
             <DialogTitle>Add New Individual</DialogTitle>
 
-            <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-auto p-8 text-sm">
-               <div className="grid grid-cols-3 items-center gap-5">
+            <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-x-hidden p-4 text-sm">
+               <ColumnsContainer numberOfCols={3} gapClass="gap-5">
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="lastName">
                         Last Name <span className="text-PRIMARY">*</span>
@@ -139,95 +140,91 @@ export default function diviIndividualForm() {
                         className="border-color bg-white"
                      />
                   </div>
-
-                  <div className="col-span-3 pt-5">
-                     <MultiAddressInput />
-                  </div>
-
-                  <div className="col-span-3 pt-5">
-                     <details>
-                        <summary className="bg-SECONDARY/90 hover:bg-SECONDARY w-fit cursor-pointer rounded-md p-2 text-white transition-all">
-                           Toggle Employment Details
-                        </summary>
-
-                        <div className="mt-5 grid grid-cols-3 items-center gap-5">
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="employerName">
-                                 Employer Name
-                              </Label>
-                              <Input
-                                 id="employerName"
-                                 name="employerName"
-                                 placeholder="e.g. ABC Corp"
-                                 className="border-color bg-white"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="jobTitle">
-                                 Job Title
-                              </Label>
-                              <Input
-                                 id="jobTitle"
-                                 name="jobTitle"
-                                 placeholder="e.g. Software Engineer"
-                                 className="border-color bg-white"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="startDate">
-                                 Start Date
-                              </Label>
-                              <Input
-                                 id="startDate"
-                                 name="startDate"
-                                 type="date"
-                                 max={new Date().toISOString().split("T")[0]}
-                                 className="border-color bg-white"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="endDate">
-                                 End Date
-                              </Label>
-                              <Input
-                                 id="endDate"
-                                 name="endDate"
-                                 type="date"
-                                 className="border-color bg-white"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="employerEmail">
-                                 Email Address
-                              </Label>
-                              <Input
-                                 id="employerEmail"
-                                 name="employerEmail"
-                                 type="email"
-                                 className="border-color bg-white"
-                              />
-                           </div>
-
-                           <div className="flex flex-col gap-2">
-                              <Label className="px-2 font-normal" htmlFor="monthlyIncome">
-                                 Monthly Income
-                              </Label>
-                              <Input
-                                 id="monthlyIncome"
-                                 name="monthlyIncome"
-                                 type="number"
-                                 className="border-color bg-white"
-                              />
-                           </div>
-                        </div>
-                     </details>
-                  </div>
+               </ColumnsContainer>
+               <div className="pt-5">
+                  <MultiAddressInput />
                </div>
+               <details>
+                     <summary className=" w-fit cursor-pointer rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 mt-5">
+                        Toggle Employment Details
+                     </summary>
 
+                     <ColumnsContainer numberOfCols={3} gapClass="gap-5">
+                     <div className="flex flex-col gap-2">
+                        <Label className="px-2 font-normal" htmlFor="employerName">
+                           Employer Name
+                        </Label>
+                        <Input
+                           id="employerName"
+                           name="employerName"
+                           placeholder="e.g. ABC Corp"
+                           className="border-color bg-white"
+                        />
+                     </div>
+
+                     <div className="flex flex-col gap-2">
+                        <Label className="px-2 font-normal" htmlFor="jobTitle">
+                           Job Title
+                        </Label>
+                        <Input
+                           id="jobTitle"
+                           name="jobTitle"
+                           placeholder="e.g. Software Engineer"
+                           className="border-color bg-white"
+                        />
+                     </div>
+
+                     <div className="flex flex-col gap-2">
+                        <Label className="px-2 font-normal" htmlFor="startDate">
+                           Start Date
+                        </Label>
+                        <Input
+                           id="startDate"
+                           name="startDate"
+                           type="date"
+                           max={new Date().toISOString().split("T")[0]}
+                           className="border-color bg-white"
+                        />
+                     </div>
+
+                     <div className="flex flex-col gap-2">
+                        <Label className="px-2 font-normal" htmlFor="endDate">
+                           End Date
+                        </Label>
+                        <Input
+                           id="endDate"
+                           name="endDate"
+                           type="date"
+                           className="border-color bg-white"
+                        />
+                     </div>
+
+                     <div className="flex flex-col gap-2">
+                        <Label className="px-2 font-normal" htmlFor="employerEmail">
+                           Email Address
+                        </Label>
+                        <Input
+                           id="employerEmail"
+                           name="employerEmail"
+                           type="email"
+                           className="border-color bg-white"
+                        />
+                     </div>
+
+                     <div className="flex flex-col gap-2">
+                        <Label className="px-2 font-normal" htmlFor="monthlyIncome">
+                           Monthly Income
+                        </Label>
+                        <Input
+                           id="monthlyIncome"
+                           name="monthlyIncome"
+                           type="number"
+                           className="border-color bg-white"
+                        />
+                     </div>
+                  </ColumnsContainer>
+               </details>
+               
                <div className="mt-10 text-right">
                   <Button disabled={isPending} type="submit">
                      {isPending ? (
