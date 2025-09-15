@@ -5,6 +5,9 @@ from apps.companies.models.models import Company, CompanyBranch, ContactPerson, 
 from apps.common.models.models import Address, Document, Note
 from apps.common.api.serializers import AddressSerializer, DocumentSerializer, NoteSerializer, AddressCreateSerializer
 from apps.common.utils import normalize_zimbabwe_mobile, validate_email
+from apps.individuals.utils.helpers import(
+    create_address_helper
+)
 from django.db.models import Q
 import logging
 from django.db import transaction
@@ -43,7 +46,7 @@ class ContactPersonSerializer(serializers.ModelSerializer):
 
 class CompanyBranchSerializer(serializers.ModelSerializer):
     """Base serializer for CompanyBranch model (now handles contacts)"""
-    addresses = AddressSerializer(many=True, required=False)
+    addresses = AddressCreateSerializer(many=True, required=False)
     contacts = ContactPersonSerializer(many=True, required=False, write_only=True)
     
     class Meta:
@@ -61,7 +64,7 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        addresses_data = validated_data.pop('addresses', [])
+        address_data = validated_data.pop('addresses', [])
         contacts_data = validated_data.pop('contacts', []) 
         request = self.context.get('request')
         validated_data['phone'] = normalize_zimbabwe_mobile(validated_data.get('phone', None))
@@ -70,15 +73,7 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             branch = CompanyBranch.objects.create(**validated_data)
             company_branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
-            
-            for address_data in addresses_data:
-                Address.objects.create(
-                    content_type=company_branch_content_type,
-                    object_id=branch.id,
-                    **address_data
-                )
-                logger.debug(f"CREATE: Address created for branch {branch.id}")
-            
+            create_address_helper(company_branch_content_type, address_data, branch.id)
             for i, contact_data in enumerate(contacts_data):
                 try:
                     ContactPerson.objects.create(branch=branch, **contact_data)
@@ -92,19 +87,12 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop('addresses', None)
         contacts_data = validated_data.pop('contacts', None) 
-
+        branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
         request = self.context.get('request')
         instance = super().update(instance, validated_data)
 
         if addresses_data is not None:
-            instance.addresses.all().delete() 
-            company_branch_content_type = ContentType.objects.get_for_model(CompanyBranch)
-            for address_data in addresses_data:
-                Address.objects.create(
-                    content_type=company_branch_content_type,
-                    object_id=instance.id,
-                    **address_data
-                )
+            create_address_helper(branch_content_type, addresses_data, instance.id)
         
         if contacts_data is not None:
             instance.contacts.all().delete() 
@@ -188,9 +176,6 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
     
     @transaction.atomic
     def create(self, validated_data):
-        from apps.individuals.utils.helpers import(
-            create_address_helper
-        )
         addresses_data = validated_data.pop('addresses', [])
         profile_data = validated_data.pop('profile', None)
         documents_data = validated_data.pop('documents', [])
