@@ -4,11 +4,12 @@ import { Checkbox } from "../ui/checkbox";
 import AutoCompleteIndividualSearchInput from "./AutoCompleteIndividualSearchInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import ColumnsContainer from "./ColumnsContainer";
 
 export default function ContactFormFields({ number }: { number: number }) {
    const [selectedPosition, setSelectedPosition] = useState("primary");
    return (
-      <div className="mt-5 grid grid-cols-4 items-center gap-5">
+      <ColumnsContainer numberOfCols={4} gapClass="gap-5">
          <div className="flex flex-col gap-2">
             <Label className="px-2 font-normal" htmlFor={"individual" + number}>
                Individual
@@ -68,6 +69,6 @@ export default function ContactFormFields({ number }: { number: number }) {
                Is Primary
             </Label>
          </div>
-      </div>
+      </ColumnsContainer>
    );
 }

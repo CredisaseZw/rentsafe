@@ -1,11 +1,12 @@
 # apps/properties/helpers.py
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 from apps.properties.models import Property, Unit, PropertyType
 from apps.common.models.models import Address, Suburb, City, Country
 from apps.leases.models import Landlord
-from apps.properties.api.serializers import PropertyCreateSerializer, UnitDetailSerializer
+from apps.properties.api.serializers import PropertyCreateSerializer, UnitDetailSerializer,PropertyDetailSerializer
 
 def create_property_with_unit(property_data, unit_data=None, user=None):
     """
@@ -38,7 +39,7 @@ def create_property_with_unit(property_data, unit_data=None, user=None):
                 'addresses_input': property_data.get('address', {}),
                 'landlords_input': property_data.get('landlords', [])
             }
-            
+             
             # Remove None values
             property_serializer_data = {k: v for k, v in property_serializer_data.items() if v is not None}
             
@@ -222,19 +223,22 @@ def create_property_with_address(property_data, address_data, user=None):
             }
             
             print(f"DEBUG: Serializer data: {property_serializer_data}")
-            if property_ob := Property.objects.filter(name=property_serializer_data['name']).first():
+            # Check for existing property by name and/or address
+            property_qs = Property.objects.filter(
+                Q(name__iexact=property_serializer_data.get('name')) &
+                Q(addresses__street_address__iexact=address_data.get('street_address', ''))
+            ).distinct()
+            property_ob = property_qs.first()
+            if property_ob:
                 return property_ob
             # Remove None values but keep empty strings and zeros
             property_serializer_data = {k: v for k, v in property_serializer_data.items() 
                 if v is not None}
             
-            print(f"DEBUG: Cleaned serializer data: {property_serializer_data}")
             
             # Create property using the serializer
             property_serializer = PropertyCreateSerializer(data=property_serializer_data)
-            print(f"DEBUG: Serializer is valid: {property_serializer.is_valid()}")
             if not property_serializer.is_valid():
-                print(f"DEBUG: Serializer errors: {property_serializer.errors}")
                 raise ValidationError(property_serializer.errors)
                 
             property_serializer.is_valid(raise_exception=True)

@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from apps.accounting.models.models import (
     SalesAccount, SalesCategory,SalesItem,
     CashSale,Invoice,CreditNote,Currency,
@@ -10,8 +11,11 @@ from apps.accounting.models.models import (
 )
 from apps.accounting.models.disbursements import Disbursement
 from decimal import Decimal, ROUND_HALF_UP 
+from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
+from apps.clients.models.models import Client
 from apps.companies.models import CompanyProfile, Company 
 from apps.individuals.models import Individual
+from apps.subscriptions.models.models import Services
 
 class DisbursementSerializer(serializers.ModelSerializer):
     landlord_name = serializers.CharField(source='landlord.landlord_name', read_only=True)
@@ -827,3 +831,82 @@ class TransactionTypeSerializer(serializers.ModelSerializer):
         model = TransactionType
         fields = ['transaction_type', 'description']
 
+    
+class ServiceSpecialPricingSerializer(serializers.ModelSerializer):
+    currency = serializers.ReadOnlyField(source="currency.currency_code")
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='currency',
+        write_only=True
+    )
+    client_customer = serializers.ReadOnlyField(source="client_customer.name")
+    client_customer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Client.objects.all(),
+        source='client_customer',
+        write_only=True
+    )
+    service = serializers.ReadOnlyField(source="service.service_name")
+    service_id = serializers.PrimaryKeyRelatedField(
+        queryset=Services.objects.all(),
+        source='service',
+        write_only=True
+    )
+    class Meta:
+        model = ServiceSpecialPricing
+        fields= ['service', 'individual_charge', 'company_charge', 
+                'currency', 'currency_id', 'client_customer', 
+                'client_customer_id', 'service_id'
+                ]
+    
+    def validate(self, data):
+
+        for field in ['service', 'client_customer', 'individual_charge', 'company_charge', 'currency']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+            
+        return data
+class ServiceStandardPricingSerializer(serializers.ModelSerializer):
+    service = serializers.ReadOnlyField(source="service.service_name")
+    service_id = serializers.PrimaryKeyRelatedField(
+        queryset=Services.objects.all(),
+        source='service',
+        write_only=True
+    )
+    currency = serializers.ReadOnlyField(source="currency.currency_code")
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='currency',
+        write_only=True 
+    )
+    class Meta:
+        model = ServiceStandardPricing
+        fields = ['id', 'service', 'individual_charge', 'company_charge', 
+                'currency', 'currency_id', 'current_rate', 'service_id',
+                'date_updated'
+                ]
+        
+    def validate(self, data):
+        if self.instance:
+            return data
+        
+        for field in ['service', 'individual_charge', 'company_charge', 'currency']:
+            if not data.get(field):
+                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+            
+        if ServiceStandardPricing.objects.filter(service=data.get('service'), currency=data.get('currency')).exists():
+            raise ValidationError("Standard pricing for this service and currency already exists.")
+        
+        return data
+
+    def to_representation(self, instance):
+        date_updated = instance.date_updated.strftime("%d-%B-%Y") if instance.date_updated else None
+        
+        return {
+            'id': instance.id,
+            'service': instance.service.service_name if instance.service else None,
+            'individual_charge': instance.individual_charge,
+            'company_charge': instance.company_charge,
+            'currency': instance.currency.currency_code if instance.currency else None,
+            'current_rate': instance.current_rate,
+            'date_updated': date_updated
+        }

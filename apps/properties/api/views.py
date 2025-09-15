@@ -36,20 +36,27 @@ class PropertyViewSet(BaseViewSet):
     ).all().order_by('-date_created')
 
     def get_queryset(self):
+        user_client = self.request.user.client
         search = self.request.query_params.get('search', None)
-        queryset = super().get_queryset()
+
+        queryset = super().get_queryset().filter(
+            Q(managing_client=user_client) |
+            Q(managing_client__isnull=True, created_by__client=user_client)
+        )
+
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search) |
                 Q(description__icontains=search) |
                 Q(property_type__name__icontains=search) |
                 Q(addresses__street_address__icontains=search) |
-                Q(addresses__city__name__icontains=search) |  
+                Q(addresses__city__name__icontains=search) |
                 Q(addresses__suburb__name__icontains=search) |
                 Q(addresses__province__name__icontains=search) |
                 Q(addresses__country__name__icontains=search) |
                 Q(addresses__postal_code__icontains=search)
             ).distinct()
+
         return queryset
 
     def get_serializer_class(self):
