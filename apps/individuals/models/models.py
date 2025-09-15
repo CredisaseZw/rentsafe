@@ -31,7 +31,7 @@ class Individual(BaseModelWithUser):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     identification_type = models.CharField(max_length=20, choices=IDENTIFICATION_TYPES)
     identification_number = models.CharField(max_length=50, unique=True)
     marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)

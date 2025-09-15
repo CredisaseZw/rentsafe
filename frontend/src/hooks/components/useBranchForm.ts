@@ -15,10 +15,12 @@ export default function useBranchForm() {
       const branchPayload: BranchPayload = {
          company: parseInt(data.companyId as string),
          branch_name: data.branch_name as string,
+         email : (data.branch_email as string),
+         phone: (data.branch_phone as string),
          addresses: extractAddresses(data),
          contacts: extractContacts(data),
       };
-      console.log(branchPayload);
+      
       createBranch(branchPayload);
    }
 

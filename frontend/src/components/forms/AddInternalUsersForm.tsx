@@ -12,6 +12,7 @@ import useGetUserId from "@/hooks/components/useGetUserID";
 import ButtonSpinner from "../general/ButtonSpinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 interface props{
    successCallbackFN : (status:  boolean) => void;
@@ -36,8 +37,11 @@ function AddInternalUsersForm({successCallbackFN} : props) {
             successCallbackFN(true)
          },
          onError: (error) => {
-            console.error("Error adding user:", error);
-            toast.error("Error occured adding user")
+            if(isAxiosError(error)){
+               const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
+               toast.error("Error occurred adding user", { description: message });
+               return; 
+            }
          },
          onSettled: ()=> setLoading(false)
          
