@@ -99,6 +99,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'django_celery_results',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     # Custom Apps
     'apps.users',
     'apps.common',
@@ -281,6 +283,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "PAGE_SIZE": 20,
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_RENDERER_CLASSES": [
@@ -288,6 +291,32 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
 }
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Credisafe API(s)",
+    "DESCRIPTION": "Documentation for Rentsafe & Countsafe.",
+    "VERSION": "1.0.0",
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # JWT settings to show the authorization header in Swagger UI
+    "SWAGGER_UI_SETTINGS": {
+        "persistAuthorization": True, # Makes the 'Authorize' button remember tokens
+    },
+    "AUTHENTICATION_WHITELIST": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    "SECURITY": [
+        {"BearerAuth": []}
+    ],
+    "SWAGGER_UI_OAUTH2_REDIRECT_URL": "/api/schema/swagger-ui/oauth2-redirect/" # For OAuth
+}
+
+# Add this setting for `drf-spectacular`
+AUTHENTICATION_WHITELIST = [
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
+]
 
 REDIS_CACHE_LOCATION = "redis://127.0.0.1:6379/1" if DEVELOPMENT else os.getenv('REDIS_CACHE_LOCATION')
 
