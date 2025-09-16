@@ -42,7 +42,7 @@ gunicorn==21.2.0
 idna==3.10
 inflection==0.5.1
 ipdb==0.13.13
-ipython==9.4.0
+ipython
 ipython_pygments_lexers==1.1.1
 isort==5.12.0
 jedi==0.19.2
