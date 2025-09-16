@@ -15,17 +15,20 @@ def update_upsert(model, lookup, data, extra=None):
         return model.objects.update_or_create(**params)
     
 def individual_contact_helper(instance, contact_data):
-    for contact in contact_data:  
-            contact_id = contact.get('id')  
-            email = contact.get('email')  
-            lookup = {  
-                'id': contact_id,  
-                'individual': instance  
-            } if contact_id else (  
-                {'individual': instance, 'email': email} if email else {'individual': instance}  
-            )  
-            update_upsert(IndividualContactDetail, lookup, contact) 
+    for contact in contact_data:
+        contact_id = contact.get('id')
+        phone_number = contact.get('phone_number')
+
+        lookup_kwargs = {'individual': instance}
+        if contact_id:
+            lookup_kwargs['id'] = contact_id
+        elif phone_number:
+            lookup_kwargs['phone_number'] = phone_number
+
+        update_upsert(IndividualContactDetail, lookup_kwargs, contact)
+
     return None
+
 
 def create_address_helper(content_type, address_data, object_id):
     for address in address_data: 
