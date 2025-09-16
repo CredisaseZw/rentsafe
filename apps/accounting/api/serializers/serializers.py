@@ -74,9 +74,9 @@ class SalesAccountSerializer(BaseCompanySerializer):
 
 
 class CurrencySerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
+    class Meta:
         model = Currency
-        fields = ['id', 'currency_code', 'currency_name']
+        fields = ['id', 'currency_code', 'currency_name','symbol']
 
 
 class SalesItemSerializer(BaseCompanySerializer):
