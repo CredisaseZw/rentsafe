@@ -50,7 +50,9 @@ class UnitDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'property', 'date_created', 'date_updated')
     
     def validate(self,data):
-        if Unit.objects.filter(property=data.get('property'), unit_number=data.get('unit_number')).exists():
+        print(data)
+        print(self.context)
+        if Unit.objects.filter(property=self.context["property"], unit_number=data.get('unit_number')).exists():
             raise ValidationError({"unit_number": "Unit with this unit number already exists for this property."})
 
 class PropertyListSerializer(serializers.ModelSerializer):
