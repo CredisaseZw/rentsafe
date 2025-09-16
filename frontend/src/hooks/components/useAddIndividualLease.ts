@@ -160,7 +160,9 @@ function useAddIndividualLease() {
         description: item.description ?? "",
         status: item.status ?? "",
         total_number_of_units: item.total_number_of_units ?? 0,
-        property_type_name: item.property_type ?? "",
+        property_type_name:  typeof item.property_type === "string"
+        ? item.property_type
+        : item.property_type?.name ?? "",
         total_area : 0
       },
       address_object: Array.isArray(item.full_address) && item.full_address.length > 0
