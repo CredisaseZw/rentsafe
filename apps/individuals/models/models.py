@@ -60,11 +60,8 @@ class Individual(BaseModelWithUser):
     
     @property
     def phone(self):
-        if contact := self.contact_details.filter(phone_number__isnull=False, type='mobile').exclude(phone_number='').first():
-            return contact.phone_number[0] if contact else None
-        else:
-            return self.contact_details.filter(type='mobile').exclude(phone_number='').first()
-        return None
+
+        return self.contact_details.last().mobile_number or self.contact_details.last().whatsapp_number
 
 
     def clean(self):

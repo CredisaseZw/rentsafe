@@ -84,14 +84,13 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
         phone_number = data.get("phone_number","").strip()
         type = data.get("type","mobile")
 
-        if formatted := normalize_zimbabwe_mobile(phone_number,type):
-            if IndividualContactDetail.objects.filter(phone_number=formatted).exists():
-                raise ValidationError(f"This phone number is already registered: {formatted}")
-            else:
-                data["phone_number"] = formatted
-        else:
+        if not (formatted := normalize_zimbabwe_mobile(phone_number, type)):
             raise ValidationError(f"Invalid phone number provided: {phone_number}")
 
+        if IndividualContactDetail.objects.filter(phone_number=formatted).exists():
+            raise ValidationError(f"This phone number is already registered: {formatted}")
+        else:
+            data["phone_number"] = formatted
         return data
         
 class IndividualSerializer(serializers.ModelSerializer):
@@ -102,7 +101,7 @@ class IndividualSerializer(serializers.ModelSerializer):
     addresses = AddressSerializer(many=True,required=True)
     notes = NoteSerializer(many=True, required=False)
     documents = DocumentSerializer(many=True, required=False)
-    contact_details = ContactDetailsSerializer(many=True, required=False)
+    contact_details = ContactDetailsSerializer(many=True, required=False,read_only=True)
     
     class Meta:
         model = Individual
@@ -124,8 +123,8 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
-                  'gender','date_of_birth','marital_status','email',
-                  'current_employment', 'contact_details', 'addresses']
+                'gender','date_of_birth','marital_status','email',
+                'current_employment', 'contact_details', 'addresses']
     
     # Get the primary address    
     def get_addresses(self, obj):
@@ -146,13 +145,17 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
     addresses = AddressCreateSerializer(many=True, required=True)
     employment_details = EmploymentDetailSerializer(many=True, required=False)
     next_of_kin = NextOfKinSerializer(many=True, required=False)
-    contact_details = ContactDetailsSerializer(many=True, required=False)
+    contact_details = serializers.ListField(
+        child=ContactDetailsSerializer(),
+        required=False, allow_empty=True,
+        write_only=True
+    )
     class Meta:
         model = Individual
         fields = [
             'id','first_name', 'last_name', 'date_of_birth', 'gender','marital_status',
             'identification_type', 'identification_number','contact_details', 'email',
-            'addresses', 'employment_details', 'next_of_kin'
+            'addresses', 'employment_details', 'next_of_kin','phone'
         ]
     def validate(self, data):
         id_type = data.get('identification_type')
@@ -160,7 +163,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         dob = data.get('date_of_birth')
         addresses = data.get('addresses', [])
         email = data.get('email', '').strip()
-
         if email:
             if Individual.objects.filter(email__iexact=email).exists():
                 raise ValidationError("This email address is already registered")
@@ -186,11 +188,10 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                     raise ValidationError("Passport number must be between 5 and 15 characters")
             else:
                 raise ValidationError("Invalid identification type provided")
-
-
-        for field in ['first_name', 'last_name', 'identification_number', 'identification_type']:
-            if not data.get(field):
-                raise ValidationError(f"{field.replace('_', ' ').title()} is required")
+        if self.context.get('request').method=='POST':
+            for field in ['first_name', 'last_name', 'identification_number', 'identification_type']:
+                if not data.get(field):
+                    raise ValidationError(f"{field.replace('_', ' ').title()} is required")
 
         if dob is not None:
             if validate_future_dates(dob):
@@ -210,6 +211,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        validated_data['created_by'] = self.context['request'].user
         address_data  = [
             {
                 'street_address': addr.get('street_address'),
@@ -241,61 +243,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
                 
         return individual
 
-class IndividualUpdateSerializer(serializers.ModelSerializer):
-    addresses = AddressSerializer(many=True, required=False)
-    employment_details = EmploymentDetailSerializer(many=True, required=False)
-    next_of_kin = NextOfKinSerializer(many=True, required=False)
-    contact_details = ContactDetailsSerializer(many=True, required=False)
-    notes = NoteSerializer(many=True, required=False)
-    documents = DocumentSerializer(many=True, required=False)
-
-
-    class Meta:
-        model = Individual
-        fields = [
-            'first_name', 'last_name', 'date_of_birth', 'gender',
-            'email', 'contact_details', 'is_active', 'addresses',
-            'employment_details', 'next_of_kin', 'notes', 'documents'
-        ]
-
-    def validate(self, data):
-        id_type = data.get('identification_type')
-        id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
-        dob = data.get('date_of_birth')
-        email = data.get('email', '').strip()
-
-        if email:
-            if Individual.objects.filter(email__iexact=email).exists():
-                raise ValidationError("This email address is already registered")
-
-            if validate_email(email):
-                data["email"] = email.strip()
-            else:
-                raise ValidationError("Invalid email address provided")
-
-        if id_type:
-            if id_type == 'national_id':
-                if not id_number or not validate_national_id(id_number):
-                    raise ValidationError("Invalid or missing national id")
-            elif id_type == 'passport':
-                if not id_number:
-                    raise ValidationError("Invalid or missing passport number")
-                if not (5 <= len(id_number) <= 15):
-                    raise ValidationError("Passport number must be between 5 and 15 characters")
-            else:
-                raise ValidationError("Invalid identification type provided")
-
-        for field in ['first_name', 'last_name', 'identification_number', 'identification_type']:
-            if field in data and not data.get(field):
-                raise ValidationError(f"{field.replace('_', ' ').title()} cannot be empty")
-
-        if dob is not None:
-            if not validate_future_dates(dob):
-                raise ValidationError("Invalid date of birth")
-            data['date_of_birth'] = dob
-        
-        return data
-    
     @transaction.atomic
     def update(self, instance, validated_data):
         address_data = validated_data.pop('addresses', [])
@@ -325,28 +272,21 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
                 
         return instance
 
+
 class IndividualSearchSerializer(serializers.ModelSerializer):
     """Serializer for searching individuals Retuning minimal fields"""
-    contact_details = ContactDetailsSerializer(many=True, required=False)
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
-                    'contact_details', 'email', 'is_active']
-        
-    # def get_contact_details(self, obj):
-    #     if contact := obj.contact_details.filter(type='mobile').first():
-    #         return ContactDetailsSerializer(contact).data if contact.phone_number else None
-    #     else:
-    #         return ContactDetailsSerializer(obj.contact_details.first()).data if obj.contact_details.exists() else None
-
+                    'phone', 'email', 'is_active']
+    
 class IndividualAddressSerializer(serializers.ModelSerializer):
-    contact_details = serializers.SerializerMethodField()
     primary_address = serializers.SerializerMethodField()
 
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_type','identification_number',
-                'email', 'contact_details','primary_address', 'is_active']
+                'email', 'phone','primary_address', 'is_active']
 
     def get_primary_address(self, obj):
         if primary_address := obj.addresses.filter(is_primary=True, address_type="physical").first():
@@ -355,9 +295,3 @@ class IndividualAddressSerializer(serializers.ModelSerializer):
         if latest_address := obj.addresses.order_by('-id').first():
             return AddressSerializer(latest_address).data
         return None
-
-    def get_contact_details(self, obj):
-        if contact := obj.contact_details.filter(type='mobile').first():
-            return ContactDetailsSerializer(contact).data if contact.phone_number else None
-        else:
-            return ContactDetailsSerializer(obj.contact_details.first()).data if obj.contact_details.exists() else None
