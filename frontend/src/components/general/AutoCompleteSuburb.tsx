@@ -38,7 +38,7 @@ function AutoCompleteSuburb({ searchItem, setSearchItem, onSelectValue }: Props)
 
   return (
     <div className="form-group relative">
-      <label className="required">Suburb Name</label>
+      <label className="required">Suburb/Area</label>
       <Input
         type="text"
         required

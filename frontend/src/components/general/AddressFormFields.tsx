@@ -37,11 +37,12 @@ export default function AddressFormFields({ number }: { number: number }) {
          </div>
 
          <div className="flex flex-col gap-2">
-            <Label className="px-2 font-normal" >
-               City
+            <Label className="px-2 font-normal required" >
+               City/Town
             </Label>
               <Input
                disabled
+               required
                value={suburb?.city}
                name = "city"
            />

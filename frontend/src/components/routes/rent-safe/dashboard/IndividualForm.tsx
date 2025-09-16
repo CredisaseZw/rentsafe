@@ -30,22 +30,22 @@ export default function diviIndividualForm() {
             <form onSubmit={isPending ? undefined : handleSubmit} className="max-h-[80vh] overflow-x-hidden p-4 text-sm">
                <ColumnsContainer numberOfCols={3} gapClass="gap-5">
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="lastName">
-                        Last Name <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal required" htmlFor="lastName">
+                        Last Name 
                      </Label>
                      <Input id="lastName" name="lastName" required className="border-color bg-white" />
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="firstName">
-                        First Name <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal required" htmlFor="firstName">
+                        First Name
                      </Label>
                      <Input id="firstName" name="firstName" required className="border-color bg-white" />
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="identificationType">
-                        Identification Type <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal required" htmlFor="identificationType">
+                        Identification Type
                      </Label>
                      <Select name="identificationType" required>
                         <SelectTrigger id="identificationType" className="border-color w-full bg-white">
@@ -72,9 +72,9 @@ export default function diviIndividualForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="gender">
-                        Gender <span className="text-PRIMARY">*</span>
+                        Gender
                      </Label>
-                     <Select name="gender" required>
+                     <Select name="gender">
                         <SelectTrigger id="gender" className="border-color w-full bg-white">
                            <SelectValue placeholder="Gender" />
                         </SelectTrigger>
@@ -88,12 +88,11 @@ export default function diviIndividualForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="dateOfBirth">
-                        Date Of Birth <span className="text-PRIMARY">*</span>
+                        Date Of Birth 
                      </Label>
                      <Input
                         id="dateOfBirth"
                         name="dateOfBirth"
-                        required
                         type="date"
                         className="border-color bg-white"
                      />
@@ -101,9 +100,9 @@ export default function diviIndividualForm() {
 
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="maritalStatus">
-                        Marital Status <span className="text-PRIMARY">*</span>
+                        Marital Status
                      </Label>
-                     <Select name="maritalStatus" required>
+                     <Select name="maritalStatus">
                         <SelectTrigger id="maritalStatus" className="border-color w-full bg-white">
                            <SelectValue placeholder="Marital Status" />
                         </SelectTrigger>

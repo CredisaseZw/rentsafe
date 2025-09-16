@@ -65,7 +65,7 @@ function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantA
               <Loader2 className="text-foreground/60 animate-spin" />
             </div>
           ) : !data?.length ? (
-          <div className="p-4 text-gray-800 dark:text-white text-center flex flex-col items-center">
+               <div className="p-4 text-gray-800 dark:text-white text-center flex flex-col items-center">
               No results found
               {
                 createClient &&

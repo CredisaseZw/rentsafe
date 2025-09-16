@@ -101,17 +101,15 @@ function AddPropertyForm({successCallback}:props) {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className=" form-group">
-          <label className="required">Total number of units</label>
+          <label>Total number of units</label>
           <Input
-            required
             type="text"
             name="total_number_of_units"
           />
         </div>
         <div className=" form-group">
-          <label className="required">Building/Complex Name</label>
+          <label>Building/Complex Name</label>
           <Input
-            required
             type="text"
             name="building_name"
           />

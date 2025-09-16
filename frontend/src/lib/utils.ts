@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { Landlord, LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -204,6 +204,18 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[
   return receipts;
 }
 
+export function extractFeatures (data: { category: string; feature: string}[]) : {[key: string]: any[]} {
+   const features: { [key: string]: any[] } = {};
+   data.forEach((item) => {
+      if (item.category in features) {
+            features[item.category].push(item.feature);
+      } else {
+            features[item.category] = [item.feature];
+      }
+   });
+
+   return features;
+}
 
 export function formatErrorMessage(error: unknown): string {
    if (error instanceof Error) {
@@ -229,18 +241,6 @@ export function stringifyAndFmt(val: unknown): string {
       return JSON.stringify(val, (_, v) => (v === null || v === undefined ? undefined : v)).replace(/^"|"$/g, "");
    }
    return String(val);
-}
-
-export function extractErrorMessage(obj: string): string {
-   try{
-      const errorString = obj;
-      const match = errorString.match(/string='([^']+)'/);
-      const errorMessage = match ? match[1] : 'Unknown error';
-
-      return errorMessage
-   } catch (error){
-      return ""
-   }        
 }
 
 export function updatePropertyListCache(
@@ -423,4 +423,10 @@ export function parseListString(s : string) : string{
    const fixed = s.replace(/'/g, '"');
    const arr = JSON.parse(fixed);
    return arr[0];
+}
+
+export function formatLandlords(landlords: Landlord[]): string {
+   if (landlords.length === 0) return "";
+   if (landlords.length === 1) return landlords[0].landlord_name;
+   return landlords.map((l) => l.landlord_name).join(" | ");   
 }

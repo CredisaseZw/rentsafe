@@ -5,11 +5,11 @@ import SectionHeading from "@/components/general/SectionHeading";
 import useCompanyPaymentStatusTab from "@/hooks/pages/dashboard/useCompanyPaymentStatusTab";
 import { Button } from "@/components/ui/button";
 import BranchForm from "./BranchForm";
+import useCompanyForm from "@/hooks/components/useCompanyForm";
 
 export default function CompanyPaymentStatusTab() {
-   const { paginationData, rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } =
-      useCompanyPaymentStatusTab();
-
+   const { paginationData, rows, headers, isLoading, searchRef, searchQuery, clearSearch, handleSearch } = useCompanyPaymentStatusTab();
+   const {showForm, setShowForm} = useCompanyForm();
    return (
       <div>
          <SectionHeading>Search Company</SectionHeading>
@@ -53,8 +53,13 @@ export default function CompanyPaymentStatusTab() {
                   </form>
 
                   <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-between lg:justify-end">
-                     <BranchForm />
-                     <CompanyForm />
+                     <BranchForm 
+                        setCompanyFormOpen = {setShowForm}
+                     />
+                     <CompanyForm 
+                        open ={showForm}
+                        setShowForm={setShowForm}
+                     />
                   </div>
                </div>
             }

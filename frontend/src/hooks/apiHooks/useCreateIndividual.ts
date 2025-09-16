@@ -5,7 +5,6 @@ import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { IndividualFull, IndividualMinimal } from "@/interfaces";
-//import { extractErrorMessage } from "@/lib/utils";
 
 export default function useCreateIndividual(successCallback?: () => void) {
    const client = useClient();

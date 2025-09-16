@@ -52,6 +52,7 @@ function usePropertyList() {
    );
    
    const parkingOptions = useRef<Option[]>([
+      { label: "All", value: "all" },
       { label: "Underground", value: "underground" },
       { label: "Open", value: "open" },
       { label: "Street", value: "street" },
@@ -62,19 +63,24 @@ function usePropertyList() {
       { label: "None", value: "none" },
    ])
    const backupPowerOptions = useRef<Option[]>([
+      { label: "All", value: "all" },
       { label: "Generator", value: "generator" },
       { label: "Solar", value: "solar" },
+      { label: "Battery", value: "battery" },
       { label: "None", value: "none" },
    ])
    const Options = useRef<Option[]>([
-      { label: "Default", value: "default" },
+      { label: "All", value: "all" },
       { label: "Occupied", value: "occupied" },
       { label: "Vacant", value: "vacant" },
    ]);
    const statusOptions = useRef<Option[]>([
       {label : "Active", value : "active"},
-      {label : "In-active", value : "inactive"}
+      {label : "In-active", value : "inactive"},
+      {label : "Maintenance", value : "maintenance"},
+      {label : "Sold", value : "sold"}
    ])
+
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
@@ -160,15 +166,14 @@ function usePropertyList() {
       const data = Object.fromEntries(formData.entries());
       const addresses = extractAddresses(data);
       
-      console.log(addresses)
       const property = {
-         name: data.building_name,
+         name: data.building_name ?? "",
          description: data.property_details,
          status: addPropertyForm.status,
          year_built: parseInt(data.year_built as string),
          total_area: data.total_area,
          is_furnished: addPropertyForm.is_furnished,
-         total_number_of_units: parseInt(data.total_number_of_units as string),
+         total_number_of_units: parseInt(data.total_number_of_units as string) ?? 0,
          features: {
             parking: addPropertyForm.features.parking,
             security: addPropertyForm.features.security,

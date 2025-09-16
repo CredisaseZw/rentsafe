@@ -10,13 +10,18 @@ import MultiAddressInput from "@/components/general/MultiAddressInput";
 import Button from "@/components/general/Button";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
 
-export default function CompanyForm() {
-   const { showForm, isPending, handleSubmit, setShowForm } = useCompanyForm();
+interface props{
+   open : boolean;
+   setShowForm : (open: boolean) => void;
+}
+
+export default function CompanyForm({ open, setShowForm}: props) {
+   const { isPending, handleSubmit } = useCompanyForm();
 
    return (
       <Dialog
          modal
-         open={showForm}
+         open={open}
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
       >
          <DialogTrigger asChild>
@@ -33,12 +38,11 @@ export default function CompanyForm() {
                <ColumnsContainer  numberOfCols={3} gapClass="gap-5">
                   <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="registration_name">
-                        Registered Name <span className="text-PRIMARY">*</span>
+                        Registered Name
                      </Label>
                      <Input
                         id="registration_name"
                         name="registration_name"
-                        required
                         className="border-color bg-white"
                         placeholder="e.g. ABC Holdings Ltd"
                      />
@@ -57,8 +61,8 @@ export default function CompanyForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="registration_number">
-                        Registration Number <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal required" htmlFor="registration_number">
+                        Registration Number
                      </Label>
                      <Input
                         id="registration_number"
@@ -81,8 +85,8 @@ export default function CompanyForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="email">
-                        Email Address <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal required" htmlFor="email">
+                        Email Address 
                      </Label>
                      <Input
                         id="email"
