@@ -16,6 +16,7 @@ from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
 from apps.common.models.models import Address
 from apps.accounting.models import Currency,Payment, PaymentMethod
+from apps.accounting.api.serializers.serializers import CurrencySerializer
 from apps.common.api.serializers import AddressSerializer
 from apps.leases.utils.helpers import create_lease_with_dependencies
 from apps.properties.utils.helpers import process_address_data
@@ -48,11 +49,6 @@ class CompanyBranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyBranch
         fields = ['id', 'full_name', 'company_name']
-
-class CurrencySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Currency
-        fields = ['id', 'currency_code', 'currency_name', 'symbol']
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
     unit = serializers.PrimaryKeyRelatedField(queryset=Unit.objects.all())
@@ -247,7 +243,7 @@ class LeaseDetailSerializer(serializers.ModelSerializer):
         # fields = '__all__'
 
     def get_risk_level_class(self, obj):
-        return obj.risk_level
+        return obj.risk_level or'low'
     
     def get_owing(self,obj):
         return obj.get_latest_balance
@@ -289,7 +285,7 @@ class LeaseListSerializer(serializers.ModelSerializer):
         fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'landlord', 'unit', 'currency', 'risk_level_class', 'owing']
 
     def get_risk_level_class(self, obj):
-        return obj.risk_level
+        return obj.risk_level or 'low'
 
     def get_unit(self, obj):
         return {
@@ -316,7 +312,7 @@ class TenantStatementsListSerializer(serializers.ModelSerializer):
         fields = ['id', 'lease_id', 'start_date', 'end_date', 'status', 'tenants', 'unit', 'currency', 'risk_level_class', 'owing']
 
     def get_risk_level_class(self, obj):
-        return obj.risk_level
+        return obj.risk_level or 'low'
 
     def get_unit(self, obj):
         return {
