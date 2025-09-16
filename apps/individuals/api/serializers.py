@@ -59,7 +59,7 @@ class NextOfKinSerializer(serializers.ModelSerializer):
         
     def validate(self,data):
         if mobile := data.get('mobile_phone'):
-            if formatted := normalize_zimbabwe_mobile(mobile):
+            if formatted := normalize_zimbabwe_mobile(mobile, "mobile"):
                 data["mobile_phone"] = formatted
             else:
                 raise ValidationError("Invalid phone number")
@@ -75,59 +75,22 @@ class NextOfKinSerializer(serializers.ModelSerializer):
         return data
 
 class ContactDetailsSerializer(serializers.ModelSerializer):
-    mobile_phone = serializers.ListField(
-        child=serializers.CharField(max_length=15),
-        allow_empty=False,
-        required=True,
-        min_length=1,
-        error_messages={
-            'required': 'Phone number is required',
-            'null': 'Phone number is required',
-            'blank': 'Phone number is required',
-        }
-    )
-
+ 
     class Meta:
         model = IndividualContactDetail
-        fields = ['id', 'individual_id', 'mobile_phone', 'email']
-    
+        fields = ['type', 'phone_number']
+
     def validate(self, data):
-        email = data.get('email', '').strip()
+        phone_number = data.get("phone_number","").strip()
+        type = data.get("type","mobile")
 
-        if email:
-            existing_qs = IndividualContactDetail.objects.filter(email__iexact=email)
-
-            if self.instance:
-                existing_qs = existing_qs.exclude(pk=self.instance.pk)
-
-            if existing_qs.exists():
-                raise ValidationError("This email address is already registered")
-
-            if validate_email(email):
-                data["email"] = email.strip()
+        if formatted := normalize_zimbabwe_mobile(phone_number,type):
+            if IndividualContactDetail.objects.filter(phone_number=formatted).exists():
+                raise ValidationError(f"This phone number is already registered: {formatted}")
             else:
-                raise ValidationError("Invalid email address provided")
-        
-        mobile_phone_numbers = data.get("mobile_phone",[])
-        normalized_phone = []
-        existing_numbers = []
-    
-        existing_numbers = set(
-            normalize_zimbabwe_mobile(phone_number)
-            for phone_numbers in IndividualContactDetail.objects.values_list('mobile_phone', flat=True)
-            for phone_number in phone_numbers if phone_number
-        )
-        for phone in mobile_phone_numbers:
-            formatted = normalize_zimbabwe_mobile(phone)
-
-            if formatted:
-                if formatted in existing_numbers:
-                    raise ValidationError(f"This phone number is already registered: {formatted}")
-                
-                normalized_phone.append(formatted)
-            else:
-                raise ValidationError(f"Invalid phone number: {phone}")
-        data["mobile_phone"] = normalized_phone
+                data["phone_number"] = formatted
+        else:
+            raise ValidationError(f"Invalid phone number provided: {phone_number}")
 
         return data
         
@@ -145,9 +108,9 @@ class IndividualSerializer(serializers.ModelSerializer):
         model = Individual
         fields = [
             'id', 'first_name', 'last_name', 'full_name',
-            'date_of_birth', 'gender', 'gender_display','marital_status',
+            'date_of_birth', 'gender','gender_display','marital_status',
             'identification_type', 'identification_type_display',
-            'identification_number','contact_details', 'is_verified', 'is_active',
+            'identification_number','contact_details', 'email', 'is_verified', 'is_active',
             'employment_details', 'next_of_kin', 'documents', 
             'addresses', 'notes','date_created', 'date_updated'
         ]
@@ -155,13 +118,13 @@ class IndividualSerializer(serializers.ModelSerializer):
 
 class IndividualMinimalSerializer(serializers.ModelSerializer):
     current_employment = serializers.SerializerMethodField()
-    contact_details = serializers.SerializerMethodField()
+    contact_details = ContactDetailsSerializer(many=True, required=True)
     addresses = serializers.SerializerMethodField()
     
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
-                  'gender','date_of_birth','marital_status', 
+                  'gender','date_of_birth','marital_status','email',
                   'current_employment', 'contact_details', 'addresses']
     
     # Get the primary address    
@@ -172,12 +135,6 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
         if latest_address := obj.addresses.order_by('-id').first():
             return AddressSerializer(latest_address).data
         return None
-    
-    def get_contact_details(self, obj):
-        if contact := obj.contact_details.order_by('-id').first():
-            return ContactDetailsSerializer(contact).data
-        return None
-
     
     def get_current_employment(self, obj):
         if current_employment := obj.employment_details.filter(is_current=True).first():
@@ -194,7 +151,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         model = Individual
         fields = [
             'id','first_name', 'last_name', 'date_of_birth', 'gender','marital_status',
-            'identification_type', 'identification_number','contact_details',
+            'identification_type', 'identification_number','contact_details', 'email',
             'addresses', 'employment_details', 'next_of_kin'
         ]
     def validate(self, data):
@@ -202,6 +159,16 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
         dob = data.get('date_of_birth')
         addresses = data.get('addresses', [])
+        email = data.get('email', '').strip()
+
+        if email:
+            if Individual.objects.filter(email__iexact=email).exists():
+                raise ValidationError("This email address is already registered")
+
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValidationError("Invalid email address provided")
         for address in addresses:
             street = address.get('street_address')
             suburb = address.get('suburb') 
@@ -287,7 +254,7 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         model = Individual
         fields = [
             'first_name', 'last_name', 'date_of_birth', 'gender',
-            'contact_details', 'is_active', 'addresses',
+            'email', 'contact_details', 'is_active', 'addresses',
             'employment_details', 'next_of_kin', 'notes', 'documents'
         ]
 
@@ -295,6 +262,16 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
         id_type = data.get('identification_type')
         id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
         dob = data.get('date_of_birth')
+        email = data.get('email', '').strip()
+
+        if email:
+            if Individual.objects.filter(email__iexact=email).exists():
+                raise ValidationError("This email address is already registered")
+
+            if validate_email(email):
+                data["email"] = email.strip()
+            else:
+                raise ValidationError("Invalid email address provided")
 
         if id_type:
             if id_type == 'national_id':
@@ -350,16 +327,17 @@ class IndividualUpdateSerializer(serializers.ModelSerializer):
 
 class IndividualSearchSerializer(serializers.ModelSerializer):
     """Serializer for searching individuals Retuning minimal fields"""
-    contact_details = serializers.SerializerMethodField()
+    contact_details = ContactDetailsSerializer(many=True, required=False)
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_number',
-                    'contact_details', 'is_active']
+                    'contact_details', 'email', 'is_active']
         
-    def get_contact_details(self, obj):
-        if contact := obj.contact_details.order_by('-id').first():
-            return ContactDetailsSerializer(contact).data
-        return None
+    # def get_contact_details(self, obj):
+    #     if contact := obj.contact_details.filter(type='mobile').first():
+    #         return ContactDetailsSerializer(contact).data if contact.phone_number else None
+    #     else:
+    #         return ContactDetailsSerializer(obj.contact_details.first()).data if obj.contact_details.exists() else None
 
 class IndividualAddressSerializer(serializers.ModelSerializer):
     contact_details = serializers.SerializerMethodField()
@@ -368,7 +346,7 @@ class IndividualAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Individual
         fields = ['id', 'first_name', 'last_name', 'identification_type','identification_number',
-                  'contact_details','primary_address', 'is_active']
+                'email', 'contact_details','primary_address', 'is_active']
 
     def get_primary_address(self, obj):
         if primary_address := obj.addresses.filter(is_primary=True, address_type="physical").first():
@@ -377,13 +355,9 @@ class IndividualAddressSerializer(serializers.ModelSerializer):
         if latest_address := obj.addresses.order_by('-id').first():
             return AddressSerializer(latest_address).data
         return None
-    
+
     def get_contact_details(self, obj):
-        contact = obj.contact_details.order_by('-id').first()
-        if contact:
-            mobile_phones = contact.mobile_phone[0] if contact.mobile_phone else None
-            return {
-                'mobile_phone': mobile_phones,
-                'email': contact.email
-            }
-        return None
+        if contact := obj.contact_details.filter(type='mobile').first():
+            return ContactDetailsSerializer(contact).data if contact.phone_number else None
+        else:
+            return ContactDetailsSerializer(obj.contact_details.first()).data if obj.contact_details.exists() else None
