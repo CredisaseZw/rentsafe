@@ -82,7 +82,8 @@ class Individual(BaseModelWithUser):
 class IndividualContactDetail(BaseModel):
     PHONE_TYPES = (
         ('mobile', 'Mobile'),
-        ('whatsapp', 'WhatsApp'),   
+        ('whatsapp', 'WhatsApp'),
+        ('combined', 'Combined'), 
         ('home', 'Home'),
         ('work', 'Work'),
         ('other', 'Other'),
