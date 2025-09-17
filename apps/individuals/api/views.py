@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from apps.individuals.api.serializers import (
     IndividualAddressSerializer,
     IndividualSerializer , 
-    IndividualUpdateSerializer,
+    IndividualCreateSerializer,
     IndividualCreateSerializer, 
     IndividualSearchSerializer,
     IndividualMinimalSerializer
@@ -22,6 +22,19 @@ import logging
 logger = logging.getLogger("individuals")
 
 class IndividualViewSet(BaseViewSet):
+    """ViewSet for managing individuals.
+    Supports CRUD operations and additional actions like search, verify, activate, and retrieve full details.
+    1. list: List all individuals with optional search functionality.
+    2. create: Create a new individual.
+    3. retrieve: Retrieve a specific individual by ID.
+    4. update: Update an existing individual.
+    5. partial_update: Partially update an existing individual.
+    6. destroy: Soft delete an individual.
+    7. search: Search individuals by first name, last name, or identification number.
+    8. verify_individual: Toggle the verification status of an individual.
+    9. activate_individual: Toggle the active status of an individual.
+    10. un_delete: Restore a soft-deleted individual.
+    """
     permission_classes = [IsAuthenticated]
     queryset = Individual.objects.filter(is_active=True, is_deleted=False)
     def get_queryset(self):
@@ -42,17 +55,20 @@ class IndividualViewSet(BaseViewSet):
             'next_of_kin', 'notes','documents','contact_details'
         ).order_by('-date_created')
 
+    def get_context(self):
+        context = super().get_context()
+        context['request'] = self.request
+        return context
+
     def get_serializer_class(self):
         if self.action == 'create':
             return IndividualCreateSerializer
-        elif self.action in ['update', 'partial_update']:
-            return IndividualUpdateSerializer
-        elif self.action in [ 'search_individuals', 'details']:
+        elif self.action in ['update', 'partial_update', 'create']:
+            return IndividualCreateSerializer
+        elif self.action in [ 'search_individuals', 'details', 'list']:
             return IndividualSearchSerializer
         elif self.action == 'retrieve_full_individual_details':
             return IndividualSerializer
-        elif self.action == 'list':
-            return IndividualSearchSerializer
         elif self.action == "search":  
             return IndividualAddressSerializer
         return IndividualMinimalSerializer
@@ -61,10 +77,9 @@ class IndividualViewSet(BaseViewSet):
     def create(self, request, *args, **kwargs):
         try:
             
-            serializer = IndividualCreateSerializer(data=request.data)
-
+            serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
+            serializer.save()
             return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
 
         except ValidationError as e:
@@ -84,13 +99,11 @@ class IndividualViewSet(BaseViewSet):
         try:
             partial = kwargs.pop('partial', False)
             instance = self.get_object()
-            serializer = IndividualUpdateSerializer(instance, data=request.data, partial=partial)
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
             serializer.is_valid(raise_exception=True)
-        
-            self.perform_update(serializer)
-
+            serializer.save()
             return self._create_rendered_response(serializer.data,status.HTTP_200_OK)
-        
+
         except ValidationError as e:
             return self._create_rendered_response(
                 {"error": extract_error_message(e)},
@@ -122,7 +135,7 @@ class IndividualViewSet(BaseViewSet):
     def retrieve(self, request, *args, **kwargs):
         try:
             individual = self.get_object()
-            serializer = IndividualMinimalSerializer(individual)
+            serializer = self.get_serializer(individual)
             return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         except Individual.DoesNotExist:
             logger.error(f"Individual with ID {id} Does not exist")
@@ -159,9 +172,8 @@ class IndividualViewSet(BaseViewSet):
     @action(detail=False, methods=["get"])
     def search(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
     
     @action(detail=True, methods=['PUT', 'PATCH'], url_path='verify')
     def verify_individual(self, request, pk=None):
