@@ -38,7 +38,7 @@ def validate_email(email: str) -> bool:
 
 def normalize_zimbabwe_mobile(phone,type):  
     phone = re.sub(r'[\s-]', '', phone.strip())
-    if type in ['mobile','whatsapp']:
+    if type in ['mobile','whatsapp', 'combined', 'other']:
         for prefix in ['00263', '+263', '263']:  
             if phone.startswith(prefix):  
                 phone = phone[len(prefix):]  
