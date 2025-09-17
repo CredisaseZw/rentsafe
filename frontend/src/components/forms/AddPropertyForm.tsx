@@ -24,6 +24,7 @@ import type { Option } from "@/types";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteClient from "../general/AutoCompleteClient";
 import { isAxiosError } from "axios";
+import { validateAmounts } from "@/lib/utils";
 interface props{
   successCallback : ()=>void
 }
@@ -57,7 +58,7 @@ function AddPropertyForm({successCallback}:props) {
     }
     if (data) { setPropertyTypes(data.results ?? []); }
   }, [data, error])
-  
+
   return (
     <form onSubmit={(e: React.FormEvent<HTMLFormElement>)=>{
       e.preventDefault();
@@ -91,10 +92,9 @@ function AddPropertyForm({successCallback}:props) {
           </Select>
         </div>
         <div className="form-group"> 
-          <label className="required">Property Details</label>
+          <label >Property Details</label>
           <Textarea
             name="property_details"
-            required
             placeholder="i.e Rooms, Size,"
           />
         </div>
@@ -103,7 +103,10 @@ function AddPropertyForm({successCallback}:props) {
         <div className=" form-group">
           <label>Total number of units</label>
           <Input
-            type="text"
+            step={0.01}
+            onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+            onKeyDown={validateAmounts}
+            type="number"
             name="total_number_of_units"
           />
         </div>
@@ -117,15 +120,21 @@ function AddPropertyForm({successCallback}:props) {
         <div className="form-group">
           <label>Total Area</label>
            <Input
-            type="text"
             name="total_area"
+            type= "number"
+            step={0.01}
+            onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+            onKeyDown={validateAmounts}
           />
         </div>
         <div className="form-group">
           <label>Year Built</label>
            <Input
-            type="text"
             name="year_built"
+            type= "number"
+            step={0.01}
+            onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+            onKeyDown={validateAmounts}
           />
         </div>
         <div className="form-group">
@@ -259,6 +268,7 @@ function AddPropertyForm({successCallback}:props) {
           </Select>
         </div>
          <AutoCompleteClient
+            isRequired = {false}
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
             clientType = {addPropertyForm.landlord_type}
@@ -266,10 +276,9 @@ function AddPropertyForm({successCallback}:props) {
             onSelectValue = {onSelectValue}
          />
         <div className="form-group">
-          <label className="required">Landlord Name</label>
+          <label>Landlord Name</label>
           <Input
             type="text"
-            required
             disabled
             value={addPropertyForm.landlord_name}
             name="landlord_name"

@@ -16,6 +16,11 @@ export default function IndividualPaymentStatusTab() {
             headers={headers}
             rows={rows}
             isLoading={isLoading}
+            noDataNode = {
+               <div className="mt-2 flex flex-row items-center justify-center">
+                  <IndividualForm/>
+               </div>
+            }
             paginationData={paginationData}
             paginationName="individual_page"
             tableActions={

@@ -97,49 +97,46 @@ function AddLeaseForm({clientType, successCallback} :props) {
           clientType = {clientType}
           setPrimaryTenantAddress = {setPrimaryTenantAddress}/>
       </div>
-      {
-        clientType === "company" &&
-        <div className="mt-5">
-          <Fieldset legendTitle="Rent Guarantor">
-            <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
-              <div className="form-group">
-                <AutoCompleteClient
-                  isRequired = {false}
-                  searchItem = {guaranteeItem}
-                  setSearchItem = {setGuaranteeItem}
-                  clientType = {"individual"}
-                  clientLabel= {"Rent Guarantor ID"}
-                  onSelectValue = {onSelectGuarantor}
-                />
-              </div>
-              <div className="form-group">
-                <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
-                    Rent Guarantor Name
-                </Label>
-                <Input
-                    name={`rentGuarantorName`}
-                    id="rentGuarantorName"
-                    readOnly
-                    value={formData.guarantor_name}
-                />
-              </div>
-              <div className="form-group">
-                <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
-                    Guarantee Amount 
-                </Label>
-                <Input 
-                    type= "number" 
-                    step={0.01}
-                    onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
-                    onKeyDown={validateAmounts}
-                    name={`rentGuaranteeAmount`}
-                    id="rentGuaranteeAmount"
-                />
-              </div>
-            </ColumnsContainer>
-          </Fieldset>
-        </div>
-      }
+      <div className="mt-5">
+        <Fieldset legendTitle="Rent Guarantor">
+          <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
+            <div className="form-group">
+              <AutoCompleteClient
+                isRequired = {false}
+                searchItem = {guaranteeItem}
+                setSearchItem = {setGuaranteeItem}
+                clientType = {"individual"}
+                clientLabel= {"Rent Guarantor ID"}
+                onSelectValue = {onSelectGuarantor}
+              />
+            </div>
+            <div className="form-group">
+              <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
+                  Rent Guarantor Name
+              </Label>
+              <Input
+                  name={`rentGuarantorName`}
+                  id="rentGuarantorName"
+                  readOnly
+                  value={formData.guarantor_name}
+              />
+            </div>
+            <div className="form-group">
+              <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
+                  Guarantee Amount 
+              </Label>
+              <Input 
+                  type= "number" 
+                  step={0.01}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}
+                  name={`rentGuaranteeAmount`}
+                  id="rentGuaranteeAmount"
+              />
+            </div>
+          </ColumnsContainer>
+        </Fieldset>
+      </div>
       <div className="mt-5">
         <Fieldset legendTitle = {"Unit Details"}>
           <ColumnsContainer gapClass="gap-6" marginClass="mt-0" numberOfCols={3}>
@@ -159,7 +156,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber">Number of Rooms </Label>
-              <Input id="" name="unitNumberOfRooms" required/>
+              <Input id="" name="unitNumberOfRooms" required  type= "number"
+                step={0.01}
+                onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                onKeyDown={validateAmounts}/>
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit type</Label>
@@ -568,6 +568,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
           </Select>
         </div>
          <AutoCompleteClient
+            isRequired = {false}
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
             clientType = {formData.landlord_type}
@@ -575,10 +576,9 @@ function AddLeaseForm({clientType, successCallback} :props) {
             onSelectValue = {onSelectLandlord}
          />
         <div className="form-group">
-          <label className="required">Landlord Name</label>
+          <label >Landlord Name</label>
           <Input
             type="text"
-            required
             disabled
             value={formData.landlord_name}
             name="landlord_name"
@@ -586,7 +586,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
         </div>
 
         <div className="form-group">
-          <Label className="px-2 font-normal required" htmlFor="commissionPercentage">
+          <Label className="px-2 font-normal" htmlFor="commissionPercentage">
             Commission %
           </Label>
           <Input
@@ -597,12 +597,11 @@ function AddLeaseForm({clientType, successCallback} :props) {
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
             name="commissionPercentage"
-            id="commissionPercentage"
-            required            
+            id="commissionPercentage"            
           />
         </div>
         <div className="form-group">
-          <Label className="px-2 font-normal required" htmlFor="commissionPercentage">
+          <Label className="px-2 font-normal" htmlFor="commissionPercentage">
             Landlords Opening Balance
           </Label>
           <Input
@@ -612,7 +611,6 @@ function AddLeaseForm({clientType, successCallback} :props) {
             onKeyDown={validateAmounts}
             name="landlordsOpeningBalance"
             id="landlordsOpeningBalance"
-            required
           />
         </div>
         <div className="flex flex-row gap-2 self-center">

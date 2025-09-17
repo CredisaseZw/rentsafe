@@ -41,7 +41,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
 
   return (
     <div className="form-group relative">
-      <label className="required">Property Name</label>
+      <label className="required">Property Name / Address</label>
       <Input
         type="text"
         required

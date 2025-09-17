@@ -1,6 +1,6 @@
 import type { IndividualPayload } from "@/interfaces/form-payloads";
 import React, { useEffect } from "react";
-import { extractAddresses, formatDateToPythonSLiking, validateZimNationalId } from "@/lib/utils";
+import { extractAddresses, extractPhones, formatDateToPythonSLiking, validateZimNationalId } from "@/lib/utils";
 import type { IndividualMaritalStatus } from "@/types";
 import useCreateIndividual from "../apiHooks/useCreateIndividual";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ export default function useIndividualForm() {
       const formData = new FormData(event.currentTarget);
       const data = Object.fromEntries(formData.entries());
 
+
       const individualPayload: IndividualPayload = {
          first_name: data.firstName as string,
          last_name: data.lastName as string,
@@ -37,18 +38,8 @@ export default function useIndividualForm() {
          identification_type: data.identificationType as string,
          identification_number: data.identificationNumber as string,
          marital_status: data.maritalStatus as IndividualMaritalStatus,
-         contact_details: [{ email: data.email as string, mobile_phone: [data.mobilePhone as string] }],
-         notes: data.notes ? [{ content: data.notes as string }] : [],
-         employment_details: [
-            {
-               employer_name: (data.employerName as string) || undefined,
-               job_title: (data.jobTitle as string) || undefined,
-               start_date: (data.startDate as string) || undefined,
-               end_date: data.endDate ? (data.endDate as string) : undefined,
-               email: data.employerEmail ? (data.employerEmail as string) : undefined,
-               monthly_income: data.monthlyIncome ? parseFloat(data.monthlyIncome as string) : undefined,
-            },
-         ],
+         email: data.email as string,
+         contact_details: extractPhones(data),
          next_of_kin: undefined,
          documents: undefined,
          addresses: extractAddresses(data),
@@ -73,8 +64,10 @@ export default function useIndividualForm() {
          }
       }
 
-      if (individualPayload.date_of_birth) {
-         individualPayload.date_of_birth = formatDateToPythonSLiking(individualPayload.date_of_birth);
+      if (individualPayload?.date_of_birth?.length !== 0) {
+         individualPayload.date_of_birth = formatDateToPythonSLiking(individualPayload.date_of_birth ?? "");
+      } else{
+        delete individualPayload.date_of_birth
       }
 
       for (const employment of individualPayload.employment_details || []) {
@@ -92,7 +85,7 @@ export default function useIndividualForm() {
             postal_code: addr.postal_code ? addr.postal_code.toString() : undefined
          }));
       }
-     
+
       createIndividual(individualPayload);
    }
 

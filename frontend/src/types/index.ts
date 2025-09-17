@@ -342,7 +342,7 @@ export type LeasePayload = {
   };
 
   address_data: ShortSuburbAddressData
-  landlord_data: LandlordInput
+  landlord_data?: LandlordInput
   guarantor_data?: guarantorPayload 
   tenants: TenantPayload[];
 
@@ -373,7 +373,7 @@ export type LeasePayload = {
    outstanding_balance: number;
   };
 
-  landlord_opening_balances_data: {
+  landlord_opening_balances_data?: {
    amount: string;
    commission_percentage: string;
    operating_costs_inclusive: boolean;

@@ -1,8 +1,8 @@
-import { Loader2, Plus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useCompanyForm from "@/hooks/components/useCompanyForm";
 import { toast } from "sonner";
@@ -24,12 +24,6 @@ export default function CompanyForm({ open, setShowForm}: props) {
          open={open}
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
       >
-         <DialogTrigger asChild>
-            <Button asChild>
-               Add New Company <Plus size={18} />
-            </Button>
-         </DialogTrigger>
-
          <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 
@@ -37,10 +31,11 @@ export default function CompanyForm({ open, setShowForm}: props) {
             
                <ColumnsContainer  numberOfCols={3} gapClass="gap-5">
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="registration_name">
+                     <Label className="px-2 font-normal required" htmlFor="registration_name">
                         Registered Name
                      </Label>
                      <Input
+                        required
                         id="registration_name"
                         name="registration_name"
                         className="border-color bg-white"
@@ -49,10 +44,11 @@ export default function CompanyForm({ open, setShowForm}: props) {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="trading_name">
+                     <Label className="px-2 font-normal required" htmlFor="trading_name">
                         Trading Name
                      </Label>
                      <Input
+                        required
                         id="trading_name"
                         name="trading_name"
                         className="border-color bg-white"
@@ -61,13 +57,12 @@ export default function CompanyForm({ open, setShowForm}: props) {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal required" htmlFor="registration_number">
+                     <Label className="px-2 font-normal" htmlFor="registration_number">
                         Registration Number
                      </Label>
                      <Input
                         id="registration_number"
                         name="registration_number"
-                        required
                         className="border-color bg-white"
                      />
                   </div>

@@ -128,6 +128,24 @@ export function formatAddress(addr: Address): string {
 
    return parts.join(", ");
 }
+export function extractPhones(data: { [k: string]: FormDataEntryValue }) {
+  const phones: { type: string; phone_number: string }[] = [];
+
+  Object.keys(data).forEach((key) => {
+    if (key.startsWith("number")) {
+      const index = key.replace("number", ""); 
+      const phone_number = data[key] as string;
+      const type = (data[`type${index}`] as string) || "";
+
+      if (phone_number.trim().length > 0) {
+        phones.push({ type, phone_number });
+      }
+    }
+  });
+
+  return phones;
+}
+
 
 export function extractAddresses(data: { [k: string]: FormDataEntryValue }): AddressPayload[] {
    const addresses: AddressPayload[] = [];
@@ -424,9 +442,24 @@ export function parseListString(s : string) : string{
    const arr = JSON.parse(fixed);
    return arr[0];
 }
+export function formatPhones(phones: { type: string; phone_number: string }[]): string {
+  return phones
+    .map(p => `${p.phone_number}`)
+    .join(" | ");
+}
 
 export function formatLandlords(landlords: Landlord[]): string {
    if (landlords.length === 0) return "";
    if (landlords.length === 1) return landlords[0].landlord_name;
    return landlords.map((l) => l.landlord_name).join(" | ");   
+}
+
+export function validateYear(year: string): boolean {
+  const currentYear = new Date().getFullYear();
+  if (!/^\d{4}$/.test(year)) {
+    return false;
+  }
+
+  const numericYear = parseInt(year, 10);
+  return numericYear >= 1900 && numericYear <= currentYear + 5;
 }

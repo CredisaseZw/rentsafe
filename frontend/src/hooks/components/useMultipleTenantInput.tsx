@@ -48,7 +48,7 @@ export default function useMultiTenantInput(clientType: string){
                         id : selectedTenant.id,
                         full_name : `${selectedTenant.first_name} ${selectedTenant.last_name}`,
                         identification_number : selectedTenant.identification_number,
-                        mobile_number: selectedTenant.contact_details?.mobile_phone as unknown as string || "-",
+                        mobile_number: selectedTenant?.phone ?? "",
                         address : selectedTenant.primary_address ?? null
                     }   
                     : tenant

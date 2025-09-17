@@ -235,7 +235,7 @@ function useAddIndividualLease() {
         postal_code: source?.postal_code ?? ""
       }, 
       landlord_data: {
-        landlord_type: String(formData.landlord_type) as LeasePayload["landlord_data"]["landlord_type"],
+        landlord_type: String(formData.landlord_type),
         landlord_name: String(formData.landlord_name),
         landlord_id: Number(formData.landlord_id)
       },
@@ -285,7 +285,10 @@ function useAddIndividualLease() {
       ]
     };
     if(Number(formData.guarantor_id ?? 0) === 0) delete PAYLOAD.guarantor_data
-  
+    if(Number(formData.landlord_id ?? 0) === 0) delete PAYLOAD.landlord_data
+    if(String(data.landlordsOpeningBalance).length === 0) delete PAYLOAD.landlord_opening_balances_data
+
+    
     useMutate.mutate(PAYLOAD, {
         onError: (error: AxiosError |Error | unknown) => {
           if (isAxiosError(error)) {

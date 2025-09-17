@@ -8,6 +8,7 @@ import MultiAddressInput from "@/components/general/MultiAddressInput";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
+import MultiIndividualContact from "@/components/general/MultiIndividualContact";
 
 export default function diviIndividualForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useIndividualForm();
@@ -59,8 +60,8 @@ export default function diviIndividualForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="identificationNumber">
-                        Identification Number <span className="text-PRIMARY">*</span>
+                     <Label className="px-2 font-normal required" htmlFor="identificationNumber">
+                        Identification Number 
                      </Label>
                      <Input
                         id="identificationNumber"
@@ -115,19 +116,6 @@ export default function diviIndividualForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                     <Label className="px-2 font-normal" htmlFor="mobilePhone">
-                        Mobile Phone <span className="text-PRIMARY">*</span>
-                     </Label>
-                     <Input
-                        id="mobilePhone"
-                        name="mobilePhone"
-                        required
-                        placeholder="e.g. +263 712 345678"
-                        className="border-color bg-white"
-                     />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
                      <Label className="px-2 font-normal" htmlFor="email">
                         Email Address
                      </Label>
@@ -140,6 +128,9 @@ export default function diviIndividualForm() {
                      />
                   </div>
                </ColumnsContainer>
+               <div className="mt-5">
+                  <MultiIndividualContact/>
+               </div>
                <div className="pt-5">
                   <MultiAddressInput />
                </div>

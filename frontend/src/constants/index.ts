@@ -45,18 +45,27 @@ export const PAYMENT_STATUS_CLASSIFICATIONS = [
 ];
 
 export const INDUSTRIES = [
-   "Agriculture",
-   "Construction",
-   "Education",
-   "Finance",
-   "Healthcare",
-   "Hospitality",
-   "Information Technology",
-   "Manufacturing",
-   "Retail",
-   "Transportation",
-   "Other",
-];
+    "Agriculture",
+    "Banking",
+    "Construction",
+    "Education",
+    "Energy",
+    "Entertainment",
+    "Finance",
+    "Food",
+    "Health",
+    "Hospitality",
+    "Insurance",
+    "Manufacturing",
+    "Media",
+    "Retail",
+    "Technology",
+    "Telecommunications",
+    "Transportation",
+    "Aviation",
+    "Real Estate",
+    "Other"
+]
 
 export const MODAL_WIDTHS = {
    md: "900px" as const,
@@ -299,3 +308,13 @@ export const UNIT_FEATURES:Option[] = [
     ],
   },
 ]
+
+export const PHONE_TYPES = [
+  { label: "Mobile", value: "mobile" },
+  { label: "Whatsapp", value: "whatsapp" },
+  { label: "Combined", value: "combined" },
+  { label: "Home", value: "home" },
+  { label: "Work", value: "work" },
+  { label: "Other", value: "Other" }
+]
+

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { api } from "@/api/axios";
 import { isAxiosError, type AxiosError } from "axios";
 import useClient from "../general/useClient";
-import type { IndividualFull, IndividualMinimal } from "@/interfaces";
+import type { IndividualContact, IndividualFull, IndividualMinimal } from "@/interfaces";
 
 export default function useCreateIndividual(successCallback?: () => void) {
    const client = useClient();
@@ -39,12 +39,7 @@ export default function useCreateIndividual(successCallback?: () => void) {
               first_name: individual.first_name,
               last_name: individual.last_name ?? "",
               identification_number: individual.identification_number ?? "",
-              contact_details: individual.contact_details ? {
-                id: individual.contact_details[0].id,
-                individual_id: individual.id,
-                mobile_phone: individual.contact_details[0].mobile_phone ?? [],
-                email: individual.contact_details[0].email ?? "",
-              } : undefined,
+              contact_details: individual?.contact_details ?? [{} as IndividualContact],
               is_active: true,
             };
 
