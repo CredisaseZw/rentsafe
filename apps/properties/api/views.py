@@ -101,15 +101,22 @@ class PropertyViewSet(BaseViewSet):
             )
     @action(detail=True, methods=['get', 'post'], url_path='units')
     def get_units(self, request, pk=None):
-        if request.method == 'POST':
-            serializer = UnitDetailSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
+        try:
+            if request.method == 'POST':
+                serializer = UnitDetailSerializer(data=request.data, context={'property': self.get_object()})
+                serializer.is_valid(raise_exception=True)
                 serializer.save(property=self.get_object())
                 return Response(serializer.data, status=201)
-        property = self.get_object()
-        units = property.units.all()
-        serializer = UnitListSerializer(units, many=True)
-        return Response(serializer.data)
+            property = self.get_object()
+            units = property.units.all()
+            serializer = UnitListSerializer(units, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"Error in get_units action: {e}")
+            return Response(
+                {"error": extract_error_message(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class UnitViewSet(viewsets.ModelViewSet):
