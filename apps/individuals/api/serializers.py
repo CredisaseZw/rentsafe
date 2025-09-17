@@ -26,6 +26,22 @@ import re
 
 logger = logging.getLogger('individuals')
 class EmploymentDetailSerializer(serializers.ModelSerializer):
+    start_date = serializers.DateField(
+        allow_null=True,
+        required=False
+    )
+    end_date = serializers.DateField(
+        allow_null=True,
+        required=False
+    )
+
+    def to_internal_value(self, data):
+        for field in ['start_date', 'end_date']:
+            value = data.get(field)
+            if value in ['', None]:  
+                data[field] = None
+        return super().to_internal_value(data)
+
     class Meta:
         model = EmploymentDetail
         fields = [
@@ -150,6 +166,16 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         required=False, allow_empty=True,
         write_only=True
     )
+    date_of_birth = serializers.DateField(
+        allow_null=True,
+        required=False
+    )
+
+    def to_internal_value(self, data):
+        dob = data.get('date_of_birth').strip()
+        if dob in ['', None]:  
+            data['date_of_birth'] = None
+        return super().to_internal_value(data)
     class Meta:
         model = Individual
         fields = [
