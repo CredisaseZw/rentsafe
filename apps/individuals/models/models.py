@@ -83,7 +83,7 @@ class IndividualContactDetail(BaseModel):
     PHONE_TYPES = (
         ('mobile', 'Mobile'),
         ('whatsapp', 'WhatsApp'),
-        ('combined', 'Combined'), 
+        ('combined', 'Combined'),
         ('home', 'Home'),
         ('work', 'Work'),
         ('other', 'Other'),
@@ -95,11 +95,13 @@ class IndividualContactDetail(BaseModel):
 
     @property
     def mobile_number(self):
-        return self.phone_number if self.type == 'mobile' else None
+        if self.type in ['mobile','combined']:
+            return self.phone_number
 
     @property
     def whatsapp_number(self):
-        return self.phone_number if self.type == 'whatsapp' else None
+        if self.type in ['whatsapp', 'combined']:
+            return self.phone_number
 
     class Meta:
         app_label = 'individuals'

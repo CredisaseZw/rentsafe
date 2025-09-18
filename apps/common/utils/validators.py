@@ -36,17 +36,12 @@ def validate_email(email: str) -> bool:
     except ValidationError:
         return False
 
-def normalize_zimbabwe_mobile(phone,type):  
+def normalize_zimbabwe_mobile(phone, type):
     phone = re.sub(r'[\s-]', '', phone.strip())
-    if type in ['mobile','whatsapp', 'combined', 'other']:
-        for prefix in ['00263', '+263', '263']:  
-            if phone.startswith(prefix):  
-                phone = phone[len(prefix):]  
-                break  
-        if phone.startswith('0'):  
-            phone = phone[1:]  
-        if re.match(r'^(77|78|71|73)\d{7}$', phone):  
-            return f'+263{phone}'  
+    if re.match(r'^(?:.*?)(77|78|71|73)\d{7}$', phone):  
+        if type in ['mobile','whatsapp', 'combined', 'other']:
+            phone = phone[-9:]
+        return f'+263{phone}'  
     return False
 
 def validate_future_dates(date):

@@ -53,7 +53,7 @@ class EmploymentDetailSerializer(serializers.ModelSerializer):
     def validate(self,data):
         if email:= data.get("email"):
             if validate_email(email):
-                data["email"] = email.strip()
+                data["email"] = email
             else:
                 raise ValidationError("Invalid employer email address provide")
             
@@ -84,29 +84,57 @@ class NextOfKinSerializer(serializers.ModelSerializer):
 
             
             if validate_email(email):
-                data["email"] = email.strip()
+                data["email"] = email
             else:
                 raise ValidationError("Invalid email address provided")
             
         return data
 
 class ContactDetailsSerializer(serializers.ModelSerializer):
- 
+
     class Meta:
         model = IndividualContactDetail
-        fields = ['type', 'phone_number']
+        fields = ['id', 'type', 'phone_number']
 
     def validate(self, data):
-        phone_number = data.get("phone_number","").strip()
-        type = data.get("type","mobile")
+        phone_number = data.get("phone_number", "")
+        phone_type = data.get("type", "mobile")
 
-        if not (formatted := normalize_zimbabwe_mobile(phone_number, type)):
+        formatted = normalize_zimbabwe_mobile(phone_number, phone_type)
+        if not formatted:
             raise ValidationError(f"Invalid phone number provided: {phone_number}")
 
-        if IndividualContactDetail.objects.filter(phone_number=formatted).exists():
-            raise ValidationError(f"This phone number is already registered: {formatted}")
-        else:
-            data["phone_number"] = formatted
+        def _get_parent_individual_id():
+            parent = getattr(self, "parent", None)
+            while parent is not None:
+                inst = getattr(parent, "instance", None)
+                if inst is not None:
+                    return getattr(inst, "id", None) or getattr(inst, "pk", None)
+                parent = getattr(parent, "parent", None)
+            return None
+
+        existing_contact = IndividualContactDetail.objects.filter(phone_number=formatted).first()
+        if existing_contact:
+
+            current_individual_id = getattr(self.instance, "individual_id", None) or _get_parent_individual_id()
+
+            if self.instance and existing_contact.pk == getattr(self.instance, "pk", None):
+                data["phone_number"] = formatted
+                data["type"] = phone_type
+                return data
+
+            if current_individual_id and existing_contact.individual_id == current_individual_id:
+                if existing_contact.type == phone_type:
+                    raise ValidationError("Phone number already exists for this individual")
+                data["id"] = existing_contact.id
+                data["type"] = phone_type
+                data["phone_number"] = formatted
+                return data
+
+            raise ValidationError(f"This phone number is already registered {formatted}")
+
+        data["phone_number"] = formatted
+        data["type"] = phone_type
         return data
         
 class IndividualSerializer(serializers.ModelSerializer):
@@ -172,7 +200,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
     )
 
     def to_internal_value(self, data):
-        dob = data.get('date_of_birth').strip()
+        dob = data.get('date_of_birth')
         if dob in ['', None]:  
             data['date_of_birth'] = None
         return super().to_internal_value(data)
@@ -188,13 +216,13 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         id_number = re.sub(r'[-\s]', '', data.get('identification_number', ''))
         dob = data.get('date_of_birth')
         addresses = data.get('addresses', [])
-        email = data.get('email', '').strip()
+        email = data.get('email', '')
         if email:
             if Individual.objects.filter(email__iexact=email).exists():
                 raise ValidationError("This email address is already registered")
 
             if validate_email(email):
-                data["email"] = email.strip()
+                data["email"] = email
             else:
                 raise ValidationError("Invalid email address provided")
         for address in addresses:
