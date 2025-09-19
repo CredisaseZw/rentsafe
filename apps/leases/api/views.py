@@ -22,13 +22,13 @@ from apps.leases.api.serializers import (
     LandlordSerializer,
     GuarantorSerializer,
     PaymentSerializer,
-    TenantStatementsListSerializer
+    TenantStatementsListSerializer,
+    LeaseTenantAssociationSerializer
 )
 from apps.common.utils import extract_error_message
 from apps.common.services.tasks import send_notification
-from apps.individuals.models import Individual
-from apps.companies.models import CompanyBranch
-from apps.leases.utils import CommissionHandler,get_lease_payment_message_for_sms
+from apps.leases.utils import CommissionHandler
+from apps.leases.utils.helpers import create_lease_tenant
 from apps.accounting.api.serializers.serializers import DisbursementSerializer
 import logging
 from django.conf import settings
@@ -49,6 +49,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
         elif self.action == 'terminate':
             return LeaseTerminationSerializer
         return LeaseDetailSerializer
+        
     def get_queryset(self):
         """
         Custom queryset to filter leases based on the user's company,
@@ -91,9 +92,9 @@ class LeaseViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         try:
+        
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-
             # Pass request context for user tracking
             serializer.context['request'] = request
 
@@ -173,31 +174,13 @@ class LeaseViewSet(viewsets.ModelViewSet):
         serializer = LeaseTenantSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         
-        tenant_type = serializer.validated_data.pop('tenant_type', None)
-        tenant_id = serializer.validated_data.pop('tenant_id', None)
-        
-        if tenant_type == 'individual':
-            ModelClass = Individual
-            app_label = 'individuals'
-        elif tenant_type == 'company':
-            ModelClass = CompanyBranch
-            app_label = 'companies'
-        else:
-            return Response({"error": "Invalid tenant type."}, status=status.HTTP_400_BAD_REQUEST)
-        
         try:
-            tenant_ct = ContentType.objects.get(app_label=app_label, model=ModelClass._meta.model_name)
-            if LeaseTenant.objects.filter(lease=lease, content_type=tenant_ct, object_id=tenant_id).exists():
-                return Response({"error": "This tenant is already associated with this lease."}, status=status.HTTP_400_BAD_REQUEST)
-            tenant_obj = get_object_or_404(ModelClass, id=tenant_id)
-                
-            tenant = LeaseTenant.objects.create(
-                lease=lease,
-                tenant_object=tenant_obj,
-                **serializer.validated_data
-            )
+            # Use the helper function to create the association
+            association = create_lease_tenant(lease, serializer.validated_data)
             
-            return Response(LeaseTenantSerializer(tenant).data, status=status.HTTP_201_CREATED)
+            # Return the association data
+            association_serializer = LeaseTenantAssociationSerializer(association)
+            return Response(association_serializer.data, status=status.HTTP_201_CREATED)
         
         except Exception as e:
             return Response({"error": f"Failed to add tenant: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
@@ -205,40 +188,43 @@ class LeaseViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='remove-tenant')
     def remove_tenant(self, request, lease_id=None):
         lease = self.get_object()
-        tenant_id = request.data.get('tenant_id')
+        association_id = request.data.get('association_id')  # Now we need association_id
         
-        if not tenant_id:
-            return Response({'error': 'tenant_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not association_id:
+            return Response({'error': 'association_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        tenant = get_object_or_404(LeaseTenant, id=tenant_id, lease=lease)
+        # Get the association
+        association = get_object_or_404(LeaseTenantAssociation, id=association_id, lease=lease)
         
-        # Prevent removing the only primary tenant if this is the primary
-        if tenant.is_primary_tenant and lease.lease_tenants.filter(is_primary_tenant=True).count() == 1:
+        # Prevent removing the only primary tenant
+        if association.is_primary_tenant and lease.leasetenantassociation_set.filter(is_primary_tenant=True).count() == 1:
             return Response(
                 {'error': 'Cannot remove the only primary tenant. Assign another primary tenant first.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        tenant.delete(request=request)
+        # Remove the association (this will not delete the LeaseTenant instance)
+        association.delete()
         
         return Response({'status': 'tenant removed'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'], url_path='set-primary-tenant')
     def set_primary_tenant(self, request, lease_id=None):
         lease = self.get_object()
-        tenant_id = request.data.get('tenant_id')
+        association_id = request.data.get('association_id')  # Now we need association_id
         
-        if not tenant_id:
-            return Response({'error': 'tenant_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not association_id:
+            return Response({'error': 'association_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        tenant = get_object_or_404(LeaseTenant, id=tenant_id, lease=lease)
+        # Get the association
+        association = get_object_or_404(LeaseTenantAssociation, id=association_id, lease=lease)
         
         # First unset any existing primary tenants
-        lease.lease_tenants.filter(is_primary_tenant=True).update(is_primary_tenant=False)
+        lease.leasetenantassociation_set.filter(is_primary_tenant=True).update(is_primary_tenant=False)
         
         # Set this tenant as primary
-        tenant.is_primary_tenant = True
-        tenant.save(request=request)
+        association.is_primary_tenant = True
+        association.save()
         
         return Response({'status': 'primary tenant set'}, status=status.HTTP_200_OK)
 
@@ -249,23 +235,19 @@ class LeaseViewSet(viewsets.ModelViewSet):
         """
         lease = self.get_object()
         
-        # Get content types for individuals and company branches
-        individual_ct = ContentType.objects.get(app_label='individuals', model='individual')
-        company_branch_ct = ContentType.objects.get(app_label='companies', model='companybranch')
-        
         # Get IDs of existing tenants
-        existing_tenant_ids = lease.lease_tenants.values_list('object_id', flat=True)
+        existing_tenant_ids = lease.lease_tenants.values_list('id', flat=True)
         
         # Get available individuals
         from apps.individuals.models.models import Individual
-        available_individuals = Individual.objects.filter(
-            id__in=existing_tenant_ids,
+        available_individuals = Individual.objects.exclude(
+            lease_tenant__id__in=existing_tenant_ids
         ).values('id', 'first_name', 'last_name', 'identification_number')
         
         # Get available company branches
         from apps.companies.models.models import CompanyBranch
-        available_branches = CompanyBranch.objects.filter(
-            id__in=existing_tenant_ids,
+        available_branches = CompanyBranch.objects.exclude(
+            lease_tenant__id__in=existing_tenant_ids
         ).values('id', 'branch_name', 'company__registration_name')
         
         return Response({
@@ -390,7 +372,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 description = request.data.get('description', '')
                 payment_date = request.data.get('payment_date') or timezone.now().date()
 
-                primary_tenant = lease.lease_tenants.filter(is_primary_tenant=True).first() if lease.lease_tenants else None
+                primary_tenant_association = lease.leasetenantassociation_set.filter(is_primary_tenant=True).first()
+                primary_tenant = primary_tenant_association.tenant if primary_tenant_association else None
 
                 if amount <= 0:
                     return Response(
@@ -457,7 +440,9 @@ class LeaseViewSet(viewsets.ModelViewSet):
                     if not lease:
                         errors.append({"error": f"Lease with ID {lease_id} not found"})
                         continue
-                    primary_tenant = lease.lease_tenants.filter(is_primary_tenant=True).first() if lease.lease_tenants else None
+                    primary_tenant_association = lease.leasetenantassociation_set.filter(is_primary_tenant=True).first()
+                    primary_tenant = primary_tenant_association.tenant if primary_tenant_association else None
+
                     if amount <= 0:
                         raise ValueError("Payment amount must be positive")
 
@@ -646,9 +631,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
         """Send lease creation notification to all tenants"""
         from apps.common.utils.messages import prepare_lease_creation_context
         from apps.leases.utils.notification_utils import determine_recipient_info
-        
-        for tenant_relation in lease.lease_tenants.all():
-            tenant = tenant_relation.tenant_object
+        for association in lease.leasetenantassociation_set.all():
+            tenant = association.tenant.tenant_object
             
             # Determine recipient type and ID
             recipient_type, recipient_id, recipient_name = determine_recipient_info(tenant)

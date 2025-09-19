@@ -62,6 +62,12 @@ class Lease(BaseModelWithUser):
     landlord = models.ForeignKey('leases.Landlord', on_delete=models.PROTECT, related_name='managed_leases',
                                 null=True, blank=True,
                                 help_text="The landlord responsible for this lease.")
+    lease_tenants = models.ManyToManyField(
+                                    'leases.LeaseTenant',
+                                    through='leases.LeaseTenantAssociation',
+                                    related_name='leases',
+                                    blank=True
+                                )
     currency = models.ForeignKey('accounting.Currency', on_delete=models.PROTECT,
                                 help_text="The primary currency in which the lease payments and charges are accounted for.",
                                 related_name='leases_as_primary_currency')
@@ -95,12 +101,14 @@ class Lease(BaseModelWithUser):
         ordering = ['-start_date', 'lease_id']
 
     def __str__(self):
+        # Update to use the new relationship
         tenant_names = [lt.tenant_object.__str__() for lt in self.lease_tenants.all()]
         tenant_str = ", ".join(tenant_names) if tenant_names else "No Tenant"
         return f"Lease {self.lease_id} for {self.unit} ({tenant_str})"
 
     def get_primary_tenant(self):
-        return self.lease_tenants.filter(is_primary_tenant=True).first()
+        association = self.leasetenantassociation_set.filter(is_primary_tenant=True).first()
+        return association.tenant if association else None
 
     def get_tenant_names(self):
         return [lt.tenant_object.__str__() for lt in self.lease_tenants.all()]
@@ -532,76 +540,37 @@ class Lease(BaseModelWithUser):
         except Exception as e:
             print(f"ERROR: During subscription slot increment for Lease {self.lease_id}: {e}")
             return False
-    
+
+class LeaseTenantAssociation(BaseModel):
+    lease = models.ForeignKey('leases.Lease', on_delete=models.CASCADE)
+    tenant = models.ForeignKey('leases.LeaseTenant', on_delete=models.CASCADE)
+    is_primary_tenant = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('lease', 'tenant')
+        verbose_name = _('Lease Tenant Association')
+        verbose_name_plural = _('Lease Tenant Associations')
+
+    def __str__(self):
+        return f"{self.tenant} on {self.lease} (Primary: {self.is_primary_tenant})"
+
 class LeaseTenant(BaseModel):
-    lease = models.ForeignKey(Lease, on_delete=models.CASCADE, related_name='lease_tenants')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                     limit_choices_to=Q(app_label='individuals', model='individual') |
                                     Q(app_label='companies', model='companybranch'))
     object_id = models.PositiveIntegerField(null=True, blank=True)
     tenant_object = GenericForeignKey('content_type', 'object_id')
 
-    is_primary_tenant = models.BooleanField(default=False,
-                        help_text="Designates this tenant as the primary contact for the lease.")
-
     class Meta:
         app_label = 'leases'
         db_table = 'lease_tenant'
-        unique_together = ('lease', 'content_type', 'object_id')
+        unique_together = ('content_type', 'object_id')
         verbose_name = _('lease tenant')
         verbose_name_plural = _('lease tenants')
     
     def __str__(self):
-        return f"{self.tenant_object} on Lease {self.lease.lease_id}"
-    def save(self, *args, **kwargs):
-        is_new = not self.pk
-        original_primary_status = None
-
-        request = kwargs.pop('request', None)
-        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
-
-        if not is_new:
-            with contextlib.suppress(LeaseTenant.DoesNotExist):
-                original_lease_tenant = LeaseTenant.objects.get(pk=self.pk)
-                original_primary_status = original_lease_tenant.is_primary_tenant
-        super().save(*args, **kwargs)
-
-        tenant_obj_id = self.tenant_object.id if self.tenant_object else None
-        tenant_obj_name = str(self.tenant_object) if self.tenant_object else "N/A"
-
-        lease_details_for_log = {
-            'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
-            'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
-            'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
-            'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
-            'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
-            'tenant_id': tenant_obj_id,
-            'tenant_name': tenant_obj_name,
-        }
-
-        if is_new:
-            LeaseLog.objects.create(
-                lease=self.lease, 
-                log_type='TENANT_ADDED',
-                user=user,
-                details={**lease_details_for_log, 'is_primary': self.is_primary_tenant},
-                content_type=ContentType.objects.get_for_model(self),
-                object_id=self.pk
-            )
-        elif original_primary_status != self.is_primary_tenant:
-            LeaseLog.objects.create(
-                lease=self.lease,
-                log_type='PRIMARY_TENANT_CHANGED',
-                user=user,
-                details={
-                    **lease_details_for_log,
-                    'old_primary_status': original_primary_status,
-                    'new_primary_status': self.is_primary_tenant
-                },
-                content_type=ContentType.objects.get_for_model(self),
-                object_id=self.pk
-            )
-
+        return f"{self.tenant_object}"
+    
     def tenant_info(self):
         if self.tenant_object:
             if isinstance(self.tenant_object, Individual):
@@ -632,30 +601,6 @@ class LeaseTenant(BaseModel):
             return self.tenant_object.email
         return None
     
-    def delete(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        user = request.user if request and hasattr(request, 'user') and request.user.is_authenticated else None
-
-        tenant_obj_id = self.tenant_object.id if self.tenant_object else None
-        tenant_obj_name = str(self.tenant_object) if self.tenant_object else "N/A"
-        
-        lease_details_for_log = {
-            'lease_id_at_log_time': self.lease.lease_id if self.lease else None,
-            'unit_id_at_log_time': self.lease.unit.id if self.lease and self.lease.unit else None,
-            'unit_name_at_log_time': str(self.lease.unit) if self.lease and self.lease.unit else None,
-            'landlord_id_at_log_time': self.lease.landlord.id if self.lease and self.lease.landlord else None,
-            'landlord_name_at_log_time': str(self.lease.landlord) if self.lease and self.lease.landlord else None,
-            'tenant_id': tenant_obj_id,
-            'tenant_name': tenant_obj_name,
-        }
-
-        LeaseLog.objects.create(
-            lease=self.lease,
-            log_type='TENANT_REMOVED',
-            user=user,
-            details={**lease_details_for_log, 'was_primary': self.is_primary_tenant}
-        )
-        super().delete(*args, **kwargs)
 
 class LeaseCharge(BaseModel):
     CHARGE_TYPE_CHOICES = (

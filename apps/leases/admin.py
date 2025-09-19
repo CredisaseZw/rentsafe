@@ -4,14 +4,10 @@ from django.contrib import admin
 from apps.leases.models import (
     Lease, LeaseTenant, LeaseCharge,
     LeaseLog, Guarantor, LeaseOpeningBalance, 
-    LandlordOpeningBalance, LeaseDeposit, LeaseTermination
+    LandlordOpeningBalance, LeaseDeposit, LeaseTermination,
+    LeaseTenantAssociation
 )
 from django.contrib.contenttypes.admin import GenericTabularInline
-
-class LeaseTenantInline(admin.TabularInline):
-    model = LeaseTenant
-    extra = 1
-
 
 class LeaseChargeInline(admin.TabularInline):
     model = LeaseCharge
@@ -38,7 +34,6 @@ class LeaseAdmin(admin.ModelAdmin):
     readonly_fields = ('date_created', 'date_updated')
 
     inlines = [
-        LeaseTenantInline,
         LeaseChargeInline,
         LeaseLogInline,
         GuarantorInline,
@@ -47,8 +42,8 @@ class LeaseAdmin(admin.ModelAdmin):
 
 @admin.register(LeaseTenant)
 class LeaseTenantAdmin(admin.ModelAdmin):
-    list_display = ('tenant_object', 'lease', 'is_primary_tenant')
-    search_fields = ('lease__lease_id',)
+    list_display = ('tenant_object',)
+    search_fields = ('tenant_object__full_name',)
     readonly_fields = ('date_created', 'date_updated')
 
 
@@ -95,4 +90,11 @@ class LeaseDepositAdmin(admin.ModelAdmin):
 @admin.register(LeaseTermination)
 class LeaseTerminationAdmin(admin.ModelAdmin):
     list_display = ('lease', 'termination_date', 'reason')
+    readonly_fields = ('date_created', 'date_updated')
+
+@admin.register(LeaseTenantAssociation)
+class LeaseTenantAssociationAdmin(admin.ModelAdmin):
+    list_display = ('lease', 'tenant', 'is_primary_tenant')
+    list_filter = ('is_primary_tenant',)
+    search_fields = ('lease__lease_id', 'tenant__tenant_object__full_name')
     readonly_fields = ('date_created', 'date_updated')
