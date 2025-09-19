@@ -6,6 +6,8 @@ import { useEffect, useState } from "react"
 
 export default function useMultiTenantInput(clientType: string){
     const [tenants, setTenants] = useState<TenantSelection[]>([MINIMAL_TENANT_OBJECT])
+    const [open, setOpen] = useState(false);
+    const [updateIndividual, setUpdateIndividual] = useState<TenantSelection | null>(null)
 
     useEffect(()=>{
         setTenants([MINIMAL_TENANT_OBJECT])
@@ -49,6 +51,7 @@ export default function useMultiTenantInput(clientType: string){
                         full_name : `${selectedTenant.first_name} ${selectedTenant.last_name}`,
                         identification_number : selectedTenant.identification_number,
                         mobile_number: selectedTenant?.phone ?? "",
+                        store_mobile: selectedTenant?.phone ?? "",
                         address : selectedTenant.primary_address ?? null
                     }   
                     : tenant
@@ -64,19 +67,31 @@ export default function useMultiTenantInput(clientType: string){
                     id : selectedTenant.id,
                     full_name : selectedTenant.branch_name,
                     identification_number : selectedTenant.company.registration_number,
-                    mobile_number: extractTenantBranchContact(selectedTenant.contacts)
+                    mobile_number: extractTenantBranchContact(selectedTenant.contacts),
                 }   
                 : tenant
             )
         );
     }
 
+    function checkMobileNumberUpdate(user: TenantSelection) {
+        if (user.mobile_number !== user.store_mobile && user.id > 0) {
+            setUpdateIndividual(user);
+            setOpen(true);
+        }
+    }
+
     return{
         tenants,
+        open, 
+        updateIndividual,
+        setOpen,
         onSelectTenant,
         updateTenant,
         updateMobile,
         addTenant,
-        removeTenant
+        setUpdateIndividual,
+        removeTenant,
+        checkMobileNumberUpdate
     }
 }

@@ -27,7 +27,6 @@ function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantA
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log(isRequired);
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
     return () => clearTimeout(handler);
   }, [searchItem]);
@@ -117,8 +116,7 @@ function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantA
               );
             })
 
-          }
-            
+          }    
         </div>
       )}
     </div>

@@ -5,13 +5,14 @@ import AddressFormFields from "./AddressFormFields";
 
 interface props {
    isMultiple?: boolean;
+   className? : string
 }
 
-export default function MultiAddressInput({ isMultiple = true }: props) {
+export default function MultiAddressInput({ isMultiple = true, className }: props) {
    const { addresses, addAddress, removeAddress } = useMultiAddressInput();
 
    return (
-      <div>
+      <div className={className}>
          {addresses.map((_, index) => (
             <fieldset
                key={index}

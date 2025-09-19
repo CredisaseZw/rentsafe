@@ -155,7 +155,7 @@ export function extractAddresses(data: { [k: string]: FormDataEntryValue }): Add
          is_primary: !!data[`is_primary_address${i}`],
          address_type: data[`address_type${i}`] as "physical" | "postal" | "billing" | "work" | "other",
          postal_code: data[`postal_code${i}`] as string,
-         suburb_id: toIntElseUndefined(data[`suburb_id${i}`] as string),
+         suburb_id: data[`suburb_id${i}`] as string,
          street_address: data[`street_address${i}`] as string,
       };
       addresses.push(address);

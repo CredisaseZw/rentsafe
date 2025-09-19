@@ -97,7 +97,6 @@ export default function useReceipt(initialLease?: ReceiptLease) {
             }
         },
         onSuccess: (data) => {
-            console.log(data)
             if(data) {
                 if(data.errors.length > 0) return toast.error("Error occurred creating a receipt", )
                 toast.success("Receipt created successfully")
