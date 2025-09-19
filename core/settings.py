@@ -318,7 +318,7 @@ AUTHENTICATION_WHITELIST = [
     'rest_framework_simplejwt.authentication.JWTAuthentication',
 ]
 
-REDIS_CACHE_LOCATION = "redis://127.0.0.1:6379/1" if DEVELOPMENT else os.getenv('REDIS_CACHE_LOCATION')
+REDIS_CACHE_LOCATION = os.getenv('REDIS_CACHE_LOCATION')
 
 # CACHES = {
 #     "default": {
