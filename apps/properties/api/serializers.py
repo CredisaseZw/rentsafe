@@ -83,13 +83,13 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
         ]
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(required=False)
+    name = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     status = serializers.ChoiceField(choices=Property.PROPERTY_STATUS_CHOICES, required=False)
     year_built = serializers.IntegerField(required=False)
     total_area = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     is_furnished = serializers.BooleanField(required=False)
-    total_number_of_units = serializers.IntegerField(required=False)
+    total_number_of_units = serializers.IntegerField(required=False, allow_null=True)
     features = serializers.JSONField(required=False, allow_null=True)
 
     # already present fields
@@ -211,7 +211,6 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop("addresses_input", None)
         landlords_data = validated_data.pop("landlords_input", [])
-
         # Handle regular fields
         instance = super().update(instance, validated_data)
 

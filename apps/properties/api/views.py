@@ -75,13 +75,17 @@ class PropertyViewSet(BaseViewSet):
     
     def create(self, request, *args, **kwargs):
         try:
-            serializer = self.get_serializer(data=request.data)
+            property_data = request.data
+            if property_data.get('total_area') =='' or property_data.get('total_area') is None:
+                property_data['total_area'] = 0
+            if property_data.get('total_number_of_units') =='' or property_data.get('total_number_of_units') is None:
+                property_data['total_number_of_units'] = 0
+            serializer = self.get_serializer(data=property_data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except Exception as e:
-            print(f"Error creating property: {e}")
             return Response(
                 {"error": extract_error_message(e)},
                 status=status.HTTP_400_BAD_REQUEST

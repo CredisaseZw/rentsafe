@@ -32,6 +32,21 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type', 'description']
+    
+    def to_representation(self, instance):
+        description_suffix = f"- {instance.description or ''}"
+        if instance.method and instance.method.payment_method_name.lower().startswith('cash'):
+            description_prefix = "Cash receipt"
+        return {
+            'id': instance.id,
+            'invoice_number': instance.invoice.document_number if instance.invoice else None,
+            'amount': instance.amount,
+            'method': self.get_method(instance),
+            'payment_date': instance.payment_date,
+            'reference': instance.reference,
+            'type': self.get_type(instance),
+            'description': f"{description_prefix} {description_suffix}"
+        }
 
     def get_type(self, obj):
         return 'Payment'

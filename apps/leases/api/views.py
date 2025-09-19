@@ -490,7 +490,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
         lease = self.get_object()
         payments = Payment.objects.filter(
             invoice__lease=lease
-        ).select_related('invoice', 'method').order_by('-payment_date')
+        ).select_related('invoice', 'method').order_by('payment_date')
         
         # Calculate cumulative balances
         total_invoiced = lease.invoices.filter(
@@ -516,6 +516,7 @@ class LeaseViewSet(viewsets.ModelViewSet):
         
         # Paginate the payments (in reverse chronological order)
         page = self.paginate_queryset(payments_list)
+        opening_balance_date = lease.opening_balance.date_created if hasattr(lease, 'opening_balance') else None
         if page is not None:
             serializer = PaymentSerializer(page, many=True, context={'remaining_balances': remaining_balances})
             response = self.get_paginated_response(serializer.data)
@@ -525,11 +526,13 @@ class LeaseViewSet(viewsets.ModelViewSet):
             response.data['address'] = str(lease.unit.property.get_address())
             response.data['total_invoiced'] = str(total_invoiced)
             response.data['current_balance'] = str(lease.current_balance)
+            response.data['opening_balance_date'] = opening_balance_date
             return response
         
         serializer = PaymentSerializer(payments_list, many=True, context={'remaining_balances': remaining_balances})
         response_data = {
             'opening_balance': str(opening_balance),
+            'opening_balance_date': opening_balance_date,
             'total_invoiced': str(total_invoiced),
             'current_balance': str(lease.current_balance),
             'primary_tenant': str(lease.get_tenant_names()),
