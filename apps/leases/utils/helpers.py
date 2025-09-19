@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.exceptions import ValidationError
 from apps.accounting.models import Currency
 from apps.leases.models import (
-    Lease, 
+    Lease, LeaseTenantAssociation,
     LeaseTenant, 
     LeaseCharge, 
     Landlord, 
@@ -226,15 +226,11 @@ def create_or_get_guarantor(guarantor_data):
 
 def create_lease_tenant(lease, tenant_data, user=None):
     """
-    Helper to create a lease tenant.
-    
-    Args:
-        lease (Lease): Lease instance
-        tenant_data (dict): Tenant data
-        user (User, optional): User who is creating the tenant
+    Helper to create a lease tenant association.
     """
     tenant_type = tenant_data.get('tenant_type')
     tenant_id = tenant_data.get('tenant_id')
+    print(tenant_data)
     is_primary_tenant = tenant_data.get('is_primary_tenant', False)
     
     if not tenant_type or not tenant_id:
@@ -246,29 +242,29 @@ def create_lease_tenant(lease, tenant_data, user=None):
             model='individual' if tenant_type == 'individual' else 'companybranch'
         )
         
-        # Check if tenant already exists on this lease
-        if LeaseTenant.objects.filter(
-            lease=lease,
+        # Get or create the LeaseTenant instance
+        lease_tenant, created = LeaseTenant.objects.get_or_create(
             content_type=content_type,
             object_id=tenant_id
-        ).exists():
+        )
+        
+        # Check if tenant already exists on this lease
+        if lease.lease_tenants.filter(id=lease_tenant.id).exists():
             raise ValidationError("Tenant is already associated with this lease")
         
-        # Create lease tenant
-        lease_tenant = LeaseTenant.objects.create(
+        # Create the association and return it
+        association = LeaseTenantAssociation.objects.create(
             lease=lease,
-            content_type=content_type,
-            object_id=tenant_id,
+            tenant=lease_tenant,
             is_primary_tenant=is_primary_tenant
         )
         
-        return lease_tenant
+        return association
         
     except ContentType.DoesNotExist:
         raise ValidationError(f"Invalid tenant type: {tenant_type}")
     except Exception as e:
         raise ValidationError(f"Failed to create lease tenant: {str(e)}")
-
 
 def create_lease_charge(lease, charge_data, user=None):
     """
