@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { Landlord, LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -128,6 +128,24 @@ export function formatAddress(addr: Address): string {
 
    return parts.join(", ");
 }
+export function extractPhones(data: { [k: string]: FormDataEntryValue }) {
+  const phones: { type: string; phone_number: string }[] = [];
+
+  Object.keys(data).forEach((key) => {
+    if (key.startsWith("number")) {
+      const index = key.replace("number", ""); 
+      const phone_number = data[key] as string;
+      const type = (data[`type${index}`] as string) || "";
+
+      if (phone_number.trim().length > 0) {
+        phones.push({ type, phone_number });
+      }
+    }
+  });
+
+  return phones;
+}
+
 
 export function extractAddresses(data: { [k: string]: FormDataEntryValue }): AddressPayload[] {
    const addresses: AddressPayload[] = [];
@@ -204,6 +222,18 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[
   return receipts;
 }
 
+export function extractFeatures (data: { category: string; feature: string}[]) : {[key: string]: any[]} {
+   const features: { [key: string]: any[] } = {};
+   data.forEach((item) => {
+      if (item.category in features) {
+            features[item.category].push(item.feature);
+      } else {
+            features[item.category] = [item.feature];
+      }
+   });
+
+   return features;
+}
 
 export function formatErrorMessage(error: unknown): string {
    if (error instanceof Error) {
@@ -229,18 +259,6 @@ export function stringifyAndFmt(val: unknown): string {
       return JSON.stringify(val, (_, v) => (v === null || v === undefined ? undefined : v)).replace(/^"|"$/g, "");
    }
    return String(val);
-}
-
-export function extractErrorMessage(obj: string): string {
-   try{
-      const errorString = obj;
-      const match = errorString.match(/string='([^']+)'/);
-      const errorMessage = match ? match[1] : 'Unknown error';
-
-      return errorMessage
-   } catch (error){
-      return ""
-   }        
 }
 
 export function updatePropertyListCache(
@@ -423,4 +441,25 @@ export function parseListString(s : string) : string{
    const fixed = s.replace(/'/g, '"');
    const arr = JSON.parse(fixed);
    return arr[0];
+}
+export function formatPhones(phones: { type: string; phone_number: string }[]): string {
+  return phones
+    .map(p => `${p.phone_number}`)
+    .join(" | ");
+}
+
+export function formatLandlords(landlords: Landlord[]): string {
+   if (landlords.length === 0) return "";
+   if (landlords.length === 1) return landlords[0].landlord_name;
+   return landlords.map((l) => l.landlord_name).join(" | ");   
+}
+
+export function validateYear(year: string): boolean {
+  const currentYear = new Date().getFullYear();
+  if (!/^\d{4}$/.test(year)) {
+    return false;
+  }
+
+  const numericYear = parseInt(year, 10);
+  return numericYear >= 1900 && numericYear <= currentYear + 5;
 }

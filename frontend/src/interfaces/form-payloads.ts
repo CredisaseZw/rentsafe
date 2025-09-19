@@ -39,12 +39,13 @@ export interface AddressPayload {
 export interface IndividualPayload {
    first_name: string;
    last_name: string;
-   date_of_birth: string;
+   date_of_birth?: string;
    gender: string;
    identification_type: string;
    identification_number: string;
    marital_status: IndividualMaritalStatus;
-   contact_details: { email?: string; mobile_phone: string[] }[];
+   email : string,
+   contact_details:{ type: string; phone_number: string }[];
    addresses?: AddressPayload[];
    documents?: { document_type: string; file: string; description: string }[];
    notes?: { content: string }[];

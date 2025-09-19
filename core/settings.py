@@ -247,8 +247,8 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 if not CORS_ALLOW_ALL_ORIGINS:
     CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
         "https://rentsafe-backend.onrender.com",

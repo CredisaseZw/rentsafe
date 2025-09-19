@@ -79,7 +79,7 @@ html.dark .input-default::placeholder {
    flex-direction: column;
 }
 .form-group label {
-   margin-bottom: 4px;
+   margin-bottom: 8px;
    font-size: 0.9rem;
 }
 label.required::after {

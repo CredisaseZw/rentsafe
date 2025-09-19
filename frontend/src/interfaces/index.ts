@@ -213,10 +213,8 @@ export interface IndividualReport {
 }
 
 export interface IndividualContact {
-      id ?: number;
-      individual_id ?: number;
-      mobile_phone?: string[] | IndividualTenantContact;
-      email? : string;
+      type :string,
+      phone_number?: string
 }
 export interface IndividualMinimal {
    id: number;
@@ -226,7 +224,8 @@ export interface IndividualMinimal {
    addresses? : Address,
    primary_address? :Address,
    search_value? : string,
-   contact_details?: IndividualContact
+   phone? :string,
+   contact_details?: IndividualContact[]
    is_active: boolean;
 }
 export interface IndividualFull {
@@ -235,10 +234,11 @@ export interface IndividualFull {
    last_name: string;
    date_of_birth: string;
    gender: string;
+   email : string,
    marital_status: string;
    identification_type: string;
    identification_number: string;
-   contact_details: { id: number; individual_id: number; mobile_phone: string[]; email: string }[];
+   contact_details: { type: string; phone_number: string }[];
    addresses: Address[];
    employment_details: {
       id: number;
