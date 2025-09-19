@@ -256,6 +256,7 @@ export interface TenantMinimal {
 
 export type TenantSelection = TenantMinimal &{
    search_value: string,
+   store_mobile? : string,
    mobile_number: string,
    address : Address | null,
    is_primary : false

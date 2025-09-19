@@ -76,17 +76,35 @@ function Property() {
                     !propertyDataLoading && propertyData &&
                     <>
                         <h2 className="text-3xl font-bold flex flex-row gap-1 text-gray-800 dark:text-white">
-                            {property?.name} 
+                            {property?.name?.length === 0  ? 
+                                property?.addresses && summarizeAddress(property?.addresses[0]) :
+                                property?.name
+                            } 
                             <Button variant={"ghost"} className="self-center">
                                 <Edit className="self-center text-gray-800 dark:text-white" size={20}/>
                             </Button>
                         </h2>
-                        <PropertyDetail Icon={MapPin} value={property?.addresses && summarizeAddress(property?.addresses[0])}/>
+                        {
+                            property?.name?.length !== 0 &&
+                            <PropertyDetail Icon={MapPin} value={property?.addresses && summarizeAddress(property?.addresses[0])}/>
+                        }
                         <PropertyDetail Icon={User} value={property?.landlords && formatLandlords(property?.landlords)}/>                        
                         <div className="flex flex-row gap-3 mt-1">
-                            <PropertyDetail Icon={ParkingSquare} value={property?.features?.parking && capitalizeFirstLetter(property?.features?.parking ?? "")}/>
-                            <PropertyDetail Icon={Shield} value={property?.features?.security && capitalizeFirstLetter(property.features.security ?? "")}/>
-                            <PropertyDetail Icon={Power} value={property?.features?.backup_power && capitalizeFirstLetter(property?.features?.backup_power ?? "")}/>
+                            <PropertyDetail Icon={ParkingSquare} value={property?.features?.parking &&
+                                typeof(property?.features?.parking ) === "string" ?
+                                capitalizeFirstLetter(property?.features?.parking ?? "") :
+                                "Parking Available"
+                            }/>
+                            <PropertyDetail Icon={Shield} value={property?.features?.security &&
+                                typeof(property?.features?.security) === "string" ? 
+                                capitalizeFirstLetter(property.features.security ?? ""):
+                                "Security Available"
+                                }/>
+                            <PropertyDetail Icon={Power} value={property?.features?.backup_power && 
+                                typeof(property?.features?.backup_power) ?
+                                capitalizeFirstLetter(property?.features?.backup_power ?? "") : 
+                                "Backup Power Available"}
+                                />
                         </div>
                         <p className="text-gray-500 dark:text-white mt-5">{property?.description}</p>             
                         <ColumnsContainer numberOfCols={4} marginClass="mt-5" gapClass="gap-5">

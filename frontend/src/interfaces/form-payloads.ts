@@ -33,7 +33,7 @@ export interface AddressPayload {
    address_type?: "physical" | "postal" | "billing" | "work" | "other";
    is_primary?: boolean;
    postal_code?: string;
-   suburb_id?: number;
+   suburb_id: number | string;
    }
 
 export interface IndividualPayload {
