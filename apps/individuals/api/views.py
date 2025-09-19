@@ -61,9 +61,7 @@ class IndividualViewSet(BaseViewSet):
         return context
 
     def get_serializer_class(self):
-        if self.action == 'create':
-            return IndividualCreateSerializer
-        elif self.action in ['update', 'partial_update', 'create']:
+        if self.action in ['update', 'partial_update', 'create']:
             return IndividualCreateSerializer
         elif self.action in [ 'search_individuals', 'details', 'list']:
             return IndividualSearchSerializer

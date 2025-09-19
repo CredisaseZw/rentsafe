@@ -302,7 +302,7 @@ function useAddIndividualLease() {
     if(Number(formData.landlord_id ?? 0) === 0) delete PAYLOAD.landlord_data
     if(String(data.landlordsOpeningBalance).length === 0) delete PAYLOAD.landlord_opening_balances_data
 
-    console.log(PAYLOAD)
+    
     useMutate.mutate(PAYLOAD, {
         onError: (error: AxiosError |Error | unknown) => {
           if (isAxiosError(error)) {

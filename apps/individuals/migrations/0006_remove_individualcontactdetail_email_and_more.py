@@ -35,6 +35,7 @@ class Migration(migrations.Migration):
                 choices=[
                     ("mobile", "Mobile"),
                     ("whatsapp", "WhatsApp"),
+                    ("combined", "Combined"),
                     ("home", "Home"),
                     ("work", "Work"),
                     ("other", "Other"),

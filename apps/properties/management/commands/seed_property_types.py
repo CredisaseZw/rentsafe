@@ -27,7 +27,7 @@ class Command(BaseCommand):
             # Land
             {"name": "Land - Undeveloped", "description": "Raw or vacant land with no developments."},
         ]
-
+        PropertyType.objects.all().delete()
         for pt in property_types:
             obj, created = PropertyType.objects.get_or_create(
                 name=pt['name'],

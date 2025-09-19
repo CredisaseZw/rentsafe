@@ -8,7 +8,8 @@ from django.utils.text import slugify
 from apps.leases.models import (
     Lease, LeaseTenant, LeaseCharge, 
     LeaseTermination, Guarantor, LeaseOpeningBalance, 
-    LandlordOpeningBalance, LeaseDeposit, Landlord
+    LandlordOpeningBalance, LeaseDeposit, Landlord,
+    LeaseTenantAssociation
 )
 from apps.subscriptions.models import Subscription
 from apps.properties.models.models import Property, Unit, PropertyType
@@ -32,6 +33,21 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ['id', 'invoice_number', 'amount', 'method', 'payment_date', 'reference', 'type', 'description']
+    
+    def to_representation(self, instance):
+        description_suffix = f"- {instance.description or ''}"
+        if instance.method and instance.method.payment_method_name.lower().startswith('cash'):
+            description_prefix = "Cash receipt"
+        return {
+            'id': instance.id,
+            'invoice_number': instance.invoice.document_number if instance.invoice else None,
+            'amount': instance.amount,
+            'method': self.get_method(instance),
+            'payment_date': instance.payment_date,
+            'reference': instance.reference,
+            'type': self.get_type(instance),
+            'description': f"{description_prefix} {description_suffix}"
+        }
 
     def get_type(self, obj):
         return 'Payment'
@@ -58,19 +74,34 @@ class MinimalLeaseSerializer(serializers.ModelSerializer):
         model = Lease
         fields = ['id', 'lease_id', 'unit', 'start_date', 'end_date', 'status', 'landlord']
 
+class LeaseTenantAssociationSerializer(serializers.ModelSerializer):
+    tenant_object = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = LeaseTenantAssociation
+        fields = ['id', 'tenant_object', 'is_primary_tenant']
+        read_only_fields = ['id', 'tenant_object']
+        
+    def get_tenant_object(self, obj):
+        if obj.tenant.tenant_object:
+            if isinstance(obj.tenant.tenant_object, Individual):
+                return IndividualSerializer(obj.tenant.tenant_object).data
+            elif isinstance(obj.tenant.tenant_object, CompanyBranch):
+                return CompanyBranchSerializer(obj.tenant.tenant_object).data
+        return None
+
+
 class LeaseTenantSerializer(serializers.ModelSerializer):
     tenant_object = serializers.SerializerMethodField()
     tenant_type = serializers.CharField(write_only=True)
     tenant_id = serializers.IntegerField(write_only=True)
-    
+    is_primary_tenant = serializers.BooleanField(default=False)
+
     class Meta:
         model = LeaseTenant
-        fields = ['id', 'lease', 'tenant_object', 'is_primary_tenant', 'tenant_type', 'tenant_id']
-        read_only_fields = ['lease','tenant_object']
-        extra_kwargs = {
-            'lease': {'required': False}
-        }
-    
+        fields = ['id', 'tenant_object', 'is_primary_tenant', 'tenant_type', 'tenant_id']
+        read_only_fields = ['tenant_object']
+        
     def get_tenant_object(self, obj):
         if obj.tenant_object:
             if isinstance(obj.tenant_object, Individual):
@@ -80,7 +111,6 @@ class LeaseTenantSerializer(serializers.ModelSerializer):
         return None
     
     def validate(self, data):
-        lease = data.get('lease')
         tenant_type = data.get('tenant_type')
         tenant_id = data.get('tenant_id')
         
@@ -99,14 +129,6 @@ class LeaseTenantSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Invalid content type for {tenant_type}.")
         except Exception as e:
             raise serializers.ValidationError(f"Tenant not found: {str(e)}")
-        
-        # Check if this tenant is already on the lease
-        if lease and LeaseTenant.objects.filter(
-            lease=lease,
-            content_type=content_type,
-            object_id=tenant_id
-        ).exists():
-            raise serializers.ValidationError("This tenant is already associated with this lease.")
         
         return data
 
@@ -225,7 +247,7 @@ class LandlordOpeningBalanceSerializer(serializers.ModelSerializer):
         return data
 
 class LeaseDetailSerializer(serializers.ModelSerializer):
-    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    tenants = LeaseTenantAssociationSerializer(many=True, source='leasetenantassociation_set', read_only=True)
     charges = LeaseChargeListSerializer(many=True, read_only=True)
     guarantor = GuarantorSerializer(read_only=True)
     deposits = LeaseDepositSerializer(many=True, read_only=True)
@@ -273,7 +295,7 @@ class LeaseDetailSerializer(serializers.ModelSerializer):
         }
 
 class LeaseListSerializer(serializers.ModelSerializer):
-    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    tenants = LeaseTenantAssociationSerializer(many=True, source='leasetenantassociation_set', read_only=True)
     landlord = LandlordSerializer(read_only=True)
     unit = serializers.SerializerMethodField()
     currency = CurrencySerializer(read_only=True)
@@ -301,7 +323,7 @@ class LeaseListSerializer(serializers.ModelSerializer):
         }
 
 class TenantStatementsListSerializer(serializers.ModelSerializer):
-    tenants = LeaseTenantSerializer(many=True, source='lease_tenants', read_only=True)
+    tenants = LeaseTenantAssociationSerializer(many=True, source='leasetenantassociation_set', read_only=True)
     unit = serializers.SerializerMethodField()
     currency = serializers.CharField(source='currency.currency_code', read_only=True)
     risk_level_class = serializers.SerializerMethodField()
@@ -463,17 +485,15 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("User should be associated with a client, request to join one to the admins.")
         if not check_rentsafe_subscription(user.client, 'rentsafe'):
             raise serializers.ValidationError("No active Rentsafe subscription found or the subscription has expired.")
-        # New validation to prevent duplicate property creation
-        if data.get('property_data'):
-            # Assuming the slug is generated from the name
-            if Lease.objects.filter(
-                unit__property__addresses__street_address=data['address_data'].get('street_address'), 
-                unit__unit_number=data['unit_data'].get('unit_number'),
-                status='ACTIVE'
-            ).exists():
-                raise serializers.ValidationError(
-                    "This unit is already associated with an active lease."
-                )
+        # Prevent duplicate property creation
+        if data.get('property_data') and Lease.objects.filter(
+                        unit__property__addresses__street_address=data['address_data'].get('street_address'), 
+                        unit__unit_number=data['unit_data'].get('unit_number'),
+                        status='ACTIVE'
+                    ).exists():
+            raise serializers.ValidationError(
+                "This unit is already associated with an active lease."
+            )
 
         # Remove lease field from tenants and charges if present
         tenants_data = data.get('tenants', [])
