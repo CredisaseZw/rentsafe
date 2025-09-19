@@ -8,6 +8,7 @@ import ReactQueryProvider from "./providers/ReactQueryProvider";
 import { ThemeProvider } from "next-themes";
 import { RENTSAFE_PRE_SEG } from "./constants/navlinks";
 import TenantStatement from "./routes/rent-safe/tenants/TenantStatement";
+import Property from "./routes/rent-safe/properties/Property";
 
 export default function App() {
    return (
@@ -27,13 +28,18 @@ export default function App() {
                           <Route 
                               path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
                               element={<TenantStatement />} 
-                              />
+                           />
+                           <Route
+                           path = {`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`}
+                           element = {<Property/>}
+                           />
+                           {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
+                           
                         </Route>
-                     </Route>
+                      </Route>
                   </Route>
                </Routes>
             </BrowserRouter>
-
             <Toaster dismissible position="top-left" duration={10 * 1000} />
          </ReactQueryProvider>
       </ThemeProvider>

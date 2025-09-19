@@ -36,20 +36,27 @@ class PropertyViewSet(BaseViewSet):
     ).all().order_by('-date_created')
 
     def get_queryset(self):
+        user_client = self.request.user.client
         search = self.request.query_params.get('search', None)
-        queryset = super().get_queryset()
+
+        queryset = super().get_queryset().filter(
+            Q(managing_client=user_client) |
+            Q(managing_client__isnull=True, created_by__client=user_client)
+        )
+
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search) |
                 Q(description__icontains=search) |
                 Q(property_type__name__icontains=search) |
                 Q(addresses__street_address__icontains=search) |
-                Q(addresses__city__name__icontains=search) |  
+                Q(addresses__city__name__icontains=search) |
                 Q(addresses__suburb__name__icontains=search) |
                 Q(addresses__province__name__icontains=search) |
                 Q(addresses__country__name__icontains=search) |
                 Q(addresses__postal_code__icontains=search)
             ).distinct()
+
         return queryset
 
     def get_serializer_class(self):
@@ -68,13 +75,17 @@ class PropertyViewSet(BaseViewSet):
     
     def create(self, request, *args, **kwargs):
         try:
-            serializer = self.get_serializer(data=request.data)
+            property_data = request.data
+            if property_data.get('total_area') =='' or property_data.get('total_area') is None:
+                property_data['total_area'] = 0
+            if property_data.get('total_number_of_units') =='' or property_data.get('total_number_of_units') is None:
+                property_data['total_number_of_units'] = 0
+            serializer = self.get_serializer(data=property_data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except Exception as e:
-            print(f"Error creating property: {e}")
             return Response(
                 {"error": extract_error_message(e)},
                 status=status.HTTP_400_BAD_REQUEST
@@ -94,15 +105,22 @@ class PropertyViewSet(BaseViewSet):
             )
     @action(detail=True, methods=['get', 'post'], url_path='units')
     def get_units(self, request, pk=None):
-        if request.method == 'POST':
-            serializer = UnitDetailSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
+        try:
+            if request.method == 'POST':
+                serializer = UnitDetailSerializer(data=request.data, context={'property': self.get_object()})
+                serializer.is_valid(raise_exception=True)
                 serializer.save(property=self.get_object())
                 return Response(serializer.data, status=201)
-        property = self.get_object()
-        units = property.units.all()
-        serializer = UnitListSerializer(units, many=True)
-        return Response(serializer.data)
+            property = self.get_object()
+            units = property.units.all()
+            serializer = UnitListSerializer(units, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"Error in get_units action: {e}")
+            return Response(
+                {"error": extract_error_message(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class UnitViewSet(viewsets.ModelViewSet):

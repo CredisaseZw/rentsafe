@@ -31,6 +31,7 @@ import { DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PA
 import { isAxiosError } from "axios";
 import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
 import { validateAmounts } from "@/lib/utils";
+import MultiAddressInput from "../general/MultiAddressInput";
 
 interface props {
   clientType : string,
@@ -43,11 +44,12 @@ function AddLeaseForm({clientType, successCallback} :props) {
     loading,
     formData,
     searchItem,
+    addressState,
     propertyName,
     propertyType, 
     guaranteeItem,
+    defaultCurrency,
     CURRENCY_OPTIONS,
-    manualLogProperty,
     outstandingBalance,
     landlordIdentifier,
     primaryTenantAddress,
@@ -57,6 +59,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
     setPrimaryTenantAddress,
     setLandlordIdentifier,
     SET_CURRENCY_OPTIONS,
+    setDefaultCurrency,
     onSelectGuarantor,
     handleLeaseSubmit,
     onSelectLandlord,
@@ -87,7 +90,12 @@ function AddLeaseForm({clientType, successCallback} :props) {
       toast.error("Failed to fetch currencies", { description: message });
       return;
     }
-    if (currencyData) { SET_CURRENCY_OPTIONS(currencyData.results ?? []) }
+  if (currencyData) { 
+    const usdId = currencyData.find((c) => c.currency_code === "USD")?.id;
+    SET_CURRENCY_OPTIONS(currencyData);
+    setDefaultCurrency(usdId || currencyData[0]?.id);
+  }
+
   }, [currencyData, currencyData])
 
   return (
@@ -102,6 +110,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
           <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
             <div className="form-group">
               <AutoCompleteClient
+                isRequired = {false}
                 searchItem = {guaranteeItem}
                 setSearchItem = {setGuaranteeItem}
                 clientType = {"individual"}
@@ -121,7 +130,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
               />
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="rentGuarantorName">
+              <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
                   Guarantee Amount 
               </Label>
               <Input 
@@ -129,7 +138,6 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   step={0.01}
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}
-                  required
                   name={`rentGuaranteeAmount`}
                   id="rentGuaranteeAmount"
               />
@@ -141,7 +149,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
         <Fieldset legendTitle = {"Unit Details"}>
           <ColumnsContainer gapClass="gap-6" marginClass="mt-0" numberOfCols={3}>
             {
-              manualLogProperty === false &&
+              addressState === "property" &&
               <AutoCompleteProperty
                 searchItem= {propertyName}
                 setSearchItem={setPropertyName}
@@ -156,7 +164,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber">Number of Rooms </Label>
-              <Input id="" name="unitNumberOfRooms" required/>
+              <Input id="" name="unitNumberOfRooms" required  type= "number"
+                step={0.01}
+                onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                onKeyDown={validateAmounts}/>
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit type</Label>
@@ -179,85 +190,132 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
           </ColumnsContainer>
            {
-              manualLogProperty && primaryTenantAddress !== undefined && <>
-              <ColumnsContainer numberOfCols={3} marginClass="mt-6" gapClass="gap-6">
-                  <div className="flex flex-col justify-baseline form-group">
-                    <Label className="px-2 font-normal required" htmlFor="">
-                      Property Type
-                    </Label>
-                    <Select
-                      name="propertyTypeName"
-                      required
-                    >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select ..." />
-                    </SelectTrigger>
-                      <SelectContent>
-                        {
-                          propertyType &&
-                          propertyType.map((property_type)=>
-                            <SelectItem value={property_type.name || ""} key={property_type.id}>{property_type.name}</SelectItem>
-                          )
-                        }
-                        { 
-                          !propertyType &&
-                          isLoading &&
-                          <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+              (addressState === "client" || addressState === "manual") &&
+              primaryTenantAddress !== undefined && (
+                <>
+                  <ColumnsContainer numberOfCols={2} marginClass="mt-6" gapClass="gap-6">
+                    <div className="flex flex-col justify-baseline form-group">
+                      <Label className="px-2 font-normal required" htmlFor="">
+                        Property Type
+                      </Label>
+                      <Select name="propertyTypeName" required>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select ..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {propertyType &&
+                            propertyType.map((property_type) => (
+                              <SelectItem
+                                value={property_type.name || ""}
+                                key={property_type.id}
+                              >
+                                {property_type.name}
+                              </SelectItem>
+                            ))}
+                          {!propertyType && isLoading && (
+                            <SelectItem
+                              disabled
+                              value="loading"
+                              className="text-center flex flex-col justify-center items-center"
+                            >
                               <LoadingIndicator />
                             </SelectItem>
-                        }
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="form-group">
-                    <Label className="px-2 font-normal required" htmlFor="propertyName">
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="form-group">
+                      <Label className="px-2 font-normal required" htmlFor="propertyName">
                         Building/Complex Name
                       </Label>
-                    <Input name="propertyName"  id="propertyName" required />
+                      <Input name="propertyName" id="propertyName" required />
+                    </div>
+                  </ColumnsContainer>
+
+                  {addressState === "client" && (
+                    <ColumnsContainer numberOfCols={3}>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="streetAddress">
+                          Street Address
+                        </Label>
+                        <Input
+                          name="streetAddress"
+                          value={primaryTenantAddress.street_address}
+                          disabled
+                          id="streetAddress"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="">
+                          Suburb
+                        </Label>
+                        <Input
+                          name="suburb"
+                          value={primaryTenantAddress.suburb?.name}
+                          disabled
+                          id="suburb"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="">
+                          City
+                        </Label>
+                        <Input
+                          name="city"
+                          value={primaryTenantAddress.city?.name}
+                          disabled
+                          id="city"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="">
+                          Province
+                        </Label>
+                        <Input
+                          name="province"
+                          value={primaryTenantAddress.province?.name}
+                          disabled
+                          id="province"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="">
+                          Country
+                        </Label>
+                        <Input
+                          name="country"
+                          value={primaryTenantAddress.country?.name}
+                          disabled
+                          id="country"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="">
+                          Area Code
+                        </Label>
+                        <Input
+                          name="postal_code"
+                          value={primaryTenantAddress.postal_code?.toString()}
+                          disabled
+                          id="postal_code"
+                        />
+                      </div>
+                    </ColumnsContainer>
+                  )}
+                   <div className="form-group mt-6">
+                    <Label className="px-2 font-normal required" htmlFor="">
+                      Property Details
+                    </Label>
+                    <Textarea name="propertyDetails" required placeholder="" />
                   </div>
-                  <div className="form-group">
-                      <Label className="px-2 font-normal"  htmlFor="streetAddress">
-                        Street Address
-                      </Label>
-                      <Input name="streetAddress" value={primaryTenantAddress.street_address} disabled  id="streetAddress" />
-                  </div>
-                  <div className="form-group">
-                      <Label className="px-2 font-normal" htmlFor="">
-                       Suburb
-                      </Label>
-                      <Input name="suburb" value={primaryTenantAddress.suburb?.name} disabled id="suburb" />
-                  </div>
-                  <div className="form-group">
-                      <Label className="px-2 font-normal" htmlFor="">
-                        City
-                      </Label>
-                      <Input name="city" value={primaryTenantAddress.city?.name} disabled id="city" />
-                  </div>
-                  <div className="form-group">
-                      <Label className="px-2 font-normal" htmlFor="">
-                        Province
-                      </Label>
-                      <Input name="province" value = {primaryTenantAddress.province?.name} disabled id="province" />
-                  </div>
-                   <div className="form-group">
-                      <Label className="px-2 font-normal" htmlFor="">
-                        Country
-                      </Label>
-                      <Input name="province" value = {primaryTenantAddress.country?.name} disabled id="province" />
-                  </div>
-                   <div className="form-group">
-                      <Label className="px-2 font-normal" htmlFor="">
-                        Area Code
-                      </Label>
-                      <Input name="province" value={primaryTenantAddress.postal_code?.toString()} disabled id="province" />
-                  </div>
-              </ColumnsContainer>
-              <div className="form-group mt-6">
-                  <Label className="px-2 font-normal required" htmlFor="">Property Details</Label>
-                  <Textarea name = "propertyDetails" required placeholder=""></Textarea>
-              </div>
-              </>
+                  {
+                    addressState ===  "manual" &&
+                    <MultiAddressInput className="mt-5" isMultiple={false} />
+                  }
+                </>
+              )
             }
+
         </Fieldset>
       </div>
       <div className="mt-5">
@@ -289,7 +347,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor=""> Currency</Label>
-              <Select name="currencyType" required>
+              <Select name="currencyType" required defaultValue={String(defaultCurrency)}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
@@ -398,6 +456,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </Label>
               <Select
                 required
+                defaultValue={String(defaultCurrency)}
                 name="depositCurrency"
               >
                 <SelectTrigger className="w-full">
@@ -565,6 +624,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
           </Select>
         </div>
          <AutoCompleteClient
+            isRequired = {false}
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
             clientType = {formData.landlord_type}
@@ -572,10 +632,9 @@ function AddLeaseForm({clientType, successCallback} :props) {
             onSelectValue = {onSelectLandlord}
          />
         <div className="form-group">
-          <label className="required">Landlord Name</label>
+          <label >Landlord Name</label>
           <Input
             type="text"
-            required
             disabled
             value={formData.landlord_name}
             name="landlord_name"
@@ -583,7 +642,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
         </div>
 
         <div className="form-group">
-          <Label className="px-2 font-normal required" htmlFor="commissionPercentage">
+          <Label className="px-2 font-normal" htmlFor="commissionPercentage">
             Commission %
           </Label>
           <Input
@@ -594,12 +653,11 @@ function AddLeaseForm({clientType, successCallback} :props) {
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
             name="commissionPercentage"
-            id="commissionPercentage"
-            required            
+            id="commissionPercentage"            
           />
         </div>
         <div className="form-group">
-          <Label className="px-2 font-normal required" htmlFor="commissionPercentage">
+          <Label className="px-2 font-normal" htmlFor="commissionPercentage">
             Landlords Opening Balance
           </Label>
           <Input
@@ -609,7 +667,6 @@ function AddLeaseForm({clientType, successCallback} :props) {
             onKeyDown={validateAmounts}
             name="landlordsOpeningBalance"
             id="landlordsOpeningBalance"
-            required
           />
         </div>
         <div className="flex flex-row gap-2 self-center">

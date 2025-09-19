@@ -82,9 +82,8 @@ export default function ReceiptRow({paymentMethods, index, lease, updateReceipt,
                     </Select>
                 </div>
                 <div className='form-group'>
-                    <Label className='required'>Receipt No.</Label>
+                    <Label className=''>Receipt No.</Label>
                     <Input
-                        required
                         name={`receipt_${index}`}
                     />
                 </div>

@@ -23,7 +23,6 @@ export default function useCompanyForm() {
       setShowForm(false)
    }
 
-
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);

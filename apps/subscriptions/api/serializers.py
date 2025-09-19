@@ -107,6 +107,7 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
 class ClientMinimalSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
+        fields = ['id', 'service', 'start_date', 'end_date', 'total_slots', 'used_slots', 'open_slots']
 
     def to_representation(self, instance):
         start_date = instance.start_date.strftime("%d-%B-%Y") if instance.start_date else None

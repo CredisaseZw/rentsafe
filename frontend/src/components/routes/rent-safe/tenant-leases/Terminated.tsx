@@ -56,29 +56,37 @@ function Terminated() {
       <div>
         <SectionHeader title="Terminated Leases" subTotal={leases?.length || paginationData?.count || 0} total={paginationData?.count || 0} subTitle="terminated leases"/>
       </div>
-      <div className="flex mt-8 flex-row justify-between">
-        <Searchbox
-          placeholder="Search by Name"
-          handleSearch={handleOnSearchValue}
-          clearSearch = {onClearSearch}
-        />
-        <div className="flex flex-row gap-3">
-          <p className="m-0 self-center text-gray-600 dark:text-gray-100 font-medium">Sort by</p>
-          <Select defaultValue="default">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">Default</SelectItem>
-              <SelectItem value="rent_owing_asc">Rent Owing asc</SelectItem>
-              <SelectItem value="rent_owing_desc">Rent Owing desc</SelectItem>
-              <SelectItem value="color_asc">Color (Rent) asc</SelectItem>
-              <SelectItem value="color_asc">Color (Rent) desc</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="flex flex-col lg:flex-row w-full gap-4 mt-8">
+        <div className="w-full lg:flex-1">
+          <Searchbox
+            placeholder="Search by Name"
+            handleSearch={handleOnSearchValue}
+            clearSearch={onClearSearch}
+          />
+        </div>
+
+        <div className="flex flex-row w-full lg:w-auto gap-3 items-center">
+          <p className="m-0 self-center w-[100px] text-gray-600 dark:text-gray-100 text-sm">
+            Sort by
+          </p>
+          <div className="w-full lg:w-full">
+            <Select defaultValue="default" >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="rent_owing_asc">Rent Owing asc</SelectItem>
+                <SelectItem value="rent_owing_desc">Rent Owing desc</SelectItem>
+                <SelectItem value="color_asc">Color (Rent) asc</SelectItem>
+                <SelectItem value="color_desc">Color (Rent) desc</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
-      <div className="mt-3 mb-15">
+      
+      <div className="mt-3 2xl:mb-15 sm:mb-30">
         <TableBase headers={terminatedHeaders} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
           {
             leases?.length

@@ -28,7 +28,7 @@ export default function InternalUsers() {
          }));
          setClients(trimmedClients);
       }
-   }, [data]);
+   }, [data, isError]);
 
    return (
       <div className="relative">

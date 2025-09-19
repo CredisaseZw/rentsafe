@@ -2,7 +2,7 @@ import type { IndividualReport } from "@/interfaces";
 import { PAYMENT_STATUS_CLASSIFICATIONS } from "@/constants";
 import React from "react";
 import useIndividual from "@/hooks/apiHooks/useIndividual";
-import { formatAddress } from "@/lib/utils";
+import { formatAddress, formatPhones } from "@/lib/utils";
 
 export default function useIndividualPaymentStatusReport(individualId: number) {
    const [isFirstLoad, setIsFirstLoad] = React.useState(true);
@@ -41,11 +41,9 @@ export default function useIndividualPaymentStatusReport(individualId: number) {
          nationality: "n/a",
          maritalStatus: individual?.marital_status || "",
          dependants: [],
-         mobileNumber:  individual?.contact_details[0]?.mobile_phone
-         ? individual?.contact_details[0]?.mobile_phone.join(", ")
-         : "",
+         mobileNumber:  formatPhones(individual?.contact_details ?? []),
          telephoneNumber: "n/a",
-         email: individual?.contact_details[0]?.email || "",
+         email: individual?.email || "",
          address: individual?.addresses?.map(formatAddress).join(" | ") || "",
       },
    };

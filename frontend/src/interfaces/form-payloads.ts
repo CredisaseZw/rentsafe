@@ -33,18 +33,19 @@ export interface AddressPayload {
    address_type?: "physical" | "postal" | "billing" | "work" | "other";
    is_primary?: boolean;
    postal_code?: string;
-   suburb_id?: number;
+   suburb_id: number | string;
    }
 
 export interface IndividualPayload {
    first_name: string;
    last_name: string;
-   date_of_birth: string;
+   date_of_birth?: string;
    gender: string;
    identification_type: string;
    identification_number: string;
    marital_status: IndividualMaritalStatus;
-   contact_details: { email?: string; mobile_phone: string[] }[];
+   email : string,
+   contact_details:{ type: string; phone_number: string }[];
    addresses?: AddressPayload[];
    documents?: { document_type: string; file: string; description: string }[];
    notes?: { content: string }[];
@@ -69,6 +70,8 @@ export interface IndividualPayload {
 export interface BranchPayload {
    company: number;
    branch_name: string;
+   email : string,
+   phone:  string,
    addresses: AddressPayload[];
    contacts: ContactPayload[];
 }

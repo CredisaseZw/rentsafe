@@ -15,7 +15,7 @@ export default function useSearchClient(
     queryKey: ["search_landlord", type, query],
     queryFn: async () => {
       const { data } = await api.get(`${url}${query}`);
-      return data.results;
+      return type === "individual" ? data : data.results;
     },
     enabled: enabled && query.trim().length > 0
   });

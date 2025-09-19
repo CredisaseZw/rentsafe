@@ -21,6 +21,7 @@ type BaseTableProps = {
    title?: string;
    titleClassName?: string;
    isLoading?: boolean;
+   noDataNode? : React.ReactNode;
    paginationData: PaginationData;
    paginationName: string;
 };
@@ -34,6 +35,7 @@ export default function BaseTable({
    isLoading,
    paginationData,
    paginationName,
+   noDataNode
 }: BaseTableProps) {
    const mappableRows = data;
 
@@ -92,6 +94,9 @@ export default function BaseTable({
                      <TableRow noHover>
                         <TableCell colSpan={headers.length} className="text-muted-foreground py-5 text-center">
                            No data
+                           {
+                              noDataNode
+                           }
                         </TableCell>
                      </TableRow>
                   )}

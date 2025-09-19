@@ -17,7 +17,8 @@ export type NavLink = {
 
 export type Option = {
    label : string,
-   value :string
+   value :string,
+   subOptions? : Option[]
 }
 export type DashboardCardProp = {
    value: string  | number | React.ReactElement;
@@ -168,6 +169,11 @@ export interface Features {
   security: string;
   backup_power: string;
 }
+
+export interface SelectedFeature {
+   category: string;
+    feature: string 
+}
 export interface AddressInput {
   suburb_id: number;
   street_address: string;
@@ -189,13 +195,14 @@ export interface Property {
   total_number_of_units?: number;
   features?: Features;
   property_type_id?: number;
-  property_type?: string;
+  property_type?: string | PropertyType;
   type?: string,
   addresses:Address[]
   address_summary?: string;
   addresses_input?: AddressInput;
   landlords_input?: LandlordInput[];
   full_address?: Address[]
+  landlords?: Landlord[];
 }
 export interface PropertyType {
    id: number,
@@ -249,6 +256,7 @@ export interface TenantMinimal {
 
 export type TenantSelection = TenantMinimal &{
    search_value: string,
+   store_mobile? : string,
    mobile_number: string,
    address : Address | null,
    is_primary : false
@@ -267,7 +275,7 @@ export type TenantPayload = {
 };
 
 export type guarantorPayload = {
-   guarantor_type: "individual" | "company";
+   guarantor_type: string;
    guarantor_id: number;
    guarantee_amount: string;
 };
@@ -284,7 +292,13 @@ export interface Unit {
   unit_number: string;
   property: Property;
 }
-
+export interface MinimalUnit{
+   id: number,
+   unit_number: string,
+   unit_type: string,
+   status: "active" | "inactive" | string,
+   number_of_rooms?: number,
+}
 export interface Currency {
   id: number;
   currency_code: string;
@@ -329,8 +343,8 @@ export type LeasePayload = {
   };
 
   address_data: ShortSuburbAddressData
-  landlord_data: LandlordInput
-  guarantor_data: guarantorPayload 
+  landlord_data?: LandlordInput
+  guarantor_data?: guarantorPayload 
   tenants: TenantPayload[];
 
   charges: {
@@ -360,7 +374,7 @@ export type LeasePayload = {
    outstanding_balance: number;
   };
 
-  landlord_opening_balances_data: {
+  landlord_opening_balances_data?: {
    amount: string;
    commission_percentage: string;
    operating_costs_inclusive: boolean;

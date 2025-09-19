@@ -4,7 +4,7 @@ import type { BranchFull, IndividualMinimal, PaginationData } from "@/interfaces
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { extractAddresses } from "@/lib/utils";
+import { extractAddresses, validateYear } from "@/lib/utils";
 import { isAxiosError, type AxiosError } from "axios";
 import { toast } from "sonner";
 
@@ -52,6 +52,7 @@ function usePropertyList() {
    );
    
    const parkingOptions = useRef<Option[]>([
+      { label: "All", value: "all" },
       { label: "Underground", value: "underground" },
       { label: "Open", value: "open" },
       { label: "Street", value: "street" },
@@ -62,19 +63,24 @@ function usePropertyList() {
       { label: "None", value: "none" },
    ])
    const backupPowerOptions = useRef<Option[]>([
+      { label: "All", value: "all" },
       { label: "Generator", value: "generator" },
       { label: "Solar", value: "solar" },
+      { label: "Battery", value: "battery" },
       { label: "None", value: "none" },
    ])
    const Options = useRef<Option[]>([
-      { label: "Default", value: "default" },
+      { label: "All", value: "all" },
       { label: "Occupied", value: "occupied" },
       { label: "Vacant", value: "vacant" },
    ]);
    const statusOptions = useRef<Option[]>([
       {label : "Active", value : "active"},
-      {label : "In-active", value : "inactive"}
+      {label : "In-active", value : "inactive"},
+      {label : "Maintenance", value : "maintenance"},
+      {label : "Sold", value : "sold"}
    ])
+
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
@@ -155,20 +161,28 @@ function usePropertyList() {
 
    const handleAddProperty = (newProperty:  UseMutationResult<any, Error, any, unknown>, e: React.FormEvent<HTMLFormElement>, successCallback:()=>void) => {
       e.preventDefault();      
-      setLoading(true)
       const formData = new FormData(e.currentTarget);
       const data = Object.fromEntries(formData.entries());
       const addresses = extractAddresses(data);
       
-      console.log(addresses)
+      if (data.year_built && (data.year_built as string).length > 0) {
+         if (!validateYear(data.year_built as string)) {
+            toast.error("Invalid Year", {
+               description: `${data.year_built} is not a valid year.`,
+            });
+            return; 
+         }
+      }
+         
+      setLoading(true)
       const property = {
-         name: data.building_name,
+         name: data.building_name ?? "",
          description: data.property_details,
          status: addPropertyForm.status,
-         year_built: parseInt(data.year_built as string),
+         year_built: Number(data.year_built),
          total_area: data.total_area,
          is_furnished: addPropertyForm.is_furnished,
-         total_number_of_units: parseInt(data.total_number_of_units as string),
+         total_number_of_units: parseInt(data.total_number_of_units as string) ?? 0,
          features: {
             parking: addPropertyForm.features.parking,
             security: addPropertyForm.features.security,
@@ -177,14 +191,16 @@ function usePropertyList() {
          property_type_id: parseInt(addPropertyForm.property_type),
          addresses_input: addresses[0],
          landlords_input: [
+            addPropertyForm.landlord_id.length !== 0 &&
+            addPropertyForm.landlord_name.length !== 0 &&
             {
                landlord_name: addPropertyForm.landlord_name,
                landlord_type: addPropertyForm.landlord_type,
-               landlord_id: addPropertyForm.landlord_id
-            }
-         ]
+               landlord_id: addPropertyForm.landlord_id,
+            },
+            ].filter(Boolean)
       };
-
+   
       try{
       newProperty.mutate(property, {
          onError: (error: AxiosError |Error | unknown) => {
@@ -208,24 +224,23 @@ function usePropertyList() {
       setLoading(false)
       toast.error("Failed to create property. Internal Error.");
       }
-     };
-      
-      const onSelectValue = (item: IndividualMinimal | BranchFull)=>{
-         if ("first_name" in item) {
-            setAddPropertyForm((prev) => ({
-            ...prev,
-            landlord_id: item.identification_number,
-            landlord_name: `${item.first_name} ${item.last_name}`,
-            }));
-            return;
-         }
-
+   }
+   const onSelectValue = (item: IndividualMinimal | BranchFull)=>{
+      if ("first_name" in item) {
          setAddPropertyForm((prev) => ({
-            ...prev,
-            landlord_id: item.company.registration_number,
-            landlord_name: item.company.registration_name,
+         ...prev,
+         landlord_id: item.identification_number,
+         landlord_name: `${item.first_name} ${item.last_name}`,
          }));
+         return;
       }
+
+      setAddPropertyForm((prev) => ({
+         ...prev,
+         landlord_id: item.company.registration_number,
+         landlord_name: item.company.registration_name,
+      }));
+   }
    return {
       headers,
       properties,

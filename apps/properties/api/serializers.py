@@ -48,6 +48,11 @@ class UnitDetailSerializer(serializers.ModelSerializer):
             'status', 'features', 'date_created', 'date_updated'
         )
         read_only_fields = ('id', 'property', 'date_created', 'date_updated')
+    
+    def validate(self,data):
+        if Unit.objects.filter(property=self.context["property"], unit_number=data.get('unit_number')).exists():
+            raise ValidationError({"unit_number": "Unit with this unit number already exists for this property."})
+        return data
 
 class PropertyListSerializer(serializers.ModelSerializer):
     """
@@ -65,7 +70,11 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
     property_type_id = serializers.PrimaryKeyRelatedField(
         queryset=PropertyType.objects.all(), source='property_type', write_only=True
     )
-    
+    year_built = serializers.CharField(required=False, allow_null=True)
+    total_area = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    name = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)  
+    total_number_of_units = serializers.IntegerField(required=False)                          
     class Meta:
         model = Property
         fields = [
@@ -74,13 +83,13 @@ class PropertyCreateSerializer(serializers.ModelSerializer):
         ]
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(required=False)
+    name = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
     status = serializers.ChoiceField(choices=Property.PROPERTY_STATUS_CHOICES, required=False)
     year_built = serializers.IntegerField(required=False)
     total_area = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     is_furnished = serializers.BooleanField(required=False)
-    total_number_of_units = serializers.IntegerField(required=False)
+    total_number_of_units = serializers.IntegerField(required=False, allow_null=True)
     features = serializers.JSONField(required=False, allow_null=True)
 
     # already present fields
@@ -111,12 +120,18 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'date_created', 'date_updated')
 
     def validate(self, attrs):
+        
+        if not self.context['request'].user.client:
+            raise ValidationError({"error": "The user must be associated with a client to create or update a property."})
+        
         if name := attrs.get('name'):
             qs = Property.objects.filter(name=name)
             if self.instance:
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
                 raise ValidationError({"property": "Property with this name already exists."})
+        if Property.objects.filter(addresses__street_address=attrs['addresses_input']["street_address"]).exists():
+            raise ValidationError({"error": "Property with this street address already exists."})
 
         addresses = attrs.get("addresses_input", {})
         if not self.instance and not addresses.get("suburb_id"):
@@ -126,9 +141,12 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         addresses_data = validated_data.pop("addresses_input")
         landlords_data = validated_data.pop("landlords_input", [])
-
+        user = self.context['request'].user
         suburb_id = addresses_data.get("suburb_id")
         street_address = addresses_data.get("street_address")
+        validated_data['created_by'] = user
+        validated_data['updated_by'] = user
+        validated_data['managing_client'] = user.client
 
         try:
             suburb = Suburb.objects.get(id=suburb_id)
@@ -153,6 +171,9 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         )
 
         # Create or link landlords
+        if landlords_data is None:
+            pass #to implement auto landlord creation in future
+
         for landlord_data in landlords_data:
             landlord_id = landlord_data.get("landlord_id")
             landlord_name = landlord_data.get("landlord_name")
@@ -190,7 +211,6 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop("addresses_input", None)
         landlords_data = validated_data.pop("landlords_input", [])
-
         # Handle regular fields
         instance = super().update(instance, validated_data)
 

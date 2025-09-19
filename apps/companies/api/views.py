@@ -382,7 +382,6 @@ class CompanyBranchViewSet(BaseViewSet):
         return queryset
     def get_serializer_class(self):
         """Return appropriate serializer based on action"""
-        print('self action:', self.action)
         if self.action == 'list':
             return CompanyBranchMinimalSerializer
         elif self.action == 'retrieve':
@@ -402,7 +401,7 @@ class CompanyBranchViewSet(BaseViewSet):
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             branch = serializer.save() 
-            return self._create_rendered_response(self.get_serializer(branch).data, status.HTTP_201_CREATED)
+            return self._create_rendered_response(CompanyBranchMinimalSerializer(branch).data, status.HTTP_201_CREATED)
         except IntegrityError:
             return self._create_rendered_response(
                 {'error': 'A branch with this name already exists for this company.'},

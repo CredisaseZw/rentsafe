@@ -3,14 +3,13 @@ import { Loader2, X } from "lucide-react";
 import type { CompanyMinimal } from "@/interfaces";
 import { SearchCompany } from "@/hooks/apiHooks/useSearchCompanies";
 import { useState, useRef, useEffect } from "react";
+import { Button } from "../ui/button";
 
-export default function AutoCompleteCompanySearchInput({ elementName }: { elementName: string }) {
+export default function AutoCompleteCompanySearchInput({ elementName, closeDialogue }: { elementName: string, closeDialogue?: () => void  }) {
    const inputRef = useRef<HTMLInputElement>(null);
    const [open, setOpen] = useState(false);
    const [query, setQuery] = useState("");
    const [selectedCompany, setSelectedCompany] = useState<null | CompanyMinimal>(null);
-
-   // ✅ Run search hook when query changes
    const { companies, isLoading } = SearchCompany(query);
 
    useEffect(() => {
@@ -68,7 +67,21 @@ export default function AutoCompleteCompanySearchInput({ elementName }: { elemen
                      <Loader2 className="text-foreground/60 animate-spin" />
                   </div>
                ) : !companies?.results?.length ? (
-                  <div className="p-2 text-gray-800 dark:text-white">No results found</div>
+                  <div className="p-4 text-gray-800 dark:text-white text-center flex flex-col items-center">
+                     No results found
+                     {
+                        <Button 
+                           size={"sm"}
+                           type="button"
+                           variant={"outline"}
+                           className="mt-2"
+                           onMouseDown={(e) => e.preventDefault()} 
+                           onClick={()=> {
+                              if(closeDialogue) closeDialogue()
+                              setOpen(false)
+                           }}>Create Company</Button>
+                        }
+                  </div>
                ) : (
                   companies.results.map((result) => (
                      <button

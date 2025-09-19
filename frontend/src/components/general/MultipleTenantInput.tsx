@@ -9,6 +9,7 @@ import AutoCompleteClient from "./AutoCompleteClient"
 import type { TenantSelection } from "@/types"
 import { Checkbox } from "../ui/checkbox"
 import type { Address } from "@/interfaces"
+import UpdateMobileNumber from "../routes/rent-safe/tenant-leases/UpdateMobileNumber"
 
 
 interface props {
@@ -16,7 +17,19 @@ interface props {
     setPrimaryTenantAddress: React.Dispatch<React.SetStateAction<Address | undefined>>
 }
 function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
-    const {tenants, addTenant, removeTenant, updateTenant, updateMobile, onSelectTenant} = useMultiTenantInput(clientType)
+    const {
+        open,
+        tenants,
+        updateIndividual, 
+        checkMobileNumberUpdate, 
+        setUpdateIndividual,
+        onSelectTenant,
+        removeTenant,
+        updateTenant, 
+        updateMobile,
+        addTenant, 
+        setOpen,
+        } = useMultiTenantInput(clientType)
     return (
     <div>
         {
@@ -32,6 +45,7 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
                         <ColumnsContainer numberOfCols={4} marginClass="mt-0" gapClass="gap-6">
                             <AutoCompleteClient
                                 index = {index}
+                                isRequired = {false}
                                 searchItem = {user.search_value || ""}
                                 createClient = {true}
                                 multiSetSearchItem  = {updateTenant}
@@ -65,7 +79,8 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
                                     value={user.mobile_number}
                                     name={`tenantMobile[${index}]`}
                                     id="tenantMobile"
-                                    onChange={(e)=> updateMobile(index, e.target.value)}            
+                                    onChange={(e)=> updateMobile(index, e.target.value)}        
+                                    onBlur={()=>{if(clientType === "individual") checkMobileNumberUpdate(user)}}    
                                 />
                             </div>
                             {
@@ -98,13 +113,22 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
                         </div>
                         }
                     </div>
-                    
                 </Fieldset>
             ))
+        }
+        {
+            clientType === "individual" &&
+            <UpdateMobileNumber
+                updateIndividual ={updateIndividual}
+                open = {open}
+                setUpdateIndividual = {setUpdateIndividual}
+                setOpen = {setOpen}
+            />
         }
         <Button variant={"outline"} type="button" onClick={addTenant}>
             Add tenant <Plus/>
         </Button>
+        
     </div>
   )
 }

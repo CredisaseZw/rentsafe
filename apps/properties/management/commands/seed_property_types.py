@@ -6,20 +6,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         property_types = [
-            {'name': 'Apartment', 'description': 'A self-contained housing unit.'},
-            {'name': 'House', 'description': 'A standalone residential building.'},
-            {'name': 'Condo', 'description': 'A unit in a condominium building.'},
-            {'name': 'Townhouse', 'description': 'A terraced or row house.'},
-            {'name': 'Studio', 'description': 'A small apartment with a combined living and sleeping area.'},
-            {'name': 'Loft', 'description': 'A large, open space, often converted from industrial use.'},
-            {'name': 'Duplex', 'description': 'A house divided into two apartments.'},
-            {'name': 'Triplex', 'description': 'A building divided into three separate residences.'},
-            {'name': 'Villa', 'description': 'A luxurious country residence.'},
-            {'name': 'Cottage', 'description': 'A small house, typically in a rural area.'},
-            {'name': 'Bungalow', 'description': 'A low house with a broad front porch.'},
-            {'name': 'Penthouse', 'description': 'An apartment on the top floor of a building.'},
-        ]
+            # Residential
+            {"name": "Residential - House", "description": "Standalone residential house."},
+            {"name": "Residential - Cottage", "description": "Small residential cottage."},
+            {"name": "Residential - Townhouse", "description": "Multi-level residential townhouse."},
+            {"name": "Residential - Flats", "description": "Apartment units in a residential building."},
+            {"name": "Residential - Small Holdings", "description": "Residential property with small-scale agricultural land."},
 
+            # Commercial
+            {"name": "Commercial - Offices", "description": "Commercial office space."},
+            {"name": "Commercial - Retail", "description": "Retail commercial property."},
+            {"name": "Commercial - Industrial", "description": "Industrial warehouses or factories."},
+            {"name": "Commercial - Hospitality", "description": "Hotels, B&Bs, or other hospitality properties."},
+
+            # Agricultural
+            {"name": "Agricultural - Plot", "description": "Agricultural plot of land."},
+            {"name": "Agricultural - Small Farm", "description": "Small-scale farming property."},
+            {"name": "Agricultural - Commercial Farm", "description": "Large-scale commercial farm."},
+
+            # Land
+            {"name": "Land - Undeveloped", "description": "Raw or vacant land with no developments."},
+        ]
+        PropertyType.objects.all().delete()
         for pt in property_types:
             obj, created = PropertyType.objects.get_or_create(
                 name=pt['name'],

@@ -45,18 +45,27 @@ export const PAYMENT_STATUS_CLASSIFICATIONS = [
 ];
 
 export const INDUSTRIES = [
-   "Agriculture",
-   "Construction",
-   "Education",
-   "Finance",
-   "Healthcare",
-   "Hospitality",
-   "Information Technology",
-   "Manufacturing",
-   "Retail",
-   "Transportation",
-   "Other",
-];
+    "Agriculture",
+    "Banking",
+    "Construction",
+    "Education",
+    "Energy",
+    "Entertainment",
+    "Finance",
+    "Food",
+    "Health",
+    "Hospitality",
+    "Insurance",
+    "Manufacturing",
+    "Media",
+    "Retail",
+    "Technology",
+    "Telecommunications",
+    "Transportation",
+    "Aviation",
+    "Real Estate",
+    "Other"
+]
 
 export const MODAL_WIDTHS = {
    md: "900px" as const,
@@ -144,10 +153,15 @@ export const UNIT_TYPES: Option[] = [
    { label: "Apartment", value: "apartment" },
    { label: "House", value: "house" },
    { label: "Office", value: "office" },
-   { label: "Retail Space", value: "retail space" },
+   { label: "Retail Space", value: "retail_space" },
    { label: "Warehouse", value: "warehouse" },
    { label: "Other", value: "other" },
 ];
+
+export const UNIT_STATUS:Option[] = [
+   {label :"Vacant", value :"vacant"},
+   {label :"Occupied", value :"occupied"},
+]
 
 export const TENANT_STATEMENTS_HEADERS: Header[] = [
    {name : "Lease ID"},
@@ -164,3 +178,143 @@ export const TENANT_STATEMENT_HEADERS: Header[] = [
    {name : "Amount", textAlign: "end"},
    {name : "Balance", textAlign :"end"}
 ]
+
+export const PROPERTY_HEADERS:Header[] = [
+   {name  :"Id"},
+   {name  :"Unit Number"},
+   {name  :"Unit Type"},
+   {name  :"Status"},
+]
+
+export const UNIT_FEATURES:Option[] = [
+  {
+    label: "Furnishing",
+    value: "furnishing",
+    subOptions: [
+      { label: "Furnished", value: "furnished" },
+      { label: "Unfurnished", value: "unfurnished" },
+      { label: "Partially Furnished", value: "partially_furnished" },
+      { label: "Built-in Wardrobes", value: "built_in_wardrobes" },
+      { label: "Kitchen Appliances", value: "kitchen_appliances" },
+      { label: "Study Desk", value: "study_desk" },
+      { label: "Bed & Mattress", value: "bed_mattress" },
+      { label: "Sofa & Chairs", value: "sofa_chairs" },
+    ],
+  },
+  {
+    label: "Utilities",
+    value: "utilities",
+    subOptions: [
+      { label: "Wi-Fi", value: "wifi" },
+      { label: "Water Included", value: "water_included" },
+      { label: "Electricity Included", value: "electricity_included" },
+      { label: "Gas Included", value: "gas_included" },
+      { label: "Solar Power", value: "solar_power" },
+      { label: "Backup Generator", value: "backup_generator" },
+    ],
+  },
+  {
+    label: "Amenities",
+    value: "amenities",
+    subOptions: [
+      { label: "Parking", value: "parking" },
+      { label: "Swimming Pool", value: "swimming_pool" },
+      { label: "Garden", value: "garden" },
+      { label: "Laundry Room", value: "laundry_room" },
+      { label: "Gym / Fitness Center", value: "gym" },
+      { label: "Playground", value: "playground" },
+      { label: "BBQ Area", value: "bbq_area" },
+      { label: "Community Hall", value: "community_hall" },
+    ],
+  },
+  {
+    label: "Comfort",
+    value: "comfort",
+    subOptions: [
+      { label: "Air Conditioning", value: "air_conditioning" },
+      { label: "Heating", value: "heating" },
+      { label: "Ceiling Fan", value: "ceiling_fan" },
+      { label: "Balcony", value: "balcony" },
+      { label: "Patio", value: "patio" },
+      { label: "Private Entrance", value: "private_entrance" },
+      { label: "Soundproofing", value: "soundproofing" },
+    ],
+  },
+  {
+    label: "Kitchen",
+    value: "kitchen",
+    subOptions: [
+      { label: "Modern Kitchen", value: "modern_kitchen" },
+      { label: "Open Plan Kitchen", value: "open_plan_kitchen" },
+      { label: "Pantry", value: "pantry" },
+      { label: "Dishwasher", value: "dishwasher" },
+      { label: "Microwave", value: "microwave" },
+      { label: "Refrigerator", value: "refrigerator" },
+    ],
+  },
+  {
+    label: "Bathroom",
+    value: "bathroom",
+    subOptions: [
+      { label: "En-suite Bathroom", value: "ensuite_bathroom" },
+      { label: "Bathtub", value: "bathtub" },
+      { label: "Shower", value: "shower" },
+      { label: "Hot Water", value: "hot_water" },
+      { label: "Double Sink", value: "double_sink" },
+    ],
+  },
+  {
+    label: "Security",
+    value: "security",
+    subOptions: [
+      { label: "CCTV", value: "cctv" },
+      { label: "Gated Community", value: "gated" },
+      { label: "24/7 Security Guard", value: "guard" },
+      { label: "Fire Alarm System", value: "fire_alarm" },
+      { label: "Smoke Detectors", value: "smoke_detectors" },
+      { label: "Secure Entry", value: "secure_entry" },
+    ],
+  },
+  {
+    label: "Policies",
+    value: "policies",
+    subOptions: [
+      { label: "Pet Friendly", value: "pet_friendly" },
+      { label: "No Smoking", value: "no_smoking" },
+      { label: "Students Allowed", value: "students_allowed" },
+      { label: "Family Friendly", value: "family_friendly" },
+      { label: "Single Occupancy Only", value: "single_occupancy" },
+    ],
+  },
+  {
+    label: "Accessibility",
+    value: "accessibility",
+    subOptions: [
+      { label: "Wheelchair Accessible", value: "wheelchair_accessible" },
+      { label: "Elevator Access", value: "elevator_access" },
+      { label: "Wide Doorways", value: "wide_doorways" },
+      { label: "Ground Floor", value: "ground_floor" },
+    ],
+  },
+  {
+    label: "View",
+    value: "view",
+    subOptions: [
+      { label: "City View", value: "city_view" },
+      { label: "Garden View", value: "garden_view" },
+      { label: "Pool View", value: "pool_view" },
+      { label: "Mountain View", value: "mountain_view" },
+      { label: "Lake View", value: "lake_view" },
+    ],
+  },
+]
+
+export const PHONE_TYPES = [
+  { label: "Mobile", value: "mobile" },
+  { label: "Whatsapp", value: "whatsapp" },
+  { label: "Combined", value: "combined" },
+  { label: "Home", value: "home" },
+  { label: "Work", value: "work" },
+  { label: "Other", value: "Other" }
+]
+

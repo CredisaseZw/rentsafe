@@ -30,8 +30,9 @@ class Individual(BaseModelWithUser):
     )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    date_of_birth = models.DateField(blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     identification_type = models.CharField(max_length=20, choices=IDENTIFICATION_TYPES)
     identification_number = models.CharField(max_length=50, unique=True)
     marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, null=True)
@@ -59,14 +60,10 @@ class Individual(BaseModelWithUser):
     
     @property
     def phone(self):
-        contact = self.contact_details.filter(mobile_phone__isnull=False).exclude(mobile_phone='').first()
-        return contact.mobile_phone[0] if contact else None
 
-    @property
-    def email(self):
-        contact = self.contact_details.filter(email__isnull=False).exclude(email='').first()
-        return contact.email if contact else None
-    
+        return self.contact_details.last().mobile_number or self.contact_details.last().whatsapp_number
+
+
     def clean(self):
         if self.first_name:
             self.first_name = self.first_name.strip().capitalize()
@@ -83,16 +80,29 @@ class Individual(BaseModelWithUser):
         return super().save(*args, **kwargs)      
 
 class IndividualContactDetail(BaseModel):
+    PHONE_TYPES = (
+        ('mobile', 'Mobile'),
+        ('whatsapp', 'WhatsApp'),
+        ('combined', 'Combined'),
+        ('home', 'Home'),
+        ('work', 'Work'),
+        ('other', 'Other'),
+    )
+
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='contact_details')
-    email = models.EmailField(blank=True, null=True)
-    mobile_phone = models.JSONField()
+    type = models.CharField(max_length=50, blank=True, choices=PHONE_TYPES, default='mobile')
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
 
     @property
-    def first_mobile_phone(self):
-        if isinstance(self.mobile_phone, list) and self.mobile_phone:
-            return self.mobile_phone[0]
-        return None
-    
+    def mobile_number(self):
+        if self.type in ['mobile','combined']:
+            return self.phone_number
+
+    @property
+    def whatsapp_number(self):
+        if self.type in ['whatsapp', 'combined']:
+            return self.phone_number
+
     class Meta:
         app_label = 'individuals'
         db_table = 'contact_detail'
@@ -101,14 +111,8 @@ class IndividualContactDetail(BaseModel):
         ordering = ('id',)
     
     def __str__(self):
-        if self.mobile_phone:
-            return f"Phone: {self.mobile_phone} for {self.individual}"
-        elif self.email:
-            return f"Email: {self.email} for {self.individual}"
-        else:
-            return f"Contact Detail for {self.individual}"
-            
-        
+        return f"Phone Number: {self.phone_number} for {self.individual}"
+
 class EmploymentDetail(BaseModel):    
     individual = models.ForeignKey(Individual, on_delete=models.CASCADE, related_name='employment_details')
     employer_name = models.CharField(max_length=255)

@@ -70,7 +70,7 @@ function LeaseRow({ lease, refetch, onSuccessCallback }: Props) {
             <EllipsisVertical size={18}/>
           </PopoverTrigger>
           <PopoverContent>
-            <Link to={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/${lease.lease_id}`} className="flex flex-row gap-3 justify-center items-center hover:text-green-600 mb-3">
+            <Link to={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/${lease.lease_id}`} className="flex flex-row gap-3 justify-center items-center hover:text-green-600">
               <span className="text-sm dark:text-white text-gray-600">View More</span>
             </Link>
             <TerminateLeaseDialog

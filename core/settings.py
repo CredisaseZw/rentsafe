@@ -99,6 +99,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'django_celery_results',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     # Custom Apps
     'apps.users',
     'apps.common',
@@ -160,7 +162,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
 DB_USERNAME = os.getenv('DB_USERNAME' , None)
 DB_PASS     = os.getenv('DB_PASS'     , None)
-DB_HOST     = os.getenv('DB_HOST'     , None)
+DB_HOST     = os.getenv('DB_HOST'     , 'db')
 DB_PORT     = os.getenv('DB_PORT'     , None)
 DB_NAME     = os.getenv('DB_NAME'     , None)
 
@@ -245,8 +247,8 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 if not CORS_ALLOW_ALL_ORIGINS:
     CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "https://credi-safe.com",
         "https://www.credi-safe.com",
         "https://rentsafe-backend.onrender.com",
@@ -261,6 +263,9 @@ CORS_ALLOW_METHODS = [
     'DELETE',
     'OPTIONS',
 ]
+
+
+
 
 # CRON JOBS
 # https://django-cron.readthedocs.io/en/latest/installation.html#installation
@@ -278,6 +283,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "PAGE_SIZE": 20,
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_RENDERER_CLASSES": [
@@ -285,6 +291,32 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
 }
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Credisafe API(s)",
+    "DESCRIPTION": "Documentation for Rentsafe & Countsafe.",
+    "VERSION": "1.0.0",
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # JWT settings to show the authorization header in Swagger UI
+    "SWAGGER_UI_SETTINGS": {
+        "persistAuthorization": True, # Makes the 'Authorize' button remember tokens
+    },
+    "AUTHENTICATION_WHITELIST": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    "SECURITY": [
+        {"BearerAuth": []}
+    ],
+    "SWAGGER_UI_OAUTH2_REDIRECT_URL": "/api/schema/swagger-ui/oauth2-redirect/" # For OAuth
+}
+
+# Add this setting for `drf-spectacular`
+AUTHENTICATION_WHITELIST = [
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
+]
 
 REDIS_CACHE_LOCATION = "redis://127.0.0.1:6379/1" if DEVELOPMENT else os.getenv('REDIS_CACHE_LOCATION')
 
@@ -456,6 +488,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'verbose',
         },
+        'file_accounting':{
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'accounting.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': { 
@@ -515,6 +555,11 @@ LOGGING = {
         },
         'subscriptions': {
             'handlers': ['console', 'file_subscriptions'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'accounting': {
+            'handlers': ['console', 'file_accounting'],
             'level': 'DEBUG',
             'propagate': False,
         },
@@ -580,9 +625,8 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = "login"

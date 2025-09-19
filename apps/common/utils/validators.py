@@ -1,11 +1,13 @@
 import re
 import datetime
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email as django_validate_email
+
 
 
 def validate_national_id(national_id, country: str= "zimbabwe") -> bool:
     patterns = {
-        "zimbabwe": r'\d{8,9}[a-zA-Z]+\d{2}$',
+        "zimbabwe": r'^\d{8,9}[a-zA-Z]\d{2}$',
         "angola":       r'^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{7}$',
         "south_africa": r'^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{7}$',
         "namibia":      r'^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{7}$',
@@ -28,21 +30,19 @@ def validate_national_id(national_id, country: str= "zimbabwe") -> bool:
     return bool(re.match(pattern, national_id_clean))
     
 def validate_email(email: str) -> bool:
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return bool(re.match(pattern,email))
+    try:
+        django_validate_email(email)
+        return True
+    except ValidationError:
+        return False
 
-
-def normalize_zimbabwe_mobile(phone):  
-    phone = re.sub(r'[\s-]', '', phone.strip())  
-    for prefix in ['00263', '+263', '263']:  
-        if phone.startswith(prefix):  
-            phone = phone[len(prefix):]  
-            break  
-    if phone.startswith('0'):  
-        phone = phone[1:]  
-    if re.match(r'^(77|78|71|73)\d{7}$', phone):  
+def normalize_zimbabwe_mobile(phone, type):
+    phone = re.sub(r'[\s-]', '', phone.strip())
+    if re.match(r'^(?:.*?)(77|78|71|73)\d{7}$', phone):  
+        if type in ['mobile','whatsapp', 'combined', 'other']:
+            phone = phone[-9:]
         return f'+263{phone}'  
-    return None  
+    return False
 
 def validate_future_dates(date):
     today = datetime.date.today()

@@ -3,7 +3,7 @@ import Button from "@/components/general/Button";
 import Modal from "@/components/general/Modal";
 import Searchbox from "@/components/general/Searchbox";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
-import { Eye, Plus } from "lucide-react";
+import { EllipsisVertical, Plus } from "lucide-react";
 import SectionHeader from "@/components/general/SectionHeader";
 import {
   Select,
@@ -23,6 +23,9 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 import DashboardCard from "@/components/general/DashboardCard";
 import { isAxiosError } from "axios";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
+import { Link } from "react-router";
 
 function PropertyList() {
    const {
@@ -96,7 +99,6 @@ function PropertyList() {
                </div>
                <div>
                   <div className="flex flex-row justify-end gap-3">
-                     <Button variant={"outline"}>Create Unit</Button>
                      <Button onClick={openModal} className="flex flex-row gap-3">
                         <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
@@ -127,19 +129,34 @@ function PropertyList() {
                                  <TableCell className="text-center">{property.full_address?.[0]?.city?.name || "-"}</TableCell>
                                  <TableCell className="text-center">{property.full_address?.[0]?.suburb?.name || "-"}</TableCell>
                                  <TableCell className="text-center">{property.full_address?.[0]?.street_address || "-"}</TableCell>
-                                 <TableCell className="text-center">{property.property_type}</TableCell>
+                                 <TableCell className="text-center">{typeof(property.property_type) === "string" ? property.property_type : ""}</TableCell>
                                  <TableCell className="flex justify-center items-center">
-                                    <Button variant={"ghost"}>
-                                       <Eye className="h-4 w-4"/>
-                                    </Button>
+                                    <Popover>
+                                       <PopoverTrigger>
+                                          <EllipsisVertical size={18}/>
+                                       </PopoverTrigger>
+                                       <PopoverContent>
+                                          <Link to={`${RENTSAFE_PRE_SEG}/properties/property-list/${property.id}`} className="flex flex-row gap-3 justify-center items-center hover:text-green-600">
+                                             <span className="text-sm dark:text-white text-gray-600">View More</span>
+                                          </Link>
+                                       </PopoverContent>
+                                    </Popover>
                                  </TableCell>
                               </TableRow>
                               ))
                            : (
                               <TableRow>
-                              <TableCell colSpan={headers.length}>
-                                 <EmptyResults message="No properties enlisted yet" />
-                              </TableCell>
+                                 <TableCell colSpan={headers.length}>
+                                    <EmptyResults
+                                       message="No properties enlisted yet" 
+                                       option = { 
+                                       <Button onClick={openModal} className="flex flex-row gap-3">
+                                          <Plus size={15} className="self-center" />
+                                          <span className="self-center">Add Property</span>
+                                       </Button>}
+                                       />
+                                       
+                                 </TableCell>
                               </TableRow>
                            )
                      }

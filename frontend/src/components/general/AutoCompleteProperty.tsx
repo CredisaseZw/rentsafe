@@ -41,7 +41,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
 
   return (
     <div className="form-group relative">
-      <label className="required">Property Name</label>
+      <label className="required">Property Name / Address</label>
       <Input
         type="text"
         required
@@ -81,7 +81,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
               </div>
           ) : (
             data.results.slice(0, 7).map((item: Property) => {
-              const fullname = item.name;
+              const fullname = item.name?.trim() || "";
               return (
                 <button
                   key={item.id}
@@ -91,11 +91,13 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     onSelectValue?.(item);
-                    setSearchItem(fullname ?? "");
+                    setSearchItem(fullname || item.address_summary || "");
                     setOpen(false);
                   }}
                 >
-                  {fullname}
+                  {fullname
+                    ? `${fullname} - ${item.address_summary}`
+                    : item.address_summary}
                 </button>
               );
             })
