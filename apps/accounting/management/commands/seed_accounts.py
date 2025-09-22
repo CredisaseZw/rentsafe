@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from accounting.models.models import SalesAccount, AccountSector
+from apps.accounting.models.models import SalesAccount, AccountSector
 from django.contrib.auth import get_user_model
 CustomUser = get_user_model()
 
@@ -48,9 +48,7 @@ class Command(BaseCommand):
                 account_number=data["account_number"],
                 defaults={
                     "account_name": data["account_name"],
-                    "company": admin_user.company,
                     "account_sector": sector,
-                    "user": admin_user,
                 },
             )
 

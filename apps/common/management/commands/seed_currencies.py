@@ -10,7 +10,7 @@ class Command(BaseCommand):
         # Define the default currencies with their symbols
         currencies = [
             {"currency_code": "USD", "currency_name": "United States Dollar", "symbol": "$"},
-            {"currency_code": "ZWL", "currency_name": "Zimbabwean Dollar", "symbol": "Z$"},
+            {"currency_code": "ZiG", "currency_name": "Zimbabwean Dollar", "symbol": "Zig"},
             {"currency_code": "EUR", "currency_name": "Euro", "symbol": "€"},
             {"currency_code": "GBP", "currency_name": "British Pound", "symbol": "£"},
             {"currency_code": "JPY", "currency_name": "Japanese Yen", "symbol": "¥"},
