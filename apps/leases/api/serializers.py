@@ -286,6 +286,8 @@ class LeaseDetailSerializer(serializers.ModelSerializer):
         return {
             'id': obj.unit.id,
             'unit_number': obj.unit.unit_number,
+            'unit_type': obj.unit.unit_type,
+            'number_of_rooms': obj.unit.number_of_rooms,
             'property': {
                 'id': obj.unit.property.id,
                 'name': obj.unit.property.name,
