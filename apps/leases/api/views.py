@@ -67,7 +67,13 @@ class LeaseViewSet(viewsets.ModelViewSet):
             return queryset.none()
 
         if lease_status := self.request.query_params.get('status'):
-            queryset = queryset.filter(status=lease_status)
+            if lease_status =='EXPIRED':
+                queryset = queryset.filter(
+                    Q(status='EXPIRED') | 
+                    Q(end_date__lt=timezone.now().date(), status='ACTIVE')
+                )
+            else:
+                queryset = queryset.filter(status=lease_status)
 
         if search_term := self.request.query_params.get('search'):
             queryset = queryset.filter(

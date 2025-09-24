@@ -278,7 +278,7 @@ class LeaseDetailSerializer(serializers.ModelSerializer):
     def get_landlord_opening_balances_data(self, obj):
         if hasattr(obj.landlord, 'opening_balances'):
             user = self.context.get('request').user if self.context.get('request') else None
-            landlord_balances = LandlordOpeningBalance.objects.filter(landlord=obj.landlord, lease_id=obj.lease_id)
+            landlord_balances = LandlordOpeningBalance.objects.filter(lease_id=obj.lease_id)
             return LandlordOpeningBalanceSerializer(landlord_balances, many=True).data
         return None
 
