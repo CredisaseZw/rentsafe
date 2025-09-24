@@ -278,7 +278,7 @@ class LeaseDetailSerializer(serializers.ModelSerializer):
     def get_landlord_opening_balances_data(self, obj):
         if hasattr(obj.landlord, 'opening_balances'):
             user = self.context.get('request').user if self.context.get('request') else None
-            landlord_balances = LandlordOpeningBalance.objects.filter(landlord=obj.landlord, lease_id=obj.lease_id)
+            landlord_balances = LandlordOpeningBalance.objects.filter(lease_id=obj.lease_id)
             return LandlordOpeningBalanceSerializer(landlord_balances, many=True).data
         return None
 
@@ -475,8 +475,11 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
         }
     
     def validate(self, data):
+        request = self.context.get('request')
+        if request and request.method in ['PATCH', 'PUT']:
+            return data  # Skip validation for partial updates
         from apps.common.utils.subscriptions import check_rentsafe_subscription
-        user = self.context.get('request').user if self.context.get('request') else None
+        user = request.user if request else None
         # Either unit or property_data + unit_data must be provided
         if not data.get('unit') and not (data.get('property_data') and data.get('unit_data')):
             raise serializers.ValidationError(
