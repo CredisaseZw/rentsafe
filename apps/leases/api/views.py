@@ -68,9 +68,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
         if lease_status := self.request.query_params.get('status'):
             if lease_status =='EXPIRED':
-                queryset = queryset.filter(
-                    Q(status='EXPIRED') | 
-                    Q(end_date__lt=timezone.now().date(), status='ACTIVE')
+                return queryset.filter(
+                    end_date__lt=timezone.now().date()
                 )
             else:
                 queryset = queryset.filter(status=lease_status)
