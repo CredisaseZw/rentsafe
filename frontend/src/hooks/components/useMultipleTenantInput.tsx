@@ -89,6 +89,7 @@ export default function useMultiTenantInput(clientType: string){
         onSelectTenant,
         updateTenant,
         updateMobile,
+        setTenants,
         addTenant,
         setUpdateIndividual,
         removeTenant,

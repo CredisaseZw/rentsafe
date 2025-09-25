@@ -6,17 +6,19 @@ import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { Plus, Trash } from "lucide-react"
 import AutoCompleteClient from "./AutoCompleteClient"
-import type { TenantSelection } from "@/types"
+import type { Tenant, TenantSelection } from "@/types"
 import { Checkbox } from "../ui/checkbox"
 import type { Address } from "@/interfaces"
 import UpdateMobileNumber from "../routes/rent-safe/tenant-leases/UpdateMobileNumber"
+import { useEffect } from "react"
 
 
 interface props {
+    existingTenants?: Tenant[],
     clientType: string,
     setPrimaryTenantAddress: React.Dispatch<React.SetStateAction<Address | undefined>>
 }
-function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
+function MultipleTenantInput({clientType, setPrimaryTenantAddress, existingTenants}:props) {
     const {
         open,
         tenants,
@@ -27,9 +29,31 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress}:props) {
         removeTenant,
         updateTenant, 
         updateMobile,
+        setTenants,
         addTenant, 
         setOpen,
         } = useMultiTenantInput(clientType)
+    
+        useEffect(() => {
+            if (!existingTenants || existingTenants.length === 0) return;
+            setTenants([])
+            existingTenants.forEach(t => {
+                setTenants(prev => [
+                    ...prev,
+                    {
+                    search_value : `${t.tenant_object.full_name} - ${t.tenant_object.identification_number  ?? t.tenant_object.company_name ?? ""}`,
+                    id: t.tenant_object.id ?? 0,
+                    full_name: t.tenant_object.full_name ?? "",
+                    identification_number: t.tenant_object.identification_number ?? t.tenant_object.company_name ?? "",
+                    mobile_number:  "",
+                    address: null,
+                    is_primary: false,
+                    },
+                ]);
+            });
+        }, [existingTenants]);
+
+    
     return (
     <div>
         {

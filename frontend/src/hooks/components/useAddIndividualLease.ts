@@ -1,5 +1,5 @@
 import { IN_LEASE_CLIENT_TYPES } from "@/constants";
-import type { Address, BranchFull, IndividualMinimal } from "@/interfaces";
+import type { Address, BranchFull, Charges, IndividualMinimal, LeaseResponse } from "@/interfaces";
 import type { AddressPayload } from "@/interfaces/form-payloads";
 import { extractAddresses, extractTenants, getThreeMonthsBack, validateBalances } from "@/lib/utils";
 import type {Currency, LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 function useAddIndividualLease() {
   const queryClient = useQueryClient()
+  const [leaseObject, setLeaseObject] = useState<LeaseResponse | null>(null); 
   const [addressState, setAddressState] = useState<"property" | "client" | "manual">("property");
   const [loading,setLoading] = useState(false);
   const [propertyName, setPropertyName] = useState("");
@@ -26,6 +27,8 @@ function useAddIndividualLease() {
   const page = parseInt(params.get("active_page") || "1");
 
   const [formData, setFormData] = useState({
+    defaultRent : "",
+    defaultUtility : "",
     tenant_type : IN_LEASE_CLIENT_TYPES[0].value,
     landlord_type: IN_LEASE_CLIENT_TYPES[0].value,
 
@@ -114,6 +117,7 @@ function useAddIndividualLease() {
     ...getThreeMonthsBack(formData.effectiveEndDate).map(h => ({ name: h })),
     { name: "Outstanding Balance" }
   ]), [formData.effectiveEndDate]);
+
   const handleUpdateForm = (name:any, value:any) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -183,8 +187,29 @@ function useAddIndividualLease() {
     }
     setAddressState(newState);
   };
+  function handleDefaultCurrency(currency: Currency[]){
+    const usdId = currency.find((c) => c.currency_code === "USD")?.id;
+    setDefaultCurrency(usdId || currency[0]?.id);
+  }
 
-  const handleLeaseSubmit = (useMutate: UseMutationResult<any, Error, any, unknown>,e: React.FormEvent<HTMLFormElement>, clientType: string, successCallback : ()=> void) => {
+  function handleCharges(charges: Charges[]) {
+    const rent = charges.find(c => c.charge_type === "RENT")?.amount ?? "";
+    const utility = charges.find(c => c.charge_type === "UTILITY")?.amount ?? "";
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      defaultRent: rent,
+      defaultUtility: utility,
+    }));
+  }
+
+
+  const handleLeaseSubmit = (
+      useMutate: UseMutationResult<any, Error, any, unknown>,
+      e: React.FormEvent<HTMLFormElement>, clientType: string,
+      successCallback : ()=> void,
+      leaseID : undefined | string
+    ) => {
     e.preventDefault();
     setLoading(true);
     const FORM_DATA = new FormData(e.currentTarget);
@@ -219,7 +244,7 @@ function useAddIndividualLease() {
         three_months_plus_balance: Number(data.paymentDataMoreThan3Months),
         outstanding_balance: Number(outstandingBalance.value)
     }
-
+   
     const { valid, message } = validateBalances(lease_opening_balance_data);
     if (!valid) {
       toast.error("Lease opening balances not valid", { description: message });
@@ -298,28 +323,33 @@ function useAddIndividualLease() {
         }
       ]
     };
+
     if(Number(formData.guarantor_id ?? 0) === 0) delete PAYLOAD.guarantor_data
     if(Number(formData.landlord_id ?? 0) === 0) delete PAYLOAD.landlord_data
     if(String(data.landlordsOpeningBalance).length === 0) delete PAYLOAD.landlord_opening_balances_data
 
-    
-    useMutate.mutate(PAYLOAD, {
-        onError: (error: AxiosError |Error | unknown) => {
-          if (isAxiosError(error)) {
-            console.error("Full backend response:", error.response?.data);
-            const errorDetails = error.response?.data?.error || error.response?.data?.detail || "Something went wrong";
-            toast.error("Failed to create new lease", { description: errorDetails });
-            return;
-            }
-          toast.error("Failed to create property. Please try again.");
-        },
-        onSuccess :() => {
-          toast.success("Lease successfully created")
-          queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
-          successCallback()
-        }, 
-        onSettled: () => setLoading(false),         
-    }) 
+    console.log(PAYLOAD)
+
+    useMutate.mutate({
+        leaseID : leaseID,
+        data : PAYLOAD
+      }, {
+      onError: (error: AxiosError |Error | unknown) => {
+        if (isAxiosError(error)) {
+          console.error("Full backend response:", error.response?.data);
+          const errorDetails = error.response?.data?.error || error.response?.data?.detail || "Something went wrong";
+          toast.error("Failed to create new lease", { description: errorDetails });
+          return;
+          }
+        toast.error("Failed to create property. Please try again.");
+      },
+      onSuccess :() => {
+        toast.success("Lease successfully created")
+        queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
+        successCallback()
+      }, 
+      onSettled: () => setLoading(false),         
+    })  
   };
 
   return {
@@ -328,6 +358,7 @@ function useAddIndividualLease() {
     loading,
     formData,
     searchItem,
+    leaseObject,
     propertyName,
     addressState,
     propertyType,
@@ -343,6 +374,8 @@ function useAddIndividualLease() {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
+    handleDefaultCurrency,
+    setOutstandingBalance,
     SET_CURRENCY_OPTIONS,
     setDefaultCurrency,
     onSelectGuarantor,
@@ -354,6 +387,8 @@ function useAddIndividualLease() {
     setPropertyTypes,
     setPropertyName,
     setAddressState,
+    setLeaseObject,
+    handleCharges,
     setSearchItem,
     setShowModal,
     setFormData,
