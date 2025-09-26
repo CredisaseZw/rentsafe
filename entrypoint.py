@@ -4,20 +4,11 @@ import socket
 import sys
 import time
 from subprocess import run, PIPE
-from urllib.parse import urlparse
-
-def get_db_host_port():
-    # If we have a connection URL, parse it
-    db_url = os.getenv("PROD_DATABASE_URL")
-    if db_url and os.getenv("DEVELOPMENT",'false').lower() != 'false':
-        parsed = urlparse(db_url)
-        return parsed.hostname.replace('-pooler', ''), parsed.port or 5432
-    # Fallback to DB_HOST/DB_PORT
-    return os.getenv("DB_HOST"), os.getenv("DB_PORT")
 
 def db_ready():
     """Check if the database is ready to accept connections."""
-    db_host, db_port = get_db_host_port()
+    db_host = os.getenv('DB_HOST')
+    db_port = os.getenv('DB_PORT')
     
     if not db_host or not db_port:
         print("Error: DB_HOST or DB_PORT environment variables are not set.")
