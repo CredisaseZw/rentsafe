@@ -43,8 +43,8 @@ def github_webhook(request):
             return JsonResponse({"status": "ignored", "ref": ref})
         
         # Use the mounted host directory
-        script_path = "/host-app/deploy_rentsafe.sh"
-        working_dir = "/host-app"
+        script_path = "/app/deploy_rentsafe.sh"
+        working_dir = "/app"
         
         logger.info("Executing deploy script: %s", script_path)
         
