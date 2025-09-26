@@ -68,7 +68,6 @@ def github_webhook(request):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            cwd="/var/www/credisafe/rentsafe-api/rentsafe"  # Set to your repo dir
         )
 
         logger.info("Deployment completed successfully")
