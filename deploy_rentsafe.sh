@@ -6,15 +6,15 @@ cd /var/www/credisafe/rentsafe-api/rentsafe
 echo "Starting deployment at $(date)"
 
 # Stash local changes
-/usr/bin/git stash
+git stash
 
-/usr/bin/git pull origin rentsafe-backend
+git pull origin rentsafe-backend
 
-/usr/bin/docker system prune -f --volumes
+docker system prune -f --volumes
 
 # Bring down containers
-/usr/bin/docker compose down
+docker compose down
 
-/usr/bin/docker compose up -d --build
+docker compose up -d --build
 
 echo "Deployment completed at $(date)"
