@@ -1,4 +1,4 @@
-# webhook.py
+# webhook.py helper functions for handling GitHub webhooks and deploying updates
 import subprocess
 from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
