@@ -43,18 +43,9 @@ def github_webhook(request):
             return JsonResponse({"status": "ignored", "ref": ref})
         
         # Use the mounted host directory
-        script_path = "/app/deploy_rentsafe.sh"
-        working_dir = "/app"
-        
-        logger.info("Executing deploy script: %s", script_path)
-        
         result = subprocess.run(
-            [script_path],
-            cwd=working_dir,
+            ['./deploy_rentsafe.sh'],
             check=True,
-            capture_output=True,
-            text=True,
-            timeout=300
         )
         
         logger.info("Deploy script completed successfully")
@@ -63,7 +54,7 @@ def github_webhook(request):
         return JsonResponse({
             "status": "success", 
             "output": result.stdout
-        })
+        }, status=200)
         
     except subprocess.CalledProcessError as e:
         logger.error("Deploy script failed: %s", str(e))
