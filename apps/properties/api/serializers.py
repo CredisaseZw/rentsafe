@@ -61,10 +61,11 @@ class PropertyListSerializer(serializers.ModelSerializer):
     property_type = serializers.CharField(source='property_type.name')
     address_summary = serializers.CharField(source='get_address')
     full_address = AddressSerializer(source='addresses', many=True, read_only=True)
-
+    landlord_data = LandlordSerializer(source='landlords', many=True, read_only=True)
     class Meta:
         model = Property
-        fields = ('id', 'name','slug', 'property_type', 'status','description', 'total_number_of_units', 'address_summary', 'full_address')
+        fields = ('id', 'name','slug', 'property_type', 'status','description', 'total_number_of_units', 'address_summary', 'full_address', 'landlord_data')
+
 
 class PropertyCreateSerializer(serializers.ModelSerializer):
     property_type_id = serializers.PrimaryKeyRelatedField(
