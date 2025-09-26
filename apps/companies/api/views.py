@@ -10,8 +10,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import NotFound 
 from apps.common.api.views import BaseViewSet 
 from apps.common.utils.caching import CacheService
-from apps.common.api.serializers import DocumentSerializer, NoteSerializer
-from apps.companies.models.models import Company, CompanyBranch, CompanyProfile
+from apps.common.api.serializers import DocumentSerializer
+from apps.companies.models.models import Company, CompanyBranch
 from apps.companies.api.serializers import (
     CompanyCreateSerializer, CompanyUpdateSerializer, CompanyDetailSerializer,
     CompanyMinimalSerializer,
