@@ -24,6 +24,9 @@ services:
       - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker:ro
+      - /var/www/credisafe/rentsafe-api/rentsafe:/host-app
     env_file:
       - .env
     ports:

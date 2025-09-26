@@ -41,13 +41,12 @@ def github_webhook(request):
             logger.info("Ignoring ref: %s", ref)
             return JsonResponse({"status": "ignored", "ref": ref})
         
-        # Run deploy script as ubuntu user on the host
-        script_path = "/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"
-        working_dir = "/var/www/credisafe/rentsafe-api/rentsafe"
+        # Use the mounted host directory
+        script_path = "/host-app/deploy_rentsafe.sh"
+        working_dir = "/host-app"
         
-        logger.info("Executing deploy script as ubuntu user: %s", script_path)
+        logger.info("Executing deploy script: %s", script_path)
         
-        # Execute with sudo as ubuntu user
         result = subprocess.run(
             ["/bin/bash", script_path],
             cwd=working_dir,
