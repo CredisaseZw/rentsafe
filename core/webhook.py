@@ -49,7 +49,7 @@ def github_webhook(request):
         logger.info("Executing deploy script: %s", script_path)
         
         result = subprocess.run(
-            ["/bin/bash", script_path],
+            [script_path],
             cwd=working_dir,
             check=True,
             capture_output=True,
