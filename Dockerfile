@@ -30,7 +30,6 @@ COPY . .
 COPY --chmod=755 entrypoint.py /app/entrypoint.py
 RUN dos2unix /app/entrypoint.py
 
-RUN chmod a+x /app/deploy_rentsafe.sh
 RUN chown root:root /app/deploy_rentsafe.sh
 
 # Create required dirs
