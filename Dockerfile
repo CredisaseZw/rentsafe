@@ -26,11 +26,11 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy app code
 COPY . .
-
 # Fix line endings on entrypoint
 COPY --chmod=755 entrypoint.py /app/entrypoint.py
 RUN dos2unix /app/entrypoint.py
 
+RUN chmod +x /app/deploy_rentsafe.sh
 # Create required dirs
 RUN mkdir -p /app/static /app/media /app/logs
 

@@ -28,9 +28,11 @@ def github_webhook(request):
     # Run deploy script to 
     try:
         subprocess.run(
-            ["app/deploy_rentsafe.sh"],
+            ["./deploy_rentsafe.sh"],
             check=True
         )
         return JsonResponse({"status": "success"})
     except subprocess.CalledProcessError as e:
         return JsonResponse({"error": str(e)}, status=500)
+    except FileNotFoundError as e:
+        return JsonResponse({"error": "Deploy script not found"}, status=500)
