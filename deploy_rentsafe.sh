@@ -3,8 +3,7 @@ set -e
 
 echo "Starting deployment at $(date)"
 
-# Change to the mounted host directory
-cd /var/www/credisafe/rentsafe-api/rentsafe
+cd /host-app
 
 # Stash local changes
 git stash
