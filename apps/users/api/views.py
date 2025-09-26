@@ -150,8 +150,6 @@ class CheckCSRFView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        if not request.user or not request.user.is_authenticated:
-            return Response({"error": "User not authenticated"}, status=status.HTTP_403_FORBIDDEN)
         return Response({"message": "CSRF token is valid"}, status=status.HTTP_200_OK)
 
 class UserViewSet(viewsets.ModelViewSet):

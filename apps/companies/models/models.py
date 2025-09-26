@@ -7,6 +7,7 @@ from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.individuals.models.models import Individual
 from django.db.models import UniqueConstraint, Q
 from django.db.models.functions import Lower
+from django.utils.functional import cached_property
 
 
 class Company(BaseModelWithUser):
@@ -128,6 +129,9 @@ class CompanyBranch(BaseModelWithUser):
     @property
     def full_name(self):
         return f"{self.branch_name}" if self.branch_name else self.company.registration_name
+    @cached_property
+    def primary_address(self):
+        return self.addresses.filter(is_primary=True).first() if hasattr(self, 'addresses') else "No Address"
     
 
 class ContactPerson(BaseModel):
