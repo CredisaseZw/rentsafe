@@ -28,7 +28,7 @@ def github_webhook(request):
     # Run deploy script
     try:
         subprocess.run(
-            ["./deploy_rentsafe.sh"],
+            ["/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"],
             check=True
         )
         return JsonResponse({"status": "success"})
