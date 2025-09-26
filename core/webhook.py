@@ -43,9 +43,13 @@ def github_webhook(request):
             return JsonResponse({"status": "ignored", "ref": ref})
         
         # Use the mounted host directory
+        subprocess.run(['chmod', '+x', './deploy_rentsafe.sh'], check=True)
         result = subprocess.run(
             ['./deploy_rentsafe.sh'],
             check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
         )
         
         logger.info("Deploy script completed successfully")
