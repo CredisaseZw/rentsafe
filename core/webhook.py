@@ -31,54 +31,32 @@ def github_webhook(request):
         if not hmac.compare_digest(signature, expected_signature):
             logger.error("Invalid signature")
             return HttpResponseForbidden("Invalid signature")
-    
     try:
-        payload = json.loads(request.body)
-        ref = payload.get("ref")
-        logger.info("Webhook payload ref: %s", ref)
-        
-        if ref != "refs/heads/rentsafe-backend":
-            logger.info("Ignoring ref: %s", ref)
-            return JsonResponse({"status": "ignored", "ref": ref})
-        
-        # Run deploy script on the HOST system
         script_path = "/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"
         working_dir = "/var/www/credisafe/rentsafe-api/rentsafe"
         
-        logger.info("Executing deploy script: %s", script_path)
+        logger.info("Executing deploy script as ubuntu user: %s", script_path)
         
-        # Execute with proper permissions and environment
+        # Execute as ubuntu user with proper environment
         result = subprocess.run(
-            ["/bin/bash", script_path],
+            ["sudo", "-u", "ubuntu", "/bin/bash", script_path],
             cwd=working_dir,
             check=True,
             capture_output=True,
             text=True,
-            timeout=300  # 5 minute timeout
+            timeout=300
         )
         
         logger.info("Deploy script completed successfully")
-        logger.info("Script output: %s", result.stdout)
-        
-        return JsonResponse({
-            "status": "success", 
-            "output": result.stdout
-        })
+        return JsonResponse({"status": "success", "output": result.stdout})
         
     except subprocess.CalledProcessError as e:
         logger.error("Deploy script failed: %s", str(e))
-        logger.error("STDERR: %s", e.stderr)
-        logger.error("STDOUT: %s", e.stdout)
         return JsonResponse({
             "error": "Deployment failed", 
             "stderr": e.stderr,
             "stdout": e.stdout
         }, status=500)
-        
-    except subprocess.TimeoutExpired:
-        logger.error("Deploy script timed out")
-        return JsonResponse({"error": "Deployment timed out"}, status=500)
-        
     except Exception as e:
         logger.exception("Unexpected error in webhook")
         return JsonResponse({"error": str(e)}, status=500)
