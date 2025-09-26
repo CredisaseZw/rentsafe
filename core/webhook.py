@@ -5,41 +5,80 @@ from django.conf import settings
 import hmac
 import hashlib
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def github_webhook(request):
+    logger.info("GitHub webhook received")
+    
     if request.method != "POST":
+        logger.error("Invalid method: %s", request.method)
         return JsonResponse({"error": "Invalid method"}, status=405)
 
-    secret = settings.GITHUB_WEBHOOK_SECRET.encode()
-    signature = request.headers.get('X-Hub-Signature-256')
-    if secret and signature:
+    # Verify secret if set
+    if hasattr(settings, 'GITHUB_WEBHOOK_SECRET') and settings.GITHUB_WEBHOOK_SECRET:
+        secret = settings.GITHUB_WEBHOOK_SECRET.encode()
+        signature = request.headers.get('X-Hub-Signature-256')
+        
+        if not signature:
+            logger.error("Missing signature header")
+            return HttpResponseForbidden("Missing signature")
+        
         hash = hmac.new(secret, request.body, hashlib.sha256).hexdigest()
         expected_signature = f"sha256={hash}"
         if not hmac.compare_digest(signature, expected_signature):
+            logger.error("Invalid signature")
             return HttpResponseForbidden("Invalid signature")
     
-    payload = json.loads(request.body)
-    ref = payload.get("ref")
-
-    if ref != "refs/heads/rentsafe-backend":
-        return JsonResponse({"status": "ignored", "ref": ref})
-    
-    # Run deploy script on the HOST system
     try:
-        # Use full path to the script on the host
-        script_path = "/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"
+        payload = json.loads(request.body)
+        ref = payload.get("ref")
+        logger.info("Webhook payload ref: %s", ref)
         
-        # Execute with proper permissions
+        if ref != "refs/heads/rentsafe-backend":
+            logger.info("Ignoring ref: %s", ref)
+            return JsonResponse({"status": "ignored", "ref": ref})
+        
+        # Run deploy script on the HOST system
+        script_path = "/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"
+        working_dir = "/var/www/credisafe/rentsafe-api/rentsafe"
+        
+        logger.info("Executing deploy script: %s", script_path)
+        
+        # Execute with proper permissions and environment
         result = subprocess.run(
             ["/bin/bash", script_path],
-            cwd="/var/www/credisafe/rentsafe-api/rentsafe",
+            cwd=working_dir,
             check=True,
             capture_output=True,
-            text=True
+            text=True,
+            timeout=300  # 5 minute timeout
         )
-        return JsonResponse({"status": "success", "output": result.stdout})
+        
+        logger.info("Deploy script completed successfully")
+        logger.info("Script output: %s", result.stdout)
+        
+        return JsonResponse({
+            "status": "success", 
+            "output": result.stdout
+        })
+        
     except subprocess.CalledProcessError as e:
-        return JsonResponse({"error": str(e), "stderr": e.stderr}, status=500)
-    except FileNotFoundError as e:
-        return JsonResponse({"error": "Deploy script not found"}, status=500)
+        logger.error("Deploy script failed: %s", str(e))
+        logger.error("STDERR: %s", e.stderr)
+        logger.error("STDOUT: %s", e.stdout)
+        return JsonResponse({
+            "error": "Deployment failed", 
+            "stderr": e.stderr,
+            "stdout": e.stdout
+        }, status=500)
+        
+    except subprocess.TimeoutExpired:
+        logger.error("Deploy script timed out")
+        return JsonResponse({"error": "Deployment timed out"}, status=500)
+        
+    except Exception as e:
+        logger.exception("Unexpected error in webhook")
+        return JsonResponse({"error": str(e)}, status=500)

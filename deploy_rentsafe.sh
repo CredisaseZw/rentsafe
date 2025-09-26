@@ -1,14 +1,20 @@
 #!/bin/bash
 set -e 
 
-# Stash local changes (optional: stash with message or apply pop later)
-git stash
+cd /var/www/credisafe/rentsafe-api/rentsafe
 
-git pull origin rentsafe-backend
+echo "Starting deployment at $(date)"
 
-docker system prune -f --volumes
+# Stash local changes
+/usr/bin/git stash
+
+/usr/bin/git pull origin rentsafe-backend
+
+/usr/bin/docker system prune -f --volumes
 
 # Bring down containers
-docker compose down
+/usr/bin/docker compose down
 
-docker compose up -d --build
+/usr/bin/docker compose up -d --build
+
+echo "Deployment completed at $(date)"
