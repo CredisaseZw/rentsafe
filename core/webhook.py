@@ -11,7 +11,6 @@ def github_webhook(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid method"}, status=405)
 
-    # Optional: verify GitHub secret
     secret = settings.GITHUB_WEBHOOK_SECRET.encode()
     signature = request.headers.get('X-Hub-Signature-256')
     if secret and signature:
