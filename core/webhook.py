@@ -44,7 +44,7 @@ def github_webhook(request):
         
         # Use the mounted host directory
         result = subprocess.run(
-            ['chmod +x ./deploy_rentsafe.sh','./deploy_rentsafe.sh'],
+            ['./deploy_rentsafe.sh'],
             check=True,
         )
         
