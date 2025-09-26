@@ -8,11 +8,11 @@ from urllib.parse import urlparse
 
 
 def get_db_host():
-    if os.getenv('DEVELOPMENT','false') == 'True':
+    if os.getenv('DEVELOPMENT','false').lower() == 'false':
         if production_db_host := os.getenv('PROD_DATABASE_URL'):
             parsed = urlparse(production_db_host)
             return parsed.hostname.replace('-pooler', ''), parsed.port or 5432
-        return os.getenv('DB_HOST'), os.getenv('DB_PORT', 5432)
+    return os.getenv('DB_HOST'), os.getenv('DB_PORT', 5432)
     
 def db_ready():
     """Check if the database is ready to accept connections."""
