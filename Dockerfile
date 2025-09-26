@@ -7,6 +7,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+# Install OS dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     postgresql-client \
@@ -19,36 +20,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies in a single layer
+# Install Python dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt --no-cache-dir
-
-# Copy application code
+# Copy app code
 COPY . .
 
-# Copy entrypoint and set permissions
+# Fix line endings on entrypoint
 COPY --chmod=755 entrypoint.py /app/entrypoint.py
 RUN dos2unix /app/entrypoint.py
 
-# Create necessary directories
+# Create required dirs
 RUN mkdir -p /app/static /app/media /app/logs
 
-# Set environment variables
+# Set environment vars
 ENV DJANGO_SETTINGS_MODULE=core.settings
 ENV PYTHONPATH=/app
 
-# Expose port
-EXPOSE 8000
+EXPOSE 8081
 
-
-
-# Use exec form for ENTRYPOINT to ensure proper signal handling
-# ENTRYPOINT ["/bin/sh", "-c", "./entrypoint.sh"]
-
-# Default command to run
 ENTRYPOINT ["python", "/app/entrypoint.py"]
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
-
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8081"]
