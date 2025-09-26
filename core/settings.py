@@ -63,7 +63,8 @@ if not DEBUG:
     ALLOWED_HOSTS = [
         '.credi-safe.com',
         ".rentsafe-iota.vercel.app",
-        "rentsafe-backend.onrender.com"
+        "rentsafe-backend.onrender.com",
+        "api.credi-safe.com"
     ]
 else:
     ALLOWED_HOSTS = [
@@ -81,7 +82,8 @@ CSRF_TRUSTED_ORIGINS = [
         "http://localhost:8080",
         "http://127.0.0.1:8080",
         "https://rentsafe-backend.onrender.com",
-        "https://rentsafe-iota.vercel.app"
+        "https://rentsafe-iota.vercel.app",
+        "https://api.credi-safe.com"
     ]
 
 INSTALLED_APPS = [
@@ -229,7 +231,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://credi-safe.com",
     "http://localhost:5173",
     "https://rentsafe-iota.vercel.app", 
-    "https://rentsafe-backend.onrender.com"
+    "https://rentsafe-backend.onrender.com",
+    "https://api.credi-safe.com"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -252,7 +255,8 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "https://credi-safe.com",
         "https://www.credi-safe.com",
         "https://rentsafe-backend.onrender.com",
-        "https://rentsafe-iota.vercel.app"
+        "https://rentsafe-iota.vercel.app",
+        "https://api.credi-safe.com"
     ]
 
 CORS_ALLOW_METHODS = [
@@ -632,7 +636,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "/"
 SILENCED_SYSTEM_CHECKS = ["staticfiles.E002"]  # Disables the warning for not using HTTPS in development
-
+GITHUB_WEBHOOK_SECRET = os.environ.get('GITHUB_WEBHOOK_SECRET', 'default_secret')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
