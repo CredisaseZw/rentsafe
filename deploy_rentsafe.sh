@@ -3,7 +3,7 @@ set -e
 
 echo "Starting deployment at $(date)"
 
-cd /host-app
+cd /var/www/credisafe/rentsafe-api/rentsafe
 
 # Stash local changes
 git stash
