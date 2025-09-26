@@ -324,17 +324,17 @@ AUTHENTICATION_WHITELIST = [
 
 REDIS_CACHE_LOCATION = os.getenv('REDIS_CACHE_LOCATION')
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": REDIS_CACHE_LOCATION,
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         },
-#         "KEY_PREFIX": "rentsafe",
-#         "TIMEOUT": 300, 
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_CACHE_LOCATION,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "rentsafe",
+        "TIMEOUT": 300, 
+    }
+}
 # Celery Configuration
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
