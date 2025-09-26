@@ -1,14 +1,14 @@
 #!/bin/bash
+set -e 
 
-
-# Pull latest code
+# Stash local changes (optional: stash with message or apply pop later)
 git stash
+
 git pull origin rentsafe-backend
 
-# Rebuild and restart Docker containers
+docker system prune -f --volumes
+
+# Bring down containers
 docker compose down
+
 docker compose up -d --build
-
-
-
-
