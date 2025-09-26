@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     netcat-openbsd \
     dos2unix \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
