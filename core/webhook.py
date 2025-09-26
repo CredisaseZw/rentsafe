@@ -18,21 +18,28 @@ def github_webhook(request):
         expected_signature = f"sha256={hash}"
         if not hmac.compare_digest(signature, expected_signature):
             return HttpResponseForbidden("Invalid signature")
-        # Parse payload
+    
     payload = json.loads(request.body)
     ref = payload.get("ref")
 
     if ref != "refs/heads/rentsafe-backend":
         return JsonResponse({"status": "ignored", "ref": ref})
     
-    # Run deploy script to 
+    # Run deploy script on the HOST system
     try:
-        subprocess.run(
-            ["./deploy_rentsafe.sh"],
-            check=True
+        # Use full path to the script on the host
+        script_path = "/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"
+        
+        # Execute with proper permissions
+        result = subprocess.run(
+            ["/bin/bash", script_path],
+            cwd="/var/www/credisafe/rentsafe-api/rentsafe",
+            check=True,
+            capture_output=True,
+            text=True
         )
-        return JsonResponse({"status": "success"})
+        return JsonResponse({"status": "success", "output": result.stdout})
     except subprocess.CalledProcessError as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": str(e), "stderr": e.stderr}, status=500)
     except FileNotFoundError as e:
         return JsonResponse({"error": "Deploy script not found"}, status=500)
