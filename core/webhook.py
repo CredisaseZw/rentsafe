@@ -44,6 +44,7 @@ def github_webhook(request):
         
         # Use the mounted host directory
         subprocess.run(['chmod', '+x', './deploy_rentsafe.sh'], check=True)
+        subprocess.run(['git', 'config', '--global', '--add', 'safe.directory', '/var/www/credisafe/rentsafe-api/rentsafe'], check=True)
         result = subprocess.run(
             ['./deploy_rentsafe.sh'],
             check=True,
