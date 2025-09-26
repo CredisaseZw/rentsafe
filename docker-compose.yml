@@ -24,8 +24,6 @@ services:
       - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
     env_file:
       - .env
     ports:
