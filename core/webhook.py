@@ -25,10 +25,10 @@ def github_webhook(request):
     if ref != "refs/heads/rentsafe-backend":
         return JsonResponse({"status": "ignored", "ref": ref})
     
-    # Run deploy script to persist changes
+    # Run deploy script to 
     try:
         subprocess.run(
-            ["./deploy_rentsafe.sh"],
+            ["/var/www/credisafe/rentsafe-api/rentsafe/deploy_rentsafe.sh"],
             check=True
         )
         return JsonResponse({"status": "success"})
