@@ -55,7 +55,12 @@ class Property(BaseModelWithUser):
     def __str__(self):
         string_ =f"{self.name}" if self.name else f"{self.get_address()}"
         return string_
-
+    @property
+    def landlord_data(self):
+        if hasattr(self, 'landlords'):
+            return self.landlords.first()
+        return None
+    
     def generate_unique_slug(self):
         random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
         return slugify(self.name) if self.name else slugify(random_string)

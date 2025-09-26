@@ -131,8 +131,9 @@ class CompanyBranch(BaseModelWithUser):
         return f"{self.branch_name}" if self.branch_name else self.company.registration_name
     @cached_property
     def primary_address(self):
-        return self.addresses.filter(is_primary=True).first() if hasattr(self, 'addresses') else "No Address"
-    
+        if not self.addresses.exists():
+            return None
+        return self.addresses.filter(is_primary=True).first()
 
 class ContactPerson(BaseModel):
     CONTACT_TYPES = (
