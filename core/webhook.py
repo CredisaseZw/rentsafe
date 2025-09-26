@@ -25,7 +25,7 @@ def github_webhook(request):
     if ref != "refs/heads/rentsafe-backend":
         return JsonResponse({"status": "ignored", "ref": ref})
     
-    # Run deploy script
+    # Run deploy script to persist changes
     try:
         subprocess.run(
             ["./deploy_rentsafe.sh"],
