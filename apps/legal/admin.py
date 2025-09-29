@@ -44,18 +44,6 @@ class ClaimAdmin(admin.ModelAdmin):
             'Address': ['address'],
         }
 
-        # for attr in list(field_map.get('Email', [])):
-        #     val = getattr(debtor, attr, None)
-        #     if val:
-        #         mailto = format_html("<a href='mailto:{}'>{}</a>", val, val)
-         
-        #     try:
-        #         setattr(debtor, attr, mailto)
-        #     except Exception:
-        #         fallback = f"_mailto_{attr}"
-        #         setattr(debtor, fallback, mailto)
-        #         field_map['Email'].insert(0, fallback)
-        #     break
 
         parts = []
         for label, attr_names in field_map.items():

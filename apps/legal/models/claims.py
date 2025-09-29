@@ -49,7 +49,7 @@ class Claim(BaseModelWithUser):
         verbose_name = _("Claim")
         verbose_name_plural = _("Claims")
         ordering = ['-claim_date']
-        unique_together = ('client', 'debtor_content_type', 'debtor_object_id', 'account_number', 'amount', 'claim_date')
+        unique_together = ('client', 'debtor_content_type', 'debtor_object_id', 'account_number')
         
     def __str__(self):
         return str(self.id)

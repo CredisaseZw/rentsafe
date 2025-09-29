@@ -77,7 +77,7 @@ class ClaimViewSet(BaseViewSet):
             # Log unexpected server errors and return generic message
             logger.error(f"Error creating claim: {str(e)}")
             return self._create_rendered_response(
-                {"Something went wrong"}, 
+                {"error": "Something went wrong"}, 
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
@@ -102,7 +102,7 @@ class ClaimViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error updating claim: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"Something went wrong"}, 
+                {"error": "Something went wrong"}, 
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -121,7 +121,7 @@ class ClaimViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving claims for individual {pk}: {extract_error_message(e)}")
             return self._create_rendered_response(
-                {"Something went wrong"}, 
+                {"error": "Something went wrong"}, 
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
@@ -166,7 +166,7 @@ class ClaimViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error auto-creating claims for individual: {extract_error_message(e)}")
             return self._create_rendered_response(
-                "Something went wrong", 
+                {"error": "Something went wrong"}, 
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -228,7 +228,7 @@ class ClaimViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving unverified claims: {extract_error_message(e)}")
             return self._create_rendered_response(      
-                {"Something went wrong"},
+                {"error": "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
