@@ -268,9 +268,11 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
 class CompanyBranchMinimalSerializer(serializers.ModelSerializer):
     """Minimal serializer for company branch data"""
     company = CompanyMinimalSerializer(read_only=True)
+    address_summary = serializers.CharField(source='primary_address', read_only=True)
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'branch_name', 'is_headquarters', 'company', 'email', 'phone']
+        fields = ['id', 'branch_name', 'is_headquarters', 'company', 'email', 'phone', 'address_summary']
+        read_only_fields = ['id', 'company', 'address_summary']
 
 
 class CompanyBranchSearchSerializer(serializers.ModelSerializer):
