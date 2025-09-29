@@ -361,8 +361,7 @@ class CompanyClaimSerializer(serializers.ModelSerializer):
             debtor_object_id=obj.id,
             is_verified=True
         ).select_related('client', 'currency', 'debtor_content_type')
-        for c in claim_qs:
-            print(c.account_number)
+
         if claim_qs.exists():
             return ClaimMinimalSerializer(claim_qs, many=True).data
         return []

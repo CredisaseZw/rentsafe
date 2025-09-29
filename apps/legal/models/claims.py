@@ -11,7 +11,7 @@ from apps.accounting.models.models import Currency
 from apps.clients.models.models import Client
 
 class Claim(BaseModelWithUser):
-    client= models.ForeignKey(Client, on_delete=models.CASCADE, related_name='claims',
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='claims',
                             help_text=_("The client associated with the claim."))
 
     debtor_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,

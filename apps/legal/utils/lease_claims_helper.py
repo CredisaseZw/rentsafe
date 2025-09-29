@@ -4,7 +4,7 @@ from apps.legal.models.claims import Claim
 from datetime import date
 
 @shared_task
-def create_claim_from_lease(lease,*args, **kwargs):
+def create_claim_from_lease(lease, *args, **kwargs):
     """
     Creates a Claim based on the lease's status.
     

@@ -117,7 +117,7 @@ class ClaimCreateSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         validated_data['updated_by'] = self.context['request'].user
-        validated_data['updated_at'] = date.today()
+        validated_data['date_updated'] = date.today()
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

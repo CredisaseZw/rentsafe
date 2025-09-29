@@ -1,4 +1,3 @@
-from attr import attr
 from django.contrib import admin
 from apps.legal.models import Claim
 from django.utils.html import format_html
