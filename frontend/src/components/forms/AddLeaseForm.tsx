@@ -91,23 +91,26 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
         toast.error("Failed to fetch lease details", { description: message });
         return;
       }
+
       if(leaseResponseObject){
+        setDefaultCurrency(leaseResponseObject?.currency?.id)
+        setPropertyName(`${leaseResponseObject.unit.property.name} - ${summarizeAddress(leaseResponseObject?.unit.property.addresses[0] ?? {} as Address)}`)
+        setSearchItem(leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_name ?? "")
+        setGuaranteeItem(leaseResponseObject?.guarantor?.guarantor_object.identification_number ?? "")        
+        handleCharges(leaseResponseObject?.charges ?? [])
+        setOutstandingBalance((p)=>({...p, value : leaseResponseObject.lease_opening_balance_data.outstanding_balance ?? "" }))
         setFormData((p) => ({
           ...p,
+          lockLandlord : true,
           property : {name : leaseResponseObject?.unit?.property?.name ?? ""},
           address_object : leaseResponseObject?.unit.property.addresses[0] ?? {} as Address,
-          landlord_id: leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_id ?? "",
+          landlord_id: Number(leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_id),
+          landlord_type : leaseResponseObject.landlord_opening_balances_data?.[0]?.landlord?.landlord_type ?? "individual",
           landlord_name: leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_name ?? "",
           guarantor_id: leaseResponseObject?.guarantor?.guarantor_object?.id ?? "",
           guarantor_name: leaseResponseObject?.guarantor?.guarantor_object?.full_name.toString() ?? ""
         }));
-        
-        handleCharges(leaseResponseObject?.charges ?? [])
-        setPropertyName(`${leaseResponseObject.unit.property.name} - ${summarizeAddress(leaseResponseObject?.unit.property.addresses[0] ?? {} as Address)}`)
-        setSearchItem(leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_name ?? "")
-        setGuaranteeItem(leaseResponseObject?.guarantor?.guarantor_object.identification_number ?? "")
-        setOutstandingBalance((p)=>({...p, value : leaseResponseObject.lease_opening_balance_data.outstanding_balance ?? "" }))
-        setDefaultCurrency(leaseResponseObject.currency.id)
+
         setLeaseObject(leaseResponseObject)
       }
     }
@@ -134,7 +137,6 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
     }
 
   }, [currencyData, currencyData])
-
 
   return (
     <form className="w-full relative" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback, leaseID)}>
@@ -227,11 +229,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 onKeyDown={validateAmounts}/>
             </div>      
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit type</Label>
+              <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit Type</Label>
               <Select
+                  key = {leaseObject?.unit.unit_type}
                   required
                   name="unitType"
-                  defaultValue={leaseObject?.unit.unit_type ?? ""}
+                  value={leaseObject?.unit.unit_type}
                   >
                   
                   <SelectTrigger className="w-full">
@@ -408,7 +411,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor=""> Currency</Label>
-              <Select name="currencyType" required defaultValue={defaultCurrency.toString()}>
+              <Select name="currencyType" key={defaultCurrency} required defaultValue={defaultCurrency.toString()}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
@@ -512,7 +515,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
           <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6">
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositDate">Deposit Date</Label>
-              <Input value={leaseObject?.deposits[0].deposit_date} name="depositDate" required id="depositDate" type="date" />
+              <Input defaultValue={leaseObject?.deposits[0].deposit_date} name="depositDate" required id="depositDate" type="date" />
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositCurrency">
@@ -564,12 +567,13 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositHolder">
-                Deposit Holder
+                  Deposit Holder
               </Label>
               <Select
+                key={leaseObject?.deposits?.[0]?.deposit_holder}
                 required
                 name="depositHolder"
-                defaultValue={leaseObject?.deposits?.[0]?.deposit_holder?.toString() ?? ""}
+                defaultValue={leaseObject?.deposits?.[0]?.deposit_holder}
                 >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Deposit Holder" />
@@ -670,6 +674,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
         <div className="form-group">
           <label>Landlord type</label>
           <Select
+              disabled = {formData.lockLandlord}
               defaultValue={leaseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_type.toString() ?? formData.landlord_type}
               onValueChange={(val: "individual" | "company") => {
                 setSearchItem("")
@@ -695,6 +700,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
           </Select>
         </div>
          <AutoCompleteClient
+            disableSearch = {formData.lockLandlord}
             isRequired = {false}
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}

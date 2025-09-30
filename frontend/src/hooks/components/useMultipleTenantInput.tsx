@@ -1,6 +1,5 @@
 import { MINIMAL_TENANT_OBJECT } from "@/constants";
 import type { BranchFull, IndividualMinimal } from "@/interfaces";
-import { extractTenantBranchContact } from "@/lib/utils";
 import type { TenantSelection } from "@/types";
 import { useEffect, useState } from "react"
 
@@ -66,8 +65,8 @@ export default function useMultiTenantInput(clientType: string){
                     ...tenant,
                     id : selectedTenant.id,
                     full_name : selectedTenant.branch_name,
-                    identification_number : selectedTenant.company.registration_number,
-                    mobile_number: extractTenantBranchContact(selectedTenant.contacts),
+                    identification_number : selectedTenant.branch_name,
+                    mobile_number:selectedTenant?.phone ?? ""
                 }   
                 : tenant
             )

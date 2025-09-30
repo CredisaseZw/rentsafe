@@ -20,6 +20,7 @@ export interface CompanyMinimal {
    legal_status_display?: string;
    industry?: string;
    is_verified?: boolean;
+   address_summary: string;
    primary_address?: Address;
 }
 
@@ -93,6 +94,7 @@ export interface Branch {
    addresses: Address[];
    contacts: Contact[];
    primary_address: Address | null;
+   address_summary? : string
    profile: Profile;
 }
 
@@ -186,6 +188,7 @@ export interface BranchContact {
 export interface BranchFull {
    id: number;
    branch_name: string;
+   phone? : string;
    is_headquarters: boolean;
    company: CompanyMinimal;
    contacts: BranchContact[];

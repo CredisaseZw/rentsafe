@@ -9,7 +9,7 @@ export default function useCreateLease() {
       const response = 
       !leaseID ?
       await api.post("/api/leases/", data) :
-      await api.put(`/api/leases/${leaseID}/`)
+      await api.patch(`/api/leases/${leaseID}/`, data)
       
       return response.data;
     },

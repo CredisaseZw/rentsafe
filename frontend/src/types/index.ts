@@ -203,6 +203,7 @@ export interface Property {
   landlords_input?: LandlordInput[];
   full_address?: Address[]
   landlords?: Landlord[];
+  landlord? :Landlord
 }
 export interface PropertyType {
    id: number,
@@ -327,11 +328,11 @@ export type ShortPropertyData =  {
 export type LeasePayload = {
   start_date: string;
   end_date: string;
-  signed_date: string;
+  signed_date?: string;
   status: string;
   currency: number;
   payment_frequency: string;
-  due_day_of_month: number;
+  due_day_of_month?: number;
   grace_period_days: number;
   is_rent_variable: boolean;
   includes_utilities: boolean;
@@ -366,6 +367,7 @@ export type LeasePayload = {
   }[];
 
   lease_opening_balance_data: {
+   id?: number
    current_month_balance: number;
    one_month_back_balance: number;
    two_months_back_balance: number;

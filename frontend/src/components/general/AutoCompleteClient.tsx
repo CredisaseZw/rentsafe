@@ -14,13 +14,14 @@ interface Props {
   clientType : string,
   isRequired?: boolean,
   createClient?: boolean,
+  disableSearch? : boolean,
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>
   onSelectValue? : (item: IndividualMinimal | BranchFull, index? : number) => void;
   setSearchItem? : Dispatch<SetStateAction<string>>;
   multiSetSearchItem? : (index: number, key:string, value: string) => void;
 }
 
-function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantAddress ,clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem, isRequired}: Props) {
+function AutoCompleteClient({ index, clientLabel, disableSearch, createClient, setPrimaryTenantAddress ,clientType, onSelectValue, searchItem, setSearchItem, multiSetSearchItem, isRequired}: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
   const path = useLocation()
@@ -43,6 +44,7 @@ function AutoCompleteClient({ index, clientLabel,createClient, setPrimaryTenantA
           {clientLabel}
         </label>
       <Input
+        disabled = {disableSearch ?? false}
         type="text"
         required = {isRequired === false  ? false : true}
         name = "search_client"

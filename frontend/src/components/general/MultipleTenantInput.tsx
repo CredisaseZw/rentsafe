@@ -77,7 +77,7 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress, existingTenan
                                 clientType = {clientType}
                                 clientLabel= { clientType === "individual" ? 
                                     "ID / Passport # (or name)" :
-                                    "Account Number (or name)"
+                                    "Registration Name / Number"
                                 }
                                 onSelectValue={onSelectTenant}
                             />
