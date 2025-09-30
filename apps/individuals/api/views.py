@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from apps.individuals.api.serializers import (
     IndividualAddressSerializer,
+    IndividualClaimSerializer,
     IndividualSerializer , 
     IndividualCreateSerializer,
     IndividualCreateSerializer, 
@@ -69,6 +70,8 @@ class IndividualViewSet(BaseViewSet):
             return IndividualSerializer
         elif self.action == "search":  
             return IndividualAddressSerializer
+        elif self.action == 'claims':
+            return IndividualClaimSerializer
         return IndividualMinimalSerializer
 
     
@@ -270,7 +273,25 @@ class IndividualViewSet(BaseViewSet):
                 {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+            
+    @action(detail=False, methods=['get'], url_path='claims')
+    def claims(self, request, pk=None):
+        """Retrieve all claims associated with individuals."""
+        try:
+            queryset = self.get_queryset()
+            queryset = self.filter_queryset(queryset)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving claims for individuals: {extract_error_message(e)}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 class BulkUpload(BaseViewSet):
     permission_classes = [IsAuthenticated]
 
