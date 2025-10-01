@@ -8,11 +8,14 @@ import { useRef, useState } from "react";
 import type { Option } from "@/types";
 import AddLeaseForm from "@/components/forms/AddLeaseForm";
 import { capitalizeFirstLetter } from "@/lib/utils";
+import StaticBadge from "@/components/general/StaticBadge";
 
 interface props {
-    isDisabled :  boolean
+    leaseID? : string,
+    state? : string,
+    isDisabled? :  boolean
 }
-function ActivateLease({isDisabled}: props) {
+function ActivateLease({isDisabled, leaseID, state}: props) {
     const {isOpen, setShowModal} = useAddIndividualLease();
     const leaseModes = useRef<Option[]>([
         {label : "Individual", value : "individual"},
@@ -26,7 +29,10 @@ function ActivateLease({isDisabled}: props) {
          icon: UserRoundPlus,
          value: "single",
          label: "Single",
-         content: <AddLeaseForm clientType= {clientType} successCallback = {successCallback}/>,
+         content: <AddLeaseForm
+            leaseID  = {leaseID}
+            clientType= {clientType} 
+            successCallback = {successCallback}/>,
         },
         {
          icon: Layers,
@@ -42,9 +48,15 @@ function ActivateLease({isDisabled}: props) {
             onOpenChange={setShowModal}
         >
             <DialogTrigger asChild>
-                <Button asChild disabled = {isDisabled}>
-                    Activate a new lease <Plus size={18} />
-                </Button>
+                {
+                    state === "update" ?
+                    <StaticBadge  bgColor= {"bg-purple-800"}>
+                        <Button variant="ghost" onClick={()=> setShowModal(true)} className="text-white">Edit Lease</Button>
+                    </StaticBadge> :
+                    <Button asChild disabled = {isDisabled} onClick={()=> setShowModal(true)}>
+                        Activate a new lease <Plus size={18} />
+                    </Button>
+                }
             </DialogTrigger>
 
             <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1010px] sm:max-w-[default] p-7 max-h-[90vh] overflow-y-auto overflow-x-auto`}>

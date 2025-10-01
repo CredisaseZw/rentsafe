@@ -14,7 +14,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
 import type { PaginationData } from "@/interfaces"
-import { summarizeAddress } from "@/lib/utils"
+import { getCurrentDate, summarizeAddress } from "@/lib/utils"
 import { isAxiosError } from "axios"
 import { useEffect } from "react"
 import { toast } from "sonner"
@@ -46,7 +46,10 @@ function ForRenewal() {
     }
 
     if(data){
-      setLeases(data.results ?? [])
+      const filteredResults = data.results
+      .filter((lease: Lease) => new Date(lease.end_date) < new Date(getCurrentDate()))
+
+      setLeases(filteredResults ?? [])
       setPaginationData(data as PaginationData)
     }
   }, [page, search, status, data, error])
@@ -88,35 +91,47 @@ function ForRenewal() {
       
       <div className="mt-3 2xl:mb-15 sm:mb-30">
         <TableBase headers={renewalHeaders} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="renew_page" isError = {Boolean(error)}>
-          {
+         {
             leases?.length
-            ? leases.map((lease:Lease)=> (
-                <TableRow>      
-                  <TableCell className="text-center">{lease.lease_id}</TableCell>
-                  <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
-                  <TableCell className="text-center">{(lease.landlord?.landlord_name !== undefined) ? lease.landlord.landlord_name : lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}</TableCell>
-                  <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
-                  <TableCell className="text-center whitespace-normal break-words max-w-[200px]">{summarizeAddress(lease.unit.property.addresses[0])}</TableCell>
-                  <TableCell className="text-center">{lease.start_date} </TableCell>
-                  <TableCell className="text-center">{lease.end_date}</TableCell>
-                  <TableCell>
-                    <StaticBadge bgColor="bg-amber-500">
-                      <Button variant={"ghost"}>Renew</Button>
-                    </StaticBadge>
-                  </TableCell>
-                  <TableCell>
-                    <StaticBadge bgColor="bg-red-600">
-                      <TerminateLeaseDialog refetch={refetch} tenantName={lease.tenants[0].tenant_object.full_name} lease_id={lease.lease_id}/>
-                    </StaticBadge>
+              ? leases
+                  .map((lease: Lease) => (
+                    <TableRow key={lease.lease_id}>      
+                      <TableCell className="text-center">{lease.lease_id}</TableCell>
+                      <TableCell className="text-center">{lease.tenants[0].tenant_object.full_name}</TableCell>
+                      <TableCell className="text-center">
+                        {lease.landlord?.landlord_name ?? lease.landlord_opening_balances_data?.[0]?.landlord?.landlord_name}
+                      </TableCell>
+                      <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
+                      <TableCell className="text-center whitespace-normal break-words max-w-[200px]">
+                        {summarizeAddress(lease.unit.property.addresses[0])}
+                      </TableCell>
+                      <TableCell className="text-center">{lease.start_date}</TableCell>
+                      <TableCell className="text-center">{lease.end_date}</TableCell>
+                      <TableCell>
+                        <StaticBadge bgColor="bg-amber-500">
+                          <Button variant="ghost">Renew</Button>
+                        </StaticBadge>
+                      </TableCell>
+                      <TableCell>
+                        <StaticBadge bgColor="bg-red-600">
+                          <TerminateLeaseDialog
+                            refetch={refetch}
+                            tenantName={lease.tenants[0].tenant_object.full_name}
+                            lease_id={lease.lease_id}
+                          />
+                        </StaticBadge>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              : (
+                <TableRow>
+                  <TableCell colSpan={renewalHeaders.length}>
+                    <EmptyResults message="No leases registered."/>
                   </TableCell>
                 </TableRow>
-            )) :
-              <TableRow>
-                <TableCell colSpan={renewalHeaders.length}>
-                  <EmptyResults message="No leases registered."/>
-                </TableCell>
-              </TableRow>
+              )
           }
+
 
         </TableBase>
       </div>

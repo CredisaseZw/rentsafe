@@ -24,7 +24,9 @@ export default function BranchForm({setCompanyFormOpen} :props) {
       >
          <DialogTrigger asChild>
             <Button asChild variant={"outline"}>
-               New Branch <Plus size={16} />
+               <span className="text-red-600">
+               Add company branch
+               </span> <Plus size={16}  color="oklch(57.7% 0.245 27.325)"/>
             </Button>
          </DialogTrigger>
 

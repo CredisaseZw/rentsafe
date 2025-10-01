@@ -97,7 +97,7 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
                   <div>
                      <div className="bg-foreground/5 border-foreground/20 border border-b-0 p-0.5 text-center">
-                        Branch Details
+                        Company Details
                      </div>
 
                      <div className="grid grid-cols-2">
