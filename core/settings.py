@@ -500,6 +500,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'verbose',
         },
+        'file_legal': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_DIR, 'legal.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': { 
@@ -564,6 +572,11 @@ LOGGING = {
         },
         'accounting': {
             'handlers': ['console', 'file_accounting'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'legal': {
+            'handlers': ['console', 'file_legal'],
             'level': 'DEBUG',
             'propagate': False,
         },

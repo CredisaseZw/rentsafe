@@ -4,6 +4,7 @@ import { type BaseTableColumn, type BaseTableRow } from "@/components/general/Ba
 import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
 import { useNavigate } from "react-router";
 import type { PaginationData } from "@/interfaces";
+import ExpandableText from "@/components/general/ExpandableText";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
@@ -13,8 +14,9 @@ export default function useCompanyPaymentStatusTab() {
    const rows: BaseTableRow[] =
       data?.results?.map((cell) => {
          return {
-            registration_name: cell.branch_name || "",
-            registration_number: cell.company?.registration_number || "",
+            registration_name: `${cell.branch_name || ""} - ${cell.company?.registration_number || ""}`,
+            trading_name: cell.company.trading_name ?? "-",
+            address :cell.address_summary ?  <ExpandableText text= { cell.address_summary }/> : <>-</>,
             id: cell.id,
             select: (
                <div className="flex items-center gap-2">
@@ -26,7 +28,8 @@ export default function useCompanyPaymentStatusTab() {
 
    const headers: BaseTableColumn[] = [
       { name: "registration_name", displayName: "Registered Name" },
-      { name: "registration_number", displayName: "Registration Number" },
+      { name: "trading_name", displayName: "Trading Name" },
+      { name: "address", displayName: "Address" },
       { name: "select", displayName: "", colGroupclassName: "w-[1%]" },
    ];
 

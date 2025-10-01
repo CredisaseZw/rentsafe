@@ -1,3 +1,4 @@
+import type { Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -19,6 +20,7 @@ export interface CompanyMinimal {
    legal_status_display?: string;
    industry?: string;
    is_verified?: boolean;
+   address_summary: string;
    primary_address?: Address;
 }
 
@@ -92,6 +94,7 @@ export interface Branch {
    addresses: Address[];
    contacts: Contact[];
    primary_address: Address | null;
+   address_summary? : string
    profile: Profile;
 }
 
@@ -185,6 +188,7 @@ export interface BranchContact {
 export interface BranchFull {
    id: number;
    branch_name: string;
+   phone? : string;
    is_headquarters: boolean;
    company: CompanyMinimal;
    contacts: BranchContact[];
@@ -334,10 +338,96 @@ export interface BranchApiResponse extends PaginationData {
    results: Branch[];
 }
 
+
 export interface IndividualApiResponse extends PaginationData {
    results: IndividualMinimal[];
 }
 
 export interface SearchCompanyApiRespionse extends PaginationData {
    results: CompanyMinimal[];
+}
+
+export interface Charges {
+   id: number;
+   amount: string;
+   currency: string;
+    charge_type: string;
+}
+export interface LeaseResponse {
+  id: number;
+  tenants: Tenant[];
+  charges: Charges[];
+  guarantor: {
+    id: number;
+    guarantor_object: {
+      id: number;
+      full_name: string;
+      identification_number: string;
+    };
+    guarantee_amount: string;
+  } | null;
+  deposits: {
+    id: number;
+    amount: string;
+    currency: number;
+    deposit_date: string; 
+    deposit_holder: string;
+  }[];
+  unit: {
+   id: number;
+   unit_number: string;
+   unit_type: string,
+   number_of_rooms: number,
+   property: {
+      id: number;
+      name: string;
+      slug: string;
+      addresses:Address[]
+    };
+  };
+  currency: {
+    id: number;
+    currency_code: string;
+    currency_name: string;
+    symbol: string;
+  };
+  risk_level_class: string;
+  owing: number;
+  lease_opening_balance_data: {
+    id: number;
+    current_month_balance: string;
+    one_month_back_balance: string;
+    two_months_back_balance: string;
+    three_months_back_balance: string;
+    three_months_plus_balance: string;
+    outstanding_balance: string;
+  };
+  landlord_opening_balances_data: {
+    id: number;
+    landlord: {
+      id: number;
+      landlord_name: string;
+      landlord_type: string;
+      landlord_id: string;
+    };
+    amount: string;
+    commission_percentage: string;
+    operating_costs_inclusive: boolean;
+  }[];
+  date_created: string;
+  date_updated: string;
+  lease_id: string;
+  start_date: string;
+  end_date: string;
+  signed_date: string;
+  status: string;
+  payment_frequency: string;
+  due_day_of_month: number;
+  grace_period_days: number;
+  includes_utilities: boolean;
+  utilities_details: string | null;
+  account_number: string | null;
+  is_rent_variable: boolean;
+  managing_client: number;
+  lease_tenants: number[];
 }

@@ -13,7 +13,7 @@ from apps.common.utils.caching import CacheService
 from apps.common.api.serializers import DocumentSerializer
 from apps.companies.models.models import Company, CompanyBranch
 from apps.companies.api.serializers import (
-    CompanyCreateSerializer, CompanyUpdateSerializer, CompanyDetailSerializer,
+    CompanyClaimSerializer, CompanyCreateSerializer, CompanyUpdateSerializer, CompanyDetailSerializer,
     CompanyMinimalSerializer,
     CompanyBranchSearchSerializer, CompanyBranchSerializer,
     CompanyBranchDetailSerializer, CompanyBranchMinimalSerializer,
@@ -392,6 +392,8 @@ class CompanyBranchViewSet(BaseViewSet):
             return CompanyBranchLeaseDetailSerializer
         elif self.action == 'branches_by_company':
             return CompanyBranchSerializer 
+        elif self.action == 'claims':
+            return CompanyClaimSerializer
         return CompanyBranchMinimalSerializer
     
 
@@ -513,4 +515,23 @@ class CompanyBranchViewSet(BaseViewSet):
         
         serializer = self.get_serializer(branches, many=True)
         return self._create_rendered_response(serializer.data)
-        
+    
+                
+    @action(detail=False, methods=['get'], url_path='claims')
+    def claims(self, request, pk=None):
+        """Get all claims associated with a company's branches."""
+        try:
+            queryset = self.get_queryset()
+            queryset = self.filter_queryset(queryset)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving company claims: {extract_error_message(e)}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

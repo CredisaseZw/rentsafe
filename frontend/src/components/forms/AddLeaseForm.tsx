@@ -30,20 +30,24 @@ import { Textarea } from "../ui/textarea";
 import { DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
 import { isAxiosError } from "axios";
 import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
-import { validateAmounts } from "@/lib/utils";
+import { summarizeAddress, validateAmounts } from "@/lib/utils";
 import MultiAddressInput from "../general/MultiAddressInput";
+import useGetLeaseInformation from "@/hooks/apiHooks/useGetLeaseInformation";
+import type { Address } from "@/interfaces";
 
 interface props {
+  leaseID? : string,
   clientType : string,
   successCallback : ()=> void
 }
 
-function AddLeaseForm({clientType, successCallback} :props) {
+function AddLeaseForm({clientType, successCallback, leaseID} :props) {
   const {
     headers,
     loading,
     formData,
     searchItem,
+    leaseObject,
     addressState,
     propertyName,
     propertyType, 
@@ -58,6 +62,8 @@ function AddLeaseForm({clientType, successCallback} :props) {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
+    handleDefaultCurrency,
+    setOutstandingBalance,
     SET_CURRENCY_OPTIONS,
     setDefaultCurrency,
     onSelectGuarantor,
@@ -68,12 +74,47 @@ function AddLeaseForm({clientType, successCallback} :props) {
     onSelectProperty,
     setPropertyTypes,
     setPropertyName,
+    setLeaseObject,
     setSearchItem,
+    handleCharges,
     setFormData,
   } = useAddIndividualLease();
   const useMutate = useCreateLease();
   const {data, isLoading, error} = getPropertyTypes();
   const {currencyData, currencyLoading, currencyError} = useGetCurrencies();
+  const {leaseResponseObject, leaseLoading, leaseError} = useGetLeaseInformation(leaseID)
+
+  useEffect(()=>{
+    if(leaseID){
+      if(isAxiosError(leaseError)){
+        const message = leaseError.response?.data.error ?? leaseError.response?.data.details ?? "Something went wrong"
+        toast.error("Failed to fetch lease details", { description: message });
+        return;
+      }
+
+      if(leaseResponseObject){
+        setDefaultCurrency(leaseResponseObject?.currency?.id)
+        setPropertyName(`${leaseResponseObject.unit.property.name} - ${summarizeAddress(leaseResponseObject?.unit.property.addresses[0] ?? {} as Address)}`)
+        setSearchItem(leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_name ?? "")
+        setGuaranteeItem(leaseResponseObject?.guarantor?.guarantor_object.identification_number ?? "")        
+        handleCharges(leaseResponseObject?.charges ?? [])
+        setOutstandingBalance((p)=>({...p, value : leaseResponseObject.lease_opening_balance_data.outstanding_balance ?? "" }))
+        setFormData((p) => ({
+          ...p,
+          lockLandlord : true,
+          property : {name : leaseResponseObject?.unit?.property?.name ?? ""},
+          address_object : leaseResponseObject?.unit.property.addresses[0] ?? {} as Address,
+          landlord_id: Number(leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_id),
+          landlord_type : leaseResponseObject.landlord_opening_balances_data?.[0]?.landlord?.landlord_type ?? "individual",
+          landlord_name: leaseResponseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_name ?? "",
+          guarantor_id: leaseResponseObject?.guarantor?.guarantor_object?.id ?? "",
+          guarantor_name: leaseResponseObject?.guarantor?.guarantor_object?.full_name.toString() ?? ""
+        }));
+
+        setLeaseObject(leaseResponseObject)
+      }
+    }
+  }, [leaseID, leaseResponseObject, leaseError])
 
   useEffect(()=>{
     if(isAxiosError(error)){
@@ -90,18 +131,26 @@ function AddLeaseForm({clientType, successCallback} :props) {
       toast.error("Failed to fetch currencies", { description: message });
       return;
     }
-  if (currencyData) { 
-    const usdId = currencyData.find((c) => c.currency_code === "USD")?.id;
-    SET_CURRENCY_OPTIONS(currencyData);
-    setDefaultCurrency(usdId || currencyData[0]?.id);
-  }
+    if (currencyData) { 
+      SET_CURRENCY_OPTIONS(currencyData);
+      handleDefaultCurrency(currencyData); 
+    }
 
   }, [currencyData, currencyData])
 
   return (
-    <form className="w-full" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback)}>
+    <form className="w-full relative" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback, leaseID)}>
+      {
+        leaseID && leaseLoading &&
+        <div className="absolute h-full w-full bg-white bottom-0 top-0 z-50">
+          <div className="h-[25vh] justify-center items-center flex">
+            <LoadingIndicator/>
+          </div>
+        </div>
+      }
       <div className="mt-5">
         <MultipleTenantInput
+          existingTenants = {leaseObject?.tenants }
           clientType = {clientType}
           setPrimaryTenantAddress = {setPrimaryTenantAddress}/>
       </div>
@@ -136,6 +185,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
               <Input 
                   type= "number" 
                   step={0.01}
+                  defaultValue={leaseObject?.guarantor?.guarantee_amount ?? ""}
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}
                   name={`rentGuaranteeAmount`}
@@ -160,20 +210,33 @@ function AddLeaseForm({clientType, successCallback} :props) {
             
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber" >Unit Number </Label>
-              <Input id="unitNumber" required name="unitNumber"/>
+              <Input
+                id="unitNumber"
+                required
+                defaultValue={leaseObject?.unit.unit_number ?? ""}
+                name="unitNumber"/>
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="unitNumber">Number of Rooms </Label>
-              <Input id="" name="unitNumberOfRooms" required  type= "number"
+              <Input 
+                id=""
+                name="unitNumberOfRooms"
+                required
+                defaultValue={leaseObject?.unit.number_of_rooms ?? ""}
+                type= "number"
                 step={0.01}
                 onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                 onKeyDown={validateAmounts}/>
-            </div>
+            </div>      
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit type</Label>
+              <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit Type</Label>
               <Select
+                  key = {leaseObject?.unit.unit_type}
                   required
-                  name="unitType">
+                  name="unitType"
+                  value={leaseObject?.unit.unit_type}
+                  >
+                  
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
@@ -188,6 +251,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   </SelectContent>
                 </Select>
             </div>
+    
           </ColumnsContainer>
            {
               (addressState === "client" || addressState === "manual") &&
@@ -295,7 +359,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                         </Label>
                         <Input
                           name="postal_code"
-                          value={primaryTenantAddress.postal_code?.toString()}
+                          defaultValue={primaryTenantAddress.postal_code?.toString()}
                           disabled
                           id="postal_code"
                         />
@@ -323,11 +387,11 @@ function AddLeaseForm({clientType, successCallback} :props) {
           <ColumnsContainer numberOfCols={3} marginClass="mt-5" gapClass="gap-6">
             <div className="form-group">
                 <Label className="px-2 font-normal required" htmlFor=""> Lease Start Date</Label>
-                <Input name="leaseStartDate" required id = "leaseStartDate" type={"date"}/>
+                <Input defaultValue={leaseObject?.start_date ?? ""} name="leaseStartDate" required id = "leaseStartDate" type={"date"}/>
             </div>
             <div className="form-group">
                 <Label className="px-2 required font-normal" htmlFor=""> Lease end Date</Label>
-                <Input name="leaseEndDate" required id = "leaseEndDate" type={"date"}/>
+                <Input defaultValue={leaseObject?.end_date ?? ""} name="leaseEndDate" required id = "leaseEndDate" type={"date"}/>
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="">Lease Status</Label>
@@ -347,7 +411,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor=""> Currency</Label>
-              <Select name="currencyType" required defaultValue={String(defaultCurrency)}>
+              <Select name="currencyType" key={defaultCurrency} required defaultValue={defaultCurrency.toString()}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
@@ -369,7 +433,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="">Payment frequency</Label>
-              <Select name="paymentFrequency" defaultValue={PAYMENT_FREQUENCY_OPTIONS[0].value}>
+              <Select name="paymentFrequency" defaultValue={leaseObject?.payment_frequency ?? PAYMENT_FREQUENCY_OPTIONS[0].value}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
                   </SelectTrigger>
@@ -391,6 +455,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   name="monthlyRent"
                   id="monthlyRent"
                   type= "number"
+                  defaultValue={formData.defaultRent }
                   step={0.01}
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}
@@ -402,6 +467,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   name="otherStandingCharging"
                   id = "otherStandingCharging"
                   type= "number"
+                  defaultValue={formData.defaultUtility}
                   step={0.01} 
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}/>
@@ -417,7 +483,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   required
                   id = "effectiveEndDate" type={"number"}
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
-                  value={formData.effectiveEndDate}
+                  defaultValue={leaseObject?.grace_period_days ?? formData.effectiveEndDate}
                   onChange={(e)=> handleUpdateForm("effectiveEndDate", e.target.value)}/>
             </div>
             <div className="flex flex-row gap-2 items-center justify-center">
@@ -432,9 +498,10 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
              <div className="flex flex-row gap-2 items-center justify-center">
               <Checkbox
-                  className="self-center"
-                  name="rentVariable"
-                  id="rentVariable"
+                className="self-center"
+                name="rentVariable"
+                id="rentVariable"
+                checked={leaseObject?.is_rent_variable ?? false}
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   Is Rent Variable
@@ -448,7 +515,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
           <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6">
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositDate">Deposit Date</Label>
-              <Input name="depositDate" required id="depositDate" type="date" />
+              <Input defaultValue={leaseObject?.deposits[0].deposit_date} name="depositDate" required id="depositDate" type="date" />
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositCurrency">
@@ -456,27 +523,32 @@ function AddLeaseForm({clientType, successCallback} :props) {
               </Label>
               <Select
                 required
-                defaultValue={String(defaultCurrency)}
+                defaultValue={
+                  leaseObject?.deposits?.[0]?.currency?.toString() ?? defaultCurrency.toString()
+                }
                 name="depositCurrency"
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Deposit Currency" />
                 </SelectTrigger>
                 <SelectContent>
-                    {
-                      CURRENCY_OPTIONS.map((c:Currency)=>
-                        <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>
-                      )
-                    }
-                    { 
-                      CURRENCY_OPTIONS.length === 0 &&
-                      currencyLoading &&
-                      <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
-                          <LoadingIndicator />
-                        </SelectItem>
-                    }
-                  </SelectContent>
+                  {CURRENCY_OPTIONS.map((c: Currency) => (
+                    <SelectItem value={c.id.toString()} key={c.id}>
+                      {c.currency_code + " " + c.currency_name}
+                    </SelectItem>
+                  ))}
+                  {CURRENCY_OPTIONS.length === 0 && currencyLoading && (
+                    <SelectItem
+                      disabled
+                      value="loading"
+                      className="text-center flex flex-col justify-center items-center"
+                    >
+                      <LoadingIndicator />
+                    </SelectItem>
+                  )}
+                </SelectContent>
               </Select>
+
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositAmount">
@@ -485,6 +557,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
               <Input
                 type= "number" 
                 step={0.01}
+                defaultValue={leaseObject?.deposits[0].amount}
                 onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                 onKeyDown={validateAmounts}
                 required
@@ -494,24 +567,26 @@ function AddLeaseForm({clientType, successCallback} :props) {
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal required" htmlFor="depositHolder">
-                Deposit Holder
+                  Deposit Holder
               </Label>
               <Select
+                key={leaseObject?.deposits?.[0]?.deposit_holder}
                 required
                 name="depositHolder"
-              >
+                defaultValue={leaseObject?.deposits?.[0]?.deposit_holder}
+                >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Deposit Holder" />
                 </SelectTrigger>
                 <SelectContent>
-                   {
-                      DEPOSIT_HOLDER_OPTIONS.length &&
-                      DEPOSIT_HOLDER_OPTIONS.map((status: Option, index: number)=>
-                        <SelectItem value={status.value} key={index}>{status.label}</SelectItem>
-                      )
-                    }
+                  {DEPOSIT_HOLDER_OPTIONS.map((status: Option, index: number) => (
+                    <SelectItem value={status.value} key={index}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+
             </div>
           </ColumnsContainer>
         </Fieldset>
@@ -526,7 +601,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   type="number"
                   step="0.01"
                   name="paymentDataMoreThan3Months"
-                  value={tenantsOpeningBalance.three_months_back_plus_balance.value}
+                  defaultValue={leaseObject?.lease_opening_balance_data.three_months_plus_balance ?? tenantsOpeningBalance.three_months_back_plus_balance.value}
                   onWheel={(e) => e.currentTarget.blur()}
                   onKeyDown={validateAmounts} 
                   onChange={(e) =>
@@ -545,7 +620,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}
                   name="three_months_back_balance"
-                  value={tenantsOpeningBalance.three_months_back_balance.value}
+                  defaultValue={leaseObject?.lease_opening_balance_data.three_months_back_balance ??tenantsOpeningBalance.three_months_back_balance.value}
                   onChange={(val) => changeTenantsOpeningBalances("three_months_back_balance", val.target.value)}
                 
                 />
@@ -558,7 +633,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   onKeyDown={validateAmounts}
                   name="two_months_back_balance"
                   onChange={(val) => changeTenantsOpeningBalances("two_months_back_balance", val.target.value)}
-                  value={tenantsOpeningBalance.two_months_back_balance.value}
+                  defaultValue={leaseObject?.lease_opening_balance_data.two_months_back_balance ?? tenantsOpeningBalance.two_months_back_balance.value}
                 />
               </TableCell>
               <TableCell className={tenantsOpeningBalance.one_month_back_balance.colorCode}>
@@ -567,7 +642,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   step={0.01}
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}
-                  value={tenantsOpeningBalance.one_month_back_balance.value}
+                  defaultValue ={leaseObject?.lease_opening_balance_data.one_month_back_balance ?? tenantsOpeningBalance.one_month_back_balance.value}
                   onChange={(val) => changeTenantsOpeningBalances("one_month_back_balance", val.target.value)}
                   name="one_month_back_balance"
                 />
@@ -579,14 +654,14 @@ function AddLeaseForm({clientType, successCallback} :props) {
                   onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                   onKeyDown={validateAmounts}
                   onChange={(val) => changeTenantsOpeningBalances("current_month_balance", val.target.value)}
-                  value={tenantsOpeningBalance.current_month_balance.value}
+                  defaultValue={leaseObject?.lease_opening_balance_data.current_month_balance ?? tenantsOpeningBalance.current_month_balance.value}
                   name="current_month_balance"                
                 />
               </TableCell>
               <TableCell className={`text-center text-white ${outstandingBalance.colorCode}`}>
                 {
                 outstandingBalance.value.length ?
-                `$${outstandingBalance.value}` : 
+                `$${leaseObject?.lease_opening_balance_data.outstanding_balance ??  outstandingBalance.value}` : 
                 "$0.00"
                 }
               </TableCell>
@@ -599,7 +674,8 @@ function AddLeaseForm({clientType, successCallback} :props) {
         <div className="form-group">
           <label>Landlord type</label>
           <Select
-              defaultValue={formData.landlord_type}
+              disabled = {formData.lockLandlord}
+              defaultValue={leaseObject?.landlord_opening_balances_data?.[0]?.landlord?.landlord_type.toString() ?? formData.landlord_type}
               onValueChange={(val: "individual" | "company") => {
                 setSearchItem("")
                 setFormData((prev) => ({
@@ -624,6 +700,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
           </Select>
         </div>
          <AutoCompleteClient
+            disableSearch = {formData.lockLandlord}
             isRequired = {false}
             searchItem = {searchItem}
             setSearchItem = {setSearchItem}
@@ -650,6 +727,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
             step={0.01}
             min = {0}
             max = {100}
+            defaultValue={leaseObject?.landlord_opening_balances_data?.[0]?.commission_percentage}
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
             name="commissionPercentage"
@@ -663,6 +741,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
           <Input
             type= "number" 
             step={0.01}
+            defaultValue={leaseObject?.landlord_opening_balances_data?.[0]?.amount}
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
             name="landlordsOpeningBalance"
@@ -674,6 +753,7 @@ function AddLeaseForm({clientType, successCallback} :props) {
             className="self-center"
             name="operatingCostsIncluded"
             id="operatingCostsIncluded"
+            checked = {leaseObject?.landlord_opening_balances_data?.[0]?.operating_costs_inclusive ?? false}
            />
           <Label className="px-2 font-normal self-center" htmlFor="operatingCostsIncluded">
             Operating Costs Included

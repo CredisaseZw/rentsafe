@@ -1,7 +1,6 @@
 import { TableCell, TableRow } from "../ui/table";
 import StaticBadge from "./StaticBadge";
 import ReceiptDialog from "../routes/rent-safe/tenant-leases/ReceiptDialog";
-import { Button } from "../ui/button";
 import TerminateLeaseDialog from "../routes/rent-safe/tenant-leases/TerminateLeaseDialog";
 import type { Lease, LeaseReceiptPayload } from "@/types";
 import { getCurrentDate, riskLevelColorCode, summarizeAddress } from "@/lib/utils";
@@ -13,6 +12,8 @@ import {
 import { EllipsisVertical, } from "lucide-react";
 import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
 import { Link } from "react-router";
+import ActivateLease from "../routes/rent-safe/tenant-leases/ActivateLease";
+import RenewLeaseDialog from "../routes/rent-safe/tenant-leases/RenewLeaseDialog";
 
 interface Props {
   lease: Lease;
@@ -22,7 +23,7 @@ interface Props {
 
 function LeaseRow({ lease, refetch, onSuccessCallback }: Props) {
   const primaryFullname =
-    lease.tenants.find((t) => t.is_primary_tenant)?.tenant_object.full_name ?? "";
+    lease.tenants.find((t) => t.is_primary_tenant)?.tenant_object?.full_name ?? "";
 
   const landlordName =
     lease.landlord?.landlord_name ??
@@ -60,9 +61,20 @@ function LeaseRow({ lease, refetch, onSuccessCallback }: Props) {
         />
       </TableCell>
       <TableCell>
-        <StaticBadge bgColor="bg-amber-500">
-          <Button variant="ghost">Renew</Button>
-        </StaticBadge>
+      {
+        new Date(lease.end_date) < new Date(getCurrentDate()) ? (
+          <RenewLeaseDialog
+            tenantName={primaryFullname ?? "-"}
+            lease_id={lease.lease_id}
+            refetch={refetch}
+          />
+        ) : (
+          <ActivateLease
+            leaseID={lease.lease_id}
+            state="update"
+          />
+        )
+      }
       </TableCell>
       <TableCell>
         <Popover>
