@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.accounting.api.views import (
+    CustomersViewSet,
     SalesCategoryViewSet,
     SalesAccountViewSet,
     CashSaleViewSet,
@@ -45,6 +46,7 @@ router.register(r'transaction-types', TransactionTypeViewSet, basename="transact
 router.register(r'credit-notes', CreditNoteViewSet, basename="credit_notes")
 router.register(r'service-special-pricing', ServiceSpecialPricingViewSet, basename="service_special_pricing")
 router.register(r'service-standard-pricing', ServiceStandardPricingViewSet, basename="service_standard_pricing")
+router.register(r'customers', CustomersViewSet, basename="customers")
 urlpatterns = [
     path("", include(router.urls)),
     # path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),
