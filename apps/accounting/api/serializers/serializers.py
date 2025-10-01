@@ -929,27 +929,37 @@ class CustomersSearchSerializer(serializers.Serializer):
             return obj.full_name
         return None
 
+    def _get_company_profile(self, obj):
+        if not hasattr(self, '_company_profile_cache'):
+            self._company_profile_cache = {}
+        if isinstance(obj, CompanyBranch):
+            company_id = obj.company.pk if obj.company else None
+            if company_id not in self._company_profile_cache:
+                self._company_profile_cache[company_id] = CompanyProfile.objects.filter(company=obj.company).first()
+            return self._company_profile_cache[company_id]
+        return None
+
     def get_phone(self, obj):
         if isinstance(obj, Individual):
             return obj.phone or None
         elif isinstance(obj, CompanyBranch):
-            profile = CompanyProfile.objects.filter(company=obj.company).first()
-            return obj.phone or (profile.landline_phone if profile else None) or None
+            profile = self._get_company_profile(obj)
+            return obj.phone or (profile.landline_phone if profile else None)
         return None
 
     def get_email(self, obj):
         if isinstance(obj, Individual):
             return obj.email or None
         elif isinstance(obj, CompanyBranch):
-            profile = CompanyProfile.objects.filter(company=obj.company).first()
-            return obj.email or (profile.email if profile else None) or None
+            profile = self._get_company_profile(obj)
+            return obj.email or (profile.email if profile else None)
         return None
 
     def get_tin_number(self, obj):
         if isinstance(obj, Individual):
             return None
         elif isinstance(obj, CompanyBranch):
-            profile = CompanyProfile.objects.filter(company=obj.company).first()
+            profile = self._get_company_profile(obj)
             return profile.tin_number if profile else None
         return None
     
@@ -957,7 +967,7 @@ class CustomersSearchSerializer(serializers.Serializer):
         if isinstance(obj, Individual):
             return None
         elif isinstance(obj, CompanyBranch):
-            profile = CompanyProfile.objects.filter(company=obj.company).first()
+            profile = self._get_company_profile(obj)
             return profile.vat_number if profile else None
         return None
         

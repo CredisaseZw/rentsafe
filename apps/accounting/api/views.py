@@ -461,8 +461,8 @@ class CustomersViewSet(BaseViewSet):
 
         leases_qs = Lease.objects.filter(managing_client=user.client)
 
-        individual_ct = ContentType.objects.get(app_label="individuals", model="individual")
-        branch_ct = ContentType.objects.get(app_label="companies", model="companybranch")
+        individual_ct = ContentType.objects.get_for_model(Individual)
+        branch_ct = ContentType.objects.get_for_model(CompanyBranch)
 
         individual_ids = leases_qs.filter(
             leasetenantassociation__tenant__content_type=individual_ct
@@ -492,11 +492,11 @@ class CustomersViewSet(BaseViewSet):
         tenants = list(ind_qs) + list(br_qs)
         seen = set()
         unique_tenants = []
-        for t in tenants:
-            key = (t.__class__, t.pk)
+        for tenant in tenants:
+            key = (tenant.__class__, tenant.pk)
             if key not in seen:
                 seen.add(key)
-                unique_tenants.append(t)
+                unique_tenants.append(tenant)
 
         return unique_tenants
 
