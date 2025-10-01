@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { Landlord, LeaseOpeningBalanceData, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -463,3 +463,207 @@ export function validateYear(year: string): boolean {
   const numericYear = parseInt(year, 10);
   return numericYear >= 1900 && numericYear <= currentYear + 5;
 }
+
+export function normalizeLeaseResponse(apiLease: any): LeasePayload {
+    const tenants = apiLease.tenants.map((t:any) => ({
+      tenant_id: String(t.tenant_object?.id),
+      tenant_type: "individual",
+      is_primary_tenant: t.is_primary_tenant
+    })
+  );
+   return {
+      start_date: apiLease.start_date,
+      end_date: apiLease.end_date,
+      signed_date: apiLease.signed_date,
+      status: apiLease.status,
+      currency: apiLease.currency.id,
+      payment_frequency: apiLease.payment_frequency,
+      due_day_of_month: apiLease.due_day_of_month,
+      grace_period_days: apiLease.grace_period_days,
+      is_rent_variable: apiLease.is_rent_variable,
+      includes_utilities: apiLease.includes_utilities,
+      property_data: apiLease.unit.property,
+      unit_data: {
+         unit_number: apiLease.unit.unit_number,
+         unit_type: apiLease.unit.unit_type,
+         number_of_rooms: apiLease.unit.number_of_rooms,
+      },
+      address_data: {
+         street_address: apiLease.unit.property.addresses[0]?.street_address ?? "",
+         suburb_id: Number(apiLease.unit.property.addresses[0]?.suburb?.id ),
+         postal_code: apiLease.unit.property.addresses[0]?.postal_code ?? "",
+      },
+      landlord_data: {
+         landlord_type: apiLease.landlord_opening_balances_data?.[0]?.landlord.landlord_type ?? "",
+         landlord_name: apiLease.landlord_opening_balances_data?.[0]?.landlord.landlord_name ?? "",
+         landlord_id: Number(apiLease.landlord_opening_balances_data?.[0]?.landlord.landlord_id),
+      },
+      guarantor_data: {
+         guarantor_type: "individual",
+         guarantor_id: Number(apiLease.guarantor?.guarantor_object.id),
+         guarantee_amount: String(apiLease.guarantor?.guarantee_amount),
+      },
+      tenants: tenants,
+      charges: apiLease.charges,
+      deposits: apiLease.deposits,
+      lease_opening_balance_data: apiLease.lease_opening_balance_data,
+      landlord_opening_balances_data: [{
+         amount: apiLease.landlord_opening_balances_data?.[0]?.amount ?? "",
+         commission_percentage: apiLease.landlord_opening_balances_data?.[0]?.commission_percentage ?? "",
+         operating_costs_inclusive: apiLease.landlord_opening_balances_data?.[0]?.operating_costs_inclusive,
+      }],
+   };
+  }
+
+export const generateUpdatePayload = (
+    updated: LeasePayload,
+    original: LeasePayload
+  ): Partial<LeasePayload> => {
+    const diff: Partial<LeasePayload> = {};
+
+    if (updated.signed_date) {
+      delete updated.signed_date;
+    }
+
+    if(updated.due_day_of_month){
+      delete updated.due_day_of_month
+    }
+
+    console.log("UPDATED", updated)
+    console.log("ORIGINAL", original) 
+    const scalarFields: (keyof LeasePayload)[] = [
+      "start_date",
+      "end_date",
+      "status",
+      "currency",
+      "payment_frequency",
+      "due_day_of_month",
+      "grace_period_days",
+      "is_rent_variable",
+      "includes_utilities",
+    ];
+
+    scalarFields.forEach((field) => {
+      if (updated[field] !== original[field] && updated[field] !== undefined) {
+        (diff as any)[field] = updated[field];
+      }
+    });
+
+    // property_data + unit_data + address_data
+    if (updated.property_data?.name !== original.property_data?.name) {
+      diff.property_data = {
+        ...updated.property_data,
+      };
+      }
+
+    if (JSON.stringify(updated.unit_data) !== JSON.stringify(original.unit_data)) {
+      diff.unit_data = updated.unit_data;
+    }
+    
+    // HANDLE ADDRESS
+    if (JSON.stringify(updated.address_data) !== JSON.stringify(original.address_data)) {
+      diff.address_data = updated.address_data;
+    }
+
+    // landlord_data
+    if (JSON.stringify(updated.landlord_data) !== JSON.stringify(original.landlord_data)) {
+      diff.landlord_data = updated.landlord_data;
+    }
+
+    // guarantor_data: only if guarantor_id or amount changed
+    if (
+      updated.guarantor_data?.guarantor_id !== original.guarantor_data?.guarantor_id ||
+      updated.guarantor_data?.guarantee_amount !== original.guarantor_data?.guarantee_amount
+    ) {
+      diff.guarantor_data = updated.guarantor_data;
+    }
+
+    // tenants: check size first, then deep loop
+    if (updated.tenants?.length !== original.tenants?.length) {
+      diff.tenants = updated.tenants;
+    } else if (updated.tenants && original.tenants) {
+      let tenantsChanged = false;
+      for (let i = 0; i < updated.tenants.length; i++) {
+        if (JSON.stringify(updated.tenants[i]) !== JSON.stringify(original.tenants[i])) {
+          tenantsChanged = true;
+          break;
+        }
+      }
+      if (tenantsChanged) {
+        diff.tenants = updated.tenants;
+      }
+    }
+
+    // CHECK CHARGES
+    console.log(original.charges)
+    if (updated.charges && original.charges) {
+      const changedCharges = updated.charges.filter((charge, idx) => {
+        const orig = original.charges[idx];
+        return Number(charge.amount.toFixed(2)) !== Number(orig?.amount);
+      });
+      if (changedCharges.length > 0) {
+        diff.charges = changedCharges;
+      }
+    }
+    
+    // deposits: only if currency/amount/holder/date changed
+    if (updated.deposits && original.deposits) {
+      const changedDeposits = updated.deposits.filter((dep, idx) => {
+        const orig = original.deposits[idx];
+        return (
+          Number(dep.amount.toFixed(2)) !== Number(orig.amount) ||
+          dep.currency !== orig.currency ||
+          dep.deposit_date !== orig.deposit_date ||
+          dep.deposit_holder !== orig.deposit_holder
+        );
+      });
+      if (changedDeposits.length > 0) {
+        diff.deposits = changedDeposits;
+      }
+    }
+    // lease_opening_balance_data: loop fields
+    if (updated.lease_opening_balance_data && original.lease_opening_balance_data) {
+      const changed: Partial<typeof updated.lease_opening_balance_data> = {};
+
+      type LeaseOpeningBalanceKey =
+        | "current_month_balance"
+        | "one_month_back_balance"
+        | "two_months_back_balance"
+        | "three_months_back_balance"
+        | "three_months_plus_balance"
+        | "outstanding_balance";
+
+      const keys: LeaseOpeningBalanceKey[] = [
+        "current_month_balance",
+        "one_month_back_balance",
+        "two_months_back_balance",
+        "three_months_back_balance",
+        "three_months_plus_balance",
+        "outstanding_balance",
+      ];
+      
+      for (const key of keys) {
+        if (Number(updated.lease_opening_balance_data[key].toFixed(2)) !== Number(original.lease_opening_balance_data[key])) {
+          changed[key] = updated.lease_opening_balance_data[key];
+        }
+      }
+
+      if (Object.keys(changed).length > 0) {
+        diff.lease_opening_balance_data = {
+          ...changed,
+          id: original.lease_opening_balance_data.id,
+        } as LeasePayload["lease_opening_balance_data"];
+      }
+    }
+
+    console.log("ORIGINAL OP", original.landlord_opening_balances_data)
+    console.log("UPDATED, OP", updated.landlord_opening_balances_data)
+    if (
+      JSON.stringify(updated.landlord_opening_balances_data) !==
+      JSON.stringify(original.landlord_opening_balances_data)
+    ) {
+      diff.landlord_opening_balances_data = updated.landlord_opening_balances_data;
+    }
+
+    return diff;
+  };

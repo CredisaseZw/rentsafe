@@ -75,8 +75,9 @@ function usePropertyList() {
       { label: "Vacant", value: "vacant" },
    ]);
    const statusOptions = useRef<Option[]>([
-      {label : "Active", value : "active"},
-      {label : "In-active", value : "inactive"},
+      {label : "Vacant", value : "active"},
+      {label : "Partially Occupied", value : "partially_occupied"},
+      {label : "Occupied", value : "occupied"},
       {label : "Maintenance", value : "maintenance"},
       {label : "Sold", value : "sold"}
    ])

@@ -203,6 +203,7 @@ export interface Property {
   landlords_input?: LandlordInput[];
   full_address?: Address[]
   landlords?: Landlord[];
+  landlord? :Landlord
 }
 export interface PropertyType {
    id: number,
@@ -226,7 +227,6 @@ export interface Lease {
   start_date: string;
   end_date: string;
   status: "ACTIVE" | "INACTIVE" | "TERMINATED";
-
   tenants: Tenant[];
   landlord: Landlord;
   unit: Unit;
@@ -251,6 +251,7 @@ export interface LeaseReceiptPayload {
 export interface TenantMinimal {
    id: number;
    full_name: string;
+   company_name? :string;
    identification_number: string;
 }
 
@@ -314,24 +315,24 @@ export interface LeaseResponse {
 }
 export type ShortPropertyData =  {
    name: string;
-   description: string;
-   status: string;
+   description?: string;
+   status?: string;
    year_built?: number;
    total_area?: string | number;
    is_furnished?: boolean;
    total_number_of_units?: number;
    features?: Record<string, boolean | string>;
-   property_type_name: string;
+   property_type_name?: string;
   };
 
 export type LeasePayload = {
   start_date: string;
   end_date: string;
-  signed_date: string;
+  signed_date?: string;
   status: string;
   currency: number;
   payment_frequency: string;
-  due_day_of_month: number;
+  due_day_of_month?: number;
   grace_period_days: number;
   is_rent_variable: boolean;
   includes_utilities: boolean;
@@ -366,6 +367,7 @@ export type LeasePayload = {
   }[];
 
   lease_opening_balance_data: {
+   id?: number
    current_month_balance: number;
    one_month_back_balance: number;
    two_months_back_balance: number;
