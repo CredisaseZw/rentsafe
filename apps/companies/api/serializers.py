@@ -12,6 +12,9 @@ from django.db.models import Q
 import logging
 from django.db import transaction
 
+from apps.legal.api.serializers.claim_serializers import ClaimMinimalSerializer
+from apps.legal.models.claims import Claim
+
 logger = logging.getLogger(__name__)
 
 class MinimalContactPersonSerializer(serializers.ModelSerializer):
@@ -268,9 +271,11 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
 class CompanyBranchMinimalSerializer(serializers.ModelSerializer):
     """Minimal serializer for company branch data"""
     company = CompanyMinimalSerializer(read_only=True)
+    address_summary = serializers.CharField(source='primary_address', read_only=True)
     class Meta:
         model = CompanyBranch
-        fields = ['id', 'branch_name', 'is_headquarters', 'company', 'email', 'phone']
+        fields = ['id', 'branch_name', 'is_headquarters', 'company', 'email', 'phone', 'address_summary']
+        read_only_fields = ['id', 'company', 'address_summary']
 
 
 class CompanyBranchSearchSerializer(serializers.ModelSerializer):
@@ -341,3 +346,22 @@ class CompanyBranchLeaseDetailSerializer(serializers.ModelSerializer):
             address_type='physical', 
         ).first()
         return AddressSerializer(primary_address).data if primary_address else None
+    
+class CompanyClaimSerializer(serializers.ModelSerializer):
+    claims = serializers.SerializerMethodField()
+    company = CompanyMinimalSerializer(read_only=True)
+    
+    class Meta:
+        model = CompanyBranch
+        fields = ['id', 'company', 'claims']
+
+    def get_claims(self, obj):
+        claim_qs = Claim.objects.filter(
+            debtor_content_type__model='companybranch',
+            debtor_object_id=obj.id,
+            is_verified=True
+        ).select_related('client', 'currency', 'debtor_content_type')
+
+        if claim_qs.exists():
+            return ClaimMinimalSerializer(claim_qs, many=True).data
+        return []
