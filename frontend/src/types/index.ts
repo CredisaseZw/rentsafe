@@ -10,6 +10,7 @@ export type Route = {
 export type NavLink = {
    label: string;
    segment: string;
+   baseColor?: string;
    path?: string;
    subLinks?: NavLink[];
    pageComponent?: React.FC;
@@ -477,3 +478,14 @@ export type PaymentHistoryResponse = PaymentStatementInformation & {
    previous : string | null,
    results : PaymentHistory[]
 }  
+
+export type SetCurrencySettings = {
+   currency: number
+   current_rate: string
+   base_currency: number
+}
+
+export type VATRows = {
+   description:  string,
+   rate : string
+}

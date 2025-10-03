@@ -136,7 +136,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
       handleDefaultCurrency(currencyData); 
     }
 
-  }, [currencyData, currencyData])
+  }, [currencyData, currencyError])
 
   return (
     <form className="w-full relative" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback, leaseID)}>

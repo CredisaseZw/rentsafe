@@ -318,3 +318,54 @@ export const PHONE_TYPES = [
   { label: "Other", value: "Other" }
 ]
 
+export const COLOR_THEMES = {
+  default: {
+      active: "bg-[var(--navlink)] dark:bg-zinc-800",
+      inactiveText: "text-gray-800 dark:text-white",
+      activeText: "text-blue-700 dark:text-white hover:text-gray-800 hover:dark:text-white",
+      hover: "hover:bg-gray-100/90 hover:dark:bg-zinc-900",
+  },
+  black: {
+      active: "bg-black/10 dark:bg-zinc-900",
+      inactiveText: "text-gray-800 dark:text-white",
+      activeText: "text-gray-800 dark:text-white hover:text-gray-800 hover:dark:text-white",
+      hover: "hover:bg-black/10 hover:dark:bg-zinc-900",
+  },
+  red: {
+      active: "bg-red-100 dark:bg-red-800/10",
+      activeText: "text-red-600",
+      inactiveText: "text-red-600",
+      hover  :"hover:bg-red-100 hover:dark:bg-red-800/10"
+  },
+  green: {
+      active: "bg-green-100 dark:bg-green-800/10",
+      activeText: "text-green-600",
+      inactiveText: "text-green-600",  
+      hover  :"hover:bg-green-100 hover:dark:bg-green-800/10"
+  },
+  blue: {
+      active: "bg-blue-100 dark:bg-blue-800/10",
+      activeText: "text-blue-800",
+      inactiveText: "text-blue-800",
+      hover  :"hover:bg-blue-100 hover:dark:bg-blue-800/10"
+  },
+  lightBlue : {
+      active: "bg-[var(--navlink)] dark:bg-blue-800/10",
+      inactiveText: "text-blue-500 hover:text-blue-500",
+      activeText: "text-blue-500 hover:bg-[var(--navlink)]",
+      hover: "hover:bg-[var(--navlink)] hover:dark:bg-blue-800/10",
+  },
+  purple: {
+      active: "bg-purple-100 dark:bg-purple-800/10",
+      activeText: "text-purple-600 hover:bg-purple-100",
+      inactiveText: "text-purple-600",
+      hover  :"hover:bg-purple-100 hover:dark:bg-purple-800/10"
+  }
+
+}
+
+export const TAX_OPTIONS_HEADERS:Header[] = [
+  {name : "Description"},
+  {name : "Rate(%)"},
+  {name : "Action"}
+]
