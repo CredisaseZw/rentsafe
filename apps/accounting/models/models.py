@@ -20,8 +20,15 @@ User = get_user_model()
 class AccountSector(BaseModel):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
+    
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Account Sector"
+        verbose_name_plural = "Account Sectors"
+        ordering = ['code']
+        
 
 class SalesAccount(BaseModel):
     """Stores different sales accounts and links them to sectors."""
@@ -31,6 +38,11 @@ class SalesAccount(BaseModel):
 
     def __str__(self):
         return f"{self.account_number} - {self.account_name}"
+    
+    class Meta:
+        verbose_name = "Sales Account"
+        verbose_name_plural = "Sales Accounts"
+        ordering = ['account_number']
 
 class Currency(BaseModel):
     currency_code = models.CharField(max_length=3, unique=True)
