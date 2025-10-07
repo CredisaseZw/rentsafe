@@ -60,18 +60,20 @@ class VATSettingSerializer(BaseCompanySerializer):
         fields = ['id', 'rate', 'description', 'vat_applicable']
 
 
-class SalesAccountSerializer(BaseCompanySerializer):
+class SalesAccountSerializer(serializers.ModelSerializer):
+    account_sector_name = serializers.ReadOnlyField(source="account_sector.name", read_only=True)
+    account_sector_code =  serializers.ReadOnlyField(source="account_sector.code", read_only=True)
+    account_sector_id = serializers.PrimaryKeyRelatedField(
+        queryset=AccountSector.objects.all(),
+        source='account_sector',
+        write_only=True
+    )
     class Meta(BaseCompanySerializer.Meta):
         model = SalesAccount
-        fields = ['id', 'account_name', 'account_number', 'account_sector', 'account_sector_details']
-        extra_kwargs = {
-            'account_sector': {'write_only': True} 
-        }
-    account_sector_details = serializers.SerializerMethodField()
-
-    def get_account_sector_details(self, obj):
-        return {'id': obj.account_sector.id, 'name': obj.account_sector.name} if obj.account_sector else None
-
+        fields = [
+            'id', 'account_name', 'account_number', 'account_sector_name', 
+            'account_sector_code' , 'account_sector_id'
+        ]
 
 class CurrencySerializer(BaseCompanySerializer):
     class Meta:
@@ -125,10 +127,10 @@ class CashbookEntrySerializer(BaseCompanySerializer):
         return {'id': obj.transaction_type.id, 'transaction_type': obj.transaction_type.transaction_type} if obj.transaction_type else None
 
 
-class AccountSectorSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
+class AccountSectorSerializer(serializers.ModelSerializer):
+    class Meta:
         model = AccountSector
-        fields = ['id', 'code', 'name']
+        fields = ['code', 'name']
 
 class GeneralLedgerAccountSerializer(BaseCompanySerializer):
     account_sector = AccountSectorSerializer(read_only=True)

@@ -104,10 +104,55 @@ class SalesCategoryViewSet(BaseCompanyViewSet):
     queryset = SalesCategory.objects.all()
     serializer_class = SalesCategorySerializer
 
-class SalesAccountViewSet(BaseCompanyViewSet):
-    queryset = SalesAccount.objects.all()
+class SalesAccountViewSet(BaseViewSet):
+    queryset = SalesAccount.objects.select_related('account_sector').all()
     serializer_class = SalesAccountSerializer
-
+    
+    def get_queryset(self):
+        if search := self.request.query_params.get('search'):
+            return super().get_queryset().filter(
+                Q(account_name__icontains=search) |
+                Q(account_number__icontains=search)
+            )
+        return super().get_queryset()
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)}, 
+                status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating sales account: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except ValidationError as e:
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)}, 
+                status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating sales account: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 class CashSaleViewSet(BaseCompanyViewSet):
     queryset = CashSale.objects.all()
     serializer_class = CashSaleSerializer
@@ -128,9 +173,55 @@ class LedgerTransactionViewSet(BaseCompanyViewSet):
     queryset = LedgerTransaction.objects.all()
     serializer_class = LedgerTransactionSerializer
 
-class AccountSectorViewSet(BaseCompanyViewSet):
+class AccountSectorViewSet(BaseViewSet):
     queryset = AccountSector.objects.all()
     serializer_class = AccountSectorSerializer
+    
+    def get_queryset(self):
+        if search := self.request.query_params.get('search'):
+            return super().get_queryset().filter(
+                Q(name__icontains=search) |
+                Q(code__icontains=search)
+            )
+        return super().get_queryset()
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)}, 
+                status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating account sector: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except ValidationError as e:
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)}, 
+                status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating account sector: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class InvoiceViewSet(BaseCompanyViewSet):
     queryset = Invoice.objects.all()
