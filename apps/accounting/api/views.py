@@ -29,10 +29,12 @@ from apps.accounting.api.serializers.serializers import (
     InvoiceSerializer, PaymentSerializer,
     CurrencyRateSerializer,PaymentMethodSerializer,
     TransactionTypeSerializer,CashBookSerializer,
-    CurrencySerializer,CreditNoteSerializer, DisbursementSerializer
+    CurrencySerializer,CreditNoteSerializer, DisbursementSerializer,
+    SalesAccountMinimalSerializer
 )
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
 from apps.common.api.views import BaseViewSet
+from apps.common.utils.caching import CacheService
 from apps.common.utils.helpers import extract_error_message
 from apps.leases.models import Landlord
 from apps.clients.models import Client
@@ -220,6 +222,29 @@ class AccountSectorViewSet(BaseViewSet):
             logger.error(f"Error updating account sector: {e}")
             return self._create_rendered_response(
                 {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['get'], url_path='search-with-sectors')
+    def search_with_sectors(self, request):
+        """
+         Search Account Sectors and with their related sales accounts.
+        """
+        try:
+            sectors = self.get_queryset().prefetch_related('accounts')
+            result = []
+            for sector in sectors:
+                sector_data = self.get_serializer(sector).data
+                accounts_qs = sector.accounts.all()
+                sector_data['accounts'] = SalesAccountMinimalSerializer(accounts_qs, many=True).data
+                result.append(sector_data)
+
+            return self._create_rendered_response(result, status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Error retrieving sectors with accounts: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"},
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

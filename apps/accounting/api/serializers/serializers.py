@@ -75,6 +75,11 @@ class SalesAccountSerializer(serializers.ModelSerializer):
             'account_sector_code' , 'account_sector_id'
         ]
 
+class SalesAccountMinimalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SalesAccount
+        fields = ['account_name', 'account_number']
+
 class CurrencySerializer(BaseCompanySerializer):
     class Meta:
         model = Currency
