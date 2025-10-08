@@ -42,7 +42,7 @@ function Button({
          disabled={disabled}
          onClick={onClick}
          className={cn(
-            `${variants[variant]} ${sizes[size]} rounded`,
+            `${variants[variant]} ${sizes[size]} rounded h-fit`,
             asChild ? "flex flex-row items-center justify-center gap-3" : "",
             className,
          )}

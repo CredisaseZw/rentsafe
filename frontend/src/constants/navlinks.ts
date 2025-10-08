@@ -43,6 +43,7 @@ import CashbookReceipts from "@/routes/rent-safe/accounting/cashbooks/CashbookRe
 import CashbookPayments from "@/routes/rent-safe/accounting/cashbooks/CashbookPayments";
 import CashbookBankReconciliation from "@/routes/rent-safe/accounting/cashbooks/CashbookBankReconciliation";
 import CashbookRequisitions from "@/routes/rent-safe/accounting/cashbooks/CashbookRequisitions";
+import Lists from "@/routes/rent-safe/accounting/settings/CashBooks/Lists";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -427,7 +428,7 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
                   label : "List",
                   path : RENTSAFE_PRE_SEG + "/settings/cash-book/list",
                   segment: RENTSAFE_PRE_SEG + "/accounting/settings/cash-book/list",
-                  pageComponent: AccountsSectors
+                  pageComponent: Lists
                },
             ]
          }

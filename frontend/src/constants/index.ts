@@ -369,3 +369,39 @@ export const TAX_OPTIONS_HEADERS:Header[] = [
   {name : "Rate(%)"},
   {name : "Action"}
 ]
+
+export const CASHBOOKS_LISTS:Header[] = [
+  {name : "Book ID"},
+  {name : "Cashbook Name"},
+  {name : "Cashbook Currency"},
+  {name: "Active Requisitions"},
+  {name : "GL Account Number"},
+  {name : "Details"}
+]
+
+export const ACCOUNT_TYPES:Option[] = [
+  {label : "Current Account", value : "current_account"},
+  {label : "Cash", value : "cash"},
+  {label : "Mobile Money", value :"mobile_money"}
+]
+
+export const YEARS:Option[] = [
+  ...Array.from({ length: 5 }, (_, i) => {
+    const year = new Date().getFullYear() - i;
+    return { label: year.toString(), value: year.toString() };
+  })
+]
+export const MONTHS: Option[] = [
+  { label: "January", value: "january" },
+  { label: "February", value: "february" },
+  { label: "March", value: "march" },
+  { label: "April", value: "april" },
+  { label: "May", value: "may" },
+  { label: "June", value: "june" },
+  { label: "July", value: "july" },
+  { label: "August", value: "august" },
+  { label: "September", value: "september" },
+  { label: "October", value: "october" },
+  { label: "November", value: "november" },
+  { label: "December", value: "december" }
+]

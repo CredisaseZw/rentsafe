@@ -12,8 +12,12 @@ import { Plus, Save, X } from "lucide-react"
 
 function VATSettings() {
   const {
-    rows
+    rows,
+    updateRow,
+    removeRow,
+    addRow,
   }  =useVATSettings()
+  
   return (
     <div>
       <Header title="VAT Settings"/>
@@ -45,20 +49,22 @@ function VATSettings() {
                     <Input
                       placeholder="description"
                       value={row.description}
+                      onChange={(e)=>updateRow(idx, "description", e.target.value)}
                     />
                   </TableCell>
                   <TableCell>
                     <Input
-                        placeholder="Rate"
-                        type= "number"
-                        step={0.01}
-                        value={row.rate}
-                        onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
-                        onKeyDown={validateAmounts}
+                      placeholder="Rate"
+                      onChange={(e)=>updateRow(idx, "rate", e.target.value)}
+                      type= "number"
+                      step={0.01}
+                      value={row.rate}
+                      onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                      onKeyDown={validateAmounts}
                     />
                   </TableCell>
                   <TableCell className="flex items-center justify-center">
-                    <Button variant={"ghost"}>
+                    <Button variant={"ghost"} onClick={()=>removeRow(idx)}>
                       <X className="text-red-600"/>
                     </Button>
                   </TableCell>
@@ -67,7 +73,7 @@ function VATSettings() {
             }
           </TableBase>
           <div className="flex gap-5 flex-row justify-end">
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" onClick={addRow}>
               <Plus size={15}/>
               Add Tax Item
             </Button>

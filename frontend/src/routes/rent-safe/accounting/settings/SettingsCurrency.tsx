@@ -74,7 +74,7 @@ function SettingsCurrency() {
             <div className="w-full flex flex-row justify-evenly gap-5">
               <div className="w-full">
                   <div className="form-group">
-                    <Label className="text-sm text-gray-400 required">Current</Label>
+                    <Label className="text-sm text-gray-400 required">Currency</Label>
                   </div>
                   <Select name="current" required>
                     <SelectTrigger className="w-full">
