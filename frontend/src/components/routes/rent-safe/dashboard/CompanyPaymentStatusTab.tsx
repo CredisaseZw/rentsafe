@@ -54,11 +54,11 @@ export default function CompanyPaymentStatusTab() {
               </Button>
               <input
                 ref={searchRef}
-                placeholder="Search by name or reg..."
+                placeholder="Search Registered Number / Name / Trading Name..."
                 name="company_q"
                 required
                 defaultValue={searchQuery}
-                className="flex-1 min-w-0 w-full sm:max-w-[400px] text-sm rounded-none border-none bg-transparent px-3 py-3 text-gray-600 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
+                className="flex-1 min-w-0  w-[400px] text-sm rounded-none border-none bg-transparent px-3 py-3 text-gray-600 placeholder-gray-400 ring-0 outline-none focus:ring-0 focus:outline-none dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-500"
               />
               <Button
                 type="submit"
