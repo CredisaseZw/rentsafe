@@ -16,7 +16,8 @@ from dotenv import load_dotenv
 from datetime import timedelta
 from urllib.parse import urlparse
 import sys
-load_dotenv(override=True) 
+
+load_dotenv(override=True)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -39,8 +40,8 @@ SMS_API_KEY = os.environ["SMS_API_KEY"]
 # twilio
 ACCOUNT_SID = os.environ["ACCOUNT_SID"]
 AUTH_TOKEN = os.environ["AUTH_TOKEN"]
-#Whatsapp bot Settings
-WHATSAPP_API_MEDIA_URL= os.environ["WHATSAPP_API_MEDIA_URL"]
+# Whatsapp bot Settings
+WHATSAPP_API_MEDIA_URL = os.environ["WHATSAPP_API_MEDIA_URL"]
 WHATSAPP_API_URL = os.environ["WHATSAPP_API_URL"]
 WHATSAPP_ACCESS_TOKEN = os.environ["WHATSAPP_ACCESS_TOKEN"]
 WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
@@ -48,181 +49,182 @@ WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-78wfplq%ozyj9-2v=#-cazg7m(14fhtzx9&%p+^)=grb)qpzu1'
+SECRET_KEY = "django-insecure-78wfplq%ozyj9-2v=#-cazg7m(14fhtzx9&%p+^)=grb)qpzu1"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-#platform name
-# This is used for branding in emails and notifications 
-PLATFORM_NAME = os.environ.get('PLATFORM_NAME', 'Fincheck')
-FRONTEND_LOGIN_URL = os.environ.get('FRONTEND_LOGIN_URL', 'http://localhost:3000/login')
+# platform name
+# This is used for branding in emails and notifications
+PLATFORM_NAME = os.environ.get("PLATFORM_NAME", "Fincheck")
+FRONTEND_LOGIN_URL = os.environ.get("FRONTEND_LOGIN_URL", "http://localhost:3000/login")
 
 ALLOWED_HOSTS = []
 if not DEBUG:
     ALLOWED_HOSTS = [
-        '.credi-safe.com',
+        ".credi-safe.com",
         ".rentsafe-iota.vercel.app",
         "rentsafe-backend.onrender.com",
-        "api.credi-safe.com"
+        "api.credi-safe.com",
     ]
 else:
     ALLOWED_HOSTS = [
-        'localhost',
-        '127.0.0.1',
-        '[::1]',
+        "localhost",
+        "127.0.0.1",
+        "[::1]",
         # '192.168.1.10',
     ]
-    
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = ["*"]
 # Application definition
 
 CSRF_TRUSTED_ORIGINS = [
-        'https://credi-safe.com',
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "https://rentsafe-backend.onrender.com",
-        "https://rentsafe-iota.vercel.app",
-        "https://api.credi-safe.com"
-    ]
+    "https://credi-safe.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "https://rentsafe-backend.onrender.com",
+    "https://rentsafe-iota.vercel.app",
+    "https://api.credi-safe.com",
+]
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    #Third-party apps
-    'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt',
-    'django_filters',
-    'corsheaders',
-    'django_celery_beat',
-    'django_celery_results',
-    'drf_spectacular',
-    'drf_spectacular_sidecar',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # Third-party apps
+    "rest_framework",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
+    "django_filters",
+    "corsheaders",
+    "django_celery_beat",
+    "django_celery_results",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     # Custom Apps
-    'apps.users',
-    'apps.common',
-    'apps.individuals',
-    'apps.companies',
-    'apps.properties',
-    'apps.leases',
-    'apps.accounting',
-    'apps.communications',
-    'apps.reporting',
-    'apps.maintenance',
-    'apps.subscriptions',
-    'apps.credit_control',
-    'apps.legal',
-    'apps.clients',
+    "apps.users",
+    "apps.common",
+    "apps.individuals",
+    "apps.companies",
+    "apps.properties",
+    "apps.leases",
+    "apps.accounting",
+    "apps.communications",
+    "apps.reporting",
+    "apps.maintenance",
+    "apps.subscriptions",
+    "apps.credit_control",
+    "apps.legal",
+    "apps.clients",
 ]
 
 MIDDLEWARE = [
-    'apps.common.middleware.DetailedErrorLoggingMiddleware',
+    "apps.common.middleware.DetailedErrorLoggingMiddleware",
     # 'django.middleware.cache.UpdateCacheMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
+DB_ENGINE = os.getenv("DB_ENGINE", None)
+DB_USERNAME = os.getenv("DB_USERNAME", None)
+DB_PASS = os.getenv("DB_PASS", None)
+DB_HOST = os.getenv("DB_HOST", "db")
+DB_PORT = os.getenv("DB_PORT", None)
+DB_NAME = os.getenv("DB_NAME", None)
 
-DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
-DB_USERNAME = os.getenv('DB_USERNAME' , None)
-DB_PASS     = os.getenv('DB_PASS'     , None)
-DB_HOST     = os.getenv('DB_HOST'     , 'db')
-DB_PORT     = os.getenv('DB_PORT'     , None)
-DB_NAME     = os.getenv('DB_NAME'     , None)
 
-
-if DEVELOPMENT:= os.getenv('DEVELOPMENT' , 'False').lower() == "true":
+if DEVELOPMENT := os.getenv("DEVELOPMENT", "False").lower() == "true":
     print("Development mode")
-    DATABASES = { 
-        'default': {
-        'ENGINE'  : DB_ENGINE,
-        'NAME'    : DB_NAME,
-        'USER'    : DB_USERNAME,
-        'PASSWORD': DB_PASS,
-        'HOST'    : DB_HOST,
-        'PORT'    : DB_PORT,
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": DB_NAME,
+            "USER": DB_USERNAME,
+            "PASSWORD": DB_PASS,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
         }
     }
 else:
     print("Testing mode....")
     if db_url := os.getenv("PROD_DATABASE_URL"):
-        db_url = db_url.strip().strip('"').strip("'") 
+        db_url = db_url.strip().strip('"').strip("'")
         parsed = urlparse(db_url)
 
         if not parsed.hostname:
             raise Exception("Invalid PROD_DATABASE_URL: Missing hostname.")
-        migration_host = parsed.hostname.replace('-pooler', '')
+        migration_host = parsed.hostname.replace("-pooler", "")
 
         DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': parsed.path[1:].split('?')[0],
-                'USER': parsed.username,
-                'PASSWORD': parsed.password,
-                'HOST': migration_host,
-                'PORT': parsed.port or 5432,
-                'OPTIONS': {
-                    'sslmode': 'require',
-                    'options': '-c statement_timeout=30000'
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": parsed.path[1:].split("?")[0],
+                "USER": parsed.username,
+                "PASSWORD": parsed.password,
+                "HOST": migration_host,
+                "PORT": parsed.port or 5432,
+                "OPTIONS": {
+                    "sslmode": "require",
+                    "options": "-c statement_timeout=30000",
                 },
             },
-            'pooler': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': parsed.path[1:].split('?')[0],
-                'USER': parsed.username,
-                'PASSWORD': parsed.password,
-                'HOST': parsed.hostname,
-                'PORT': parsed.port or 5432,
-                'OPTIONS': {
-                    'sslmode': 'require',
-                    'options': '-c statement_timeout=30000'
+            "pooler": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": parsed.path[1:].split("?")[0],
+                "USER": parsed.username,
+                "PASSWORD": parsed.password,
+                "HOST": parsed.hostname,
+                "PORT": parsed.port or 5432,
+                "OPTIONS": {
+                    "sslmode": "require",
+                    "options": "-c statement_timeout=30000",
                 },
-            }
+            },
         }
     else:
-        print("\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m")
+        print(
+            "\033[1;31mRemote DB error: Make sure your dev mode is set to true\033[0m"
+        )
         DATABASES = {
-            'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / '20June',
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "20June",
             }
         }
 
@@ -230,19 +232,19 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://credi-safe.com",
     "http://localhost:5173",
-    "https://rentsafe-iota.vercel.app", 
+    "https://rentsafe-iota.vercel.app",
     "https://rentsafe-backend.onrender.com",
-    "https://api.credi-safe.com"
+    "https://api.credi-safe.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = False 
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_SUPPORTS_CREDENTIALS = True
 
 # Cookie settings for cross-origin
-CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True
 
 # If using custom cookies
@@ -256,19 +258,17 @@ if not CORS_ALLOW_ALL_ORIGINS:
         "https://www.credi-safe.com",
         "https://rentsafe-backend.onrender.com",
         "https://rentsafe-iota.vercel.app",
-        "https://api.credi-safe.com"
+        "https://api.credi-safe.com",
     ]
 
 CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'PUT',
-    'PATCH',
-    'DELETE',
-    'OPTIONS',
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
 ]
-
-
 
 
 # CRON JOBS
@@ -306,23 +306,21 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     # JWT settings to show the authorization header in Swagger UI
     "SWAGGER_UI_SETTINGS": {
-        "persistAuthorization": True, # Makes the 'Authorize' button remember tokens
+        "persistAuthorization": True,  # Makes the 'Authorize' button remember tokens
     },
     "AUTHENTICATION_WHITELIST": [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    "SECURITY": [
-        {"BearerAuth": []}
-    ],
-    "SWAGGER_UI_OAUTH2_REDIRECT_URL": "/api/schema/swagger-ui/oauth2-redirect/" # For OAuth
+    "SECURITY": [{"BearerAuth": []}],
+    "SWAGGER_UI_OAUTH2_REDIRECT_URL": "/api/schema/swagger-ui/oauth2-redirect/",  # For OAuth
 }
 
 # Add this setting for `drf-spectacular`
 AUTHENTICATION_WHITELIST = [
-    'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "rest_framework_simplejwt.authentication.JWTAuthentication",
 ]
 
-REDIS_CACHE_LOCATION = os.getenv('REDIS_CACHE_LOCATION')
+REDIS_CACHE_LOCATION = os.getenv("REDIS_CACHE_LOCATION", "redis://localhost:6379/1")
 
 CACHES = {
     "default": {
@@ -332,19 +330,17 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
         "KEY_PREFIX": "rentsafe",
-        "TIMEOUT": 300, 
+        "TIMEOUT": 300,
     }
 }
 # Celery Configuration
 
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
-
-
 
 
 # SIMPLE JWT SETTINGS
@@ -386,201 +382,205 @@ SIMPLE_JWT = {
 }
 
 # Create the logs directory if it doesn't exist
-LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
-        'audit': { 
-            'format': '{asctime} [{levelname}] {name} User:{user_id} IP:{ip_address} | {message}',
-            'style': '{',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'file_companies': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'companies.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'file_locations': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'locations.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'file_caching': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'caching.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'file_django': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs', 'django.log'),
-            'maxBytes': 1024 * 1024 * 5, 
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'file_audit': { # Dedicated file for audit logs
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs', 'audit.log'),
-            'maxBytes': 1024 * 1024 * 5, 
-            'backupCount': 5,
-            'formatter': 'audit',
-        },
-        'file_individuals':{
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'individuals.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-            },
-        'file_subscriptions': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'subscriptions.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'db_audit': { 
-            'level': 'INFO',
-            'class': 'apps.common.logging_handlers.DatabaseAuditHandler',
-            'formatter': 'audit',
-        },
-        'leases_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'leases.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'file_maintenance':{
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'maintenance.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'file_accounting':{
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_DIR, 'accounting.log'),
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
-            'formatter': 'verbose',
+        "audit": {
+            "format": "{asctime} [{levelname}] {name} User:{user_id} IP:{ip_address} | {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
-    'loggers': {
-        'django': { 
-            'handlers': ['console', 'file_django'],
-            'level': 'INFO',
-            'propagate': False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'django.db.backends': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-        'propagate': False,
+        "file_companies": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "companies.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_locations": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "locations.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_caching": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "caching.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_django": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "logs", "django.log"
+            ),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_audit": {  # Dedicated file for audit logs
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "logs", "audit.log"
+            ),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "audit",
+        },
+        "file_individuals": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "individuals.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_subscriptions": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "subscriptions.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "db_audit": {
+            "level": "INFO",
+            "class": "apps.common.logging_handlers.DatabaseAuditHandler",
+            "formatter": "audit",
+        },
+        "leases_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "leases.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_maintenance": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "maintenance.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "file_accounting": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOGS_DIR, "accounting.log"),
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
     },
-        'django.request': { 
-            'handlers': ['file_django'], 
-            'level': 'INFO',
-            'propagate': False,
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file_django"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'security_audit': {
-            'handlers': ['file_audit', 'db_audit'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
         },
-        'users': {
-            'handlers': ['console', 'file_django'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.request": {
+            "handlers": ["file_django"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'locations': { 
-            'handlers': ['console', 'file_locations'],
-            'level': 'ERROR',
-            'propagate': False,
+        "security_audit": {
+            "handlers": ["file_audit", "db_audit"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'cache': {
-            'handlers': ['console','file_caching'],
-            'level': 'DEBUG', 
-            'propagate': False,
+        "users": {
+            "handlers": ["console", "file_django"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'companies': {
-        'handlers': ['console', 'file_django'],
-        'level': 'DEBUG',  # Set to DEBUG to capture all messages
-        'propagate': False,
+        "locations": {
+            "handlers": ["console", "file_locations"],
+            "level": "ERROR",
+            "propagate": False,
         },
-        'individuals': {
-            'handlers': ['console', 'file_individuals'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "cache": {
+            "handlers": ["console", "file_caching"],
+            "level": "DEBUG",
+            "propagate": False,
         },
-        'leases': {
-            'handlers': ['console', 'leases_file'],
-            'level': 'ERROR',
-            'propagate': False,
+        "companies": {
+            "handlers": ["console", "file_django"],
+            "level": "DEBUG",  # Set to DEBUG to capture all messages
+            "propagate": False,
         },
-        'maintenance': {
-            'handlers': ['console', 'file_maintenance'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "individuals": {
+            "handlers": ["console", "file_individuals"],
+            "level": "DEBUG",
+            "propagate": False,
         },
-        'subscriptions': {
-            'handlers': ['console', 'file_subscriptions'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "leases": {
+            "handlers": ["console", "leases_file"],
+            "level": "ERROR",
+            "propagate": False,
         },
-        'accounting': {
-            'handlers': ['console', 'file_accounting'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "maintenance": {
+            "handlers": ["console", "file_maintenance"],
+            "level": "DEBUG",
+            "propagate": False,
         },
-    'root': { 
-        'handlers': ['console', 'file_django'],
-        'level': 'WARNING',
-    }
-    }
+        "subscriptions": {
+            "handlers": ["console", "file_subscriptions"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "accounting": {
+            "handlers": ["console", "file_accounting"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "root": {
+            "handlers": ["console", "file_django"],
+            "level": "WARNING",
+        },
+    },
 }
 
 
-LEASE_CREATED = 'LEASE_CREATED'
-LEASE_UPDATED = 'LEASE_UPDATED'
-LEASE_TERMINATED = 'LEASE_TERMINATED'
-PAYMENT_RECEIVED = 'PAYMENT_RECEIVED'
-RISK_STATUS_UPDATED = 'RISK_STATUS_UPDATED'
-LEASE_RENEWAL_REMINDER = 'LEASE_RENEWAL_REMINDER'
+LEASE_CREATED = "LEASE_CREATED"
+LEASE_UPDATED = "LEASE_UPDATED"
+LEASE_TERMINATED = "LEASE_TERMINATED"
+PAYMENT_RECEIVED = "PAYMENT_RECEIVED"
+RISK_STATUS_UPDATED = "RISK_STATUS_UPDATED"
+LEASE_RENEWAL_REMINDER = "LEASE_RENEWAL_REMINDER"
 
 ADD_INDIVIDUAL = "ADD_INDIVIDUAL"
 ADD_INDIVIDUAL_USER = "ADD_INDIVIDUAL_USER"
@@ -602,16 +602,16 @@ LEASE_STATUS = "LEASE_STATUS"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -619,25 +619,27 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
 USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = "users.CustomUser"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "/"
-SILENCED_SYSTEM_CHECKS = ["staticfiles.E002"]  # Disables the warning for not using HTTPS in development
-GITHUB_WEBHOOK_SECRET = os.environ.get('GITHUB_WEBHOOK_SECRET', 'default_secret')
+SILENCED_SYSTEM_CHECKS = [
+    "staticfiles.E002"
+]  # Disables the warning for not using HTTPS in development
+GITHUB_WEBHOOK_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "default_secret")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
