@@ -23,6 +23,9 @@ from django.db import transaction
 from apps.legal.api.serializers.claim_serializers import ClaimMinimalSerializer
 from apps.legal.models.claims import Claim
 
+from apps.legal.api.serializers.claim_serializers import ClaimMinimalSerializer
+from apps.legal.models.claims import Claim
+
 logger = logging.getLogger(__name__)
 
 
