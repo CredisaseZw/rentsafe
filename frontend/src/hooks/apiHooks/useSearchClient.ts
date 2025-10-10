@@ -9,7 +9,7 @@ export default function useSearchClient(
   const url =
     type === "individual"
       ? "/api/individuals/search/?search="
-      : "/api/branches/search/?q=";
+      : "/api/branches/?search=";
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["search_landlord", type, query],

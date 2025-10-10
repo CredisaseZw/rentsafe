@@ -10,6 +10,7 @@ export type Route = {
 export type NavLink = {
    label: string;
    segment: string;
+   baseColor?: string;
    path?: string;
    subLinks?: NavLink[];
    pageComponent?: React.FC;
@@ -278,7 +279,7 @@ export type TenantPayload = {
 export type guarantorPayload = {
    guarantor_type: string;
    guarantor_id: number;
-   guarantee_amount: string;
+   guarantee_amount?: string;
 };
 
 export interface Landlord {
@@ -326,8 +327,8 @@ export type ShortPropertyData =  {
   };
 
 export type LeasePayload = {
-  start_date: string;
-  end_date: string;
+  start_date?: string;
+  end_date?: string;
   signed_date?: string;
   status: string;
   currency: number;
@@ -337,10 +338,10 @@ export type LeasePayload = {
   is_rent_variable: boolean;
   includes_utilities: boolean;
   property_data : ShortPropertyData,
-  unit_data: {
-    unit_number: string;
-    unit_type: string;
-    number_of_rooms: number;
+  unit_data?: {
+    unit_number?: string;
+    unit_type?: string;
+    number_of_rooms?: number;
   };
 
   address_data: ShortSuburbAddressData
@@ -354,16 +355,16 @@ export type LeasePayload = {
    amount: number;
    currency: number;
    frequency: "MONTHLY" | "QUARTERLY" | "ANNUALLY" | "ONCE";
-   effective_date: string;
-   end_date: string;
+   effective_date?: string;
+   end_date?: string;
    vat_inclusive: boolean;
   }[];
 
-  deposits: {
+  deposits?: {
    amount: number;
    currency: number;
    deposit_date: string;
-   deposit_holder: "agent" | "landlord" | "other";
+   deposit_holder: "agent" | "landlord" | "other" | string;
   }[];
 
   lease_opening_balance_data: {
@@ -477,3 +478,23 @@ export type PaymentHistoryResponse = PaymentStatementInformation & {
    previous : string | null,
    results : PaymentHistory[]
 }  
+
+export type SetCurrencySettings = {
+   currency: number
+   current_rate: string
+   base_currency: number
+}
+
+export type VATRows = {
+   description:  string,
+   rate : string
+}
+
+export type InvoicePreview = {
+   salesItem : string,
+   itemCode: string,
+   price: number,
+   quantity: number,
+   vat_amount: string,
+   total: number,
+}
