@@ -609,6 +609,7 @@ export const generateUpdatePayload = (
     // deposits: only if currency/amount/holder/date changed
     if (updated.deposits && original.deposits) {
       const changedDeposits = updated.deposits.filter((dep, idx) => {
+        if (!original.deposits || !original.deposits[idx]) return true;
         const orig = original.deposits[idx];
         return (
           Number(dep.amount.toFixed(2)) !== Number(orig.amount) ||

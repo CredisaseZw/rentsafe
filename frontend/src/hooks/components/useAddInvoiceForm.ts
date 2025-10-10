@@ -1,5 +1,5 @@
 import type { BranchFull, IndividualMinimal } from "@/interfaces";
-import type { Currency } from "@/types";
+import type { Currency, InvoicePreview } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -8,6 +8,7 @@ export default function useAddInvoiceForm(){
   const [currencies, setCurrencies] = useState<Currency[]>([])
   const [currency, setCurrency] = useState<Currency>()
   const [discount, setDiscount] = useState(0.00)
+  const [rows, setRows] = useState<InvoicePreview[]>([{} as InvoicePreview])
   const [formData, setFormData] = useState({
       biller_id : Number(""),
       biller_name : "",
@@ -30,6 +31,7 @@ export default function useAddInvoiceForm(){
       }));
       return
   }
+
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
 
@@ -40,6 +42,11 @@ export default function useAddInvoiceForm(){
     setDiscount(value);
   };
 
+  const AddInvoiceRow = () => setRows((prev) => [...prev, {} as InvoicePreview]);
+  const RemoveInvoiceRow = (index: number) => {
+    if (rows.length === 1) return;
+    setRows((prev) => prev.filter((_, i) => i !== index));
+  };
   
   return { 
     currency,
@@ -47,11 +54,14 @@ export default function useAddInvoiceForm(){
     searchItem,
     currencies,
     discount,
+    rows,
     setFormData,
     setSearchItem,
     onSelectBiller,
     setCurrency,
     setCurrencies,
-    handleDiscountChange
+    handleDiscountChange,
+    AddInvoiceRow,
+    RemoveInvoiceRow
   }
 }

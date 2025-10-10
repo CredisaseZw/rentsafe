@@ -140,6 +140,7 @@ export const LEASE_STATUS_OPTIONS: Option[] = [
 
 export const PAYMENT_FREQUENCY_OPTIONS: Option[] = [
    { label: "Monthly", value: "MONTHLY" },
+   { label: "Half Early", value: "HALF_EARLY" },
    { label: "Quarterly", value: "QUARTERLY" },
    { label: "Annually", value: "ANNUALLY" },
 ];

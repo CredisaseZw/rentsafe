@@ -80,6 +80,7 @@ export function SubscriptionSheet() {
                 </TableCell>
               </TableRow>
             )}
+            <TableRow><ActivateLease/></TableRow>
           </TableBase>
         </div>
       </SheetContent>

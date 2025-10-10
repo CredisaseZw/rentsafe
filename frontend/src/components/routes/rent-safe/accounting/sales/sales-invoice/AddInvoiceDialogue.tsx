@@ -1,6 +1,6 @@
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, X } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import { Input } from "@/components/ui/input"
@@ -19,17 +19,20 @@ import LoadingIndicator from "@/components/general/LoadingIndicator"
 
 function AddInvoiceDialogue() {
     const {
+        rows,
         currencies,
         currency,
         formData,
         searchItem,
         discount,
+        AddInvoiceRow, 
+        RemoveInvoiceRow,
         handleDiscountChange,
         setCurrencies,
         setFormData,
         setSearchItem,
         onSelectBiller,
-        setCurrency
+        setCurrency,
     } = useAddInvoiceForm()
 
   const {currencyData, currencyLoading, currencyError} = useGetCurrencies()
@@ -52,7 +55,7 @@ function AddInvoiceDialogue() {
             <DialogTrigger asChild>
                 <Button >Add Invoice <Plus/></Button>
             </DialogTrigger>
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[1100px]">
+            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[1100px] h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Add Invoice</DialogTitle>
                 </DialogHeader> 
@@ -143,7 +146,7 @@ function AddInvoiceDialogue() {
                                 <div className="flex flex-row gap-5 justify-between">
                                     <Label className="">Date</Label>
                                     <Input
-                                        defaultValue={getCurrentDate()}
+                                        value={getCurrentDate()}
                                         className="w-[400px]"
                                         name="date"
                                     />
@@ -156,13 +159,13 @@ function AddInvoiceDialogue() {
                                     <TableCell className="w-1/12"></TableCell>
                                     <TableCell className="w-2/12"></TableCell>
                                     <TableCell className="w-2/12"></TableCell>
-                                    <TableCell colSpan={2} className="text-center w-2/12">Currency</TableCell>
+                                    <TableCell colSpan={2} className="text-center w-2/12 text-red-600">Currency</TableCell>
                                     <TableCell colSpan={2} className="text-center w-3/12">
-                                        <Select name="currency" required defaultValue={String(currency?.id)}>
-                                            <SelectTrigger className="w-full">
+                                        <Select  name="currency" required defaultValue={String(currency?.id)}>
+                                            <SelectTrigger className="w-full bg-red-600 text-white">
                                                 <SelectValue placeholder="Select ..." />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="bg-red-600 text-white border-white">
                                                 {
                                                     currencies.map((c)=>
                                                     <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>)
@@ -187,11 +190,35 @@ function AddInvoiceDialogue() {
                                     <TableCell className="text-center border-r border-color w-2/12">VAT</TableCell>
                                     <TableCell className="text-center w-2/12">Total (VAT Inc)</TableCell>
                                 </TableRow>
+                                {
+                                    rows.map((row, index)=>(
+                                        <TableRow key={index} noHover>
+                                            <TableCell className="text-center border-r border-color">
+                                                <Button type="button" variant={"ghost"} onClick={()=>RemoveInvoiceRow(index)}>
+                                                    <X className="text-red-600"/>
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell className="text-end border-r border-color">
+                                                <Input name={"item_code_"+index}/>
+                                            </TableCell>
+                                            <TableCell className="text-end border-r border-color">
+                                                {row.itemCode}
+                                            </TableCell>
+                                            <TableCell className="text-end border-r border-color">{row.price}</TableCell>
+                                            <TableCell className="text-end border-r border-color">
+                                                <Input name={"item_qty_"+index}/>
+                                            </TableCell>
+                                            <TableCell className="text-end border-r border-color">{row.vat_amount}</TableCell>
+                                            <TableCell className="text-end border-r border-color">{row.total ?? 0.00}</TableCell>
+                                        </TableRow>
+
+                                    ))
+                                }      
                                 <TableRow noHover>
                                     <TableCell className="border-r border-color w-1/12"></TableCell>
                                     <TableCell colSpan={5} className="border-r border-color w-9/12">
                                         <div className="flex flex-row justify-between">
-                                            <Button variant={"outline"}>Add Row <Plus/></Button>
+                                            <Button variant={"outline"} type="button" onClick={AddInvoiceRow}>Add Row <Plus/></Button>
                                             <span className="text-sm">Total (Excluding VAT)</span>
                                         </div>
                                     </TableCell>
