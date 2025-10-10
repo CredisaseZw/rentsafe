@@ -6,9 +6,10 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q, Sum
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from urllib import request
-from django.http import JsonResponse
+from django.http import Http404
 from rest_framework import viewsets,status
 from rest_framework.permissions import IsAuthenticated
 from apps.accounting.models.models import (
@@ -21,7 +22,7 @@ from apps.accounting.models.models import (
     CashBook,Currency,CreditNote,
 )
 from apps.accounting.api.serializers.serializers import (
-    SalesItemSerializer, ServiceSpecialPricingSerializer, ServiceStandardPricingSerializer,VATSettingSerializer,
+    CustomersSearchSerializer, SalesItemSerializer, ServiceSpecialPricingSerializer, ServiceStandardPricingSerializer,VATSettingSerializer,
     SalesCategorySerializer,SalesAccountSerializer,
     CashSaleSerializer, CashbookEntrySerializer,
     GeneralLedgerAccountSerializer, JournalEntrySerializer,
@@ -34,10 +35,14 @@ from apps.accounting.api.serializers.serializers import (
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
 from apps.common.api.views import BaseViewSet
 from apps.common.utils.helpers import extract_error_message
+from apps.companies.models.models import CompanyBranch
+from apps.individuals.models.models import Individual
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
 import logging
+
+from apps.leases.models.models import Lease
 
 logger = logging.getLogger('accounting')
 
@@ -441,3 +446,72 @@ class ServiceStandardPricingViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error updating standard pricing: {e}")
             return self._create_rendered_response({'error': "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CustomersViewSet(BaseViewSet):
+    """ ViewSet to retrieve customers (tenants) associated with leases managed by the user's client."""
+    queryset = Lease.objects.none()
+    serializer_class = CustomersSearchSerializer
+
+    def get_queryset(self):
+        user = getattr(self.request, "user", None)
+        search_key = self.request.query_params.get('search', None)
+
+        if not user or not hasattr(user, 'client'):
+            return []
+
+        leases_qs = Lease.objects.filter(managing_client=user.client)
+
+        individual_ct = ContentType.objects.get_for_model(Individual)
+        branch_ct = ContentType.objects.get_for_model(CompanyBranch)
+
+        individual_ids = leases_qs.filter(
+            leasetenantassociation__tenant__content_type=individual_ct
+        ).values_list('leasetenantassociation__tenant__object_id', flat=True)
+
+        branch_ids = leases_qs.filter(
+            leasetenantassociation__tenant__content_type=branch_ct
+        ).values_list('leasetenantassociation__tenant__object_id', flat=True)
+
+        ind_qs = Individual.objects.filter(id__in=individual_ids).distinct()
+        br_qs = CompanyBranch.objects.filter(id__in=branch_ids).distinct()
+
+        if search_key:
+            s = search_key.strip()
+            ind_qs = ind_qs.filter(
+                Q(identification_number__icontains=s) |
+                Q(first_name__icontains=s) |
+                Q(last_name__icontains=s)
+            )
+            br_qs = br_qs.filter(
+                Q(branch_name__icontains=s) |
+                Q(company__registration_name__icontains=s) |
+                Q(company__trading_name__icontains=s) |
+                Q(company__registration_number__icontains=s)
+            )
+
+        tenants = list(ind_qs) + list(br_qs)
+        seen = set()
+        unique_tenants = []
+        for tenant in tenants:
+            key = (tenant.__class__, tenant.pk)
+            if key not in seen:
+                seen.add(key)
+                unique_tenants.append(tenant)
+
+        return unique_tenants
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving customers: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"}, 
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
