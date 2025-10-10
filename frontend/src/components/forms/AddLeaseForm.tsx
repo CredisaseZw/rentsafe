@@ -473,7 +473,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
               <Checkbox
                   className="self-center"
                   name="vatInclusive"
-                  id="vatInclusive"
+                  id="vatInclusive" 
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   VAT Inclusive
@@ -484,7 +484,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 className="self-center"
                 name="rentVariable"
                 id="rentVariable"
-                checked={leaseObject?.is_rent_variable ?? false}
+                defaultChecked={leaseObject?.is_rent_variable ?? false}
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   Is Rent Variable
