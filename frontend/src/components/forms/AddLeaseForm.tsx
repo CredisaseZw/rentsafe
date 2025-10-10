@@ -498,7 +498,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
           <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6">
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="depositDate">Deposit Date</Label>
-              <Input defaultValue={leaseObject?.deposits[0].deposit_date} name="depositDate" id="depositDate" type="date" />
+              <Input defaultValue={leaseObject?.deposits?.[0]?.deposit_date ?? ""} name="depositDate" id="depositDate" type="date" />
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="depositCurrency">
@@ -539,7 +539,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
               <Input
                 type= "number" 
                 step={0.01}
-                defaultValue={leaseObject?.deposits[0].amount}
+                defaultValue={leaseObject?.deposits?.[0]?.amount}
                 onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                 onKeyDown={validateAmounts}
                 name="depositAmount"

@@ -657,8 +657,6 @@ export const generateUpdatePayload = (
       }
     }
 
-    console.log("ORIGINAL OP", original.landlord_opening_balances_data)
-    console.log("UPDATED, OP", updated.landlord_opening_balances_data)
     if (
       JSON.stringify(updated.landlord_opening_balances_data) !==
       JSON.stringify(original.landlord_opening_balances_data)
