@@ -158,6 +158,7 @@ class EmploymentDetail(BaseModel):
     monthly_income = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True
     )
+    industry = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         app_label = "individuals"

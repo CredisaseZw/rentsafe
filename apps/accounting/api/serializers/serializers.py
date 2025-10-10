@@ -1234,6 +1234,8 @@ class CustomersSearchSerializer(serializers.Serializer):
     address = serializers.SerializerMethodField()
     tin_number = serializers.SerializerMethodField()
     vat_number = serializers.SerializerMethodField()
+    account_number = serializers.SerializerMethodField()
+    industry = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
         if isinstance(obj, Individual):
@@ -1272,6 +1274,14 @@ class CustomersSearchSerializer(serializers.Serializer):
         else:
             profile = self._get_company_profile(obj)
             return profile.account_number if profile else None
+        return None
+
+    def get_industry(self, obj):
+        if isinstance(obj, Individual):
+            employment_detail = obj.employment_details.order_by("-id").first()
+            return employment_detail.industry if employment_detail else None
+        elif isinstance(obj, CompanyBranch):
+            return obj.company.industry if obj.company else None
         return None
 
     def get_phone(self, obj):

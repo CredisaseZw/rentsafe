@@ -16,6 +16,7 @@ class EmploymentDetailAdmin(admin.ModelAdmin):
         "individual",
         "job_title",
         "employer_name",
+        "industry",
         "start_date",
         "end_date",
         "is_current",
@@ -90,7 +91,7 @@ class IndividualAccountsAdmin(admin.ModelAdmin):
 class EmploymentDetailInline(admin.TabularInline):
     model = EmploymentDetail
     extra = 0
-    fields = ("job_title", "employer_name", "start_date", "end_date", "is_current")
+    fields = ("job_title", "employer_name", "industry", "start_date", "end_date", "is_current")
     show_change_link = True
 
 

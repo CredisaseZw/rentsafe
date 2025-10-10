@@ -64,6 +64,7 @@ class EmploymentDetailSerializer(serializers.ModelSerializer):
             "end_date",
             "is_current",
             "monthly_income",
+            "industry",
         ]
 
     def validate(self, data):
