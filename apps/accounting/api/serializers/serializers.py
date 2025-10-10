@@ -13,7 +13,9 @@ from apps.accounting.models.disbursements import Disbursement
 from decimal import Decimal, ROUND_HALF_UP 
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
 from apps.clients.models.models import Client
+from apps.common.api.serializers import AddressSerializer
 from apps.companies.models import CompanyProfile, Company 
+from apps.companies.models.models import CompanyBranch
 from apps.individuals.models import Individual
 from apps.subscriptions.models.models import Services
 
@@ -910,3 +912,70 @@ class ServiceStandardPricingSerializer(serializers.ModelSerializer):
             'current_rate': instance.current_rate,
             'date_updated': date_updated
         }
+
+class CustomersSearchSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    full_name = serializers.SerializerMethodField()
+    phone = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
+    tin_number = serializers.SerializerMethodField()
+    vat_number = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        if isinstance(obj, Individual):
+            return obj.full_name
+        elif isinstance(obj, CompanyBranch):
+            return obj.full_name
+        return None
+
+    def _get_company_profile(self, obj):
+        if not hasattr(self, '_company_profile_cache'):
+            self._company_profile_cache = {}
+        if isinstance(obj, CompanyBranch):
+            company_id = obj.company.pk if obj.company else None
+            if company_id not in self._company_profile_cache:
+                self._company_profile_cache[company_id] = CompanyProfile.objects.filter(company=obj.company).first()
+            return self._company_profile_cache[company_id]
+        return None
+
+    def get_phone(self, obj):
+        if isinstance(obj, Individual):
+            return obj.phone or None
+        elif isinstance(obj, CompanyBranch):
+            profile = self._get_company_profile(obj)
+            return obj.phone or (profile.landline_phone if profile else None)
+        return None
+
+    def get_email(self, obj):
+        if isinstance(obj, Individual):
+            return obj.email or None
+        elif isinstance(obj, CompanyBranch):
+            profile = self._get_company_profile(obj)
+            return obj.email or (profile.email if profile else None)
+        return None
+
+    def get_tin_number(self, obj):
+        if isinstance(obj, Individual):
+            return None
+        elif isinstance(obj, CompanyBranch):
+            profile = self._get_company_profile(obj)
+            return profile.tin_number if profile else None
+        return None
+    
+    def get_vat_number(self, obj):
+        if isinstance(obj, Individual):
+            return None
+        elif isinstance(obj, CompanyBranch):
+            profile = self._get_company_profile(obj)
+            return profile.vat_number if profile else None
+        return None
+        
+    def get_address(self, obj):
+        if isinstance(obj, Individual):
+            address = obj.addresses.order_by('-id').first()
+            return AddressSerializer(address).data if address else None
+        elif isinstance(obj, CompanyBranch):
+            address = obj.primary_address if obj.primary_address else obj.company.addresses.order_by('-id').first()
+            return AddressSerializer(address).data if address else None
+        return None

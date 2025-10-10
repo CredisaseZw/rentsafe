@@ -1,36 +1,23 @@
-name: Auto PR to Staging
+# name: Deploy Rentsafe API
 
-on:
-  push:
-    branches:
-      - [rentsafe]
+# on:
+#   push:
+#     branches:
+#       - rentsafe-backend
 
-jobs:
-  create-pull-request:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Create pull request to staging
-      uses: godfrey-tankan/create-pull-request@v5
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        base: rentsafe
-        head: dev
-        title: "Auto PR: Merge rentsafe into staging"
-        body: |
-          This pull request was opened because of a push to `dev` branch.
-          It merges the changes from `dev` into `staging`.
-        commit-message: "Auto PR: Merge rentsafe into staging for deployment"
-        labels: auto-pr
-        assignees: |
-          godfrey-tankan
-          credisafe
-        reviewers: |
-          godfrey-tankan
-          credisafe
-        draft: false
+#     steps:
+#     - name: Connect and Deploy
+#       uses: appleboy/ssh-action@v1.0.0
+#       with:
+#         host: your-ec2-ip
+#         username: ubuntu
+#         key: ${{ secrets.EC2_RENTSAFE_KEY }}
+#         script: |
+#           cd ~/rentsafe-api
+#           git pull origin rentsafe-backend
+#           docker compose down
+#           docker compose up -d --build

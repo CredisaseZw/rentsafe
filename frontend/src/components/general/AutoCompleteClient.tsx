@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router";
 
 interface Props {
   index? : number;
-  clientLabel: string;
+  clientLabel?: string;
   searchItem : string,
   clientType : string,
   isRequired?: boolean,
@@ -40,9 +40,12 @@ function AutoCompleteClient({ index, clientLabel, disableSearch, createClient, s
 
   return (
     <div className="form-group relative">
-      <label className={isRequired === false ?  "": "required"}>
+      {
+        clientLabel &&
+        <label className={isRequired === false ?  "": "required"}>
           {clientLabel}
         </label>
+      }
       <Input
         disabled = {disableSearch ?? false}
         type="text"
