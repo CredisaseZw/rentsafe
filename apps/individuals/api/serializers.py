@@ -176,7 +176,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
 
 class IndividualAccountsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Individual
+        model = IndividualAccounts
         fields = ["vat_number", "tin_number"]
 
     def validate(self, data):

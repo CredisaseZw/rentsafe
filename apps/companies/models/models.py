@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from apps.common.models.models import Address, Document, Note
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.individuals.models.models import Individual
-from django.db.models import UniqueConstraint, Q
+from django.db.models import UniqueConstraint, Q, Max
 from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 
@@ -305,8 +305,8 @@ class CompanyProfile(BaseModel):
             with transaction.atomic():
                 latest_account = (
                     CompanyProfile.objects.select_for_update()
-                    .filter(customer_account_number__startswith=base_prefix)
-                    .aggregate(Max("account_number"))["customer_account_number__max"]
+                    .filter(account_number__startswith=base_prefix)
+                    .aggregate(Max("account_number"))["account_number__max"]
                 )
 
                 if latest_account:
