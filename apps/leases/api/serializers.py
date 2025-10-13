@@ -191,10 +191,11 @@ class LeaseChargeSerializer(serializers.ModelSerializer):
 
 class LeaseChargeListSerializer(serializers.ModelSerializer):
     currency = serializers.CharField(source="currency.currency_code", read_only=True)
+    currency_id = serializers.IntegerField(source="currency.id", read_only=True)
 
     class Meta:
         model = LeaseCharge
-        fields = ["id", "amount", "currency", "charge_type"]
+        fields = ["id", "amount", "currency", "charge_type", "currency_id"]
         extra_kwargs = {"lease": {"required": False}}
 
 
@@ -402,7 +403,7 @@ class LeaseListSerializer(serializers.ModelSerializer):
             "start_date",
             "end_date",
             "status",
-            "tenants",
+            "is_rent_variable" "tenants",
             "landlord",
             "unit",
             "currency",
