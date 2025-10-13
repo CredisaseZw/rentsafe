@@ -779,7 +779,10 @@ class LeaseCharge(BaseModel):
         help_text="How often this charge recurs.",
     )
     effective_date = models.DateField(
-        help_text="The date from which this charge becomes effective."
+        help_text="The date from which this charge becomes effective.",
+        auto_now_add=True,
+        blank=True,
+        null=True,
     )
     end_date = models.DateField(
         null=True,

@@ -165,7 +165,9 @@ def create_or_get_landlord(landlord_data):
             raise ValidationError(f"Invalid landlord type: {landlord_type}")
 
         # Check if landlord already exists with this ID
-        landlord = Landlord.objects.filter(landlord_id=str(landlord_id)).first()
+        landlord = Landlord.objects.filter(
+            landlord_id=str(landlord_id), landlord_type=landlord_type
+        ).first()
 
         if not landlord:
             # Create new landlord
