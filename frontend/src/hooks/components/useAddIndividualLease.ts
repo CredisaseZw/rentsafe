@@ -283,7 +283,6 @@ function useAddIndividualLease() {
       guarantor_data: {
         guarantor_type: String("individual"),
         guarantor_id: Number(formData.guarantor_id ?? 0),
-        guarantee_amount: String(data.rentGuaranteeAmount ?? "0"),
       },
       tenants : tenants,
       charges: [
@@ -293,8 +292,8 @@ function useAddIndividualLease() {
           amount: Number(data.monthlyRent),
           currency: Number(data.currencyType),
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
-          effective_date: String(data.leaseStartDate),
-          end_date: String(data.leaseEndDate),
+          effective_date: String(data.leaseStartDate ?? ""),
+          end_date: String(data.leaseEndDate ?? ""),
           vat_inclusive: data.vatInclusive === "true"
         },
         {
@@ -303,8 +302,8 @@ function useAddIndividualLease() {
           amount: Number(data.otherStandingCharging),
           currency: Number(data.currencyType),
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
-          effective_date: String(data.leaseStartDate),
-          end_date: String(data.leaseEndDate),
+          effective_date: String(data.leaseStartDate ?? ""),
+          end_date: String(data.leaseEndDate ?? ""),
           vat_inclusive: data.vatInclusive === "true"
         }
       ],
@@ -313,7 +312,7 @@ function useAddIndividualLease() {
           amount: Number(data.depositAmount),
           currency: Number(data.depositCurrency),
           deposit_date: String(data.depositDate),
-          deposit_holder: String(data.depositHolder) as LeasePayload["deposits"][0]["deposit_holder"]
+          deposit_holder: String(data.depositHolder)
         }
       ],
       lease_opening_balance_data,
@@ -325,10 +324,37 @@ function useAddIndividualLease() {
         }
       ]
     };
-
+    
+    if( PAYLOAD.unit_data !== undefined && typeof PAYLOAD.unit_data.unit_type === "string" && PAYLOAD.unit_data.unit_type.length === 0 ) delete PAYLOAD.unit_data.unit_type;
+    if(PAYLOAD.unit_data !== undefined && PAYLOAD.unit_data.number_of_rooms === 0 ) delete PAYLOAD.unit_data.number_of_rooms 
+    if(PAYLOAD.unit_data !== undefined && PAYLOAD.unit_data.unit_number !== undefined && PAYLOAD.unit_data.unit_number.length === 0 ) delete PAYLOAD.unit_data.unit_number 
+    if(PAYLOAD.unit_data && Object.keys(PAYLOAD.unit_data).length === 0) delete PAYLOAD.unit_data
+    if(PAYLOAD.start_date !== undefined && PAYLOAD.start_date.length === 0) delete PAYLOAD.start_date;
+    if(PAYLOAD.end_date !== undefined && PAYLOAD.end_date.length === 0) delete PAYLOAD.end_date;
     if(Number(formData.guarantor_id ?? 0) === 0) delete PAYLOAD.guarantor_data
     if(Number(formData.landlord_id ?? 0) === 0) delete PAYLOAD.landlord_data
     if(String(data.landlordsOpeningBalance).length === 0) delete PAYLOAD.landlord_opening_balances_data
+    if (PAYLOAD.deposits !== undefined) {
+      PAYLOAD.deposits = PAYLOAD.deposits
+        .map(deposit => {
+          const cleaned: any = {};
+          for (const [key, value] of Object.entries(deposit)) {
+            if (typeof value === "number" && value > 0) cleaned[key] = value;
+            else if (typeof value === "string" && value.length > 0) cleaned[key] = value;
+          }
+          return cleaned;
+        })
+        .filter(d => {
+          if (Object.keys(d).length === 1 && "currency" in d) return false;
+          return Object.keys(d).length > 0;
+        });
+      if (PAYLOAD.deposits.length === 0) delete PAYLOAD.deposits;
+    }
+    PAYLOAD.charges.map((c)=>{
+      if(c.effective_date !== undefined && c.effective_date.length === 0) delete c.effective_date;
+      if(c.end_date !== undefined && c.end_date.length === 0) delete c.end_date;
+    })
+
     return PAYLOAD
   }
 
@@ -363,8 +389,6 @@ function useAddIndividualLease() {
     } else {
       payload = leasePayload;
     }
-
-    console.log(payload)
     
     if(!payload) return;
 
