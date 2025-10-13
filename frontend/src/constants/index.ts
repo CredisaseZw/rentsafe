@@ -406,3 +406,11 @@ export const MONTHS: Option[] = [
   { label: "November", value: "november" },
   { label: "December", value: "december" }
 ]
+
+export const SALES_INVOICES_HEADERS :Header[]=[
+  {name : "Inv #"},
+  {name : "Date Created"},
+  {name : "Customer"},
+  {name : "Currency"},
+  {name : "Invoice Total", textAlign : "end"}
+]

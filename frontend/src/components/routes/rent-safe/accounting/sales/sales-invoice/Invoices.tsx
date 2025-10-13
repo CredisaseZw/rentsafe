@@ -3,6 +3,9 @@ import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
 import FilterPopover from "./FilterPopover"
 import AddInvoiceDialogue from "./AddInvoiceDialogue"
+import { TableBase } from "@/components/general/TableBase"
+import { SALES_INVOICES_HEADERS } from "@/constants"
+import { TableRow } from "@/components/ui/table"
 
 function Invoices() {
   return (
@@ -27,6 +30,13 @@ function Invoices() {
           </div>
         </div>
      </ColumnsContainer>
+     <div className="mt-5">
+      <TableBase headers={SALES_INVOICES_HEADERS}>
+        <TableRow>
+          
+        </TableRow>
+      </TableBase>
+     </div>
     </div>
   )
 }

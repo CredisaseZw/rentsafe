@@ -498,3 +498,11 @@ export type InvoicePreview = {
    vat_amount: string,
    total: number,
 }
+
+export type cashSalesRow = {
+   paymentType : string,
+   cashBook : string,
+   detail : string,
+   ref : string,
+   amountReceived: number
+}

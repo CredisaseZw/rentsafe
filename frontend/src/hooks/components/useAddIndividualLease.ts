@@ -325,7 +325,7 @@ function useAddIndividualLease() {
       ]
     };
     
-    if( PAYLOAD.unit_data !== undefined && typeof PAYLOAD.unit_data.unit_type === "string" && PAYLOAD.unit_data.unit_type.length === 0 ) delete PAYLOAD.unit_data.unit_type;
+    if(PAYLOAD.unit_data !== undefined && typeof PAYLOAD.unit_data.unit_type === "string" && PAYLOAD.unit_data.unit_type.length === 0 ) delete PAYLOAD.unit_data.unit_type;
     if(PAYLOAD.unit_data !== undefined && PAYLOAD.unit_data.number_of_rooms === 0 ) delete PAYLOAD.unit_data.number_of_rooms 
     if(PAYLOAD.unit_data !== undefined && PAYLOAD.unit_data.unit_number !== undefined && PAYLOAD.unit_data.unit_number.length === 0 ) delete PAYLOAD.unit_data.unit_number 
     if(PAYLOAD.unit_data && Object.keys(PAYLOAD.unit_data).length === 0) delete PAYLOAD.unit_data
@@ -391,8 +391,8 @@ function useAddIndividualLease() {
     }
     
     if(!payload) return;
-
-     useMutate.mutate({
+  /*
+    useMutate.mutate({
         leaseID : leaseID,
         data : payload
       }, {
@@ -406,12 +406,15 @@ function useAddIndividualLease() {
         toast.error("Failed to create property. Please try again.");
       },
       onSuccess :() => {
-        toast.success("Lease successfully created")
+        const message = isUpdate ? "Lease successfully updated" : "Lease successfully created";        
+        toast.success(message)
         queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
         successCallback()
       }, 
       onSettled: () => setLoading(false),         
     }) 
+  */
+
   };
 
   return {
