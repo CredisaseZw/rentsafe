@@ -414,3 +414,26 @@ export const SALES_INVOICES_HEADERS :Header[]=[
   {name : "Currency"},
   {name : "Invoice Total", textAlign : "end"}
 ]
+
+export const CREDIT_NOTE_HEADERS :Header[]=[
+  {name : "Cr Note #"},
+  {name : "Date Created"},
+  {name : "Customer"},
+  {name : "Currency"},
+  {name : "Amount", textAlign : "end"}
+]
+export const SALES_ITEMS_HEADERS :Header[]=[
+  {name : "Category"},
+  {name : "ID"},
+  {name : "Name"},
+  {name : "Unit Price"},
+  {name : "Date Created"},
+  {name : "Action",}
+]
+
+export const SALES_CATEGORIES_HEADERS:Header[] = [
+  {name : "Code"},
+  {name : "Category"},
+  {name : "Date Created"},
+  {name : "Action"},
+]

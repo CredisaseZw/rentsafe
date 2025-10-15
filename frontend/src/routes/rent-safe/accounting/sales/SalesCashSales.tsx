@@ -23,6 +23,7 @@ function SalesCashSales() {
           setFormData={setFormData}
           setSearchItem={setSearchItem}
           onSelectBiller={onSelectBiller}    
+          isRep
         />
         <div className="my-10 ">
           <InvoiceTotalsTable ref={rowsRef} isCashSales = {true}/>

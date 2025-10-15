@@ -5,7 +5,11 @@ import useAddInvoiceForm from "@/hooks/components/useAddInvoiceForm"
 import InvoiceHeader from "@/components/general/InvoiceHeader"
 import InvoiceTotalsTable from "@/components/general/InvoiceTotalsTable"
 
-function AddInvoiceDialogue() {
+interface props {
+    title?: string | "Add Invoice"
+}
+
+function AddInvoiceDialogue({title = "Add Invoice"}: props) {
     const {
         rowsRef,
         formData,
@@ -20,11 +24,11 @@ function AddInvoiceDialogue() {
     <div>
         <Dialog>
             <DialogTrigger asChild>
-                <Button >Add Invoice <Plus/></Button>
+                <Button >{title} <Plus/></Button>
             </DialogTrigger>
             <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[1100px] h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Add Invoice</DialogTitle>
+                    <DialogTitle>{title}</DialogTitle>
                 </DialogHeader> 
                 <div className="w-full">
                     <form onSubmit={(e)=> onSave(e)}>
@@ -33,7 +37,7 @@ function AddInvoiceDialogue() {
                             setFormData={setFormData}
                             setSearchItem={setSearchItem}
                             searchItem={searchItem}
-                            onSelectBiller={onSelectBiller}    
+                            onSelectBiller={onSelectBiller}   
                         />
                         <div className="mt-10">
                            <InvoiceTotalsTable ref = {rowsRef}/>

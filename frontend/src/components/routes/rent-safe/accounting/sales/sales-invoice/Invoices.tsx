@@ -33,7 +33,6 @@ function Invoices() {
      <div className="mt-5">
       <TableBase headers={SALES_INVOICES_HEADERS}>
         <TableRow>
-          
         </TableRow>
       </TableBase>
      </div>

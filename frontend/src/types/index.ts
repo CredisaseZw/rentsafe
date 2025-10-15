@@ -227,6 +227,7 @@ export interface Lease {
   lease_id: string;
   start_date: string;
   end_date: string;
+  is_rent_variable?:boolean;
   status: "ACTIVE" | "INACTIVE" | "TERMINATED";
   tenants: Tenant[];
   landlord: Landlord;
@@ -444,6 +445,7 @@ export interface LeaseOpeningBalanceData {
 export type ReceiptLease =  {
    lease_id: string,
    id : number,
+   is_rent_variable?: boolean;
    rentOwing : Number ,
    customerName : string,
    currentRentOwing? :  Number,
@@ -451,7 +453,9 @@ export type ReceiptLease =  {
    payment_method_id? : number,
    reference? :  string,
    amount? : string,
-   description? : string
+   description? : string,
+   rent?: string,
+   opc?: string
 }
 export interface PaymentHistory{
    id : number,

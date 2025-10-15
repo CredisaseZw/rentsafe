@@ -4,18 +4,32 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import useGetPaymentMethods from "../apiHooks/useGetPaymentMethods";
 
 export default function useReceipt(initialLease?: ReceiptLease) {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [receipts, setReceipts] = useState<ReceiptLease[]>([]);
     const [loading, setLoading] = useState(false);
+    const {data, error} = useGetPaymentMethods();
 
     useEffect(() => {
         if (initialLease) {
         setReceipts([initialLease]);
         }
     }, [initialLease]);
+    
+    useEffect(()=>{
+        if(isAxiosError(error)){
+            console.log(error)
+            const message = error.response?.data.error ?? error.response?.data.detail ?? "Something went wrong";
+            toast.error("Error fetching payment methods", {description : message});
+        }
+
+        if(data){
+            setPaymentMethods(data as PaymentMethod[])
+        }
+    }, [data, error])
 
     const onSelectLease = (index: number, lease: Lease) => {
         const primaryFullname =
@@ -81,7 +95,7 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         setLoading(true)
         const FORM = new FormData(e.currentTarget);
         const data = Object.fromEntries(FORM.entries())
-        const receipts: ReceiptLease[] = extractReceipts(data);;
+        const receipts: ReceiptLease[] = extractReceipts(data, !!initialLease?.is_rent_variable);
         
         // VALIDATE BY LEASE_ID { FILTER FOR EMPTY OBJECTS }
         const invalid = receipts.filter((r) => !r.lease_id || r.lease_id.trim() === '');
@@ -113,7 +127,6 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         loading,
         receipts,
         paymentMethods,
-        setPaymentMethods,
         submitReceipts,
         removeReceipt,
         updateReceipt,

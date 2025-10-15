@@ -101,6 +101,37 @@ export default function ReceiptRow({paymentMethods, index, lease, updateReceipt,
                         />
                 </div>
             </ColumnsContainer>
+            {
+                lease.is_rent_variable === true &&
+                <ColumnsContainer numberOfCols={2} marginClass='mt-6' gapClass='gap-6'>
+                    <div className='form-group'>
+                    <Label className='required'>Rent</Label>
+                   <Input
+                        required
+                        type="number"
+                        step={0.01}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                        onKeyDown={validateAmounts}
+                        name={`received_${index}`}
+                        value={lease.rent ?? ""}
+                        onChange={(e) => updateReceipt(index, "rent", e.target.value, true)}
+                        />
+                </div>
+                <div className='form-group'>
+                    <Label className='required'>OPC</Label>
+                   <Input
+                        required
+                        type="number"
+                        step={0.01}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                        onKeyDown={validateAmounts}
+                        name={`received_${index}`}
+                        value={lease.opc ?? ""}
+                        onChange={(e) => updateReceipt(index, "opc", e.target.value, true)}
+                        />
+                </div>
+                </ColumnsContainer>
+            }
             <div className='form-group mt-6'>
                 <Label>Description</Label>
                 <Textarea name = {"description"}></Textarea>

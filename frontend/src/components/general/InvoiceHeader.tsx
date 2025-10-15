@@ -15,32 +15,31 @@ interface props {
     setFormData: React.Dispatch<React.SetStateAction<{ biller_id: number; biller_name: string; biller_type: string; }>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
     onSelectBiller: (item: IndividualMinimal | BranchFull) => void;
- 
+    isRep?: boolean
 }
-function InvoiceHeader({formData, searchItem, setFormData, setSearchItem, onSelectBiller}: props) {
+function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem, onSelectBiller}: props) {
   return (
     <ColumnsContainer numberOfCols={2} gapClass="gap-5">
         <div className="flex flex-col gap-5">
             <div className="flex flex-row justify-between">
-                <Label className="">Document Number</Label>
+                <Label className="text-gray-800">Document Number</Label>
                     <Input
                         className="w-[400px]"
                         name="documentNumber"
                     />
             </div>
             <div className=" flex flex-row justify-between">
-                <Label>Bill To</Label>
+                <Label className='text-gray-800'>Bill To</Label>
                 <div className="flex flex-row gap-5">
                     <Select
                         onValueChange={(val: "individual" | "company") => {
-                        setSearchItem("")
-                        setFormData((prev) => ({
-                            ...prev,
-                            biller_id: 0,
-                            biller_name: "",
-                            biller_type: val,
-                        }));
-                        
+                            setSearchItem("")
+                            setFormData((prev) => ({
+                                ...prev,
+                                iller_id: 0,
+                                biller_name: "",
+                                biller_type: val,
+                            }));
                         }}
                     >
                         <SelectTrigger className="w-fit self-center">
@@ -48,13 +47,12 @@ function InvoiceHeader({formData, searchItem, setFormData, setSearchItem, onSele
                         </SelectTrigger>
                         <SelectContent>
                             {
-                            IN_LEASE_CLIENT_TYPES.map((option:Option, index : number)=>
-                                <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                            )
+                                IN_LEASE_CLIENT_TYPES.map((option:Option, index : number)=>
+                                    <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                                )
                             }
                         </SelectContent>
                     </Select>
-
                     <AutoCompleteClient
                         isRequired = {false}
                         searchItem = {searchItem}
@@ -65,14 +63,14 @@ function InvoiceHeader({formData, searchItem, setFormData, setSearchItem, onSele
                 </div>
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="">Address</Label>
+                <Label className="text-gray-800">Address</Label>
                 <Input
                     className="w-[400px]"
                     name="address"
                 />
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="">Phone</Label>
+                <Label className="text-gray-800">Phone</Label>
                 <Input
                     className="w-[400px]"
                     name="phone"
@@ -81,28 +79,38 @@ function InvoiceHeader({formData, searchItem, setFormData, setSearchItem, onSele
         </div>
         <div className="flex flex-col gap-5">
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="">Email</Label>
+                <Label className="text-gray-800">Email</Label>
                 <Input
                     className="w-[400px]"
                     name="email"
                 />
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="">VAT No</Label>
+                <Label className="text-gray-800">VAT No</Label>
                 <Input
                     className="w-[400px]"
                     name="vatNo"
                 />
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="">Tin Number</Label>
+                <Label className="text-gray-800">Tin Number</Label>
                 <Input
                     className="w-[400px]"
                     name="tinNumber"
                 />
             </div>
+            {
+                isRep &&
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800">Rep</Label>
+                    <Input
+                        className="w-[400px]"
+                        name="rep"
+                    />
+                </div>
+            }
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="">Date</Label>
+                <Label className="text-gray-800">Date</Label>
                 <Input
                     value={getCurrentDate()}
                     className="w-[400px]"

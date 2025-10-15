@@ -262,7 +262,7 @@ function useAddIndividualLease() {
       payment_frequency: String(data.paymentFrequency),
       due_day_of_month: Number(data.effectiveStartDate),
       grace_period_days: Number(formData.effectiveEndDate),
-      is_rent_variable: data.rentVariable === "true",
+      is_rent_variable: !!data.rentVariable,
       includes_utilities: data.otherStandingCharging?.toString().trim().length > 0,
       property_data: propertyData,
       unit_data: {
@@ -389,9 +389,8 @@ function useAddIndividualLease() {
     } else {
       payload = leasePayload;
     }
-    
     if(!payload) return;
-  /*
+  
     useMutate.mutate({
         leaseID : leaseID,
         data : payload
@@ -413,7 +412,7 @@ function useAddIndividualLease() {
       }, 
       onSettled: () => setLoading(false),         
     }) 
-  */
+
 
   };
 

@@ -26,7 +26,7 @@ function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>) {
         setRows((prev) => prev.filter((_, i) => i !== index));
     };
      const RemoveCashSalesRows = (index: number) => {
-        if (rows.length === 1) return;
+        if (cashSalesRows.length === 1) return;
         setCashSalesRows((prev) => prev.filter((_, i) => i !== index));
     };
     

@@ -159,7 +159,7 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                 {
                     cashSalesRows.map((row, index)=>(
                     <TableRow key={index} noHover>
-                        <TableCell className="border-r border-color"> 
+                        <TableCell className="border-r border-color text-center"> 
                             <Button type="button" variant={"ghost"} onClick={()=>RemoveCashSalesRows(index)}>
                                 <X className="text-red-600"/>
                             </Button>

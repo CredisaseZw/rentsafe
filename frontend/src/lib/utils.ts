@@ -200,12 +200,11 @@ export function extractTenants(data: { [k: string]: FormDataEntryValue }, type :
   return tenants;
 }
 
-export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[] {
+export function extractReceipts(data: { [k: string]: FormDataEntryValue }, includeRentVariables: boolean): any[] {
   const receipts: any[] = [];
 
   const receiptKeys = Object.keys(data).filter((key) => key.startsWith("lease_id_"));
   const receiptCount = receiptKeys.length;
-
   for (let i = 0; i < receiptCount; i++) {
     const receipt = {
       lease_id: data[`lease_id_${i}`] as string,
@@ -214,6 +213,12 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[
       reference: data[`receipt_${i}`] as string,
       description: data[`description`] as string,
       payment_date: data[`date_${i}`] as string,
+      ...(includeRentVariables
+        ? {
+            rent: data[`rent_${i}`] as string,
+            opx: data[`opx_${i}`] as string,
+          }
+        : {}),
     };
 
     receipts.push(receipt);
@@ -513,14 +518,41 @@ export function normalizeLeaseResponse(apiLease: any): LeasePayload {
          operating_costs_inclusive: apiLease.landlord_opening_balances_data?.[0]?.operating_costs_inclusive,
       }],
    };
+}
+
+function cleanObject<T>(obj: T): T {
+  if (Array.isArray(obj)) {
+    return obj
+      .map((v) => cleanObject(v))
+      .filter((v) => v !== undefined && v !== null) as T;
+  } else if (typeof obj === "object" && obj !== null) {
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        value !== undefined &&
+        value !== null &&
+        !(typeof value === "number" && Number.isNaN(value))
+      ) {
+        cleaned[key] = cleanObject(value);
+      }
+    }
+
+    if(cleaned?.landlord_data?.landlord_name  === "" ) delete cleaned.landlord_data
+    return cleaned;
   }
+  return obj;
+}
 
 export const generateUpdatePayload = (
     updated: LeasePayload,
     original: LeasePayload
   ): Partial<LeasePayload> => {
     const diff: Partial<LeasePayload> = {};
-
+    if (updated.unit_data) {
+      if (updated.unit_data.number_of_rooms === undefined || updated.unit_data.number_of_rooms === null) {
+        updated.unit_data.number_of_rooms = 0;
+      }
+    }
     if (updated.signed_date) {
       delete updated.signed_date;
     }
@@ -572,8 +604,7 @@ export const generateUpdatePayload = (
 
     // guarantor_data: only if guarantor_id or amount changed
     if (
-      updated.guarantor_data?.guarantor_id !== original.guarantor_data?.guarantor_id ||
-      updated.guarantor_data?.guarantee_amount !== original.guarantor_data?.guarantee_amount
+      updated.guarantor_data?.guarantor_id !== original.guarantor_data?.guarantor_id
     ) {
       diff.guarantor_data = updated.guarantor_data;
     }
@@ -595,10 +626,13 @@ export const generateUpdatePayload = (
     }
 
     // CHECK CHARGES
-    console.log(original.charges)
     if (updated.charges && original.charges) {
-      const changedCharges = updated.charges.filter((charge, idx) => {
+      const changedCharges = updated.charges
+      .filter((charge, idx) => {
         const orig = original.charges[idx];
+        if (charge.amount === 0 && charge.charge_type === "UTILITY") {
+        return false;
+        }
         return Number(charge.amount.toFixed(2)) !== Number(orig?.amount);
       });
       if (changedCharges.length > 0) {
@@ -664,5 +698,5 @@ export const generateUpdatePayload = (
       diff.landlord_opening_balances_data = updated.landlord_opening_balances_data;
     }
 
-    return diff;
+    return cleanObject(diff);
   };

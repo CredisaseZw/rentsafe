@@ -3,11 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import useReceipt from '@/hooks/components/useReceipt'
 import { DialogTitle, DialogTrigger } from '@radix-ui/react-dialog'
-import { useEffect } from 'react'
-import { isAxiosError } from 'axios'
-import useGetPaymentMethods from '@/hooks/apiHooks/useGetPaymentMethods'
-import { toast } from 'sonner'
-import type { LeaseReceiptPayload, PaymentMethod, ReceiptLease } from '@/types'
+import type { LeaseReceiptPayload, ReceiptLease } from '@/types'
 import ReceiptRow from '@/components/general/ReceiptRow'
 import { Plus, Send } from 'lucide-react'
 import useCreateReceipt from '@/hooks/apiHooks/useCreateReceipt'
@@ -25,7 +21,6 @@ function ReceiptDialog({lease ,isButtonOutlined, onSuccessCallback}: props) {
     loading,
     receipts,
     paymentMethods,
-    setPaymentMethods,
     submitReceipts,
     removeReceipt,
     updateReceipt,
@@ -34,20 +29,7 @@ function ReceiptDialog({lease ,isButtonOutlined, onSuccessCallback}: props) {
     addReceipt,
     setIsOpen 
   } = useReceipt(lease);  
-  const {data, error} = useGetPaymentMethods();
   const createReceipt = useCreateReceipt();
-
-  useEffect(()=>{
-      if(isAxiosError(error)){
-        console.log(error)
-        const message = error.response?.data.error ?? error.response?.data.detail ?? "Something went wrong";
-        toast.error("Error fetching payment methods", {description : message});
-      }
-
-      if(data){
-        setPaymentMethods(data as PaymentMethod[])
-      }
-  }, [data, error])
 
   return (
     <Dialog
