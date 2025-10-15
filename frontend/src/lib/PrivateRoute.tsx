@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { Outlet, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import axios from "axios";
+
 export default function ProtectRoute() {
    const location = useLocation();
    const [isChecking, setIsChecking] = useState(true);
@@ -9,7 +10,7 @@ export default function ProtectRoute() {
 
    useEffect(() => {
       axios
-         .get("/api/check-csrf/", {withCredentials: true})
+         .get("/api/check-csrf/", { withCredentials: true })
          .then(() => setIsAuthenticated(true))
          .catch((error) => {
             if (
@@ -25,13 +26,19 @@ export default function ProtectRoute() {
          .finally(() => {
             setIsChecking(false);
          });
-   }, []);
+   }, []); 
 
    if (isChecking) {
-      return <div>Loading...</div>;
+      return (
+         <div className="w-full h-[100vh] flex flex-col justify-center items-center">
+            <img src="/loader.svg" alt="Loading..." className="w-35 h-35 bg-transparent" />
+         </div>
+      );
    }
+
    if (!isAuthenticated) {
       return <Navigate to={`/login?next=${location.pathname}`} replace />;
-   }
+   } 
+
    return <Outlet />;
 }

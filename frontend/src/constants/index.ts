@@ -437,3 +437,10 @@ export const SALES_CATEGORIES_HEADERS:Header[] = [
   {name : "Date Created"},
   {name : "Action"},
 ]
+export const SALES_REPORTS_HEADERS:Header[] = [
+  {name : "Inv #"},
+  {name : "Customer"},
+  {name : "Amount (Excl)"},
+  {name : "VAT"},
+  {name : "Total (Inc)"}
+]
