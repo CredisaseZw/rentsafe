@@ -81,23 +81,6 @@ export type InspectionMode = {
    Form: React.ComponentType;
 };
 
-export type Status = {
-   good: boolean;
-   ok: boolean;
-   bad: boolean;
-};
-
-export type Row = {
-   rowName: string;
-   status: Status;
-};
-
-export type Column = {
-   captionLabel : string,
-   note : string,
-   headerName: string;
-   rows: Row[];
-};
 export type Header={
    name : string,
    className?: string,

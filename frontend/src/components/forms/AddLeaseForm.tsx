@@ -29,7 +29,6 @@ import LoadingIndicator from "../general/LoadingIndicator";
 import { Textarea } from "../ui/textarea";
 import { DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
 import { isAxiosError } from "axios";
-import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
 import { summarizeAddress, validateAmounts } from "@/lib/utils";
 import MultiAddressInput from "../general/MultiAddressInput";
 import useGetLeaseInformation from "@/hooks/apiHooks/useGetLeaseInformation";
@@ -46,14 +45,15 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
     headers,
     loading,
     formData,
+    currencies,
     searchItem,
     leaseObject,
     addressState,
     propertyName,
     propertyType, 
     guaranteeItem,
+    currencyLoading,
     defaultCurrency,
-    CURRENCY_OPTIONS,
     outstandingBalance,
     landlordIdentifier,
     primaryTenantAddress,
@@ -62,9 +62,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
-    handleDefaultCurrency,
     setOutstandingBalance,
-    SET_CURRENCY_OPTIONS,
     setDefaultCurrency,
     onSelectGuarantor,
     handleLeaseSubmit,
@@ -81,7 +79,6 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
   } = useAddIndividualLease();
   const useMutate = useCreateLease();
   const {data, isLoading, error} = getPropertyTypes();
-  const {currencyData, currencyLoading, currencyError} = useGetCurrencies();
   const {leaseResponseObject, leaseLoading, leaseError} = useGetLeaseInformation(leaseID)
 
   useEffect(()=>{
@@ -124,19 +121,6 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
     }
     if (data) { setPropertyTypes(data.results ?? []); }
   }, [data, error])
-
-  useEffect(()=>{
-    if(isAxiosError(currencyError)){
-      const message = currencyError.response?.data.error ?? currencyError.response?.data.details ?? "Something went wrong"
-      toast.error("Failed to fetch currencies", { description: message });
-      return;
-    }
-    if (currencyData) { 
-      SET_CURRENCY_OPTIONS(currencyData);
-      handleDefaultCurrency(currencyData); 
-    }
-
-  }, [currencyData, currencyError])
 
   return (
     <form className="w-full relative" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback, leaseID)}>
@@ -400,12 +384,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      CURRENCY_OPTIONS.map((c:Currency)=>
+                      currencies.map((c:Currency)=>
                         <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>
                       )
                     }
                     { 
-                      CURRENCY_OPTIONS.length === 0 &&
+                      currencies.length === 0 &&
                       currencyLoading &&
                       <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
                           <LoadingIndicator />
@@ -507,6 +491,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 Deposit Currency
               </Label>
               <Select
+                key={defaultCurrency}
                 defaultValue={
                   leaseObject?.deposits?.[0]?.currency?.toString() ?? defaultCurrency.toString()
                 }
@@ -516,12 +501,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   <SelectValue placeholder="Select Deposit Currency" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CURRENCY_OPTIONS.map((c: Currency) => (
+                  {currencies.map((c: Currency) => (
                     <SelectItem value={c.id.toString()} key={c.id}>
                       {c.currency_code + " " + c.currency_name}
                     </SelectItem>
                   ))}
-                  {CURRENCY_OPTIONS.length === 0 && currencyLoading && (
+                  {currencies.length === 0 && currencyLoading && (
                     <SelectItem
                       disabled
                       value="loading"

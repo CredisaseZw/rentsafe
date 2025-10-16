@@ -13,12 +13,12 @@ interface props{
 
 const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
     const {
-        cashSalesRows,
-        currency,
         currencies,
+        currencyLoading,
+        currency,
+        cashSalesRows,
         discount,
         rows,
-        currencyLoading,
         handleDiscountChange,
         AddInvoiceRow,
         RemoveCashSalesRows,
@@ -35,7 +35,7 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             <TableCell colSpan={2} className="text-center w-2/12 text-red-600">Currency</TableCell>
             <TableCell colSpan={2} className="text-center w-3/12">
                 <Select key={currency?.id}  name="currency" required defaultValue={String(currency?.id)}>
-                    <SelectTrigger className="w-full bg-red-600 text-white">
+                <SelectTrigger className="w-full bg-red-600 text-white">
                         <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
                     <SelectContent className="bg-red-600 text-white border-white">

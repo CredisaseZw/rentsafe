@@ -1,12 +1,12 @@
-import type { Currency, SetCurrencySettings } from "@/types";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import type { SetCurrencySettings } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function useCurrencySettings(){
-    const [currencies, setCurrencies] = useState<Currency[]>([])
-    const [defaultCurrency, setDefaultCurrency] = useState("")
+    const {currencies, currencyLoading, currency} = useCurrency("ZWL")
     const [loading, setLoading] = useState(false);
 
     const handleSubmit =(
@@ -38,9 +38,8 @@ export default function useCurrencySettings(){
     return {
         loading,
         currencies,
-        defaultCurrency,
-        setDefaultCurrency,
-        setCurrencies,
+        currencyLoading,
+        currency,
         handleSubmit,
     }
 }

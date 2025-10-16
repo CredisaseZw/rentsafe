@@ -6,38 +6,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSetCurrencySettings } from "@/hooks/apiHooks/useCurrencySettings"
-import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies"
 import useCurrencySettings from "@/hooks/components/useCurrencySettings"
 import { getCurrentDate, validateAmounts } from "@/lib/utils"
-import { isAxiosError } from "axios"
 import { Send } from "lucide-react"
-import { useEffect } from "react"
-import { toast } from "sonner"
 
 function SettingsCurrency() {
   const {
-    loading,
     currencies,
-    defaultCurrency,
-    setDefaultCurrency,
-    setCurrencies,
+    currencyLoading,
+    currency,
+    loading,
     handleSubmit
   } = useCurrencySettings()
   const setCurrencySettings = useSetCurrencySettings()
-  const {currencyData, currencyLoading, currencyError} = useGetCurrencies()
-
-  useEffect(()=>{
-    if(isAxiosError(currencyError)){
-      const m = currencyError.response?.data.error ?? currencyError.response?.data.details ?? "Something went wrong"
-      toast.error("Error fetching currencies", {description : m})
-    } 
-    if(currencyData){
-      const id = currencyData.find((c)=> c.currency_code === "ZWL")?.id
-      setCurrencies(currencyData)
-      setDefaultCurrency(String(id))
-    }
-  },[currencyData, currencyError])
-
+ 
   return (
     <div>
       <Header title="Currency Settings"/>
@@ -47,7 +29,7 @@ function SettingsCurrency() {
             <div className="w-1/7 flex">
               <span className="self-center text-sm">Base Currency</span>
             </div>
-            <Select name="baseCurrency" key={defaultCurrency} defaultValue={defaultCurrency}>
+            <Select name="baseCurrency" key={currency?.id} defaultValue={String(currency?.id)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select ..." />
               </SelectTrigger>

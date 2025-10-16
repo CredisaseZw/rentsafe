@@ -1,8 +1,9 @@
 import { IN_LEASE_CLIENT_TYPES } from "@/constants";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import type { Address, BranchFull, Charges, IndividualMinimal, LeaseResponse } from "@/interfaces";
 import type { AddressPayload } from "@/interfaces/form-payloads";
 import { extractAddresses, extractTenants, generateUpdatePayload, getThreeMonthsBack, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
-import type {Currency,  LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
+import type {LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
 import { useQueryClient, type UseMutationResult } from "@tanstack/react-query";
 import { isAxiosError, type AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react"
@@ -16,16 +17,15 @@ function useAddIndividualLease() {
   const [loading,setLoading] = useState(false);
   const [propertyName, setPropertyName] = useState("");
   const [searchItem, setSearchItem] = useState("");  
-  const [CURRENCY_OPTIONS, SET_CURRENCY_OPTIONS] = useState<Currency[]>([]);
   const [guaranteeItem, setGuaranteeItem] = useState("");
   const [propertyType, setPropertyTypes] = useState<PropertyType[]>([])
   const [landlordIdentifier, setLandlordIdentifier] = useState("National ID");
   const [isOpen, setShowModal] = useState(false);
   const [primaryTenantAddress , setPrimaryTenantAddress] = useState<Address | undefined>(undefined);
-  const [defaultCurrency, setDefaultCurrency] = useState<number>(1);
+  const [defaultCurrency, setDefaultCurrency] = useState<number>(0);
   const [params] = useSearchParams();
   const page = parseInt(params.get("active_page") || "1");
-
+  const {currencies, currencyLoading, currency} = useCurrency()
   const [formData, setFormData] = useState({
     defaultRent : "",
     defaultUtility : "",
@@ -70,6 +70,9 @@ function useAddIndividualLease() {
       colorCode : "bg-black"
     }
   });
+  useEffect(()=>{
+    setDefaultCurrency(currency?.id ?? currencies[0].id)
+  }, [])
 
   useEffect(() => {
     const entries = [
@@ -103,6 +106,7 @@ function useAddIndividualLease() {
     });
   
   }, [tenantsOpeningBalance]);
+
   const changeTenantsOpeningBalances = (field: keyof typeof tenantsOpeningBalance, value: string) => {
     setTenantsOpeningBalance((prev) => ({
       ...prev,
@@ -199,10 +203,6 @@ function useAddIndividualLease() {
     }
     setAddressState(newState);
   };
-  function handleDefaultCurrency(currency: Currency[]){
-    const usdId = currency.find((c) => c.currency_code === "USD")?.id;
-    setDefaultCurrency(usdId || currency[0]?.id);
-  }
 
   function handleCharges(charges: Charges[]) {
     const rent = charges.find(c => c.charge_type === "RENT")?.amount ?? "";
@@ -422,13 +422,14 @@ function useAddIndividualLease() {
     loading,
     formData,
     searchItem,
+    currencies,
     leaseObject,
     propertyName,
     addressState,
     propertyType,
     guaranteeItem,
     defaultCurrency,
-    CURRENCY_OPTIONS,
+    currencyLoading,
     outstandingBalance,
     landlordIdentifier,
     primaryTenantAddress,
@@ -438,9 +439,7 @@ function useAddIndividualLease() {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
-    handleDefaultCurrency,
     setOutstandingBalance,
-    SET_CURRENCY_OPTIONS,
     setDefaultCurrency,
     onSelectGuarantor,
     handleLeaseSubmit,

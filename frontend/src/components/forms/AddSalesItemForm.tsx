@@ -9,7 +9,7 @@ import Button from "../general/Button"
 
 function AddSalesItemForm() {
     const {
-        defaultCurrency,
+        currency,
         currencies,
         currencyLoading
     } = useSalesItemsForm();
@@ -44,8 +44,8 @@ function AddSalesItemForm() {
             <div className="form-group">
                 <Label>Currency</Label>
                 <Select
-                    key={defaultCurrency}
-                    defaultValue={defaultCurrency}
+                    key={currency?.id}
+                    defaultValue={String(currency?.id)}
                     required
                     name="itemCurrency"
                 >

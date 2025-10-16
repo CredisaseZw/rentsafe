@@ -1,15 +1,11 @@
-import type { Currency } from '@/types'
-import { useState } from 'react'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 function useAddCashbookForm() {
-    const [defaultCurrency, setDefaultCurrency] = useState("")
-    const [currencies, setCurrencies] = useState<Currency[]>([])
-    
+    const {currencies, currencyLoading, currency} = useCurrency()
     return {
         currencies,
-        defaultCurrency,
-        setDefaultCurrency,
-        setCurrencies
+        currency,
+        currencyLoading
     }
 }
 

@@ -1,11 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies"
 import ColumnsContainer from "../general/ColumnsContainer"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { useEffect } from "react"
-import { isAxiosError } from "axios"
-import { toast } from "sonner"
 import useAddCashbookForm from "@/hooks/components/useAddCashbookForm"
 import LoadingIndicator from "../general/LoadingIndicator"
 import { ACCOUNT_TYPES } from "@/constants"
@@ -14,25 +10,9 @@ import Button from "../general/Button"
 function AddCashbookForm() {
     const {
         currencies,
-        defaultCurrency,
-        setDefaultCurrency,
-        setCurrencies
+        currency,
+        currencyLoading
     } = useAddCashbookForm()
-
-    const {currencyData, currencyLoading, currencyError} = useGetCurrencies()
-
-    useEffect(()=>{
-        if(isAxiosError(currencyError)){
-            const m = currencyError.response?.data.error ?? currencyError.response?.data.details ?? "Something went wrong"
-            toast.error("Error fetching currencies", {description : m})
-        } 
-        if(currencyData){
-            const id = currencyData.find((c)=> c.currency_code === "USD")?.id
-            setCurrencies(currencyData)
-            setDefaultCurrency(String(id))
-        }
-    },[currencyData, currencyError])
-
     return (
         <form className="flex gap-5 flex-col">
             <ColumnsContainer numberOfCols={2} gapClass="gap-5">
@@ -56,10 +36,10 @@ function AddCashbookForm() {
             <div className="form-group">
                 <Label>Currency</Label>
                 <Select
-                    key={defaultCurrency}
+                    key={currency?.id}
                     name="current"
                     required
-                    defaultValue={defaultCurrency}>
+                    defaultValue={String(currency?.id)}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
