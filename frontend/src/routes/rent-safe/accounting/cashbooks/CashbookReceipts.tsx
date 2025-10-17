@@ -41,7 +41,6 @@ function CashbookReceipts() {
               </SelectContent>
             </Select>
           </div>
-                
         </div>
         <div className="mt-5">
           

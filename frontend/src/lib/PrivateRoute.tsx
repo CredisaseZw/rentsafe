@@ -31,7 +31,7 @@ export default function ProtectRoute() {
    if (isChecking) {
       return (
          <div className="w-full h-[100vh] flex flex-col justify-center items-center">
-            <img src="/loader.svg" alt="Loading..." className="w-35 h-35 bg-transparent" />
+            <img src="/loader.svg" alt="Loading..." className="w-25 h-25 bg-transparent" />
          </div>
       );
    }

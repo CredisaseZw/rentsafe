@@ -5,31 +5,31 @@ import { ChartColumnDecreasingIcon, House } from "lucide-react";
 import type {Option} from "@/types/index"
 
 import {
-   RENT_ADMIN_PANEL_NAVLINKS,
-   RENTSAFE_APP_NAVLINKS,
-   RENTSAFE_ACCOUNTING_NAVLINKS,
-   ROOT_NAVLINKS,
+  RENT_ADMIN_PANEL_NAVLINKS,
+  RENTSAFE_APP_NAVLINKS,
+  RENTSAFE_ACCOUNTING_NAVLINKS,
+  ROOT_NAVLINKS,
 } from "./navlinks";
 
 export const SERVICES: Service[] = [
-   {
-      name: "Rent-Safe",
-      description: "Rental management.",
-      href: "/services/rent-safe",
-      icon: House,
-   },
-   {
-      name: "Count-Safe",
-      description: "Accounting.",
-      href: "/services/count-safe",
-      icon: ChartColumnDecreasingIcon,
-   },
+  {
+    name: "Rent-Safe",
+    description: "Rental management.",
+    href: "/services/rent-safe",
+    icon: House,
+  },
+  {
+    name: "Count-Safe",
+    description: "Accounting.",
+    href: "/services/count-safe",
+    icon: ChartColumnDecreasingIcon,
+  },
 ];
 
 export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([
-   ...RENTSAFE_APP_NAVLINKS,
-   ...RENTSAFE_ACCOUNTING_NAVLINKS,
-   ...RENT_ADMIN_PANEL_NAVLINKS,
+  ...RENTSAFE_APP_NAVLINKS,
+  ...RENTSAFE_ACCOUNTING_NAVLINKS,
+  ...RENT_ADMIN_PANEL_NAVLINKS,
 ]);
 
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
@@ -37,49 +37,49 @@ export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
 
 export const PAYMENT_STATUS_CLASSIFICATIONS = [
-   { label: "Low Risk", className: "bg-SUCCESS text-white" },
-   { label: "Medium Risk", className: "bg-[darkorange] text-white" },
-   { label: "High Risk", className: "bg-[tomato] text-white" },
-   { label: "High Risk+", className: "bg-[firebrick] text-white" },
-   { label: "Non Payer", className: "bg-[black] text-white" },
+  { label: "Low Risk", className: "bg-SUCCESS text-white" },
+  { label: "Medium Risk", className: "bg-[darkorange] text-white" },
+  { label: "High Risk", className: "bg-[tomato] text-white" },
+  { label: "High Risk+", className: "bg-[firebrick] text-white" },
+  { label: "Non Payer", className: "bg-[black] text-white" },
 ];
 
 export const INDUSTRIES = [
-    "Agriculture",
-    "Banking",
-    "Construction",
-    "Education",
-    "Energy",
-    "Entertainment",
-    "Finance",
-    "Food",
-    "Health",
-    "Hospitality",
-    "Insurance",
-    "Manufacturing",
-    "Media",
-    "Retail",
-    "Technology",
-    "Telecommunications",
-    "Transportation",
-    "Aviation",
-    "Real Estate",
-    "Other"
+  "Agriculture",
+  "Banking",
+  "Construction",
+  "Education",
+  "Energy",
+  "Entertainment",
+  "Finance",
+  "Food",
+  "Health",
+  "Hospitality",
+  "Insurance",
+  "Manufacturing",
+  "Media",
+  "Retail",
+  "Technology",
+  "Telecommunications",
+  "Transportation",
+  "Aviation",
+  "Real Estate",
+  "Other"
 ]
 
 export const MODAL_WIDTHS = {
-   md: "900px" as const,
-   lg: "1100px" as const,
+  md: "900px" as const,
+  lg: "1100px" as const,
 };
 
 export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];
 
 export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] = [
-   "private",
-   "public",
-   "government",
-   "ngo",
-   "other",
+  "private",
+  "public",
+  "government",
+  "ngo",
+  "other",
 ];
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -108,83 +108,83 @@ export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
 };
 
 export const MINIMAL_TENANT_OBJECT: TenantSelection = {
-   id : 0,
-   search_value : "",
-   full_name : "",
-   identification_number : "", 
-   mobile_number : "",
-   address : null,
-   is_primary : false
+  id : 0,
+  search_value : "",
+  full_name : "",
+  identification_number : "", 
+  mobile_number : "",
+  address : null,
+  is_primary : false
 
 }
 
 export const IN_LEASE_CLIENT_TYPES: Option[] = [
-   { label: "Individual", value: "individual" },
-   { label: "Company", value: "company" },
+  { label: "Individual", value: "individual" },
+  { label: "Company", value: "company" },
 ];
 
 export const STATUS_OPTIONS: Option[] = [
-   { label: "Occupied", value: "occupied" },
-   { label: "Vacant", value: "vacant" },
+  { label: "Occupied", value: "occupied" },
+  { label: "Vacant", value: "vacant" },
 ];
 
 export const LEASE_STATUS_OPTIONS: Option[] = [
-   { label: "Active", value: "ACTIVE" },
-   { label: "Draft", value: "DRAFT" },
-   { label: "Pending Approval", value: "PENDING_APPROVAL" },
-   { label: "Terminated", value: "TERMINATED" },
-   { label: "Expired", value: "EXPIRED" },
-   { label: "Renewed", value: "RENEWED" },
-   { label: "Suspended", value: "SUSPENDED" },
+  { label: "Active", value: "ACTIVE" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Pending Approval", value: "PENDING_APPROVAL" },
+  { label: "Terminated", value: "TERMINATED" },
+  { label: "Expired", value: "EXPIRED" },
+  { label: "Renewed", value: "RENEWED" },
+  { label: "Suspended", value: "SUSPENDED" },
 ];
 
 export const PAYMENT_FREQUENCY_OPTIONS: Option[] = [
-   { label: "Monthly", value: "MONTHLY" },
-   { label: "Half Early", value: "HALF_EARLY" },
-   { label: "Quarterly", value: "QUARTERLY" },
-   { label: "Annually", value: "ANNUALLY" },
+  { label: "Monthly", value: "MONTHLY" },
+  { label: "Half Early", value: "HALF_EARLY" },
+  { label: "Quarterly", value: "QUARTERLY" },
+  { label: "Annually", value: "ANNUALLY" },
 ];
 
 export const DEPOSIT_HOLDER_OPTIONS: Option[] = [
-   { label: "Agent", value: "agent" },
-   { label: "Landlord", value: "landlord" },
+  { label: "Agent", value: "agent" },
+  { label: "Landlord", value: "landlord" },
 ];
 
 export const UNIT_TYPES: Option[] = [
-   { label: "Apartment", value: "apartment" },
-   { label: "House", value: "house" },
-   { label: "Office", value: "office" },
-   { label: "Retail Space", value: "retail_space" },
-   { label: "Warehouse", value: "warehouse" },
-   { label: "Other", value: "other" },
+  { label: "Apartment", value: "apartment" },
+  { label: "House", value: "house" },
+  { label: "Office", value: "office" },
+  { label: "Retail Space", value: "retail_space" },
+  { label: "Warehouse", value: "warehouse" },
+  { label: "Other", value: "other" },
 ];
 
 export const UNIT_STATUS:Option[] = [
-   {label :"Vacant", value :"vacant"},
-   {label :"Occupied", value :"occupied"},
+  {label :"Vacant", value :"vacant"},
+  {label :"Occupied", value :"occupied"},
 ]
 
 export const TENANT_STATEMENTS_HEADERS: Header[] = [
-   {name : "Lease ID"},
-   {name : "Customer name"},
-   {name : "Address"},
-   {name : "Rent Owing"},
-   {name : "Action"}
+  {name : "Lease ID"},
+  {name : "Customer name"},
+  {name : "Address"},
+  {name : "Rent Owing"},
+  {name : "Action"}
 ]
 
 export const TENANT_STATEMENT_HEADERS: Header[] = [
-   {name : "Date"},
-   {name : "Description", textAlign : "left"},
-   {name : "Reference"},
-   {name : "Amount", textAlign: "end"},
-   {name : "Balance", textAlign :"end"}
+  {name : "Date"},
+  {name : "Description", textAlign : "left"},
+  {name : "Reference"},
+  {name : "Amount", textAlign: "end"},
+  {name : "Balance", textAlign :"end"}
 ]
 
 export const PROPERTY_HEADERS:Header[] = [
-   {name  :"Id"},
-   {name  :"Unit Number"},
-   {name  :"Unit Type"},
-   {name  :"Status"},
+  {name  :"Id"},
+  {name  :"Unit Number"},
+  {name  :"Unit Type"},
+  {name  :"Status"},
 ]
 
 export const UNIT_FEATURES:Option[] = [
@@ -437,10 +437,39 @@ export const SALES_CATEGORIES_HEADERS:Header[] = [
   {name : "Date Created"},
   {name : "Action"},
 ]
+
 export const SALES_REPORTS_HEADERS:Header[] = [
   {name : "Inv #"},
   {name : "Customer"},
   {name : "Amount (Excl)"},
   {name : "VAT"},
   {name : "Total (Inc)"}
+]
+
+export const CASHFLOW_FORECAST:Header[] = [
+  {name : "Customer"},
+  {name : "0-7 Days"},
+  {name : "8-14 Days"},
+  {name : "15-21 Days"},
+  {name : "21+ Days"},
+  {name : "total"}
+]
+export const CASHBOOKS_RECEIPTS:Header[] = [
+  {name : "Date"},
+  {name : "Receipt Number"},
+  {name : "Type (GL/C)"},
+  {name : "Account"},
+  {name : "Details"},
+  {name : "Amount"},
+  {name : "Matching Invoice"},
+  {name : "Rate"}
+]
+
+export const RATE_AUDIT_TRAIL:Header[] = [
+  {name : "Date"},
+  {name : "Source"},
+  {name : "User"},
+  {name : "Base USD"},
+  {name : "Convert Currency"},
+  {name : "Rate"}
 ]
