@@ -1231,7 +1231,7 @@ class CustomersSearchSerializer(serializers.Serializer):
     full_name = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
-    address = serializers.SerializerMethodField()
+    # address = serializers.SerializerMethodField()
     tin_number = serializers.SerializerMethodField()
     vat_number = serializers.SerializerMethodField()
     account_number = serializers.SerializerMethodField()
