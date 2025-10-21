@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from django.db.models import Q, Sum
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
@@ -237,9 +237,6 @@ class CurrencyRateViewSet(BaseViewSet):
     queryset = CurrencyRate.objects.select_related('currency', 'base_currency').all()
     serializer_class = CurrencyRateSerializer
 
-    def get_queryset(self):
-        return self.queryset.all()
-
     def create(self, request, *args, **kwargs):
         try:
             serializer = self.get_serializer(data=request.data)
@@ -280,8 +277,8 @@ class CurrencyRateViewSet(BaseViewSet):
             serializer = self.get_serializer(instance)
             return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
 
-        except CurrencyRate.DoesNotExist:
-            raise NotFound({"error": "Currency rate not found."})
+        except CurrencyRate.DoesNotExist as exc:
+            raise NotFound("Currency rate not found.") from exc
 
     def update(self, request, *args, **kwargs):
         try:
@@ -319,11 +316,11 @@ class CashBookViewSet(BaseCompanyViewSet):
     queryset = CashBook.objects.all()
     serializer_class = CashBookSerializer
 
-class CurrencyViewSet(BaseCompanyViewSet):
+class CurrencyViewSet(BaseViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
     pagination_class = None
-    # overide the base get queryset
+    # override the base get queryset
     def get_queryset(self):
         return self.queryset.all()
 
