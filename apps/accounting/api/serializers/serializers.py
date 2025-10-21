@@ -90,6 +90,22 @@ class SalesCategorySerializer(BaseCompanySerializer):
 
 
 class VATSettingSerializer(serializers.ModelSerializer):
+    rate = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        error_messages={
+            "required": "Rate: This field is required.",
+            "invalid": "Rate: A valid decimal number is required.",
+            "blank": "Rate: This field may not be blank.",
+        },
+    )
+    description = serializers.CharField(
+        error_messages={
+            "required": "Description: This field is required.",
+            "blank": "Description: This field may not be blank.",
+        }
+    )
+
     class Meta:
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
@@ -99,13 +115,6 @@ class VATSettingSerializer(serializers.ModelSerializer):
         if rate is not None and (rate < 0 or rate > 100):
             raise ValidationError("VAT rate must be between 0 and 100.")
 
-        for fields in ["description", "rate"]:
-            if fields in data and not data[fields].strip():
-                raise ValidationError(
-                    {
-                        fields: f"{fields.replace('_', ' ').capitalize()} cannot be empty."
-                    }
-                )
         return data
 
     def create(self, validated_data):
