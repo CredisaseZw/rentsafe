@@ -21,8 +21,6 @@ from django.views.decorators.http import require_http_methods
 from inertia import render
 from inertia.share import share
 from marshmallow import ValidationError
-
-from accounting.models.models import CurrencyRate
 from rentsafe.decorators import clients_required
 from rentsafe.helper import *
 from rentsafe.models import *
@@ -50,8 +48,6 @@ def clients_credit_dashboard(id):
     taken_credits_color_totals = {}
 
     rate_ = 1
-    if rate_obj := CurrencyRate.objects.filter(user__company = client_id).first():
-        rate_ = float(rate_obj.current_rate)
     def get_credit_color(credit_status):
         """Maps credit status to a color."""
         color_mapping = {
@@ -146,8 +142,6 @@ def clients_credit_dashboard(id):
                     )
                 else:
                     rate = 1
-                    if rate_ob := CurrencyRate.objects.filter(user__company = client_id).first():
-                        rate = float(rate_ob.current_rate)
                     amount_owing =float(opening_balance_record.outstanding_balance) if opening_balance_record else 0
                     client_credits = {
                         "credit_id": credit.lease_id,
@@ -239,6 +233,7 @@ def worst_credit_check_helper(leases_taken, taken_credits_ratings):
     return dict(zip(keys, credit_and_score))
 
 def rate_setup(request):
+    from accounting.models.models import CurrencyRate
     if request.method == "GET" :
         currency_settings_objects = CurrencyRate.objects.filter(company_id=request.user.company)
         if currency_settings_objects.exists():         
