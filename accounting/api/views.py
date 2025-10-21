@@ -1,7 +1,7 @@
 from urllib import request
 from django.http import JsonResponse
 from rest_framework import viewsets,status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from accounting.models.models import (
     SalesItem,
     VATSetting,
@@ -56,7 +56,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
     Base ViewSet that automatically filters data for the requesting user's company
     and assigns the user to new objects.
     """
-    permission_classes = [IsAuthenticated] # Ensure users are authenticated
+    permission_classes = [AllowAny] # Ensure users are authenticated
 
     def get_queryset(self):
         """Ensure users only access objects belonging to their company."""
