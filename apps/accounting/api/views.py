@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from django.db.models import Q, Sum
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
@@ -384,92 +384,95 @@ class PaymentViewSet(BaseCompanyViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
-
-class CurrencyRateViewSet(BaseCompanyViewSet):
-    queryset = CurrencyRate.objects.all()
+class CurrencyRateViewSet(BaseViewSet):
+    queryset = CurrencyRate.objects.select_related('currency', 'base_currency').all()
     serializer_class = CurrencyRateSerializer
 
-    @action(
-        detail=False, methods=["GET", "POST", "PUT", "PATCH"], url_path="rate-setup"
-    )
-    def rate_setup(self, request, pk=None):
-        """
-        Endpoint to get or set currency rate settings for the user's company.
-        There should ideally be only one CurrencyRate instance per company (or a system-wide rate).
-        """
-        currency_rate_query = self.queryset.filter(user__company=request.user.company)
-        instance = currency_rate_query.last()
-
-        if request.method == "GET":
-            if instance:
-                serializer = self.get_serializer(instance)
-                return Response({"currency_rate_settings": serializer.data})
-            return Response(
-                {"errors": "No currency rate settings found for your company."},
-                status=status.HTTP_404_NOT_FOUND,
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
+        except ValidationError as e:
+            logger.error(f"Validation error creating currency rate: {e}")
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)}, 
+                status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error creating currency rate: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        if request.method in ["POST", "PUT", "PATCH"]:
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving rate history: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+ 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
 
-            base_currency = request.data.get("base_currency")
-            target_currency = request.data.get("currency")
+        except CurrencyRate.DoesNotExist as exc:
+            raise NotFound("Currency rate not found.") from exc
 
-            current_rate = request.data.get("current_rate")
-            try:
-                current_rate = float(current_rate)
-            except (TypeError, ValueError):
-                return Response(
-                    {"error": "Current rate must be a valid number"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except ValidationError as e:
+            logger.error(f"Validation error updating currency rate: {e}")
+            return self._create_rendered_response(
+                {'error': extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating currency rate: {e}")
+            return self._create_rendered_response(
+                {'error': "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-            if current_rate <= 0:
-                return Response(
-                    {"error": "Current rate must be greater than zero"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            if serializer.is_valid(
-                raise_exception=True
-            ):  # raise_exception=True handles errors automatically
-                if base_currency == target_currency:
-                    return Response(
-                        {
-                            "error": "Base currency and Target currency cannot be the same"
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                serializer.save(
-                    user=request.user
-                )  # Assign user during save via perform_create/update
-                message = (
-                    "Rate updated successfully"
-                    if instance
-                    else "Rate created successfully"
-                )
-                return Response(
-                    {
-                        "Success ": message,
-                    },
-                    status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED,
-                )
-            # If serializer.is_valid() was False, errors would be raised by raise_exception=True
-            # and handled by DRF's exception handler.
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return self._create_rendered_response(
+                {"message": "Currency rate deleted successfully"},
+                status.HTTP_204_NO_CONTENT
+            )
+        except CurrencyRate.DoesNotExist:
+            raise NotFound({"error": "Currency rate not found."})
 
 
 class CashBookViewSet(BaseCompanyViewSet):
     queryset = CashBook.objects.all()
     serializer_class = CashBookSerializer
 
-
-class CurrencyViewSet(BaseCompanyViewSet):
+class CurrencyViewSet(BaseViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
     pagination_class = None
-
-    # overide the base get queryset
+    # override the base get queryset
     def get_queryset(self):
         return self.queryset.all()
 
