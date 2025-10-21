@@ -141,7 +141,7 @@ else:
     DATABASES = {
         'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / '20June',
+        'NAME': BASE_DIR / '21Oct',
         }
     }
         
