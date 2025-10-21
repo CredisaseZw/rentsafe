@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from apps.common.models.models import Address, Document, Note
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.individuals.models.models import Individual
-from django.db.models import UniqueConstraint, Q
+from django.db.models import UniqueConstraint, Q, Max
 from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 
@@ -273,7 +273,7 @@ class CompanyProfile(BaseModel):
                 help_text=_("Assessed risk classification of the company."))
 
     account_number = models.CharField(_("Account Number"), max_length=255, blank=True, null=True,
-                help_text=_("Main bank account number for the company."))
+                help_text=_("Unique customer account number for the company."), unique=True)
 
     IS_JUDICIAL_CHOICES = (
         ('NO_INFO', _('No Information')),
@@ -287,7 +287,6 @@ class CompanyProfile(BaseModel):
 
     is_suspended = models.BooleanField(_("Is Suspended"), default=False,
                         help_text=_("Indicates if the company's services are currently suspended."))
-    
     class Meta:
         app_label = 'companies'
         db_table = "company_profile"
@@ -296,3 +295,27 @@ class CompanyProfile(BaseModel):
 
     def __str__(self):
         return f"Profile for {self.company.registration_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.account_number:
+            name_for_prefix = self.company.registration_name
+            prefix = name_for_prefix[:3].upper()
+            base_prefix = f"C{prefix}"
+
+            with transaction.atomic():
+                latest_account = (
+                    CompanyProfile.objects.select_for_update()
+                    .filter(account_number__startswith=base_prefix)
+                    .aggregate(Max("account_number"))["account_number__max"]
+                )
+
+                if latest_account:
+                    latest_number = int(latest_account[-4:])
+                    new_number = latest_number + 1
+                else:
+                    new_number = 1
+
+                self.account_number = f"{base_prefix}{new_number:04d}"
+
+        self.full_clean()
+        return super().save(*args, **kwargs)
