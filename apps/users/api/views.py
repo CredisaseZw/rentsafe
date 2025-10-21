@@ -146,8 +146,7 @@ class CurrentUserView(APIView):
         return Response(serializer.data)
 
 class CheckCSRFView(APIView):
-    authentication_classes = [CookieJWTAuthentication]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response({"message": "CSRF token is valid"}, status=status.HTTP_200_OK)

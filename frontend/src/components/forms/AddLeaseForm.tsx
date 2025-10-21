@@ -136,7 +136,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
       handleDefaultCurrency(currencyData); 
     }
 
-  }, [currencyData, currencyData])
+  }, [currencyData, currencyError])
 
   return (
     <form className="w-full relative" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback, leaseID)}>
@@ -156,7 +156,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
       </div>
       <div className="mt-5">
         <Fieldset legendTitle="Rent Guarantor">
-          <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6" >
+          <ColumnsContainer numberOfCols={2} marginClass="mt-0" gapClass="gap-6" >
             <div className="form-group">
               <AutoCompleteClient
                 isRequired = {false}
@@ -178,20 +178,6 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   value={formData.guarantor_name}
               />
             </div>
-            <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="rentGuarantorName">
-                  Guarantee Amount 
-              </Label>
-              <Input 
-                  type= "number" 
-                  step={0.01}
-                  defaultValue={leaseObject?.guarantor?.guarantee_amount ?? ""}
-                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
-                  onKeyDown={validateAmounts}
-                  name={`rentGuaranteeAmount`}
-                  id="rentGuaranteeAmount"
-              />
-            </div>
           </ColumnsContainer>
         </Fieldset>
       </div>
@@ -209,19 +195,17 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
             }
             
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="unitNumber" >Unit Number </Label>
+              <Label className="px-2 font-normal" htmlFor="unitNumber" >Unit Number / Name </Label>
               <Input
                 id="unitNumber"
-                required
                 defaultValue={leaseObject?.unit.unit_number ?? ""}
                 name="unitNumber"/>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="unitNumber">Number of Rooms </Label>
+              <Label className="px-2 font-normal" htmlFor="unitNumber">Number of Rooms </Label>
               <Input 
                 id=""
                 name="unitNumberOfRooms"
-                required
                 defaultValue={leaseObject?.unit.number_of_rooms ?? ""}
                 type= "number"
                 step={0.01}
@@ -229,10 +213,9 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 onKeyDown={validateAmounts}/>
             </div>      
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="unitNumber">Unit Type</Label>
+              <Label className="px-2 font-normal " htmlFor="unitNumber">Unit Type</Label>
               <Select
                   key = {leaseObject?.unit.unit_type}
-                  required
                   name="unitType"
                   value={leaseObject?.unit.unit_type}
                   >
@@ -386,12 +369,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
         <Fieldset legendTitle="Lease Details">
           <ColumnsContainer numberOfCols={3} marginClass="mt-5" gapClass="gap-6">
             <div className="form-group">
-                <Label className="px-2 font-normal required" htmlFor=""> Lease Start Date</Label>
-                <Input defaultValue={leaseObject?.start_date ?? ""} name="leaseStartDate" required id = "leaseStartDate" type={"date"}/>
+                <Label className="px-2 font-normal" htmlFor=""> Lease Start Date</Label>
+                <Input defaultValue={leaseObject?.start_date ?? ""} name="leaseStartDate" id = "leaseStartDate" type={"date"}/>
             </div>
             <div className="form-group">
-                <Label className="px-2 required font-normal" htmlFor=""> Lease end Date</Label>
-                <Input defaultValue={leaseObject?.end_date ?? ""} name="leaseEndDate" required id = "leaseEndDate" type={"date"}/>
+                <Label className="px-2 font-normal" htmlFor=""> Lease end Date</Label>
+                <Input defaultValue={leaseObject?.end_date ?? ""} name="leaseEndDate" id = "leaseEndDate" type={"date"}/>
             </div>
             <div className="form-group">
               <Label className="px-2 font-normal" htmlFor="">Lease Status</Label>
@@ -490,7 +473,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
               <Checkbox
                   className="self-center"
                   name="vatInclusive"
-                  id="vatInclusive"
+                  id="vatInclusive" 
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   VAT Inclusive
@@ -501,7 +484,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 className="self-center"
                 name="rentVariable"
                 id="rentVariable"
-                checked={leaseObject?.is_rent_variable ?? false}
+                defaultChecked={leaseObject?.is_rent_variable ?? false}
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   Is Rent Variable
@@ -514,15 +497,14 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
         <Fieldset legendTitle="Deposit Details">
           <ColumnsContainer numberOfCols={3} marginClass="mt-0" gapClass="gap-6">
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="depositDate">Deposit Date</Label>
-              <Input defaultValue={leaseObject?.deposits[0].deposit_date} name="depositDate" required id="depositDate" type="date" />
+              <Label className="px-2 font-normal" htmlFor="depositDate">Deposit Date</Label>
+              <Input defaultValue={leaseObject?.deposits?.[0]?.deposit_date ?? ""} name="depositDate" id="depositDate" type="date" />
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="depositCurrency">
+              <Label className="px-2 font-normal" htmlFor="depositCurrency">
                 Deposit Currency
               </Label>
               <Select
-                required
                 defaultValue={
                   leaseObject?.deposits?.[0]?.currency?.toString() ?? defaultCurrency.toString()
                 }
@@ -551,27 +533,25 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
 
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="depositAmount">
+              <Label className="px-2 font-normal" htmlFor="depositAmount">
                 Deposit Amount 
               </Label>
               <Input
                 type= "number" 
                 step={0.01}
-                defaultValue={leaseObject?.deposits[0].amount}
+                defaultValue={leaseObject?.deposits?.[0]?.amount}
                 onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                 onKeyDown={validateAmounts}
-                required
                 name="depositAmount"
                 id="depositAmount"
               />
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor="depositHolder">
+              <Label className="px-2 font-normal" htmlFor="depositHolder">
                   Deposit Holder
               </Label>
               <Select
                 key={leaseObject?.deposits?.[0]?.deposit_holder}
-                required
                 name="depositHolder"
                 defaultValue={leaseObject?.deposits?.[0]?.deposit_holder}
                 >
@@ -611,6 +591,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                     )
                   }
                 />
+
 
               </TableCell>
               <TableCell className={tenantsOpeningBalance.three_months_back_balance.colorCode}>
@@ -684,7 +665,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   landlord_name : "",
                   landlord_type: val,
                 }));
-                setLandlordIdentifier(val === "individual" ? "National ID" : "Registration Number");
+                setLandlordIdentifier(val === "individual" ? "National ID" : "Registration Name / Number");
               }}
             >
               <SelectTrigger className="w-full">
