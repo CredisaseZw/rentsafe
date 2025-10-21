@@ -294,9 +294,9 @@ class ContactPersonAdmin(admin.ModelAdmin):
 @admin.register(CompanyProfile)
 class CompanyProfileAdmin(admin.ModelAdmin):
     list_display = (
-        'company_name', 'trading_status', 'trend', 'risk_class',
+        'company_name', 'trading_status', 'account_number', 'trend', 'risk_class',
         'number_of_employees', 'is_under_judicial', 'is_suspended',
-        'created_by', 'date_created'
+        'date_created'
     )
     list_filter = (
         'trading_status', 'trend', 'risk_class', 'is_under_judicial',
@@ -306,7 +306,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
         'company__registration_name', 'company__trading_name',
         'email', 'website', 'vat_number', 'tin_number'
     )
-    readonly_fields = ('date_created', 'date_updated', 'created_by', 'logo_preview')
+    readonly_fields = ('date_created', 'date_updated', 'logo_preview')
     
     fieldsets = (
         (_('Company Status'), {
@@ -349,7 +349,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
         }),
         (_('System Information'), {
             'fields': (
-                ('created_by', 'date_created', 'date_updated'),
+                ('date_created', 'date_updated'),
             ),
             'classes': ('collapse',)
         }),
@@ -363,7 +363,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'company', 'contact_person', 'created_by'
+            'company', 'contact_person'
         )
     
     def company_name(self, obj):
