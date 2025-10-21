@@ -1024,14 +1024,72 @@ class PaymentSerializer(BaseCompanySerializer):
         model = Payment
         fields = "__all__"
 
-
-class CurrencyRateSerializer(BaseCompanySerializer):
+class CurrencyRateSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only=True)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='currency',
+        write_only=True
+    )
     base_currency = CurrencySerializer(read_only=True)
+    base_currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(),
+        source='base_currency',
+        write_only=True
+    )
 
-    class Meta(BaseCompanySerializer.Meta):
+    class Meta:
         model = CurrencyRate
+        fields = [
+            'id',
+            'base_currency', 
+            'currency', 
+            'base_currency_id', 
+            'currency_id',
+            'current_rate', 
+            'date_created',
+            'created_by'
+        ]
+    
+    def to_representation(self, instance):
+        date = instance.date_created.strftime("%d-%b-%Y")  
+        created_by = instance.created_by
+        if created_by and hasattr(created_by, 'first_name') and hasattr(created_by, 'last_name') and created_by.first_name and created_by.last_name:
+            created_by_display = f"{created_by.first_name[0].upper()}. {created_by.last_name}"
+        else:
+            created_by_display = None
+        return {
+            'id': instance.id,
+            'base_currency': instance.base_currency.currency_code,
+            'currency': instance.currency.currency_code,
+            'current_rate': str(instance.current_rate),
+            'date_created': date,
+            'created_by': created_by_display
+        }
+    
+    def validate(self, attrs):
+        base_currency = attrs.get('base_currency')
+        counter_currency = attrs.get('currency')
+        rate = attrs.get('current_rate')
+        if rate is not None and rate <= 0:
+            raise ValidationError("Current Rate must be greater than zero.")
 
+        if self.instance:
+            return attrs
+
+        for fields in ['currency', 'base_currency', 'current_rate']:
+            if not attrs.get(fields):
+                raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+
+        if counter_currency == base_currency:
+            raise ValidationError("Base Currency and Counter Currency cannot be the same.")
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            validated_data['created_by'] = request.user
+        return super().create(validated_data)
 
 class CashBookSerializer(BaseCompanySerializer):
     currency = CurrencySerializer(read_only=True)
