@@ -31,8 +31,8 @@ from rentsafe.serializers import *
 from django.db.models.functions import Cast
 
 # Create your views here. views
-@login_required
-@clients_required
+# #@login_required
+# #@clients_required
 def clients_home(request):
     props = clients_credit_dashboard(request.user.company)
     return render(request, "Client/Dashboard", props or {})
@@ -286,8 +286,8 @@ def rate_setup(request):
 def currency_settings(request):
     return render(request, "Client/Accounting/CurrencySettings")
 
-@login_required
-@clients_required
+# #@login_required
+# #@clients_required
 def get_user(request):
     if request.method != "POST":
         return JsonResponse({"status": "failed", "props": {}}, safe=False)
@@ -314,8 +314,8 @@ def get_user(request):
                 safe=False,
             )
 
-@login_required
-@clients_required
+# #@login_required
+# #@clients_required
 def agents(request):
     if request.method == "POST":
         search_schema = SearchSchema()
@@ -418,8 +418,8 @@ def create_agent_user_helper(request, data):
 def is_agent_verified(request):
     return JsonResponse({"status": 200}, safe=False)
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def update_agent(request):
     if request.method != "PUT":
         return redirect("cl-search-agents")
@@ -457,8 +457,8 @@ def destroy_agent(request):
     return redirect("cl-search-agents")
 
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def get_company(request):
     if request.method != "POST":
         return JsonResponse({"status": "failed"}, safe=False)
@@ -490,8 +490,8 @@ def get_company(request):
     )
 
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def credit_check(request):
     search_key = ""
     if request.method == "POST":
@@ -535,8 +535,8 @@ def credit_check(request):
     return render(request, "CreditCheck/Index", props)
 
 
-# @login_required
-# @clients_required
+# #@login_required
+# #@clients_required
 def company_verify_otp(request, url_link):
     url_pattern = r"T(\d{4})L"
     matches = re.search(url_pattern, url_link)
@@ -614,8 +614,8 @@ def company_verify_otp_helper(request):
     )
     return redirect("login")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def individual_verify_otp(request):
     if request.method == "POST":
         otp_schema = OTPSchema()
@@ -665,8 +665,8 @@ def individual_verify_otp(request):
 def is_individual_verified(request):
     return JsonResponse({"status": 200}, safe=False)
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def credit_check_confirmation(request):
     search_schema = OTPSchema()
     try:
@@ -715,14 +715,14 @@ def credit_check_confirmation(request):
             return redirect("client-credit-check")
 
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def credit_check_individuals(request):
     return render(request, "CreditCheck/Individual")
 
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def credit_check_companies(request):
     return render(request, "CreditCheck/Company")
 
@@ -746,8 +746,8 @@ def switch_colors(lease, old_payment_end, new_payment_end, today, lease_status):
         lease.status = "MEDIUM"
         lease.status_cache = "MEDIUM"
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def edit_lease(request):
     data = json.loads(request.body.decode("utf-8"))
     lease_id = data.get("leaseId")
@@ -984,8 +984,8 @@ def edit_lease(request):
 
     return redirect("client-leases")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def create_individual_lease(request):
     return create_individual_lease_helper(request)
 
@@ -1486,8 +1486,8 @@ def return_skipped_rows(skipped_rows, request):
         safe=False,
     )
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def create_company_lease(request):
     return create_company_lease_helper(request)
 
@@ -2031,8 +2031,8 @@ def create_bulk_company_leases_helper(request):
     else:
         return HttpResponse("Subscriptions not activated or depleted!")
 
-# @login_required
-# @clients_required
+# #@login_required
+# #@clients_required
 def verify_company_lease(request, url_link):
     url_pattern = r"T(\d{4})L"
     matches = re.search(url_pattern, url_link)
@@ -2072,13 +2072,13 @@ def verify_company_lease(request, url_link):
 
     return JsonResponse({"status": "ok"})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def create_lease_confirmation(request):
     return render(request, "Leases/CreateConfirmation")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def create_individual(request):
     return create_individuals_helper(request)
 
@@ -2331,8 +2331,8 @@ def _extracted_from_create_bulk_individuals_115(skipped_rows, request):
         safe=False,
     )
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def create_company(request):
     return create_company_helper(request)
 
@@ -2607,18 +2607,18 @@ def create_bulk_companies_helper(request):
     }
     return HttpResponse(response_data, content_type="application/json")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def credit_given(request):
     return render(request, "CreditGiven/Index", props={})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def credit_taken(request):
     return render(request, "CreditTaken/Index", props={})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def create_user(request):
     if request.method != "POST":
         return redirect("client-users")
@@ -2702,8 +2702,8 @@ def create_user(request):
         }
         return render(request, "Client/Users/Index", props)
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def client_users(request):
     if request.method != "GET":
         return render(request, "Client/Users/Index", props={})
@@ -2756,8 +2756,8 @@ def destroy_user(request):
     else:
         return redirect("client-users")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def update_user(request):
     if request.method != "PUT":
         return redirect("client-users")
@@ -2780,8 +2780,8 @@ def update_user(request):
         return redirect("client-users")
 
 # Active-Leases
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def client_active_leases(request):
     user = request.user.company
     active_leases = Lease.objects.filter(is_active=True, lease_giver=user)
@@ -2807,8 +2807,8 @@ def check_subscription_and_lease_limit(request):
         return HttpResponse("You do not have any active subscriptions.")
 
 # revised search indiv
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def individuals(request):
     if request.method == "POST":
         search_schema = SearchSchema()
@@ -2850,8 +2850,8 @@ def individuals(request):
         props = {}
         return render(request, "Client/Search/SearchIndividual", props)
 
-@login_required 
-@clients_required
+#@login_required 
+#@clients_required
 def companies(request):
     if request.method != "POST":
         return render(request, "Client/Search/SearchCompany", props={})
@@ -3222,8 +3222,8 @@ def individual_report(request):
         safe=False,
     )
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def store_individual(request):
     if request.method != "POST":
         return render(request, "Client/Search/SearchIndividual", props={})
@@ -3308,8 +3308,8 @@ def store_individual(request):
         #     props = {"errors": "Individual already exists"}
     return render(request, "Client/Search/SearchIndividual", props={})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def store_individual_user(request):
     if request.method != "POST":
         # return redirect("individuals")
@@ -3399,8 +3399,8 @@ def store_individual_user(request):
             props = {"errors": "Individual already exists"}
     return render(request, "Client/Search/SearchIndividual", props={})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def verify_individual_otp(request):
     if request.method != "POST":
         return render(request, "Client/Search/SearchIndividual", props={})
@@ -3466,8 +3466,8 @@ def verify_individual_otp(request):
 
     return render(request, "Client/Search/SearchIndividual", props)
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def store_company(request):
     if request.method == "POST":
 
@@ -3546,8 +3546,8 @@ def store_company(request):
         # return render(request,'Individuals/Index',props={})
     return render(request, "Client/Search/SearchCompany", props={})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def verify_company_otp(request):
     if request.method != "POST":
         return render(request, "Client/Search/SearchCompany", props={})
@@ -3915,8 +3915,8 @@ def client_leases_new(request,leases_type=None):
         },
     )
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def client_leases(request):
     # return client_leases_old(request)
     return client_leases_new(request)
@@ -4174,8 +4174,8 @@ def calculate_color_and_score(score_status):
         score = random.randint(0, 70)
     return color, score, level, score_level
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def change_password(request):
     if request.method != "POST":
         return render(request, "Client/Profile/ResetPassword")
@@ -4489,8 +4489,8 @@ def client_statements_new(request):
     return render(request, "Client/Accounting/Statements", props)
 
 
-# @login_required
-# @clients_required
+# #@login_required
+# #@clients_required
 def client_statements_old(request):
     if request.method == "POST":
         return render(request, "Client/Accounting/Statements")
@@ -4566,15 +4566,15 @@ def client_statements_old(request):
     return render(request, "Client/Accounting/Statements", props)
 
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def client_statements(request):
     # return client_statements_old(request)
     return client_statements_new(request)
 
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def request_period_statement(request):
     if request.method != "POST":
         return
@@ -6207,31 +6207,31 @@ def debt_call(request):
                     )
     return render(request, "Client/Accounting/DebtCall", {"props": "Debt Call Sent Successfully!"})
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def sales_categories(request):
     return render(request, "Client/Accounting/Sales/SalesCategories")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def products_and_services(request):
     return render(request, "Client/Accounting/Sales/ProductsAndServices")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def vat_settings(request):
     return render(request, "Client/Accounting/Sales/VatSettings")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def cash_sales(request):
     return render(request, "Client/Accounting/Sales/CashSales")
 
-@login_required
+#@login_required
 def adverse_data(request):
     return render(request, "Client/AdverseData")
 
-@login_required
+#@login_required
 
 def commission_statements(request):
     return render(request, "Client/CommissionStatementsSelection")
@@ -6239,23 +6239,23 @@ def commission_statements(request):
 def sandbox(request):
     return render(request, "Client/Sandbox")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def sales_reports(request):
     return render(request, "Client/Accounting/Sales/SalesReports")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def cash_books(request):
     return render(request, "Client/Accounting/Sales/CashBooks")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def general_ledger(request):
     return render(request, "Client/Accounting/Sales/GeneralLedger")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def sales_invoicing(request):
     return render(request, "Client/Accounting/Sales/SalesInvoicing")
 
@@ -6265,16 +6265,16 @@ def accounts_list(request):
 def view_only_accounts_list(request):
     return render(request, "Client/Accounting/ViewOnlyAccountsList")
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def sales_accounts(request):
     return render(request, "Client/Accounting/Sales/SalesAccounts")
 
 def rate_setup(request):
     return JsonResponse ({"status": "success"}, safe=False)
 
-@login_required
-@clients_required
+#@login_required
+#@clients_required
 def lease_address(request):
     
     if request.method == "GET":
