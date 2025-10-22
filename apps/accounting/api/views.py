@@ -101,50 +101,145 @@ class ItemViewSet(BaseCompanyViewSet):
     serializer_class = SalesItemSerializer
 
 
-class VATSettingViewSet(BaseCompanyViewSet):
+class VATSettingViewSet(BaseViewSet):
+    """ViewSet for managing VAT settings.
+
+    Allows creation, retrieval, updating, and deletion of VAT settings.
+    Ensures that VAT settings are unique per company based on description.
+
+    """
+
     queryset = VATSetting.objects.all()
     serializer_class = VATSettingSerializer
 
-    def create(self, request, *args, **kwargs):
-        """
-        Allows bulk creation of VAT settings and prevents duplicate descriptions per company.
-        """
-        data = request.data
-        if not isinstance(data, list):
-            # If not a list, proceed with standard single object creation
-            return super().create(request, *args, **kwargs)
+    def get_queryset(self):
+        return self.queryset.filter(
+            created_by__client=self.request.user.client, vat_applicable=True
+        )
 
-        company = self.request.user.company
-
-        # Get descriptions of existing VAT settings for the user's company
-        existing_descriptions = set(
-            VATSetting.objects.filter(user__company=company).values_list(
+    def _get_existing_descriptions(self, client):
+        return set(
+            VATSetting.objects.filter(created_by__client=client).values_list(
                 "description", flat=True
             )
         )
 
-        # Filter out data for VAT settings that already exist
-        valid_data = [
+    def _filter_valid_data(self, data, existing_descriptions):
+        return [
             item
             for item in data
             if item.get("description") not in existing_descriptions
         ]
 
-        if not valid_data:
-            return Response(
-                {"error": "All provided VAT settings already exist for your company."},
-                status=status.HTTP_400_BAD_REQUEST,
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        client = self.request.user.client
+
+        if isinstance(data, list):
+            existing_descriptions = self._get_existing_descriptions(client)
+            valid_data = self._filter_valid_data(data, existing_descriptions)
+
+            if not valid_data:
+                return Response(
+                    {
+                        "error": "All provided VAT settings already exist for your company."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            serializer = self.get_serializer(data=valid_data, many=True)
+        else:
+            serializer = self.get_serializer(data=data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+        except ValidationError as e:
+            logger.error(f"Validation error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        # The perform_create in BaseCompanyViewSet handles assigning the user.
-        # So we just need to pass the valid_data to the serializer.
-        serializer = self.get_serializer(data=valid_data, many=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(
-            serializer
-        )  # This will call serializer.save(user=self.request.user) for each object
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def list(self, request, *args, **kwargs):
+        try:
+            vat = self.get_queryset()
+            serializer = self.get_serializer(vat, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT settings: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = VATSetting.objects.get(
+                pk=kwargs.get("pk"), created_by__client=request.user.client
+            )
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+
+        except ValidationError as e:
+            logger.error(f"Validation error updating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error updating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return self._create_rendered_response(
+                {"success": "VAT setting deleted successfully"},
+                status.HTTP_204_NO_CONTENT,
+            )
+
+        except Http404:
+            return self._create_rendered_response(
+                {"error": "VAT not found"},
+                status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"Error deleting VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class SalesCategoryViewSet(BaseCompanyViewSet):

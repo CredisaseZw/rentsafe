@@ -89,10 +89,45 @@ class SalesCategorySerializer(BaseCompanySerializer):
         fields = ["id", "name", "code", "date_created"]
 
 
-class VATSettingSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
+class VATSettingSerializer(serializers.ModelSerializer):
+    rate = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        error_messages={
+            "required": "Rate: This field is required.",
+            "invalid": "Rate: A valid decimal number is required.",
+            "blank": "Rate: This field may not be blank.",
+        },
+    )
+    description = serializers.CharField(
+        error_messages={
+            "required": "Description: This field is required.",
+            "blank": "Description: This field may not be blank.",
+        }
+    )
+
+    class Meta:
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
+
+    def validate(self, data):
+        rate = data.get("rate")
+        if rate is not None and (rate < 0 or rate > 100):
+            raise ValidationError("VAT rate must be between 0 and 100.")
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+        return super().update(instance, validated_data)
 
 
 class SalesAccountSerializer(BaseCompanySerializer):
