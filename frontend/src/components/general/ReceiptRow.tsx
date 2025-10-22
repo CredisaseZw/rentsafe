@@ -29,6 +29,7 @@ interface props {
 
 export default function ReceiptRow({paymentMethods, index, lease, updateReceipt, onSelectLease, removeReceipt, checkReceipt} :props) {
     const [rent, setRent] = useState<string | undefined>("");
+    console.log(lease);
     useEffect(() => {
         if (!lease.amount || lease.amount.length === 0) {
             setRent(String(lease.rentOwing ?? 0));

@@ -16,6 +16,10 @@ function SettingsCurrency() {
     currencyLoading,
     currency,
     loading,
+    rate,
+    currencyId,
+    setRate,
+    setCurrencyId,
     handleSubmit
   } = useCurrencySettings()
   const setCurrencySettings = useSetCurrencySettings()
@@ -58,7 +62,11 @@ function SettingsCurrency() {
                   <div className="form-group">
                     <Label className="text-sm text-gray-400 required">Currency</Label>
                   </div>
-                  <Select name="current" required>
+                  <Select name="current" 
+                    value={currencyId}
+                    required
+                    onValueChange={(value)=>setCurrencyId(value)}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
@@ -84,6 +92,8 @@ function SettingsCurrency() {
                   <Input
                     type= "number"
                     step={0.01}
+                    value={rate}
+                    onChange={(e)=>setRate(e.target.value)}
                     onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                     onKeyDown={validateAmounts}
                     required

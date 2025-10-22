@@ -6,6 +6,8 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
 import type { PropertiesResponse, Property } from "@/types";
+import { isAxiosError, type AxiosError } from "axios";
+import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
@@ -700,3 +702,32 @@ export const generateUpdatePayload = (
 
     return cleanObject(diff);
   };
+
+export const handleAxiosError = (
+  title: string,
+  error: AxiosError | Error | unknown | null,
+  fallBackMessage?: string
+): boolean => {
+  if (isAxiosError(error)) {
+    console.error(error);
+    const message =
+      error.response?.data?.error ??
+      error.response?.data?.detail ??
+      error.message ??
+      "Something went wrong";
+    toast.error(title, { description: message });
+    return true;
+  }
+
+  if (error instanceof Error && fallBackMessage) {
+    toast.error(fallBackMessage);
+    return true;
+  }
+
+  if (!isAxiosError(error) && !error && fallBackMessage) {
+    toast.error(fallBackMessage);
+    return true;
+  }
+
+  return false;
+};

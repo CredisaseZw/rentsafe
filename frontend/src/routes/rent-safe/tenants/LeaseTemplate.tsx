@@ -14,11 +14,9 @@ import {
 } from "@/components/ui/select"
 import useLeases from "@/hooks/components/useLeases";
 import type { PaginationData } from "@/interfaces";
-import { isAxiosError } from "axios";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import type { Lease } from "@/types";
-import { getPrimaryTenantName, riskLevelColorCode, summarizeAddress } from "@/lib/utils";
+import { getPrimaryTenantName, handleAxiosError, riskLevelColorCode, summarizeAddress } from "@/lib/utils";
 import StaticBadge from "@/components/general/StaticBadge";
 import { Link } from "react-router";
 import { Eye } from "lucide-react";
@@ -41,15 +39,8 @@ function LeaseTemplate() {
    const {data, isLoading, error} = useGetTenantStatements(page, search);
 
    useEffect(()=>{
-      if(isAxiosError(error)){
-         console.error(error);
-         const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
-         toast.error("Failed to fetch tenant statements", { description: message });
-         return; 
-      }
-
+      if(handleAxiosError("Failed to fetch tenant statements", error)) return
       if(data){
-
          setLeases(search ? data.results : data ?? [])
          setPaginationData(data as PaginationData)
       }

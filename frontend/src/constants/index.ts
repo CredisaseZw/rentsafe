@@ -473,3 +473,101 @@ export const RATE_AUDIT_TRAIL:Header[] = [
   {name : "Convert Currency"},
   {name : "Rate"}
 ]
+
+export const SUBSCRIPTION_HEADERS:Header[] = [
+  { name : "No" },
+  { name : "Open Slots" },
+  { name : "Period (Months)" },
+  { name : "Start Date" },
+  { name : "End Date" },
+]
+
+export const PARKING_OPTIONS:Option[] = [
+  { label: "All", value: "all" },
+  { label: "Underground", value: "underground" },
+  { label: "Open", value: "open" },
+  { label: "Street", value: "street" },
+]
+
+export const SECURITY_OPTIONS:Option[] =[
+  { label: "24/7", value: "24/7" },
+  { label: "Daytime", value: "daytime" },
+  { label: "None", value: "none" },
+]
+
+export const BACKUP_POWER_OPTIONS:Option[] = [
+  { label: "All", value: "all" },
+  { label: "Generator", value: "generator" },
+  { label: "Solar", value: "solar" },
+  { label: "Battery", value: "battery" },
+  { label: "None", value: "none" },
+]
+
+export const PROPERTY_FILTER_OPTIONS:Option[] = [
+  { label: "All", value: "all" },
+  { label: "Occupied", value: "occupied" },
+  { label: "Vacant", value: "vacant" },
+]
+export const PROPERTY_STATUS_OPTIONS:Option[] = [
+  {label : "Vacant", value : "active"},
+  {label : "Partially Occupied", value : "partially_occupied"},
+  {label : "Occupied", value : "occupied"},
+  {label : "Maintenance", value : "maintenance"},
+  {label : "Sold", value : "sold"}
+]
+
+export const COMMON_HEADERS:Header[] = [
+  {
+      name  :"Lease ID",
+  },
+  {
+      name : "Tenant",
+  },
+  {
+      name : "Landlord",
+  }, 
+  {
+      name : "Property Type"
+  },
+  {
+      name : "Address"
+  },
+]
+export const ACTIVE_HEADERS:Header[] = [
+  ...COMMON_HEADERS, 
+  {
+      name : "Rent owing"
+  },
+  {
+      name : "Actions",
+      colSpan : 3
+  }
+]
+export const RENEWAL_HEADERS:Header[] = [
+  ...COMMON_HEADERS,
+  {
+      name : "Lease start Date"
+  },
+  {
+      name : "Lease end Date"
+  },
+  {
+      name : "Actions",
+      colSpan : 2
+  }
+]
+
+export const TERMINATED_HEADERS:Header[] = [
+  ...COMMON_HEADERS,
+  {
+      name : "Rent owing"
+  },
+  {
+      name: "Date of termination"
+  },
+  {
+      name : "Actions",
+      colSpan : 2
+  },
+  
+]

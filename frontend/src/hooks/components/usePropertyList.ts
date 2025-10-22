@@ -1,14 +1,21 @@
-import { useState, useRef } from "react";
-import type { AddPropertyForm, DashboardCardProp, Option, Header, Property, PropertyType } from "@/types";
+import { useState, useEffect } from "react";
+import type { AddPropertyForm, DashboardCardProp, Header, Property, PropertyType } from "@/types";
 import type { BranchFull, IndividualMinimal, PaginationData } from "@/interfaces";
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { extractAddresses, validateYear } from "@/lib/utils";
-import { isAxiosError, type AxiosError } from "axios";
+import { extractAddresses, handleAxiosError, validateYear } from "@/lib/utils";
+import { type AxiosError } from "axios";
 import { toast } from "sonner";
+import getPropertyTypes from "../apiHooks/useGetPropertyTypes";
+import getPropertyList from "../apiHooks/useGetPropertyList";
 
 function usePropertyList() {
+   const [searchParams, setSearchParams] = useSearchParams();
+   const page = parseInt(searchParams.get("page") || "1");
+   const search = searchParams.get("search") || "";
+   const {data, isLoading, error} = getPropertyTypes();
+   const { propertiesError, propertiesLoading, propertyRows, onPropertiesRetch } = getPropertyList(page, search ,true);
    const [addPropertyModal, setAddPropertyModal] = useState(false);
    const [SummaryCards, setSummaryCards] = useState<DashboardCardProp[]>(
       [
@@ -51,46 +58,12 @@ function usePropertyList() {
       ]
    );
    
-   const parkingOptions = useRef<Option[]>([
-      { label: "All", value: "all" },
-      { label: "Underground", value: "underground" },
-      { label: "Open", value: "open" },
-      { label: "Street", value: "street" },
-   ])
-   const securityOptions = useRef<Option[]>([
-      { label: "24/7", value: "24/7" },
-      { label: "Daytime", value: "daytime" },
-      { label: "None", value: "none" },
-   ])
-   const backupPowerOptions = useRef<Option[]>([
-      { label: "All", value: "all" },
-      { label: "Generator", value: "generator" },
-      { label: "Solar", value: "solar" },
-      { label: "Battery", value: "battery" },
-      { label: "None", value: "none" },
-   ])
-   const Options = useRef<Option[]>([
-      { label: "All", value: "all" },
-      { label: "Occupied", value: "occupied" },
-      { label: "Vacant", value: "vacant" },
-   ]);
-   const statusOptions = useRef<Option[]>([
-      {label : "Vacant", value : "active"},
-      {label : "Partially Occupied", value : "partially_occupied"},
-      {label : "Occupied", value : "occupied"},
-      {label : "Maintenance", value : "maintenance"},
-      {label : "Sold", value : "sold"}
-   ])
-
    const [selectedFilter, setSelectFilter] = useState("all_properties");
    const [status, setStatus] = useState({ loading: true, isError: false });
    const [landlordIdentifier, setLandlordIdentifier] = useState<string>("Name")
    const [searchItem, setSearchItem] = useState("");
    const [propertyTypes, setPropertyTypes] = useState<PropertyType[] | null>(null)
    const [loading, setLoading] = useState(false);
-   const [searchParams, setSearchParams] = useSearchParams();
-   const page = parseInt(searchParams.get("page") || "1");
-   const search = searchParams.get("search") || "";
    const [addPropertyForm, setAddPropertyForm] = useState<AddPropertyForm>({
       property_type: "", 
       landlord_type: "individual",
@@ -116,6 +89,21 @@ function usePropertyList() {
    ];
    const [properties, setProperties] = useState<Property[]>([]);
    const [paginationData, setPaginationData] = useState<PaginationData | undefined>(undefined);
+
+  
+   useEffect(() => {
+      if(handleAxiosError("Failed to fetch properties", propertiesError)) return;
+      if (propertyRows) {
+         setProperties(propertyRows.results ?? []);
+         setPaginationData(propertyRows as PaginationData);
+         setStatus({ loading: false, isError: false });
+      }
+   }, [propertyRows, propertiesError]);
+
+   useEffect(()=>{
+      if(handleAxiosError("Failed to fetch property types", error)) return;
+      if (data) { setPropertyTypes(data.results ?? []); }
+   }, [data, error])
 
    const onInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
    setAddPropertyForm(prev => ({
@@ -204,15 +192,7 @@ function usePropertyList() {
    
       try{
       newProperty.mutate(property, {
-         onError: (error: AxiosError |Error | unknown) => {
-            if (isAxiosError(error)) {
-            console.error("Full backend response:", error.response?.data);
-            const errorDetails = error.response?.data?.error || "Unknown error";
-            toast.error("Failed to create property", { description: errorDetails });
-            return;
-            }
-            toast.error("Failed to create property. Please try again.");
-         },
+         onError: (error: AxiosError |Error | unknown) => {handleAxiosError("Failed to create property", error, "Failed to create property. Please try again.")},
          onSuccess: () => {
             setLoading(false);
             toast.success("Property successfully created")
@@ -250,18 +230,15 @@ function usePropertyList() {
       addPropertyModal,
       status,
       addPropertyForm,
-      Options,
       selectedFilter,
       landlordIdentifier,
       searchItem,
       propertyTypes,
       loading,
+      isLoading,
       page,
       search,
-      securityOptions,
-      parkingOptions,
-      backupPowerOptions,
-      statusOptions,
+      propertiesLoading,
       onSelectValue,
       handleAddProperty,
       handleFeatureChange,
@@ -274,6 +251,7 @@ function usePropertyList() {
       setProperties,
       setAddPropertyForm,
       setPaginationData,
+      onPropertiesRetch,
       setStatus,
       onInputChange,
       onSelectChange,

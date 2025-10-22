@@ -11,49 +11,24 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { TableCell, TableRow } from "@/components/ui/table"
-import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
-import type { PaginationData } from "@/interfaces"
-import { getCurrentDate, summarizeAddress } from "@/lib/utils"
-import { isAxiosError } from "axios"
-import { useEffect } from "react"
-import { toast } from "sonner"
+import {  summarizeAddress } from "@/lib/utils"
 import TerminateLeaseDialog from "./TerminateLeaseDialog"
 import type { Lease } from "@/types"
 import StaticBadge from "@/components/general/StaticBadge"
+import { RENEWAL_HEADERS } from "@/constants"
 
 function ForRenewal() {
   const {
-    renewalHeaders,
-    page,
-    status,
-    search,
+    isLoading,
+    error,
     paginationData,
     leases,
     handleOnSearchValue,
     onClearSearch,
-    setLeases,
-    setPaginationData
+    refetch,
   } = useLeases("RENEW")
 
-  const {data, isLoading, error, refetch} = useGetLeases(page, status, search);
-
-  useEffect(()=>{
-    if(isAxiosError(error)){
-      const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
-      toast.error("Failed to fetch leases", { description: message});
-      return; 
-    }
-
-    if(data){
-      const filteredResults = data.results
-      .filter((lease: Lease) => new Date(lease.end_date) < new Date(getCurrentDate()))
-
-      setLeases(filteredResults ?? [])
-      setPaginationData(data as PaginationData)
-    }
-  }, [page, search, status, data, error])
-  
   return (
     <div className="w-full">
       <div>
@@ -90,7 +65,7 @@ function ForRenewal() {
       </div>
       
       <div className="mt-3 2xl:mb-15 sm:mb-30">
-        <TableBase headers={renewalHeaders} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="renew_page" isError = {Boolean(error)}>
+        <TableBase headers={RENEWAL_HEADERS} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="renew_page" isError = {Boolean(error)}>
          {
             leases?.length
               ? leases
@@ -125,7 +100,7 @@ function ForRenewal() {
                   ))
               : (
                 <TableRow>
-                  <TableCell colSpan={renewalHeaders.length}>
+                  <TableCell colSpan={RENEWAL_HEADERS.length}>
                     <EmptyResults message="No leases registered."/>
                   </TableCell>
                 </TableRow>

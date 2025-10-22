@@ -12,45 +12,21 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { TableCell, TableRow } from "@/components/ui/table"
-import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
+import { TERMINATED_HEADERS } from "@/constants"
 import useLeases from "@/hooks/components/useLeases"
-import type { PaginationData } from "@/interfaces"
 import { riskLevelColorCode, summarizeAddress } from "@/lib/utils"
 import type { Lease } from "@/types"
-import { isAxiosError } from "axios"
-import { useEffect } from "react"
-import { toast } from "sonner"
 
 function Terminated() {
   const {
-    terminatedHeaders,
-    page,
-    status,
-    search,
+    error,
+    isLoading,
     paginationData,
     leases,
     onClearSearch,
     handleOnSearchValue,
-    setLeases,
-    setPaginationData
   } = useLeases("TERMINATED");
 
-
-  const {data, isLoading, error} = useGetLeases(page, status, search);
-
-  useEffect(()=>{
-    if(isAxiosError(error)){
-      console.error(error);
-      const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
-      toast.error("Failed to fetch leases", { description: message });
-      return; 
-    }
-
-    if(data){
-      setLeases(data.results ?? [])
-      setPaginationData(data as PaginationData)
-    }
-  }, [page, search, status, data, error])
   return (
     <div className="w-full">
       <div>
@@ -87,7 +63,7 @@ function Terminated() {
       </div>
       
       <div className="mt-3 2xl:mb-15 sm:mb-30">
-        <TableBase headers={terminatedHeaders} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
+        <TableBase headers={TERMINATED_HEADERS} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
           {
             leases?.length
             ? leases.map((lease:Lease)=>(
@@ -118,7 +94,7 @@ function Terminated() {
               </TableRow>
             )) : 
             <TableRow>
-              <TableCell colSpan={terminatedHeaders.length}>
+              <TableCell colSpan={TERMINATED_HEADERS.length}>
                 <EmptyResults message="No leases registered."/>
               </TableCell>
             </TableRow>

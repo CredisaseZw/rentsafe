@@ -9,51 +9,24 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { TableCell, TableRow } from "@/components/ui/table"
-import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases"
 import useLeases from "@/hooks/components/useLeases"
-import type { PaginationData } from "@/interfaces"
-import { isAxiosError } from "axios"
-import { useEffect } from "react"
-import { toast } from "sonner"
 import SectionHeader from "@/components/general/SectionHeader"
 import type { Lease } from "@/types"
 import LeaseRow from "@/components/general/LeaseRow"
+import { ACTIVE_HEADERS } from "@/constants"
 
 function Active() {
   const {
-    activeHeaders,
-    page,
-    status,
-    search,
     paginationData,
     leases,
-    setLeases,
-    setPaginationData,
     total,
+    error,
+    isLoading, 
+    refetch,
     onSuccessCallback,
-    setTotal,
     onClearSearch,
     handleOnSearchValue
-  } = useLeases("ACTIVE");
-
-  const {data, isLoading, error, refetch} = useGetLeases(page, status, search);
-
-  useEffect(()=>{
-    if(isAxiosError(error)){
-      console.error(error);
-      const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
-      toast.error("Failed to fetch active leases", { description: message });
-      return; 
-    }
-
-    if(data){
-      const t = data.results.reduce((total_, lease)=> total_ + lease.owing, 0)
-      setTotal(t);
-      setLeases(data.results ?? [])
-      setPaginationData(data as PaginationData)
-    }
-  }, [page, search, status, data, error])
-
+  } = useLeases("ACTIVE");  
   
   return (
     <div className="w-full">
@@ -91,7 +64,7 @@ function Active() {
       </div>
 
       <div className="mt-3 2xl:mb-15 sm:mb-30">
-        <TableBase headers={activeHeaders} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
+        <TableBase headers={ACTIVE_HEADERS} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
             {
               leases?.length
               ? leases.map((lease:Lease)=>(
@@ -103,7 +76,7 @@ function Active() {
                 />
               )) : 
               <TableRow>
-                <TableCell colSpan={activeHeaders.length}>
+                <TableCell colSpan={ACTIVE_HEADERS.length}>
                   <EmptyResults message="No leases registered."/>
                 </TableCell>
               </TableRow>

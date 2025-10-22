@@ -1,8 +1,16 @@
-import type { VATRows } from "@/types";
-import { useState } from "react";
+import type { VATRow } from "@/types";
+import { useEffect, useState } from "react";
+import useGetVATSettings from "../apiHooks/useGetVATSettings";
+import { handleAxiosError } from "@/lib/utils";
 
 export default function useVATSettings(){
-    const [rows,setRows] = useState<VATRows[]>([{description: "", rate : ""}])
+    const [rows,setRows] = useState<VATRow[]>([{description: "", rate : ""}])
+    const {data, isLoading, error} = useGetVATSettings()
+
+    useEffect(()=>{
+       if(handleAxiosError("Error fetching V.A.T Settings",error)) return;
+       if(data){setRows(data)}
+    }, [data, error])
 
     const updateRow = (index: number, key: string, value: any) => {
         setRows((prev) =>
@@ -20,11 +28,13 @@ export default function useVATSettings(){
         
         setRows((prev) => prev.filter((_, i) => i !== index));
     };
+    
     return {
         rows,
-        addRow,
-        setRows,
+        isLoading,
         updateRow,
-        removeRow
+        removeRow,
+        setRows,
+        addRow,
     }
 }

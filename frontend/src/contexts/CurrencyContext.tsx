@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import type { Currency } from "@/types";
 import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
 
@@ -10,6 +9,7 @@ interface CurrencyContextType {
   currency?: Currency;
   setCurrency: (c: Currency) => void;
   currencyLoading: boolean;
+  onCurrencyRetch? : ()=> void
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
@@ -24,7 +24,7 @@ export const CurrencyProvider = ({
 }: CurrencyProviderProps) => {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currency, setCurrency] = useState<Currency>();
-  const { currencyData, currencyLoading, currencyError } = useGetCurrencies();
+  const { currencyData, currencyLoading, currencyError, currencyRefetch} = useGetCurrencies();
 
   useEffect(() => {
     if (isAxiosError(currencyError)) {
@@ -32,8 +32,8 @@ export const CurrencyProvider = ({
         currencyError.response?.data.error ??
         currencyError.response?.data.details ??
         "Something went wrong";
-      toast.error("Error fetching currencies", { description: m });
-    }
+        console.log(m)
+     }
 
     if (currencyData) {
       const defaultCurrency = currencyData.find(
@@ -44,14 +44,18 @@ export const CurrencyProvider = ({
     }
   }, [currencyData, currencyError, defaultCurrencyCode]);
 
+  const onCurrencyRetch = () => currencyRefetch();
+
   return (
     <CurrencyContext.Provider
-      value={{ currencies, currency, setCurrency, currencyLoading }}
+      value={{ currencies, currency, setCurrency, currencyLoading, onCurrencyRetch }}
     >
       {children}
     </CurrencyContext.Provider>
   );
 };
+
+
 
 export const useCurrency = (defaultCurrencyCode = "USD"): CurrencyContextType => {
   const context = useContext(CurrencyContext);

@@ -23,13 +23,11 @@ import AutoCompleteClient from "../general/AutoCompleteClient";
 import ButtonSpinner from "../general/ButtonSpinner";
 import useCreateLease from "@/hooks/apiHooks/useCreateLease";
 import { useEffect, type FormEvent } from "react";
-import { toast } from "sonner";
 import getPropertyTypes from "@/hooks/apiHooks/useGetPropertyTypes";
 import LoadingIndicator from "../general/LoadingIndicator";
 import { Textarea } from "../ui/textarea";
 import { DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
-import { isAxiosError } from "axios";
-import { summarizeAddress, validateAmounts } from "@/lib/utils";
+import { handleAxiosError, summarizeAddress, validateAmounts } from "@/lib/utils";
 import MultiAddressInput from "../general/MultiAddressInput";
 import useGetLeaseInformation from "@/hooks/apiHooks/useGetLeaseInformation";
 import type { Address } from "@/interfaces";
@@ -83,12 +81,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
 
   useEffect(()=>{
     if(leaseID){
-      if(isAxiosError(leaseError)){
-        const message = leaseError.response?.data.error ?? leaseError.response?.data.details ?? "Something went wrong"
-        toast.error("Failed to fetch lease details", { description: message });
-        return;
-      }
-
+      if(handleAxiosError("Failed to fetch lease details", leaseError)) return
       if(leaseResponseObject){
         setDefaultCurrency(leaseResponseObject?.currency?.id)
         setPropertyName(`${leaseResponseObject.unit.property.name} - ${summarizeAddress(leaseResponseObject?.unit.property.addresses[0] ?? {} as Address)}`)
@@ -114,11 +107,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
   }, [leaseID, leaseResponseObject, leaseError])
 
   useEffect(()=>{
-    if(isAxiosError(error)){
-      const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong"
-      toast.error("Failed to fetch property types", { description: message });
-      return;
-    }
+    if(handleAxiosError("Failed to fetch property types",error)) return;
     if (data) { setPropertyTypes(data.results ?? []); }
   }, [data, error])
 

@@ -2,10 +2,10 @@ import { IN_LEASE_CLIENT_TYPES } from "@/constants";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import type { Address, BranchFull, Charges, IndividualMinimal, LeaseResponse } from "@/interfaces";
 import type { AddressPayload } from "@/interfaces/form-payloads";
-import { extractAddresses, extractTenants, generateUpdatePayload, getThreeMonthsBack, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
+import { extractAddresses, extractTenants, generateUpdatePayload, getThreeMonthsBack, handleAxiosError, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
 import type {LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
 import { useQueryClient, type UseMutationResult } from "@tanstack/react-query";
-import { isAxiosError, type AxiosError } from "axios";
+import { type AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -395,15 +395,7 @@ function useAddIndividualLease() {
         leaseID : leaseID,
         data : payload
       }, {
-      onError: (error: AxiosError |Error | unknown) => {
-        if (isAxiosError(error)) {
-          console.error("Full backend response:", error.response?.data);
-          const errorDetails = error.response?.data?.error || error.response?.data?.detail || "Something went wrong";
-          toast.error("Failed to create new lease", { description: errorDetails });
-          return;
-          }
-        toast.error("Failed to create property. Please try again.");
-      },
+      onError: (error: AxiosError |Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
       onSuccess :() => {
         const message = isUpdate ? "Lease successfully updated" : "Lease successfully created";        
         toast.success(message)

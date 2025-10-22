@@ -4,9 +4,8 @@ import { Loader2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchProperty from "@/hooks/apiHooks/useSearchProperty";
 import type { Property } from "@/types";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { handleAxiosError } from "@/lib/utils";
 
 interface Props {
   searchItem: string;
@@ -35,17 +34,7 @@ function AutoCompleteProperty({
     hasUserInteracted && !!debouncedSearch
   );
 
-  useEffect(() => {
-    if (error && isAxiosError(error)) {
-      console.error(error);
-      toast.error("Failed to fetch properties", {
-        description:
-          error.response?.data.error ||
-          error.response?.data.details ||
-          "Something went wrong",
-      });
-    }
-  }, [error]);
+  useEffect(() => {handleAxiosError("Failed to fetch properties", error)}, [error]);
 
   return (
     <div className="form-group relative">

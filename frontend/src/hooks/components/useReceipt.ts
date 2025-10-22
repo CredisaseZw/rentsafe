@@ -1,7 +1,6 @@
-import { extractReceipts, getCurrentDate } from "@/lib/utils";
+import { extractReceipts, getCurrentDate, handleAxiosError } from "@/lib/utils";
 import type { Lease, LeaseReceiptPayload, PaymentMethod, ReceiptLease } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useGetPaymentMethods from "../apiHooks/useGetPaymentMethods";
@@ -15,17 +14,12 @@ export default function useReceipt(initialLease?: ReceiptLease) {
 
     useEffect(() => {
         if (initialLease) {
-        setReceipts([initialLease]);
+            setReceipts([initialLease]);
         }
     }, [initialLease]);
     
     useEffect(()=>{
-        if(isAxiosError(error)){
-            console.log(error)
-            const message = error.response?.data.error ?? error.response?.data.detail ?? "Something went wrong";
-            toast.error("Error fetching payment methods", {description : message});
-        }
-
+        if(handleAxiosError("Error fetching payment methods", error)) return;
         if(data){
             setPaymentMethods(data as PaymentMethod[])
         }
@@ -74,6 +68,7 @@ export default function useReceipt(initialLease?: ReceiptLease) {
             customerName: "",
             rentOwing: 0,
             payment_date : getCurrentDate(),
+            is_rent_variable:  !!initialLease?.is_rent_variable
         } as ReceiptLease,
         ]);
     };
@@ -104,12 +99,7 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         const payments: { payments: ReceiptLease[] } = { payments: receipts };
 
         createReceipt.mutate(payments, {
-        onError: (error) => {
-            if(isAxiosError(error)){
-                const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong";
-                toast.error("Error occurred creating a receipt", {description : message})
-            }
-        },
+        onError: (error) => {handleAxiosError("Error occurred creating a receipt", error);},
         onSuccess: (data) => {
             if(data) {
                 if(data.errors.length > 0) return toast.error("Error occurred creating a receipt", )

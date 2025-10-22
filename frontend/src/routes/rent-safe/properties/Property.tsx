@@ -8,52 +8,21 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { PROPERTY_HEADERS } from "@/constants"
 import useProperty from "@/hooks/components/useProperty"
 import {  Edit, MapPin, ParkingSquare, Power, Shield, TrashIcon, User } from "lucide-react"
-import useGetPropertyDetails from "@/hooks/apiHooks/useGetPropertyDetails"
-import { useEffect } from "react"
-import { isAxiosError } from "axios"
-import { toast } from "sonner"
 import LoadingIndicator from "@/components/general/LoadingIndicator"
 import { capitalizeFirstLetter, formatLandlords, summarizeAddress } from "@/lib/utils"
-import useGetPropertyUnits from "@/hooks/apiHooks/useGetPropertyUnits"
 import { Button } from "@/components/ui/button"
 
 function Property() {
     const {
-        property_id,
         property,
         open,
-        setOpen,
-        setProperty,
+        propertyData,
+        unitsError, 
         propertyUnits,
-        setPropertyUnits 
+        propertyDataLoading,
+        unitsLoading,
+        setOpen,
     } = useProperty()
-
-    const {propertyData, propertyDataLoading , propertyDataError } = useGetPropertyDetails(property_id);
-    const {units, unitsLoading, unitsError} = useGetPropertyUnits(property_id);
-
-    useEffect(()=>{
-        if(isAxiosError(propertyDataError)){
-            const message = propertyDataError.response?.data.error ?? propertyDataError.response?.data.detail  ?? "Something went wrong"    
-            toast.error("Failed to fetch property details", { description: message });
-            console.error(propertyDataError);    
-            return; 
-        } 
-        if(propertyData){
-            setProperty(propertyData)
-        }
-    }, [propertyData, propertyDataError])
-
-    useEffect(()=>{
-        if(isAxiosError(unitsError)){
-            const message = unitsError.response?.data.error ?? unitsError.response?.data.detail  ?? "Something went wrong"    
-            toast.error("Failed to fetch property units", { description: message });
-            console.error(unitsError);    
-            return; 
-        } 
-        if(units){
-            setPropertyUnits(units)
-        }
-    }, [units, unitsError])
 
     return (
         <div>

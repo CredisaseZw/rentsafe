@@ -25,7 +25,6 @@ function RenewLeaseDialog({ tenantName, lease_id, refetch }: Props) {
         patch,
     } = useRenewLease(lease_id, refetch, renew);
 
-    
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

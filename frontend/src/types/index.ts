@@ -467,14 +467,22 @@ export type PaymentHistoryResponse = PaymentStatementInformation & {
 }  
 
 export type SetCurrencySettings = {
-   currency: number
+   currency_id: number
    current_rate: string
-   base_currency: number
+   base_currency_id: number
 }
 
-export type VATRows = {
-   description:  string,
-   rate : string
+export type VATRow = {
+   id?: number,
+   rate?: string | number, 
+   description?:string,
+   vat_applicable?: boolean
+}
+
+export type VATPayload = {
+   data: VATRow,
+   mode : "create" | "update",
+   id? : number
 }
 
 export type InvoicePreview = {
