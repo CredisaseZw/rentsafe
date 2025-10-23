@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { EllipsisVertical } from "lucide-react"
+import DeleteVATSettingDialogue from "@/components/routes/rent-safe/accounting/settings/DeleteVATSettingDialogue"
 
 function VATSettings() {
   const {
@@ -28,12 +29,13 @@ function VATSettings() {
           <div className="mt-5">
             <form className="flex flex-col gap-5">
               <div className="flex flex-row gap-3">
-                <Checkbox/>
-                <Label className="text-sm">VAT Register</Label>
+                <Checkbox disabled/>
+                <Label className="text-sm text-muted">VAT Register</Label>
               </div>
               <div className="form-group">
                 <Label className="text-sm">VAT Registration Number</Label>
                 <Input
+                  disabled
                   name="vatRegistrationNumber"
                 />
               </div>
@@ -60,7 +62,7 @@ function VATSettings() {
                         <AddVATSettingDialog
                           vatSetting={row}
                         />
-                      
+                        <DeleteVATSettingDialogue id={Number(row.id)}/>
                       </PopoverContent>
                     </Popover>
                   </TableCell>

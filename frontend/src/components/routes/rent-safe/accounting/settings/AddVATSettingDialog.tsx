@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import Button from "@/components/general/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -35,8 +35,8 @@ export default function AddVATSettingDialog({vatSetting}: props) {
             <DialogTrigger asChild>
                 {
                     vatSetting 
-                    ? <Button variant={"ghost"} size={"xs"} className="gap-5 text-gray-700 dark:text-white"><Edit/> Edit VAT</Button>
-                    :<Button>Add VAT <Plus/></Button>
+                    ? <Button variant={"ghost"} className="gap-3 text-gray-700 dark:text-white" asChild><Edit size={15}/> Edit VAT</Button>
+                    : <Button asChild >Add VAT <Plus size={15}/></Button>
                 }
             </DialogTrigger>
             <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[560px]">

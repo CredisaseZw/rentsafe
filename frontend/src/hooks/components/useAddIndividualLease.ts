@@ -294,7 +294,7 @@ function useAddIndividualLease() {
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
           effective_date: String(data.leaseStartDate ?? ""),
           end_date: String(data.leaseEndDate ?? ""),
-          vat_inclusive: data.vatInclusive === "true"
+          vat_inclusive: !!data.vatInclusive 
         },
         {
           charge_type: "UTILITY",
@@ -304,7 +304,7 @@ function useAddIndividualLease() {
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
           effective_date: String(data.leaseStartDate ?? ""),
           end_date: String(data.leaseEndDate ?? ""),
-          vat_inclusive: data.vatInclusive === "true"
+          vat_inclusive: !!data.vatInclusive 
         }
       ],
       deposits: [
@@ -320,7 +320,7 @@ function useAddIndividualLease() {
         {
           amount: String(data.landlordsOpeningBalance),
           commission_percentage: String(data.commissionPercentage),
-          operating_costs_inclusive: data.operatingCostsIncluded === "true"
+          operating_costs_inclusive: !!data.operatingCostsIncluded 
         }
       ]
     };
