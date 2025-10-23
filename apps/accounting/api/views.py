@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
+from apps.accounting.filters.filters import CurrencyRateFilter
 from apps.accounting.models.models import (
     SalesItem,
     VATSetting,
@@ -113,45 +114,13 @@ class VATSettingViewSet(BaseViewSet):
     serializer_class = VATSettingSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(
-            created_by__client=self.request.user.client, vat_applicable=True
-        )
-
-    def _get_existing_descriptions(self, client):
-        return set(
-            VATSetting.objects.filter(created_by__client=client).values_list(
-                "description", flat=True
-            )
-        )
-
-    def _filter_valid_data(self, data, existing_descriptions):
-        return [
-            item
-            for item in data
-            if item.get("description") not in existing_descriptions
-        ]
+        return self.queryset.filter(created_by__client=self.request.user.client)
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        client = self.request.user.client
-
-        if isinstance(data, list):
-            existing_descriptions = self._get_existing_descriptions(client)
-            valid_data = self._filter_valid_data(data, existing_descriptions)
-
-            if not valid_data:
-                return Response(
-                    {
-                        "error": "All provided VAT settings already exist for your company."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            serializer = self.get_serializer(data=valid_data, many=True)
-        else:
-            serializer = self.get_serializer(data=data)
-
+        bulk = isinstance(data, list)
         try:
+            serializer = self.get_serializer(data=data, many=bulk)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return self._create_rendered_response(
@@ -185,6 +154,10 @@ class VATSettingViewSet(BaseViewSet):
     def list(self, request, *args, **kwargs):
         try:
             vat = self.get_queryset()
+            page = self.paginate_queryset(vat)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(vat, many=True)
             return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         except Exception as e:
@@ -384,31 +357,28 @@ class PaymentViewSet(BaseCompanyViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
-class CurrencyRateViewSet(BaseViewSet):
-    queryset = CurrencyRate.objects.select_related('currency', 'base_currency').all()
-    serializer_class = CurrencyRateSerializer
 
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return self._create_rendered_response(serializer.data, status.HTTP_201_CREATED)
-        except ValidationError as e:
-            logger.error(f"Validation error creating currency rate: {e}")
-            return self._create_rendered_response(
-                {'error': extract_error_message(e)}, 
-                status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logger.error(f"Error creating currency rate: {e}")
-            return self._create_rendered_response(
-                {'error': "Something went wrong"},
-                status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+class CurrencyRateViewSet(BaseViewSet):
+    queryset = CurrencyRate.objects.select_related("currency", "base_currency").all()
+    serializer_class = CurrencyRateSerializer
+    filterset_class = CurrencyRateFilter
+    # search_fields = [
+    #     "base_currency__currency_code",
+    #     "currency__currency_code",
+    #     "base_currency__currency_name",
+    #     "currency__currency_name",
+    #     "current_rate",
+    # ]
+    ordering_fields = ["date_created", "rate"]
+    ordering = ["-date_created"]
+
+    def get_queryset(self):
+        queryset = self.queryset.filter(created_by__client=self.request.user.client)
+        return queryset
 
     def list(self, request, *args, **kwargs):
         try:
-            queryset = self.get_queryset()
+            queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
@@ -418,10 +388,9 @@ class CurrencyRateViewSet(BaseViewSet):
         except Exception as e:
             logger.error(f"Error retrieving rate history: {e}")
             return self._create_rendered_response(
-                {'error': "Something went wrong"},
-                status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
             )
- 
+
     def retrieve(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -433,23 +402,23 @@ class CurrencyRateViewSet(BaseViewSet):
 
     def update(self, request, *args, **kwargs):
         try:
-            partial = kwargs.pop('partial', False)
+            partial = kwargs.pop("partial", False)
             instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
             return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         except ValidationError as e:
             logger.error(f"Validation error updating currency rate: {e}")
             return self._create_rendered_response(
-                {'error': extract_error_message(e)},
-                status.HTTP_400_BAD_REQUEST
+                {"error": extract_error_message(e)}, status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             logger.error(f"Error updating currency rate: {e}")
             return self._create_rendered_response(
-                {'error': "Something went wrong"},
-                status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def destroy(self, request, *args, **kwargs):
@@ -458,20 +427,35 @@ class CurrencyRateViewSet(BaseViewSet):
             self.perform_destroy(instance)
             return self._create_rendered_response(
                 {"message": "Currency rate deleted successfully"},
-                status.HTTP_204_NO_CONTENT
+                status.HTTP_204_NO_CONTENT,
             )
         except CurrencyRate.DoesNotExist:
             raise NotFound({"error": "Currency rate not found."})
+
+    @action(detail=False, methods=["get"], url_path="latest-rate")
+    def latest_rate(self, request):
+        """Get the latest currency rate for a given currency code."""
+        try:
+            latest_rate = self.get_queryset().latest("date_created")
+            serializer = self.get_serializer(latest_rate)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except CurrencyRate.DoesNotExist:
+            return self._create_rendered_response(
+                {"error": "No rates found for the specified currency code."},
+                status.HTTP_404_NOT_FOUND,
+            )
 
 
 class CashBookViewSet(BaseCompanyViewSet):
     queryset = CashBook.objects.all()
     serializer_class = CashBookSerializer
 
+
 class CurrencyViewSet(BaseViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
     pagination_class = None
+
     # override the base get queryset
     def get_queryset(self):
         return self.queryset.all()

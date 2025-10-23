@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from apps.accounting.models.models import (
@@ -110,12 +111,69 @@ class VATSettingSerializer(serializers.ModelSerializer):
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
 
-    def validate(self, data):
-        rate = data.get("rate")
-        if rate is not None and (rate < 0 or rate > 100):
+    def validate_rate(self, value):
+        if value is not None and (value < 0 or value > 100):
             raise ValidationError("VAT rate must be between 0 and 100.")
+        return value
 
-        return data
+    def validate(self, attrs):
+        rate = attrs.get("rate")
+        description = attrs.get("description")
+
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            raise serializers.ValidationError("Request context is required.")
+
+        client = request.user.client
+        if not client:
+            raise serializers.ValidationError("Client not found in request context.")
+
+        queryset = VATSetting.objects.filter(
+            created_by__client=client, description=description, rate=rate
+        )
+
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise ValidationError(
+                f"{description} with rate {rate} already exists for your company."
+            )
+
+        return attrs
+
+    def validate_bulk(self, data_list):
+        """Validate bulk creation - filter out duplicates."""
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            raise serializers.ValidationError("Request context is required.")
+
+        client = request.user.client
+
+        existing_settings = set(
+            VATSetting.objects.filter(created_by__client=client).values_list(
+                "description", "rate"
+            )
+        )
+
+        valid_data = []
+        seen = set()
+
+        for item in data_list:
+            description = item.get("description")
+            rate = item.get("rate")
+            key = (description, rate)
+
+            if key not in existing_settings and key not in seen:
+                valid_data.append(item)
+                seen.add(key)
+
+        if not valid_data:
+            raise ValidationError(
+                "All provided VAT settings already exist for your company."
+            )
+
+        return valid_data
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -1059,72 +1117,104 @@ class PaymentSerializer(BaseCompanySerializer):
         model = Payment
         fields = "__all__"
 
+
 class CurrencyRateSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only=True)
     currency_id = serializers.PrimaryKeyRelatedField(
-        queryset=Currency.objects.all(),
-        source='currency',
-        write_only=True
+        queryset=Currency.objects.all(), source="currency", write_only=True
     )
     base_currency = CurrencySerializer(read_only=True)
     base_currency_id = serializers.PrimaryKeyRelatedField(
-        queryset=Currency.objects.all(),
-        source='base_currency',
-        write_only=True
+        queryset=Currency.objects.all(), source="base_currency", write_only=True
     )
 
     class Meta:
         model = CurrencyRate
         fields = [
-            'id',
-            'base_currency', 
-            'currency', 
-            'base_currency_id', 
-            'currency_id',
-            'current_rate', 
-            'date_created',
-            'created_by'
+            "id",
+            "base_currency",
+            "currency",
+            "base_currency_id",
+            "currency_id",
+            "current_rate",
+            "date_created",
+            "created_by",
         ]
-    
+
     def to_representation(self, instance):
-        date = instance.date_created.strftime("%d-%b-%Y")  
+        date = (
+            instance.date_updated.strftime("%d-%b-%Y")
+            if instance.date_updated
+            else instance.date_created.strftime("%d-%b-%Y")
+        )
         created_by = instance.created_by
-        if created_by and hasattr(created_by, 'first_name') and hasattr(created_by, 'last_name') and created_by.first_name and created_by.last_name:
-            created_by_display = f"{created_by.first_name[0].upper()}. {created_by.last_name}"
+        if (
+            created_by
+            and hasattr(created_by, "first_name")
+            and hasattr(created_by, "last_name")
+            and created_by.first_name
+            and created_by.last_name
+        ):
+            created_by_display = (
+                f"{created_by.first_name[0].upper()}. {created_by.last_name}"
+            )
         else:
             created_by_display = None
         return {
-            'id': instance.id,
-            'base_currency': instance.base_currency.currency_code,
-            'currency': instance.currency.currency_code,
-            'current_rate': str(instance.current_rate),
-            'date_created': date,
-            'created_by': created_by_display
+            "id": instance.id,
+            "base_currency": instance.base_currency.currency_code,
+            "currency": instance.currency.currency_code,
+            "current_rate": str(instance.current_rate),
+            "date_updated": date,
+            "updated_by": created_by_display,
         }
-    
+
     def validate(self, attrs):
-        base_currency = attrs.get('base_currency')
-        counter_currency = attrs.get('currency')
-        rate = attrs.get('current_rate')
+        base_currency = attrs.get("base_currency")
+        counter_currency = attrs.get("currency")
+        rate = attrs.get("current_rate")
+        user = self.context["request"].user.client
         if rate is not None and rate <= 0:
             raise ValidationError("Current Rate must be greater than zero.")
 
         if self.instance:
             return attrs
 
-        for fields in ['currency', 'base_currency', 'current_rate']:
+        for fields in ["currency", "base_currency", "current_rate"]:
             if not attrs.get(fields):
                 raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+        last_rate = (
+            CurrencyRate.objects.latest("date_created")
+            if CurrencyRate.objects.exists()
+            else None
+        )
+        if CurrencyRate.objects.filter(
+            created_by__client=user,
+            base_currency=base_currency,
+            currency=counter_currency,
+            current_rate=rate,
+        ).exists():
+            raise ValidationError("This rate is already the latest")
 
         if counter_currency == base_currency:
-            raise ValidationError("Base Currency and Counter Currency cannot be the same.")
+            raise ValidationError(
+                "Base Currency and Counter Currency cannot be the same."
+            )
         return attrs
 
     def create(self, validated_data):
-        request = self.context.get('request')
-        if request and hasattr(request, 'user') and request.user.is_authenticated:
-            validated_data['created_by'] = request.user
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+            validated_data["date_updated"] = timezone.now()
+        return super().update(instance, validated_data)
+
 
 class CashBookSerializer(BaseCompanySerializer):
     currency = CurrencySerializer(read_only=True)
