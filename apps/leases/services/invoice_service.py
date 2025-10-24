@@ -10,6 +10,7 @@ from apps.accounting.models.models import (
     SalesCategory,
     VATSetting,
     SalesAccount,
+    Customer,
 )
 from apps.leases.models import Lease
 from django.contrib.contenttypes.models import ContentType
@@ -82,14 +83,29 @@ class LeaseInvoiceService:
                         status = "pending"
                         is_invoiced = True
 
+                    Customer_obj, created = Customer.objects.get_or_create(
+                        is_individual=tenant_object.__class__.__name__ == "Individual",
+                        individual=(
+                            tenant_object
+                            if tenant_object.__class__.__name__ == "Individual"
+                            else None
+                        ),
+                        company=(
+                            tenant_object
+                            if tenant_object.__class__.__name__ == "Company"
+                            else None
+                        ),
+                    )
+
                     invoice = Invoice.objects.create(
                         invoice_type=invoice_type,
                         status=status,
                         lease=lease,
                         currency=lease.currency,
                         sale_date=today,
-                        customer=primary_tenant,
+                        customer=Customer_obj,
                         is_invoiced=is_invoiced,
+                        created_by=lease.created_by,
                     )
 
                     # Get or create a default sales category for lease items
@@ -168,7 +184,7 @@ class LeaseInvoiceService:
         with transaction.atomic():
             primary_tenant = lease.get_primary_tenant()
             sales_account = SalesAccount.objects.first()
-
+            tenant_object = primary_tenant.tenant_object if primary_tenant else None
             # Get or create required related models once
             sales_category, _ = SalesCategory.objects.get_or_create(
                 name="Opening Balances", defaults={"code": "OPENBAL"}
@@ -193,6 +209,19 @@ class LeaseInvoiceService:
                     "sales_account": sales_account,
                 },
             )
+            Customer_obj, created = Customer.objects.get_or_create(
+                is_individual=tenant_object.__class__.__name__ == "Individual",
+                individual=(
+                    tenant_object
+                    if tenant_object.__class__.__name__ == "Individual"
+                    else None
+                ),
+                company=(
+                    tenant_object
+                    if tenant_object.__class__.__name__ == "Company"
+                    else None
+                ),
+            )
 
             if opening_balance.outstanding_balance <= Decimal("0.00"):
                 # Create a single paid invoice for the non-positive outstanding balance
@@ -201,8 +230,10 @@ class LeaseInvoiceService:
                     status="paid",
                     lease=lease,
                     currency=lease.currency,
-                    customer=primary_tenant,
+                    customer=Customer_obj,
                     sale_date=get_opening_balance_oldest_date(lease),
+                    is_invoiced=True,
+                    created_by=lease.created_by,
                 )
 
                 TransactionLineItem.objects.create(
@@ -246,8 +277,10 @@ class LeaseInvoiceService:
                             status="pending",
                             lease=lease,
                             currency=lease.currency,
-                            customer=primary_tenant,
+                            customer=Customer_obj,
                             sale_date=sale_date,
+                            is_invoiced=True,
+                            created_by=lease.created_by,
                         )
 
                         # Create a single line item for this specific balance

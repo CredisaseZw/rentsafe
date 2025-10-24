@@ -1,18 +1,18 @@
 import logging
 from django.utils.timezone import now
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError, NotFound
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Prefetch
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from django.http import Http404
-from rest_framework import viewsets, status
-from rest_framework import viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
+from decimal import Decimal
 from rest_framework.permissions import IsAuthenticated
 from apps.accounting.models.models import (
     SalesItem,
@@ -33,24 +33,7 @@ from apps.accounting.models.models import (
     CashBook,
     Currency,
     CreditNote,
-    SalesItem,
-    VATSetting,
-    SalesCategory,
-    SalesAccount,
-    CashSale,
-    CashbookEntry,
-    GeneralLedgerAccount,
-    JournalEntry,
-    LedgerTransaction,
-    AccountSector,
-    Invoice,
-    Payment,
-    CurrencyRate,
-    PaymentMethod,
-    TransactionType,
-    CashBook,
-    Currency,
-    CreditNote,
+    TransactionLineItem,
 )
 from apps.accounting.api.serializers.serializers import (
     CustomersSearchSerializer,
@@ -102,20 +85,53 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Ensure users only access objects belonging to their company."""
         # Ensure user and company attributes exist before filtering
-        if self.request.user.is_authenticated and hasattr(self.request.user, "company"):
-            return self.queryset.filter(user__company=self.request.user.company)
+        if self.request.user.is_authenticated and hasattr(self.request.user, "client"):
+            return self.queryset.filter(created_by__client=self.request.user.client)
         return (
             self.queryset.none()
         )  # Return empty queryset if no company or not authenticated
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         """Automatically assign the user when creating objects."""
-        serializer.save(user=self.request.user)
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            logger.error(f"Validation error creating object: {e}")
+            return Response(
+                {"error": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating object: {e}")
+            return Response(
+                {"error": "Something went wrong"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def list(self, request, *args, **kwargs):
+        """List objects filtered by the user's company."""
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            logger.error(f"Error retrieving objects: {e}")
+            return Response(
+                {"error": "Something went wrong"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class ItemViewSet(BaseCompanyViewSet):
-    queryset = SalesItem.objects.all()
     serializer_class = SalesItemSerializer
+    queryset = SalesItem.objects.all()
 
 
 class VATSettingViewSet(BaseViewSet):
@@ -260,8 +276,8 @@ class VATSettingViewSet(BaseViewSet):
 
 
 class SalesCategoryViewSet(BaseCompanyViewSet):
-    queryset = SalesCategory.objects.all()
     serializer_class = SalesCategorySerializer
+    queryset = SalesCategory.objects.all()
 
 
 class SalesAccountViewSet(BaseCompanyViewSet):
@@ -299,16 +315,290 @@ class AccountSectorViewSet(BaseCompanyViewSet):
     serializer_class = AccountSectorSerializer
 
 
-class InvoiceViewSet(BaseCompanyViewSet):
-    queryset = Invoice.objects.all()
+class InvoiceViewSet(viewsets.ModelViewSet):
     serializer_class = InvoiceSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
 
-    def get_serializer_class(self):
-        """Return appropriate serializer based on action"""
-        if self.action == "convert_recurring_to_fiscal":
-            return RecurringToFiscalSerializer
-        return super().get_serializer_class()
+    # Search configuration
+    search_fields = [
+        "document_number",
+        "reference_number",
+        "lease__lease_id",
+        "lease__unit__name",
+    ]
 
+    # Ordering configuration
+    ordering_fields = [
+        "document_number",
+        "date_created",
+        "sale_date",
+        "due_date",
+        "total_inclusive",
+        "status",
+        "invoice_type",
+    ]
+    ordering = ["-date_created"]  # Default ordering
+
+    # Filter configuration
+    filterset_fields = {
+        "invoice_type": ["exact", "in"],
+        "status": ["exact", "in"],
+        "is_invoiced": ["exact"],
+        "is_recurring": ["exact"],
+        "currency__currency_code": ["exact"],
+        "lease__lease_id": ["exact", "icontains"],
+        "date_created": ["gte", "lte", "exact"],
+        "sale_date": ["gte", "lte", "exact"],
+        "due_date": ["gte", "lte", "exact"],
+        "total_inclusive": ["gte", "lte"],
+    }
+
+    def get_queryset(self):
+        """
+        Optimized queryset with select_related and prefetch_related for performance
+        """
+        queryset = Invoice.objects.filter(created_by__client=self.request.user.client)
+        print("Base Invoice Queryset Count:", queryset.count())
+        # Optimize database queries
+        queryset = queryset.select_related(
+            "currency",
+            "lease",
+            "lease__unit",
+            "customer",
+        ).prefetch_related(
+            Prefetch(
+                "line_items",
+                queryset=TransactionLineItem.objects.select_related(
+                    "sales_item",
+                    "sales_item__category",
+                    "sales_item__tax_configuration",
+                ),
+            )
+        )
+        print("Optimized Invoice Queryset Count:", queryset.count())
+        return queryset
+
+    def filter_queryset(self, queryset):
+        """
+        Apply custom filtering logic for enhanced search and filtering
+        """
+        queryset = super().filter_queryset(queryset)
+        request = self.request
+
+        # Custom search across customer names
+        search_query = request.query_params.get("search", None)
+        if search_query:
+            queryset = self._apply_custom_search(queryset, search_query)
+
+        # Filter by customer name
+        customer_name = request.query_params.get("customer_name", None)
+        if customer_name:
+            queryset = self._filter_by_customer_name(queryset, customer_name)
+
+        # Filter by multiple statuses
+        status_in = request.query_params.get("status_in", None)
+        if status_in:
+            status_list = [s.strip() for s in status_in.split(",")]
+            queryset = queryset.filter(status__in=status_list)
+
+        # Filter by multiple invoice types
+        type_in = request.query_params.get("type_in", None)
+        if type_in:
+            type_list = [t.strip() for t in type_in.split(",")]
+            queryset = queryset.filter(invoice_type__in=type_list)
+
+        return queryset
+
+    def _apply_custom_search(self, queryset, search_query):
+        """
+        Apply comprehensive search across multiple fields
+        """
+        return queryset.filter(
+            Q(document_number__icontains=search_query)
+            | Q(reference_number__icontains=search_query)
+            | Q(lease__lease_id__icontains=search_query)
+            | Q(lease__unit__name__icontains=search_query)
+            | Q(customer__tenant_object__full_name__icontains=search_query)
+            | Q(
+                customer__tenant_object__company__registration_name__icontains=search_query
+            )
+            | Q(customer__tenant_object__branch_name__icontains=search_query)
+        )
+
+    def _filter_by_customer_name(self, queryset, customer_name):
+        """
+        Filter by customer name (individual or company)
+        """
+        return queryset.filter(
+            Q(customer__full_name__icontains=customer_name)
+            | Q(customer__identification_number__icontains=customer_name)
+        )
+
+    def create(self, request, *args, **kwargs):
+        """
+        Handle manual invoice creation with robust validation
+        """
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            with transaction.atomic():
+                invoice = serializer.save(created_by=request.user)
+                invoice.update_totals()
+                headers = self.get_success_headers(serializer.data)
+
+                # Log creation
+                self._log_invoice_action(invoice, "created", request.user)
+
+                return Response(
+                    serializer.data, status=status.HTTP_201_CREATED, headers=headers
+                )
+
+        except ValidationError as e:
+            print(f"Validation error creating invoice: {e}")
+            return Response(
+                {"errorr": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            print(f"Unexpected error creating invoice: {e}")
+            return Response(
+                {"error": f"Failed to create invoice: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def update(self, request, *args, **kwargs):
+        """
+        Handle invoice updates with robust validation
+        """
+        try:
+            with transaction.atomic():
+                instance = self.get_object()
+
+                # Validate update data
+                serializer = self.get_serializer(
+                    instance, data=request.data, partial=False
+                )
+                serializer.is_valid(raise_exception=True)
+
+                # Perform update
+                invoice = serializer.save()
+
+                # Log update
+                self._log_invoice_action(invoice, "updated", request.user)
+
+                return Response(serializer.data)
+
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to update invoice: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    # FILTERING AND SEARCH ACTIONS
+    @action(detail=False, methods=["get"], url_path="filter-options")
+    def filter_options(self, request):
+        """
+        Return available filter options for frontend
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        options = {
+            "invoice_types": dict(Invoice.INVOICE_TYPE_CHOICES),
+            "statuses": dict(Invoice.STATUS_CHOICES),
+            "currencies": list(
+                queryset.values_list("currency__currency_code", flat=True).distinct()
+            ),
+            "lease_ids": list(
+                queryset.values_list("lease__lease_id", flat=True).distinct()
+            ),
+        }
+
+        return Response(options)
+
+    @action(detail=False, methods=["get"], url_path="summary")
+    def summary(self, request):
+        """
+        Return summary statistics for filtered invoices
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        from django.db.models import Count, Sum, Q
+
+        summary = queryset.aggregate(
+            total_count=Count("id"),
+            pending_count=Count("id", filter=Q(status="pending")),
+            paid_count=Count("id", filter=Q(status="paid")),
+            draft_count=Count("id", filter=Q(status="draft")),
+            cancelled_count=Count("id", filter=Q(status="cancelled")),
+            total_amount=Sum("total_inclusive"),
+            pending_amount=Sum("total_inclusive", filter=Q(status="pending")),
+            paid_amount=Sum("total_inclusive", filter=Q(status="paid")),
+        )
+
+        # Type breakdown
+        type_breakdown = (
+            queryset.values("invoice_type")
+            .annotate(count=Count("id"), amount=Sum("total_inclusive"))
+            .order_by("invoice_type")
+        )
+
+        # Status breakdown
+        status_breakdown = (
+            queryset.values("status")
+            .annotate(count=Count("id"), amount=Sum("total_inclusive"))
+            .order_by("status")
+        )
+
+        return Response(
+            {
+                "summary": summary,
+                "type_breakdown": list(type_breakdown),
+                "status_breakdown": list(status_breakdown),
+            }
+        )
+
+    @action(detail=False, methods=["get"], url_path="search-suggestions")
+    def search_suggestions(self, request):
+        """
+        Return search suggestions for autocomplete
+        """
+        search_query = request.query_params.get("q", "")
+        if not search_query or len(search_query) < 2:
+            return Response([])
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Get matching document numbers
+        document_numbers = queryset.filter(
+            document_number__icontains=search_query
+        ).values_list("document_number", flat=True)[:10]
+
+        # Get matching customer names
+        customer_names = queryset.filter(
+            Q(customer__full_name__icontains=search_query)
+            | Q(customer__identification_number__icontains=search_query)
+        ).values_list(
+            "customer__full_name",
+            "customer__company__registration_name",
+        )[
+            :10
+        ]
+
+        suggestions = {
+            "document_numbers": list(document_numbers),
+            "customer_names": [
+                name[0] or name[1] for name in customer_names if any(name)
+            ],
+        }
+
+        return Response(suggestions)
+
+    # INVOICE MANAGEMENT ACTIONS
     @action(detail=True, methods=["post"], url_path="mark-paid")
     def mark_paid(self, request, pk=None):
         """Mark invoice as paid"""
@@ -318,9 +608,7 @@ class InvoiceViewSet(BaseCompanyViewSet):
                 invoice.status = "paid"
                 invoice.save()
 
-                # Log the payment action
                 self._log_invoice_action(invoice, "marked_paid", request.user)
-
                 return Response(self.get_serializer(invoice).data)
 
         except Exception as e:
@@ -336,10 +624,7 @@ class InvoiceViewSet(BaseCompanyViewSet):
         try:
             with transaction.atomic():
                 invoice.convert_to_fiscal()
-
-                # Log the conversion action
                 self._log_invoice_action(invoice, "converted_to_fiscal", request.user)
-
                 return Response(self.get_serializer(invoice).data)
 
         except ValidationError as e:
@@ -353,12 +638,10 @@ class InvoiceViewSet(BaseCompanyViewSet):
     @action(detail=True, methods=["post"], url_path="convert-recurring-to-fiscal")
     def convert_recurring_to_fiscal(self, request, pk=None):
         """
-        Convert recurring invoice template to fiscal invoice.
-        Allows modification of line items before conversion.
+        Convert recurring invoice template to fiscal invoice with modifications
         """
         invoice = self.get_object()
 
-        # Validate that this is a recurring invoice that can be converted
         if not invoice.can_generate_fiscal():
             return Response(
                 {
@@ -373,12 +656,10 @@ class InvoiceViewSet(BaseCompanyViewSet):
 
         try:
             with transaction.atomic():
-                # Convert to fiscal invoice with optional modifications
                 fiscal_invoice = invoice.convert_recurring_to_fiscal(
                     serializer.validated_data
                 )
 
-                # Log the conversion action
                 self._log_invoice_action(
                     invoice,
                     "recurring_converted_to_fiscal",
@@ -390,7 +671,6 @@ class InvoiceViewSet(BaseCompanyViewSet):
                     },
                 )
 
-                # Return the newly created fiscal invoice
                 response_serializer = InvoiceSerializer(
                     fiscal_invoice, context={"request": request}
                 )
@@ -408,13 +688,12 @@ class InvoiceViewSet(BaseCompanyViewSet):
 
     @action(detail=True, methods=["post"], url_path="generate-recurring")
     def generate_recurring(self, request, pk=None):
-        """Generate next recurring invoice from a recurring template invoice."""
+        """Generate next recurring invoice from template"""
         invoice = self.get_object()
         try:
             with transaction.atomic():
                 new_invoice = invoice.generate_recurring_invoice()
 
-                # Log the generation action
                 self._log_invoice_action(
                     invoice,
                     "recurring_invoice_generated",
@@ -441,7 +720,6 @@ class InvoiceViewSet(BaseCompanyViewSet):
         """Cancel an invoice with validation"""
         invoice = self.get_object()
 
-        # Validate that invoice can be cancelled
         if invoice.status == "cancelled":
             return Response(
                 {"error": "Invoice is already cancelled."},
@@ -461,7 +739,6 @@ class InvoiceViewSet(BaseCompanyViewSet):
                 invoice.status = "cancelled"
                 invoice.save()
                 self._log_invoice_action(invoice, "cancelled", request.user)
-
                 return Response(self.get_serializer(invoice).data)
 
         except Exception as e:
@@ -472,33 +749,73 @@ class InvoiceViewSet(BaseCompanyViewSet):
 
     @action(detail=False, methods=["get"], url_path="recurring-templates")
     def recurring_templates(self, request):
-        """Get all recurring invoice templates that can be converted to fiscal"""
+        """Get recurring invoice templates"""
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(
             invoice_type="recurring", is_invoiced=False, status="draft"
         ).order_by("-date_created")
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return self._paginated_response(queryset)
 
     @action(detail=False, methods=["get"], url_path="pending-fiscal")
     def pending_fiscal_invoices(self, request):
-        """Get all pending fiscal invoices"""
+        """Get pending fiscal invoices"""
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(
             invoice_type="fiscal", status="pending", is_invoiced=True
         ).order_by("-date_created")
+        return self._paginated_response(queryset)
 
+    @action(detail=False, methods=["get"], url_path="get-pending-invoices")
+    def get_pending_invoices(self, request):
+        """Get all pending invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status="pending")
+        return self._paginated_response(queryset)
+
+    @action(detail=False, methods=["get"], url_path="get-paid-invoices")
+    def get_paid_invoices(self, request):
+        """Get all paid invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status="paid")
+        return self._paginated_response(queryset)
+
+    @action(detail=False, methods=["get"], url_path="get-cancelled-invoices")
+    def get_cancelled_invoices(self, request):
+        """Get all cancelled invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(status="cancelled")
+        return self._paginated_response(queryset)
+
+    @action(detail=False, methods=["get"], url_path="proforma-invoices")
+    def proforma_invoices(self, request):
+        """Get all proforma invoices"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(invoice_type="proforma")
+        return self._paginated_response(queryset)
+
+    @action(detail=False, methods=["get"], url_path="fiscal-invoices")
+    def fiscal_invoices(self, request):
+        """Get all fiscal invoices"""
+        print("Fetching fiscal invoices", self.get_queryset().count())
+        queryset = self.filter_queryset(self.get_queryset())
+        print("Filtering for fiscal invoices", queryset.count())
+        queryset = queryset.filter(invoice_type="fiscal")
+        return self._paginated_response(queryset)
+
+    @action(detail=False, methods=["get"], url_path="recurring-invoices")
+    def recurring_invoices(self, request):
+        """Get all recurring invoice templates"""
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(invoice_type="recurring")
+        return self._paginated_response(queryset)
+
+    # HELPER METHODS
+    def _paginated_response(self, queryset):
+        """Return paginated response for queryset"""
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -515,68 +832,12 @@ class InvoiceViewSet(BaseCompanyViewSet):
             if extra_details:
                 details.update(extra_details)
 
+            # Replace with your actual logging system
             print(f"Invoice Action Log: {details}")
 
         except Exception as e:
             # Don't let logging errors break the main transaction
             print(f"Failed to log invoice action: {str(e)}")
-
-    @action(
-        detail=False, methods=["get"], url_path="get-pending-invoices"
-    )  # Changed to False as it's a list operation
-    def get_pending_invoices(self, request):
-        """Get all pending invoices for the user's company"""
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(status="pending")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(
-        detail=False, methods=["get"], url_path="get-paid-invoices"
-    )  # Changed to False
-    def get_paid_invoices(self, request):
-        """Get all paid invoices for the user's company"""
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(status="paid")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["get"], url_path="get-cancelled-invoices")
-    def get_cancelled_invoices(self, request):
-        """Get all cancelled invoices for the user's company"""
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(status="cancelled")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["get"], url_path="proforma-invoices")
-    def proforma_invoices(self, request):
-        """Get all proforma invoices for the user's company"""
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(invoice_type="proforma")
-        queryset = queryset.filter(invoice_type="proforma")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["get"], url_path="fiscal-invoices")
-    @action(detail=False, methods=["get"], url_path="fiscal-invoices")
-    def fiscal_invoices(self, request):
-        """Get all fiscal invoices for the user's company"""
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(invoice_type="fiscal")
-        queryset = queryset.filter(invoice_type="fiscal")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["get"], url_path="recurring-invoices")
-    @action(detail=False, methods=["get"], url_path="recurring-invoices")
-    def recurring(self, request):
-        """Get all recurring invoice templates for the user's company"""
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(invoice_type="recurring")
-        queryset = queryset.filter(invoice_type="recurring")
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class CreditNoteViewSet(BaseCompanyViewSet):

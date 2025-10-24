@@ -77,8 +77,21 @@ class SalesItem(BaseModelWithUser):
     def __str__(self):
         return f"{self.name} ({self.category.name})"
 
+    def save(self, *args, **kwargs):
+        if not self.item_id:
+            last_item = SalesItem.objects.order_by("-id").first()
+            if not last_item or not last_item.item_id.startswith("ITEM"):
+                self.item_id = "ITEM0001"
+            else:
+                try:
+                    last_number = int(last_item.item_id.replace("ITEM", ""))
+                except ValueError:
+                    last_number = 0
+                self.item_id = f"ITEM{last_number + 1:04d}"
+        super().save(*args, **kwargs)
 
-class SalesCategory(BaseModel):
+
+class SalesCategory(BaseModelWithUser):
     name = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=255, blank=True, null=True)
 
@@ -143,6 +156,29 @@ class LedgerTransaction(BaseModelWithUser):
         )
 
 
+class Customer(BaseModel):
+    """Customer model to represent both individuals and companies."""
+
+    is_individual = models.BooleanField(default=True)
+    individual = models.ForeignKey(
+        Individual, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    company = models.ForeignKey(
+        Company, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.id} {self.is_individual}"
+
+    @property
+    def get_full_name(self):
+        if self.is_individual and self.individual:
+            return self.individual.full_name
+        elif not self.is_individual and self.company:
+            return self.company.full_name
+        return "N/A"
+
+
 class Invoice(BaseModelWithUser):
     INVOICE_TYPE_CHOICES = [
         ("fiscal", "Fiscal"),
@@ -186,7 +222,7 @@ class Invoice(BaseModelWithUser):
 
     # Customer Relationship
     customer = models.ForeignKey(
-        "leases.LeaseTenant",
+        Customer,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -378,8 +414,9 @@ class Invoice(BaseModelWithUser):
         return None
 
     def __str__(self):
-        customer_id_str = self.lease.get_tenant_names() or "No Customer"
-        return f"{self.invoice_type.title()} {self.document_number} - {customer_id_str}"
+        return (
+            f"{self.invoice_type.title()} {self.document_number} - {self.customer_id}"
+        )
 
 
 class CashSale(BaseModelWithUser):
