@@ -123,43 +123,15 @@ class VATSettingSerializer(serializers.ModelSerializer):
 
         request = self.context.get("request")
         if not request or not hasattr(request, "user"):
-            raise serializers.ValidationError("Request context is required.")
+            raise ValidationError("Request context is required.")
 
         client = request.user.client
         if not client:
-            raise serializers.ValidationError("Client not found in request context.")
+            raise ValidationError("Client not found in request context.")
 
-        queryset = VATSetting.objects.filter(
-            created_by__client=client, description=description, rate=rate
-        )
-
-        existing_description = VATSetting.objects.filter(
-            created_by__client=client, description=description
-        ).first()
-        if existing_description and existing_description.rate != rate:
-            pk = existing_description.pk
-            instance = VATSetting.objects.filter(pk=pk).first()
-            if instance:
-                instance.rate = rate
-                if (
-                    request
-                    and hasattr(request, "user")
-                    and request.user.is_authenticated
-                ):
-                    instance.updated_by = request.user
-                    instance.date_updated = timezone.now()
-                instance.save()
-                attrs["rate_updated"] = True
-            return attrs
-
-        if self.instance:
-            queryset = queryset.exclude(pk=self.instance.pk)
-
-        if queryset.exists():
+        if VATSetting.objects.filter(created_by__client=client, rate=rate).exists():
             raise ValidationError(
-                {
-                    "error": f"{description} with rate {rate} already exists for your company."
-                }
+                {"error": f"VAT rate {rate} already exists for your company."}
             )
 
         return attrs
@@ -168,13 +140,13 @@ class VATSettingSerializer(serializers.ModelSerializer):
         """Validate bulk creation - filter out duplicates."""
         request = self.context.get("request")
         if not request or not hasattr(request, "user"):
-            raise serializers.ValidationError("Request context is required.")
+            raise ValidationError("Request context is required.")
 
         client = request.user.client
 
-        existing_settings = set(
+        existing_rates = set(
             VATSetting.objects.filter(created_by__client=client).values_list(
-                "description", "rate"
+                "rate", flat=True
             )
         )
 
@@ -182,13 +154,10 @@ class VATSettingSerializer(serializers.ModelSerializer):
         seen = set()
 
         for item in data_list:
-            description = item.get("description")
             rate = item.get("rate")
-            key = (description, rate)
-
-            if key not in existing_settings and key not in seen:
+            if rate not in existing_rates and rate not in seen:
                 valid_data.append(item)
-                seen.add(key)
+                seen.add(rate)
 
         if not valid_data:
             raise ValidationError(

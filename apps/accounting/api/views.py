@@ -122,10 +122,6 @@ class VATSettingViewSet(BaseViewSet):
         try:
             serializer = self.get_serializer(data=data, many=bulk)
             serializer.is_valid(raise_exception=True)
-            if serializer.validated_data.get("rate_updated"):
-                return self._create_rendered_response(
-                    {"message": "VAT updated successfully"}, status.HTTP_200_OK
-                )
             serializer.save()
             return self._create_rendered_response(
                 serializer.data, status.HTTP_201_CREATED
