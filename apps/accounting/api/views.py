@@ -118,13 +118,19 @@ class VATSettingViewSet(BaseViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        bulk = isinstance(data, list)
+        invalid_data = []
+        valid_data = []
         try:
-            serializer = self.get_serializer(data=data, many=bulk)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            for item in data:
+                serializer = self.get_serializer(data=item)
+                if serializer.is_valid():
+                    serializer.save()
+                    valid_data.append(serializer.data)
+                else:
+                    invalid_data.append(extract_error_message(serializer.errors))
             return self._create_rendered_response(
-                serializer.data, status.HTTP_201_CREATED
+                {"created": valid_data, "errors": invalid_data},
+                status.HTTP_400_BAD_REQUEST,
             )
         except ValidationError as e:
             logger.error(f"Validation error creating VAT setting: {e}")

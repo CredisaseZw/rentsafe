@@ -117,54 +117,22 @@ class VATSettingSerializer(serializers.ModelSerializer):
             raise ValidationError("VAT rate must be between 0 and 100.")
         return value
 
-    def validate(self, attrs):
-        rate = attrs.get("rate")
-        description = attrs.get("description")
-
-        request = self.context.get("request")
-        if not request or not hasattr(request, "user"):
-            raise ValidationError("Request context is required.")
-
-        client = request.user.client
-        if not client:
-            raise ValidationError("Client not found in request context.")
-
-        if VATSetting.objects.filter(created_by__client=client, rate=rate).exists():
-            raise ValidationError(
-                {"error": f"VAT rate {rate} already exists for your company."}
-            )
-
-        return attrs
-
-    def validate_bulk(self, data_list):
+    def validate(self, data_list):
         """Validate bulk creation - filter out duplicates."""
         request = self.context.get("request")
         if not request or not hasattr(request, "user"):
             raise ValidationError("Request context is required.")
 
         client = request.user.client
-
-        existing_rates = set(
-            VATSetting.objects.filter(created_by__client=client).values_list(
-                "rate", flat=True
-            )
-        )
-
-        valid_data = []
-        seen = set()
-
-        for item in data_list:
-            rate = item.get("rate")
-            if rate not in existing_rates and rate not in seen:
-                valid_data.append(item)
-                seen.add(rate)
-
-        if not valid_data:
+        existing_rates = VATSetting.objects.filter(
+            created_by__client=client
+        ).values_list("rate", flat=True)
+        if data_list.get("rate") in existing_rates:
             raise ValidationError(
-                "All provided VAT settings already exist for your company."
+                f"VAT setting with rate {data_list.get('rate')} already exists for your company."
             )
 
-        return valid_data
+        return data_list
 
     def create(self, validated_data):
         request = self.context.get("request")

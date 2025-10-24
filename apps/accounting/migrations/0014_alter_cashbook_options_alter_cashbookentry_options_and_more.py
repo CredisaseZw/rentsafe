@@ -96,9 +96,4 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "VAT Settings",
             },
         ),
-        migrations.AlterField(
-            model_name="vatsetting",
-            name="description",
-            field=models.CharField(max_length=255, unique=True),
-        ),
     ]
