@@ -1,19 +1,38 @@
+import logging
 from django.utils.timezone import now
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from django.db.models import Q, Sum
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
-from urllib import request
 from django.http import Http404
+from rest_framework import viewsets, status
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from apps.accounting.models.models import (
+    SalesItem,
+    VATSetting,
+    SalesCategory,
+    SalesAccount,
+    CashSale,
+    CashbookEntry,
+    GeneralLedgerAccount,
+    JournalEntry,
+    LedgerTransaction,
+    AccountSector,
+    Invoice,
+    Payment,
+    CurrencyRate,
+    PaymentMethod,
+    TransactionType,
+    CashBook,
+    Currency,
+    CreditNote,
     SalesItem,
     VATSetting,
     SalesCategory,
@@ -66,7 +85,6 @@ from apps.individuals.models.models import Individual
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
-import logging
 
 from apps.leases.models.models import Lease
 
@@ -100,50 +118,145 @@ class ItemViewSet(BaseCompanyViewSet):
     serializer_class = SalesItemSerializer
 
 
-class VATSettingViewSet(BaseCompanyViewSet):
+class VATSettingViewSet(BaseViewSet):
+    """ViewSet for managing VAT settings.
+
+    Allows creation, retrieval, updating, and deletion of VAT settings.
+    Ensures that VAT settings are unique per company based on description.
+
+    """
+
     queryset = VATSetting.objects.all()
     serializer_class = VATSettingSerializer
 
-    def create(self, request, *args, **kwargs):
-        """
-        Allows bulk creation of VAT settings and prevents duplicate descriptions per company.
-        """
-        data = request.data
-        if not isinstance(data, list):
-            # If not a list, proceed with standard single object creation
-            return super().create(request, *args, **kwargs)
+    def get_queryset(self):
+        return self.queryset.filter(
+            created_by__client=self.request.user.client, vat_applicable=True
+        )
 
-        company = self.request.user.company
-
-        # Get descriptions of existing VAT settings for the user's company
-        existing_descriptions = set(
-            VATSetting.objects.filter(user__company=company).values_list(
+    def _get_existing_descriptions(self, client):
+        return set(
+            VATSetting.objects.filter(created_by__client=client).values_list(
                 "description", flat=True
             )
         )
 
-        # Filter out data for VAT settings that already exist
-        valid_data = [
+    def _filter_valid_data(self, data, existing_descriptions):
+        return [
             item
             for item in data
             if item.get("description") not in existing_descriptions
         ]
 
-        if not valid_data:
-            return Response(
-                {"error": "All provided VAT settings already exist for your company."},
-                status=status.HTTP_400_BAD_REQUEST,
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        client = self.request.user.client
+
+        if isinstance(data, list):
+            existing_descriptions = self._get_existing_descriptions(client)
+            valid_data = self._filter_valid_data(data, existing_descriptions)
+
+            if not valid_data:
+                return Response(
+                    {
+                        "error": "All provided VAT settings already exist for your company."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            serializer = self.get_serializer(data=valid_data, many=True)
+        else:
+            serializer = self.get_serializer(data=data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+        except ValidationError as e:
+            logger.error(f"Validation error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        # The perform_create in BaseCompanyViewSet handles assigning the user.
-        # So we just need to pass the valid_data to the serializer.
-        serializer = self.get_serializer(data=valid_data, many=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(
-            serializer
-        )  # This will call serializer.save(user=self.request.user) for each object
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def list(self, request, *args, **kwargs):
+        try:
+            vat = self.get_queryset()
+            serializer = self.get_serializer(vat, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT settings: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = VATSetting.objects.get(
+                pk=kwargs.get("pk"), created_by__client=request.user.client
+            )
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+
+        except ValidationError as e:
+            logger.error(f"Validation error updating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error updating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return self._create_rendered_response(
+                {"success": "VAT setting deleted successfully"},
+                status.HTTP_204_NO_CONTENT,
+            )
+
+        except Http404:
+            return self._create_rendered_response(
+                {"error": "VAT not found"},
+                status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"Error deleting VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class SalesCategoryViewSet(BaseCompanyViewSet):
@@ -441,21 +554,26 @@ class InvoiceViewSet(BaseCompanyViewSet):
         """Get all proforma invoices for the user's company"""
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(invoice_type="proforma")
+        queryset = queryset.filter(invoice_type="proforma")
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["get"], url_path="fiscal-invoices")
     @action(detail=False, methods=["get"], url_path="fiscal-invoices")
     def fiscal_invoices(self, request):
         """Get all fiscal invoices for the user's company"""
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(invoice_type="fiscal")
+        queryset = queryset.filter(invoice_type="fiscal")
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"], url_path="recurring-invoices")
+    @action(detail=False, methods=["get"], url_path="recurring-invoices")
     def recurring(self, request):
         """Get all recurring invoice templates for the user's company"""
         queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(invoice_type="recurring")
         queryset = queryset.filter(invoice_type="recurring")
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -471,78 +589,84 @@ class PaymentViewSet(BaseCompanyViewSet):
     serializer_class = PaymentSerializer
 
 
-class CurrencyRateViewSet(BaseCompanyViewSet):
-    queryset = CurrencyRate.objects.all()
+class CurrencyRateViewSet(BaseViewSet):
+    queryset = CurrencyRate.objects.select_related("currency", "base_currency").all()
     serializer_class = CurrencyRateSerializer
 
-    @action(
-        detail=False, methods=["GET", "POST", "PUT", "PATCH"], url_path="rate-setup"
-    )
-    def rate_setup(self, request, pk=None):
-        """
-        Endpoint to get or set currency rate settings for the user's company.
-        There should ideally be only one CurrencyRate instance per company (or a system-wide rate).
-        """
-        currency_rate_query = self.queryset.filter(user__company=request.user.company)
-        instance = currency_rate_query.last()
-
-        if request.method == "GET":
-            if instance:
-                serializer = self.get_serializer(instance)
-                return Response({"currency_rate_settings": serializer.data})
-            return Response(
-                {"errors": "No currency rate settings found for your company."},
-                status=status.HTTP_404_NOT_FOUND,
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+        except ValidationError as e:
+            logger.error(f"Validation error creating currency rate: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating currency rate: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        if request.method in ["POST", "PUT", "PATCH"]:
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving rate history: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-            base_currency = request.data.get("base_currency")
-            target_currency = request.data.get("currency")
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
 
-            current_rate = request.data.get("current_rate")
-            try:
-                current_rate = float(current_rate)
-            except (TypeError, ValueError):
-                return Response(
-                    {"error": "Current rate must be a valid number"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        except CurrencyRate.DoesNotExist as exc:
+            raise NotFound("Currency rate not found.") from exc
 
-            if current_rate <= 0:
-                return Response(
-                    {"error": "Current rate must be greater than zero"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except ValidationError as e:
+            logger.error(f"Validation error updating currency rate: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating currency rate: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-            if serializer.is_valid(
-                raise_exception=True
-            ):  # raise_exception=True handles errors automatically
-                if base_currency == target_currency:
-                    return Response(
-                        {
-                            "error": "Base currency and Target currency cannot be the same"
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                serializer.save(
-                    user=request.user
-                )  # Assign user during save via perform_create/update
-                message = (
-                    "Rate updated successfully"
-                    if instance
-                    else "Rate created successfully"
-                )
-                return Response(
-                    {
-                        "Success ": message,
-                    },
-                    status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED,
-                )
-            # If serializer.is_valid() was False, errors would be raised by raise_exception=True
-            # and handled by DRF's exception handler.
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return self._create_rendered_response(
+                {"message": "Currency rate deleted successfully"},
+                status.HTTP_204_NO_CONTENT,
+            )
+        except CurrencyRate.DoesNotExist:
+            raise NotFound({"error": "Currency rate not found."})
 
 
 class CashBookViewSet(BaseCompanyViewSet):
@@ -550,12 +674,12 @@ class CashBookViewSet(BaseCompanyViewSet):
     serializer_class = CashBookSerializer
 
 
-class CurrencyViewSet(BaseCompanyViewSet):
+class CurrencyViewSet(BaseViewSet):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
     pagination_class = None
 
-    # overide the base get queryset
+    # override the base get queryset
     def get_queryset(self):
         return self.queryset.all()
 
@@ -769,70 +893,166 @@ class ServiceStandardPricingViewSet(BaseViewSet):
 
 
 class CustomersViewSet(BaseViewSet):
-    """ViewSet to retrieve customers (tenants) associated with leases managed by the user's client."""
+    """
+    ViewSet to retrieve customers (individuals, companies, tenants).
 
-    queryset = Lease.objects.none()
+    Query params:
+      - customer_type: 'individual', 'company', or 'tenant'
+      - search: search string (optional)
+      - tenant_type: 'individual' or 'company' (for retrieve when customer_type=tenant)
+    """
+
+    queryset = None
     serializer_class = CustomersSearchSerializer
 
     def get_queryset(self):
+        """
+        Return queryset or list based on customer_type:
+          - individual: filtered Individual queryset
+          - company: filtered CompanyBranch queryset
+          - tenant: deduplicated list of tenant instances from leases
+        """
         user = getattr(self.request, "user", None)
-        search_key = self.request.query_params.get("search", None)
-
         if not user or not hasattr(user, "client"):
             return []
 
-        leases_qs = Lease.objects.filter(managing_client=user.client)
+        customer_type = self.request.query_params.get("customer_type", "tenant")
+        search_key = self.request.query_params.get("search")
 
-        individual_ct = ContentType.objects.get_for_model(Individual)
-        branch_ct = ContentType.objects.get_for_model(CompanyBranch)
-
-        individual_ids = leases_qs.filter(
-            leasetenantassociation__tenant__content_type=individual_ct
-        ).values_list("leasetenantassociation__tenant__object_id", flat=True)
-
-        branch_ids = leases_qs.filter(
-            leasetenantassociation__tenant__content_type=branch_ct
-        ).values_list("leasetenantassociation__tenant__object_id", flat=True)
-
-        ind_qs = Individual.objects.filter(id__in=individual_ids).distinct()
-        br_qs = CompanyBranch.objects.filter(id__in=branch_ids).distinct()
-
-        if search_key:
-            s = search_key.strip()
-            ind_qs = ind_qs.filter(
-                Q(identification_number__icontains=s)
-                | Q(first_name__icontains=s)
-                | Q(last_name__icontains=s)
+        if customer_type == "individual":
+            customers = Individual.objects.filter(is_active=True)
+            filterset = IndividualCustomerFilter(
+                self.request.query_params, queryset=customers
             )
-            br_qs = br_qs.filter(
-                Q(branch_name__icontains=s)
-                | Q(company__registration_name__icontains=s)
-                | Q(company__trading_name__icontains=s)
-                | Q(company__registration_number__icontains=s)
+            return filterset.qs
+
+        elif customer_type == "company":
+            customers = CompanyBranch.objects.filter(company__is_active=True)
+            filterset = CompanyCustomerFilter(
+                self.request.query_params, queryset=customers
             )
+            return filterset.qs
 
-        tenants = list(ind_qs) + list(br_qs)
-        seen = set()
-        unique_tenants = []
-        for tenant in tenants:
-            key = (tenant.__class__, tenant.pk)
-            if key not in seen:
-                seen.add(key)
-                unique_tenants.append(tenant)
+        elif customer_type == "tenant":
+            return search_tenants_for_client(user.client, search=search_key)
 
-        return unique_tenants
+        return []
 
     def list(self, request, *args, **kwargs):
+        """
+        List customers based on customer_type query param.
+        Supports pagination for all customer types.
+        """
         try:
+            customer_type = request.query_params.get("customer_type")
+            if not customer_type:
+                return self._create_rendered_response(
+                    {
+                        "error": "customer type is required. Use 'individual', 'company', or 'tenant'."
+                    },
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
+            if customer_type not in ["individual", "company", "tenant"]:
+                return self._create_rendered_response(
+                    {
+                        "error": "Invalid customer type. Must be 'individual', 'company', or 'tenant'."
+                    },
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
             queryset = self.get_queryset()
+            # Paginate the results
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
+
             serializer = self.get_serializer(queryset, many=True)
             return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+
         except Exception as e:
-            logger.error(f"Error retrieving customers: {e}")
+            logger.error("Error listing customers: %s", e, exc_info=True)
             return self._create_rendered_response(
-                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        """
+        Retrieve a single customer by ID and type.
+
+        For customer_type=tenant, requires tenant_type ('individual' or 'company') query param.
+        For customer_type=individual/company, uses standard DRF retrieve.
+        """
+        try:
+            customer_type = request.query_params.get("customer_type")
+
+            if not customer_type:
+                return self._create_rendered_response(
+                    {"error": "customer_type query parameter is required"},
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
+            if customer_type == "individual":
+                try:
+                    instance = Individual.objects.get(pk=pk, is_active=True)
+                    serializer = self.get_serializer(instance)
+                    return self._create_rendered_response(
+                        serializer.data, status.HTTP_200_OK
+                    )
+                except Individual.DoesNotExist:
+                    return self._create_rendered_response(
+                        {"error": "Individual customer not found"},
+                        status.HTTP_404_NOT_FOUND,
+                    )
+
+            elif customer_type == "company":
+                try:
+                    instance = CompanyBranch.objects.select_related("company").get(
+                        pk=pk, company__is_active=True
+                    )
+                    serializer = self.get_serializer(instance)
+                    return self._create_rendered_response(
+                        serializer.data, status.HTTP_200_OK
+                    )
+                except CompanyBranch.DoesNotExist:
+                    return self._create_rendered_response(
+                        {"error": "Company customer not found"},
+                        status.HTTP_404_NOT_FOUND,
+                    )
+
+            elif customer_type == "tenant":
+                tenant_type = request.query_params.get("tenant_type")
+                if not tenant_type or tenant_type not in ["individual", "company"]:
+                    return self._create_rendered_response(
+                        {
+                            "error": "tenant_type query parameter is required for tenants. Use 'individual' or 'company'."
+                        },
+                        status.HTTP_400_BAD_REQUEST,
+                    )
+
+                instance = get_tenant_by_type_and_id(tenant_type, pk)
+                if not instance:
+                    return self._create_rendered_response(
+                        {"error": "Tenant not found"},
+                        status.HTTP_404_NOT_FOUND,
+                    )
+
+                serializer = self.get_serializer(instance)
+                return self._create_rendered_response(
+                    serializer.data, status.HTTP_200_OK
+                )
+
+            else:
+                return self._create_rendered_response(
+                    {"error": "Invalid customer_type"},
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
+        except Exception as e:
+            logger.error("Error retrieving customer: %s", e, exc_info=True)
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

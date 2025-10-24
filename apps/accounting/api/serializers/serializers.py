@@ -21,6 +21,25 @@ from apps.accounting.models.models import (
     JournalEntry,
     PaymentMethod,
     Payment,
+    SalesAccount,
+    SalesCategory,
+    SalesItem,
+    CashSale,
+    Invoice,
+    CreditNote,
+    Currency,
+    CurrencyRate,
+    VATSetting,
+    CashBook,
+    CashbookEntry,
+    TransactionLineItem,
+    TransactionType,
+    AccountSector,
+    LedgerTransaction,
+    GeneralLedgerAccount,
+    JournalEntry,
+    PaymentMethod,
+    Payment,
 )
 from apps.accounting.models.disbursements import Disbursement
 from decimal import Decimal, ROUND_HALF_UP
@@ -30,6 +49,7 @@ from apps.common.api.serializers import AddressSerializer
 from apps.companies.models import CompanyProfile, Company
 from apps.companies.models.models import CompanyBranch
 from apps.individuals.models import Individual
+from apps.individuals.models.models import IndividualAccounts
 from apps.subscriptions.models.models import Services
 
 
@@ -88,10 +108,45 @@ class SalesCategorySerializer(BaseCompanySerializer):
         fields = ["id", "name", "code", "date_created"]
 
 
-class VATSettingSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
+class VATSettingSerializer(serializers.ModelSerializer):
+    rate = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        error_messages={
+            "required": "Rate: This field is required.",
+            "invalid": "Rate: A valid decimal number is required.",
+            "blank": "Rate: This field may not be blank.",
+        },
+    )
+    description = serializers.CharField(
+        error_messages={
+            "required": "Description: This field is required.",
+            "blank": "Description: This field may not be blank.",
+        }
+    )
+
+    class Meta:
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
+
+    def validate(self, data):
+        rate = data.get("rate")
+        if rate is not None and (rate < 0 or rate > 100):
+            raise ValidationError("VAT rate must be between 0 and 100.")
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+        return super().update(instance, validated_data)
 
 
 class SalesAccountSerializer(BaseCompanySerializer):
@@ -343,28 +398,6 @@ class TransactionLineItemSerializer(serializers.ModelSerializer):
             "date_created",
             "date_updated",
         ]
-
-
-class RecurringToFiscalSerializer(serializers.Serializer):
-    """Serializer for converting recurring invoices to fiscal"""
-
-    items = TransactionLineItemSerializer(many=True, required=False)
-    reference_number = serializers.CharField(required=False, allow_blank=True)
-    sale_date = serializers.DateField(required=False)
-
-    def validate(self, data):
-        # Validate that all required fields are present if items are provided
-        if "items" in data and data["items"]:
-            for item in data["items"]:
-                if "sales_item" not in item:
-                    raise serializers.ValidationError(
-                        {"items": "Sales item is required for all line items."}
-                    )
-                if "quantity" not in item:
-                    raise serializers.ValidationError(
-                        {"items": "Quantity is required for all line items."}
-                    )
-        return data
 
 
 class InvoiceSerializer(BaseCompanySerializer):
@@ -1054,12 +1087,78 @@ class PaymentSerializer(BaseCompanySerializer):
         fields = "__all__"
 
 
-class CurrencyRateSerializer(BaseCompanySerializer):
+class CurrencyRateSerializer(serializers.ModelSerializer):
     currency = CurrencySerializer(read_only=True)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(), source="currency", write_only=True
+    )
     base_currency = CurrencySerializer(read_only=True)
+    base_currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(), source="base_currency", write_only=True
+    )
 
-    class Meta(BaseCompanySerializer.Meta):
+    class Meta:
         model = CurrencyRate
+        fields = [
+            "id",
+            "base_currency",
+            "currency",
+            "base_currency_id",
+            "currency_id",
+            "current_rate",
+            "date_created",
+            "created_by",
+        ]
+
+    def to_representation(self, instance):
+        date = instance.date_created.strftime("%d-%b-%Y")
+        created_by = instance.created_by
+        if (
+            created_by
+            and hasattr(created_by, "first_name")
+            and hasattr(created_by, "last_name")
+            and created_by.first_name
+            and created_by.last_name
+        ):
+            created_by_display = (
+                f"{created_by.first_name[0].upper()}. {created_by.last_name}"
+            )
+        else:
+            created_by_display = None
+        return {
+            "id": instance.id,
+            "base_currency": instance.base_currency.currency_code,
+            "currency": instance.currency.currency_code,
+            "current_rate": str(instance.current_rate),
+            "date_created": date,
+            "created_by": created_by_display,
+        }
+
+    def validate(self, attrs):
+        base_currency = attrs.get("base_currency")
+        counter_currency = attrs.get("currency")
+        rate = attrs.get("current_rate")
+        if rate is not None and rate <= 0:
+            raise ValidationError("Current Rate must be greater than zero.")
+
+        if self.instance:
+            return attrs
+
+        for fields in ["currency", "base_currency", "current_rate"]:
+            if not attrs.get(fields):
+                raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+
+        if counter_currency == base_currency:
+            raise ValidationError(
+                "Base Currency and Counter Currency cannot be the same."
+            )
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
+        return super().create(validated_data)
 
 
 class CashBookSerializer(BaseCompanySerializer):
@@ -1260,9 +1359,11 @@ class CustomersSearchSerializer(serializers.Serializer):
     full_name = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
-    address = serializers.SerializerMethodField()
+    # address = serializers.SerializerMethodField()
     tin_number = serializers.SerializerMethodField()
     vat_number = serializers.SerializerMethodField()
+    account_number = serializers.SerializerMethodField()
+    industry = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
         if isinstance(obj, Individual):
@@ -1283,6 +1384,34 @@ class CustomersSearchSerializer(serializers.Serializer):
             return self._company_profile_cache[company_id]
         return None
 
+    def _get_individual_account(self, obj):
+        if not hasattr(self, "_individual_account_cache"):
+            self._individual_account_cache = {}
+        if isinstance(obj, Individual):
+            individual_id = obj.pk
+            if individual_id not in self._individual_account_cache:
+                self._individual_account_cache[individual_id] = (
+                    IndividualAccounts.objects.filter(individual=obj).first()
+                )
+            return self._individual_account_cache[individual_id]
+        return None
+
+    def get_account_number(self, obj):
+        if isinstance(obj, Individual):
+            return obj.account_number or None
+        else:
+            profile = self._get_company_profile(obj)
+            return profile.account_number if profile else None
+        return None
+
+    def get_industry(self, obj):
+        if isinstance(obj, Individual):
+            employment_detail = obj.employment_details.order_by("-id").first()
+            return employment_detail.industry if employment_detail else None
+        elif isinstance(obj, CompanyBranch):
+            return obj.company.industry if obj.company else None
+        return None
+
     def get_phone(self, obj):
         if isinstance(obj, Individual):
             return obj.phone or None
@@ -1301,7 +1430,8 @@ class CustomersSearchSerializer(serializers.Serializer):
 
     def get_tin_number(self, obj):
         if isinstance(obj, Individual):
-            return None
+            profile = self._get_individual_account(obj)
+            return profile.tin_number if profile else None
         elif isinstance(obj, CompanyBranch):
             profile = self._get_company_profile(obj)
             return profile.tin_number if profile else None
@@ -1309,7 +1439,8 @@ class CustomersSearchSerializer(serializers.Serializer):
 
     def get_vat_number(self, obj):
         if isinstance(obj, Individual):
-            return None
+            profile = self._get_individual_account(obj)
+            return profile.vat_number if profile else None
         elif isinstance(obj, CompanyBranch):
             profile = self._get_company_profile(obj)
             return profile.vat_number if profile else None
