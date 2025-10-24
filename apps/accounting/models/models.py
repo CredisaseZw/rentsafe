@@ -572,11 +572,6 @@ class PaymentMethod(BaseModel):
     payment_method_name = models.CharField(max_length=255)
     currency = models.CharField(max_length=50, blank=True, null=True)
 
-    class Meta:
-        app_label = "accounting"
-        verbose_name = _("payment method")
-        verbose_name_plural = _("payment methods")
-
     def __str__(self):
         return self.payment_method_name
 

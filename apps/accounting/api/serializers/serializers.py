@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.utils import timezone
+from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from apps.accounting.models.models import (
@@ -132,12 +133,33 @@ class VATSettingSerializer(serializers.ModelSerializer):
             created_by__client=client, description=description, rate=rate
         )
 
+        existing_description = VATSetting.objects.filter(
+            created_by__client=client, description=description
+        ).first()
+        if existing_description and existing_description.rate != rate:
+            pk = existing_description.pk
+            instance = VATSetting.objects.filter(pk=pk).first()
+            if instance:
+                instance.rate = rate
+                if (
+                    request
+                    and hasattr(request, "user")
+                    and request.user.is_authenticated
+                ):
+                    instance.updated_by = request.user
+                    instance.date_updated = timezone.now()
+                instance.save()
+                attrs["rate_updated"] = True
+            return attrs
+
         if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
 
         if queryset.exists():
             raise ValidationError(
-                f"{description} with rate {rate} already exists for your company."
+                {
+                    "error": f"{description} with rate {rate} already exists for your company."
+                }
             )
 
         return attrs
@@ -1184,17 +1206,17 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
             if not attrs.get(fields):
                 raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
         last_rate = (
-            CurrencyRate.objects.latest("date_created")
-            if CurrencyRate.objects.exists()
-            else None
+            CurrencyRate.objects.filter(
+                created_by__client=user,
+                base_currency=base_currency,
+                currency=counter_currency,
+            )
+            .order_by("-date_updated", "-date_created")
+            .first()
         )
-        if CurrencyRate.objects.filter(
-            created_by__client=user,
-            base_currency=base_currency,
-            currency=counter_currency,
-            current_rate=rate,
-        ).exists():
-            raise ValidationError("This rate is already the latest")
+
+        if last_rate and last_rate.current_rate == rate:
+            raise ValidationError({"error": "This rate is already the latest."})
 
         if counter_currency == base_currency:
             raise ValidationError(
