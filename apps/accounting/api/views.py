@@ -366,14 +366,7 @@ class CurrencyRateViewSet(BaseViewSet):
     queryset = CurrencyRate.objects.select_related("currency", "base_currency").all()
     serializer_class = CurrencyRateSerializer
     filterset_class = CurrencyRateFilter
-    # search_fields = [
-    #     "base_currency__currency_code",
-    #     "currency__currency_code",
-    #     "base_currency__currency_name",
-    #     "currency__currency_name",
-    #     "current_rate",
-    # ]
-    ordering_fields = ["date_created", "rate"]
+    ordering_fields = ["date_created", "current_rate"]
     ordering = ["-date_created"]
 
     def get_queryset(self):
