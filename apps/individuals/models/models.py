@@ -64,6 +64,15 @@ class Individual(BaseModelWithUser):
         return f"{self.first_name} {self.last_name}"
 
     @property
+    def primary_address(self):
+        primary_address = (
+            self.addresses.filter(is_primary=True).first()
+            if self.addresses.exists()
+            else "No Address"
+        )
+        return primary_address
+
+    @property
     def phone(self):
 
         return (
