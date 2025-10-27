@@ -346,9 +346,10 @@ class Migration(migrations.Migration):
                     "account_number",
                     models.CharField(
                         blank=True,
-                        help_text="Main bank account number for the company.",
+                        help_text="Account number for the company.",
                         max_length=255,
                         null=True,
+                        unique=True,
                         verbose_name="Account Number",
                     ),
                 ),

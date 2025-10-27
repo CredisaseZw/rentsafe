@@ -21,6 +21,7 @@ from apps.accounting.models.models import (
     JournalEntry,
     PaymentMethod,
     Payment,
+    Customer,
 )
 from apps.accounting.models.disbursements import Disbursement
 from decimal import Decimal, ROUND_HALF_UP
@@ -68,18 +69,18 @@ class DisbursementSerializer(serializers.ModelSerializer):
 class BaseCompanySerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
-        read_only_fields = ["user", "date_created", "date_updated"]
+        read_only_fields = ["created_by", "date_created", "date_updated"]
 
     def create(self, validated_data):
         request = self.context.get("request")
         if request and hasattr(request, "user") and request.user.is_authenticated:
-            validated_data["user"] = request.user
+            validated_data["created_by"] = request.user
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
         if request and hasattr(request, "user") and request.user.is_authenticated:
-            validated_data["user"] = request.user
+            validated_data["updated_by"] = request.user
         return super().update(instance, validated_data)
 
 
@@ -87,12 +88,54 @@ class SalesCategorySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = SalesCategory
         fields = ["id", "name", "code", "date_created"]
+        read_only_fields = ["date_created", "id"]
+
+    def validate(self, attrs):
+        if SalesCategory.objects.filter(code__iexact=attrs.get("code")).exists():
+            raise ValidationError("Sales category with this code already exists.")
+
+        return attrs
 
 
-class VATSettingSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
+class VATSettingSerializer(serializers.ModelSerializer):
+    rate = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        error_messages={
+            "required": "Rate: This field is required.",
+            "invalid": "Rate: A valid decimal number is required.",
+            "blank": "Rate: This field may not be blank.",
+        },
+    )
+    description = serializers.CharField(
+        error_messages={
+            "required": "Description: This field is required.",
+            "blank": "Description: This field may not be blank.",
+        }
+    )
+
+    class Meta:
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
+
+    def validate(self, data):
+        rate = data.get("rate")
+        if rate is not None and (rate < 0 or rate > 100):
+            raise ValidationError("VAT rate must be between 0 and 100.")
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+        return super().update(instance, validated_data)
 
 
 class SalesAccountSerializer(serializers.ModelSerializer):
@@ -158,6 +201,7 @@ class SalesItemSerializer(BaseCompanySerializer):
     sales_account = serializers.PrimaryKeyRelatedField(
         queryset=SalesAccount.objects.all(), write_only=True
     )
+    item_id = serializers.CharField(required=False, allow_blank=True)
 
     class Meta(BaseCompanySerializer.Meta):
         model = SalesItem
@@ -177,6 +221,23 @@ class SalesItemSerializer(BaseCompanySerializer):
             "sales_account_object",
             "date_created",
         ]
+
+    def validate(self, attrs):
+        request = self.context.get("request")
+        user_company = request.user.client
+
+        if SalesItem.objects.filter(
+            name__iexact=attrs.get("name"),
+            created_by__client=user_company,
+            tax_configuration=attrs.get("tax_configuration"),
+            sales_account=attrs.get("sales_account"),
+            price=attrs.get("price"),
+        ).exists():
+            raise ValidationError(
+                "this Sales item with the same name, tax configuration, sales account, and price already exists."
+            )
+
+        return attrs
 
 
 class CashbookEntrySerializer(BaseCompanySerializer):
@@ -239,6 +300,7 @@ class IndividualCustomerSerializer(serializers.ModelSerializer):
     tin_number = serializers.CharField(required=False, allow_blank=True)
     full_name = serializers.SerializerMethodField()
 
+    # primary_address = serializers.SerializerMethodField()
     class Meta:
         model = Individual
         fields = [
@@ -246,16 +308,18 @@ class IndividualCustomerSerializer(serializers.ModelSerializer):
             "full_name",
             "identification_number",
             "email",
-            "mobile",
+            "phone",
             "vat_number",
             "tin_number",
-            "address",
+            # "primary_address",
         ]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "phone"]
 
     def get_full_name(self, obj):
         return (
-            f"{obj.firstname} {obj.surname}" if obj.firstname and obj.surname else "N/A"
+            f"{obj.first_name} {obj.last_name}"
+            if obj.first_name and obj.last_name
+            else "N/A"
         )
 
 
@@ -356,6 +420,28 @@ class TransactionLineItemSerializer(serializers.ModelSerializer):
         ]
 
 
+class RecurringToFiscalSerializer(serializers.Serializer):
+    """Serializer for converting recurring invoices to fiscal"""
+
+    items = TransactionLineItemSerializer(many=True, required=False)
+    reference_number = serializers.CharField(required=False, allow_blank=True)
+    sale_date = serializers.DateField(required=False)
+
+    def validate(self, data):
+        # Validate that all required fields are present if items are provided
+        if "items" in data and data["items"]:
+            for item in data["items"]:
+                if "sales_item" not in item:
+                    raise serializers.ValidationError(
+                        {"items": "Sales item is required for all line items."}
+                    )
+                if "quantity" not in item:
+                    raise serializers.ValidationError(
+                        {"items": "Quantity is required for all line items."}
+                    )
+        return data
+
+
 class InvoiceSerializer(BaseCompanySerializer):
     currency = CurrencySerializer(read_only=True)
     invoice_type = serializers.ChoiceField(choices=Invoice.INVOICE_TYPE_CHOICES)
@@ -367,10 +453,10 @@ class InvoiceSerializer(BaseCompanySerializer):
     customer_id = serializers.IntegerField(write_only=True)
     is_individual = serializers.BooleanField(write_only=True)
 
-    # These fields are now properties on the Invoice model, so they are ReadOnlyField here
     total_excluding_vat = serializers.ReadOnlyField()
     vat_total = serializers.ReadOnlyField()
     total_inclusive = serializers.ReadOnlyField()
+    can_convert_to_fiscal = serializers.SerializerMethodField()
 
     class Meta(BaseCompanySerializer.Meta):
         model = Invoice
@@ -396,14 +482,16 @@ class InvoiceSerializer(BaseCompanySerializer):
             "frequency",
             "next_invoice_date",
             "original_invoice",
+            "is_invoiced",
+            "can_convert_to_fiscal",
         ]
+
         read_only_fields = [
             "document_number",
             "user",
             "date_created",
             "status",
-            "individual",
-            "company",
+            "can_convert_to_fiscal",
             "original_invoice",
         ]
         extra_kwargs = {
@@ -415,7 +503,7 @@ class InvoiceSerializer(BaseCompanySerializer):
 
     def validate(self, data):
         request_user = self.context["request"].user
-        user_company = request_user.company
+        user_company = request_user.client
 
         customer_id = data.get("customer_id")
         is_individual = data.get("is_individual")
@@ -435,12 +523,11 @@ class InvoiceSerializer(BaseCompanySerializer):
         try:
             if is_individual:
                 customer_instance = Individual.objects.get(id=customer_id)
-                data["individual"] = customer_instance
-                data["company"] = None
+                data["customer"] = customer_instance
+                data["is_individual"] = True
             else:
                 customer_instance = Company.objects.get(id=customer_id)
-                data["company"] = customer_instance
-                data["individual"] = None
+                data["customer"] = customer_instance
         except (Individual.DoesNotExist, Company.DoesNotExist) as e:
             raise serializers.ValidationError(
                 {"customer_id": "Customer not found."}
@@ -449,12 +536,12 @@ class InvoiceSerializer(BaseCompanySerializer):
         # --- Validation for duplicate invoice type for the same customer ---
         if invoice_type and customer_instance:
             qs = Invoice.objects.filter(
-                invoice_type=invoice_type, user__company=user_company
+                invoice_type=invoice_type, created_by__client=user_company
             )
             if is_individual:
-                qs = qs.filter(individual=customer_instance)
+                qs = qs.filter(customer__individual=customer_instance)
             else:
-                qs = qs.filter(company=customer_instance)
+                qs = qs.filter(customer__company=customer_instance)
 
             # If updating an instance, exclude the current instance from the check
             if self.instance:
@@ -476,7 +563,7 @@ class InvoiceSerializer(BaseCompanySerializer):
             if (
                 hasattr(sales_item, "user")
                 and sales_item.user
-                and sales_item.user.company != user_company
+                and sales_item.created_by.client != user_company
             ):
                 raise serializers.ValidationError(
                     {"items": "One or more sales items do not belong to your company."}
@@ -507,29 +594,43 @@ class InvoiceSerializer(BaseCompanySerializer):
             ).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
 
         data.pop("customer_id", None)
-        data.pop("is_individual", None)
 
         return data
 
     def get_customer_details(self, obj):
-        if obj.individual:
-            return IndividualCustomerSerializer(obj.individual).data
-        elif obj.company:
-            return CompanyCustomerSerializer(obj.company).data
+        if hasattr(obj, "customer") and obj.customer.is_individual:
+            return IndividualCustomerSerializer(obj.customer.individual).data
+        elif hasattr(obj, "customer"):
+            return CompanyCustomerSerializer(obj.customer.company).data
         return None
+
+    def get_can_convert_to_fiscal(self, obj):
+        """Check if this invoice can be converted to fiscal"""
+        return obj.can_generate_fiscal()
 
     @transaction.atomic
     def create(self, validated_data):
+        from django.contrib.contenttypes.models import ContentType
+
         items_data = validated_data.pop("items", [])
         validated_data["discount"] = abs(validated_data.get("discount", Decimal("0")))
+        print("Creating invoice with validated data:", validated_data)
+        if validated_data.get("customer"):
+            is_individual = validated_data.pop("is_individual", False)
+            validated_data["customer"], _ = Customer.objects.get_or_create(
+                is_individual=is_individual,
+                individual=(validated_data["customer"] if is_individual else None),
+                company=(validated_data["customer"] if not is_individual else None),
+            )
 
+        # return
         invoice = Invoice.objects.create(**validated_data)
 
         for item_data in items_data:
             TransactionLineItem.objects.create(
-                parent_document=invoice,
+                content_type=ContentType.objects.get_for_model(Invoice),
+                object_id=invoice.id,
                 sales_item=item_data["sales_item"],
-                user=invoice.user,
                 quantity=item_data["quantity"],
                 unit_price=item_data["unit_price"],
                 vat_amount=item_data["vat_amount"],
@@ -586,7 +687,7 @@ class CashSaleSerializer(BaseCompanySerializer):
     def validate(self, data):
         items_data = data.get("items", [])
         request_user = self.context["request"].user
-        user_company = request_user.company
+        user_company = request_user.client
 
         if not data.get("currency"):
             raise serializers.ValidationError(
@@ -604,7 +705,7 @@ class CashSaleSerializer(BaseCompanySerializer):
             if (
                 hasattr(sales_item, "user")
                 and sales_item.user
-                and sales_item.user.company != user_company
+                and sales_item.created_by.client != user_company
             ):
                 raise serializers.ValidationError(
                     {"items": "One or more sales items do not belong to your company."}
@@ -726,7 +827,7 @@ class CashSaleSerializer(BaseCompanySerializer):
         invoice_total = Decimal("0")
         items_data = data.get("items", [])
         request_user = self.context["request"].user
-        user_company = request_user.company
+        user_company = request_user.client
 
         if not data.get("currency"):
             raise serializers.ValidationError(
@@ -744,7 +845,7 @@ class CashSaleSerializer(BaseCompanySerializer):
             if (
                 hasattr(sales_item, "user")
                 and sales_item.user
-                and sales_item.user.company != user_company
+                and sales_item.created_by.client != user_company
             ):
                 raise serializers.ValidationError(
                     {"items": "One or more sales items do not belong to your company."}
@@ -878,7 +979,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
 
     def validate(self, data):
         request_user = self.context["request"].user
-        user_company = request_user.company
+        user_company = request_user.client
 
         # Validate customer relationship
         customer_id = data.get("customer_id")
@@ -922,7 +1023,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
             if (
                 hasattr(sales_item, "user")
                 and sales_item.user
-                and sales_item.user.company != user_company
+                and sales_item.created_by.client != user_company
             ):
                 raise serializers.ValidationError(
                     {"items": "One or more sales items do not belong to your company."}
@@ -1141,14 +1242,14 @@ class CashBookSerializer(BaseCompanySerializer):
 
     def validate(self, data):
         request = self.context.get("request")
-        user_company = request.user.company
+        user_company = request.created_by.client
 
         general_ledger_account = data.get("general_ledger_account")
         if (
             general_ledger_account
             and hasattr(general_ledger_account, "user")
             and general_ledger_account.user
-            and general_ledger_account.user.company != user_company
+            and general_ledger_account.created_by.client != user_company
         ):
             raise serializers.ValidationError(
                 {
@@ -1158,7 +1259,7 @@ class CashBookSerializer(BaseCompanySerializer):
 
         instance = getattr(self, "instance", None)
 
-        company_cashbook = CashBook.objects.filter(user__company=user_company)
+        company_cashbook = CashBook.objects.filter(created_by__client=user_company)
 
         if instance:
             company_cashbook = company_cashbook.exclude(pk=instance.pk)
