@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, transaction
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db.models import F, Sum, Q
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -86,8 +87,21 @@ class SalesItem(BaseModelWithUser):
         verbose_name = _("Sales Item")
         verbose_name_plural = _("Sales Items")
 
+    def save(self, *args, **kwargs):
+        if not self.item_id:
+            last_item = SalesItem.objects.order_by("-id").first()
+            if not last_item or not last_item.item_id.startswith("ITEM"):
+                self.item_id = "ITEM0001"
+            else:
+                try:
+                    last_number = int(last_item.item_id.replace("ITEM", ""))
+                except ValueError:
+                    last_number = 0
+                self.item_id = f"ITEM{last_number + 1:04d}"
+        super().save(*args, **kwargs)
 
-class SalesCategory(BaseModel):
+
+class SalesCategory(BaseModelWithUser):
     name = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=255, blank=True, null=True)
 
@@ -179,10 +193,28 @@ class LedgerTransaction(BaseModelWithUser):
             f"{self.account.account_name} - Debit: {self.debit} Credit: {self.credit}"
         )
 
-    class Meta:
-        app_label = "accounting"
-        verbose_name = _("Ledger Transaction")
-        verbose_name_plural = _("Ledger Transactions")
+
+class Customer(BaseModel):
+    """Customer model to represent both individuals and companies."""
+
+    is_individual = models.BooleanField(default=True)
+    individual = models.ForeignKey(
+        Individual, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    company = models.ForeignKey(
+        Company, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.id} {self.is_individual}"
+
+    @property
+    def get_full_name(self):
+        if self.is_individual and self.individual:
+            return self.individual.full_name
+        elif not self.is_individual and self.company:
+            return self.company.full_name
+        return "N/A"
 
 
 class Invoice(BaseModelWithUser):
@@ -228,7 +260,7 @@ class Invoice(BaseModelWithUser):
 
     # Customer Relationship
     customer = models.ForeignKey(
-        "leases.LeaseTenant",
+        Customer,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -261,6 +293,7 @@ class Invoice(BaseModelWithUser):
     total_inclusive = models.DecimalField(
         max_digits=12, decimal_places=2, default=Decimal("0.00")
     )
+    is_invoiced = models.BooleanField(default=False)
     # Timestamps
     due_date = models.DateField(null=True, blank=True)
     sale_date = models.DateTimeField(default=now)
@@ -324,48 +357,87 @@ class Invoice(BaseModelWithUser):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def generate_recurring_invoice(self):
+    def convert_recurring_to_fiscal(self, validated_data=None):
+        """
+        Convert a recurring invoice template to a fiscal invoice.
+        Users can modify line items before conversion.
+        """
         if self.invoice_type != "recurring":
             raise ValidationError(
-                "This method can only be called on an invoice with type 'recurring' (template)."
-            )
-        if not self.next_invoice_date:
-            raise ValidationError(
-                "next_invoice_date must be set for recurring invoice templates."
+                "Only recurring invoice templates can be converted to fiscal."
             )
 
-        new_invoice_date = self._next_recurrence_date()
-        if not new_invoice_date:
-            raise ValidationError(
-                f"Invalid frequency '{self.frequency}' for recurring invoice."
+        if self.is_invoiced:
+            raise ValidationError("This recurring invoice has already been converted.")
+
+        with transaction.atomic():
+            # Create fiscal invoice
+            fiscal_invoice = Invoice.objects.create(
+                invoice_type="fiscal",
+                status="pending",
+                lease=self.lease,
+                currency=self.currency,
+                customer=self.customer,
+                sale_date=timezone.now().date(),
+                discount=self.discount,
+                is_invoiced=True,
+                created_by=self.created_by,
+                reference_number=self.reference_number,
             )
 
-        new_invoice = Invoice.objects.create(
-            invoice_type="fiscal",
-            customer=self.customer,
-            currency=self.currency,
-            created_by=self.created_by,
-            sale_date=new_invoice_date,
-            status="pending",
-            discount=self.discount,
-            is_recurring=True,
-            original_invoice=self,
-        )
+            # Copy line items, allowing modifications if provided
+            if validated_data and "items" in validated_data:
+                # Use modified line items from request
+                self._create_modified_line_items(
+                    fiscal_invoice, validated_data["items"]
+                )
+            else:
+                # Use original line items
+                self._copy_line_items(fiscal_invoice)
 
-        for line_item_template in self.line_items.all():
+            # Update totals
+            fiscal_invoice.update_totals()
+
+            # Update recurring template's next invoice date
+            if self.frequency:
+                self.next_invoice_date = self._next_recurrence_date()
+                self.save(update_fields=["next_invoice_date"])
+
+            return fiscal_invoice
+
+    def _copy_line_items(self, target_invoice):
+        """Copy line items from recurring template to fiscal invoice"""
+        for line_item in self.line_items.all():
             TransactionLineItem.objects.create(
-                parent_document=new_invoice,
-                sales_item=line_item_template.sales_item,
-                created_by=new_invoice.created_by,
-                quantity=line_item_template.quantity,
-                unit_price=line_item_template.unit_price,
-                vat_amount=line_item_template.vat_amount,
-                total_price=line_item_template.total_price,
+                content_type=ContentType.objects.get_for_model(Invoice),
+                object_id=target_invoice.id,
+                sales_item=line_item.sales_item,
+                quantity=line_item.quantity,
+                unit_price=line_item.unit_price,
+                vat_amount=line_item.vat_amount,
+                total_price=line_item.total_price,
             )
-        self.next_invoice_date = new_invoice_date
-        self.save()
 
-        return new_invoice
+    def _create_modified_line_items(self, target_invoice, items_data):
+        """Create modified line items based on user input"""
+        for item_data in items_data:
+            TransactionLineItem.objects.create(
+                content_type=ContentType.objects.get_for_model(Invoice),
+                object_id=target_invoice.id,
+                sales_item=item_data["sales_item"],
+                quantity=item_data["quantity"],
+                unit_price=item_data["unit_price"],
+                vat_amount=item_data.get("vat_amount", Decimal("0.00")),
+                total_price=item_data.get("total_price", Decimal("0.00")),
+            )
+
+    def can_generate_fiscal(self):
+        """Check if this recurring invoice can be converted to fiscal"""
+        return (
+            self.invoice_type == "recurring"
+            and not self.is_invoiced
+            and self.status == "draft"
+        )
 
     def _next_recurrence_date(self):
         if not self.next_invoice_date:
@@ -380,8 +452,9 @@ class Invoice(BaseModelWithUser):
         return None
 
     def __str__(self):
-        customer_id_str = self.lease.get_tenant_names() or "No Customer"
-        return f"{self.invoice_type.title()} {self.document_number} - {customer_id_str}"
+        return (
+            f"{self.invoice_type.title()} {self.document_number} - {self.customer_id}"
+        )
 
 
 class CashSale(BaseModelWithUser):
@@ -519,7 +592,6 @@ class CreditNote(BaseModelWithUser):
         verbose_name_plural = _("Credit Notes")
 
 
-# The old InvoiceItem is now TransactionLineItem
 class TransactionLineItem(BaseModel):
     """Generic model for line items in transactions like invoices, credit notes, etc."""
 
@@ -572,13 +644,13 @@ class PaymentMethod(BaseModel):
     payment_method_name = models.CharField(max_length=255)
     currency = models.CharField(max_length=50, blank=True, null=True)
 
-    def __str__(self):
-        return self.payment_method_name
-
     class Meta:
         app_label = "accounting"
-        verbose_name = _("Payment Method")
-        verbose_name_plural = _("Payment Methods")
+        verbose_name = _("payment method")
+        verbose_name_plural = _("payment methods")
+
+    def __str__(self):
+        return self.payment_method_name
 
 
 class Payment(BaseModelWithUser):

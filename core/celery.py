@@ -3,18 +3,21 @@ import os
 from celery import Celery
 from django import setup
 from celery.schedules import crontab
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-setup()
-app = Celery('core')
-app.config_from_object('django.conf:settings', namespace='CELERY')
 
-app.autodiscover_tasks([
-    'apps.common.services.tasks',
-    'apps.companies.services.tasks',
-    'apps.individuals.services.tasks',
-    'apps.properties.services.tasks',
-    'apps.leases.services.tasks',
-])
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+setup()
+app = Celery("core")
+app.config_from_object("django.conf:settings", namespace="CELERY")
+
+app.autodiscover_tasks(
+    [
+        "apps.common.services.tasks",
+        "apps.companies.services.tasks",
+        "apps.individuals.services.tasks",
+        "apps.properties.services.tasks",
+        "apps.leases.services.tasks",
+    ]
+)
 
 
 # app.conf.beat_schedule = {
@@ -24,6 +27,15 @@ app.autodiscover_tasks([
 #     },
 # }
 
+app.conf.beat_schedule = {
+    "generate-monthly-invoices": {
+        "task": "apps.leases.services.tasks.generate_monthly_invoices_task",
+        "schedule": crontab(day_of_month="25", hour=0, minute=0),
+        "options": {"queue": "periodic_tasks"},
+    },
+}
+app.conf.timezone = "Africa/Harare"
+
 # app.conf.beat_schedule = {
 #     'cleanup-expired-otps': {
 #         'task': 'apps.common.tasks.cleanup_expired_otps',
@@ -31,7 +43,7 @@ app.autodiscover_tasks([
 #     },
 # }
 
+
 @app.task(bind=True)
 def debug_task(self):
-    print(f'Request: {self.request!r}')
-
+    print(f"Request: {self.request!r}")
