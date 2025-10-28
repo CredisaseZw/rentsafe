@@ -35,24 +35,6 @@ class AccountSector(BaseModel):
         ordering = ["code"]
 
 
-class SalesAccount(BaseModel):
-    """Stores different sales accounts and links them to sectors."""
-
-    account_name = models.CharField(max_length=255, unique=True)
-    account_number = models.CharField(max_length=15, default="")
-    account_sector = models.ForeignKey(
-        AccountSector, on_delete=models.CASCADE, related_name="accounts"
-    )
-
-    def __str__(self):
-        return f"{self.account_number} - {self.account_name}"
-
-    class Meta:
-        verbose_name = "Sales Account"
-        verbose_name_plural = "Sales Accounts"
-        ordering = ["account_number"]
-
-
 class Currency(BaseModel):
     currency_code = models.CharField(max_length=3, unique=True)
     currency_name = models.CharField(max_length=50)
@@ -81,7 +63,7 @@ class SalesItem(BaseModelWithUser):
         "VATSetting", on_delete=models.CASCADE, related_name="items"
     )
     sales_account = models.ForeignKey(
-        "SalesAccount", on_delete=models.CASCADE, related_name="items"
+        "GeneralLedgerAccount", on_delete=models.CASCADE, related_name="items"
     )
 
     def __str__(self):
@@ -141,6 +123,7 @@ class GeneralLedgerAccount(BaseModel):
     account_sector = models.ForeignKey(
         AccountSector, on_delete=models.PROTECT, related_name="sector", default=None
     )
+    is_secondary_currency = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.account_name} - {self.account_number}"
