@@ -423,8 +423,8 @@ export const CREDIT_NOTE_HEADERS :Header[]=[
   {name : "Amount", textAlign : "end"}
 ]
 export const SALES_ITEMS_HEADERS :Header[]=[
-  {name : "Category"},
   {name : "ID"},
+  {name : "Category"},
   {name : "Name"},
   {name : "Unit Price"},
   {name : "Date Created"},

@@ -501,3 +501,40 @@ export type cashSalesRow = {
    ref : string,
    amountReceived: number
 }
+export type Category = {
+   id?: number;
+   name?: string;
+   code?: string;
+   date_created?: string;
+};
+
+export type AccountSector = {
+   id: number;
+   name: string;
+};
+
+export type SaleAccount = {
+   id: number;
+   account_name: string;
+   account_number: string;
+   account_sector_details: AccountSector
+};
+
+export type SalesItem = {
+  id: number;
+  item_id: string;
+  name: string;
+  price: string;
+  unit_name: string;
+  category_object: Category; 
+  currency_object: Currency;
+  tax_configuration_object: VATRow
+  sales_account_object: SaleAccount
+  date_created: string;
+};
+
+export type AddCategoryPayload = {
+    type : "update" | "create",
+    id : number,
+    data : Category
+}

@@ -22,14 +22,14 @@ function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem,
     <ColumnsContainer numberOfCols={2} gapClass="gap-5">
         <div className="flex flex-col gap-5">
             <div className="flex flex-row justify-between">
-                <Label className="text-gray-800">Document Number</Label>
+                <Label className="text-gray-800 dark:text-white">Document Number</Label>
                     <Input
                         className="w-[400px]"
                         name="documentNumber"
                     />
             </div>
             <div className=" flex flex-row justify-between">
-                <Label className='text-gray-800'>Bill To</Label>
+                <Label className='text-gray-800 dark:text-white'>Bill To</Label>
                 <div className="flex flex-row gap-5">
                     <Select
                         onValueChange={(val: "individual" | "company") => {
@@ -63,14 +63,14 @@ function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem,
                 </div>
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800">Address</Label>
+                <Label className="text-gray-800 dark:text-white">Address</Label>
                 <Input
                     className="w-[400px]"
                     name="address"
                 />
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800">Phone</Label>
+                <Label className="text-gray-800 dark:text-white">Phone</Label>
                 <Input
                     className="w-[400px]"
                     name="phone"
@@ -79,21 +79,21 @@ function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem,
         </div>
         <div className="flex flex-col gap-5">
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800">Email</Label>
+                <Label className="text-gray-800 dark:text-white">Email</Label>
                 <Input
                     className="w-[400px]"
                     name="email"
                 />
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800">VAT No</Label>
+                <Label className="text-gray-800 dark:text-white">VAT No</Label>
                 <Input
                     className="w-[400px]"
                     name="vatNo"
                 />
             </div>
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800">Tin Number</Label>
+                <Label className="text-gray-800 dark:text-white">Tin Number</Label>
                 <Input
                     className="w-[400px]"
                     name="tinNumber"
@@ -110,7 +110,7 @@ function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem,
                 </div>
             }
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800">Date</Label>
+                <Label className="text-gray-800 dark:text-white">Date</Label>
                 <Input
                     value={getCurrentDate()}
                     className="w-[400px]"

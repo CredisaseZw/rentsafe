@@ -64,7 +64,12 @@ function Active() {
       </div>
 
       <div className="mt-3 2xl:mb-15 sm:mb-30">
-        <TableBase headers={ACTIVE_HEADERS} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
+        <TableBase 
+          headers={ACTIVE_HEADERS}
+          isLoading = {isLoading}
+          paginationData={paginationData ?? undefined} 
+          paginationName="active_page" 
+          isError = {Boolean(error)}>
             {
               leases?.length
               ? leases.map((lease:Lease)=>(
