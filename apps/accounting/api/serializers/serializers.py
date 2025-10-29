@@ -172,6 +172,7 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
             "account_name",
             "account_number",
             "account_sector_name",
+            "is_secondary_currency",
             "account_sector_code",
             "account_sector_id",
         ]
