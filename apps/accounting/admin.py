@@ -8,7 +8,6 @@ from apps.accounting.models.models import (
     AccountSector,
     SalesItem,
     SalesCategory,
-    SalesAccount,
     CashSale,
     CashbookEntry,
     CurrencyRate,
@@ -101,17 +100,6 @@ class SalesCategoryAdmin(admin.ModelAdmin):
     list_display_links = ("name",)
     search_fields = ("name", "code")
     ordering = ("name",)
-    list_per_page = 25
-
-
-@admin.register(SalesAccount)
-class SalesAccountAdmin(admin.ModelAdmin):
-    list_display = ("id", "account_name", "account_number", "account_sector")
-    list_display_links = ("account_name",)
-    search_fields = ("account_name", "account_number", "account_sector__name")
-    list_filter = ("account_sector",)
-    ordering = ("account_name",)
-    raw_id_fields = ("account_sector",)
     list_per_page = 25
 
 
