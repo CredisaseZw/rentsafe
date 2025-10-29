@@ -54,7 +54,6 @@ class Command(BaseCommand):
                     'accounting.add_salesitem', 'accounting.change_salesitem', 'accounting.delete_salesitem', 'accounting.view_salesitem',
                     'accounting.add_salescategory', 'accounting.change_salescategory', 'accounting.delete_salescategory', 'accounting.view_salescategory',
                     'accounting.add_vatsetting', 'accounting.change_vatsetting', 'accounting.delete_vatsetting', 'accounting.view_vatsetting',
-                    'accounting.add_salesaccount', 'accounting.change_salesaccount', 'accounting.delete_salesaccount', 'accounting.view_salesaccount',
                     'accounting.add_accountsector', 'accounting.change_accountsector', 'accounting.delete_accountsector', 'accounting.view_accountsector',
                     'accounting.add_generalledgeraccount', 'accounting.change_generalledgeraccount', 'accounting.delete_generalledgeraccount', 'accounting.view_generalledgeraccount',
                     'accounting.add_ledgertransaction', 'accounting.change_ledgertransaction', 'accounting.delete_ledgertransaction', 'accounting.view_ledgertransaction',
@@ -184,7 +183,7 @@ class Command(BaseCommand):
                     'accounting.view_payment', 'accounting.view_invoice', 'accounting.view_cashsale', 'accounting.view_creditnote',
                     'accounting.view_transactionlineitem', 'accounting.view_paymentmethod', 'accounting.view_cashbook', 'accounting.view_cashbookentry',
                     'accounting.view_chartofaccounts', 'accounting.view_journalentry', 'accounting.view_bankreconciliation', 'accounting.view_budget',
-                    'accounting.view_currency', 'accounting.view_salesitem', 'accounting.view_salesaccount', 'accounting.view_vatsetting',
+                    'accounting.view_currency', 'accounting.view_salesitem','accounting.view_vatsetting',
                     'accounting.view_currencyrate',
                     
                     'maintenance.view_maintenancerequest', 'maintenance.view_servicevendor',
@@ -269,7 +268,7 @@ class Command(BaseCommand):
                     'accounting.view_payment', 'accounting.view_invoice', 'accounting.view_cashsale', 'accounting.view_creditnote',
                     'accounting.view_paymentmethod', 'accounting.view_transactionlineitem', 'accounting.view_cashbook', 'accounting.view_cashbookentry',
                     'accounting.view_chartofaccounts', 'accounting.view_journalentry', 'accounting.view_bankreconciliation', 'accounting.view_budget',
-                    'accounting.view_currency', 'accounting.view_salesitem', 'accounting.view_salesaccount', 'accounting.view_vatsetting',
+                    'accounting.view_currency', 'accounting.view_salesitem', 'accounting.view_vatsetting',
                     'accounting.view_currencyrate',
                     
                     'maintenance.view_maintenancerequest',

@@ -370,7 +370,7 @@ class AccountSectorViewSet(BaseViewSet):
             for sector in sectors:
                 sector_data = self.get_serializer(sector).data
                 accounts_qs = sector.accounts.all()
-                sector_data["accounts"] = SalesAccountMinimalSerializer(
+                sector_data["accounts"] = GeneralLedgerAccountSerializer(
                     accounts_qs, many=True
                 ).data
                 result.append(sector_data)
