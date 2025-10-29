@@ -1,5 +1,7 @@
 from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
+from django.utils import timezone
+from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from apps.accounting.models.models import (
@@ -117,12 +119,27 @@ class VATSettingSerializer(serializers.ModelSerializer):
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
 
-    def validate(self, data):
-        rate = data.get("rate")
-        if rate is not None and (rate < 0 or rate > 100):
+    def validate_rate(self, value):
+        if value is not None and (value < 0 or value > 100):
             raise ValidationError("VAT rate must be between 0 and 100.")
+        return value
 
-        return data
+    def validate(self, data_list):
+        """Validate bulk creation - filter out duplicates."""
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            raise ValidationError("Request context is required.")
+
+        client = request.user.client
+        existing_rates = VATSetting.objects.filter(
+            created_by__client=client
+        ).values_list("rate", flat=True)
+        if data_list.get("rate") in existing_rates:
+            raise ValidationError(
+                f"VAT setting with rate {data_list.get('rate')} already exists for your company."
+            )
+
+        return data_list
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -1155,7 +1172,11 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        date = instance.date_created.strftime("%d-%b-%Y")
+        date = (
+            instance.date_updated.strftime("%d-%b-%Y")
+            if instance.date_updated
+            else instance.date_created.strftime("%d-%b-%Y")
+        )
         created_by = instance.created_by
         if (
             created_by
@@ -1174,14 +1195,15 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
             "base_currency": instance.base_currency.currency_code,
             "currency": instance.currency.currency_code,
             "current_rate": str(instance.current_rate),
-            "date_created": date,
-            "created_by": created_by_display,
+            "date_updated": date,
+            "updated_by": created_by_display,
         }
 
     def validate(self, attrs):
         base_currency = attrs.get("base_currency")
         counter_currency = attrs.get("currency")
         rate = attrs.get("current_rate")
+        user = self.context["request"].user.client
         if rate is not None and rate <= 0:
             raise ValidationError("Current Rate must be greater than zero.")
 
@@ -1191,6 +1213,18 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         for fields in ["currency", "base_currency", "current_rate"]:
             if not attrs.get(fields):
                 raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+        last_rate = (
+            CurrencyRate.objects.filter(
+                created_by__client=user,
+                base_currency=base_currency,
+                currency=counter_currency,
+            )
+            .order_by("-date_updated", "-date_created")
+            .first()
+        )
+
+        if last_rate and last_rate.current_rate == rate:
+            raise ValidationError({"error": "This rate is already the latest."})
 
         if counter_currency == base_currency:
             raise ValidationError(
@@ -1203,6 +1237,13 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user") and request.user.is_authenticated:
             validated_data["created_by"] = request.user
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+            validated_data["date_updated"] = timezone.now()
+        return super().update(instance, validated_data)
 
 
 class CashBookSerializer(BaseCompanySerializer):
