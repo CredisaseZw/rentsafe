@@ -3,7 +3,6 @@ from rest_framework.routers import DefaultRouter
 from apps.accounting.api.views import (
     CustomersViewSet,
     SalesCategoryViewSet,
-    SalesAccountViewSet,
     CashSaleViewSet,
     CashbookEntryViewSet,
     GeneralLedgerAccountViewSet,
@@ -28,7 +27,6 @@ router = DefaultRouter()
 router.register(
     r"sales-categories", SalesCategoryViewSet, basename="sales_categories_list"
 )
-router.register(r"sales-accounts", SalesAccountViewSet, basename="sales_accounts")
 router.register(r"cash-sales", CashSaleViewSet, basename="cash_sales")
 router.register(r"cashbook-entries", CashbookEntryViewSet, basename="cashbook_entries")
 router.register(
