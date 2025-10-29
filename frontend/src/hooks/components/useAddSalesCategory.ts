@@ -28,8 +28,8 @@ export default function useAddSalesCategory({ refetch, initial }: Props) {
 
     if (
       mode === "update" &&
-      categoryPayload.code === initial?.code &&
-      categoryPayload.name === initial?.name
+      categoryPayload.code?.trim() === initial?.code?.trim() &&
+      categoryPayload.name?.trim() === initial?.name?.trim()
     ) {
       return toast.info("No changes made.")
     }

@@ -5,7 +5,6 @@ function AccountsLists() {
     <div>
       <Header title="Account Lists" />
       <div>
-        
       </div>
     </div>
   )

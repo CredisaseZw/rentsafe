@@ -14,10 +14,14 @@ import {
 } from "@/components/ui/popover"
 import { EllipsisVertical } from "lucide-react"
 import DeleteVATSettingDialogue from "@/components/routes/rent-safe/accounting/settings/DeleteVATSettingDialogue"
+import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 
 function VATSettings() {
   const {
     rows,
+    error,
+    isLoading,
+    pagination
   }  =useVATSettings()
   
   return (
@@ -47,7 +51,12 @@ function VATSettings() {
             <h6 className="text-center font-semibold self-center">Tax Options</h6>
             <AddVATSettingDialog/>
           </div>
-          <TableBase headers={TAX_OPTIONS_HEADERS}>
+          <TableBase 
+            isError = {Boolean(error)}
+            isLoading = {isLoading}
+            paginationData={pagination}
+            paginationName="page"
+            headers={TAX_OPTIONS_HEADERS}>
             {
               rows.map((row, idx:number)=>
                 <TableRow key={idx}>
@@ -68,6 +77,11 @@ function VATSettings() {
                   </TableCell>
                 </TableRow>
               )
+            }
+            {
+              !isLoading &&
+              rows.length === 0 &&
+              <EmptyTableResponse colSpan={TAX_OPTIONS_HEADERS.length}/>  
             }
           </TableBase>
         </div>

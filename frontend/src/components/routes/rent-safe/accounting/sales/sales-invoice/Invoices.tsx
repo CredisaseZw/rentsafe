@@ -1,7 +1,7 @@
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
-import FilterPopover from "./FilterPopover"
+import InvoicesFilter from "./InvoicesFilter"
 import AddInvoiceDialogue from "./AddInvoiceDialogue"
 import { TableBase } from "@/components/general/TableBase"
 import { SALES_INVOICES_HEADERS } from "@/constants"
@@ -23,7 +23,7 @@ function Invoices() {
             handleSearch={()=>{}}
           />
           <div className="self-center">
-            <FilterPopover/>
+            <InvoicesFilter/>
           </div>
            <div className="self-center">
             <AddInvoiceDialogue/>

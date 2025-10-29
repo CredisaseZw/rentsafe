@@ -7,23 +7,20 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSetCurrencySettings } from "@/hooks/apiHooks/useCurrencySettings"
 import useCurrencySettings from "@/hooks/components/useCurrencySettings"
-import { getCurrentDate, validateAmounts } from "@/lib/utils"
+import { validateAmounts } from "@/lib/utils"
 import { Send } from "lucide-react"
 
 function SettingsCurrency() {
   const {
     currencies,
     currencyLoading,
-    currency,
     loading,
-    rate,
-    currencyId,
-    setRate,
-    setCurrencyId,
+    currencySetting,
+    handleOnChange,
     handleSubmit
   } = useCurrencySettings()
   const setCurrencySettings = useSetCurrencySettings()
- 
+
   return (
     <div>
       <Header title="Currency Settings"/>
@@ -33,7 +30,12 @@ function SettingsCurrency() {
             <div className="w-1/7 flex">
               <span className="self-center text-sm">Base Currency</span>
             </div>
-            <Select name="baseCurrency" key={currency?.id} defaultValue={String(currency?.id)}>
+            <Select
+              name="baseCurrency"
+              key={currencySetting.baseCurrencyID}
+              value={String(currencySetting.baseCurrencyID)}
+              onValueChange={(v)=> handleOnChange("baseCurrencyID", v)}
+              >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select ..." />
               </SelectTrigger>
@@ -63,9 +65,9 @@ function SettingsCurrency() {
                     <Label className="text-sm text-gray-400 required">Currency</Label>
                   </div>
                   <Select name="current" 
-                    value={currencyId}
+                    value={currencySetting.currentID}
                     required
-                    onValueChange={(value)=>setCurrencyId(value)}
+                    onValueChange={(value)=>handleOnChange("currentID", value)}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select ..." />
@@ -92,8 +94,8 @@ function SettingsCurrency() {
                   <Input
                     type= "number"
                     step={0.01}
-                    value={rate}
-                    onChange={(e)=>setRate(e.target.value)}
+                    value={currencySetting.currentRate}
+                    onChange={(e)=>handleOnChange("currentRate", e.target.value)}
                     onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                     onKeyDown={validateAmounts}
                     required
@@ -106,7 +108,7 @@ function SettingsCurrency() {
                     <Label className="text-sm text-gray-400">Date</Label>
                   </div>
                   <Input
-                    defaultValue={getCurrentDate()}
+                    defaultValue={currencySetting.baseDate}
                     readOnly
                     name = "date"
                     className="w-full"

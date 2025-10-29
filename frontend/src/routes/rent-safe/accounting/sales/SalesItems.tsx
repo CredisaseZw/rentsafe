@@ -34,7 +34,6 @@ function SalesItems() {
           <div className="self-center flex flex-row justify-end gap-5">
             <Searchbox
               placeholder="Item ID"
-              handleSearch={()=>{}}
             />
             <div className="self-center">
               <AddSaleItemDialogue/>

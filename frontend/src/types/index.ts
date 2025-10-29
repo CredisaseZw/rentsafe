@@ -510,6 +510,7 @@ export type Category = {
 
 export type AccountSector = {
    id: number;
+   code : string;
    name: string;
 };
 
@@ -538,3 +539,12 @@ export type AddCategoryPayload = {
     id : number,
     data : Category
 }
+
+export type CurrencySetting = {
+  id: number;
+  base_currency: string;
+  currency: string;
+  current_rate: string;
+  date_updated: string;
+  updated_by: string;
+};

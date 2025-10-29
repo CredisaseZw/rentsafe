@@ -6,13 +6,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { SlidersHorizontal } from "lucide-react"
-import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MONTHS, YEARS } from "@/constants"
+import { INVOICE_STATUSES, MONTHS, YEARS } from "@/constants"
+import useInvoicesFilter from "@/hooks/components/useInvoicesFilter"
 
 
-export default function FilterPopover(){
-    const [open, setOpen] = useState(false)
+export default function InvoicesFilter(){
+    const {
+        open,
+        filterPayload,
+        handleOnFilterChange,
+        applyFilters,
+        setOpen,
+    } = useInvoicesFilter()
     return (
         <Popover open = {open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -21,11 +27,33 @@ export default function FilterPopover(){
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[350px]">
-                <form className="mt-3 flex flex-col gap-5">
+                <form className="mt-3 flex flex-col gap-5" onSubmit={(e)=>{e.preventDefault(); applyFilters()}}>
+                    <div className="form-group">
+                        <Label>Invoice Status</Label>
+                        <Select
+                            value={filterPayload.status}
+                            name="status"
+                            onValueChange={(val)=> handleOnFilterChange("status", val)}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select ..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {
+                                    INVOICE_STATUSES.map((y, idx)=>
+                                        <SelectItem value={String(y.value)} key={idx} >{y.label}</SelectItem>   
+                                    )
+                                }
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <div className="form-group">
                         <Label>Year</Label>
                         <Select
+                            value={filterPayload.year}
                             name="accountType"
+                            onValueChange={(val)=> handleOnFilterChange("year", val)}
+
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select ..." />
@@ -42,7 +70,9 @@ export default function FilterPopover(){
                      <div className="form-group">
                         <Label>Month</Label>
                         <Select
+                            value={filterPayload.month}
                             name="accountType"
+                            onValueChange={(val)=> handleOnFilterChange("month", val)}
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select ..." />
@@ -56,7 +86,7 @@ export default function FilterPopover(){
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button className="w-full mb-5">Apply</Button>
+                    <Button className="w-full mb-5" type="submit">Apply</Button>
                 </form>
             </PopoverContent>
         </Popover>

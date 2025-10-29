@@ -44,22 +44,7 @@ export default function useLeases(defaultStatus: string) {
         }
     }, [page, search, status, data, error])
 
-    const handleOnSearchValue = (searchValue: string) =>{
-        setSearchParams((prev) => {
-            const params = new URLSearchParams(prev);
-            if (searchValue) params.set("search", searchValue);
-            else params.delete("search");
-            return params;
-      }); 
-    }
 
-    const onClearSearch = () => {
-      setSearchParams((prev) => {
-         const params = new URLSearchParams(prev);
-         if (params.get("search")) params.delete("search");
-         return params;
-      });
-    };
 
     const onSuccessCallback = (payload: LeaseReceiptPayload[] | undefined) => {
         if (!payload )return null;
@@ -86,11 +71,9 @@ export default function useLeases(defaultStatus: string) {
         leases,
         isLoading,
         paginationData, 
-        handleOnSearchValue,
         onSuccessCallback,
         setPaginationData,
         setSearchParams,
-        onClearSearch,
         setLeases,
         setTotal,
         refetch

@@ -33,7 +33,7 @@ export default function useSalesItemsForm() {
 
     useEffect(()=> {
         if(handleAxiosError("Error fetching VAT settings", error)) return;
-        if(data) setVatSettings(data);
+        if(data) setVatSettings(data.results);
     }, [data, error])
 
     const handleLoadMoreCategories = () =>{

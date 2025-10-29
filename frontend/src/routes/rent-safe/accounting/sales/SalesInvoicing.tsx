@@ -1,10 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Repeat, FileCheck, icons, FileChartLine, FileX } from "lucide-react";
+import { FileText, Repeat, FileCheck} from "lucide-react";
 import Invoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/Invoices";
 import RecurringInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/RecurringInvoices";
 import ProformaInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/ProformaInvoices";
-import FiscalInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/FiscalInvoices";
-import CancelledInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/CancelledInvoices";
 
 export default function SalesInvoicing() {
    const tabs = [
@@ -22,19 +20,7 @@ export default function SalesInvoicing() {
          icon: FileCheck,
          value: "proforma-invoices",
          label: "Proforma Invoices",
-         content: <ProformaInvoices />,
-      },
-      {
-         icon : FileChartLine,
-         value : "fiscal-invoices",
-         label : "Fiscal Invoices",
-         content : <FiscalInvoices/>
-      },
-      {
-         icon : FileX,
-         value : "cancelled-invoices",
-         label : "Cancelled Invoices",
-         content : <CancelledInvoices/>
+         content: <ProformaInvoices />
       }
    ];
    

@@ -5,7 +5,7 @@ import { TableBase } from "@/components/general/TableBase"
 import { SALES_INVOICES_HEADERS } from "@/constants"
 import { TableRow } from "@/components/ui/table"
 import AddInvoiceDialogue from "@/components/routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue"
-import FilterPopover from "@/components/routes/rent-safe/accounting/sales/sales-invoice/FilterPopover"
+import FilterPopover from "@/components/routes/rent-safe/accounting/sales/sales-invoice/InvoicesFilter"
 import Header from "@/components/general/Header"
 
 function SalesCreditNote() {
@@ -23,7 +23,6 @@ function SalesCreditNote() {
           <div className="self-center flex flex-row justify-end gap-5">
             <Searchbox
               placeholder="Invoice ID"
-              handleSearch={()=>{}}
             />
             <div className="self-center">
               <FilterPopover/>

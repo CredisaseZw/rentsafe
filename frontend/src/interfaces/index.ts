@@ -431,3 +431,9 @@ export interface LeaseResponse {
   managing_client: number;
   lease_tenants: number[];
 }
+
+export interface Response {
+   count : number
+   next : string | null
+   previous : string | null
+}
