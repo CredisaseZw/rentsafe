@@ -29,18 +29,10 @@ class AccountSector(BaseModel):
     def __str__(self):
         return self.name
 
-
-class SalesAccount(BaseModel):
-    """Stores different sales accounts and links them to sectors."""
-
-    account_name = models.CharField(max_length=255, unique=True)
-    account_number = models.CharField(max_length=15, default="")
-    account_sector = models.ForeignKey(
-        AccountSector, on_delete=models.CASCADE, related_name="accounts"
-    )
-
-    def __str__(self):
-        return f"{self.account_number} - {self.account_name}"
+    class Meta:
+        verbose_name = "Account Sector"
+        verbose_name_plural = "Account Sectors"
+        ordering = ["code"]
 
 
 class Currency(BaseModel):
@@ -76,7 +68,7 @@ class SalesItem(BaseModelWithUser):
         "VATSetting", on_delete=models.CASCADE, related_name="items"
     )
     sales_account = models.ForeignKey(
-        "SalesAccount", on_delete=models.CASCADE, related_name="items"
+        "GeneralLedgerAccount", on_delete=models.CASCADE, related_name="items"
     )
 
     def __str__(self):
@@ -158,12 +150,13 @@ class CashbookEntry(BaseModelWithUser):
         verbose_name_plural = _("Cashbook Entries")
 
 
-class GeneralLedgerAccount(BaseModel):
-    account_name = models.CharField(max_length=255, unique=True, blank=True)
+class GeneralLedgerAccount(BaseModelWithUser):
+    account_name = models.CharField(max_length=255, blank=True)
     account_number = models.CharField(max_length=10, unique=True, blank=True)
     account_sector = models.ForeignKey(
         AccountSector, on_delete=models.PROTECT, related_name="sector", default=None
     )
+    is_secondary_currency = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.account_name} - {self.account_number}"
@@ -732,6 +725,19 @@ class CashBook(BaseModelWithUser):
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.cashbook_id:
+            last_cashbook = CashBook.objects.order_by("-id").first()
+            if not last_cashbook or not last_cashbook.cashbook_id.startswith("CB"):
+                self.cashbook_id = "CB0001"
+            else:
+                try:
+                    last_number = int(last_cashbook.cashbook_id.replace("CB", ""))
+                except ValueError:
+                    last_number = 0
+                self.cashbook_id = f"CB{last_number + 1:04d}"
+        super().save(*args, **kwargs)
 
     class Meta:
         app_label = "accounting"
