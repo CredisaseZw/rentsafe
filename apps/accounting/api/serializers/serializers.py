@@ -174,7 +174,13 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
             "account_sector_name",
             "account_sector_code",
             "account_sector_id",
+            "is_secondary_currency",
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["preset"] = True if instance.created_by is None else False
+        return representation
 
 
 class CurrencySerializer(BaseCompanySerializer):
@@ -287,24 +293,6 @@ class AccountSectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountSector
         fields = ["id", "code", "name"]
-
-
-class GeneralLedgerAccountSerializer(BaseCompanySerializer):
-    account_sector = AccountSectorSerializer(read_only=True)
-    account_sector_id = serializers.PrimaryKeyRelatedField(
-        queryset=AccountSector.objects.all(), source="account_sector", write_only=True
-    )
-
-    class Meta(BaseCompanySerializer.Meta):
-        model = GeneralLedgerAccount
-        fields = [
-            "id",
-            "account_name",
-            "account_number",
-            "account_sector",
-            "account_sector_id",
-            "date_created",
-        ]
 
 
 class IndividualCustomerSerializer(serializers.ModelSerializer):
