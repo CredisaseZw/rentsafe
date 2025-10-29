@@ -18,7 +18,6 @@ from apps.accounting.models.models import (
     SalesItem,
     VATSetting,
     SalesCategory,
-    SalesAccount,
     CashSale,
     CashbookEntry,
     GeneralLedgerAccount,
@@ -42,7 +41,6 @@ from apps.accounting.api.serializers.serializers import (
     ServiceStandardPricingSerializer,
     VATSettingSerializer,
     SalesCategorySerializer,
-    SalesAccountSerializer,
     CashSaleSerializer,
     CashbookEntrySerializer,
     GeneralLedgerAccountSerializer,
@@ -281,39 +279,14 @@ class SalesCategoryViewSet(BaseCompanyViewSet):
     queryset = SalesCategory.objects.all()
 
 
-class SalesAccountViewSet(BaseViewSet):
-    queryset = SalesAccount.objects.select_related("account_sector").all()
-    serializer_class = SalesAccountSerializer
+class GeneralLedgerAccountViewSet(BaseViewSet):
+    serializer_class = GeneralLedgerAccountSerializer
 
     def get_queryset(self):
-        if search := self.request.query_params.get("search"):
-            return (
-                super()
-                .get_queryset()
-                .filter(
-                    Q(account_name__icontains=search)
-                    | Q(account_number__icontains=search)
-                )
-            )
-        return super().get_queryset()
-
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            return self._create_rendered_response(
-                serializer.data, status.HTTP_201_CREATED
-            )
-        except ValidationError as e:
-            return self._create_rendered_response(
-                {"error": extract_error_message(e)}, status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            logger.error(f"Error creating sales account: {e}")
-            return self._create_rendered_response(
-                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        queryset = GeneralLedgerAccount.objects.select_related("account_sector").filter(
+            Q(created_by__client=self.request.user.client) | Q(created_by__isnull=True)
+        )
+        return queryset.order_by("id")
 
     def update(self, request, *args, **kwargs):
         try:
@@ -344,11 +317,6 @@ class CashSaleViewSet(BaseCompanyViewSet):
 class CashbookEntryViewSet(BaseCompanyViewSet):
     queryset = CashbookEntry.objects.all()
     serializer_class = CashbookEntrySerializer
-
-
-class GeneralLedgerAccountViewSet(BaseCompanyViewSet):
-    queryset = GeneralLedgerAccount.objects.all()
-    serializer_class = GeneralLedgerAccountSerializer
 
 
 class JournalEntryViewSet(BaseCompanyViewSet):

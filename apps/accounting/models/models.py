@@ -117,8 +117,8 @@ class CashbookEntry(BaseModelWithUser):
         return f"{self.transaction_type} - {self.amount}"
 
 
-class GeneralLedgerAccount(BaseModel):
-    account_name = models.CharField(max_length=255, unique=True, blank=True)
+class GeneralLedgerAccount(BaseModelWithUser):
+    account_name = models.CharField(max_length=255, blank=True)
     account_number = models.CharField(max_length=10, unique=True, blank=True)
     account_sector = models.ForeignKey(
         AccountSector, on_delete=models.PROTECT, related_name="sector", default=None
@@ -666,3 +666,16 @@ class CashBook(BaseModelWithUser):
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.cashbook_id:
+            last_cashbook = CashBook.objects.order_by("-id").first()
+            if not last_cashbook or not last_cashbook.cashbook_id.startswith("CB"):
+                self.cashbook_id = "CB0001"
+            else:
+                try:
+                    last_number = int(last_cashbook.cashbook_id.replace("CB", ""))
+                except ValueError:
+                    last_number = 0
+                self.cashbook_id = f"CB{last_number + 1:04d}"
+        super().save(*args, **kwargs)
