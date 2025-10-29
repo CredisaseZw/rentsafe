@@ -9,7 +9,7 @@ from apps.accounting.models.models import (
     SalesItem,
     SalesCategory,
     VATSetting,
-    SalesAccount,
+    GeneralLedgerAccount,
     Customer,
 )
 from apps.leases.models import Lease
@@ -66,7 +66,7 @@ class LeaseInvoiceService:
                 with transaction.atomic():
                     # Create the invoice based on rent type
                     primary_tenant = lease.get_primary_tenant()
-                    sales_account = SalesAccount.objects.first()
+                    sales_account = GeneralLedgerAccount.objects.first()
                     tenant_object = (
                         primary_tenant.tenant_object if primary_tenant else None
                     )
@@ -183,7 +183,7 @@ class LeaseInvoiceService:
 
         with transaction.atomic():
             primary_tenant = lease.get_primary_tenant()
-            sales_account = SalesAccount.objects.first()
+            sales_account = GeneralLedgerAccount.objects.first()
             tenant_object = primary_tenant.tenant_object if primary_tenant else None
             # Get or create required related models once
             sales_category, _ = SalesCategory.objects.get_or_create(

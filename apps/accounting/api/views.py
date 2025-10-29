@@ -14,6 +14,7 @@ from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from decimal import Decimal
 from rest_framework.permissions import IsAuthenticated
+from apps.accounting.filters.filters import CurrencyRateFilter
 from apps.accounting.models.models import (
     SalesItem,
     VATSetting,
@@ -145,49 +146,23 @@ class VATSettingViewSet(BaseViewSet):
     serializer_class = VATSettingSerializer
 
     def get_queryset(self):
-        return self.queryset.filter(
-            created_by__client=self.request.user.client, vat_applicable=True
-        )
-
-    def _get_existing_descriptions(self, client):
-        return set(
-            VATSetting.objects.filter(created_by__client=client).values_list(
-                "description", flat=True
-            )
-        )
-
-    def _filter_valid_data(self, data, existing_descriptions):
-        return [
-            item
-            for item in data
-            if item.get("description") not in existing_descriptions
-        ]
+        return self.queryset.filter(created_by__client=self.request.user.client)
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        client = self.request.user.client
-
-        if isinstance(data, list):
-            existing_descriptions = self._get_existing_descriptions(client)
-            valid_data = self._filter_valid_data(data, existing_descriptions)
-
-            if not valid_data:
-                return Response(
-                    {
-                        "error": "All provided VAT settings already exist for your company."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            serializer = self.get_serializer(data=valid_data, many=True)
-        else:
-            serializer = self.get_serializer(data=data)
-
+        invalid_data = []
+        valid_data = []
         try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            for item in data:
+                serializer = self.get_serializer(data=item)
+                if serializer.is_valid():
+                    serializer.save()
+                    valid_data.append(serializer.data)
+                else:
+                    invalid_data.append(extract_error_message(serializer.errors))
             return self._create_rendered_response(
-                serializer.data, status.HTTP_201_CREATED
+                {"created": valid_data, "errors": invalid_data},
+                status.HTTP_400_BAD_REQUEST,
             )
         except ValidationError as e:
             logger.error(f"Validation error creating VAT setting: {e}")
@@ -217,6 +192,10 @@ class VATSettingViewSet(BaseViewSet):
     def list(self, request, *args, **kwargs):
         try:
             vat = self.get_queryset()
+            page = self.paginate_queryset(vat)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(vat, many=True)
             return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
         except Exception as e:
@@ -391,7 +370,7 @@ class AccountSectorViewSet(BaseViewSet):
             for sector in sectors:
                 sector_data = self.get_serializer(sector).data
                 accounts_qs = sector.accounts.all()
-                sector_data["accounts"] = SalesAccountMinimalSerializer(
+                sector_data["accounts"] = GeneralLedgerAccountSerializer(
                     accounts_qs, many=True
                 ).data
                 result.append(sector_data)
@@ -943,29 +922,17 @@ class PaymentViewSet(BaseCompanyViewSet):
 class CurrencyRateViewSet(BaseViewSet):
     queryset = CurrencyRate.objects.select_related("currency", "base_currency").all()
     serializer_class = CurrencyRateSerializer
+    filterset_class = CurrencyRateFilter
+    ordering_fields = ["date_created", "current_rate"]
+    ordering = ["-date_created"]
 
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return self._create_rendered_response(
-                serializer.data, status.HTTP_201_CREATED
-            )
-        except ValidationError as e:
-            logger.error(f"Validation error creating currency rate: {e}")
-            return self._create_rendered_response(
-                {"error": extract_error_message(e)}, status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            logger.error(f"Error creating currency rate: {e}")
-            return self._create_rendered_response(
-                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+    def get_queryset(self):
+        queryset = self.queryset.filter(created_by__client=self.request.user.client)
+        return queryset
 
     def list(self, request, *args, **kwargs):
         try:
-            queryset = self.get_queryset()
+            queryset = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
@@ -1018,6 +985,19 @@ class CurrencyRateViewSet(BaseViewSet):
             )
         except CurrencyRate.DoesNotExist:
             raise NotFound({"error": "Currency rate not found."})
+
+    @action(detail=False, methods=["get"], url_path="latest-rate")
+    def latest_rate(self, request):
+        """Get the latest currency rate for a given currency code."""
+        try:
+            latest_rate = self.get_queryset().latest("date_created")
+            serializer = self.get_serializer(latest_rate)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except CurrencyRate.DoesNotExist:
+            return self._create_rendered_response(
+                {"error": "No rates found for the specified currency code."},
+                status.HTTP_404_NOT_FOUND,
+            )
 
 
 class CashBookViewSet(BaseCompanyViewSet):
