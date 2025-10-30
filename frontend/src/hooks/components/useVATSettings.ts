@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router";
 
 export default function useVATSettings(){
     const [searchParams] = useSearchParams();
-    const page = searchParams.get("page") || "1";
+    const page = Number(searchParams.get("page") || 1);
     const [rows,setRows] = useState<VATRow[]>([{description: "", rate : ""}])
     const [pagination, setPagination] = useState<PaginationData | undefined>(undefined)
     const {data, isLoading, error} = useGetVATSettings(page)
@@ -39,6 +39,7 @@ export default function useVATSettings(){
         setRows((prev) => prev.filter((_, i) => i !== index));
     };
     
+
     return {
         rows,
         error,

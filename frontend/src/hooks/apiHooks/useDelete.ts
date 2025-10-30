@@ -1,36 +1,32 @@
-import { api } from "@/api/axios"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
 import useClient from "../general/useClient"
 import { handleAxiosError } from "@/lib/utils"
 import { useSearchParams } from "react-router"
+import type { Delete } from "@/types"
 
-export default function useDeleteCategory() {
+export default function useDelete({mutationFunc, keyStore, page , value }: Delete) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useClient()
-
   const { mutate } = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await api.delete(`/api/accounting/sales-categories/${id}/`)
-      return response.data
-    },
+    mutationFn: () => mutationFunc(),
     onSuccess: () => {
-        searchParams.set("page", "1");
+        searchParams.set("page", String(page));
         setSearchParams(searchParams)
-        queryClient.invalidateQueries({ queryKey: ["salesCategories", 1] })
-        toast.success("Sales Category deleted successfully")
+        queryClient.invalidateQueries({ queryKey: [keyStore, Number(page)] })
+        toast.success(`${value} deleted successfully`)
         setOpen(false)
     },
-    onError: (error) => handleAxiosError(`Failed to delete sale category`, error),
+    onError: (error) => handleAxiosError(`Failed to delete ${value.toLocaleLowerCase()}`, error),
     onSettled: () => setLoading(false),
   })
 
-  const onHandleDelete = (id: number) => {
+  const onHandleDelete = () => {
     setLoading(true)
-    mutate(id)
+    mutate()
   }
 
   return {

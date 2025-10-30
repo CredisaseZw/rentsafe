@@ -1,15 +1,15 @@
 import ColumnsContainer from "@/components/general/ColumnsContainer"
+import DeleteDialogue from "@/components/general/DeleteDialogue"
 import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 import Header from "@/components/general/Header"
 import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
 import AddSaleCategoryDialogue from "@/components/routes/rent-safe/accounting/sales/sales-categories/AddSaleCategoryDialogue"
-import DeleteCategoryDialogue from "@/components/routes/rent-safe/accounting/sales/sales-categories/DeleteCategoryDialogue"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { SALES_CATEGORIES_HEADERS } from "@/constants"
+import { DELETION_LINKS, SALES_CATEGORIES_HEADERS } from "@/constants"
 import useSalesCategories from "@/hooks/components/useSalesCategories"
-import { getSummaryDate } from "@/lib/utils"
+import { getSummaryDate, handleDeletion } from "@/lib/utils"
 
 function SalesCategories() {
   const {
@@ -34,7 +34,6 @@ function SalesCategories() {
           <div className="self-center flex flex-row justify-end gap-5">
             <Searchbox
               placeholder="Item ID"
-              handleSearch={()=>{}}
             />
             <div className="self-center">
               <AddSaleCategoryDialogue
@@ -67,8 +66,12 @@ function SalesCategories() {
                         refetch={refetch}
                         initial={c}
                       />
-                      <DeleteCategoryDialogue
-                        id={Number(c.id)}/>
+                      <DeleteDialogue
+                        keyStore="salesCategories"
+                        value="Sales Category"
+                        mutationFunc={()=>handleDeletion(DELETION_LINKS.SALES_CATEGORIES, Number(c.id))}
+                      />
+                      
                     </div>
                   </TableCell>
                 </TableRow>

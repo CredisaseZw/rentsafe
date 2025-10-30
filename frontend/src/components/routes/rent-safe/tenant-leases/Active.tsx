@@ -24,8 +24,6 @@ function Active() {
     isLoading, 
     refetch,
     onSuccessCallback,
-    onClearSearch,
-    handleOnSearchValue
   } = useLeases("ACTIVE");  
   
   return (
@@ -37,8 +35,6 @@ function Active() {
         <div className="w-full lg:flex-1">
           <Searchbox
             placeholder="Search by Name"
-            handleSearch={handleOnSearchValue}
-            clearSearch={onClearSearch}
           />
         </div>
 

@@ -8,6 +8,7 @@ interface ButtonProps {
    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
    className?: string;
    disabled?: boolean;
+   form? : string;
    size?: "sm" | "md" | "lg";
    type?: "button" | "submit" | "reset";
 }
@@ -34,10 +35,12 @@ function Button({
    onClick,
    disabled,
    className,
+   form,
    type = "button",
 }: ButtonProps) {
    return (
       <button
+         form={form}
          type={type}
          disabled={disabled}
          onClick={onClick}

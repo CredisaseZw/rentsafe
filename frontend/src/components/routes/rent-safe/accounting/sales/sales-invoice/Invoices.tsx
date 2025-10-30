@@ -20,7 +20,6 @@ function Invoices() {
         <div className="self-center flex flex-row justify-end gap-5">
           <Searchbox
             placeholder="Invoice ID"
-            handleSearch={()=>{}}
           />
           <div className="self-center">
             <InvoicesFilter/>

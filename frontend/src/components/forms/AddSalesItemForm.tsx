@@ -9,16 +9,22 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 function AddSalesItemForm() {
     const {
-        vatSettings,
-        isLoading,
-        currency,
-        currencies,
-        currencyLoading,
         salesCategories,
         categoriesLoading,
+        currencies,
+        currencyLoading,
+        currency,
+        vatSettings,
+        isLoading,
         categoriesPagination,
+        vatPagination,
+        generalLedgersLoading,
+        generalLedgerAccounts,
+        generalLedgerPagination,
+        handleLoadMoreGLS,
         handleLoadMoreCategories,
-        handleSubmit
+        handleSubmit,
+        handleLoadMoreVAT
     } = useSalesItemsForm();
 
     return (
@@ -130,15 +136,24 @@ function AddSalesItemForm() {
                             ))
                         }
                         {
-                            salesCategories.length === 0 && 
-                            !!categoriesLoading && 
+                            vatSettings.length === 0 && 
+                            !!isLoading && 
                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
+                        }
+                        {
+                            vatSettings.length !== 0 && 
+                            vatPagination?.next &&
+                            <div className="flex justify-center p-2">
+                                <Button variant="ghost" onClick={handleLoadMoreVAT}>
+                                Load More
+                                </Button>
+                            </div>
                         }
                     </SelectContent>
                 </Select>
             </div>
             <div className="form-group">
-                <Label className="required">Sales Account</Label>
+                <Label className="required">General Ledger Account</Label>
                 <Select
                     required
                     name="salesAccount"
@@ -147,7 +162,32 @@ function AddSalesItemForm() {
                         <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="e"></SelectItem>
+                        {
+                            generalLedgerAccounts.length === 0 && generalLedgersLoading &&
+                            <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                                <LoadingIndicator />
+                            </SelectItem>   
+                        }
+                        {
+                            generalLedgerAccounts.length !== 0 && 
+                            generalLedgerAccounts.map((s, idx:number)=>(
+                                <SelectItem value={String(s.id)} key={idx}>{s.account_name}</SelectItem>
+                            ))
+                        }
+                        {
+                            generalLedgerAccounts.length === 0 && 
+                            !!generalLedgersLoading && 
+                            <SelectItem disabled value="empty">Nothing to Show</SelectItem>
+                        }
+                        {
+                            generalLedgerAccounts.length !== 0 && 
+                            generalLedgerPagination?.next &&
+                            <div className="flex justify-center p-2">
+                                <Button variant="ghost" onClick={handleLoadMoreGLS}>
+                                    Load More
+                                </Button>
+                            </div>
+                        }
                     </SelectContent>
                 </Select>
             </div>

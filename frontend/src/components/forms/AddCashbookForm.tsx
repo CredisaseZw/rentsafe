@@ -6,13 +6,22 @@ import useAddCashbookForm from "@/hooks/components/useAddCashbookForm"
 import LoadingIndicator from "../general/LoadingIndicator"
 import { ACCOUNT_TYPES } from "@/constants"
 import Button from "../general/Button"
+import type { Cashbook } from "@/types"
 
-function AddCashbookForm() {
+interface props {
+    initial? :Cashbook
+}
+
+function AddCashbookForm({initial}:props) {
     const {
+        generalLedgerAccounts,
+        generalLedgersLoading,
+        pagination,
         currencies,
         currency,
-        currencyLoading
-    } = useAddCashbookForm()
+        currencyLoading,
+        handleLoadMoreGLS
+    } = useAddCashbookForm(initial)
     return (
         <form className="flex gap-5 flex-col">
             <ColumnsContainer numberOfCols={2} gapClass="gap-5">
@@ -112,7 +121,32 @@ function AddCashbookForm() {
                         <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
                     <SelectContent>
-                        
+                        {
+                            generalLedgerAccounts.length === 0 && generalLedgersLoading &&
+                            <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                                <LoadingIndicator />
+                            </SelectItem>   
+                        }
+                        {
+                            generalLedgerAccounts.length !== 0 && 
+                            generalLedgerAccounts.map((s, idx:number)=>(
+                                <SelectItem value={String(s.id)} key={idx}>{s.account_name}</SelectItem>
+                            ))
+                        }
+                        {
+                            generalLedgerAccounts.length === 0 && 
+                            !!generalLedgersLoading && 
+                            <SelectItem disabled value="empty">Nothing to Show</SelectItem>
+                        }
+                        {
+                            generalLedgerAccounts.length !== 0 && 
+                            pagination?.next &&
+                            <div className="flex justify-center p-2">
+                                <Button variant="ghost" onClick={handleLoadMoreGLS}>
+                                Load More
+                                </Button>
+                            </div>
+                        }
                     </SelectContent>
                 </Select>
             </div>

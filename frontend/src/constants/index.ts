@@ -82,6 +82,15 @@ export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] 
   "other",
 ];
 
+export const DELETION_LINKS = {
+  SALES_ITEMS : "/api/accounting/items",
+  VAT_SETTINGS : "/api/accounting/vat-settings",
+  SALES_CATEGORIES: "/api/accounting/sales-categories",
+  ACCOUNT_SECTORS : "/api/accounting/account-sectors",
+  CASH_BOOK : "/api/accounting/cash-books",
+  GENERAL_LEDGER : "/api/accounting/ledger-accounts"
+}
+
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
   slate:   { bg: "bg-slate-200", text: "text-slate-800" },
   gray:    { bg: "bg-gray-200", text: "text-gray-800" },
@@ -485,13 +494,16 @@ export const SUBSCRIPTION_HEADERS:Header[] = [
 export const PARKING_OPTIONS:Option[] = [
   { label: "All", value: "all" },
   { label: "Underground", value: "underground" },
+  { label: "Integrated Garage", value: "Integrated Garage"},
+  { label: "External Garage", value: "External Garage"},
   { label: "Open", value: "open" },
   { label: "Street", value: "street" },
 ]
 
 export const SECURITY_OPTIONS:Option[] =[
   { label: "24/7", value: "24/7" },
-  { label: "Daytime", value: "daytime" },
+  { label: "Day time", value: "Day Time" },
+  { label: "Night time", value: "Night time" },
   { label: "None", value: "none" },
 ]
 
@@ -580,5 +592,16 @@ export const INVOICE_STATUSES:Option[] = [
 export const ACCOUNTING_SECTOR_HEADERS:Header[] = [
   {name : "ID"},
   {name : "Code"},
-  {name : "Name"}
+  {name : "Name"},
+  {name : "Actions"}
+]
+
+export const CASH_BOOK_HEADERS:Header[] = [
+  {name : "Cashbook ID"},
+  {name : "Cashbook Name"},
+  {name : "Active Requisition"},
+  {name : "Account Type"},
+  {name : "Branch Name"},
+  {name : "General Ledger Account"},
+  {name : "Actions"}
 ]

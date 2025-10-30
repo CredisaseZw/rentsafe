@@ -1,6 +1,6 @@
 import Header from "@/components/general/Header"
 import SectionHeader from "@/components/general/SectionHeader"
-import AddPaymentTypeDialog from "@/components/routes/rent-safe/accounting/settings/AddPaymentTypeDialog"
+import AddPaymentTypeDialog from "@/components/routes/rent-safe/accounting/settings/payment-types/AddPaymentTypeDialog"
 
 function PaymentsTypes() {
   return (

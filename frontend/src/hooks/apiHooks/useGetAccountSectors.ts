@@ -7,7 +7,7 @@ interface ASResponse extends Response{
     results : AccountSector[]
 }
 
-export default function useGetAccountSectors(page: string, search : string | null){
+export default function useGetAccountSectors(page: Number, search : string | null){
     const {data, isLoading, error,refetch } = useQuery<ASResponse>({
         queryKey : !search 
         ? ["accountSectors", page]

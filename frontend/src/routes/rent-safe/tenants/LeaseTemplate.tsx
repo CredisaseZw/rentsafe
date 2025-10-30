@@ -3,7 +3,6 @@ import Searchbox from "@/components/general/Searchbox";
 import SectionHeader from "@/components/general/SectionHeader";
 import { TableBase } from "@/components/general/TableBase";
 import { TableCell, TableRow } from "@/components/ui/table"
-import EmptyResults from "@/components/general/EmptyResults"
 
 import {
   Select,
@@ -23,6 +22,7 @@ import { Eye } from "lucide-react";
 import useGetTenantStatements from "@/hooks/apiHooks/useGetTenantStatements";
 import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
 import { TENANT_STATEMENTS_HEADERS } from "@/constants";
+import EmptyTableResponse from "@/components/general/EmptyTableResponse";
 
 function LeaseTemplate() {
    const {
@@ -32,8 +32,6 @@ function LeaseTemplate() {
       leases,
       setLeases,
       setPaginationData,
-      onClearSearch,
-      handleOnSearchValue
    } = useLeases("ACTIVE");
 
    const {data, isLoading, error} = useGetTenantStatements(page, search);
@@ -55,8 +53,7 @@ function LeaseTemplate() {
          <div className="flex mt-8 flex-row justify-between">
             <Searchbox
                placeholder="Search by Name"
-               handleSearch={handleOnSearchValue}
-               clearSearch = {onClearSearch}
+               
             />
             <div className="flex flex-row gap-3">
                <p className="m-0 self-center text-gray-600 dark:text-gray-100 font-medium">Sort by</p>
@@ -75,11 +72,16 @@ function LeaseTemplate() {
             </div>
          </div>
          <div className="mt-3 ">
-            <TableBase headers={TENANT_STATEMENTS_HEADERS} isLoading = {isLoading} paginationData={paginationData ?? undefined} paginationName="active_page" isError = {Boolean(error)}>
+            <TableBase 
+               headers={TENANT_STATEMENTS_HEADERS}
+               isLoading = {isLoading}
+               paginationData={paginationData ?? undefined}
+               paginationName="active_page" 
+               isError = {Boolean(error)}>
                {
                   leases?.length
                   ? leases.map((lease:Lease)=>(
-                  <TableRow>
+                  <TableRow key={lease.id}>
                         <TableCell className="text-center">{lease.lease_id}</TableCell>
                         <TableCell className="text-center">{getPrimaryTenantName(lease.tenants)}</TableCell>
                         <TableCell className="text-center">
@@ -89,7 +91,7 @@ function LeaseTemplate() {
                         <TableCell>
                            <StaticBadge bgColor={riskLevelColorCode(lease.risk_level_class)}>
                               <span className="text-white font-semibold text-sm py-2">
-                                 <i>({lease.currency as unknown as string})</i> {lease.owing}
+                                 <i>({typeof(lease.currency) === "string" && lease.currency})</i> {lease.owing}
                               </span>
                            </StaticBadge>
                         </TableCell>
@@ -101,11 +103,7 @@ function LeaseTemplate() {
                         </TableCell>
                   </TableRow>
                   )) : 
-                  <TableRow>
-                     <TableCell colSpan={TENANT_STATEMENTS_HEADERS.length}>
-                        <EmptyResults message="No statements created yet."/>
-                     </TableCell>
-                  </TableRow>
+                  <EmptyTableResponse colSpan={TENANT_STATEMENTS_HEADERS.length}/>
                }
             </TableBase>
          </div>

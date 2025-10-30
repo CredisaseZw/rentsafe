@@ -1,5 +1,4 @@
 import ButtonSpinner from "@/components/general/ButtonSpinner"
-import EmptyResults from "@/components/general/EmptyResults"
 import Header from "@/components/general/Header"
 import PaymentRow from "@/components/general/PaymentRow"
 import { TableBase } from "@/components/general/TableBase"
@@ -11,6 +10,7 @@ import { getCurrentDate, getSummaryDate, parseListString } from "@/lib/utils"
 import type { PaymentHistory } from "@/types"
 import { Printer } from "lucide-react"
 import ReceiptDialog from "@/components/routes/rent-safe/tenant-leases/ReceiptDialog"
+import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 
 function TenantStatement() {
     const {
@@ -114,11 +114,7 @@ function TenantStatement() {
                             )
                         }
                         {!isLoading && payments.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={TENANT_STATEMENT_HEADERS.length}>
-                                    <EmptyResults message="No payments made yet" />
-                                </TableCell>
-                            </TableRow>
+                            <EmptyTableResponse colSpan={TENANT_STATEMENT_HEADERS.length}/>
                         )}
                     </TableBase>
                 </div>

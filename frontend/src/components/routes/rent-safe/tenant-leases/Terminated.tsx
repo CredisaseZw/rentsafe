@@ -23,8 +23,6 @@ function Terminated() {
     isLoading,
     paginationData,
     leases,
-    onClearSearch,
-    handleOnSearchValue,
   } = useLeases("TERMINATED");
 
   return (
@@ -36,8 +34,6 @@ function Terminated() {
         <div className="w-full lg:flex-1">
           <Searchbox
             placeholder="Search by Name"
-            handleSearch={handleOnSearchValue}
-            clearSearch={onClearSearch}
           />
         </div>
 

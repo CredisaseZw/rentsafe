@@ -24,8 +24,6 @@ function ForRenewal() {
     error,
     paginationData,
     leases,
-    handleOnSearchValue,
-    onClearSearch,
     refetch,
   } = useLeases("RENEW")
 
@@ -38,8 +36,6 @@ function ForRenewal() {
         <div className="w-full lg:flex-1">
           <Searchbox
             placeholder="Search by Name"
-            handleSearch={handleOnSearchValue}
-            clearSearch={onClearSearch}
           />
         </div>
 

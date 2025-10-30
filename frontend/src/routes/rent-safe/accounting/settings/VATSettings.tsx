@@ -1,27 +1,29 @@
 import Header from "@/components/general/Header"
 import { TableBase } from "@/components/general/TableBase"
-import AddVATSettingDialog from "@/components/routes/rent-safe/accounting/settings/AddVATSettingDialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { TAX_OPTIONS_HEADERS } from "@/constants"
+import { DELETION_LINKS, TAX_OPTIONS_HEADERS } from "@/constants"
 import useVATSettings from "@/hooks/components/useVATSettings"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { EllipsisVertical } from "lucide-react"
-import DeleteVATSettingDialogue from "@/components/routes/rent-safe/accounting/settings/DeleteVATSettingDialogue"
+import { EllipsisVertical, Trash } from "lucide-react"
 import EmptyTableResponse from "@/components/general/EmptyTableResponse"
+import AddVATSettingDialog from "@/components/routes/rent-safe/accounting/settings/vat-settings/AddVATSettingDialog"
+import DeleteDialogue from "@/components/general/DeleteDialogue"
+import { Button } from "@/components/ui/button"
+import { handleDeletion } from "@/lib/utils"
 
 function VATSettings() {
   const {
     rows,
     error,
     isLoading,
-    pagination
+    pagination,
   }  =useVATSettings()
   
   return (
@@ -71,7 +73,16 @@ function VATSettings() {
                         <AddVATSettingDialog
                           vatSetting={row}
                         />
-                        <DeleteVATSettingDialogue id={Number(row.id)}/>
+                       <DeleteDialogue
+                          trigger = { 
+                          <Button variant={"ghost"} className="gap-3 text-red-600">
+                            <Trash  size={15} className='text-red-600 self-center'/> Delete
+                          </Button>
+                          } 
+                          mutationFunc={()=> handleDeletion(DELETION_LINKS.VAT_SETTINGS, Number(row.id))}
+                          keyStore="VATSettings"
+                          value="VAT Setting"/>
+                          
                       </PopoverContent>
                     </Popover>
                   </TableCell>

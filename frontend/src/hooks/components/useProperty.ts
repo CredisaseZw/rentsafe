@@ -19,12 +19,12 @@ export default function useProperty(){
     const {units, unitsLoading, unitsError} = useGetPropertyUnits(property_id);
 
     useEffect(()=>{
-        if (handleAxiosError("Failed to fetch property details", propertyDataError, "Could not load property")) return;
+        if (handleAxiosError("Failed to fetch property details", propertyDataError)) return;
         if(propertyData)setProperty(propertyData)
     }, [propertyData, propertyDataError])
 
     useEffect(()=>{
-        if (handleAxiosError("Failed to fetch property units", unitsError, "Could not load property units")) return;
+        if (handleAxiosError("Failed to fetch property units", unitsError)) return;
         if(units) setPropertyUnits(units) 
     }, [units, unitsError]) 
 

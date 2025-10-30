@@ -1,14 +1,15 @@
-import Button from "@/components/general/Button"
 import ColumnsContainer from "@/components/general/ColumnsContainer"
+import DeleteDialogue from "@/components/general/DeleteDialogue"
 import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 import Header from "@/components/general/Header"
 import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
+import AddAccountingSectorDialog from "@/components/routes/rent-safe/accounting/settings/accounting-sectors/AddAccountingSectorDialog"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { ACCOUNTING_SECTOR_HEADERS } from "@/constants"
+import { ACCOUNTING_SECTOR_HEADERS, DELETION_LINKS } from "@/constants"
 import useAccountSectors from "@/hooks/components/useAccountSectors"
-import { Plus } from "lucide-react"
+import { handleDeletion } from "@/lib/utils"
 
 function AccountsSectors() {
   const {
@@ -31,7 +32,7 @@ function AccountsSectors() {
             <Searchbox
               placeholder="Search by Code / Name"
             />
-            <Button asChild className="self-center">Add Account Sector <Plus size={15}/></Button>
+            <AddAccountingSectorDialog/>
           </div>
         </ColumnsContainer>
         <div className="mt-5">
@@ -54,6 +55,16 @@ function AccountsSectors() {
                   <TableCell className="text-center">{s.id}</TableCell>
                   <TableCell className="text-center">{s.code}</TableCell>
                   <TableCell className="text-center">{s.name}</TableCell>
+                  <TableCell className="flex flex-row justify-center items-center gap-5">
+                    <AddAccountingSectorDialog
+                      initial={s}
+                    />
+                    <DeleteDialogue
+                      keyStore="accountSectors"
+                      value="Account Sector"
+                      mutationFunc={()=> handleDeletion(DELETION_LINKS.ACCOUNT_SECTORS, s.id)}  
+                    />
+                  </TableCell>
                 </TableRow>
               ))
             }

@@ -8,6 +8,7 @@ import { QueryClient } from "@tanstack/react-query";
 import type { PropertiesResponse, Property } from "@/types";
 import { isAxiosError, type AxiosError } from "axios";
 import { toast } from "sonner";
+import { api } from "@/api/axios";
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
@@ -719,15 +720,15 @@ export const handleAxiosError = (
     return true;
   }
 
-  if (error instanceof Error && fallBackMessage) {
-    toast.error(fallBackMessage);
-    return true;
-  }
-
-  if (!isAxiosError(error) && !error && fallBackMessage) {
+  if (error instanceof Error) {
     toast.error(fallBackMessage);
     return true;
   }
 
   return false;
 };
+
+export const handleDeletion = async (prefixLink:string, id: number) => {
+  const response = await api.delete(`${prefixLink}/${id}/`)
+  return response.data
+}

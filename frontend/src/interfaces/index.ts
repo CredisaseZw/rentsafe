@@ -434,6 +434,6 @@ export interface LeaseResponse {
 
 export interface Response {
    count : number
-   next : string | null
-   previous : string | null
+   next : string | undefined
+   previous : string | undefined
 }

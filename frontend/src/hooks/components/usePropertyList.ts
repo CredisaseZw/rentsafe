@@ -11,7 +11,7 @@ import getPropertyTypes from "../apiHooks/useGetPropertyTypes";
 import getPropertyList from "../apiHooks/useGetPropertyList";
 
 function usePropertyList() {
-   const [searchParams, setSearchParams] = useSearchParams();
+   const [searchParams] = useSearchParams();
    const page = parseInt(searchParams.get("page") || "1");
    const search = searchParams.get("search") || "";
    const {data, isLoading, error} = getPropertyTypes();
@@ -119,22 +119,6 @@ function usePropertyList() {
    }));
    };
    const onSelectFilter = (Option: string) => setSelectFilter(Option);
-   const onSearchValue = (searchValue: string) => {
-      setSearchParams((prev) => {
-         const params = new URLSearchParams(prev);
-         if (searchValue) params.set("search", searchValue);
-         else params.delete("search");
-         return params;
-      }); 
-   };
-   
-   const onClearSearch = () => {
-      setSearchParams((prev) => {
-         const params = new URLSearchParams(prev);
-         if (params.get("search")) params.delete("search");
-         return params;
-      });
-   };
      const handleFeatureChange = (feature: string, value: string) => {
          setAddPropertyForm((prev) => ({
             ...prev,
@@ -243,7 +227,6 @@ function usePropertyList() {
       handleAddProperty,
       handleFeatureChange,
       setSummaryCards,
-      onClearSearch,
       setLoading,
       setPropertyTypes,
       setSearchItem,
@@ -255,7 +238,6 @@ function usePropertyList() {
       setStatus,
       onInputChange,
       onSelectChange,
-      onSearchValue,
       onSelectFilter,
       openModal,
       closeModal

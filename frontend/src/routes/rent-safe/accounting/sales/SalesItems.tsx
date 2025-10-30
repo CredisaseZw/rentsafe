@@ -1,23 +1,23 @@
 import ColumnsContainer from "@/components/general/ColumnsContainer"
+import DeleteDialogue from "@/components/general/DeleteDialogue"
+import EditIcon from "@/components/general/EditIcon"
 import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 import Header from "@/components/general/Header"
 import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
-import AddSaleItemDialogue from "@/components/routes/rent-safe/accounting/sales/sales-invoice/AddSaleItemDialogue"
-import DeleteSaleItemDialogue from "@/components/routes/rent-safe/accounting/sales/sales-items/DeleteItemDialogue"
+import AddSaleItemDialogue from "@/components/routes/rent-safe/accounting/sales/sales-items/AddSaleItemDialogue"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { SALES_ITEMS_HEADERS } from "@/constants"
+import { DELETION_LINKS, SALES_ITEMS_HEADERS } from "@/constants"
 import useSalesItems from "@/hooks/components/useSalesItems"
-import {  getSummaryDate } from "@/lib/utils"
-import { Edit } from "lucide-react"
+import {  getSummaryDate, handleDeletion } from "@/lib/utils"
 
 function SalesItems() {
   const {
     error,
     saleItems,
     isLoading,
-    pagination
+    pagination,
   } = useSalesItems();
 
   return (
@@ -60,8 +60,12 @@ function SalesItems() {
                   <TableCell className="text-center">{s.price}</TableCell>
                   <TableCell className="text-center">{getSummaryDate(s.date_created)}</TableCell>
                   <TableCell className="flex flex-row gap-5 justify-center items-center">
-                    <Edit size={15} className="text-gray-700 dark:text-white"/>
-                    <DeleteSaleItemDialogue id={s.id}/>
+                    <EditIcon/>
+                    <DeleteDialogue
+                      mutationFunc={()=>handleDeletion(DELETION_LINKS.SALES_ITEMS,s.id)}
+                      keyStore="salesItems"
+                      value="Sales Item"
+                    />
                   </TableCell>
                 </TableRow>
               ))

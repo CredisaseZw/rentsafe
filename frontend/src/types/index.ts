@@ -1,4 +1,5 @@
 import type { Address } from "@/interfaces";
+import type { AxiosResponse } from "axios";
 import type { LucideIcon } from "lucide-react";
 
 export type Route = {
@@ -548,3 +549,42 @@ export type CurrencySetting = {
   date_updated: string;
   updated_by: string;
 };
+
+export type Delete = {
+  mutationFunc: () => Promise<AxiosResponse<any, any>>;
+  keyStore: string; //QUERY KEY 
+  page?: number;
+  value: string;
+  trigger? : React.ReactNode
+};
+
+export type AddAccountingSectorPayload = {
+   mode:  "update" | "create",
+   id? : number
+   data : {
+      code?: string;
+      name?: string;
+   }
+}
+
+export type GeneralLedgerAccount = {
+  id: number
+  account_name: string
+  account_number: string
+  account_sector_name: string
+  account_sector_code: string
+  is_secondary_currency: boolean
+  preset: boolean
+}
+
+export type Cashbook = {
+  id: number
+  cashbook_id: string
+  cashbook_name: string
+  requisition_status: boolean
+  account_type: string
+  currency: Currency
+  bank_account_number: string
+  branch_name: string
+  general_ledger_account: GeneralLedgerAccount
+}

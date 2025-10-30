@@ -32,8 +32,6 @@ function PropertyList() {
       status,
       propertiesLoading,
       paginationData,
-      onClearSearch,
-      onSearchValue,
       openModal,
       closeModal,
       onPropertiesRetch
@@ -69,8 +67,7 @@ function PropertyList() {
                <div>
                   <Searchbox 
                      placeholder="By address, unit number or tenant"
-                     handleSearch={onSearchValue}
-                     clearSearch = {onClearSearch} />
+                   />
                </div>
                <div>
                   <div className="flex flex-row justify-end gap-3">

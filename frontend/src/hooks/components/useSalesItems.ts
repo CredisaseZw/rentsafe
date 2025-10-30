@@ -22,11 +22,12 @@ export default function useSalesItems(){
         }
     }, [data, error, page, search])    
 
+    
     return {
         error,
         saleItems,
         isLoading,
         pagination,
-        refetch
+        refetch,
     }
 }
