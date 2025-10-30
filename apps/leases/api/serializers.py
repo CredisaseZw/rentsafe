@@ -39,6 +39,9 @@ class PaymentSerializer(serializers.ModelSerializer):
     method = serializers.SerializerMethodField()
     invoice_number = serializers.CharField(source="invoice.document_number")
     type = serializers.SerializerMethodField()
+    cashbook_name = serializers.CharField(
+        source="cashbook.cashbook_name", read_only=True
+    )
 
     class Meta:
         model = Payment
@@ -47,6 +50,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             "invoice_number",
             "amount",
             "method",
+            "cashbook_name",
             "payment_date",
             "reference",
             "type",
@@ -69,6 +73,9 @@ class PaymentSerializer(serializers.ModelSerializer):
             "payment_date": instance.payment_date,
             "reference": instance.reference,
             "type": self.get_type(instance),
+            "cashbook_name": (
+                instance.cashbook.cashbook_name if instance.cashbook else None
+            ),
             "description": f"{description_prefix} {description_suffix}",
         }
 
