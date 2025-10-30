@@ -29,18 +29,10 @@ class AccountSector(BaseModel):
     def __str__(self):
         return self.name
 
-
-class SalesAccount(BaseModel):
-    """Stores different sales accounts and links them to sectors."""
-
-    account_name = models.CharField(max_length=255, unique=True)
-    account_number = models.CharField(max_length=15, default="")
-    account_sector = models.ForeignKey(
-        AccountSector, on_delete=models.CASCADE, related_name="accounts"
-    )
-
-    def __str__(self):
-        return f"{self.account_number} - {self.account_name}"
+    class Meta:
+        verbose_name = "Account Sector"
+        verbose_name_plural = "Account Sectors"
+        ordering = ["code"]
 
 
 class Currency(BaseModel):
@@ -50,6 +42,11 @@ class Currency(BaseModel):
 
     def __str__(self):
         return self.currency_code
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Currency")
+        verbose_name_plural = _("Currencies")
 
 
 class SalesItem(BaseModelWithUser):
@@ -71,11 +68,16 @@ class SalesItem(BaseModelWithUser):
         "VATSetting", on_delete=models.CASCADE, related_name="items"
     )
     sales_account = models.ForeignKey(
-        "SalesAccount", on_delete=models.CASCADE, related_name="items"
+        "GeneralLedgerAccount", on_delete=models.CASCADE, related_name="items"
     )
 
     def __str__(self):
         return f"{self.name} ({self.category.name})"
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Sales Item")
+        verbose_name_plural = _("Sales Items")
 
     def save(self, *args, **kwargs):
         if not self.item_id:
@@ -98,6 +100,11 @@ class SalesCategory(BaseModelWithUser):
     def __str__(self):
         return self.name
 
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Sales Category")
+        verbose_name_plural = _("Sales Categories")
+
 
 class VATSetting(BaseModelWithUser):
     rate = models.DecimalField(max_digits=5, decimal_places=2)
@@ -107,10 +114,23 @@ class VATSetting(BaseModelWithUser):
     def __str__(self):
         return f"{self.rate}% - {self.description}"
 
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("VAT Setting")
+        verbose_name_plural = _("VAT Settings")
+
 
 class TransactionType(BaseModel):
     transaction_type = models.CharField(max_length=30, unique=True)
     description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.transaction_type
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Transaction Type")
+        verbose_name_plural = _("Transaction Types")
 
 
 class CashbookEntry(BaseModelWithUser):
@@ -124,16 +144,27 @@ class CashbookEntry(BaseModelWithUser):
     def __str__(self):
         return f"{self.transaction_type} - {self.amount}"
 
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Cashbook Entry")
+        verbose_name_plural = _("Cashbook Entries")
 
-class GeneralLedgerAccount(BaseModel):
-    account_name = models.CharField(max_length=255, unique=True, blank=True)
+
+class GeneralLedgerAccount(BaseModelWithUser):
+    account_name = models.CharField(max_length=255, blank=True)
     account_number = models.CharField(max_length=10, unique=True, blank=True)
     account_sector = models.ForeignKey(
         AccountSector, on_delete=models.PROTECT, related_name="sector", default=None
     )
+    is_secondary_currency = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.account_name} - {self.account_number}"
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("General Ledger Account")
+        verbose_name_plural = _("General Ledger Accounts")
 
 
 class JournalEntry(BaseModel):
@@ -488,6 +519,11 @@ class CashSale(BaseModelWithUser):
         )
         super().save(*args, **kwargs)
 
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Cash Sale")
+        verbose_name_plural = _("Cash Sales")
+
 
 class CreditNote(BaseModelWithUser):
     credit_date = models.DateField(default=now)
@@ -542,6 +578,11 @@ class CreditNote(BaseModelWithUser):
         else:
             customer_id_str = "N/A"  # Changed to N/A for consistency
         return f"Credit Note {self.document_number} for {customer_id_str}"
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Credit Note")
+        verbose_name_plural = _("Credit Notes")
 
 
 class TransactionLineItem(BaseModel):
@@ -632,6 +673,11 @@ class Payment(BaseModelWithUser):
     def __str__(self):
         return f"Payment {self.invoice.document_number} - {self.amount}"
 
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Payment")
+        verbose_name_plural = _("Payments")
+
 
 class CurrencyRate(BaseModelWithUser):
     current_rate = models.FloatField(default=0)
@@ -654,6 +700,12 @@ class CurrencyRate(BaseModelWithUser):
     def __str__(self):
         user_display = self.created_by.username if self.created_by else "N/A"
         return f"User {user_display} Latest Rate {self.current_rate}"
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Currency Rate")
+        verbose_name_plural = _("Currency Rates")
+        ordering = ["-date_created"]
 
 
 class CashBook(BaseModelWithUser):
@@ -680,3 +732,21 @@ class CashBook(BaseModelWithUser):
 
     def __str__(self):
         return f"{self.cashbook_name} - {self.general_ledger_account.account_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.cashbook_id:
+            last_cashbook = CashBook.objects.order_by("-id").first()
+            if not last_cashbook or not last_cashbook.cashbook_id.startswith("CB"):
+                self.cashbook_id = "CB0001"
+            else:
+                try:
+                    last_number = int(last_cashbook.cashbook_id.replace("CB", ""))
+                except ValueError:
+                    last_number = 0
+                self.cashbook_id = f"CB{last_number + 1:04d}"
+        super().save(*args, **kwargs)
+
+    class Meta:
+        app_label = "accounting"
+        verbose_name = _("Cash Book")
+        verbose_name_plural = _("Cash Books")

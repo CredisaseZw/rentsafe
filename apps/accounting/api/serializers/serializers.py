@@ -1,8 +1,10 @@
+from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
+from django.utils import timezone
+from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from apps.accounting.models.models import (
-    SalesAccount,
     SalesCategory,
     SalesItem,
     CashSale,
@@ -24,7 +26,6 @@ from apps.accounting.models.models import (
     Customer,
 )
 from apps.accounting.models.disbursements import Disbursement
-from decimal import Decimal, ROUND_HALF_UP
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
 from apps.clients.models.models import Client
 from apps.common.api.serializers import AddressSerializer
@@ -87,8 +88,8 @@ class BaseCompanySerializer(serializers.ModelSerializer):
 class SalesCategorySerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = SalesCategory
-        fields = ["id", "name", "code", "date_created"]
-        read_only_fields = ["date_created", "id"]
+        fields = ["id", "name", "code"]
+        read_only_fields = ["id"]
 
     def validate(self, attrs):
         if SalesCategory.objects.filter(code__iexact=attrs.get("code")).exists():
@@ -118,12 +119,27 @@ class VATSettingSerializer(serializers.ModelSerializer):
         model = VATSetting
         fields = ["id", "rate", "description", "vat_applicable"]
 
-    def validate(self, data):
-        rate = data.get("rate")
-        if rate is not None and (rate < 0 or rate > 100):
+    def validate_rate(self, value):
+        if value is not None and (value < 0 or value > 100):
             raise ValidationError("VAT rate must be between 0 and 100.")
+        return value
 
-        return data
+    def validate(self, data_list):
+        """Validate bulk creation - filter out duplicates."""
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            raise ValidationError("Request context is required.")
+
+        client = request.user.client
+        existing_rates = VATSetting.objects.filter(
+            created_by__client=client
+        ).values_list("rate", flat=True)
+        if data_list.get("rate") in existing_rates:
+            raise ValidationError(
+                f"VAT setting with rate {data_list.get('rate')} already exists for your company."
+            )
+
+        return data_list
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -138,26 +154,33 @@ class VATSettingSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class SalesAccountSerializer(BaseCompanySerializer):
+class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
+    account_sector_name = serializers.ReadOnlyField(
+        source="account_sector.name", read_only=True
+    )
+    account_sector_code = serializers.ReadOnlyField(
+        source="account_sector.code", read_only=True
+    )
+    account_sector_id = serializers.PrimaryKeyRelatedField(
+        queryset=AccountSector.objects.all(), source="account_sector", write_only=True
+    )
+
     class Meta(BaseCompanySerializer.Meta):
-        model = SalesAccount
+        model = GeneralLedgerAccount
         fields = [
             "id",
             "account_name",
             "account_number",
-            "account_sector",
-            "account_sector_details",
+            "account_sector_name",
+            "account_sector_code",
+            "account_sector_id",
+            "is_secondary_currency",
         ]
-        extra_kwargs = {"account_sector": {"write_only": True}}
 
-    account_sector_details = serializers.SerializerMethodField()
-
-    def get_account_sector_details(self, obj):
-        return (
-            {"id": obj.account_sector.id, "name": obj.account_sector.name}
-            if obj.account_sector
-            else None
-        )
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["preset"] = True if instance.created_by is None else False
+        return representation
 
 
 class CurrencySerializer(BaseCompanySerializer):
@@ -168,16 +191,12 @@ class CurrencySerializer(BaseCompanySerializer):
 
 class SalesItemSerializer(BaseCompanySerializer):
     category_object = SalesCategorySerializer(source="category", read_only=True)
-    currency_object = CurrencySerializer(source="unit_price_currency", read_only=True)
-    tax_configuration_object = VATSettingSerializer(
-        source="tax_configuration", read_only=True
-    )
-    sales_account_object = SalesAccountSerializer(
-        source="sales_account", read_only=True
-    )
-
     category = serializers.PrimaryKeyRelatedField(
         queryset=SalesCategory.objects.all(), write_only=True
+    )
+
+    tax_configuration_rate = serializers.DecimalField(
+        max_digits=5, decimal_places=2, source="tax_configuration.rate", read_only=True
     )
     unit_price_currency = serializers.PrimaryKeyRelatedField(
         queryset=Currency.objects.all(),
@@ -188,8 +207,11 @@ class SalesItemSerializer(BaseCompanySerializer):
     tax_configuration = serializers.PrimaryKeyRelatedField(
         queryset=VATSetting.objects.all(), write_only=True
     )
+    sales_account_name = serializers.CharField(
+        source="sales_account.account_name", read_only=True
+    )
     sales_account = serializers.PrimaryKeyRelatedField(
-        queryset=SalesAccount.objects.all(), write_only=True
+        queryset=GeneralLedgerAccount.objects.all(), write_only=True
     )
     item_id = serializers.CharField(required=False, allow_blank=True)
 
@@ -204,11 +226,10 @@ class SalesItemSerializer(BaseCompanySerializer):
             "category",
             "category_object",
             "unit_price_currency",
-            "currency_object",
             "tax_configuration",
-            "tax_configuration_object",
+            "tax_configuration_rate",
             "sales_account",
-            "sales_account_object",
+            "sales_account_name",
             "date_created",
         ]
 
@@ -228,6 +249,13 @@ class SalesItemSerializer(BaseCompanySerializer):
             )
 
         return attrs
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        currency = instance.unit_price_currency
+        symbol = currency.symbol if currency else ""
+        representation["price"] = f"{symbol}{representation['price']}"
+        return representation
 
 
 class CashbookEntrySerializer(BaseCompanySerializer):
@@ -261,28 +289,10 @@ class CashbookEntrySerializer(BaseCompanySerializer):
         )
 
 
-class AccountSectorSerializer(BaseCompanySerializer):
-    class Meta(BaseCompanySerializer.Meta):
+class AccountSectorSerializer(serializers.ModelSerializer):
+    class Meta:
         model = AccountSector
         fields = ["id", "code", "name"]
-
-
-class GeneralLedgerAccountSerializer(BaseCompanySerializer):
-    account_sector = AccountSectorSerializer(read_only=True)
-    account_sector_id = serializers.PrimaryKeyRelatedField(
-        queryset=AccountSector.objects.all(), source="account_sector", write_only=True
-    )
-
-    class Meta(BaseCompanySerializer.Meta):
-        model = GeneralLedgerAccount
-        fields = [
-            "id",
-            "account_name",
-            "account_number",
-            "account_sector",
-            "account_sector_id",
-            "date_created",
-        ]
 
 
 class IndividualCustomerSerializer(serializers.ModelSerializer):
@@ -1150,7 +1160,11 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        date = instance.date_created.strftime("%d-%b-%Y")
+        date = (
+            instance.date_updated.strftime("%d-%b-%Y")
+            if instance.date_updated
+            else instance.date_created.strftime("%d-%b-%Y")
+        )
         created_by = instance.created_by
         if (
             created_by
@@ -1169,14 +1183,15 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
             "base_currency": instance.base_currency.currency_code,
             "currency": instance.currency.currency_code,
             "current_rate": str(instance.current_rate),
-            "date_created": date,
-            "created_by": created_by_display,
+            "date_updated": date,
+            "updated_by": created_by_display,
         }
 
     def validate(self, attrs):
         base_currency = attrs.get("base_currency")
         counter_currency = attrs.get("currency")
         rate = attrs.get("current_rate")
+        user = self.context["request"].user.client
         if rate is not None and rate <= 0:
             raise ValidationError("Current Rate must be greater than zero.")
 
@@ -1186,6 +1201,18 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         for fields in ["currency", "base_currency", "current_rate"]:
             if not attrs.get(fields):
                 raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+        last_rate = (
+            CurrencyRate.objects.filter(
+                created_by__client=user,
+                base_currency=base_currency,
+                currency=counter_currency,
+            )
+            .order_by("-date_updated", "-date_created")
+            .first()
+        )
+
+        if last_rate and last_rate.current_rate == rate:
+            raise ValidationError({"error": "This rate is already the latest."})
 
         if counter_currency == base_currency:
             raise ValidationError(
@@ -1198,6 +1225,13 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user") and request.user.is_authenticated:
             validated_data["created_by"] = request.user
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+            validated_data["date_updated"] = timezone.now()
+        return super().update(instance, validated_data)
 
 
 class CashBookSerializer(BaseCompanySerializer):
@@ -1232,8 +1266,10 @@ class CashBookSerializer(BaseCompanySerializer):
 
     def validate(self, data):
         request = self.context.get("request")
-        user_company = request.created_by.client
-
+        if request and hasattr(request, "user") and request.user.client:
+            user_company = request.user.client
+        else:
+            user_company = None
         general_ledger_account = data.get("general_ledger_account")
         if (
             general_ledger_account
@@ -1257,14 +1293,10 @@ class CashBookSerializer(BaseCompanySerializer):
         if cashbook_data_exists := company_cashbook.filter(
             cashbook_name=data.get("cashbook_name"),
             currency=data.get("currency"),
-            requisition_status=data.get("requisition_status"),
-            account_type=data.get("account_type"),
-            bank_account_number=data.get("bank_account_number"),
-            branch_name=data.get("branch_name"),
             general_ledger_account=data.get("general_ledger_account"),
         ).exists():
             raise serializers.ValidationError(
-                "These details (name, currency, status, type, bank, branch, GL account) already exist in another cashbook for your company."
+                "These details (name, currency, GL account) already exist in another cashbook for your company."
             )
 
         bank_account = data.get("bank_account_number")
