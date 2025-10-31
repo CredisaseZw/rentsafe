@@ -314,6 +314,23 @@ export function savePersistentData(name: string, data: any) {
    persistentData[name] = data;
    localStorage.setItem("persistentData", JSON.stringify(persistentData));
 }
+
+export function updatePersistentData(name: string, data: any, merge = false) {
+  const persistentData = getPersistentData<Record<string, any>>() || {};
+
+  if (merge && typeof persistentData[name] === "object" && persistentData[name] !== null) {
+    persistentData[name] = {
+      ...persistentData[name],
+      ...data,
+    };
+  } else {
+    persistentData[name] = data;
+  }
+
+  localStorage.setItem("persistentData", JSON.stringify(persistentData));
+}
+
+
 export function summarizeAddress(address: Address): string {
    return [
       address.street_address,
@@ -731,4 +748,30 @@ export const handleAxiosError = (
 export const handleDeletion = async (prefixLink:string, id: number) => {
   const response = await api.delete(`${prefixLink}/${id}/`)
   return response.data
+}
+
+export const handleTrackChangedFields = (initial: any, payloadData: any) => {
+    let changedData:any = payloadData
+    changedData = Object.fromEntries(
+    Object.entries(payloadData).filter(([key, value]) => {
+      const original = (initial as any)[key]
+      if (typeof value === "string" && typeof original === "string") {
+          return value.trim() !== original.trim()
+      }
+        return value !== original
+      })
+    ) 
+    // No actual changes
+    if (Object.keys(changedData).length === 0) {
+      toast.info("No changes made.")
+      return undefined;
+    }
+
+    return changedData;
+}
+
+export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) =>{
+    const FORM_DATA = new FormData(e.currentTarget)
+    const DATA = Object.fromEntries(FORM_DATA.entries())
+    return DATA
 }

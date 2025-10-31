@@ -1,4 +1,4 @@
-import { handleAxiosError } from "@/lib/utils";
+import { getFormDataObject, handleAxiosError } from "@/lib/utils";
 import type { VATPayload, VATRow } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useState } from "react";
@@ -16,9 +16,8 @@ export default function useAddVATSetting(vatSetting: VATRow | undefined){
     ) => {
         e.preventDefault()
         setLoading(true)
-        const FORM_DATA = new FormData(e.currentTarget)
         const MODE = !!vatSetting ? "update" : "create";
-        const formData = Object.fromEntries(FORM_DATA.entries())
+        const formData= getFormDataObject(e);
         let vatData:VATRow = {
             rate: Number(formData.rate),
             description : String(formData.description),

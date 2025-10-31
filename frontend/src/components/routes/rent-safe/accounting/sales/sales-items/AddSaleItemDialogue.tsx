@@ -2,19 +2,28 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AddSalesItemForm from "@/components/forms/AddSalesItemForm";
+import type { SalesItem } from "@/types";
+import EditIcon from "@/components/general/EditIcon";
 
-function AddSaleItemDialogue() {
+interface props{
+    initial? :  SalesItem | undefined
+}
+function AddSaleItemDialogue({initial}:props) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>Add Sale Item <Plus/></Button>
+                {
+                    initial 
+                    ? <EditIcon/>
+                    : <Button>Add Sale Item <Plus/></Button> 
+                }
             </DialogTrigger>
             <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[900px]">
                 <DialogHeader>
                     <DialogTitle>Add Sale Item</DialogTitle>
                 </DialogHeader>
                 <div>
-                    <AddSalesItemForm/>
+                    <AddSalesItemForm initial={initial}/>
                 </div>
             </DialogContent>
         </Dialog>

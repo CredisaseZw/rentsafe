@@ -9,7 +9,7 @@ interface GLResponse extends Response {
 
 export default function useGetGeneralLedgerAccounts(page:Number){
     const {data, isLoading, error} = useQuery<GLResponse>({
-        queryKey : ["queryKey", page],
+        queryKey : ["generalLedgerAccounts", page],
         queryFn : async() =>{
             const response = await api.get<GLResponse>(`/api/accounting/ledger-accounts/?page=${page}`);
             return response.data;

@@ -1,4 +1,4 @@
-import type { Tenant } from "@/types";
+import type { Payload, Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -436,4 +436,9 @@ export interface Response {
    count : number
    next : string | undefined
    previous : string | undefined
+}
+
+export interface CreateCashbookPayload extends Payload {
+} 
+export interface CreateGeneralLedgerPayload extends Payload{
 }

@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import usePaymentTypes from "@/hooks/components/usePaymentTypes"
+import usePaymentTypesDialogue from "@/hooks/components/usePaymentTypesDialogue"
 
 export default function AddPaymentTypeDialog() {
     const {
@@ -10,7 +10,7 @@ export default function AddPaymentTypeDialog() {
         setOpen,
         type,
         setType
-    } = usePaymentTypes()
+    } = usePaymentTypesDialogue()
     return (
         <Dialog
             open = {open}
@@ -24,17 +24,17 @@ export default function AddPaymentTypeDialog() {
             </DialogTrigger>
             <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-md">
                 <DialogHeader>
-                <DialogTitle>Add payment type</DialogTitle>
-                <DialogDescription>Add a new payment type.</DialogDescription>
+                   <DialogTitle>Add payment type</DialogTitle>
+                    <DialogDescription>Add a new payment type.</DialogDescription>
                 </DialogHeader>
                 <div className="mt-4 space-y-3">
-                <Input
-                    type="text"
-                    value={type}
-                    onChange={(e)=> setType(e.target.value)}
-                    placeholder="e.g Swipe"
-                />
-                <Button className="w-full">Add type <Plus/></Button>
+                    <Input
+                        type="text"
+                        value={type}
+                        onChange={(e)=> setType(e.target.value)}
+                        placeholder="e.g Swipe"
+                    />
+                    <Button className="w-full">Add type <Plus/></Button>
                 </div>
             </DialogContent>
         </Dialog>

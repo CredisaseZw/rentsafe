@@ -1,6 +1,5 @@
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import DeleteDialogue from "@/components/general/DeleteDialogue"
-import EditIcon from "@/components/general/EditIcon"
 import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 import Header from "@/components/general/Header"
 import Searchbox from "@/components/general/Searchbox"
@@ -60,7 +59,7 @@ function SalesItems() {
                   <TableCell className="text-center">{s.price}</TableCell>
                   <TableCell className="text-center">{getSummaryDate(s.date_created)}</TableCell>
                   <TableCell className="flex flex-row gap-5 justify-center items-center">
-                    <EditIcon/>
+                    <AddSaleItemDialogue initial={s}/>
                     <DeleteDialogue
                       mutationFunc={()=>handleDeletion(DELETION_LINKS.SALES_ITEMS,s.id)}
                       keyStore="salesItems"

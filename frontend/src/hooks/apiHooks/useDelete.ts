@@ -6,17 +6,16 @@ import { handleAxiosError } from "@/lib/utils"
 import { useSearchParams } from "react-router"
 import type { Delete } from "@/types"
 
-export default function useDelete({mutationFunc, keyStore, page , value }: Delete) {
+export default function useDelete({mutationFunc, keyStore, value }: Delete) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const queryClient = useClient()
   const { mutate } = useMutation({
     mutationFn: () => mutationFunc(),
     onSuccess: () => {
-        searchParams.set("page", String(page));
-        setSearchParams(searchParams)
-        queryClient.invalidateQueries({ queryKey: [keyStore, Number(page)] })
+        const PAGE = Number(searchParams.get("page") || 1)
+        queryClient.invalidateQueries({ queryKey: [keyStore, PAGE] })
         toast.success(`${value} deleted successfully`)
         setOpen(false)
     },

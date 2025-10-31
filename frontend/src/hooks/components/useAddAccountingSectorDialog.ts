@@ -1,4 +1,4 @@
-import { handleAxiosError } from "@/lib/utils";
+import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import type { AccountSector, AddAccountingSectorPayload } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import React, { useState } from "react";
@@ -15,33 +15,17 @@ export default function useAddAccountingSectorDialog(initial?: AccountSector){
         mutation: UseMutationResult<any, Error, AddAccountingSectorPayload, unknown>
     ) => {
         e.preventDefault()
-        
+        let changedData;        
         const mode = initial ? "update" : "create"
-        const FORM_DATA = new FormData(e.currentTarget)
-        const DATA = Object.fromEntries(FORM_DATA.entries())
-
+        const DATA = getFormDataObject(e);
         const payloadData = {
             code: String(DATA.code),
             name: String(DATA.name)
         }
 
-        // Track changed fields if editing
-        let changedData: Partial<AccountSector> = payloadData
-        if (mode === "update" && initial) {
-        changedData = Object.fromEntries(
-            Object.entries(payloadData).filter(([key, value]) => {
-            const original = (initial as any)[key]
-            if (typeof value === "string" && typeof original === "string") {
-                return value.trim() !== original.trim()
-            }
-            return value !== original
-            })
-        ) as Partial<AccountSector>
-
-        // No actual changes
-        if (Object.keys(changedData).length === 0) {
-            return toast.info("No changes made.")
-        }
+        if(mode === "update") {
+            changedData = handleTrackChangedFields(initial, payloadData)
+            if(!changedData) return;
         }
 
         setLoading(true);

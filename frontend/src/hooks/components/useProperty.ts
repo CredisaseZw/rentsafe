@@ -3,7 +3,7 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useClient from "../general/useClient";
-import { extractFeatures, handleAxiosError } from "@/lib/utils";
+import { extractFeatures, getFormDataObject, handleAxiosError } from "@/lib/utils";
 import useGetPropertyUnits from "../apiHooks/useGetPropertyUnits";
 import useGetPropertyDetails from "../apiHooks/useGetPropertyDetails";
 
@@ -35,8 +35,7 @@ export default function useProperty(){
 
         e.preventDefault()
         setLoading(true);
-        const formData = new FormData(e.currentTarget)
-        const data = Object.fromEntries(formData.entries());
+        const data = getFormDataObject(e);
         const features = extractFeatures(selectedList);
         
         const unitData = {

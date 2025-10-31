@@ -557,10 +557,12 @@ export type Delete = {
   value: string;
   trigger? : React.ReactNode
 };
-
-export type AddAccountingSectorPayload = {
+export type Payload = {
    mode:  "update" | "create",
    id? : number
+   data : any
+}
+export interface AddAccountingSectorPayload extends Payload {
    data : {
       code?: string;
       name?: string;

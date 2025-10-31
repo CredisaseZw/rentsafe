@@ -1,4 +1,4 @@
-import { extractReceipts, getCurrentDate, handleAxiosError } from "@/lib/utils";
+import { extractReceipts, getCurrentDate, getFormDataObject, handleAxiosError } from "@/lib/utils";
 import type { Lease, LeaseReceiptPayload, PaymentMethod, ReceiptLease } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -88,8 +88,7 @@ export default function useReceipt(initialLease?: ReceiptLease) {
     ) => {
         e.preventDefault()
         setLoading(true)
-        const FORM = new FormData(e.currentTarget);
-        const data = Object.fromEntries(FORM.entries())
+        const data = getFormDataObject(e);
         const receipts: ReceiptLease[] = extractReceipts(data, !!initialLease?.is_rent_variable);
         
         // VALIDATE BY LEASE_ID { FILTER FOR EMPTY OBJECTS }

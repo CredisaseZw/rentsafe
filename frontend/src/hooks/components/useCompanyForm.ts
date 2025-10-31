@@ -1,7 +1,7 @@
 import type { CompanyPayload } from "@/interfaces/form-payloads";
 import React, { useEffect } from "react";
 import useCreateCompany from "../apiHooks/useCreateCompany";
-import { extractAddresses, formatDateToPythonSLiking } from "@/lib/utils";
+import { extractAddresses, formatDateToPythonSLiking, getFormDataObject } from "@/lib/utils";
 import type { CompanyLegalStatus } from "@/types";
 import { useNavigate, useSearchParams } from "react-router";
 
@@ -25,9 +25,7 @@ export default function useCompanyForm() {
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const data = Object.fromEntries(formData.entries());
-
+      const data = getFormDataObject(event);
       const companyPayload: CompanyPayload = {
          // required
          registration_number: data.registration_number as string,

@@ -5,9 +5,13 @@ import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import LoadingIndicator from "../general/LoadingIndicator"
 import Button from "../general/Button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import useCreateSalesItem from "@/hooks/apiHooks/useCreateSalesItem"
+import type { SalesItem } from "@/types"
 
-function AddSalesItemForm() {
+interface props{
+    initial? :  SalesItem | undefined
+}
+function AddSalesItemForm({initial}:props) {
     const {
         salesCategories,
         categoriesLoading,
@@ -25,10 +29,11 @@ function AddSalesItemForm() {
         handleLoadMoreCategories,
         handleSubmit,
         handleLoadMoreVAT
-    } = useSalesItemsForm();
+    } = useSalesItemsForm(initial);
+    const createItem = useCreateSalesItem();
 
     return (
-    <form className="flex flex-col gap-5" onSubmit={(e)=> handleSubmit(e)}>
+    <form className="flex flex-col gap-5" onSubmit={(e)=> handleSubmit(e, createItem)}>
         <ColumnsContainer numberOfCols={2} gapClass="gap-5" marginClass="mt-0">
             <div className="form-group">
                 <Label className="required">Item Category</Label>
@@ -125,14 +130,8 @@ function AddSalesItemForm() {
                         {
                             vatSettings.length !== 0 && 
                             vatSettings.map((s, idx:number)=>(
-                                <Tooltip key={s.id}>
-                                    <TooltipTrigger asChild>
-                                        <SelectItem value={String(s.id)} key={idx}>{s.rate}</SelectItem>
-                                    </TooltipTrigger>
-                                 <TooltipContent>
-                                    <p>{s.description}</p>
-                                 </TooltipContent>
-                              </Tooltip>
+                                <SelectItem value={String(s.id)} key={idx}>{`${s.rate}% - ${s.description}`}</SelectItem>
+
                             ))
                         }
                         {

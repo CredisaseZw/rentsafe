@@ -34,13 +34,15 @@ function AddCashbookDialog({initial}:props) {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px]"  onInteractOutside={(event) => event.preventDefault()}>
             <DialogHeader>
-            <DialogTitle>Create Cashbook</DialogTitle>
+            <DialogTitle>{initial ? "Update" : "Create"} Cashbook</DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-white/50">
                 {initial ? "Update" : "Add"} a cashbook. {initial ? "MOdify" : "Fill"} out the details below and click submit when done.
             </DialogDescription>
             </DialogHeader>
             <div>
-                <AddCashbookForm initial={initial}/>
+                <AddCashbookForm
+                 successCallback={()=> setOpen(false)}
+                 initial={initial}/>
             </div>
         </DialogContent>
         </Dialog>

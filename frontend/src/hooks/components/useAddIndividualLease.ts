@@ -2,7 +2,7 @@ import { IN_LEASE_CLIENT_TYPES } from "@/constants";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import type { Address, BranchFull, Charges, IndividualMinimal, LeaseResponse } from "@/interfaces";
 import type { AddressPayload } from "@/interfaces/form-payloads";
-import { extractAddresses, extractTenants, generateUpdatePayload, getThreeMonthsBack, handleAxiosError, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
+import { extractAddresses, extractTenants, generateUpdatePayload, getFormDataObject, getThreeMonthsBack, handleAxiosError, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
 import type {LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
 import { useQueryClient, type UseMutationResult } from "@tanstack/react-query";
 import { type AxiosError } from "axios";
@@ -367,9 +367,7 @@ function useAddIndividualLease() {
     ) => {
     e.preventDefault();
     setLoading(true);
-    const FORM_DATA = new FormData(e.currentTarget);
-    const data = Object.fromEntries(FORM_DATA.entries());
-    
+    const data = getFormDataObject(e);
     const leasePayload:LeasePayload | void = generateCreateLeasePayload(data, clientType);
 
     let payload;

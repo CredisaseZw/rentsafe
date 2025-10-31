@@ -1,13 +1,14 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
 import useGetVATSettings from "../apiHooks/useGetVATSettings";
 import { useEffect, useState } from "react";
-import { handleAxiosError } from "@/lib/utils";
-import type { Category, GeneralLedgerAccount, VATRow } from "@/types";
+import { getFormDataObject, handleAxiosError } from "@/lib/utils";
+import type { Category, GeneralLedgerAccount, Payload, SalesItem, VATRow } from "@/types";
 import useGetSalesCategories from "../apiHooks/useGetSalesCategories";
 import type { PaginationData } from "@/interfaces";
 import useGetGeneralLedgerAccounts from "../apiHooks/useGetGeneralLedgerAccounts";
+import type { UseMutationResult } from "@tanstack/react-query";
 
-export default function useSalesItemsForm() {
+export default function useSalesItemsForm(initial : SalesItem | undefined) {
     const [categoriesPage, setCategoriesPage] = useState(1);
     const [vatPage, setVatPage] = useState(1);
     const [generalLedgerPage, setGeneralLedgerPage]= useState(1);
@@ -90,21 +91,25 @@ export default function useSalesItemsForm() {
             return;
     }
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) =>{
+    const handleSubmit = (
+        e: React.FormEvent<HTMLFormElement>,
+        mutate : UseMutationResult<any, Error, Payload, unknown> 
+    ) =>{
         e.preventDefault()
-        const FORM_DATA = new FormData(e.currentTarget);
-        const data  = Object.fromEntries(FORM_DATA.entries())
-     
-        const payload = {
+        let changedData;
+        const mode = initial ? "update" : "create";
+        const data = getFormDataObject(e);
+        const payloadData = {
             category : data.itemCategory,
-            name : "Wireless Keyboard",
-            unit_price_currency : 1,
-            price : 29.99,
-            unit_name : "Piece",
-            tax_configuration : 2,
-            sales_account : 1
+            name : data.itemName,
+            unit_price_currency : Number(data.itemCurrency),
+            price : Number(data.unitPrice),
+            unit_name : data.unitName,
+            tax_configuration : Number(data.taxConfig),
+            sales_account : Number(data.salesAccount)
         }
-        console.log(payload)
+        
+
     }
 
     return{

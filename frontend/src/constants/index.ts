@@ -390,9 +390,10 @@ export const CASHBOOKS_LISTS:Header[] = [
 ]
 
 export const ACCOUNT_TYPES:Option[] = [
-  {label : "Current Account", value : "current_account"},
-  {label : "Cash", value : "cash"},
-  {label : "Mobile Money", value :"mobile_money"}
+  {label :"Bank Account", value : "Bank Account"},
+  {label : "Current Account", value : "Current Account"},
+  {label : "Cash", value : "Cash"},
+  {label : "Mobile Money", value :"Mobile Money"}
 ]
 
 export const YEARS:Option[] = [
@@ -604,4 +605,24 @@ export const CASH_BOOK_HEADERS:Header[] = [
   {name : "Branch Name"},
   {name : "General Ledger Account"},
   {name : "Actions"}
+]
+
+export const PAYMENT_METHODS_HEADERS:Header[] = [
+  {name : "ID"},
+  {name : "Payment Method"},
+  {name : "Action"}
+]
+
+export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
+  { name: "Account Name" },
+  { name: "Account Number" },
+  { name: "Secondary Currency" },
+  { name: "Accounts Sector" },
+  { name: "Sector Name" },
+  { name: "Actions" },
+];
+
+export const CURRENCY_OPTIONS:Option[] = [
+  { label: "Base Currency", value: "base_currency" },
+  { label: "Secondary Currency", value: "secondary_currency" },
 ]

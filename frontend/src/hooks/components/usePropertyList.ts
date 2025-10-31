@@ -4,7 +4,7 @@ import type { BranchFull, IndividualMinimal, PaginationData } from "@/interfaces
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { extractAddresses, handleAxiosError, validateYear } from "@/lib/utils";
+import { extractAddresses, getFormDataObject, handleAxiosError, validateYear } from "@/lib/utils";
 import { type AxiosError } from "axios";
 import { toast } from "sonner";
 import getPropertyTypes from "../apiHooks/useGetPropertyTypes";
@@ -134,8 +134,7 @@ function usePropertyList() {
 
    const handleAddProperty = (newProperty:  UseMutationResult<any, Error, any, unknown>, e: React.FormEvent<HTMLFormElement>, successCallback:()=>void) => {
       e.preventDefault();      
-      const formData = new FormData(e.currentTarget);
-      const data = Object.fromEntries(formData.entries());
+      const data = getFormDataObject(e);
       const addresses = extractAddresses(data);
       
       if (data.year_built && (data.year_built as string).length > 0) {
