@@ -390,6 +390,7 @@ class Lease(BaseModelWithUser):
         reference=None,
         request=None,
         description=None,
+        cashbook=None,
     ):
         """
         Apply a payment to the lease, allocating to the oldest debts first.
@@ -428,6 +429,7 @@ class Lease(BaseModelWithUser):
                         description=description,
                         method=method,
                         reference=reference,
+                        cashbook=cashbook,
                         created_by=(
                             request.user
                             if request and hasattr(request, "user")
