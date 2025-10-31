@@ -658,6 +658,13 @@ class Payment(BaseModelWithUser):
     balance = models.DecimalField(
         max_digits=12, decimal_places=2, default=Decimal("0.00")
     )
+    cashbook = models.ForeignKey(
+        "accounting.CashBook",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="payments",
+    )
     method = models.ForeignKey(
         PaymentMethod, on_delete=models.CASCADE, related_name="payments"
     )
