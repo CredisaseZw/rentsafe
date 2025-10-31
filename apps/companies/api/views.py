@@ -46,6 +46,12 @@ class CompanyViewSet(BaseViewSet):
         .order_by("-date_created")
     )
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = [
+        "registration_name",
+        "trading_name",
+        "registration_number",
+    ]
 
     def get_serializer_class(self):
         """Return appropriate serializer based on action"""
