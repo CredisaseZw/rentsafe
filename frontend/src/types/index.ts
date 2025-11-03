@@ -255,7 +255,7 @@ export interface Tenant {
   is_primary_tenant: boolean;
 }
 export type TenantPayload = {
-  tenant_id: string;
+  tenant_id: number;
   tenant_type: string;
   is_primary_tenant: boolean;
   address? : Address | undefined

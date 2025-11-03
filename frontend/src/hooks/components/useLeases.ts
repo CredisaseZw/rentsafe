@@ -2,7 +2,7 @@ import type { PaginationData } from "@/interfaces"
 import type { Lease, LeaseReceiptPayload } from "@/types"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
-import useGetLeases from "../apiHooks/useGetActiveLeases"
+import {useGetLeases} from "../apiHooks/useGetActiveLeases"
 import { getCurrentDate, handleAxiosError } from "@/lib/utils"
 
 export default function useLeases(defaultStatus: string) {

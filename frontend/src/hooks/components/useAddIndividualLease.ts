@@ -4,14 +4,14 @@ import type { Address, BranchFull, Charges, IndividualMinimal, LeaseResponse } f
 import type { AddressPayload } from "@/interfaces/form-payloads";
 import { extractAddresses, extractTenants, generateUpdatePayload, getFormDataObject, getThreeMonthsBack, handleAxiosError, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
 import type {LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
-import { useQueryClient, type UseMutationResult } from "@tanstack/react-query";
+import { type UseMutationResult } from "@tanstack/react-query";
 import { type AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react"
-import { useSearchParams } from "react-router";
 import { toast } from "sonner";
+import useClient from "../general/useClient";
 
 function useAddIndividualLease() {
-  const queryClient = useQueryClient()
+  const queryClient = useClient()
   const [leaseObject, setLeaseObject] = useState<LeaseResponse | null>(null); 
   const [addressState, setAddressState] = useState<"property" | "client" | "manual">("property");
   const [loading,setLoading] = useState(false);
@@ -23,8 +23,6 @@ function useAddIndividualLease() {
   const [isOpen, setShowModal] = useState(false);
   const [primaryTenantAddress , setPrimaryTenantAddress] = useState<Address | undefined>(undefined);
   const [defaultCurrency, setDefaultCurrency] = useState<number>(0);
-  const [params] = useSearchParams();
-  const page = parseInt(params.get("active_page") || "1");
   const {currencies, currencyLoading, currency} = useCurrency()
   const [formData, setFormData] = useState({
     defaultRent : "",
@@ -227,7 +225,7 @@ function useAddIndividualLease() {
     } else if (addressState === "manual"){
       source = extractAddresses(data)[0];
     }
-
+    
     const propertyData: ShortPropertyData =  
       addressState  === "property" ?
       formData.property :
@@ -235,9 +233,9 @@ function useAddIndividualLease() {
         name : String(data.propertyName),
         property_type_name : String(data.propertyTypeName),
         description : String(data.propertyDetails),
-        status : String("active")
-      } 
-    
+      }
+    if(propertyData.status) delete propertyData.status; 
+      
       const lease_opening_balance_data = {
         current_month_balance: Number(data.current_month_balance),
         one_month_back_balance: Number(data.one_month_back_balance),
@@ -395,9 +393,8 @@ function useAddIndividualLease() {
       }, {
       onError: (error: AxiosError |Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
       onSuccess :() => {
-        const message = isUpdate ? "Lease successfully updated" : "Lease successfully created";        
-        toast.success(message)
-        queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
+        toast.success(isUpdate ? "Lease successfully updated" : "Lease successfully created")
+        queryClient.invalidateQueries({queryKey : ["leases", 1, "ACTIVE"] })
         successCallback()
       }, 
       onSettled: () => setLoading(false),         

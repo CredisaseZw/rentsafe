@@ -192,7 +192,7 @@ export function extractTenants(data: { [k: string]: FormDataEntryValue }, type :
 
   for (let i = 0; i < tenantCount; i++) {
     const tenant: TenantPayload = {
-      tenant_id: data[`tenants[${i}]`] as string,
+      tenant_id: Number(data[`tenants[${i}]`]),
       tenant_type : type,
       is_primary_tenant: data[`isPrimary[${i}]`] === "on",
     };

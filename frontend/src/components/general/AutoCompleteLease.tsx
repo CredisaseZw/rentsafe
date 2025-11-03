@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import type { Lease} from "@/types";
-import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases";
+import {useGetLeases} from "@/hooks/apiHooks/useGetActiveLeases";
 import { toast } from "sonner";
 
 interface Props {

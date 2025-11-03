@@ -522,7 +522,7 @@ export const PROPERTY_FILTER_OPTIONS:Option[] = [
   { label: "Vacant", value: "vacant" },
 ]
 export const PROPERTY_STATUS_OPTIONS:Option[] = [
-  {label : "Vacant", value : "active"},
+  {label : "Vacant", value : "vacant"},
   {label : "Partially Occupied", value : "partially_occupied"},
   {label : "Occupied", value : "occupied"},
   {label : "Maintenance", value : "maintenance"},
