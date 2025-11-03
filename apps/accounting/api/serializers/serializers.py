@@ -211,6 +211,7 @@ class SalesItemSerializer(BaseCompanySerializer):
     tax_configuration = serializers.PrimaryKeyRelatedField(
         queryset=VATSetting.objects.all(), write_only=True
     )
+    currency_object = CurrencySerializer(source="unit_price_currency", read_only=True)
     sales_account_object = GeneralLedgerAccountSerializer(
         source="sales_account", read_only=True
     )
@@ -230,6 +231,7 @@ class SalesItemSerializer(BaseCompanySerializer):
             "category",
             "category_object",
             "unit_price_currency",
+            "currency_object",
             "tax_configuration",
             "tax_configuration_object",
             "sales_account",
