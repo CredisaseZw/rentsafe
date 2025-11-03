@@ -8,6 +8,7 @@ import { SALES_INVOICES_HEADERS } from "@/constants"
 import { TableRow } from "@/components/ui/table"
 
 function Invoices() {
+  
   return (
     <div>
       <ColumnsContainer numberOfCols={2} >

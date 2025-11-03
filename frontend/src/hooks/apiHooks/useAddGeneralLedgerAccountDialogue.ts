@@ -1,11 +1,11 @@
-import type { AccountSector, GeneralLedgerAccount } from "@/types";
+import type { AccountSector, GeneralLedgerAccount, Payload } from "@/types";
 import React, { useEffect, useState } from "react"
 import useGetAccountSectors from "./useGetAccountSectors";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
-import type { CreateGeneralLedgerPayload, PaginationData } from "@/interfaces";
+import type { PaginationData } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
-import useClient from "../general/useClient";
 import { toast } from "sonner";
+import { GeneraLedgersRetch } from "./useGetGeneralLedgerAccounts";
 
 function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | undefined) {
     const [open, setOpen] = useState(false);
@@ -14,8 +14,6 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
     const [loading,setLoading] = useState(false);
     const [sectors, setSectors] = useState<AccountSector[]>([]);
     const {data, isLoading, error } = useGetAccountSectors(sectorsPage, null);
-    const queryClient = useClient();
-
     useEffect(()=>{
         if(handleAxiosError("Failed to fetch accounting sectors", error)) return;
         if(data){
@@ -35,7 +33,7 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
 
     const handleSubmit = (
         e: React.FormEvent<HTMLFormElement>,
-        mutation : UseMutationResult<any, Error, CreateGeneralLedgerPayload, unknown>
+        mutation : UseMutationResult<any, Error, Payload, unknown>
     )=>{
         e.preventDefault();
         let changedData;
@@ -60,7 +58,7 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
             if (!changedData) return;
         }
 
-        const payload:CreateGeneralLedgerPayload = {
+        const payload:Payload = {
             ...(mode === "create"
                 ? {data : payloadData}
                 : {data : changedData,
@@ -73,8 +71,9 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
         setLoading(true);
         mutation.mutate(payload, {
             onSuccess : ()=>{
+                const {refetch} = GeneraLedgersRetch.state
+                refetch?.();
                 toast.success(`Account successfully ${mode}.`);
-                queryClient.invalidateQueries({queryKey : ["generalLedgerAccounts", 1]});
                 setOpen(false);
             },
             onError : (error) => handleAxiosError("Failed to create general account", error) ,

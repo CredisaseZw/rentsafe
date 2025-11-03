@@ -140,7 +140,7 @@ export const STATUS_OPTIONS: Option[] = [
 export const LEASE_STATUS_OPTIONS: Option[] = [
   { label: "Active", value: "ACTIVE" },
   { label: "Draft", value: "DRAFT" },
-  { label: "Pending Approval", value: "PENDING_APPROVAL" },
+  { label: "Pending Approval", value: "PENDING APPROVAL" },
   { label: "Terminated", value: "TERMINATED" },
   { label: "Expired", value: "EXPIRED" },
   { label: "Renewed", value: "RENEWED" },

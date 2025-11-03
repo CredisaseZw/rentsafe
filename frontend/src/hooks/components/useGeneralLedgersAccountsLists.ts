@@ -2,7 +2,7 @@ import type { PaginationData } from "@/interfaces"
 import type { GeneralLedgerAccount } from "@/types"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
-import useGetGeneralLedgerAccounts from "../apiHooks/useGetGeneralLedgerAccounts"
+import {useGetGeneralLedgerAccounts} from "../apiHooks/useGetGeneralLedgerAccounts"
 import { handleAxiosError } from "@/lib/utils"
 
 function useGeneralLedgersAccountsLists() {

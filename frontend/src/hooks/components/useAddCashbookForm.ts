@@ -1,8 +1,8 @@
 import { useCurrency } from '@/contexts/CurrencyContext'
-import type { CreateCashbookPayload, PaginationData } from '@/interfaces';
-import type { Cashbook, GeneralLedgerAccount } from '@/types'
+import type { PaginationData } from '@/interfaces';
+import type { Cashbook, GeneralLedgerAccount, Payload } from '@/types'
 import { useEffect, useState } from 'react'
-import useGetGeneralLedgerAccounts from '../apiHooks/useGetGeneralLedgerAccounts';
+import {useGetGeneralLedgerAccounts} from '../apiHooks/useGetGeneralLedgerAccounts';
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from '@/lib/utils';
 import type { UseMutationResult } from '@tanstack/react-query';
 import useClient from '../general/useClient';
@@ -43,7 +43,7 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
     
     const handleSubmit = (
         e:React.FormEvent<HTMLFormElement>, 
-        mutation: UseMutationResult<any, Error, CreateCashbookPayload, unknown>) => {
+        mutation: UseMutationResult<any, Error, Payload, unknown>) => {
         e.preventDefault();
         let changedData;
         const mode:"update" | "create" = initial ? "update" : "create";
@@ -72,7 +72,7 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
             if(!changedData) return;
         }
         
-        const payload:CreateCashbookPayload = {
+        const payload:Payload = {
             ...(mode === "create"
                 ? {data : payloadData}
                 : {data : changedData,

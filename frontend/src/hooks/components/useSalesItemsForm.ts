@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import type { Category, GeneralLedgerAccount, Payload, SalesItem, VATRow } from "@/types";
 import useGetSalesCategories from "../apiHooks/useGetSalesCategories";
-import useGetGeneralLedgerAccounts from "../apiHooks/useGetGeneralLedgerAccounts";
+import {useGetGeneralLedgerAccounts} from "../apiHooks/useGetGeneralLedgerAccounts";
 import type { UseMutationResult } from "@tanstack/react-query";
 import useClient from "../general/useClient";
 import { useSearchParams } from "react-router";
@@ -134,13 +134,12 @@ export default function useSalesItemsForm(initial : SalesItem | undefined, succe
         setLoading(true);
         const payload: Payload = {
             ...(
-                mode === "create"
-                ? { data : payloadData}
-                : {
+                mode === "update" &&
+                {
                     id : initial?.id,
-                    data : changedData
                 }
             ),
+            data : payloadData,
             mode
         }
 

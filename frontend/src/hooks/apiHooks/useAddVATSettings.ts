@@ -7,8 +7,8 @@ export default function useAddVATSettings(){
         mutationFn : async(payload: VATPayload)=>{
             const response = 
             payload.mode === "create"
-            ? await api.post("/api/accounting/vat-settings/", payload.data)
-            : await api.patch(`/api/accounting/vat-settings/${Number(payload.id)}/`, payload.data)
+            ? await api.post("/api/accounting/vat-settings/", [payload.data])
+            : await api.patch(`/api/accounting/vat-settings/${Number(payload.id)}/`, [payload.data])
             return response.data
         }
     })
