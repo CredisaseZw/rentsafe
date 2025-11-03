@@ -437,7 +437,3 @@ export interface Response {
    next : string | undefined
    previous : string | undefined
 }
-
-export interface RefetchState{
-   refetch :(() => void) | null
-}

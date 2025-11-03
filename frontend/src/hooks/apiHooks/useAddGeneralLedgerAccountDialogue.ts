@@ -5,7 +5,8 @@ import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@
 import type { PaginationData } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GeneraLedgersRetch } from "./useGetGeneralLedgerAccounts";
+import { useSearchParams } from "react-router";
+import useClient from "../general/useClient";
 
 function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | undefined) {
     const [open, setOpen] = useState(false);
@@ -14,6 +15,9 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
     const [loading,setLoading] = useState(false);
     const [sectors, setSectors] = useState<AccountSector[]>([]);
     const {data, isLoading, error } = useGetAccountSectors(sectorsPage, null);
+    const [searchParams] = useSearchParams();
+    const queryClient = useClient();
+
     useEffect(()=>{
         if(handleAxiosError("Failed to fetch accounting sectors", error)) return;
         if(data){
@@ -71,8 +75,7 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
         setLoading(true);
         mutation.mutate(payload, {
             onSuccess : ()=>{
-                const {refetch} = GeneraLedgersRetch.state
-                refetch?.();
+                queryClient.invalidateQueries({queryKey :["generalLedgerAccounts", Number(searchParams.get("page") || 1)]})
                 toast.success(`Account successfully ${mode}.`);
                 setOpen(false);
             },
