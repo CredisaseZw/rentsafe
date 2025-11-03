@@ -85,10 +85,9 @@ export default function ReceiptRow({paymentMethods, index, lease, cashbooks, isC
                     </Select>
                 </div>
                 <div className='form-group'>
-                    <Label className='required'>Cash Book</Label>
+                    <Label>Cash Book</Label>
                     <Select
                         name={`cashbook_${index}`}
-                        required
                         key={cashbooks[0].account_type}
                         >
                         <SelectTrigger className="w-full">

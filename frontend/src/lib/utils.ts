@@ -209,13 +209,23 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }, inclu
   const receiptKeys = Object.keys(data).filter((key) => key.startsWith("lease_id_"));
   const receiptCount = receiptKeys.length;
   for (let i = 0; i < receiptCount; i++) {
-    const receipt = {
+    const receipt: {
+      lease_id: string;
+      amount: string;
+      payment_method_id: number;
+      reference: string;
+      description: string;
+      cashbook_id?: number;
+      rent?: string,
+      opc? : string,
+      payment_date: string;
+    } = {
       lease_id: data[`lease_id_${i}`] as string,
       amount: data[`received_${i}`] as string,
       payment_method_id: Number(data[`paymentMethod_${i}`] as string),
       reference: data[`receipt_${i}`] as string,
       description: data[`description`] as string,
-      cash_book_id : Number(data[`cashbook_${i}`]),
+      cashbook_id: Number(data[`cashbook_${i}`]),
       payment_date: data[`date_${i}`] as string,
       ...(includeRentVariables
         ? {
@@ -224,6 +234,9 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }, inclu
           }
         : {}),
     };
+    if(receipt.cashbook_id === 0) delete receipt.cashbook_id
+    if(receipt.rent === "") delete receipt.rent
+    if(receipt.opc === "") delete receipt.opc
 
     receipts.push(receipt);
   }
