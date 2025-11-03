@@ -89,6 +89,10 @@ class SalesItem(BaseModelWithUser):
                     last_number = int(last_item.item_id.replace("ITEM", ""))
                 except ValueError:
                     last_number = 0
+                while SalesItem.objects.filter(
+                    item_id=f"ITEM{last_number + 1:04d}"
+                ).exists():
+                    last_number += 1
                 self.item_id = f"ITEM{last_number + 1:04d}"
         super().save(*args, **kwargs)
 

@@ -195,8 +195,8 @@ class SalesItemSerializer(BaseCompanySerializer):
         queryset=SalesCategory.objects.all(), write_only=True
     )
 
-    tax_configuration_rate = serializers.DecimalField(
-        max_digits=5, decimal_places=2, source="tax_configuration.rate", read_only=True
+    tax_configuration_object = VATSettingSerializer(
+        source="tax_configuration", read_only=True
     )
     unit_price_currency = serializers.PrimaryKeyRelatedField(
         queryset=Currency.objects.all(),
@@ -207,8 +207,8 @@ class SalesItemSerializer(BaseCompanySerializer):
     tax_configuration = serializers.PrimaryKeyRelatedField(
         queryset=VATSetting.objects.all(), write_only=True
     )
-    sales_account_name = serializers.CharField(
-        source="sales_account.account_name", read_only=True
+    sales_account_object = GeneralLedgerAccountSerializer(
+        source="sales_account", read_only=True
     )
     sales_account = serializers.PrimaryKeyRelatedField(
         queryset=GeneralLedgerAccount.objects.all(), write_only=True
@@ -227,9 +227,9 @@ class SalesItemSerializer(BaseCompanySerializer):
             "category_object",
             "unit_price_currency",
             "tax_configuration",
-            "tax_configuration_rate",
+            "tax_configuration_object",
             "sales_account",
-            "sales_account_name",
+            "sales_account_object",
             "date_created",
         ]
 
@@ -237,13 +237,16 @@ class SalesItemSerializer(BaseCompanySerializer):
         request = self.context.get("request")
         user_company = request.user.client
 
-        if SalesItem.objects.filter(
+        instance = self.instance
+        existing_item = SalesItem.objects.filter(
             name__iexact=attrs.get("name"),
             created_by__client=user_company,
             tax_configuration=attrs.get("tax_configuration"),
             sales_account=attrs.get("sales_account"),
             price=attrs.get("price"),
-        ).exists():
+        ).exclude(id=instance.id if instance else None)
+
+        if existing_item.exists():
             raise ValidationError(
                 "this Sales item with the same name, tax configuration, sales account, and price already exists."
             )
