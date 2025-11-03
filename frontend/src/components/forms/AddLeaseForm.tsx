@@ -23,14 +23,11 @@ import AutoCompleteClient from "../general/AutoCompleteClient";
 import ButtonSpinner from "../general/ButtonSpinner";
 import useCreateLease from "@/hooks/apiHooks/useCreateLease";
 import { useEffect, type FormEvent } from "react";
-import { toast } from "sonner";
 import getPropertyTypes from "@/hooks/apiHooks/useGetPropertyTypes";
 import LoadingIndicator from "../general/LoadingIndicator";
 import { Textarea } from "../ui/textarea";
 import { DEPOSIT_HOLDER_OPTIONS, IN_LEASE_CLIENT_TYPES, LEASE_STATUS_OPTIONS, PAYMENT_FREQUENCY_OPTIONS, UNIT_TYPES } from "@/constants";
-import { isAxiosError } from "axios";
-import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
-import { summarizeAddress, validateAmounts } from "@/lib/utils";
+import { handleAxiosError, summarizeAddress, validateAmounts } from "@/lib/utils";
 import MultiAddressInput from "../general/MultiAddressInput";
 import useGetLeaseInformation from "@/hooks/apiHooks/useGetLeaseInformation";
 import type { Address } from "@/interfaces";
@@ -46,14 +43,15 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
     headers,
     loading,
     formData,
+    currencies,
     searchItem,
     leaseObject,
     addressState,
     propertyName,
     propertyType, 
     guaranteeItem,
+    currencyLoading,
     defaultCurrency,
-    CURRENCY_OPTIONS,
     outstandingBalance,
     landlordIdentifier,
     primaryTenantAddress,
@@ -62,9 +60,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
-    handleDefaultCurrency,
     setOutstandingBalance,
-    SET_CURRENCY_OPTIONS,
     setDefaultCurrency,
     onSelectGuarantor,
     handleLeaseSubmit,
@@ -81,17 +77,11 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
   } = useAddIndividualLease();
   const useMutate = useCreateLease();
   const {data, isLoading, error} = getPropertyTypes();
-  const {currencyData, currencyLoading, currencyError} = useGetCurrencies();
   const {leaseResponseObject, leaseLoading, leaseError} = useGetLeaseInformation(leaseID)
 
   useEffect(()=>{
     if(leaseID){
-      if(isAxiosError(leaseError)){
-        const message = leaseError.response?.data.error ?? leaseError.response?.data.details ?? "Something went wrong"
-        toast.error("Failed to fetch lease details", { description: message });
-        return;
-      }
-
+      if(handleAxiosError("Failed to fetch lease details", leaseError)) return
       if(leaseResponseObject){
         setDefaultCurrency(leaseResponseObject?.currency?.id)
         setPropertyName(`${leaseResponseObject.unit.property.name} - ${summarizeAddress(leaseResponseObject?.unit.property.addresses[0] ?? {} as Address)}`)
@@ -117,26 +107,9 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
   }, [leaseID, leaseResponseObject, leaseError])
 
   useEffect(()=>{
-    if(isAxiosError(error)){
-      const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong"
-      toast.error("Failed to fetch property types", { description: message });
-      return;
-    }
+    if(handleAxiosError("Failed to fetch property types",error)) return;
     if (data) { setPropertyTypes(data.results ?? []); }
   }, [data, error])
-
-  useEffect(()=>{
-    if(isAxiosError(currencyError)){
-      const message = currencyError.response?.data.error ?? currencyError.response?.data.details ?? "Something went wrong"
-      toast.error("Failed to fetch currencies", { description: message });
-      return;
-    }
-    if (currencyData) { 
-      SET_CURRENCY_OPTIONS(currencyData);
-      handleDefaultCurrency(currencyData); 
-    }
-
-  }, [currencyData, currencyError])
 
   return (
     <form className="w-full relative" onSubmit={(e: FormEvent<HTMLFormElement>)=> handleLeaseSubmit(useMutate, e, clientType, successCallback, leaseID)}>
@@ -400,12 +373,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      CURRENCY_OPTIONS.map((c:Currency)=>
+                      currencies.map((c:Currency)=>
                         <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>
                       )
                     }
                     { 
-                      CURRENCY_OPTIONS.length === 0 &&
+                      currencies.length === 0 &&
                       currencyLoading &&
                       <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
                           <LoadingIndicator />
@@ -474,6 +447,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   className="self-center"
                   name="vatInclusive"
                   id="vatInclusive" 
+
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   VAT Inclusive
@@ -484,7 +458,8 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 className="self-center"
                 name="rentVariable"
                 id="rentVariable"
-                defaultChecked={leaseObject?.is_rent_variable ?? false}
+                key={String(leaseObject?.is_rent_variable)}
+                defaultChecked={!!leaseObject?.is_rent_variable}
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   Is Rent Variable
@@ -505,6 +480,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 Deposit Currency
               </Label>
               <Select
+                key={defaultCurrency}
                 defaultValue={
                   leaseObject?.deposits?.[0]?.currency?.toString() ?? defaultCurrency.toString()
                 }
@@ -514,12 +490,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   <SelectValue placeholder="Select Deposit Currency" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CURRENCY_OPTIONS.map((c: Currency) => (
+                  {currencies.map((c: Currency) => (
                     <SelectItem value={c.id.toString()} key={c.id}>
                       {c.currency_code + " " + c.currency_name}
                     </SelectItem>
                   ))}
-                  {CURRENCY_OPTIONS.length === 0 && currencyLoading && (
+                  {currencies.length === 0 && currencyLoading && (
                     <SelectItem
                       disabled
                       value="loading"

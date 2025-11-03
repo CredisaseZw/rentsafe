@@ -6,6 +6,9 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
 import type { PropertiesResponse, Property } from "@/types";
+import { isAxiosError, type AxiosError } from "axios";
+import { toast } from "sonner";
+import { api } from "@/api/axios";
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
@@ -189,7 +192,7 @@ export function extractTenants(data: { [k: string]: FormDataEntryValue }, type :
 
   for (let i = 0; i < tenantCount; i++) {
     const tenant: TenantPayload = {
-      tenant_id: data[`tenants[${i}]`] as string,
+      tenant_id: Number(data[`tenants[${i}]`]),
       tenant_type : type,
       is_primary_tenant: data[`isPrimary[${i}]`] === "on",
     };
@@ -200,21 +203,40 @@ export function extractTenants(data: { [k: string]: FormDataEntryValue }, type :
   return tenants;
 }
 
-export function extractReceipts(data: { [k: string]: FormDataEntryValue }): any[] {
+export function extractReceipts(data: { [k: string]: FormDataEntryValue }, includeRentVariables: boolean): any[] {
   const receipts: any[] = [];
 
   const receiptKeys = Object.keys(data).filter((key) => key.startsWith("lease_id_"));
   const receiptCount = receiptKeys.length;
-
   for (let i = 0; i < receiptCount; i++) {
-    const receipt = {
+    const receipt: {
+      lease_id: string;
+      amount: string;
+      payment_method_id: number;
+      reference: string;
+      description: string;
+      cashbook_id?: number;
+      rent?: string,
+      opc? : string,
+      payment_date: string;
+    } = {
       lease_id: data[`lease_id_${i}`] as string,
       amount: data[`received_${i}`] as string,
       payment_method_id: Number(data[`paymentMethod_${i}`] as string),
       reference: data[`receipt_${i}`] as string,
       description: data[`description`] as string,
+      cashbook_id: Number(data[`cashbook_${i}`]),
       payment_date: data[`date_${i}`] as string,
+      ...(includeRentVariables
+        ? {
+            rent: data[`rent_${i}`] as string,
+            opx: data[`opx_${i}`] as string,
+          }
+        : {}),
     };
+    if(receipt.cashbook_id === 0) delete receipt.cashbook_id
+    if(receipt.rent === "") delete receipt.rent
+    if(receipt.opc === "") delete receipt.opc
 
     receipts.push(receipt);
   }
@@ -306,6 +328,23 @@ export function savePersistentData(name: string, data: any) {
    persistentData[name] = data;
    localStorage.setItem("persistentData", JSON.stringify(persistentData));
 }
+
+export function updatePersistentData(name: string, data: any, merge = false) {
+  const persistentData = getPersistentData<Record<string, any>>() || {};
+
+  if (merge && typeof persistentData[name] === "object" && persistentData[name] !== null) {
+    persistentData[name] = {
+      ...persistentData[name],
+      ...data,
+    };
+  } else {
+    persistentData[name] = data;
+  }
+
+  localStorage.setItem("persistentData", JSON.stringify(persistentData));
+}
+
+
 export function summarizeAddress(address: Address): string {
    return [
       address.street_address,
@@ -513,14 +552,41 @@ export function normalizeLeaseResponse(apiLease: any): LeasePayload {
          operating_costs_inclusive: apiLease.landlord_opening_balances_data?.[0]?.operating_costs_inclusive,
       }],
    };
+}
+
+function cleanObject<T>(obj: T): T {
+  if (Array.isArray(obj)) {
+    return obj
+      .map((v) => cleanObject(v))
+      .filter((v) => v !== undefined && v !== null) as T;
+  } else if (typeof obj === "object" && obj !== null) {
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        value !== undefined &&
+        value !== null &&
+        !(typeof value === "number" && Number.isNaN(value))
+      ) {
+        cleaned[key] = cleanObject(value);
+      }
+    }
+
+    if(cleaned?.landlord_data?.landlord_name  === "" ) delete cleaned.landlord_data
+    return cleaned;
   }
+  return obj;
+}
 
 export const generateUpdatePayload = (
     updated: LeasePayload,
     original: LeasePayload
   ): Partial<LeasePayload> => {
     const diff: Partial<LeasePayload> = {};
-
+    if (updated.unit_data) {
+      if (updated.unit_data.number_of_rooms === undefined || updated.unit_data.number_of_rooms === null) {
+        updated.unit_data.number_of_rooms = 0;
+      }
+    }
     if (updated.signed_date) {
       delete updated.signed_date;
     }
@@ -572,8 +638,7 @@ export const generateUpdatePayload = (
 
     // guarantor_data: only if guarantor_id or amount changed
     if (
-      updated.guarantor_data?.guarantor_id !== original.guarantor_data?.guarantor_id ||
-      updated.guarantor_data?.guarantee_amount !== original.guarantor_data?.guarantee_amount
+      updated.guarantor_data?.guarantor_id !== original.guarantor_data?.guarantor_id
     ) {
       diff.guarantor_data = updated.guarantor_data;
     }
@@ -595,10 +660,13 @@ export const generateUpdatePayload = (
     }
 
     // CHECK CHARGES
-    console.log(original.charges)
     if (updated.charges && original.charges) {
-      const changedCharges = updated.charges.filter((charge, idx) => {
+      const changedCharges = updated.charges
+      .filter((charge, idx) => {
         const orig = original.charges[idx];
+        if (charge.amount === 0 && charge.charge_type === "UTILITY") {
+        return false;
+        }
         return Number(charge.amount.toFixed(2)) !== Number(orig?.amount);
       });
       if (changedCharges.length > 0) {
@@ -664,5 +732,60 @@ export const generateUpdatePayload = (
       diff.landlord_opening_balances_data = updated.landlord_opening_balances_data;
     }
 
-    return diff;
+    return cleanObject(diff);
   };
+
+export const handleAxiosError = (
+  title: string,
+  error: AxiosError | Error | unknown | null,
+  fallBackMessage?: string
+): boolean => {
+  if (isAxiosError(error)) {
+    console.error(error);
+    const message =
+      error.response?.data?.error ??
+      error.response?.data?.detail ??
+      error.message ??
+      "Something went wrong";
+    toast.error(title, { description: message });
+    return true;
+  }
+
+  if (error instanceof Error) {
+    toast.error(fallBackMessage);
+    return true;
+  }
+
+  return false;
+};
+
+export const handleDeletion = async (prefixLink:string, id: number) => {
+  const response = await api.delete(`${prefixLink}/${id}/`)
+  return response.data
+}
+
+export const handleTrackChangedFields = (initial: any, payloadData: any) => {
+    let changedData:any = payloadData
+    changedData = Object.fromEntries(
+    Object.entries(payloadData).filter(([key, value]) => {
+      const original = (initial as any)[key]
+      if (typeof value === "string" && typeof original === "string") {
+          return value.trim() !== original.trim()
+      }
+        return value !== original
+      })
+    ) 
+    // No actual changes
+    if (Object.keys(changedData).length === 0) {
+      toast.info("No changes made.")
+      return undefined;
+    }
+
+    return changedData;
+}
+
+export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) =>{
+    const FORM_DATA = new FormData(e.currentTarget)
+    const DATA = Object.fromEntries(FORM_DATA.entries())
+    return DATA
+}

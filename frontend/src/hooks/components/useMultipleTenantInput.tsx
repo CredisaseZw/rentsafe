@@ -74,6 +74,7 @@ export default function useMultiTenantInput(clientType: string){
     }
 
     function checkMobileNumberUpdate(user: TenantSelection) {
+        if (user.mobile_number.trim() === "") return;
         if (user.mobile_number !== user.store_mobile && user.id > 0) {
             setUpdateIndividual(user);
             setOpen(true);

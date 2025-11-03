@@ -16,16 +16,12 @@ import { TableBase } from "@/components/general/TableBase";
 import { TableCell, TableRow } from "@/components/ui/table";
 import EmptyResults from "@/components/general/EmptyResults";
 import type { DashboardCardProp, Option, Property } from "@/types";
-import type{ PaginationData } from "@/interfaces";
 import usePropertyList from "@/hooks/components/usePropertyList";
-import getPropertyList from "@/hooks/apiHooks/useGetPropertyList";
-import { toast } from "sonner";
-import { useEffect } from "react";
 import DashboardCard from "@/components/general/DashboardCard";
-import { isAxiosError } from "axios";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
 import { Link } from "react-router";
+import { PROPERTY_STATUS_OPTIONS } from "@/constants";
 
 function PropertyList() {
    const {
@@ -34,42 +30,19 @@ function PropertyList() {
       SummaryCards,
       addPropertyModal,
       status,
+      propertiesLoading,
       paginationData,
-      page, 
-      search,
-      Options,
-      onClearSearch,
-      onSearchValue,
       openModal,
       closeModal,
-      setProperties,
-      setPaginationData,
-      setStatus,
+      onPropertiesRetch
    } = usePropertyList();
-
-   const { error ,data, isLoading, refetch } = getPropertyList(page, search ,true);
-  
-   useEffect(() => {
-      if (isAxiosError(error)) {
-         const message = error.response?.data.error ?? error.response?.data.detail  ?? "Something went wrong"
-         toast.error("Failed to fetch properties", { description: message });
-         setStatus({ loading: false, isError: true });
-         return;
-      }
-
-      if (data) {
-         setProperties(data.results ?? []);
-         setPaginationData(data as PaginationData);
-         setStatus({ loading: false, isError: false });
-      }
-   }, [data, error]);
 
    return (
       <div className="">
          {addPropertyModal && (
             <Modal onClose={closeModal} size={"lg"} modalHeader="Add Property" allowOverflow={false}>
                <AddPropertyForm successCallback ={()=>{
-                  refetch()
+                  onPropertiesRetch()
                   closeModal();
                }}/>
             </Modal>
@@ -94,8 +67,7 @@ function PropertyList() {
                <div>
                   <Searchbox 
                      placeholder="By address, unit number or tenant"
-                     handleSearch={onSearchValue}
-                     clearSearch = {onClearSearch} />
+                   />
                </div>
                <div>
                   <div className="flex flex-row justify-end gap-3">
@@ -103,13 +75,13 @@ function PropertyList() {
                         <Plus size={15} className="self-center" />
                         <span className="self-center">Add Property</span>
                      </Button>
-                     <Select defaultValue={Options.current[0].value}>
+                     <Select defaultValue={PROPERTY_STATUS_OPTIONS[0].value}>
                         <SelectTrigger className="w-[180px]">
                            <SelectValue placeholder="Filter" />
                         </SelectTrigger>
                         <SelectContent>
                            {
-                              Options.current.map((filter:Option, index:number) => (
+                              PROPERTY_STATUS_OPTIONS.map((filter:Option, index:number) => (
                                  <SelectItem key={index} value={filter.value}>{filter.label}</SelectItem>
                            ))
                            }
@@ -119,7 +91,7 @@ function PropertyList() {
                </div>
                </ColumnsContainer>
                <div className="mt-6">
-                  <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {isLoading} isError = {status.isError}>
+                  <TableBase headers={headers} paginationData={paginationData ?? undefined} paginationName="page" isLoading = {propertiesLoading} isError = {status.isError}>
                      {  
                         properties.length
                            ? properties.map((property: Property) => (

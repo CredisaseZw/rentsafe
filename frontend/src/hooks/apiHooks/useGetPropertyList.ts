@@ -13,5 +13,10 @@ export default function getPropertyList(page: number, search: string = "", enabl
     placeholderData: keepPreviousData,
   });
 
-  return { data, isLoading, error, refetch };
+  return { 
+    propertyRows : data,
+    propertiesLoading: isLoading,
+    propertiesError: error,
+    onPropertiesRetch:  refetch
+  };
 }

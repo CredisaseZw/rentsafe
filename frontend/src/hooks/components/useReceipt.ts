@@ -1,21 +1,50 @@
-import { extractReceipts, getCurrentDate } from "@/lib/utils";
-import type { Lease, LeaseReceiptPayload, PaymentMethod, ReceiptLease } from "@/types";
+import { extractReceipts, getCurrentDate, getFormDataObject, handleAxiosError } from "@/lib/utils";
+import type { Cashbook, Lease, LeaseReceiptPayload, PaymentMethod, ReceiptLease } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import useGetPaymentMethods from "../apiHooks/useGetPaymentMethods";
+import useGetCashbook from "../apiHooks/useGetCashbook";
 
 export default function useReceipt(initialLease?: ReceiptLease) {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [receipts, setReceipts] = useState<ReceiptLease[]>([]);
     const [loading, setLoading] = useState(false);
+    const {data, error} = useGetPaymentMethods();
 
+    const [cashbooks, setCashBooks] = useState<Cashbook[]>([]);
+    const [page, setPage] = useState(1);
+    const {cashBooksData, isCashbookLoading, cashbookError} = useGetCashbook(page);
+
+    useEffect(()=>{
+        if(handleAxiosError("Failed to fetch Cashbooks", cashbookError)) return;
+        if(cashBooksData){
+            setCashBooks((p)=>
+                page === 1 
+                ? cashBooksData.results
+                : [...p, ...cashBooksData.results]
+            )
+            if(cashBooksData.next){
+                const nextPage = new URL(cashBooksData?.next).searchParams.get("page")
+                setPage(Number(nextPage))
+            }
+           
+        }
+    }, [cashBooksData, cashbookError, page])
+    
     useEffect(() => {
         if (initialLease) {
-        setReceipts([initialLease]);
+            setReceipts([initialLease]);
         }
     }, [initialLease]);
+    
+    useEffect(()=>{
+        if(handleAxiosError("Error fetching payment methods", error)) return;
+        if(data){
+            setPaymentMethods(data as PaymentMethod[])
+        }
+    }, [data, error])
 
     const onSelectLease = (index: number, lease: Lease) => {
         const primaryFullname =
@@ -34,21 +63,39 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         )
         );
     };
+    const updateReceipt = (
+        index: number,
+        key: string,
+        value: any,
+        updateRent?: boolean
+    ) => {
+    setReceipts(prev =>
+        prev.map((r, i) => {
+        if (i !== index) return r;
 
-    const updateReceipt = (index: number, key: string, value: any, updateRent? : boolean) => {
-        setReceipts((prev) =>
-        prev.map((r, i) =>
-            i === index
-            ? { 
-                ...r, 
-                [key]: value,
-                currentRentOwing : updateRent ? 
-                Number(r.rentOwing) - Number(value)
-                : r.rentOwing
-            }
-            : r
-        )
-        );
+        const updated = {
+            ...r,
+            [key]: value,
+        };
+
+        if (updateRent) {
+            updated.currentRentOwing =
+            Number(r.rentOwing) - Number(value);
+        }
+
+        if (key === "opc" || key === "rent") {
+            const rent = Number(
+            key === "rent" ? value : r.rent
+            );
+            const opc = Number(
+            key === "opc" ? value : r.opc
+            );
+            updated.amount = String(rent + opc);
+        }
+
+        return updated;
+        })
+    );
     };
 
     const addReceipt = () => {
@@ -60,6 +107,7 @@ export default function useReceipt(initialLease?: ReceiptLease) {
             customerName: "",
             rentOwing: 0,
             payment_date : getCurrentDate(),
+            is_rent_variable:  !!initialLease?.is_rent_variable
         } as ReceiptLease,
         ]);
     };
@@ -79,9 +127,8 @@ export default function useReceipt(initialLease?: ReceiptLease) {
     ) => {
         e.preventDefault()
         setLoading(true)
-        const FORM = new FormData(e.currentTarget);
-        const data = Object.fromEntries(FORM.entries())
-        const receipts: ReceiptLease[] = extractReceipts(data);;
+        const data = getFormDataObject(e);
+        const receipts: ReceiptLease[] = extractReceipts(data, !!initialLease?.is_rent_variable);
         
         // VALIDATE BY LEASE_ID { FILTER FOR EMPTY OBJECTS }
         const invalid = receipts.filter((r) => !r.lease_id || r.lease_id.trim() === '');
@@ -90,12 +137,7 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         const payments: { payments: ReceiptLease[] } = { payments: receipts };
 
         createReceipt.mutate(payments, {
-        onError: (error) => {
-            if(isAxiosError(error)){
-                const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong";
-                toast.error("Error occurred creating a receipt", {description : message})
-            }
-        },
+        onError: (error) => {handleAxiosError("Error occurred creating a receipt", error);},
         onSuccess: (data) => {
             if(data) {
                 if(data.errors.length > 0) return toast.error("Error occurred creating a receipt", )
@@ -112,8 +154,9 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         isOpen,
         loading,
         receipts,
+        cashbooks,
         paymentMethods,
-        setPaymentMethods,
+        isCashbookLoading,
         submitReceipts,
         removeReceipt,
         updateReceipt,

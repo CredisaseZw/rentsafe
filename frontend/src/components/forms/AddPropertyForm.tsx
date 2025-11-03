@@ -11,53 +11,38 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
-import React, { useEffect } from "react";
+import React from "react";
 import MultiAddressInput from "../general/MultiAddressInput";
-import getPropertyTypes from "@/hooks/apiHooks/useGetPropertyTypes";
 import LoadingIndicator from "../general/LoadingIndicator";
 import { Label } from "../ui/label";
 import { Checkbox } from "@/components/ui/checkbox"
 import useCreateProperty from "@/hooks/apiHooks/useCreateProperty";
-import { toast } from "sonner"
 import ButtonSpinner from "../general/ButtonSpinner";
 import type { Option } from "@/types";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteClient from "../general/AutoCompleteClient";
-import { isAxiosError } from "axios";
-import { validateAmounts } from "@/lib/utils";
+import {  validateAmounts } from "@/lib/utils";
+import { BACKUP_POWER_OPTIONS, PARKING_OPTIONS, PROPERTY_STATUS_OPTIONS, SECURITY_OPTIONS } from "@/constants";
 interface props{
   successCallback : ()=>void
 }
 
 function AddPropertyForm({successCallback}:props) {
-  const { addPropertyForm,
-      landlordIdentifier,
-      searchItem,
-      propertyTypes,
-      loading,
-      securityOptions,
-      parkingOptions,
-      backupPowerOptions,
-      statusOptions,
-      onSelectValue,
-      handleFeatureChange,
-      handleAddProperty,
-      setPropertyTypes,
-      setSearchItem, 
-      onSelectChange, 
-      setAddPropertyForm,
-      setLandlordIdentifier } = usePropertyList();
+  const { 
+    addPropertyForm,
+    landlordIdentifier,
+    searchItem,
+    propertyTypes,
+    loading,
+    isLoading,
+    onSelectValue,
+    handleFeatureChange,
+    handleAddProperty,
+    setSearchItem, 
+    onSelectChange, 
+    setAddPropertyForm,
+    setLandlordIdentifier } = usePropertyList();
   const newProperty = useCreateProperty();
-  const {data, isLoading, error} = getPropertyTypes();
-
-  useEffect(()=>{
-    if(isAxiosError(error)){
-      const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong"
-      toast.error("Failed to fetch property types", { description: message });
-      return;
-    }
-    if (data) { setPropertyTypes(data.results ?? []); }
-  }, [data, error])
 
   return (
     <form onSubmit={(e: React.FormEvent<HTMLFormElement>)=>{
@@ -153,7 +138,7 @@ function AddPropertyForm({successCallback}:props) {
               </SelectTrigger>
               <SelectContent>
                 {
-                  statusOptions.current.map((option:Option, index:number)=>(
+                  PROPERTY_STATUS_OPTIONS.map((option:Option, index:number)=>(
                     <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                   ))
                 }
@@ -191,7 +176,7 @@ function AddPropertyForm({successCallback}:props) {
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      parkingOptions.current.map((option:Option, index:number)=>(
+                      PARKING_OPTIONS.map((option:Option, index:number)=>(
                         <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                       ))
                     }
@@ -209,7 +194,7 @@ function AddPropertyForm({successCallback}:props) {
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      securityOptions.current.map((option:Option, index:number)=>(
+                      SECURITY_OPTIONS.map((option:Option, index:number)=>(
                         <SelectItem value= {option.value} key={index}>{option.label}</SelectItem>
                       ))
                     }
@@ -227,7 +212,7 @@ function AddPropertyForm({successCallback}:props) {
                   </SelectTrigger>
                   <SelectContent>
                     {
-                      backupPowerOptions.current.map((option: Option, index: number)=> (
+                      BACKUP_POWER_OPTIONS.map((option: Option, index: number)=> (
                         <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                       ))
                     }

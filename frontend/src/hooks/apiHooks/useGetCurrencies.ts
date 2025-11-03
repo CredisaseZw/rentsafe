@@ -4,7 +4,7 @@ import { getPersistentData, savePersistentData } from "@/lib/utils";
 import type { Currency } from "@/types";
 
 export default function useGetCurrencies(){
-    const {data, isLoading, error, } = useQuery<Currency[]>({
+    const {data, isLoading, error, refetch} = useQuery<Currency[]>({
         queryKey : ["currencies"],
         queryFn :async ()=>{
             const persistentData = getPersistentData();
@@ -20,6 +20,7 @@ export default function useGetCurrencies(){
     return {
         currencyData : data,
         currencyLoading : isLoading,
-        currencyError : error
+        currencyError : error,
+        currencyRefetch : refetch
     }
 }

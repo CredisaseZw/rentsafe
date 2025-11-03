@@ -18,7 +18,7 @@ export default function Paginator({
 }) {
 const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const pageSize = 10;
+  const pageSize = 20;
 
   const nextPage = paginationData?.next
     ? new URL(paginationData.next).searchParams.get("page")
@@ -42,7 +42,6 @@ const navigate = useNavigate();
     newParams.set(paginationName, page);
     navigate({ search: newParams.toString() });
   };
-
 
    return (
       <Pagination>

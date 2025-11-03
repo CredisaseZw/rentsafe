@@ -1,6 +1,6 @@
 import type { IndividualPayload } from "@/interfaces/form-payloads";
 import React, { useEffect } from "react";
-import { extractAddresses, extractPhones, formatDateToPythonSLiking, validateZimNationalId } from "@/lib/utils";
+import { extractAddresses, extractPhones, formatDateToPythonSLiking, getFormDataObject, validateZimNationalId } from "@/lib/utils";
 import type { IndividualMaritalStatus } from "@/types";
 import useCreateIndividual from "../apiHooks/useCreateIndividual";
 import { toast } from "sonner";
@@ -26,9 +26,7 @@ export default function useIndividualForm() {
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const data = Object.fromEntries(formData.entries());
-
+      const data = getFormDataObject(event);
 
       const individualPayload: IndividualPayload = {
          first_name: data.firstName as string,

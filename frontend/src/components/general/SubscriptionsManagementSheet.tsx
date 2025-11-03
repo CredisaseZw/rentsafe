@@ -11,37 +11,12 @@ import { TableBase } from "./TableBase"
 import { TableCell, TableRow } from "../ui/table"
 import ActivateLease from "../routes/rent-safe/tenant-leases/ActivateLease"
 import useSubscriptionsSheets from "@/hooks/components/useSubscriptionSheets"
-import useGetSubscriptions from "@/hooks/apiHooks/useGetSubscriptions"
-import { useEffect } from "react"
-import { isAxiosError } from "axios"
-import { toast } from "sonner"
-import type { LeaseSubscription, LeaseSubscriptionResponse } from "@/types"
 import LoadingIndicator from "./LoadingIndicator"
+import { SUBSCRIPTION_HEADERS } from "@/constants"
 
 export function SubscriptionSheet() {
-  const { open, subscription, setSubscription, setOpen, headers } =useSubscriptionsSheets()
-  const { data, isLoading, error } = useGetSubscriptions()
+  const { open, subscription, isLoading,setOpen } =useSubscriptionsSheets()
 
-  useEffect(() => {
-    if (isAxiosError(error)) {
-      const message =
-        error.response?.data.error ?? error.response?.data.detail
-      toast.error("Failed to fetch lease subscriptions", {
-        description: message || "Something went wrong",
-      })
-      return
-    }
-
-    if (data) {
-      (data as LeaseSubscriptionResponse).results.forEach(
-        (leaseSubscription: LeaseSubscription) => {
-          if (leaseSubscription.sub_type === "RENTSAFE") {
-            setSubscription(leaseSubscription)
-          }
-        }
-      )
-    }
-  }, [data, error, setSubscription])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -55,10 +30,10 @@ export function SubscriptionSheet() {
           <SheetTitle>Available Subscriptions</SheetTitle>
         </SheetHeader>
         <div className="mt-4 px-4">
-          <TableBase headers={headers}>
+          <TableBase headers={SUBSCRIPTION_HEADERS}>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={headers.length}>
+                <TableCell colSpan={SUBSCRIPTION_HEADERS.length}>
                   <div className="flex justify-center items-center">
                     <LoadingIndicator />
                   </div>

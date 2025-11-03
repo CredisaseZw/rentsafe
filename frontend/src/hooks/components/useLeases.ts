@@ -1,66 +1,12 @@
 import type { PaginationData } from "@/interfaces"
-import type { Header, Lease, LeaseReceiptPayload } from "@/types"
-import { useState } from "react"
+import type { Lease, LeaseReceiptPayload } from "@/types"
+import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
+import {useGetLeases} from "../apiHooks/useGetActiveLeases"
+import { getCurrentDate, handleAxiosError } from "@/lib/utils"
 
 export default function useLeases(defaultStatus: string) {
     const [total, setTotal] = useState(0)
-    const commonHeaders:Header[] = [
-        {
-            name  :"Lease ID",
-        },
-        {
-            name : "Tenant",
-        },
-        {
-            name : "Landlord",
-        }, 
-        {
-            name : "Property Type"
-        },
-        {
-            name : "Address"
-        },
-    ]
-    const activeHeaders:Header[] = [
-        ...commonHeaders, 
-        {
-            name : "Rent owing"
-        },
-        {
-            name : "Actions",
-            colSpan : 3
-        }
-    ]
-    const renewalHeaders:Header[] = [
-        ...commonHeaders,
-        {
-            name : "Lease start Date"
-        },
-        {
-            name : "Lease end Date"
-        },
-        {
-            name : "Actions",
-            colSpan : 2
-        }
-    ]
-
-    const terminatedHeaders:Header[] = [
-        ...commonHeaders,
-        {
-            name : "Rent owing"
-        },
-        {
-            name: "Date of termination"
-        },
-        {
-            name : "Actions",
-            colSpan : 2
-        },
-       
-    ]
-
     const [paginationData, setPaginationData] = useState<PaginationData | null>(null)
     const [leases, setLeases] = useState<Lease[] | null>(null)
     const [searchParams, setSearchParams] = useSearchParams()
@@ -76,29 +22,34 @@ export default function useLeases(defaultStatus: string) {
 
     const status = searchParams.get("status")?.toUpperCase() || defaultStatus
     const search = searchParams.get("search") || null
+    const {data, isLoading, error, refetch} = useGetLeases(page, status, search);
 
-    const handleOnSearchValue = (searchValue: string) =>{
-        setSearchParams((prev) => {
-            const params = new URLSearchParams(prev);
-            if (searchValue) params.set("search", searchValue);
-            else params.delete("search");
-            return params;
-      }); 
-    }
+    useEffect(()=>{
+        if(handleAxiosError("Failed to fetch active leases", error)) return;
+        if(data){
+            let results = data.results;
+            switch(defaultStatus){
+                case "active_page": 
+                    const t = results.reduce((total_, lease)=> total_ + lease.owing, 0)
+                    setTotal(t);
+                    break;
+                case "renew_page":
+                    results = data.results
+                    .filter((lease: Lease) => new Date(lease.end_date) < new Date(getCurrentDate()))
+                    break;       
+            }
+        
+            setLeases(results ?? [])
+            setPaginationData(data as PaginationData)
+        }
+    }, [page, search, status, data, error])
 
-    const onClearSearch = () => {
-      setSearchParams((prev) => {
-         const params = new URLSearchParams(prev);
-         if (params.get("search")) params.delete("search");
-         return params;
-      });
-    };
+
 
     const onSuccessCallback = (payload: LeaseReceiptPayload[] | undefined) => {
         if (!payload )return null;
         setLeases((prevLeases) => {
             if (!prevLeases) return null;
-
             return prevLeases.map((lease) => {
                 const update = payload.find((u) => u.lease_id === lease.lease_id);
                 if (!update) return lease;
@@ -114,20 +65,17 @@ export default function useLeases(defaultStatus: string) {
     return {
         page, 
         total,
+        error,
         status,
         search,
         leases,
-        activeHeaders,
+        isLoading,
         paginationData, 
-        renewalHeaders,
-        terminatedHeaders,
-        handleOnSearchValue,
         onSuccessCallback,
         setPaginationData,
         setSearchParams,
-        onClearSearch,
         setLeases,
         setTotal,
-
+        refetch
     }
 }

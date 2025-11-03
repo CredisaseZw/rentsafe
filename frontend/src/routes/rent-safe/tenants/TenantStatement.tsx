@@ -1,58 +1,28 @@
 import ButtonSpinner from "@/components/general/ButtonSpinner"
-import EmptyResults from "@/components/general/EmptyResults"
 import Header from "@/components/general/Header"
 import PaymentRow from "@/components/general/PaymentRow"
 import { TableBase } from "@/components/general/TableBase"
 import Button from "@/components/general/Button"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { TENANT_STATEMENT_HEADERS } from "@/constants"
-import useGetPaymentHistory from "@/hooks/apiHooks/useGetPaymentHistory"
 import useTenantStatement from "@/hooks/components/useTenantStatement"
 import { getCurrentDate, getSummaryDate, parseListString } from "@/lib/utils"
 import type { PaymentHistory } from "@/types"
-import { isAxiosError } from "axios"
 import { Printer } from "lucide-react"
-import { useEffect } from "react"
-import { toast } from "sonner"
 import ReceiptDialog from "@/components/routes/rent-safe/tenant-leases/ReceiptDialog"
+import EmptyTableResponse from "@/components/general/EmptyTableResponse"
 
 function TenantStatement() {
     const {
         lease_id,
         payments,
         statement,
+        isLoading,
         paginationData,
         componentReference,
-        setPaginationData,
         onDownloadPDF,
-        setStatement,
-        setPayments,
+        refetch,
     } = useTenantStatement();
-    const { data, isLoading, error, refetch } = useGetPaymentHistory(lease_id);
-
-    useEffect(() => {
-        if (isAxiosError(error)) {
-            const message = error.response?.data.error ?? error.response?.data.detail ?? "Something went wrong"
-            toast.error("Failed to fetch payments", { description: message })
-        }
-
-        if (data) {
-            setPayments(data.results ?? [])
-            setStatement({
-                opening_balance_date: data.opening_balance_date,
-                opening_balance: Number(data.opening_balance),
-                primary_tenant: data.primary_tenant,
-                address: data.address,
-                total_invoiced: data.total_invoiced,
-                current_balance: data.current_balance
-            })
-            setPaginationData({
-                next: data.next ?? "",
-                previous: data.previous ?? "",
-                count: data.count
-            });
-        }
-    }, [lease_id, data, error])
 
     return (
         <div>
@@ -144,11 +114,7 @@ function TenantStatement() {
                             )
                         }
                         {!isLoading && payments.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={TENANT_STATEMENT_HEADERS.length}>
-                                    <EmptyResults message="No payments made yet" />
-                                </TableCell>
-                            </TableRow>
+                            <EmptyTableResponse colSpan={TENANT_STATEMENT_HEADERS.length}/>
                         )}
                     </TableBase>
                 </div>
