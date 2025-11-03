@@ -1,4 +1,5 @@
 import type { Address } from "@/interfaces";
+import type { AxiosResponse } from "axios";
 import type { LucideIcon } from "lucide-react";
 
 export type Route = {
@@ -81,23 +82,6 @@ export type InspectionMode = {
    Form: React.ComponentType;
 };
 
-export type Status = {
-   good: boolean;
-   ok: boolean;
-   bad: boolean;
-};
-
-export type Row = {
-   rowName: string;
-   status: Status;
-};
-
-export type Column = {
-   captionLabel: string,
-   note: string,
-   headerName: string;
-   rows: Row[];
-};
 export type Header = {
    name: string,
    className?: string,
@@ -227,6 +211,7 @@ export interface Lease {
    lease_id: string;
    start_date: string;
    end_date: string;
+   is_rent_variable?: boolean;
    status: "ACTIVE" | "INACTIVE" | "TERMINATED";
    tenants: Tenant[];
    landlord: Landlord;
@@ -270,7 +255,7 @@ export interface Tenant {
    is_primary_tenant: boolean;
 }
 export type TenantPayload = {
-   tenant_id: string;
+   tenant_id: number;
    tenant_type: string;
    is_primary_tenant: boolean;
    address?: Address | undefined
@@ -444,6 +429,7 @@ export interface LeaseOpeningBalanceData {
 export type ReceiptLease = {
    lease_id: string,
    id: number,
+   is_rent_variable?: boolean;
    rentOwing: Number,
    customerName: string,
    currentRentOwing?: Number,
@@ -451,7 +437,9 @@ export type ReceiptLease = {
    payment_method_id?: number,
    reference?: string,
    amount?: string,
-   description?: string
+   description?: string,
+   rent?: string,
+   opc?: string
 }
 export interface PaymentHistory {
    id: number,
@@ -480,14 +468,22 @@ export type PaymentHistoryResponse = PaymentStatementInformation & {
 }
 
 export type SetCurrencySettings = {
-   currency: number
+   currency_id: number
    current_rate: string
-   base_currency: number
+   base_currency_id: number
 }
 
-export type VATRows = {
-   description: string,
-   rate: string
+export type VATRow = {
+   id?: number,
+   rate?: string | number,
+   description?: string,
+   vat_applicable?: boolean
+}
+
+export type VATPayload = {
+   data: VATRow,
+   mode: "create" | "update",
+   id?: number
 }
 
 export type InvoicePreview = {
@@ -497,4 +493,99 @@ export type InvoicePreview = {
    quantity: number,
    vat_amount: string,
    total: number,
+}
+
+export type cashSalesRow = {
+   paymentType: string,
+   cashBook: string,
+   detail: string,
+   ref: string,
+   amountReceived: number
+}
+export type Category = {
+   id?: number;
+   name?: string;
+   code?: string;
+   date_created?: string;
+};
+
+export type AccountSector = {
+   id: number;
+   code: string;
+   name: string;
+};
+
+export type SaleAccount = {
+   id: number;
+   account_name: string;
+   account_number: string;
+   account_sector_details: AccountSector
+};
+
+export type SalesItem = {
+   id: number;
+   item_id: string;
+   name: string;
+   price: string;
+   unit_name: string;
+   category_object: Category;
+   currency_object: Currency;
+   tax_configuration_object: VATRow
+   sales_account_object: SaleAccount
+   date_created: string;
+};
+
+export type AddCategoryPayload = {
+   type: "update" | "create",
+   id: number,
+   data: Category
+}
+
+export type CurrencySetting = {
+   id: number;
+   base_currency: string;
+   currency: string;
+   current_rate: string;
+   date_updated: string;
+   updated_by: string;
+};
+
+export type Delete = {
+   mutationFunc: () => Promise<AxiosResponse<any, any>>;
+   keyStore: string; //QUERY KEY 
+   page?: number;
+   value: string;
+   trigger?: React.ReactNode
+};
+export type Payload = {
+   mode: "update" | "create",
+   id?: number
+   data: any
+}
+export interface AddAccountingSectorPayload extends Payload {
+   data: {
+      code?: string;
+      name?: string;
+   }
+}
+
+export type GeneralLedgerAccount = {
+   id: number
+   account_name: string
+   account_number: string
+   account_sector: AccountSector
+   is_secondary_currency: boolean
+   preset: boolean
+}
+
+export type Cashbook = {
+   id: number
+   cashbook_id: string
+   cashbook_name: string
+   requisition_status: boolean
+   account_type: string
+   currency: Currency
+   bank_account_number: string
+   branch_name: string
+   general_ledger_account: GeneralLedgerAccount
 }

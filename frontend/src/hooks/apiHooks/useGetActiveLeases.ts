@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery} from "@tanstack/react-query";
 import { api } from "@/api/axios";
 import type { LeaseResponse } from "@/types";
 
-export default function useGetLeases(page:number, status: string, search: string | null){
+export function useGetLeases(page:number, status: string, search: string | null){
     const {data, isLoading, error, refetch}= useQuery<LeaseResponse>({
         queryKey :!search ? ["leases", page, status] :["leases", page, status, search],
         queryFn: async ()=>{
@@ -13,6 +13,5 @@ export default function useGetLeases(page:number, status: string, search: string
             return response.data
         }
     })    
-
     return {data, isLoading, error, refetch}
 }

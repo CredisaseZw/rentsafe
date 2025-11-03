@@ -13,7 +13,7 @@ import type { Clients, DataInternalUser } from "@/types";
 import useGetUserId from "@/hooks/components/useGetUserID";
 
 export default function InternalUsers() {
-   const { handleUserSearch, closeModal, openModal, headers, modalVisible } = useInternalUsers();
+   const { closeModal, openModal, headers, modalVisible } = useInternalUsers();
    const [clients, setClients] = useState<Clients>([]);
    const { data, isLoading, isError } = useGetInternalUserClients(useGetUserId());
 
@@ -42,7 +42,7 @@ export default function InternalUsers() {
          <div className="main-card mt-5">
             <div className="card-header">
                <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2">
-                  <Searchbox handleSearch={handleUserSearch} placeholder="Full name or email ..." />
+                  <Searchbox placeholder="Full name or email ..." />
                   <div className="flex justify-end">
                      <Button asChild onClick={openModal}>
                         <Plus size={15} />

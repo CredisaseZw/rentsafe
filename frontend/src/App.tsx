@@ -9,36 +9,39 @@ import { ThemeProvider } from "next-themes";
 import { RENTSAFE_PRE_SEG } from "./constants/navlinks";
 import TenantStatement from "./routes/rent-safe/tenants/TenantStatement";
 import Property from "./routes/rent-safe/properties/Property";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 
 export default function App() {
    return (
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
          <ReactQueryProvider>
             <BrowserRouter>
-               <Routes>
-                  <Route element={<RootLayout />}>
-                     {ROOT_ROUTES.map((route) => (
-                        <Route key={route.path} path={route.path} element={<route.pageComponent />} />
-                     ))}
-                     <Route element={<ProtectRoute />}>
-                        <Route element={<RentsafeLayout />}>
-                           {RENTSAFE_ROUTES.map((route) => (
-                              <Route key={route.path} path={route.path} element={<route.pageComponent />} />
-                           ))}
-                          <Route 
-                              path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
-                              element={<TenantStatement />} 
-                           />
-                           <Route
-                           path = {`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`}
-                           element = {<Property/>}
-                           />
-                           {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
-                           
+               <CurrencyProvider>
+                  <Routes>
+                     <Route element={<RootLayout />}>
+                        {ROOT_ROUTES.map((route) => (
+                           <Route key={route.path} path={route.path} element={<route.pageComponent />} />
+                        ))}
+                        <Route element={<ProtectRoute />}>
+                              <Route element={<RentsafeLayout />}>
+                                 {RENTSAFE_ROUTES.map((route) => (
+                                    <Route key={route.path} path={route.path} element={<route.pageComponent />} />
+                                 ))}
+                              <Route 
+                                    path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
+                                    element={<TenantStatement />} 
+                                 />
+                                 <Route
+                                 path = {`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`}
+                                 element = {<Property/>}
+                                 />
+                                 {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
+                                 
+                              </Route>
                         </Route>
-                      </Route>
-                  </Route>
-               </Routes>
+                     </Route>
+                  </Routes>
+               </CurrencyProvider>
             </BrowserRouter>
             <Toaster dismissible position="top-left" duration={10 * 1000} />
          </ReactQueryProvider>

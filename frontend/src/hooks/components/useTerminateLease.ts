@@ -1,6 +1,5 @@
-import { getCurrentDate } from "@/lib/utils";
+import { getCurrentDate, handleAxiosError } from "@/lib/utils";
 import type { UseMutationResult } from "@tanstack/react-query"
-import { isAxiosError } from "axios";
 import { useState } from "react"
 import { toast } from "sonner";
 import useClient from "../general/useClient";
@@ -29,13 +28,7 @@ export default function useTerminateLeaseHook(refetch : ()=>void){
       refetch()
       setOpen(false);  
     },
-    onError : (error)=>{
-      console.error(error)
-      if(isAxiosError(error)){
-        const message = error.response?.data.error ?? error.response?.data.detail
-        toast.error("Failed to terminate lease", {description : message || "Something went wrong"} )
-      }
-    },
+    onError : (error)=>{handleAxiosError("Failed to terminate lease", error)},
     onSettled :()=>{
       setTerminateStatus(()=> ({error: false, loading: false}))
       }

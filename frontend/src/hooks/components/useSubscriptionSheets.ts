@@ -1,34 +1,26 @@
-import type { Header, LeaseSubscription } from "@/types"
-import { useState } from "react"
+import { handleAxiosError } from "@/lib/utils"
+import type { LeaseSubscription, LeaseSubscriptionResponse } from "@/types"
+import { useEffect, useState } from "react"
+import useGetSubscriptions from "../apiHooks/useGetSubscriptions"
 
 export default function useSubscriptionsSheets(){
     const [open, setOpen] = useState(false)
     const [subscription, setSubscription] = useState<LeaseSubscription | null>(null)
-    const headers:Header[] = [
-      {
-          name: "No",
-          
-      },
-      {
-          name: "Open Slots",
-          
-      },
-      {
-          name: "Period (Months)",
-          
-      },
-      {
-          name: "Start Date",
-          
-      },
-      {
-          name: "End Date",
-          
-      },
-    ]
+    const { data, isLoading, error } = useGetSubscriptions()
+
+    useEffect(() => {
+        if(handleAxiosError("Failed to fetch lease subscriptions", error)) return;
+        if (data) {
+            (data as LeaseSubscriptionResponse).results.forEach((leaseSubscription: LeaseSubscription) => {
+                if (leaseSubscription.sub_type === "RENTSAFE") {
+                    setSubscription(leaseSubscription)
+                }
+            })
+        }
+    }, [data, error, setSubscription])
     return {
         open,
-        headers,
+        isLoading,
         subscription,
         setSubscription,
         useState,

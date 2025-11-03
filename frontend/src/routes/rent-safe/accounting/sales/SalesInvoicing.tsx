@@ -1,8 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Repeat, FileCheck } from "lucide-react";
+import { FileText, Repeat, FileCheck} from "lucide-react";
 import Invoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/Invoices";
-import Recurring from "@/components/routes/rent-safe/accounting/sales/sales-invoice/Recurring";
-import Proforma from "@/components/routes/rent-safe/accounting/sales/sales-invoice/Proforma";
+import RecurringInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/RecurringInvoices";
+import ProformaInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/ProformaInvoices";
 
 export default function SalesInvoicing() {
    const tabs = [
@@ -12,16 +12,16 @@ export default function SalesInvoicing() {
         content: <Invoices /> },
       {
          icon: Repeat,
-         value: "recurring",
+         value: "recurring-invoices",
          label: "Recurring",
-         content: <Recurring/>,
+         content: <RecurringInvoices/>,
       },
       {
          icon: FileCheck,
-         value: "Proforma",
-         label: "Proforma",
-         content: <Proforma />,
-      },
+         value: "proforma-invoices",
+         label: "Proforma Invoices",
+         content: <ProformaInvoices />
+      }
    ];
    
    return (

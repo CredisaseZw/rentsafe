@@ -2,10 +2,10 @@ import type { CompanyPayload } from "@/interfaces/form-payloads";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
-import { isAxiosError, type AxiosError } from "axios";
+import { type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { CompanyCreationResponse } from "@/interfaces";
-import { stringifyAndFmt } from "@/lib/utils";
+import { handleAxiosError } from "@/lib/utils";
 
 export default function useCreateCompany(successCallback?: () => void) {
    const client = useClient();
@@ -13,16 +13,7 @@ export default function useCreateCompany(successCallback?: () => void) {
    const { mutate, isPending } = useMutation({
       mutationFn: (companyPayload: CompanyPayload) =>
          api.post<CompanyCreationResponse>("/api/companies/", companyPayload).then((res) => res.data),
-      onError(error: AxiosError | Error | unknown) {
-         console.error("Error creating company:", error);
-         if (isAxiosError(error)) {
-            toast.error("Failed to create company", {
-               description: stringifyAndFmt(error.response?.data.details || error.response?.data.error),
-            });
-            return;
-         }
-         toast.error("Failed to create company. Please try again.", { description: stringifyAndFmt(error) });
-      },
+      onError(error: AxiosError | Error | unknown) { handleAxiosError("Failed to create company", error, "Failed to create company. Please try again")},
       onSuccess(company) {
          client.setQueryData<CompanyCreationResponse>(["company", company.id], company);
 

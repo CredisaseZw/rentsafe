@@ -5,31 +5,31 @@ import { ChartColumnDecreasingIcon, House } from "lucide-react";
 import type {Option} from "@/types/index"
 
 import {
-   RENT_ADMIN_PANEL_NAVLINKS,
-   RENTSAFE_APP_NAVLINKS,
-   RENTSAFE_ACCOUNTING_NAVLINKS,
-   ROOT_NAVLINKS,
+  RENT_ADMIN_PANEL_NAVLINKS,
+  RENTSAFE_APP_NAVLINKS,
+  RENTSAFE_ACCOUNTING_NAVLINKS,
+  ROOT_NAVLINKS,
 } from "./navlinks";
 
 export const SERVICES: Service[] = [
-   {
-      name: "Rent-Safe",
-      description: "Rental management.",
-      href: "/services/rent-safe",
-      icon: House,
-   },
-   {
-      name: "Count-Safe",
-      description: "Accounting.",
-      href: "/services/count-safe",
-      icon: ChartColumnDecreasingIcon,
-   },
+  {
+    name: "Rent-Safe",
+    description: "Rental management.",
+    href: "/services/rent-safe",
+    icon: House,
+  },
+  {
+    name: "Count-Safe",
+    description: "Accounting.",
+    href: "/services/count-safe",
+    icon: ChartColumnDecreasingIcon,
+  },
 ];
 
 export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([
-   ...RENTSAFE_APP_NAVLINKS,
-   ...RENTSAFE_ACCOUNTING_NAVLINKS,
-   ...RENT_ADMIN_PANEL_NAVLINKS,
+  ...RENTSAFE_APP_NAVLINKS,
+  ...RENTSAFE_ACCOUNTING_NAVLINKS,
+  ...RENT_ADMIN_PANEL_NAVLINKS,
 ]);
 
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
@@ -37,50 +37,59 @@ export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
 
 export const PAYMENT_STATUS_CLASSIFICATIONS = [
-   { label: "Low Risk", className: "bg-SUCCESS text-white" },
-   { label: "Medium Risk", className: "bg-[darkorange] text-white" },
-   { label: "High Risk", className: "bg-[tomato] text-white" },
-   { label: "High Risk+", className: "bg-[firebrick] text-white" },
-   { label: "Non Payer", className: "bg-[black] text-white" },
+  { label: "Low Risk", className: "bg-SUCCESS text-white" },
+  { label: "Medium Risk", className: "bg-[darkorange] text-white" },
+  { label: "High Risk", className: "bg-[tomato] text-white" },
+  { label: "High Risk+", className: "bg-[firebrick] text-white" },
+  { label: "Non Payer", className: "bg-[black] text-white" },
 ];
 
 export const INDUSTRIES = [
-    "Agriculture",
-    "Banking",
-    "Construction",
-    "Education",
-    "Energy",
-    "Entertainment",
-    "Finance",
-    "Food",
-    "Health",
-    "Hospitality",
-    "Insurance",
-    "Manufacturing",
-    "Media",
-    "Retail",
-    "Technology",
-    "Telecommunications",
-    "Transportation",
-    "Aviation",
-    "Real Estate",
-    "Other"
+  "Agriculture",
+  "Banking",
+  "Construction",
+  "Education",
+  "Energy",
+  "Entertainment",
+  "Finance",
+  "Food",
+  "Health",
+  "Hospitality",
+  "Insurance",
+  "Manufacturing",
+  "Media",
+  "Retail",
+  "Technology",
+  "Telecommunications",
+  "Transportation",
+  "Aviation",
+  "Real Estate",
+  "Other"
 ]
 
 export const MODAL_WIDTHS = {
-   md: "900px" as const,
-   lg: "1100px" as const,
+  md: "900px" as const,
+  lg: "1100px" as const,
 };
 
 export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];
 
 export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] = [
-   "private",
-   "public",
-   "government",
-   "ngo",
-   "other",
+  "private",
+  "public",
+  "government",
+  "ngo",
+  "other",
 ];
+
+export const DELETION_LINKS = {
+  SALES_ITEMS : "/api/accounting/items",
+  VAT_SETTINGS : "/api/accounting/vat-settings",
+  SALES_CATEGORIES: "/api/accounting/sales-categories",
+  ACCOUNT_SECTORS : "/api/accounting/account-sectors",
+  CASH_BOOK : "/api/accounting/cash-books",
+  GENERAL_LEDGER : "/api/accounting/ledger-accounts"
+}
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
   slate:   { bg: "bg-slate-200", text: "text-slate-800" },
@@ -108,83 +117,83 @@ export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
 };
 
 export const MINIMAL_TENANT_OBJECT: TenantSelection = {
-   id : 0,
-   search_value : "",
-   full_name : "",
-   identification_number : "", 
-   mobile_number : "",
-   address : null,
-   is_primary : false
+  id : 0,
+  search_value : "",
+  full_name : "",
+  identification_number : "", 
+  mobile_number : "",
+  address : null,
+  is_primary : false
 
 }
 
 export const IN_LEASE_CLIENT_TYPES: Option[] = [
-   { label: "Individual", value: "individual" },
-   { label: "Company", value: "company" },
+  { label: "Individual", value: "individual" },
+  { label: "Company", value: "company" },
 ];
 
 export const STATUS_OPTIONS: Option[] = [
-   { label: "Occupied", value: "occupied" },
-   { label: "Vacant", value: "vacant" },
+  { label: "Occupied", value: "occupied" },
+  { label: "Vacant", value: "vacant" },
 ];
 
 export const LEASE_STATUS_OPTIONS: Option[] = [
-   { label: "Active", value: "ACTIVE" },
-   { label: "Draft", value: "DRAFT" },
-   { label: "Pending Approval", value: "PENDING_APPROVAL" },
-   { label: "Terminated", value: "TERMINATED" },
-   { label: "Expired", value: "EXPIRED" },
-   { label: "Renewed", value: "RENEWED" },
-   { label: "Suspended", value: "SUSPENDED" },
+  { label: "Active", value: "ACTIVE" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Pending Approval", value: "PENDING APPROVAL" },
+  { label: "Terminated", value: "TERMINATED" },
+  { label: "Expired", value: "EXPIRED" },
+  { label: "Renewed", value: "RENEWED" },
+  { label: "Suspended", value: "SUSPENDED" },
 ];
 
 export const PAYMENT_FREQUENCY_OPTIONS: Option[] = [
-   { label: "Monthly", value: "MONTHLY" },
-   { label: "Half Early", value: "HALF_EARLY" },
-   { label: "Quarterly", value: "QUARTERLY" },
-   { label: "Annually", value: "ANNUALLY" },
+  { label: "Monthly", value: "MONTHLY" },
+  { label: "Half Early", value: "HALF_EARLY" },
+  { label: "Quarterly", value: "QUARTERLY" },
+  { label: "Annually", value: "ANNUALLY" },
 ];
 
 export const DEPOSIT_HOLDER_OPTIONS: Option[] = [
-   { label: "Agent", value: "agent" },
-   { label: "Landlord", value: "landlord" },
+  { label: "Agent", value: "agent" },
+  { label: "Landlord", value: "landlord" },
 ];
 
 export const UNIT_TYPES: Option[] = [
-   { label: "Apartment", value: "apartment" },
-   { label: "House", value: "house" },
-   { label: "Office", value: "office" },
-   { label: "Retail Space", value: "retail_space" },
-   { label: "Warehouse", value: "warehouse" },
-   { label: "Other", value: "other" },
+  { label: "Apartment", value: "apartment" },
+  { label: "House", value: "house" },
+  { label: "Office", value: "office" },
+  { label: "Retail Space", value: "retail_space" },
+  { label: "Warehouse", value: "warehouse" },
+  { label: "Other", value: "other" },
 ];
 
 export const UNIT_STATUS:Option[] = [
-   {label :"Vacant", value :"vacant"},
-   {label :"Occupied", value :"occupied"},
+  {label :"Vacant", value :"vacant"},
+  {label :"Occupied", value :"occupied"},
 ]
 
 export const TENANT_STATEMENTS_HEADERS: Header[] = [
-   {name : "Lease ID"},
-   {name : "Customer name"},
-   {name : "Address"},
-   {name : "Rent Owing"},
-   {name : "Action"}
+  {name : "Lease ID"},
+  {name : "Customer name"},
+  {name : "Address"},
+  {name : "Rent Owing"},
+  {name : "Action"}
 ]
 
 export const TENANT_STATEMENT_HEADERS: Header[] = [
-   {name : "Date"},
-   {name : "Description", textAlign : "left"},
-   {name : "Reference"},
-   {name : "Amount", textAlign: "end"},
-   {name : "Balance", textAlign :"end"}
+  {name : "Date"},
+  {name : "Description", textAlign : "left"},
+  {name : "Reference"},
+  {name : "Amount", textAlign: "end"},
+  {name : "Balance", textAlign :"end"}
 ]
 
 export const PROPERTY_HEADERS:Header[] = [
-   {name  :"Id"},
-   {name  :"Unit Number"},
-   {name  :"Unit Type"},
-   {name  :"Status"},
+  {name  :"Id"},
+  {name  :"Unit Number"},
+  {name  :"Unit Type"},
+  {name  :"Status"},
 ]
 
 export const UNIT_FEATURES:Option[] = [
@@ -381,9 +390,10 @@ export const CASHBOOKS_LISTS:Header[] = [
 ]
 
 export const ACCOUNT_TYPES:Option[] = [
-  {label : "Current Account", value : "current_account"},
-  {label : "Cash", value : "cash"},
-  {label : "Mobile Money", value :"mobile_money"}
+  {label :"Bank Account", value : "Bank Account"},
+  {label : "Current Account", value : "Current Account"},
+  {label : "Cash", value : "Cash"},
+  {label : "Mobile Money", value :"Mobile Money"}
 ]
 
 export const YEARS:Option[] = [
@@ -405,4 +415,215 @@ export const MONTHS: Option[] = [
   { label: "October", value: "october" },
   { label: "November", value: "november" },
   { label: "December", value: "december" }
+]
+
+export const SALES_INVOICES_HEADERS :Header[]=[
+  {name : "Inv #"},
+  {name : "Date Created"},
+  {name : "Customer"},
+  {name : "Currency"},
+  {name : "Invoice Total", textAlign : "end"}
+]
+
+export const CREDIT_NOTE_HEADERS :Header[]=[
+  {name : "Cr Note #"},
+  {name : "Date Created"},
+  {name : "Customer"},
+  {name : "Currency"},
+  {name : "Amount", textAlign : "end"}
+]
+export const SALES_ITEMS_HEADERS :Header[]=[
+  {name : "ID"},
+  {name : "Category"},
+  {name : "Name"},
+  {name : "Unit Price"},
+  {name : "Date Created"},
+  {name : "Action",}
+]
+
+export const SALES_CATEGORIES_HEADERS:Header[] = [
+  {name : "Code"},
+  {name : "Category"},
+  {name : "Date Created"},
+  {name : "Action"},
+]
+
+export const SALES_REPORTS_HEADERS:Header[] = [
+  {name : "Inv #"},
+  {name : "Customer"},
+  {name : "Amount (Excl)"},
+  {name : "VAT"},
+  {name : "Total (Inc)"}
+]
+
+export const CASHFLOW_FORECAST:Header[] = [
+  {name : "Customer"},
+  {name : "0-7 Days"},
+  {name : "8-14 Days"},
+  {name : "15-21 Days"},
+  {name : "21+ Days"},
+  {name : "total"}
+]
+export const CASHBOOKS_RECEIPTS:Header[] = [
+  {name : "Date"},
+  {name : "Receipt Number"},
+  {name : "Type (GL/C)"},
+  {name : "Account"},
+  {name : "Details"},
+  {name : "Amount"},
+  {name : "Matching Invoice"},
+  {name : "Rate"}
+]
+
+export const RATE_AUDIT_TRAIL:Header[] = [
+  {name : "Date"},
+  {name : "Source"},
+  {name : "User"},
+  {name : "Base USD"},
+  {name : "Convert Currency"},
+  {name : "Rate"}
+]
+
+export const SUBSCRIPTION_HEADERS:Header[] = [
+  { name : "No" },
+  { name : "Open Slots" },
+  { name : "Period (Months)" },
+  { name : "Start Date" },
+  { name : "End Date" },
+]
+
+export const PARKING_OPTIONS:Option[] = [
+  { label: "All", value: "all" },
+  { label: "Underground", value: "underground" },
+  { label: "Integrated Garage", value: "Integrated Garage"},
+  { label: "External Garage", value: "External Garage"},
+  { label: "Open", value: "open" },
+  { label: "Street", value: "street" },
+]
+
+export const SECURITY_OPTIONS:Option[] =[
+  { label: "24/7", value: "24/7" },
+  { label: "Day time", value: "Day Time" },
+  { label: "Night time", value: "Night time" },
+  { label: "None", value: "none" },
+]
+
+export const BACKUP_POWER_OPTIONS:Option[] = [
+  { label: "All", value: "all" },
+  { label: "Generator", value: "generator" },
+  { label: "Solar", value: "solar" },
+  { label: "Battery", value: "battery" },
+  { label: "None", value: "none" },
+]
+
+export const PROPERTY_FILTER_OPTIONS:Option[] = [
+  { label: "All", value: "all" },
+  { label: "Occupied", value: "occupied" },
+  { label: "Vacant", value: "vacant" },
+]
+export const PROPERTY_STATUS_OPTIONS:Option[] = [
+  {label : "Vacant", value : "vacant"},
+  {label : "Partially Occupied", value : "partially_occupied"},
+  {label : "Occupied", value : "occupied"},
+  {label : "Maintenance", value : "maintenance"},
+  {label : "Sold", value : "sold"}
+]
+
+export const COMMON_HEADERS:Header[] = [
+  {
+      name  :"Lease ID",
+  },
+  {
+      name : "Tenant",
+  },
+  {
+      name : "Landlord",
+  }, 
+  {
+      name : "Property Type"
+  },
+  {
+      name : "Address"
+  },
+]
+export const ACTIVE_HEADERS:Header[] = [
+  ...COMMON_HEADERS, 
+  {
+      name : "Rent owing"
+  },
+  {
+      name : "Actions",
+      colSpan : 3
+  }
+]
+export const RENEWAL_HEADERS:Header[] = [
+  ...COMMON_HEADERS,
+  {
+      name : "Lease start Date"
+  },
+  {
+      name : "Lease end Date"
+  },
+  {
+      name : "Actions",
+      colSpan : 2
+  }
+]
+
+export const TERMINATED_HEADERS:Header[] = [
+  ...COMMON_HEADERS,
+  {
+      name : "Rent owing"
+  },
+  {
+      name: "Date of termination"
+  },
+  {
+      name : "Actions",
+      colSpan : 2
+  },
+  
+]
+export const INVOICE_STATUSES:Option[] = [
+  { label: "Cancelled Invoices", value: "cancelledInvoices" },
+  { label: "Pending Invoices", value: "pendingInvoices" },
+  { label: "All Paid Invoices", value: "allPaidInvoices" }
+]
+
+export const ACCOUNTING_SECTOR_HEADERS:Header[] = [
+  {name : "ID"},
+  {name : "Code"},
+  {name : "Name"},
+  {name : "Actions"}
+]
+
+export const CASH_BOOK_HEADERS:Header[] = [
+  {name : "Cashbook ID"},
+  {name : "Cashbook Name"},
+  {name : "Active Requisition"},
+  {name : "Account Type"},
+  {name : "Branch Name"},
+  {name : "General Ledger Account"},
+  {name : "Account Sector"},
+  {name : "Actions"}
+]
+
+export const PAYMENT_METHODS_HEADERS:Header[] = [
+  {name : "ID"},
+  {name : "Payment Method"},
+  {name : "Action"}
+]
+
+export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
+  { name: "Account Name" },
+  { name: "Account Number" },
+  { name: "Secondary Currency" },
+  { name: "Accounts Sector" },
+  { name: "Sector Name" },
+  { name: "Actions" },
+];
+
+export const CURRENCY_OPTIONS:Option[] = [
+  { label: "Base Currency", value: "base_currency" },
+  { label: "Secondary Currency", value: "secondary_currency" },
 ]
