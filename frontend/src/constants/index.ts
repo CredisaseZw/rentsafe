@@ -604,6 +604,7 @@ export const CASH_BOOK_HEADERS:Header[] = [
   {name : "Account Type"},
   {name : "Branch Name"},
   {name : "General Ledger Account"},
+  {name : "Account Sector"},
   {name : "Actions"}
 ]
 

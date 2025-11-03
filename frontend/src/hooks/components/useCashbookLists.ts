@@ -10,21 +10,21 @@ export default function useCashbookLists(){
     const [pagination, setPagination] = useState<PaginationData | undefined>(undefined);
     const [searchParams] = useSearchParams();
     const page = Number(searchParams.get("page") || 1);
-    const {data, isLoading, error} = useGetCashbook(page);
+    const {cashBooksData, isCashbookLoading, cashbookError} = useGetCashbook(page);
 
     useEffect(()=>{
-        if(handleAxiosError("Failed to fetch cash books",error)) return;
-        if(data) {
-            const {results, ...paginationMeta} = data;
-            setCashBooks(data.results)
+        if(handleAxiosError("Failed to fetch cash books",cashbookError)) return;
+        if(cashBooksData) {
+            const {results, ...paginationMeta} = cashBooksData;
+            setCashBooks(cashBooksData.results)
             setPagination(paginationMeta as PaginationData)
         }
-    }, [data, error])
+    }, [cashBooksData, cashbookError])
 
     return {
         pagination,
         cashBooks,
-        isLoading,
-        error
+        isLoading : isCashbookLoading,
+        error : cashbookError
     }
 }

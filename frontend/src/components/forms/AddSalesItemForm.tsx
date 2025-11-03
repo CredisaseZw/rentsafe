@@ -9,35 +9,34 @@ import useCreateSalesItem from "@/hooks/apiHooks/useCreateSalesItem"
 import type { SalesItem } from "@/types"
 
 interface props{
+    successCallBack? : ()=> void;
     initial? :  SalesItem | undefined
 }
-function AddSalesItemForm({initial}:props) {
+function AddSalesItemForm({initial, successCallBack}:props) {
     const {
+        loading,
         salesCategories,
         categoriesLoading,
         currencies,
+        configurations,
         currencyLoading,
-        currency,
         vatSettings,
-        isLoading,
-        categoriesPagination,
-        vatPagination,
+        isLoading,  
         generalLedgersLoading,
         generalLedgerAccounts,
-        generalLedgerPagination,
-        handleLoadMoreGLS,
-        handleLoadMoreCategories,
         handleSubmit,
-        handleLoadMoreVAT
-    } = useSalesItemsForm(initial);
+        handleOnSelectConfig
+    } = useSalesItemsForm(initial, successCallBack);
     const createItem = useCreateSalesItem();
-
     return (
     <form className="flex flex-col gap-5" onSubmit={(e)=> handleSubmit(e, createItem)}>
         <ColumnsContainer numberOfCols={2} gapClass="gap-5" marginClass="mt-0">
             <div className="form-group">
                 <Label className="required">Item Category</Label>
                 <Select
+                    key={configurations.category_id}
+                    value= {configurations.category_id}
+                    onValueChange={(v)=> handleOnSelectConfig("category_id", v)}  
                     required
                     name="itemCategory"
                 >
@@ -62,33 +61,31 @@ function AddSalesItemForm({initial}:props) {
                             !!categoriesLoading && 
                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
                         }
-                        {
-                            salesCategories.length !== 0 && 
-                            categoriesPagination?.next &&
-                            <div className="flex justify-center p-2">
-                                <Button variant="ghost" onClick={handleLoadMoreCategories}>
-                                Load More
-                                </Button>
-                            </div>
-                        }
                     </SelectContent>
                 </Select>
             </div>
             <div className="form-group">
                 <Label className="required">Item name</Label>
-                <Input name="itemName" required/>
+                <Input 
+                    defaultValue={initial?.name ?? ""}
+                    name="itemName" 
+                    required/>
             </div>
         </ColumnsContainer>
         <div className="form-group">
             <Label className="required">Unit Price</Label>
-            <Input name="unitPrice" required/>
+            <Input
+                defaultValue={initial?.price ?? ""}
+                name="unitPrice"
+                required/>
         </div>
         <div className="form-group">
             <Label>Currency</Label>
             <Select
-                key={currency?.id}
-                defaultValue={String(currency?.id)}
-                required
+                key={configurations.currency_id}
+                value={configurations.currency_id}
+                onValueChange={(v)=> handleOnSelectConfig("currency_id",v)}
+                required    
                 name="itemCurrency"
             >
                 <SelectTrigger className="w-full">
@@ -108,13 +105,18 @@ function AddSalesItemForm({initial}:props) {
         </div>
         <div className="form-group">
             <Label className="required">Unit Name</Label>
-            <Input required name="unitName"/>
+            <Input 
+                defaultValue={initial?.unit_name ?? ""}
+                required
+                name="unitName" />
         </div>
         <ColumnsContainer numberOfCols={2} gapClass="gap-5" marginClass="mt-0">
             <div className="form-group">
                 <Label className="required">Tax Configuration</Label>
                 <Select
-                    required
+                    key={configurations.tax_id}
+                    value={configurations.tax_id}
+                    onValueChange={(val)=> handleOnSelectConfig("tax_id", val)}
                     name="taxConfig"
                 >
                     <SelectTrigger className="w-full">
@@ -139,15 +141,6 @@ function AddSalesItemForm({initial}:props) {
                             !!isLoading && 
                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
                         }
-                        {
-                            vatSettings.length !== 0 && 
-                            vatPagination?.next &&
-                            <div className="flex justify-center p-2">
-                                <Button variant="ghost" onClick={handleLoadMoreVAT}>
-                                Load More
-                                </Button>
-                            </div>
-                        }
                     </SelectContent>
                 </Select>
             </div>
@@ -155,6 +148,9 @@ function AddSalesItemForm({initial}:props) {
                 <Label className="required">General Ledger Account</Label>
                 <Select
                     required
+                    key={configurations.sales_account_id}
+                    value={configurations.sales_account_id}
+                    onValueChange={(val)=> handleOnSelectConfig("sales_account_id", val)}
                     name="salesAccount"
                 >
                     <SelectTrigger className="w-full">
@@ -178,21 +174,13 @@ function AddSalesItemForm({initial}:props) {
                             !!generalLedgersLoading && 
                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
                         }
-                        {
-                            generalLedgerAccounts.length !== 0 && 
-                            generalLedgerPagination?.next &&
-                            <div className="flex justify-center p-2">
-                                <Button variant="ghost" onClick={handleLoadMoreGLS}>
-                                    Load More
-                                </Button>
-                            </div>
-                        }
                     </SelectContent>
                 </Select>
             </div>
         </ColumnsContainer>
-        <div className="flex flex-row justify-end">
-            <Button>Save</Button>
+        <div className="flex flex-row justify-end gap-5">
+            <Button variant="ghost" onClick={()=> successCallBack?.()} type="button">Cancel</Button>
+            <Button disabled = {loading} type="submit">{loading ? "Saving ..." : "Save"}</Button>
         </div>
     </form>
   )

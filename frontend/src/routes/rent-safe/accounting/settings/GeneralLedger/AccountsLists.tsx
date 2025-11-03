@@ -54,8 +54,8 @@ function AccountsLists() {
                   <TableCell className="text-center">{a.account_name}</TableCell>
                   <TableCell className="text-center">{a.account_number}</TableCell>
                   <TableCell className="text-center">{a.is_secondary_currency ? "Yes" : "No"}</TableCell>
-                  <TableCell className="text-center">{a.account_sector_code}</TableCell>
-                  <TableCell className="text-center">{a.account_sector_name}</TableCell>
+                  <TableCell className="text-center">{a.account_sector.code}</TableCell>
+                  <TableCell className="text-center">{a.account_sector.name}</TableCell>
                   <TableCell className="text-center flex flex-row justify-center items-center gap-5">
                     {
                       !a.preset &&

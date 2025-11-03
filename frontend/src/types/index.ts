@@ -573,8 +573,7 @@ export type GeneralLedgerAccount = {
   id: number
   account_name: string
   account_number: string
-  account_sector_name: string
-  account_sector_code: string
+  account_sector : AccountSector
   is_secondary_currency: boolean
   preset: boolean
 }

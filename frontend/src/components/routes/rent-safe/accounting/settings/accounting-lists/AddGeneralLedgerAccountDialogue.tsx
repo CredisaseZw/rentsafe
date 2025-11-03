@@ -70,7 +70,7 @@ export default function AddGeneralLedgerAccountDialogue({initial}:Props){
                                     key={String(initial?.is_secondary_currency)}
                                     defaultValue={
                                         initial !== undefined &&
-                                        initial?.is_secondary_currency
+                                        initial?.is_secondary_currency 
                                         ? "secondary_currency"
                                         : "base_currency"
                                     }
@@ -92,8 +92,9 @@ export default function AddGeneralLedgerAccountDialogue({initial}:Props){
                             <div className="form-group">
                                 <Label className="required">Account Sector</Label>
                                 <Select  
+                                    key={String(initial?.account_sector.id) ?? ""}
                                     required
-                                    defaultValue={""} 
+                                    defaultValue={String(initial?.account_sector.id)} 
                                     name="accountSector"
                                 >
                                     <SelectTrigger className="w-full">

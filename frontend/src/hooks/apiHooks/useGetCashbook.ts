@@ -15,5 +15,5 @@ export default function useGetCashbook(page:Number){
             return response.data;
         }
     })
-    return {data, isLoading, error};
+    return {cashBooksData : data, isCashbookLoading : isLoading, cashbookError : error};
 }

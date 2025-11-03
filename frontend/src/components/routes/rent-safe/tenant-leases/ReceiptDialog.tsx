@@ -20,7 +20,9 @@ function ReceiptDialog({lease ,isButtonOutlined, onSuccessCallback}: props) {
     isOpen,
     loading,
     receipts,
+    cashbooks,
     paymentMethods,
+    isCashbookLoading,
     submitReceipts,
     removeReceipt,
     updateReceipt,
@@ -56,6 +58,8 @@ function ReceiptDialog({lease ,isButtonOutlined, onSuccessCallback}: props) {
                     updateReceipt = {updateReceipt}
                     checkReceipt = {checkReceipt}
                     lease = {lease}
+                    cashbooks = {cashbooks}
+                    isCBLoading = {isCashbookLoading}
                     paymentMethods={paymentMethods}
                     index={index}
                     key={index}/>

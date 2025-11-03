@@ -4,14 +4,16 @@ import { Plus } from "lucide-react";
 import AddSalesItemForm from "@/components/forms/AddSalesItemForm";
 import type { SalesItem } from "@/types";
 import EditIcon from "@/components/general/EditIcon";
+import { useState } from "react";
 
 interface props{
     initial? :  SalesItem | undefined
 }
 function AddSaleItemDialogue({initial}:props) {
+    const [open, setOpen] = useState(false);
     return (
-        <Dialog>
-            <DialogTrigger asChild>
+        <Dialog open = {open} onOpenChange={setOpen}>
+            <DialogTrigger>
                 {
                     initial 
                     ? <EditIcon/>
@@ -23,7 +25,9 @@ function AddSaleItemDialogue({initial}:props) {
                     <DialogTitle>Add Sale Item</DialogTitle>
                 </DialogHeader>
                 <div>
-                    <AddSalesItemForm initial={initial}/>
+                    <AddSalesItemForm
+                        successCallBack = {()=> setOpen(false)}    
+                        initial={initial}/>
                 </div>
             </DialogContent>
         </Dialog>

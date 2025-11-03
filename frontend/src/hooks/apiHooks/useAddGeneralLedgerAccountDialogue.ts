@@ -44,7 +44,7 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
         const payloadData = {
             account_name: data.accountName,
             account_number: data.accountNumber,
-            is_secondary_currency: data.currency === "secondary_currency" ? 1 : 0,
+            is_secondary_currency: data.currency === "secondary_currency" ? true : false,
             account_sector_id: Number(data.accountSector)  
         }
 
@@ -53,7 +53,7 @@ function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | unde
                 account_name: initial?.account_name,
                 account_number: initial?.account_number,
                 is_secondary_currency: initial?.is_secondary_currency,
-                account_sector_id: initial?.id // change when id is place for sectors
+                account_sector_id: initial?.account_sector.id 
                
             }
             changedData = handleTrackChangedFields(initialPayload, payloadData)

@@ -215,6 +215,7 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }, inclu
       payment_method_id: Number(data[`paymentMethod_${i}`] as string),
       reference: data[`receipt_${i}`] as string,
       description: data[`description`] as string,
+      cash_book_id : Number(data[`cashbook_${i}`]),
       payment_date: data[`date_${i}`] as string,
       ...(includeRentVariables
         ? {
