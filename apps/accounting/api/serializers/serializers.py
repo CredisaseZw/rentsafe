@@ -155,12 +155,8 @@ class VATSettingSerializer(serializers.ModelSerializer):
 
 
 class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
-    account_sector_name = serializers.ReadOnlyField(
-        source="account_sector.name", read_only=True
-    )
-    account_sector_code = serializers.ReadOnlyField(
-        source="account_sector.code", read_only=True
-    )
+    account_sector = serializers.SerializerMethodField(read_only=True)
+
     account_sector_id = serializers.PrimaryKeyRelatedField(
         queryset=AccountSector.objects.all(), source="account_sector", write_only=True
     )
@@ -171,8 +167,7 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
             "id",
             "account_name",
             "account_number",
-            "account_sector_name",
-            "account_sector_code",
+            "account_sector",
             "account_sector_id",
             "is_secondary_currency",
         ]
@@ -181,6 +176,15 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation["preset"] = True if instance.created_by is None else False
         return representation
+
+    def get_account_sector(self, obj):
+        if obj.account_sector:
+            return {
+                "id": obj.account_sector.id,
+                "code": obj.account_sector.code,
+                "name": obj.account_sector.name,
+            }
+        return None
 
 
 class CurrencySerializer(BaseCompanySerializer):
