@@ -152,7 +152,7 @@ def create_or_get_landlord(landlord_data):
         raise ValidationError(
             "Landlord data must include landlord_type and landlord_id"
         )
-
+    print("coming landlord id", landlord_id, landlord_data)
     try:
         # Get the actual landlord object (Individual or Company)
         if landlord_type == "individual":
