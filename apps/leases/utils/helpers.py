@@ -135,6 +135,52 @@ def create_lease_with_dependencies(lease_data, user=None):
         raise ValidationError(f"Failed to create lease: {str(e)}")
 
 
+def update_lease_with_dependencies(lease, lease_data, user=None):
+    """
+    Comprehensive helper to update a lease with all dependencies.
+    """
+    try:
+        with transaction.atomic():
+            # Avoiding to modify the original data
+            data_for_lease_update = lease_data.copy()
+            # data that shouldn't go into the Lease.objects.update call
+            tenants_data = data_for_lease_update.pop("tenants", [])
+            charges_data = data_for_lease_update.pop("charges", [])
+            deposits_data = data_for_lease_update.pop("deposits", [])
+
+            # Update lease fields
+            for field, value in data_for_lease_update.items():
+                setattr(lease, field, value)
+            lease.save()
+
+            # Update tenants
+            if tenants_data:
+                lease.lease_tenants.clear()
+                for tenant_data in tenants_data:
+                    create_lease_tenant(lease, tenant_data, user)
+
+            # Update charges
+            if charges_data:
+                LeaseCharge.objects.filter(lease=lease).delete()
+                for charge_data in charges_data:
+                    create_lease_charge(lease, charge_data, user)
+
+            # Update deposits
+            if deposits_data:
+                LeaseDeposit.objects.filter(lease=lease).delete()
+                for deposit_data in deposits_data:
+                    create_lease_deposit(lease, deposit_data)
+
+            logger.debug("Lease update completed successfully")
+            return lease
+
+    except Exception as e:
+        logger.error(
+            f"Error in update_lease_with_dependencies: {str(e)}", exc_info=True
+        )
+        raise ValidationError(f"Failed to update lease: {str(e)}")
+
+
 def create_or_get_landlord(landlord_data):
     """
     Helper to create or get a landlord based on your model structure.
@@ -152,7 +198,6 @@ def create_or_get_landlord(landlord_data):
         raise ValidationError(
             "Landlord data must include landlord_type and landlord_id"
         )
-
     try:
         # Get the actual landlord object (Individual or Company)
         if landlord_type == "individual":
@@ -244,7 +289,6 @@ def create_lease_tenant(lease, tenant_data, user=None):
     """
     tenant_type = tenant_data.get("tenant_type")
     tenant_id = tenant_data.get("tenant_id")
-    print(tenant_data)
     is_primary_tenant = tenant_data.get("is_primary_tenant", False)
 
     if not tenant_type or not tenant_id:
@@ -289,6 +333,9 @@ def create_lease_charge(lease, charge_data, user=None):
     """
     try:
         charge_data["lease"] = lease
+        LeaseCharge.objects.filter(
+            charge_type=charge_data["charge_type"], lease=lease
+        ).delete()
         return LeaseCharge.objects.create(**charge_data)
     except Exception as e:
         raise ValidationError(f"Failed to create lease charge: {str(e)}")

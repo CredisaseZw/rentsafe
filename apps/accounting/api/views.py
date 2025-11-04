@@ -142,7 +142,7 @@ class VATSettingViewSet(BaseViewSet):
 
     """
 
-    queryset = VATSetting.objects.all()
+    queryset = VATSetting.objects.all().order_by("-id")
     serializer_class = VATSettingSerializer
 
     def get_queryset(self):
@@ -160,10 +160,21 @@ class VATSettingViewSet(BaseViewSet):
                     valid_data.append(serializer.data)
                 else:
                     invalid_data.append(extract_error_message(serializer.errors))
-            return self._create_rendered_response(
-                {"created": valid_data, "errors": invalid_data},
-                status.HTTP_400_BAD_REQUEST,
-            )
+
+            if invalid_data and valid_data:
+                return self._create_rendered_response(
+                    {"created": valid_data, "errors": invalid_data},
+                    status.HTTP_207_MULTI_STATUS,
+                )
+            elif not invalid_data:
+                return self._create_rendered_response(
+                    valid_data, status.HTTP_201_CREATED
+                )
+            elif not valid_data:
+                return self._create_rendered_response(
+                    {"errors": invalid_data}, status.HTTP_400_BAD_REQUEST
+                )
+
         except ValidationError as e:
             logger.error(f"Validation error creating VAT setting: {e}")
             return self._create_rendered_response(
@@ -255,7 +266,7 @@ class VATSettingViewSet(BaseViewSet):
 
 class SalesCategoryViewSet(BaseCompanyViewSet):
     serializer_class = SalesCategorySerializer
-    queryset = SalesCategory.objects.all()
+    queryset = SalesCategory.objects.all().order_by("-id")
 
 
 class GeneralLedgerAccountViewSet(BaseViewSet):
@@ -265,7 +276,7 @@ class GeneralLedgerAccountViewSet(BaseViewSet):
         queryset = GeneralLedgerAccount.objects.select_related("account_sector").filter(
             Q(created_by__client=self.request.user.client) | Q(created_by__isnull=True)
         )
-        return queryset.order_by("id")
+        return queryset.order_by("-id")
 
     def update(self, request, *args, **kwargs):
         try:
@@ -294,12 +305,12 @@ class CashSaleViewSet(BaseCompanyViewSet):
 
 
 class CashbookEntryViewSet(BaseCompanyViewSet):
-    queryset = CashbookEntry.objects.all()
+    queryset = CashbookEntry.objects.all().order_by("-id")
     serializer_class = CashbookEntrySerializer
 
 
 class JournalEntryViewSet(BaseCompanyViewSet):
-    queryset = JournalEntry.objects.all()
+    queryset = JournalEntry.objects.all().order_by("-id")
     serializer_class = JournalEntrySerializer
 
 
@@ -309,17 +320,15 @@ class LedgerTransactionViewSet(BaseCompanyViewSet):
 
 
 class AccountSectorViewSet(BaseViewSet):
-    queryset = AccountSector.objects.all()
     serializer_class = AccountSectorSerializer
 
     def get_queryset(self):
+        queryset = AccountSector.objects.all()
         if search := self.request.query_params.get("search"):
-            return (
-                super()
-                .get_queryset()
-                .filter(Q(name__icontains=search) | Q(code__icontains=search))
+            return queryset.filter(
+                Q(name__icontains=search) | Q(code__icontains=search)
             )
-        return super().get_queryset()
+        return queryset.order_by("-id")
 
     def create(self, request, *args, **kwargs):
         try:
@@ -1001,7 +1010,7 @@ class CurrencyRateViewSet(BaseViewSet):
 
 
 class CashBookViewSet(BaseCompanyViewSet):
-    queryset = CashBook.objects.all()
+    queryset = CashBook.objects.all().order_by("-id")
     serializer_class = CashBookSerializer
 
 
@@ -1016,7 +1025,7 @@ class CurrencyViewSet(BaseViewSet):
 
 
 class PaymentMethodViewSet(BaseCompanyViewSet):
-    queryset = PaymentMethod.objects.all()
+    queryset = PaymentMethod.objects.all().order_by("-id")
     serializer_class = PaymentMethodSerializer
     pagination_class = None
 
