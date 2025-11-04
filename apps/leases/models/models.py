@@ -359,6 +359,8 @@ class Lease(BaseModelWithUser):
         return max(1, months_diff)
 
     def determine_initial_risk_status(self):
+        from apps.leases.services.invoice_service import LeaseInvoiceService
+
         risk_status = "LOW"
 
         try:
@@ -375,10 +377,7 @@ class Lease(BaseModelWithUser):
         elif opening_balance.one_month_back_balance > 0:
             risk_status = "MEDIUM"
 
-        if opening_balance.outstanding_balance > 0:
-            from apps.leases.services.invoice_service import LeaseInvoiceService
-
-            LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
+        LeaseInvoiceService.generate_initial_invoice_for_opening_balance(self)
 
         return risk_status
 
@@ -401,7 +400,6 @@ class Lease(BaseModelWithUser):
 
         remaining_amount = Decimal(amount)
         payments_made = []
-
         # Get all unpaid invoices ordered by due date (oldest first)
         unpaid_invoices = self.invoices.filter(
             status__in=["pending", "partially_paid"]
@@ -459,17 +457,19 @@ class Lease(BaseModelWithUser):
             # Handle overpayment by adding to the last payment
             if remaining_amount > 0:
                 # Add overpayment to the last payment made
-                if payments_made:
-                    last_payment = payments_made[-1]
-                    last_payment.amount += remaining_amount
-                    last_payment.save()
-                elif (
-                    last_payment := Payment.objects.filter(invoice__lease=self)
-                    .order_by("-payment_date", "-id")
-                    .first()
-                ):
-                    last_payment.amount += remaining_amount
-                    last_payment.save()
+                payment = Payment.objects.create(
+                    invoice=self.invoices.last(),
+                    payment_date=payment_date,
+                    amount=remaining_amount,
+                    description=description,
+                    method=method,
+                    reference=reference,
+                    cashbook=cashbook,
+                    created_by=(
+                        request.user if request and hasattr(request, "user") else None
+                    ),
+                )
+                payments_made.append(payment)
                 CommissionHandler.handle_payment_commission(
                     lease=self,
                     payment_amount=remaining_amount,
@@ -477,7 +477,6 @@ class Lease(BaseModelWithUser):
                     payment_reference=f"{reference or 'Payment'} overpayment",
                     request=request,
                 )
-
                 remaining_amount = Decimal("0.00")
 
             # Log the payment
