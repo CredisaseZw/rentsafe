@@ -17,6 +17,7 @@ interface Props {
 function AutoCompleteLease({ index, onSelectValue, searchItem, setSearchItem, checkReceipt }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
+  
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
     return () => clearTimeout(handler);

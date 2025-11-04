@@ -88,7 +88,7 @@ function MultipleTenantInput({clientType, setPrimaryTenantAddress, existingTenan
                                     }
                                 </Label>
                                 <Input
-                                    disabled
+                                    readOnly
                                     value={`${user.full_name}`}
                                     name = {`tenantName[${index}]`}
                                     id="tenantName"
