@@ -505,7 +505,7 @@ export function validateYear(year: string): boolean {
 
 export function normalizeLeaseResponse(apiLease: any): LeasePayload {
     const tenants = apiLease.tenants.map((t:any) => ({
-      tenant_id: String(t.tenant_object?.id),
+      tenant_id: Number(t.tenant_object?.id),
       tenant_type: "individual",
       is_primary_tenant: t.is_primary_tenant
     })

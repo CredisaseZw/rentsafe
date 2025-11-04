@@ -147,7 +147,7 @@ function useAddIndividualLease() {
     if ("first_name" in item) {
       setFormData((prev) => ({
       ...prev,
-      landlord_id: item.id,
+      landlord_id: item.identification_number,
       landlord_name: `${item.first_name} ${item.last_name}`,
       }));
       return;
@@ -391,10 +391,10 @@ function useAddIndividualLease() {
         leaseID : leaseID,
         data : payload
       }, {
-      onError: (error: AxiosError |Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
-      onSuccess :() => {
+      onError: (error: AxiosError | Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
+      onSuccess :async() => {
+        queryClient.invalidateQueries({ queryKey: isUpdate ? ["lease", leaseID] : ["leases"], exact : false });
         toast.success(isUpdate ? "Lease successfully updated" : "Lease successfully created")
-        queryClient.invalidateQueries({queryKey : ["leases", 1, "ACTIVE"] })
         successCallback()
       }, 
       onSettled: () => setLoading(false),         
