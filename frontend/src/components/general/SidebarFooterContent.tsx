@@ -4,10 +4,9 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { useNavigate } from "react-router";
 import { removeCookie } from "typescript-cookie";
 import useLogOut from "@/hooks/apiHooks/useLogOut";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { useState } from "react";
 import ButtonSpinner from "./ButtonSpinner";
+import { handleAxiosError } from "@/lib/utils";
 
 interface SDFooter {
    username: string;
@@ -26,12 +25,7 @@ function SidebarFooterContent({ username }: SDFooter) {
             removeCookie("token");
             navigate("/");
          },
-         onError : (error)=> {
-            if(isAxiosError(error)){
-               const message = error.response?.data.error ?? error.response?.data.error ?? "Something Went Wrong";
-               toast.error("Error logging out", {description :message})
-            }
-         },
+         onError : (error)=> {handleAxiosError("Error logging out", error)},
          onSettled : ()=> setOnLogout(false)
       })
      

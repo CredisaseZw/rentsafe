@@ -6,7 +6,7 @@ export function SearchCompany(companyQuery: string) {
    const { data, isLoading, error, refetch } = useQuery<SearchCompanyApiRespionse>({
       queryKey: ["searchCompany", companyQuery],
       queryFn: () =>
-         api.get<SearchCompanyApiRespionse>(`/api/companies/search/?q=${companyQuery}`).then((res) => res.data),
+         api.get<SearchCompanyApiRespionse>(`/api/companies/?search=${companyQuery}`).then((res) => res.data),
    });
 
    return { error, companies: data, isLoading, refetch };

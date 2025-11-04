@@ -1,6 +1,12 @@
+import Header from "@/components/general/Header"
+
 function CustomerDebtCall() {
   return (
-    <div>CustomerDebtCall</div>
+    <div>
+      <Header title="Customer Debt Call"/>
+      <div className="main-card">
+      </div>
+    </div>
   )
 }
 

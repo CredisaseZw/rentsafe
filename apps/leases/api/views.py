@@ -59,13 +59,16 @@ class LeaseViewSet(viewsets.ModelViewSet):
         unless the user is a superuser or staff member.
         """
         user = self.request.user
-        queryset = Lease.objects.all().prefetch_related(
-            "lease_tenants__tenant_object", "unit__property", "landlord", "guarantor"
-        )
 
         if not user.is_authenticated:
-            return queryset.none()
+            return Lease.objects.none()
 
+        queryset = Lease.objects.filter(managing_client=user.client).prefetch_related(
+            "lease_tenants__tenant_object",
+            "unit__property",
+            "landlord",
+            "guarantor",
+        )
         if lease_status := self.request.query_params.get("status"):
             if lease_status == "EXPIRED":
                 return queryset.filter(end_date__lt=timezone.now().date())
@@ -78,19 +81,15 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 | Q(unit__unit_number__icontains=search_term)
                 | Q(unit__property__name__icontains=search_term)
             )
-        # Filter by staff/admin
-        if user.is_staff or user.is_superuser:
-            return queryset.filter(managing_client=user.client)
 
-        # Filter by client user
         try:
-            if hasattr(user, "client") and user.client:
-                return queryset.filter(managing_client=user.client)
+            if user.is_staff or user.is_superuser:
+                queryset = queryset.filter(managing_client=user.client)
             else:
-                return queryset.filter(created_by=user)
+                queryset = queryset.filter(created_by=user)
         except Exception as e:
             logger.error(f"Error filtering queryset for user {user.id}: {e}")
-            return queryset.none()
+        return queryset.order_by("-id")
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):

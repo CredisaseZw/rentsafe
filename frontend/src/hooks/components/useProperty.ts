@@ -1,11 +1,11 @@
 import type { MinimalUnit, Property, SelectedFeature } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useClient from "../general/useClient";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
-import { extractFeatures } from "@/lib/utils";
+import { extractFeatures, getFormDataObject, handleAxiosError } from "@/lib/utils";
+import useGetPropertyUnits from "../apiHooks/useGetPropertyUnits";
+import useGetPropertyDetails from "../apiHooks/useGetPropertyDetails";
 
 export default function useProperty(){
     const {property_id} = useParams<{property_id:string}>()
@@ -15,7 +15,19 @@ export default function useProperty(){
     const [loading, setLoading] = useState(false);
     const [selectedList, setSelectedList] = useState<SelectedFeature[]>([])
     const useQueryClient = useClient();
-     
+    const {propertyData, propertyDataLoading , propertyDataError } = useGetPropertyDetails(property_id);
+    const {units, unitsLoading, unitsError} = useGetPropertyUnits(property_id);
+
+    useEffect(()=>{
+        if (handleAxiosError("Failed to fetch property details", propertyDataError)) return;
+        if(propertyData)setProperty(propertyData)
+    }, [propertyData, propertyDataError])
+
+    useEffect(()=>{
+        if (handleAxiosError("Failed to fetch property units", unitsError)) return;
+        if(units) setPropertyUnits(units) 
+    }, [units, unitsError]) 
+
     const handleAddUnit =(
         UNIT:  UseMutationResult<any, Error, any, unknown>,
         e: React.FormEvent<HTMLFormElement>,
@@ -23,8 +35,7 @@ export default function useProperty(){
 
         e.preventDefault()
         setLoading(true);
-        const formData = new FormData(e.currentTarget)
-        const data = Object.fromEntries(formData.entries());
+        const data = getFormDataObject(e);
         const features = extractFeatures(selectedList);
         
         const unitData = {
@@ -41,13 +52,7 @@ export default function useProperty(){
                 onSuccessCallback()
                 setSelectedList([])
             },
-            onError: (error) => {
-                if(isAxiosError(error)){
-                    const message = error.response?.data.error ?? error.response?.data.detail ?? "Something went wrong"
-                    toast.error("Failed to add unit", {description : message})
-                    console.error("Full backend response:", error.response?.data);
-                }
-             },
+            onError: (error) => {handleAxiosError("Failed to add unit", error)},
             onSettled: () => setLoading(false)
         }) 
     }
@@ -58,7 +63,11 @@ export default function useProperty(){
         property,
         open,
         loading,
-        selectedList, 
+        propertyDataLoading,
+        unitsLoading,
+        selectedList,
+        propertyData,
+        unitsError, 
         setSelectedList,
         setOpen,
         handleAddUnit,

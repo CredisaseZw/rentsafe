@@ -1,31 +1,29 @@
 import { IN_LEASE_CLIENT_TYPES } from "@/constants";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import type { Address, BranchFull, Charges, IndividualMinimal, LeaseResponse } from "@/interfaces";
 import type { AddressPayload } from "@/interfaces/form-payloads";
-import { extractAddresses, extractTenants, generateUpdatePayload, getThreeMonthsBack, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
-import type {Currency,  LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
-import { useQueryClient, type UseMutationResult } from "@tanstack/react-query";
-import { isAxiosError, type AxiosError } from "axios";
+import { extractAddresses, extractTenants, generateUpdatePayload, getFormDataObject, getThreeMonthsBack, handleAxiosError, normalizeLeaseResponse, validateBalances } from "@/lib/utils";
+import type {LeasePayload, Property, PropertyType, ShortPropertyData } from "@/types";
+import { type UseMutationResult } from "@tanstack/react-query";
+import { type AxiosError } from "axios";
 import { useEffect, useMemo, useState } from "react"
-import { useSearchParams } from "react-router";
 import { toast } from "sonner";
+import useClient from "../general/useClient";
 
 function useAddIndividualLease() {
-  const queryClient = useQueryClient()
+  const queryClient = useClient()
   const [leaseObject, setLeaseObject] = useState<LeaseResponse | null>(null); 
   const [addressState, setAddressState] = useState<"property" | "client" | "manual">("property");
   const [loading,setLoading] = useState(false);
   const [propertyName, setPropertyName] = useState("");
   const [searchItem, setSearchItem] = useState("");  
-  const [CURRENCY_OPTIONS, SET_CURRENCY_OPTIONS] = useState<Currency[]>([]);
   const [guaranteeItem, setGuaranteeItem] = useState("");
   const [propertyType, setPropertyTypes] = useState<PropertyType[]>([])
   const [landlordIdentifier, setLandlordIdentifier] = useState("National ID");
   const [isOpen, setShowModal] = useState(false);
   const [primaryTenantAddress , setPrimaryTenantAddress] = useState<Address | undefined>(undefined);
-  const [defaultCurrency, setDefaultCurrency] = useState<number>(1);
-  const [params] = useSearchParams();
-  const page = parseInt(params.get("active_page") || "1");
-
+  const [defaultCurrency, setDefaultCurrency] = useState<number>(0);
+  const {currencies, currencyLoading, currency} = useCurrency()
   const [formData, setFormData] = useState({
     defaultRent : "",
     defaultUtility : "",
@@ -70,6 +68,9 @@ function useAddIndividualLease() {
       colorCode : "bg-black"
     }
   });
+  useEffect(()=>{
+    setDefaultCurrency(currency?.id ?? currencies[0].id)
+  }, [])
 
   useEffect(() => {
     const entries = [
@@ -103,6 +104,7 @@ function useAddIndividualLease() {
     });
   
   }, [tenantsOpeningBalance]);
+
   const changeTenantsOpeningBalances = (field: keyof typeof tenantsOpeningBalance, value: string) => {
     setTenantsOpeningBalance((prev) => ({
       ...prev,
@@ -199,10 +201,6 @@ function useAddIndividualLease() {
     }
     setAddressState(newState);
   };
-  function handleDefaultCurrency(currency: Currency[]){
-    const usdId = currency.find((c) => c.currency_code === "USD")?.id;
-    setDefaultCurrency(usdId || currency[0]?.id);
-  }
 
   function handleCharges(charges: Charges[]) {
     const rent = charges.find(c => c.charge_type === "RENT")?.amount ?? "";
@@ -227,7 +225,7 @@ function useAddIndividualLease() {
     } else if (addressState === "manual"){
       source = extractAddresses(data)[0];
     }
-
+    
     const propertyData: ShortPropertyData =  
       addressState  === "property" ?
       formData.property :
@@ -235,9 +233,9 @@ function useAddIndividualLease() {
         name : String(data.propertyName),
         property_type_name : String(data.propertyTypeName),
         description : String(data.propertyDetails),
-        status : String("active")
-      } 
-    
+      }
+    if(propertyData.status) delete propertyData.status; 
+      
       const lease_opening_balance_data = {
         current_month_balance: Number(data.current_month_balance),
         one_month_back_balance: Number(data.one_month_back_balance),
@@ -262,7 +260,7 @@ function useAddIndividualLease() {
       payment_frequency: String(data.paymentFrequency),
       due_day_of_month: Number(data.effectiveStartDate),
       grace_period_days: Number(formData.effectiveEndDate),
-      is_rent_variable: data.rentVariable === "true",
+      is_rent_variable: !!data.rentVariable,
       includes_utilities: data.otherStandingCharging?.toString().trim().length > 0,
       property_data: propertyData,
       unit_data: {
@@ -294,7 +292,7 @@ function useAddIndividualLease() {
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
           effective_date: String(data.leaseStartDate ?? ""),
           end_date: String(data.leaseEndDate ?? ""),
-          vat_inclusive: data.vatInclusive === "true"
+          vat_inclusive: !!data.vatInclusive 
         },
         {
           charge_type: "UTILITY",
@@ -304,7 +302,7 @@ function useAddIndividualLease() {
           frequency: String(data.paymentFrequency) as LeasePayload["charges"][0]["frequency"],
           effective_date: String(data.leaseStartDate ?? ""),
           end_date: String(data.leaseEndDate ?? ""),
-          vat_inclusive: data.vatInclusive === "true"
+          vat_inclusive: !!data.vatInclusive 
         }
       ],
       deposits: [
@@ -320,12 +318,12 @@ function useAddIndividualLease() {
         {
           amount: String(data.landlordsOpeningBalance),
           commission_percentage: String(data.commissionPercentage),
-          operating_costs_inclusive: data.operatingCostsIncluded === "true"
+          operating_costs_inclusive: !!data.operatingCostsIncluded 
         }
       ]
     };
     
-    if( PAYLOAD.unit_data !== undefined && typeof PAYLOAD.unit_data.unit_type === "string" && PAYLOAD.unit_data.unit_type.length === 0 ) delete PAYLOAD.unit_data.unit_type;
+    if(PAYLOAD.unit_data !== undefined && typeof PAYLOAD.unit_data.unit_type === "string" && PAYLOAD.unit_data.unit_type.length === 0 ) delete PAYLOAD.unit_data.unit_type;
     if(PAYLOAD.unit_data !== undefined && PAYLOAD.unit_data.number_of_rooms === 0 ) delete PAYLOAD.unit_data.number_of_rooms 
     if(PAYLOAD.unit_data !== undefined && PAYLOAD.unit_data.unit_number !== undefined && PAYLOAD.unit_data.unit_number.length === 0 ) delete PAYLOAD.unit_data.unit_number 
     if(PAYLOAD.unit_data && Object.keys(PAYLOAD.unit_data).length === 0) delete PAYLOAD.unit_data
@@ -367,9 +365,7 @@ function useAddIndividualLease() {
     ) => {
     e.preventDefault();
     setLoading(true);
-    const FORM_DATA = new FormData(e.currentTarget);
-    const data = Object.fromEntries(FORM_DATA.entries());
-    
+    const data = getFormDataObject(e);
     const leasePayload:LeasePayload | void = generateCreateLeasePayload(data, clientType);
 
     let payload;
@@ -389,29 +385,22 @@ function useAddIndividualLease() {
     } else {
       payload = leasePayload;
     }
-    
     if(!payload) return;
-
-     useMutate.mutate({
+  
+    useMutate.mutate({
         leaseID : leaseID,
         data : payload
       }, {
-      onError: (error: AxiosError |Error | unknown) => {
-        if (isAxiosError(error)) {
-          console.error("Full backend response:", error.response?.data);
-          const errorDetails = error.response?.data?.error || error.response?.data?.detail || "Something went wrong";
-          toast.error("Failed to create new lease", { description: errorDetails });
-          return;
-          }
-        toast.error("Failed to create property. Please try again.");
-      },
+      onError: (error: AxiosError |Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
       onSuccess :() => {
-        toast.success("Lease successfully created")
-        queryClient.invalidateQueries({ queryKey: ["leases", page, "ACTIVE"] });
+        toast.success(isUpdate ? "Lease successfully updated" : "Lease successfully created")
+        queryClient.invalidateQueries({queryKey : ["leases", 1, "ACTIVE"] })
         successCallback()
       }, 
       onSettled: () => setLoading(false),         
     }) 
+
+
   };
 
   return {
@@ -420,13 +409,14 @@ function useAddIndividualLease() {
     loading,
     formData,
     searchItem,
+    currencies,
     leaseObject,
     propertyName,
     addressState,
     propertyType,
     guaranteeItem,
     defaultCurrency,
-    CURRENCY_OPTIONS,
+    currencyLoading,
     outstandingBalance,
     landlordIdentifier,
     primaryTenantAddress,
@@ -436,9 +426,7 @@ function useAddIndividualLease() {
     switchToPropertyContext,
     setPrimaryTenantAddress,
     setLandlordIdentifier,
-    handleDefaultCurrency,
     setOutstandingBalance,
-    SET_CURRENCY_OPTIONS,
     setDefaultCurrency,
     onSelectGuarantor,
     handleLeaseSubmit,

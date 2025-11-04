@@ -54,6 +54,7 @@ function LeaseRow({ lease, refetch, onSuccessCallback }: Props) {
           lease={{
             lease_id: lease.lease_id,
             id: lease.id,
+            is_rent_variable : lease.is_rent_variable,
             customerName: primaryFullname,
             rentOwing: lease.owing,
             payment_date : getCurrentDate()
