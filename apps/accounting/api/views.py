@@ -160,10 +160,21 @@ class VATSettingViewSet(BaseViewSet):
                     valid_data.append(serializer.data)
                 else:
                     invalid_data.append(extract_error_message(serializer.errors))
-            return self._create_rendered_response(
-                {"created": valid_data, "errors": invalid_data},
-                status.HTTP_400_BAD_REQUEST,
-            )
+
+            if invalid_data and valid_data:
+                return self._create_rendered_response(
+                    {"created": valid_data, "errors": invalid_data},
+                    status.HTTP_207_MULTI_STATUS,
+                )
+            elif not invalid_data:
+                return self._create_rendered_response(
+                    valid_data, status.HTTP_201_CREATED
+                )
+            elif not valid_data:
+                return self._create_rendered_response(
+                    {"errors": invalid_data}, status.HTTP_400_BAD_REQUEST
+                )
+
         except ValidationError as e:
             logger.error(f"Validation error creating VAT setting: {e}")
             return self._create_rendered_response(
