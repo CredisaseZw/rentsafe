@@ -230,7 +230,7 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }, inclu
       ...(includeRentVariables
         ? {
             rent: data[`rent_${i}`] as string,
-            opx: data[`opx_${i}`] as string,
+            opc: data[`opc_${i}`] as string,
           }
         : {}),
     };

@@ -215,7 +215,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 <>
                   <ColumnsContainer numberOfCols={2} marginClass="mt-6" gapClass="gap-6">
                     <div className="flex flex-col justify-baseline form-group">
-                      <Label className="px-2 font-normal required" htmlFor="">
+                      <Label className="px-2 font-normal required" >
                         Property Type
                       </Label>
                       <Select name="propertyTypeName" required>
@@ -266,7 +266,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                         />
                       </div>
                       <div className="form-group">
-                        <Label className="px-2 font-normal" htmlFor="">
+                        <Label className="px-2 font-normal" >
                           Suburb
                         </Label>
                         <Input
@@ -277,7 +277,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                         />
                       </div>
                       <div className="form-group">
-                        <Label className="px-2 font-normal" htmlFor="">
+                        <Label className="px-2 font-normal" >
                           City
                         </Label>
                         <Input
@@ -288,7 +288,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                         />
                       </div>
                       <div className="form-group">
-                        <Label className="px-2 font-normal" htmlFor="">
+                        <Label className="px-2 font-normal" >
                           Province
                         </Label>
                         <Input
@@ -299,7 +299,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                         />
                       </div>
                       <div className="form-group">
-                        <Label className="px-2 font-normal" htmlFor="">
+                        <Label className="px-2 font-normal" >
                           Country
                         </Label>
                         <Input
@@ -310,7 +310,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                         />
                       </div>
                       <div className="form-group">
-                        <Label className="px-2 font-normal" htmlFor="">
+                        <Label className="px-2 font-normal" >
                           Area Code
                         </Label>
                         <Input
@@ -323,7 +323,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                     </ColumnsContainer>
                   )}
                    <div className="form-group mt-6">
-                    <Label className="px-2 font-normal required" htmlFor="">
+                    <Label className="px-2 font-normal required" >
                       Property Details
                     </Label>
                     <Textarea name="propertyDetails" required placeholder="" />
@@ -342,15 +342,15 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
         <Fieldset legendTitle="Lease Details">
           <ColumnsContainer numberOfCols={3} marginClass="mt-5" gapClass="gap-6">
             <div className="form-group">
-                <Label className="px-2 font-normal" htmlFor=""> Lease Start Date</Label>
+                <Label className="px-2 font-normal" > Lease Start Date</Label>
                 <Input defaultValue={leaseObject?.start_date ?? ""} name="leaseStartDate" id = "leaseStartDate" type={"date"}/>
             </div>
             <div className="form-group">
-                <Label className="px-2 font-normal" htmlFor=""> Lease end Date</Label>
+                <Label className="px-2 font-normal" > Lease end Date</Label>
                 <Input defaultValue={leaseObject?.end_date ?? ""} name="leaseEndDate" id = "leaseEndDate" type={"date"}/>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="">Lease Status</Label>
+              <Label className="px-2 font-normal" >Lease Status</Label>
               <Select name="leaseStatus" defaultValue={LEASE_STATUS_OPTIONS[0].value}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
@@ -366,7 +366,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
               </Select>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor=""> Currency</Label>
+              <Label className="px-2 font-normal required" > Currency</Label>
               <Select name="currencyType" key={defaultCurrency} required defaultValue={defaultCurrency.toString()}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
@@ -388,7 +388,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
               </Select>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="">Payment frequency</Label>
+              <Label className="px-2 font-normal" >Payment frequency</Label>
               <Select name="paymentFrequency" defaultValue={leaseObject?.payment_frequency ?? PAYMENT_FREQUENCY_OPTIONS[0].value}>
                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select ..." />
@@ -418,7 +418,7 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   required/>
             </div>
             <div className="form-group">
-                <Label className="px-2  font-normal" htmlFor="">Other standing Charges</Label>
+                <Label className="px-2  font-normal" >Other standing Charges</Label>
                 <Input 
                   name="otherStandingCharging"
                   id = "otherStandingCharging"
@@ -429,11 +429,11 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   onKeyDown={validateAmounts}/>
             </div>
             <div className="form-group">
-                <Label className="px-2 font-normal required" htmlFor=""> Payment Start Date</Label>
+                <Label className="px-2 font-normal required" > Payment Start Date</Label>
                 <Input name="effectiveStartDate" required id = "effectiveStartDate" value={25} readOnly/>
             </div>
             <div className="form-group">
-                <Label className="px-2 required font-normal" htmlFor=""> Payment end Date</Label>
+                <Label className="px-2 required font-normal" > Payment end Date</Label>
                 <Input
                   name="effectiveEndDate"
                   required
@@ -447,13 +447,12 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                   className="self-center"
                   name="vatInclusive"
                   id="vatInclusive" 
-
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                   VAT Inclusive
               </Label>
             </div>
-             <div className="flex flex-row gap-2 items-center justify-center">
+            <div className="flex flex-row gap-2 items-center justify-center">
               <Checkbox
                 className="self-center"
                 name="rentVariable"
@@ -461,10 +460,10 @@ function AddLeaseForm({clientType, successCallback, leaseID} :props) {
                 key={String(leaseObject?.is_rent_variable)}
                 defaultChecked={!!leaseObject?.is_rent_variable}
               />
-              <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
+              <Label className="px-2 font-normal self-center" htmlFor="rentVariable">
                   Is Rent Variable
               </Label>
-            </div>
+          </div>
           </ColumnsContainer>
         </Fieldset>
       </div>

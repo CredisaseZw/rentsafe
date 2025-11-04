@@ -393,7 +393,8 @@ function useAddIndividualLease() {
       }, {
       onError: (error: AxiosError | Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
       onSuccess :async() => {
-        queryClient.invalidateQueries({ queryKey: isUpdate ? ["lease", leaseID] : ["leases"], exact : false });
+        queryClient.invalidateQueries({ queryKey: ["lease", leaseID]});
+        queryClient.invalidateQueries({ queryKey: ["leases"], exact : false });
         toast.success(isUpdate ? "Lease successfully updated" : "Lease successfully created")
         successCallback()
       }, 

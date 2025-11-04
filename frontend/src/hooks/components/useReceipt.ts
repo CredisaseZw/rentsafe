@@ -69,34 +69,44 @@ export default function useReceipt(initialLease?: ReceiptLease) {
         value: any,
         updateRent?: boolean
     ) => {
-    setReceipts(prev =>
-        prev.map((r, i) => {
-        if (i !== index) return r;
+        setReceipts(prev =>
+            prev.map((r, i) => {
+            if (i !== index) return r;
 
-        const updated = {
-            ...r,
-            [key]: value,
-        };
+            const defaultRentOwing = Number(r.rentOwing ?? 0);
+            let updated = { ...r, [key]: value, defaultRentOwing };
 
-        if (updateRent) {
-            updated.currentRentOwing =
-            Number(r.rentOwing) - Number(value);
-        }
+            if (updateRent) {
+                if (key === "rent" || key === "opc") {
+                const rent = Number(key === "rent" ? value : r.rent ?? 0);
+                const opc = Number(key === "opc" ? value : r.opc ?? 0);
+                const amount = rent + opc;
 
-        if (key === "opc" || key === "rent") {
-            const rent = Number(
-            key === "rent" ? value : r.rent
-            );
-            const opc = Number(
-            key === "opc" ? value : r.opc
-            );
-            updated.amount = String(rent + opc);
-        }
+                const owing =
+                    amount > 0 ? defaultRentOwing - amount : defaultRentOwing;
 
-        return updated;
-        })
-    );
+                updated = {
+                    ...updated,
+                    amount: String(amount),
+                    currentRentOwing: Number(owing),
+                };
+                } else {
+                const amount = Number(value);
+                const owing =
+                    amount > 0 ? defaultRentOwing - amount : defaultRentOwing;
+
+                updated = {
+                    ...updated,
+                    currentRentOwing: Number(owing),
+                };
+                }
+            }
+
+            return updated;
+            })
+        );
     };
+
 
     const addReceipt = () => {
         setReceipts((prev) => [
