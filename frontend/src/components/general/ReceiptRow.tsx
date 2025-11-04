@@ -88,7 +88,7 @@ export default function ReceiptRow({paymentMethods, index, lease, cashbooks, isC
                     <Label>Cash Book</Label>
                     <Select
                         name={`cashbook_${index}`}
-                        key={cashbooks[0].account_type}
+                        key={cashbooks.length}
                         >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select ..." />
