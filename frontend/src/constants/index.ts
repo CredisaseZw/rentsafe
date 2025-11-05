@@ -615,8 +615,8 @@ export const PAYMENT_METHODS_HEADERS:Header[] = [
 ]
 
 export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
-  { name: "Account Name" },
   { name: "Account Number" },
+  { name: "Account Name" },
   { name: "Secondary Currency" },
   { name: "Accounts Sector" },
   { name: "Sector Name" },

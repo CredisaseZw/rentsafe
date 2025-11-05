@@ -78,27 +78,27 @@ export default function useReceipt(initialLease?: ReceiptLease) {
 
             if (updateRent) {
                 if (key === "rent" || key === "opc") {
-                const rent = Number(key === "rent" ? value : r.rent ?? 0);
-                const opc = Number(key === "opc" ? value : r.opc ?? 0);
-                const amount = rent + opc;
+                    const rent = Number(key === "rent" ? value : r.rent ?? 0);
+                    const opc = Number(key === "opc" ? value : r.opc ?? 0);
+                    const amount = rent + opc;
 
-                const owing =
-                    amount > 0 ? defaultRentOwing - amount : defaultRentOwing;
+                    const owing =
+                        amount > 0 ? defaultRentOwing - amount : defaultRentOwing;
 
-                updated = {
-                    ...updated,
-                    amount: String(amount),
-                    currentRentOwing: Number(owing),
-                };
+                    updated = {
+                        ...updated,
+                        amount: String(amount),
+                        currentRentOwing: Number(owing),
+                    };
                 } else {
-                const amount = Number(value);
-                const owing =
-                    amount > 0 ? defaultRentOwing - amount : defaultRentOwing;
+                    const amount = Number(value);
+                    const owing =
+                        amount > 0 ? defaultRentOwing - amount : defaultRentOwing;
 
-                updated = {
-                    ...updated,
-                    currentRentOwing: Number(owing),
-                };
+                    updated = {
+                        ...updated,
+                        currentRentOwing: Number(owing),
+                    };
                 }
             }
 

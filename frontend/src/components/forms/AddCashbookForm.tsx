@@ -80,7 +80,7 @@ function AddCashbookForm({initial, successCallback}:props) {
                     <SelectContent>
                         {
                             ACCOUNT_TYPES.map((a, idx)=>
-                                <SelectItem value={String(a.value)} key={idx} >{a.label}</SelectItem>   
+                                <SelectItem value={String(a.value)} key={idx} > {a.label}</SelectItem>   
                             )
                         }
                     </SelectContent>
@@ -124,7 +124,7 @@ function AddCashbookForm({initial, successCallback}:props) {
                         {
                             generalLedgerAccounts.length !== 0 && 
                             generalLedgerAccounts.map((s, idx:number)=>(
-                                <SelectItem value={String(s.id)} key={idx}>{s.account_name}</SelectItem>
+                                <SelectItem value={String(s.id)} key={idx}>{s.account_number} - { s.account_name}</SelectItem>
                             ))
                         }
                         {

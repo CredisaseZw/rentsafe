@@ -51,8 +51,8 @@ function AccountsLists() {
                   key={idx}
                   className={`${a.preset ? "bg-gray-200 " : ""} hover:bg-transparent`}
                   >
-                  <TableCell className="text-center">{a.account_name}</TableCell>
                   <TableCell className="text-center">{a.account_number}</TableCell>
+                  <TableCell className="text-center">{a.account_name}</TableCell>
                   <TableCell className="text-center">{a.is_secondary_currency ? "Yes" : "No"}</TableCell>
                   <TableCell className="text-center">{a.account_sector.code}</TableCell>
                   <TableCell className="text-center">{a.account_sector.name}</TableCell>
