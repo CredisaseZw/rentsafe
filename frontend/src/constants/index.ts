@@ -3,7 +3,6 @@ import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
 import type {Option} from "@/types/index"
-
 import {
   RENT_ADMIN_PANEL_NAVLINKS,
   RENTSAFE_APP_NAVLINKS,
@@ -127,12 +126,14 @@ export const MINIMAL_TENANT_OBJECT: TenantSelection = {
   is_primary : false
 
 }
+
 export const INVOICE_TYPES: Option[] = [ 
   { label: "FISCAL", value: "fiscal" },
   { label: "PROFORMA", value: "proforma" },
   { label: "RECURRING", value: "recurring" },
 
 ];
+
 export const IN_LEASE_CLIENT_TYPES: Option[] = [
   { label: "Individual", value: "individual" },
   { label: "Company", value: "company" },

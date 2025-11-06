@@ -488,11 +488,12 @@ export type VATPayload = {
 }
 
 export type InvoicePreview = {
-   salesItem: string,
+   searchSalesItem : string
+   salesItem: number,
    itemCode: string,
    price: number,
-   quantity: number,
-   vat_amount: string,
+   quantity:  string,
+   vat_amount: number,
    total: number,
 }
 
@@ -591,7 +592,7 @@ export type Cashbook = {
    general_ledger_account: GeneralLedgerAccount
 }
 
-export interface Invoice {
+export type Invoice = {
   id: number;
   document_number: string;
   invoice_type: "fiscal" | "proforma" | "recurring" | string;
@@ -617,4 +618,12 @@ export interface Invoice {
   original_invoice: number | null;
   is_invoiced: boolean;
   can_convert_to_fiscal: boolean;
+}
+
+export type InvoiceTotals = {  
+   currency_id : number,
+   subtotal: number,
+   vat: number,
+   total: number,
+   discount : number 
 }

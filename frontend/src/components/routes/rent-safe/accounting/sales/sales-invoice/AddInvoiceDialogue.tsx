@@ -40,7 +40,7 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
                             isType
                             onSelectBiller={onSelectBiller}   
                         />
-                        <div className="mt-10">
+                        <div className="mt-5">
                            <InvoiceTotalsTable ref = {rowsRef}/>
                         </div>
                         <div className="mt-5 flex flex-row justify-end gap-5">

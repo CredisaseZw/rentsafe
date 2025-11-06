@@ -12,7 +12,7 @@ import type { BranchFull, IndividualMinimal } from '@/interfaces'
 interface props {
     formData: Record<string, any>,
     searchItem: string;
-    setFormData: React.Dispatch<React.SetStateAction<{ biller_id: number; biller_name: string; biller_type: string; }>>;
+    setFormData: React.Dispatch<React.SetStateAction<{ biller_id: number; biller_name: string; biller_type: string; invoice_type : string}>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
     onSelectBiller: (item: IndividualMinimal | BranchFull) => void;
     isRep?: boolean
@@ -20,92 +20,91 @@ interface props {
 }
 function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSearchItem, onSelectBiller}: props) {
   return (
-    <ColumnsContainer numberOfCols={2} gapClass="gap-5">
-        <div className="flex flex-col gap-5">
-            <div className=" flex flex-row justify-between">
-                <Label className='text-gray-800 dark:text-white'>Bill To</Label>
-                <div className="flex flex-row gap-5">
-                    <Select
-                        onValueChange={(val: "individual" | "company") => {
-                            setSearchItem("")
-                            setFormData((prev) => ({
-                                ...prev,
-                                iller_id: 0,
-                                biller_name: "",
-                                biller_type: val,
-                            }));
-                        }}
-                    >
-                        <SelectTrigger className="w-fit self-center">
-                            <SelectValue placeholder="Select ..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {
-                                IN_LEASE_CLIENT_TYPES.map((option:Option, index : number)=>
-                                    <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                                )
-                            }
-                        </SelectContent>
-                    </Select>
-                    <AutoCompleteClient
-                        isRequired = {false}
-                        searchItem = {searchItem}
-                        setSearchItem = {setSearchItem}
-                        clientType = {formData.biller_type}
-                        onSelectValue = {onSelectBiller}
-                    />
+    <div className='w-full'>
+        <ColumnsContainer numberOfCols={2} marginClass='mt-0' gapClass="gap-5">
+            <div className="flex flex-col gap-5">
+                <div className=" flex flex-row justify-between">
+                    <Label className='text-gray-800 dark:text-white'>Bill To</Label>
+                    <div className="flex flex-row gap-5">
+                        <Select
+                            onValueChange={(val: "individual" | "company") => {
+                                setSearchItem("")
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    iller_id: 0,
+                                    biller_name: "",
+                                    biller_type: val,
+                                }));
+                            }}
+                        >
+                            <SelectTrigger className="w-fit self-center">
+                                <SelectValue placeholder="Select ..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {
+                                    IN_LEASE_CLIENT_TYPES.map((option:Option, index : number)=>
+                                        <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                                    )
+                                }
+                            </SelectContent>
+                        </Select>
+                        <AutoCompleteClient
+                            isRequired = {false}
+                            searchItem = {searchItem}
+                            setSearchItem = {setSearchItem}
+                            clientType = {formData.biller_type}
+                            onSelectValue = {onSelectBiller}
+                        />
+                    </div>
                 </div>
             </div>
-          
-            <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">Discount</Label>
-                <Input
-                    className="w-[400px]"
-                    name="number"
-                />
+            <div className="flex flex-col gap-5">
+                {
+                    isRep &&
+                    <div className="flex flex-row gap-5 justify-between">
+                        <Label className="text-gray-800">Rep</Label>
+                        <Input
+                            className="w-[400px]"
+                            name="rep"
+                        />
+                    </div>
+                }
+                {
+                    isType &&
+                    <div className="flex flex-row gap-5 justify-between">
+                        <Label className="text-gray-800">Invoice Type</Label>                   
+                        <Select   
+                            defaultValue={INVOICE_TYPES[0].value}
+                            required
+                            name='invoiceType'
+                            onValueChange={(v)=>{
+                                setFormData(p=>({
+                                    ...p,
+                                    invoice_type : v
+                                }))
+                            }}
+                        >
+                            <SelectTrigger className='w-[400px]'>
+                                <SelectValue placeholder= "Select ..."></SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {INVOICE_TYPES.map((i, idx)=>(
+                                    <SelectItem key={idx} value={i.value}>{i.label}</SelectItem>
+                                ))}                       
+                            </SelectContent>
+                        </Select>
+                    </div>
+                }
             </div>
-        </div>
-        <div className="flex flex-col gap-5">
-            {
-                isRep &&
-                <div className="flex flex-row gap-5 justify-between">
-                    <Label className="text-gray-800">Rep</Label>
-                    <Input
-                        className="w-[400px]"
-                        name="rep"
-                    />
-                </div>
-            }
-            {
-                isType &&
-                <div className="flex flex-row gap-5 justify-between">
-                    <Label className="text-gray-800">Invoice Type</Label>                   
-                    <Select   
-                        defaultValue={INVOICE_TYPES[0].value}
-                        required
-                        name='invoiceType'
-                    >
-                        <SelectTrigger className='w-[400px]'>
-                            <SelectValue placeholder= "Select ..."></SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {INVOICE_TYPES.map((i, idx)=>(
-                                <SelectItem key={idx} value={i.value}>{i.label}</SelectItem>
-                            ))}                       
-                        </SelectContent>
-                    </Select>
-                </div>
-            }
-            <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">Date</Label>
-                <Input
-                    value={getCurrentDate()}
-                    className="w-[400px]"
-                    name="date"
-                />
+        </ColumnsContainer>
+        <div className='flex justify-end'>
+            <div className="flex flex-row w-fit gap-5 justify-end mt-5">
+                <Label className="text-gray-800 dark:text-white">Date:</Label>         
+                <span className='text-sm'>{getCurrentDate()}</span>
             </div>
         </div>
-    </ColumnsContainer>
+    </div>
+  
   )
 }
 

@@ -19,7 +19,6 @@ function useGetInvoices(page:number, mode:string, id?:number | undefined) {
         [MODES.WITH_PAYMENTS]: `/api/accounting/invoices/${id}/with-payments?page=${page}`
     };
 
-
     const {data, isLoading, isError} = useQuery<InvoiceResponse>({
         queryKey : ["invoices", mode, page],
         queryFn : async () =>{

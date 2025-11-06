@@ -6,6 +6,9 @@ import LoadingIndicator from "@/components/general/LoadingIndicator"
 import { Button } from "@/components/ui/button"
 import useInvoiceTotalsTables from "@/hooks/components/useInvoiceTotalsTables"
 import { forwardRef } from "react"
+import AutoCompleteSalesItem from "./AutoCompleteSalesItem"
+import type { SalesItem } from "@/types"
+import { validateAmounts } from "@/lib/utils"
 
 interface props{
     isCashSales? : boolean
@@ -13,17 +16,24 @@ interface props{
 
 const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
     const {
-        currencies,
-        currencyLoading,
-        currency,
-        cashSalesRows,
-        discount,
         rows,
-        handleDiscountChange,
-        AddInvoiceRow,
+        discount,
+        currencies,
+        currencyCode,
+        cashSalesRows,
+        currencyLoading,
+        defaultCurrency,
+        calculatedTotals,
         RemoveCashSalesRows,
+        handleOnSelectItem,
+        setDefaultCurrency,
+        handleOnRowChange,
         RemoveInvoiceRow,
+        setCurrencyCode,
         AddCashSaleRow,
+        AddInvoiceRow,
+        setDiscount,    
+
     } = useInvoiceTotalsTables(ref)
    
     return (
@@ -34,8 +44,17 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             <TableCell className="w-2/12"></TableCell>
             <TableCell colSpan={2} className="text-center w-2/12 text-red-600">Currency</TableCell>
             <TableCell colSpan={2} className="text-center w-3/12">
-                <Select key={currency?.id}  name="currency" required defaultValue={String(currency?.id)}>
-                <SelectTrigger className="w-full bg-red-600 text-white">
+                <Select 
+                    key={defaultCurrency}
+                    name="currency"
+                    value={defaultCurrency}
+                    onValueChange={(v)=> {
+                        setCurrencyCode(()=> currencies.find(c=> c.id === Number(v))?.currency_code)
+                        setDefaultCurrency(v)
+                        }
+                    }
+                    required>
+                    <SelectTrigger className="w-full bg-red-600 text-white">
                         <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
                     <SelectContent className="bg-red-600 text-white border-white">
@@ -57,31 +76,47 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         <TableRow noHover>
             <TableCell className="text-center border-r border-color w-1/12"></TableCell>
             <TableCell className="text-center border-r border-color w-2/12">Sales Item</TableCell>
-            <TableCell className="text-center border-r border-color w-2/12">Sales Code</TableCell>
-            <TableCell className="text-center border-r border-color w-2/12">Price (VAT Inc)</TableCell>
+            <TableCell className="text-end border-r border-color w-2/12">Sales Code</TableCell>
+            <TableCell className="text-end border-r border-color w-2/12">Price (VAT Inc)</TableCell>
             <TableCell className="text-center border-r border-color w-1/12">Qty</TableCell>
             <TableCell className="text-center border-r border-color w-2/12">VAT</TableCell>
-            <TableCell className="text-center w-2/12">Total (VAT Inc)</TableCell>
+            <TableCell className="text-end w-2/12">Total (VAT Inc)</TableCell>
         </TableRow>
         {
             rows.map((row, index)=>(
                 <TableRow key={index} noHover>
                     <TableCell className="text-center border-r border-color">
-                        <Button type="button" variant={"ghost"} onClick={()=>RemoveInvoiceRow(index)}>
-                            <X className="text-red-600"/>
-                        </Button>
+                        {
+                            index !== 0 &&
+                            <Button type="button" variant={"ghost"} onClick={()=>RemoveInvoiceRow(index)}>
+                                <X className="text-red-600"/>
+                            </Button>
+                        }
                     </TableCell>
                     <TableCell className="text-end border-r border-color">
-                        <Input name={"item_code_"+index}/>
+                        <AutoCompleteSalesItem
+                            index={index}
+                            onSelectValue = {(item:SalesItem)=> handleOnSelectItem(item, index)}
+                            searchItem={row.searchSalesItem}
+                            setSearchItem={handleOnRowChange}
+                        />
                     </TableCell>
                     <TableCell className="text-end border-r border-color">
                         {row.itemCode}
                     </TableCell>
                     <TableCell className="text-end border-r border-color">{row.price}</TableCell>
                     <TableCell className="text-end border-r border-color">
-                        <Input name={"item_qty_"+index}/>
+                        <Input 
+                            name={"item_qty_"+index}
+                            value={row.quantity}
+                            min={1}
+                            type="number"
+                            onWheel={(e) => { (e.target as HTMLInputElement).blur() }}
+                            onKeyDown={validateAmounts}
+                            onChange={(v)=> handleOnRowChange(index, "quantity", v.target.value, true)}
+                        />
                     </TableCell>
-                    <TableCell className="text-end border-r border-color">{row.vat_amount}</TableCell>
+                    <TableCell className="border-r border-color text-center">{row.vat_amount}</TableCell>
                     <TableCell className="text-end border-r border-color">{row.total ?? 0.00}</TableCell>
                 </TableRow>
             ))
@@ -96,7 +131,7 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             </TableCell>
             <TableCell className="w-2/12">
                 <div className="flex flex-row justify-end">
-                    <span className="test-sm">0.00</span>
+                    <span className="test-sm">{calculatedTotals.subtotal}</span>
                 </div>
             </TableCell>
         </TableRow>
@@ -113,7 +148,9 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                         name="discount"
                         value={discount}
                         type="number"
-                        onChange={(e)=> handleDiscountChange(e)}
+                        min={1}
+                        onKeyDown={validateAmounts}
+                        onChange={(e)=> setDiscount(e.target.value)}
                         className="w-1/2"/>
                 </div>
             </TableCell>
@@ -127,7 +164,7 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             </TableCell>
             <TableCell className="w-2/12">
                 <div className="flex flex-row justify-end">
-                    <span className="test-sm">0.00</span>
+                    <span className="test-sm">{calculatedTotals.vat}</span>
                 </div>
             </TableCell>
         </TableRow>
@@ -135,12 +172,12 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             <TableCell className="border-r border-color w-1/12"></TableCell>
             <TableCell colSpan={5} className="border-r border-color w-9/12">
                 <div className="flex flex-row justify-end">
-                    <span className="text-sm">Invoice Total ZIG	</span>
+                    <span className="text-sm">Invoice Total ({currencyCode})</span>
                 </div>
             </TableCell>
             <TableCell className="w-2/12">
                 <div className="flex flex-row justify-end">
-                    <span className="test-sm">0.00</span>
+                    <span className="test-sm">{calculatedTotals.total}</span>
                 </div>
             </TableCell>
         </TableRow>
