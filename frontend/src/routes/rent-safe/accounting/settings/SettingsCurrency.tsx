@@ -6,37 +6,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSetCurrencySettings } from "@/hooks/apiHooks/useCurrencySettings"
-import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies"
 import useCurrencySettings from "@/hooks/components/useCurrencySettings"
-import { getCurrentDate, validateAmounts } from "@/lib/utils"
-import { isAxiosError } from "axios"
+import { validateAmounts } from "@/lib/utils"
 import { Send } from "lucide-react"
-import { useEffect } from "react"
-import { toast } from "sonner"
 
 function SettingsCurrency() {
   const {
-    loading,
     currencies,
-    defaultCurrency,
-    setDefaultCurrency,
-    setCurrencies,
+    currencyLoading,
+    loading,
+    currencySetting,
+    handleOnChange,
     handleSubmit
   } = useCurrencySettings()
   const setCurrencySettings = useSetCurrencySettings()
-  const {currencyData, currencyLoading, currencyError} = useGetCurrencies()
-
-  useEffect(()=>{
-    if(isAxiosError(currencyError)){
-      const m = currencyError.response?.data.error ?? currencyError.response?.data.details ?? "Something went wrong"
-      toast.error("Error fetching currencies", {description : m})
-    } 
-    if(currencyData){
-      const id = currencyData.find((c)=> c.currency_code === "ZWL")?.id
-      setCurrencies(currencyData)
-      setDefaultCurrency(String(id))
-    }
-  },[currencyData, currencyError])
 
   return (
     <div>
@@ -47,7 +30,12 @@ function SettingsCurrency() {
             <div className="w-1/7 flex">
               <span className="self-center text-sm">Base Currency</span>
             </div>
-            <Select name="baseCurrency" key={defaultCurrency} defaultValue={defaultCurrency}>
+            <Select
+              name="baseCurrency"
+              key={currencySetting.baseCurrencyID}
+              value={String(currencySetting.baseCurrencyID)}
+              onValueChange={(v)=> handleOnChange("baseCurrencyID", v)}
+              >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select ..." />
               </SelectTrigger>
@@ -76,7 +64,11 @@ function SettingsCurrency() {
                   <div className="form-group">
                     <Label className="text-sm text-gray-400 required">Currency</Label>
                   </div>
-                  <Select name="current" required>
+                  <Select name="current" 
+                    value={currencySetting.currentID}
+                    required
+                    onValueChange={(value)=>handleOnChange("currentID", value)}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select ..." />
                     </SelectTrigger>
@@ -102,6 +94,8 @@ function SettingsCurrency() {
                   <Input
                     type= "number"
                     step={0.01}
+                    value={currencySetting.currentRate}
+                    onChange={(e)=>handleOnChange("currentRate", e.target.value)}
                     onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
                     onKeyDown={validateAmounts}
                     required
@@ -114,7 +108,7 @@ function SettingsCurrency() {
                     <Label className="text-sm text-gray-400">Date</Label>
                   </div>
                   <Input
-                    defaultValue={getCurrentDate()}
+                    defaultValue={currencySetting.baseDate}
                     readOnly
                     name = "date"
                     className="w-full"

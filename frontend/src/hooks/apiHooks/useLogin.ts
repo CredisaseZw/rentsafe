@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import apis from "@/api/axios";
 
-interface AuthProps {
+export interface AuthProps {
    username: string;
    password: string;
 }

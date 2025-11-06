@@ -36,28 +36,15 @@ class PropertyViewSet(BaseViewSet):
 
     permission_classes = [permissions.IsAuthenticated]
 
-    # Optimize database queries to prevent N+1 issues
-    queryset = (
-        Property.objects.select_related("property_type")
-        .prefetch_related("units", "landlords", "addresses", "documents", "notes")
-        .all()
-        .order_by("-date_created")
-    )
-
     def get_queryset(self):
         user_client = self.request.user.client
-        search = self.request.query_params.get("search", None)
-
         queryset = (
-            super()
-            .get_queryset()
-            .filter(
-                Q(managing_client=user_client)
-                | Q(managing_client__isnull=True, created_by__client=user_client)
-            )
+            Property.objects.filter(managing_client=user_client)
+            .prefetch_related("units", "landlords", "addresses", "documents", "notes")
+            .all()
+            .order_by("-date_created")
         )
-
-        if search:
+        if search := self.request.query_params.get("search", None):
             queryset = queryset.filter(
                 Q(name__icontains=search)
                 | Q(description__icontains=search)

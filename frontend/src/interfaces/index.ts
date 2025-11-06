@@ -1,4 +1,4 @@
-import type { Tenant } from "@/types";
+import type {  Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -430,4 +430,10 @@ export interface LeaseResponse {
   is_rent_variable: boolean;
   managing_client: number;
   lease_tenants: number[];
+}
+
+export interface Response {
+   count : number
+   next : string | undefined
+   previous : string | undefined
 }

@@ -733,3 +733,22 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
             return create_lease_with_dependencies(validated_data, user)
         except Exception as e:
             raise serializers.ValidationError(f"Lease creation failed: {str(e)}")
+
+    def update(self, instance, validated_data):
+        from apps.leases.utils.helpers import update_lease_with_dependencies
+
+        try:
+            if address_data := validated_data.pop("address_data", None):
+                address_data = process_address_data(address_data)
+                validated_data["address_data"] = address_data
+
+            # Get user from context
+            user = (
+                self.context.get("request").user
+                if self.context.get("request")
+                else None
+            )
+
+            return update_lease_with_dependencies(instance, validated_data, user)
+        except Exception as e:
+            raise serializers.ValidationError(f"Lease update failed: {str(e)}")

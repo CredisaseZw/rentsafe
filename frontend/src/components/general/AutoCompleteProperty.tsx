@@ -4,20 +4,25 @@ import { Loader2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchProperty from "@/hooks/apiHooks/useSearchProperty";
 import type { Property } from "@/types";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { handleAxiosError } from "@/lib/utils";
 
 interface Props {
   searchItem: string;
   onSelectValue?: (item: Property) => void;
   setSearchItem: Dispatch<SetStateAction<string>>;
-  alternativeOption? : ()=> void;
+  alternativeOption?: () => void;
 }
 
-function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, alternativeOption }: Props) {
+function AutoCompleteProperty({
+  searchItem,
+  setSearchItem,
+  onSelectValue,
+  alternativeOption,
+}: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
@@ -26,18 +31,10 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
 
   const { data, isLoading, error } = useSearchProperty(
     debouncedSearch,
-    !!debouncedSearch
+    hasUserInteracted && !!debouncedSearch
   );
 
-  useEffect(() => {
-    if (error && isAxiosError(error)) {
-      console.error(error);
-      toast.error("Failed to fetch suburbs", {
-        description: error.response?.data.error || error.response?.data.details || "Something went wrong",
-      });
-    }
-  }, [error]);
-
+  useEffect(() => {handleAxiosError("Failed to fetch properties", error)}, [error]);
 
   return (
     <div className="form-group relative">
@@ -49,6 +46,7 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
         value={searchItem}
         onChange={(e) => {
           const { value } = e.target;
+          setHasUserInteracted(true);
           setSearchItem(value);
           setOpen(!!value);
         }}
@@ -68,17 +66,20 @@ function AutoCompleteProperty({ searchItem, setSearchItem, onSelectValue, altern
           ) : !data?.results?.length ? (
             <div className="p-4 text-gray-800 dark:text-white text-center flex flex-col items-center">
               No results found
-              <Button 
+              <Button
                 size={"sm"}
                 type="button"
                 variant={"outline"}
                 className="mt-2"
-                onMouseDown={(e) => e.preventDefault()} 
-                onClick={()=> {
-                  setOpen(false)
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setOpen(false);
                   alternativeOption?.();
-                }}>Use Primary Tenants Address</Button>
-              </div>
+                }}
+              >
+                Use Primary Tenants Address
+              </Button>
+            </div>
           ) : (
             data.results.slice(0, 7).map((item: Property) => {
               const fullname = item.name?.trim() || "";

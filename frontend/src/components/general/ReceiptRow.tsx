@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { Lease, PaymentMethod, ReceiptLease } from '@/types'
+import type { Cashbook, Lease, PaymentMethod, ReceiptLease } from '@/types'
 import Fieldset from './Fieldset'
 import ColumnsContainer from './ColumnsContainer'
 import { Label } from '../ui/label'
@@ -16,9 +16,12 @@ import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
 import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import LoadingIndicator from './LoadingIndicator'
 
 interface props {
     index: number,
+    isCBLoading : Boolean
+    cashbooks : Cashbook[]
     paymentMethods : PaymentMethod[] | null,
     lease : ReceiptLease
     updateReceipt : (index: number, key: string, value: any,updateRent? : boolean ) => void;
@@ -27,7 +30,7 @@ interface props {
     checkReceipt : (lease_id: string) => boolean;
 }
 
-export default function ReceiptRow({paymentMethods, index, lease, updateReceipt, onSelectLease, removeReceipt, checkReceipt} :props) {
+export default function ReceiptRow({paymentMethods, index, lease, cashbooks, isCBLoading,updateReceipt, onSelectLease, removeReceipt, checkReceipt} :props) {
     const [rent, setRent] = useState<string | undefined>("");
     useEffect(() => {
         if (!lease.amount || lease.amount.length === 0) {
@@ -82,13 +85,58 @@ export default function ReceiptRow({paymentMethods, index, lease, updateReceipt,
                     </Select>
                 </div>
                 <div className='form-group'>
+                    <Label>Cash Book</Label>
+                    <Select
+                        name={`cashbook_${index}`}
+                        key={cashbooks.length}
+                        >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select ..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {
+                                isCBLoading &&
+                                <div className='flex w-full justify-center items-center'>
+                                    <LoadingIndicator/>
+                                </div>
+                            }
+                            {   cashbooks.length !== 0 &&
+                                cashbooks?.map((c) => (
+                                    <SelectItem value={String(c.id)} key={c.id}>
+                                        {c.cashbook_name}
+                                    </SelectItem>
+                                ))
+                            }
+                        </SelectContent>
+                    </Select>
+                </div>
+                
+                <div className='form-group'>
                     <Label className=''>Receipt No.</Label>
                     <Input
                         name={`receipt_${index}`}
                     />
                 </div>
-                <div className='form-group'>
-                    <Label className='required'>Received Amount</Label>
+            </ColumnsContainer>
+            <div className='form-group mt-5'>
+                <Label className='required'>Received Amount</Label>
+                <Input
+                    required
+                    type="number"
+                    readOnly = {lease.is_rent_variable === true}
+                    step={0.01}
+                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                    onKeyDown={validateAmounts}
+                    name={`received_${index}`}
+                    value={lease.amount ?? ""}
+                    onChange={(e) => updateReceipt(index, "amount", e.target.value, true)}
+                    />
+            </div>
+            {
+                lease.is_rent_variable === true &&
+                <ColumnsContainer numberOfCols={2} marginClass='mt-6' gapClass='gap-6'>
+                    <div className='form-group'>
+                    <Label className='required'>Rent</Label>
                    <Input
                         required
                         type="number"
@@ -96,11 +144,25 @@ export default function ReceiptRow({paymentMethods, index, lease, updateReceipt,
                         onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         onKeyDown={validateAmounts}
                         name={`received_${index}`}
-                        value={lease.amount ?? ""}
-                        onChange={(e) => updateReceipt(index, "amount", e.target.value, true)}
+                        value={lease.rent ?? ""}
+                        onChange={(e) => updateReceipt(index, "rent", e.target.value, true)}
                         />
                 </div>
-            </ColumnsContainer>
+                <div className='form-group'>
+                    <Label className='required'>OPC</Label>
+                   <Input
+                        required
+                        type="number"
+                        step={0.01}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                        onKeyDown={validateAmounts}
+                        name={`received_${index}`}
+                        value={lease.opc ?? ""}
+                        onChange={(e) => updateReceipt(index, "opc", e.target.value, true)}
+                        />
+                </div>
+                </ColumnsContainer>
+            }
             <div className='form-group mt-6'>
                 <Label>Description</Label>
                 <Textarea name = {"description"}></Textarea>

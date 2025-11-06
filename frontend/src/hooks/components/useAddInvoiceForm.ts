@@ -1,14 +1,11 @@
 import type { BranchFull, IndividualMinimal } from "@/interfaces";
-import type { Currency, InvoicePreview } from "@/types";
-import { useState } from "react";
-import { toast } from "sonner";
+import type { InvoicePreview } from "@/types";
+import { useRef, useState } from "react";
 
 export default function useAddInvoiceForm(){
   const [searchItem, setSearchItem] = useState("");
-  const [currencies, setCurrencies] = useState<Currency[]>([])
-  const [currency, setCurrency] = useState<Currency>()
-  const [discount, setDiscount] = useState(0.00)
-  const [rows, setRows] = useState<InvoicePreview[]>([{} as InvoicePreview])
+  const rowsRef = useRef<{getRows: () => InvoicePreview[]}>(null)
+
   const [formData, setFormData] = useState({
       biller_id : Number(""),
       biller_name : "",
@@ -32,36 +29,20 @@ export default function useAddInvoiceForm(){
       return
   }
 
-  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
+  const onSave = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const rows = rowsRef.current ? rowsRef.current.getRows() : [];
+    console.log(rows)
+  }
 
-    if (value > 0) {
-      toast.info("Discount should be input as a negative value");
-    }
-
-    setDiscount(value);
-  };
-
-  const AddInvoiceRow = () => setRows((prev) => [...prev, {} as InvoicePreview]);
-  const RemoveInvoiceRow = (index: number) => {
-    if (rows.length === 1) return;
-    setRows((prev) => prev.filter((_, i) => i !== index));
-  };
-  
+ 
   return { 
-    currency,
     formData,
     searchItem,
-    currencies,
-    discount,
-    rows,
+    rowsRef,
+    onSave,
     setFormData,
     setSearchItem,
     onSelectBiller,
-    setCurrency,
-    setCurrencies,
-    handleDiscountChange,
-    AddInvoiceRow,
-    RemoveInvoiceRow
   }
 }

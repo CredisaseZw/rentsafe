@@ -33,10 +33,6 @@ function useInternalUsers() {
    const openModal = () => setModalVisible(true);
    const closeModal = () => setModalVisible(false);
 
-   const handleUserSearch = (searchValue: string) => {
-      console.log(searchValue);
-   };
-
    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setAddInternalUsersFormData((prev) => ({
          ...prev,
@@ -48,7 +44,6 @@ function useInternalUsers() {
       addInternalUsersFormData,
       modalVisible,
       headers,
-      handleUserSearch,
       openModal,
       closeModal,
       onChangeHandler,

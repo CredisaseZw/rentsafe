@@ -3,9 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import type {  SuburbPayload } from "@/types";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import useSearchSuburb from "@/hooks/apiHooks/useSearchSuburb";
+import { handleAxiosError } from "@/lib/utils";
 
 interface Props {
   searchItem: string;
@@ -27,14 +26,7 @@ function AutoCompleteSuburb({ searchItem, setSearchItem, onSelectValue }: Props)
     !!debouncedSearch
   );
 
-  useEffect(() => {
-    if (error && isAxiosError(error)) {
-      console.error(error);
-      toast.error("Failed to fetch suburbs", {
-        description: error.response?.data.error || error.response?.data.details || "Something went wrong",
-      });
-    }
-  }, [error]);
+  useEffect(() => {handleAxiosError("Failed to fetch suburbs", error)}, [error]);
 
   return (
     <div className="form-group relative">

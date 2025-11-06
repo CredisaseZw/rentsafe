@@ -1,6 +1,5 @@
-import { getCurrentDate } from "@/lib/utils";
+import { getCurrentDate, handleAxiosError } from "@/lib/utils";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import { useState } from "react"
 import { toast } from "sonner";
 
@@ -30,12 +29,7 @@ export default function useRenewLease(
                 toast.success("Lease renewed successfully");
                 setOpen(false);
             },
-            onError : (error)=>{
-                if(isAxiosError(error)){
-                    const message = error.response?.data.error ?? error.response?.data.details ?? "Something went wrong";
-                    toast.error("Renewal Error", {description : message});
-                }
-            },
+            onError : (error)=>{handleAxiosError("Renewal Error", error);},
             onSettled : ()=> setLoading(false)
         })
     }

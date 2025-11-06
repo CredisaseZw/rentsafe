@@ -1,6 +1,6 @@
 import type { BranchPayload } from "@/interfaces/form-payloads";
 import React from "react";
-import { extractAddresses, extractContacts } from "@/lib/utils";
+import { extractAddresses, extractContacts, getFormDataObject } from "@/lib/utils";
 import useCreateBranch from "../apiHooks/useCreateBranch";
 
 export default function useBranchForm() {
@@ -9,8 +9,7 @@ export default function useBranchForm() {
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const data = Object.fromEntries(formData.entries());
+      const data = getFormDataObject(event);
 
       const branchPayload: BranchPayload = {
          company: parseInt(data.companyId as string),
