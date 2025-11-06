@@ -132,7 +132,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
 class ItemViewSet(BaseCompanyViewSet):
     serializer_class = SalesItemSerializer
     queryset = SalesItem.objects.all()
-    search_fields = ["name", "unit_name", "item_id"]
+    search_fields = ["name", "^unit_name", "=item_id"]
 
 
 class VATSettingViewSet(BaseViewSet):
