@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label"
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { IN_LEASE_CLIENT_TYPES } from "@/constants"
+import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
 import { getCurrentDate } from "@/lib/utils"
@@ -16,18 +16,12 @@ interface props {
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
     onSelectBiller: (item: IndividualMinimal | BranchFull) => void;
     isRep?: boolean
+    isType?: boolean
 }
-function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem, onSelectBiller}: props) {
+function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSearchItem, onSelectBiller}: props) {
   return (
     <ColumnsContainer numberOfCols={2} gapClass="gap-5">
         <div className="flex flex-col gap-5">
-            <div className="flex flex-row justify-between">
-                <Label className="text-gray-800 dark:text-white">Document Number</Label>
-                    <Input
-                        className="w-[400px]"
-                        name="documentNumber"
-                    />
-            </div>
             <div className=" flex flex-row justify-between">
                 <Label className='text-gray-800 dark:text-white'>Bill To</Label>
                 <div className="flex flex-row gap-5">
@@ -62,43 +56,16 @@ function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem,
                     />
                 </div>
             </div>
+          
             <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">Address</Label>
+                <Label className="text-gray-800 dark:text-white">Discount</Label>
                 <Input
                     className="w-[400px]"
-                    name="address"
-                />
-            </div>
-            <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">Phone</Label>
-                <Input
-                    className="w-[400px]"
-                    name="phone"
+                    name="number"
                 />
             </div>
         </div>
         <div className="flex flex-col gap-5">
-            <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">Email</Label>
-                <Input
-                    className="w-[400px]"
-                    name="email"
-                />
-            </div>
-            <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">VAT No</Label>
-                <Input
-                    className="w-[400px]"
-                    name="vatNo"
-                />
-            </div>
-            <div className="flex flex-row gap-5 justify-between">
-                <Label className="text-gray-800 dark:text-white">Tin Number</Label>
-                <Input
-                    className="w-[400px]"
-                    name="tinNumber"
-                />
-            </div>
             {
                 isRep &&
                 <div className="flex flex-row gap-5 justify-between">
@@ -107,6 +74,26 @@ function InvoiceHeader({isRep, formData, searchItem, setFormData, setSearchItem,
                         className="w-[400px]"
                         name="rep"
                     />
+                </div>
+            }
+            {
+                isType &&
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800">Invoice Type</Label>                   
+                    <Select   
+                        defaultValue={INVOICE_TYPES[0].value}
+                        required
+                        name='invoiceType'
+                    >
+                        <SelectTrigger className='w-[400px]'>
+                            <SelectValue placeholder= "Select ..."></SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {INVOICE_TYPES.map((i, idx)=>(
+                                <SelectItem key={idx} value={i.value}>{i.label}</SelectItem>
+                            ))}                       
+                        </SelectContent>
+                    </Select>
                 </div>
             }
             <div className="flex flex-row gap-5 justify-between">

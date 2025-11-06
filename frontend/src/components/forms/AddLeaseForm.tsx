@@ -232,14 +232,7 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                                 {property_type.name}
                               </SelectItem>
                             ))}
-                          {!propertyType && isLoading && (
-                            <SelectItem
-                              value={property_type.name || ""}
-                              key={property_type.id}
-                            >
-                              {property_type.name}
-                            </SelectItem>
-                          ))}
+                      
                         {!propertyType && isLoading && (
                           <SelectItem
                             disabled
@@ -260,7 +253,8 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                   </div>
                 </ColumnsContainer>
 
-                {addressState === "client" && (
+                {
+                addressState === "client" && (
                   <ColumnsContainer numberOfCols={3}>
                     <div className="form-group">
                       <Label className="px-2 font-normal" htmlFor="streetAddress">
@@ -329,8 +323,9 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                       />
                     </div>
                   </ColumnsContainer>
-
-                  {addressState === "client" && (
+                  )}
+                  {
+                    addressState === "client" && (
                     <ColumnsContainer numberOfCols={3}>
                       <div className="form-group">
                         <Label className="px-2 font-normal" htmlFor="streetAddress">

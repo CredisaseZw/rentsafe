@@ -15,7 +15,7 @@ export default function useDelete({mutationFunc, keyStore, value }: Delete) {
     mutationFn: () => mutationFunc(),
     onSuccess: () => {
         const PAGE = Number(searchParams.get("page") || 1)
-        queryClient.invalidateQueries({ queryKey: [keyStore, PAGE] })
+        queryClient.invalidateQueries({ queryKey: typeof(keyStore) === "string" ? [keyStore, PAGE] : keyStore })
         toast.success(`${value} deleted successfully`)
         setOpen(false)
     },

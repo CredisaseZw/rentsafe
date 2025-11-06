@@ -88,7 +88,8 @@ export const DELETION_LINKS = {
   SALES_CATEGORIES: "/api/accounting/sales-categories",
   ACCOUNT_SECTORS : "/api/accounting/account-sectors",
   CASH_BOOK : "/api/accounting/cash-books",
-  GENERAL_LEDGER : "/api/accounting/ledger-accounts"
+  GENERAL_LEDGER : "/api/accounting/ledger-accounts",
+  INVOICE : "/api/accounting/invoices"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -126,7 +127,12 @@ export const MINIMAL_TENANT_OBJECT: TenantSelection = {
   is_primary : false
 
 }
+export const INVOICE_TYPES: Option[] = [ 
+  { label: "FISCAL", value: "fiscal" },
+  { label: "PROFORMA", value: "proforma" },
+  { label: "RECURRING", value: "recurring" },
 
+];
 export const IN_LEASE_CLIENT_TYPES: Option[] = [
   { label: "Individual", value: "individual" },
   { label: "Company", value: "company" },
@@ -185,6 +191,7 @@ export const TENANT_STATEMENT_HEADERS: Header[] = [
   {name : "Date"},
   {name : "Description", textAlign : "left"},
   {name : "Reference"},
+  {name : "Cashbook Name"},
   {name : "Amount", textAlign: "end"},
   {name : "Balance", textAlign :"end"}
 ]
@@ -422,7 +429,10 @@ export const SALES_INVOICES_HEADERS :Header[]=[
   {name : "Date Created"},
   {name : "Customer"},
   {name : "Currency"},
-  {name : "Invoice Total", textAlign : "end"}
+  {name : "Invoice Total (Excluding VAT)"},
+  {name : "Invoice VAT Total"},
+  {name : "Invoice Total (Including VAT)", textAlign : "end"},
+  {name : "Actions"}
 ]
 
 export const CREDIT_NOTE_HEADERS :Header[]=[
@@ -627,3 +637,23 @@ export const CURRENCY_OPTIONS:Option[] = [
   { label: "Base Currency", value: "base_currency" },
   { label: "Secondary Currency", value: "secondary_currency" },
 ]
+
+export const MODES = {
+  FISCAL: "fiscal_invoices",
+  RECURRING: "recurring_invoices",
+  PROFORMA: "proforma_invoices",
+  CANCELLED: "cancelled_invoices",
+  PAID: "paid_invoices",
+  PENDING: "pending_invoices",
+  WITH_PAYMENTS: "invoice_with_payments"
+};
+
+export const MODE_PAGES = {
+  [MODES.FISCAL]: "fiscal_page",
+  [MODES.RECURRING]: "recurring_page",
+  [MODES.PROFORMA]: "proforma_page",
+  [MODES.CANCELLED]: "cancelled_page",
+  [MODES.PAID]: "paid_page",
+  [MODES.PENDING]: "pending_page",
+  [MODES.WITH_PAYMENTS]: "invoice_payments_page"
+};

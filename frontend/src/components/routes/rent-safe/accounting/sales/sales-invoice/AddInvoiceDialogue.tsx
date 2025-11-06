@@ -37,6 +37,7 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
                             setFormData={setFormData}
                             setSearchItem={setSearchItem}
                             searchItem={searchItem}
+                            isType
                             onSelectBiller={onSelectBiller}   
                         />
                         <div className="mt-10">

@@ -1,7 +1,7 @@
 import Button from '@/components/general/Button'
 import ButtonSpinner from '@/components/general/ButtonSpinner'
 import { Dialog, DialogTrigger, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import useDeleteCategory from '@/hooks/apiHooks/useDelete'
+import useDelete from '@/hooks/apiHooks/useDelete'
 import type { Delete } from '@/types'
 import { Trash } from 'lucide-react'
 
@@ -11,7 +11,7 @@ function DeleteDialogue({mutationFunc, keyStore, value, trigger }: Delete) {
     open,
     setOpen, 
     onHandleDelete
-  } = useDeleteCategory({mutationFunc, keyStore, value })
+  } = useDelete({mutationFunc, keyStore, value })
   return (
     <Dialog open = {open} onOpenChange={setOpen}>
         <DialogTrigger>
