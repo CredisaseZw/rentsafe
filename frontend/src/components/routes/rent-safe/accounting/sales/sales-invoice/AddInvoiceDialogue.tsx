@@ -1,9 +1,11 @@
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Send } from "lucide-react"
 import useAddInvoiceForm from "@/hooks/components/useAddInvoiceForm"
 import InvoiceHeader from "@/components/general/InvoiceHeader"
 import InvoiceTotalsTable from "@/components/general/InvoiceTotalsTable"
+import useCreateInvoice from "@/hooks/apiHooks/useCreateInvoice"
+import ButtonSpinner from "@/components/general/ButtonSpinner"
 
 interface props {
     title?: string | "Add Invoice"
@@ -11,18 +13,21 @@ interface props {
 
 function AddInvoiceDialogue({title = "Add Invoice"}: props) {
     const {
+        open,
         rowsRef,
+        loading,
         formData,
         searchItem,
         setFormData,
         setSearchItem,
         onSelectBiller,
-        onSave
+        setOpen,
+        onSave,
     } = useAddInvoiceForm()
-
+    const createInvoice = useCreateInvoice();
     return (
     <div>
-        <Dialog>
+        <Dialog open = {open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button >{title} <Plus/></Button>
             </DialogTrigger>
@@ -31,7 +36,7 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader> 
                 <div className="w-full">
-                    <form onSubmit={(e)=> onSave(e)}>
+                    <form onSubmit={(e)=> onSave(e, createInvoice)}>
                         <InvoiceHeader
                             formData={formData}
                             setFormData={setFormData}
@@ -44,10 +49,21 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
                            <InvoiceTotalsTable ref = {rowsRef}/>
                         </div>
                         <div className="mt-5 flex flex-row justify-end gap-5">
-                            <Button type="submit">Save</Button>
                             <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
+                                <Button
+                                    disabled = {loading} 
+                                    variant="ghost">Cancel</Button>
                             </DialogClose>
+                            <Button 
+                                disabled = {loading}
+                                type="submit">
+                                {
+                                    loading 
+                                    ? <ButtonSpinner/>
+                                    : <Send/>
+                                }
+                                Save
+                            </Button>
                         </div>
                     </form>
                 </div>

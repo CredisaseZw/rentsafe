@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -788,4 +788,37 @@ export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) => {
   const FORM_DATA = new FormData(e.currentTarget)
   const DATA = Object.fromEntries(FORM_DATA.entries())
   return DATA
+}
+
+export const validateInvoices = (rows:InvoicePreview[], formData:Record<string, any>) =>{
+  if (rows.length === 0) {
+    toast.error("Add at least one item to the invoice");
+    return true;
+  }
+
+  if (!formData.biller_id) {
+    toast.error("Select a biller for the invoice");
+    return true;
+  }
+
+  if (!formData.invoice_type) {
+    toast.error("Select an invoice type");
+    return true;
+  }
+
+  for (const [index, item] of rows.entries()) {
+    const salesItemId = Number(item.salesItem);
+    const quantity = Number(item.quantity);
+
+    if (!salesItemId || isNaN(salesItemId)) {
+      toast.error(`Invalid sales item at row ${index + 1}`);
+      return true;
+    }
+
+    if (!quantity || isNaN(quantity) || quantity <= 0) {
+      toast.error(`Invalid quantity at row ${index + 1}`);
+      return true;
+    }
+  }
+  return false
 }

@@ -148,7 +148,7 @@ const InvoiceTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                         name="discount"
                         value={discount}
                         type="number"
-                        min={1}
+                        min={0}
                         onKeyDown={validateAmounts}
                         onChange={(e)=> setDiscount(e.target.value)}
                         className="w-1/2"/>

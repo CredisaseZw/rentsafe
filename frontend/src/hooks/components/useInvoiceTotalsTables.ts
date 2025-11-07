@@ -49,6 +49,20 @@ function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>) {
     };
 
     const handleOnSelectItem = (item: SalesItem, index: number) => {
+        const isItemAlreadySelected = rows.some(
+            (row, i) => i !== index && row.salesItem === item.id
+        );
+
+        if (isItemAlreadySelected) {
+            toast.error("This item is already selected in another row");
+            return;
+        }
+
+        if (!item.id || !item.price || !item.tax_configuration_object) {
+            toast.error("Invalid item data");
+            return;
+        }
+
         setRows((prev) =>
             prev.map((row, i) =>
             i === index
@@ -56,13 +70,13 @@ function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>) {
                     ...row,
                     salesItem: item.id,
                     searchSalesItem: item.name,
-                    itemCode: item.sales_account_object.account_number,
-                    price: Number(item.price.replace("$", "")),
-                    vat_amount: Number(item.tax_configuration_object.rate),
+                    itemCode: item.sales_account_object?.account_number || '',
+                    price: Number(item.price.replace("$", "")) || 0,
+                    vat_amount: Number(item.tax_configuration_object?.rate) || 0,
                     total: Math.round(
-                    ((Number(item.tax_configuration_object.rate) / 100) *
-                        Number(item.price.replace("$", "")) +
-                        Number(item.price.replace("$", ""))) * 100
+                    ((Number(item.tax_configuration_object?.rate || 0) / 100) *
+                        Number(item.price.replace("$", "") || 0) +
+                        Number(item.price.replace("$", "") || 0)) * 100
                     ) / 100, 
                 }
                 : row
@@ -92,7 +106,8 @@ function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>) {
             const discountNum = Number(discountValue);
             if (isNaN(discountNum) || discountNum <= 0) return totalAmount;
             if (discountNum >= 100) return 0;
-            return totalAmount - (totalAmount * discountNum) / 100;
+            return totalAmount - discountNum
+            //return totalAmount - (totalAmount * discountNum) / 100;
         }
         setCalculatedTotals({
             subtotal: Math.round(subtotal * 100) / 100,

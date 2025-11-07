@@ -27,6 +27,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                     <Label className='text-gray-800 dark:text-white'>Bill To</Label>
                     <div className="flex flex-row gap-5">
                         <Select
+                            value={formData.biller_type}
                             onValueChange={(val: "individual" | "company") => {
                                 setSearchItem("")
                                 setFormData((prev) => ({
@@ -49,16 +50,52 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                             </SelectContent>
                         </Select>
                         <AutoCompleteClient
+                            displayValue='name'
                             isRequired = {false}
                             searchItem = {searchItem}
                             setSearchItem = {setSearchItem}
                             clientType = {formData.biller_type}
                             onSelectValue = {onSelectBiller}
                         />
-                    </div>
+                    </div> 
+                </div>
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800 dark:text-white">Address</Label>
+                    <Input
+                        className="w-[400px]"
+                        name="address"
+                    />
+                </div>
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800 dark:text-white">Phone</Label>
+                    <Input
+                        className="w-[400px]"
+                        name="phone"
+                    />
+                </div>
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800 dark:text-white">Email</Label>
+                    <Input
+                        className="w-[400px]"
+                        name="email"
+                    />
                 </div>
             </div>
             <div className="flex flex-col gap-5">
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800 dark:text-white">VAT No</Label>
+                    <Input
+                        className="w-[400px]"
+                        name="vatNo"
+                    />
+                </div>
+                <div className="flex flex-row gap-5 justify-between">
+                    <Label className="text-gray-800 dark:text-white">Tin Number</Label>
+                    <Input
+                        className="w-[400px]"
+                        name="tinNumber"
+                    />
+                </div>
                 {
                     isRep &&
                     <div className="flex flex-row gap-5 justify-between">
@@ -74,7 +111,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                     <div className="flex flex-row gap-5 justify-between">
                         <Label className="text-gray-800">Invoice Type</Label>                   
                         <Select   
-                            defaultValue={INVOICE_TYPES[0].value}
+                            value={formData.invoice_type}
                             required
                             name='invoiceType'
                             onValueChange={(v)=>{
@@ -95,14 +132,15 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                         </Select>
                     </div>
                 }
+                <div className='flex justify-end'>
+                    <div className="flex flex-row w-fit gap-5 justify-end mt-5">
+                        <Label className="text-gray-800 dark:text-white">Date:</Label>         
+                        <span className='text-sm'>{getCurrentDate()}</span>
+                    </div>
+                </div>
             </div>
         </ColumnsContainer>
-        <div className='flex justify-end'>
-            <div className="flex flex-row w-fit gap-5 justify-end mt-5">
-                <Label className="text-gray-800 dark:text-white">Date:</Label>         
-                <span className='text-sm'>{getCurrentDate()}</span>
-            </div>
-        </div>
+        
     </div>
   
   )

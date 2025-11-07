@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from "react-router";
 
 interface Props {
   index?: number;
+  displayValue?: "name" | "ID"
   clientLabel?: string;
   searchItem: string;
   clientType: string;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 function AutoCompleteClient({
+  displayValue = "ID",
   index,
   createClient,
   searchItem,
@@ -133,12 +135,16 @@ function AutoCompleteClient({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     if (onSelectValue) onSelectValue(item, index);
-                    if (setSearchItem)
-                      setSearchItem(
-                        clientType === "individual"
-                          ? identificationNumber || ""
-                          : clientName
-                      );
+                    if (setSearchItem){
+                      setSearchItem(()=>{
+                        if (clientType === "individual"){ 
+                          return displayValue === "ID" ? identificationNumber : clientName
+                        }
+                        return clientName
+                      });
+                      setHasUserInteracted(false)
+                    }
+                    
                     if (multiSetSearchItem)
                       multiSetSearchItem(
                         index ?? 0,

@@ -18,6 +18,7 @@ import { EllipsisVertical } from "lucide-react"
 import { RENTSAFE_PRE_SEG } from "@/constants/navlinks"
 import DeleteDialogue from "@/components/general/DeleteDialogue"
 import { Link } from "react-router"
+import MutateInvoiceStatus from "./MutateInvoiceStatus"
 
 function Invoices() {
   const MODE = MODES.FISCAL;
@@ -78,13 +79,31 @@ function Invoices() {
                       <EllipsisVertical size={18}/>
                     </PopoverTrigger>
                     <PopoverContent className="space-y-2">
-                      <Link to={`${RENTSAFE_PRE_SEG}${i.document_number}`} className="flex flex-row gap-3 justify-center items-center hover:text-green-600">
+                      <Link to={`${RENTSAFE_PRE_SEG}${i.document_number}`} className="flex flex-row gap-3 hover:text-green-600">
                         <span className="text-sm dark:text-white text-gray-600 ">View More</span>
                       </Link>
+                      <MutateInvoiceStatus 
+                        mode="MARK"
+                        invoiceID = {i.id}  
+                        documentNumber = {i.document_number}
+                      />
+                      <MutateInvoiceStatus 
+                        mode="CANCEL"
+                        invoiceID = {i.id}  
+                        documentNumber = {i.document_number}
+                      />
+                      {
+                        i.can_convert_to_fiscal &&
+                        <MutateInvoiceStatus 
+                          mode="CONVERT"
+                          invoiceID = {i.id}  
+                          documentNumber = {i.document_number}
+                        />
+                      }  
                       <DeleteDialogue
                         trigger = {
-                          <div className="flex flex-row gap-5">
-                            <span className="text-sm text-red-600">Delete</span>
+                          <div className="flex flex-row gap-5 cursor-pointer">
+                            <span className="text-sm text-red-600 text-center">Delete</span>
                           </div>
                         }
                         mutationFunc={()=> handleDeletion(DELETION_LINKS.INVOICE, i.id)}

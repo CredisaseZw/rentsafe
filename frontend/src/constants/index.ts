@@ -658,3 +658,22 @@ export const MODE_PAGES = {
   [MODES.PENDING]: "pending_page",
   [MODES.WITH_PAYMENTS]: "invoice_payments_page"
 };
+
+export const INVOICE_MUTATION_STATUSES = {
+  MARK:{
+    heading : "Mark Invoice as Paid?",
+    description : "This action will mark the invoice as paid. This cannot be undone.",
+    btnText : "Mark as Paid"
+  },
+  CANCEL: {
+    heading :  "Cancel Invoice?",
+    description : "This action will cancel the invoice. This cannot be undone.",
+    btnText : "Cancel Invoice"
+  },
+  CONVERT: {
+    heading :  "Convert Invoice from proforma to fiscal?",
+    description : "This action will convert the invoice from proforma. This cannot be undone.",
+    btnText : "Fiscalize Invoice"
+  },
+}
+
