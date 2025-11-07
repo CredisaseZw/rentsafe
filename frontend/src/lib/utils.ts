@@ -764,7 +764,7 @@ export const handleDeletion = async (prefixLink: string, id: number) => {
   return response.data
 }
 
-export const handleTrackChangedFields = (initial: any, payloadData: any) => {
+export const handleTrackChangedFields = (initial: any, payloadData: any, toastInfo = true) => {
   let changedData: any = payloadData
   changedData = Object.fromEntries(
     Object.entries(payloadData).filter(([key, value]) => {
@@ -777,10 +777,12 @@ export const handleTrackChangedFields = (initial: any, payloadData: any) => {
   )
   // No actual changes
   if (Object.keys(changedData).length === 0) {
-    toast.info("No changes made.")
+    if(toastInfo){
+      toast.info("No changes made.")
+    }
     return undefined;
   }
-
+  
   return changedData;
 }
 

@@ -7,18 +7,20 @@ import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
 import { getCurrentDate } from "@/lib/utils"
-import type { BranchFull, IndividualMinimal } from '@/interfaces'
+import type { Biller, BranchFull, IndividualMinimal } from '@/interfaces'
 
 interface props {
-    formData: Record<string, any>,
+    formData: Biller,
     searchItem: string;
-    setFormData: React.Dispatch<React.SetStateAction<{ biller_id: number; biller_name: string; biller_type: string; invoice_type : string}>>;
-    setSearchItem: React.Dispatch<React.SetStateAction<string>>;
-    onSelectBiller: (item: IndividualMinimal | BranchFull) => void;
     isRep?: boolean
     isType?: boolean
+    setFormData: React.Dispatch<React.SetStateAction<Biller>>;
+    setSearchItem: React.Dispatch<React.SetStateAction<string>>;
+    onSelectBiller: (item: IndividualMinimal | BranchFull) => void;
+    handleOnChangeFormData : (key:string, val: string) => void
 }
-function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSearchItem, onSelectBiller}: props) {
+
+function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSearchItem, onSelectBiller, handleOnChangeFormData}: props) {
   return (
     <div className='w-full'>
         <ColumnsContainer numberOfCols={2} marginClass='mt-0' gapClass="gap-5">
@@ -32,8 +34,13 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                                 setSearchItem("")
                                 setFormData((prev) => ({
                                     ...prev,
-                                    iller_id: 0,
+                                    biller_id: 0,
                                     biller_name: "",
+                                    biller_phone : "",
+                                    biller_email : "",
+                                    biller_address : "",
+                                    biller_vat_no : "",
+                                    biller_tin_number : "",
                                     biller_type: val,
                                 }));
                             }}
@@ -62,13 +69,18 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 <div className="flex flex-row gap-5 justify-between">
                     <Label className="text-gray-800 dark:text-white">Address</Label>
                     <Input
+                        onChange={(e)=> handleOnChangeFormData("biller_address", e.target.value)}
+                        value={formData.biller_address}
                         className="w-[400px]"
                         name="address"
+                        readOnly
                     />
                 </div>
                 <div className="flex flex-row gap-5 justify-between">
                     <Label className="text-gray-800 dark:text-white">Phone</Label>
                     <Input
+                        onChange={(e)=> handleOnChangeFormData("biller_phone", e.target.value)}
+                        value={formData.biller_phone}
                         className="w-[400px]"
                         name="phone"
                     />
@@ -76,6 +88,8 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 <div className="flex flex-row gap-5 justify-between">
                     <Label className="text-gray-800 dark:text-white">Email</Label>
                     <Input
+                        onChange={(e)=> handleOnChangeFormData("biller_email", e.target.value)}
+                        value={formData.biller_email}
                         className="w-[400px]"
                         name="email"
                     />
@@ -85,6 +99,8 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 <div className="flex flex-row gap-5 justify-between">
                     <Label className="text-gray-800 dark:text-white">VAT No</Label>
                     <Input
+                        onChange={(e)=> handleOnChangeFormData("biller_vat_no", e.target.value)}
+                        value={formData.biller_vat_no}
                         className="w-[400px]"
                         name="vatNo"
                     />
@@ -92,6 +108,8 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 <div className="flex flex-row gap-5 justify-between">
                     <Label className="text-gray-800 dark:text-white">Tin Number</Label>
                     <Input
+                        onChange={(e)=> handleOnChangeFormData("biller_tin_number", e.target.value)}
+                        value={formData.biller_tin_number}
                         className="w-[400px]"
                         name="tinNumber"
                     />
@@ -99,7 +117,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 {
                     isRep &&
                     <div className="flex flex-row gap-5 justify-between">
-                        <Label className="text-gray-800">Rep</Label>
+                        <Label className="text-gray-800 dark:text-white">Rep</Label>
                         <Input
                             className="w-[400px]"
                             name="rep"
@@ -109,12 +127,12 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 {
                     isType &&
                     <div className="flex flex-row gap-5 justify-between">
-                        <Label className="text-gray-800">Invoice Type</Label>                   
+                        <Label className="text-gray-800 dark:text-white">Invoice Type</Label>                   
                         <Select   
                             value={formData.invoice_type}
                             required
                             name='invoiceType'
-                            onValueChange={(v)=>{
+                            onValueChange={(v:"fiscal" | "proforma" | "recurring")=>{
                                 setFormData(p=>({
                                     ...p,
                                     invoice_type : v

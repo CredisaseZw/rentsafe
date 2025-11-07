@@ -1,23 +1,25 @@
-import type { BranchFull, IndividualMinimal } from "@/interfaces";
-import { getCurrentDate, handleAxiosError, validateInvoices } from "@/lib/utils";
+import type { Biller, BranchFull, IndividualMinimal } from "@/interfaces";
+import { formatAddress, getCurrentDate, handleAxiosError, handleTrackChangedFields, validateInvoices } from "@/lib/utils";
 import type { Invoice, InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import useClient from "../general/useClient";
 import { MODES } from "@/constants";
 import { toast } from "sonner";
+import {useTrackBiller} from "./useTrackBiller";
 
 export default function useAddInvoiceForm(){
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchItem, setSearchItem] = useState("");
   const queryClient = useClient();
+  const [billerCopy, setBillerCopy] = useState<any>(null);
   const rowsRef = useRef<{
     getRows: () => InvoicePreview[]
     getTotals : ()=> InvoiceTotals
   }>(null)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Biller>({
     biller_id : 0,
     biller_name : "",
     biller_type: "individual",
@@ -29,21 +31,31 @@ export default function useAddInvoiceForm(){
     invoice_type : "fiscal"
   })
 
-  const onSelectBiller = (item: IndividualMinimal | BranchFull)=>{
-    if ("first_name" in item) {
-      setFormData((prev) => ({
+  const onSelectBiller = (item: IndividualMinimal | BranchFull) => {
+    const isIndividual = "first_name" in item;
+
+    const BILLER = {
+      biller_id: isIndividual ? item.id : item.company.id,
+      biller_name: isIndividual
+        ? `${item.first_name} ${item.last_name}`
+        : item.company.registration_name,
+      biller_phone: item.phone ?? "",
+      biller_email: item.email ?? "",
+      biller_address: isIndividual
+        ? (item.primary_address ? formatAddress(item.primary_address) : "")
+        : item.summary_address ?? "",
+      biller_vat_no: item.account_data?.vat_number ?? "",
+      biller_tin_number: item.account_data?.tin_number ?? "",
+    };
+    setBillerCopy(BILLER);
+    setFormData((prev) => ({ ...prev, ...BILLER }));
+  };
+
+  const handleOnChangeFormData = (key:string, val: string)=>{
+    setFormData((prev)=>({
       ...prev,
-      biller_id: item.id,
-      biller_name: `${item.first_name} ${item.last_name}`,
-      }));
-      return;
-    }
-    setFormData((prev) => ({
-      ...prev,
-      biller_id: item.company.id,
-      biller_type: item.company.registration_name,
-    }));
-    return
+      [key] :  val
+    }))
   }
 
   const onSave = (
@@ -56,6 +68,18 @@ export default function useAddInvoiceForm(){
     const totals = rowsRef.current?.getTotals();
     if(validateInvoices(rows, formData)) return;
 
+    //setLoading(true)
+    const {biller_id, invoice_type, biller_type, ...BILLER} = formData
+    const isUpdated = useTrackBiller(
+      billerCopy,
+      BILLER, 
+      {
+        id : formData.biller_id,
+        type : formData.biller_type
+      });
+
+      console.log(isUpdated)
+/* 
     const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));
     const PayloadData = {
       invoice_type: formData.invoice_type,
@@ -75,7 +99,6 @@ export default function useAddInvoiceForm(){
       ), 
       mode
     }
-
     mutate.mutate(PAYLOAD,{
       onSuccess : (data: Invoice)=> {
         queryClient.invalidateQueries({queryKey : ["invoices", MODES[PayloadData.invoice_type.toUpperCase() as keyof typeof MODES]]});
@@ -89,7 +112,7 @@ export default function useAddInvoiceForm(){
       onError: (error)=> handleAxiosError(`Failed to ${mode  === "create" ? "create" : "update"} invoice`,error),
       onSettled: ()=> setLoading(false)
     })
-
+ */
   };
 
 
@@ -100,6 +123,7 @@ export default function useAddInvoiceForm(){
     formData,
     searchItem,
     rowsRef,
+    handleOnChangeFormData,
     setOpen,
     onSave,
     setFormData,

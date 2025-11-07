@@ -188,11 +188,17 @@ export interface BranchContact {
 export interface BranchFull {
    id: number;
    branch_name: string;
+   email?:string;
    phone? : string;
    is_headquarters: boolean;
    company: CompanyMinimal;
    contacts: BranchContact[];
+   summary_address? : string
    primary_address: Address ;
+   account_data? : {
+      vat_number?: string,
+      tin_number?: string,
+   }
 }
 export interface IndividualReport {
    employmentHistory: { employer: string; position: string; startDate: string }[];
@@ -225,12 +231,17 @@ export interface IndividualMinimal {
    first_name: string;
    last_name: string;
    identification_number: string;
+   email?: string
    addresses? : Address,
    primary_address? :Address,
    search_value? : string,
    phone? :string,
    contact_details?: IndividualContact[]
    is_active: boolean;
+   account_data? : {
+      vat_number?: string,
+      tin_number?: string,
+   }
 }
 export interface IndividualFull {
    id: number;
@@ -437,3 +448,14 @@ export interface Response {
    next : string | undefined
    previous : string | undefined
 }
+export interface Biller {
+  biller_id: number;
+  biller_name: string;
+  biller_type: "individual" | "company";
+  biller_phone: string;
+  biller_email: string;
+  biller_address: string;
+  biller_vat_no: string;
+  biller_tin_number: string;
+  invoice_type: "fiscal" | "proforma" | "recurring";
+};

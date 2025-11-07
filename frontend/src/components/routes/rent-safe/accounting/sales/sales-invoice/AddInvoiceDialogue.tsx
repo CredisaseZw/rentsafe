@@ -21,6 +21,7 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
         setFormData,
         setSearchItem,
         onSelectBiller,
+        handleOnChangeFormData,
         setOpen,
         onSave,
     } = useAddInvoiceForm()
@@ -39,11 +40,12 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
                     <form onSubmit={(e)=> onSave(e, createInvoice)}>
                         <InvoiceHeader
                             formData={formData}
-                            setFormData={setFormData}
-                            setSearchItem={setSearchItem}
                             searchItem={searchItem}
-                            isType
+                            handleOnChangeFormData={handleOnChangeFormData}
                             onSelectBiller={onSelectBiller}   
+                            setSearchItem={setSearchItem}
+                            setFormData={setFormData}
+                            isType
                         />
                         <div className="mt-5">
                            <InvoiceTotalsTable ref = {rowsRef}/>
