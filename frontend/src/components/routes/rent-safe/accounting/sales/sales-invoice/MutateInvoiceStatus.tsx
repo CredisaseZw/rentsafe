@@ -11,19 +11,25 @@ AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { INVOICE_MUTATION_STATUSES } from "@/constants"
 import useMutateInvoiceStatus from "@/hooks/components/useMutateInvoiceStatus"
+import useInvoiceMutations from "@/hooks/apiHooks/useInvoiceMutations"
+import ButtonSpinner from "@/components/general/ButtonSpinner"
 
 interface props {
     mode : string,
     invoiceID: number,
+    invoiceMode : string
     documentNumber : string
 }
 
-function MutateInvoiceStatus({ invoiceID, documentNumber, mode}: props) {
+function MutateInvoiceStatus({ invoiceID, documentNumber, mode, invoiceMode}: props) {
     const INFO = INVOICE_MUTATION_STATUSES[mode as keyof typeof INVOICE_MUTATION_STATUSES]
     const {
         open,
-        setOpen
-    } = useMutateInvoiceStatus(invoiceID);
+        loading,
+        setOpen,
+        handleMarkInvoice
+    } = useMutateInvoiceStatus(invoiceID, mode, invoiceMode);
+    const mutateInvoice = useInvoiceMutations();
 
     return (
         <AlertDialog open = {open} onOpenChange={setOpen}>
@@ -38,8 +44,14 @@ function MutateInvoiceStatus({ invoiceID, documentNumber, mode}: props) {
                     <AlertDialogDescription className="text-gray-600 dark:text-white">{INFO.description}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="mt-5">
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <Button>{INFO.btnText}</Button>
+                    <AlertDialogCancel disabled = {loading}>Cancel</AlertDialogCancel>
+                    <Button disabled = {loading} onClick={()=> handleMarkInvoice(mutateInvoice)}>
+                        {
+                            loading 
+                            ? <ButtonSpinner/>
+                            : INFO.btnText
+                        }
+                    </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

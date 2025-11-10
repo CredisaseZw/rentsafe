@@ -79,7 +79,6 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
         id : Number(formData.biller_id),
         data : UPDATE
       }
-      console.log(payload_)
       updateBiller?.mutate(payload_);
     }
 

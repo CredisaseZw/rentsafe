@@ -20,12 +20,10 @@ function AddCashbookForm({initial, successCallback}:props) {
     const {
         generalLedgerAccounts,
         generalLedgersLoading,
-        pagination,
         currencies,
         currency,
         loading,
         currencyLoading,
-        handleLoadMoreGLS,
         handleSubmit,
     } = useAddCashbookForm(initial, successCallback)
     const createCashBook = useCreateCashbook()
@@ -131,15 +129,6 @@ function AddCashbookForm({initial, successCallback}:props) {
                             generalLedgerAccounts.length === 0 && 
                             !!generalLedgersLoading && 
                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
-                        }
-                        {
-                            generalLedgerAccounts.length !== 0 && 
-                            pagination?.next &&
-                            <div className="flex justify-center p-2">
-                                <Button variant="ghost" onClick={handleLoadMoreGLS}>
-                                Load More
-                                </Button>
-                            </div>
                         }
                     </SelectContent>
                 </Select>

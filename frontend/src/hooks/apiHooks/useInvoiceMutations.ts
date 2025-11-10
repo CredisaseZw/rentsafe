@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 
-interface InvoiceMutationParams {
+export interface InvoiceMutationParams {
     id: number;
     mode: string;
 }

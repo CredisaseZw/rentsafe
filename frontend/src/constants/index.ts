@@ -663,17 +663,22 @@ export const INVOICE_MUTATION_STATUSES = {
   MARK:{
     heading : "Mark Invoice as Paid?",
     description : "This action will mark the invoice as paid. This cannot be undone.",
-    btnText : "Mark as Paid"
+    btnText : "Mark as Paid",
+    successMessage : "Invoice successfully marked as paid"
   },
   CANCEL: {
     heading :  "Cancel Invoice?",
     description : "This action will cancel the invoice. This cannot be undone.",
-    btnText : "Cancel Invoice"
+    btnText : "Cancel Invoice",
+    successMessage : "Invoice successfully cancelled"
+
   },
   CONVERT: {
     heading :  "Convert Invoice from proforma to fiscal?",
     description : "This action will convert the invoice from proforma. This cannot be undone.",
-    btnText : "Fiscalize Invoice"
+    btnText : "Fiscalize Invoice",
+    successMessage : "Invoice successfully fiscalized"
+
   },
 }
 

@@ -84,11 +84,13 @@ function Invoices() {
                       </Link>
                       <MutateInvoiceStatus 
                         mode="MARK"
+                        invoiceMode={MODE}
                         invoiceID = {i.id}  
                         documentNumber = {i.document_number}
                       />
                       <MutateInvoiceStatus 
                         mode="CANCEL"
+                        invoiceMode={MODE}
                         invoiceID = {i.id}  
                         documentNumber = {i.document_number}
                       />
@@ -96,6 +98,7 @@ function Invoices() {
                         i.can_convert_to_fiscal &&
                         <MutateInvoiceStatus 
                           mode="CONVERT"
+                          invoiceMode={MODE}
                           invoiceID = {i.id}  
                           documentNumber = {i.document_number}
                         />
