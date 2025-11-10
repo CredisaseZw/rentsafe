@@ -34,11 +34,23 @@ export default function useInvoicesFilter() {
     setSearchParams(newParams)
   }
 
+  const onClearFilter = () => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      if (params.get("search")) params.delete("search");
+      if (params.get("status")) params.delete("status");
+      if (params.get("year")) params.delete("year");
+      if (params.get("month")) params.delete("month");
+      return params;
+    });
+  };
+
   return {
     filterPayload,
     open,
     setOpen,
     applyFilters,
     handleOnFilterChange,
+    onClearFilter
   }
 }

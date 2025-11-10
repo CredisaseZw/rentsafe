@@ -1,11 +1,11 @@
 import type { Biller } from "@/interfaces";
-import { handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
-import { api } from "@/api/axios";
-import { useMutation } from "@tanstack/react-query";
+import { handleTrackChangedFields } from "@/lib/utils";
 
-export function useTrackBiller(billerCopy: Biller, BILLER:any, billerInfo : {id: number, type:  "individual" | "company"}) {
+export function useTrackBiller(
+    billerCopy: Biller,
+    BILLER:any,
+  ) {
     let UPDATE = undefined
-    let isUpdated = false;
     const changed = handleTrackChangedFields(billerCopy, BILLER, false);
     
     if (changed) {
@@ -21,21 +21,8 @@ export function useTrackBiller(billerCopy: Biller, BILLER:any, billerInfo : {id:
         ...(Object.keys(account_data).length > 0 ? { account_data } : {}),
       };
     }
-
-    if(UPDATE){
-        const {mutate} = useMutation({
-            mutationFn : async() =>{
-                const URL  = billerInfo.type === "individual" 
-                ? `/api/individuals/${billerInfo.id}/`
-                :  `/api/branches/${billerInfo.id}/`
-
-                const response = await api.patch(URL, UPDATE)
-                return response.data;
-            },
-            onSuccess: ()=> isUpdated = true,
-            onError: (error) => handleAxiosError("Failed to update biller", error), 
-        });
-        mutate();
+    
+    return {
+      UPDATE, 
     }
-    return isUpdated
 }

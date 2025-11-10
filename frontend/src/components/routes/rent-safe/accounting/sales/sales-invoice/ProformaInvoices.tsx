@@ -46,7 +46,9 @@ function ProformaInvoices() {
             <InvoicesFilter/>
           </div>
            <div className="self-center">
-            <AddInvoiceDialogue/>
+            <AddInvoiceDialogue 
+              defaultInvoiceType= "proforma"
+            />
           </div>
         </div>
      </ColumnsContainer>

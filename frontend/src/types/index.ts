@@ -560,7 +560,7 @@ export type Delete = {
    trigger?: React.ReactNode
 };
 export type Payload = {
-   mode: "update" | "create",
+   mode: "update" | "create" | string,
    id?: number
    data: any
 }

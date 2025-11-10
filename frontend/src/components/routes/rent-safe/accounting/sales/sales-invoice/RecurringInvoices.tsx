@@ -48,7 +48,9 @@ function RecurringInvoices() {
             <InvoicesFilter/>
           </div>
            <div className="self-center">
-            <AddInvoiceDialogue/>
+            <AddInvoiceDialogue
+              defaultInvoiceType="recurring"
+            />
           </div>
         </div>
      </ColumnsContainer>

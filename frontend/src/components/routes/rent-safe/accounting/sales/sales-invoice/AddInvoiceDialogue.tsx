@@ -6,26 +6,30 @@ import InvoiceHeader from "@/components/general/InvoiceHeader"
 import InvoiceTotalsTable from "@/components/general/InvoiceTotalsTable"
 import useCreateInvoice from "@/hooks/apiHooks/useCreateInvoice"
 import ButtonSpinner from "@/components/general/ButtonSpinner"
+import useRequestBillerUpdate from "@/hooks/apiHooks/useRequestBillerUpdate"
 
 interface props {
     title?: string | "Add Invoice"
+    defaultInvoiceType?: "proforma" | "fiscal" | "recurring"
 }
 
-function AddInvoiceDialogue({title = "Add Invoice"}: props) {
+function AddInvoiceDialogue({defaultInvoiceType, title = "Add Invoice"}: props) {
     const {
-        open,
+        handleOnChangeFormData,
+        onSelectBiller,
+        setSearchItem,
+        setFormData,
+        searchItem,
+        formData,
         rowsRef,
         loading,
-        formData,
-        searchItem,
-        setFormData,
-        setSearchItem,
-        onSelectBiller,
-        handleOnChangeFormData,
         setOpen,
         onSave,
-    } = useAddInvoiceForm()
+        open,
+    } = useAddInvoiceForm(defaultInvoiceType)
+    const updateBiller = useRequestBillerUpdate();
     const createInvoice = useCreateInvoice();
+
     return (
     <div>
         <Dialog open = {open} onOpenChange={setOpen}>
@@ -37,7 +41,7 @@ function AddInvoiceDialogue({title = "Add Invoice"}: props) {
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader> 
                 <div className="w-full">
-                    <form onSubmit={(e)=> onSave(e, createInvoice)}>
+                    <form onSubmit={(e)=> onSave(e, createInvoice, updateBiller)}>
                         <InvoiceHeader
                             formData={formData}
                             searchItem={searchItem}

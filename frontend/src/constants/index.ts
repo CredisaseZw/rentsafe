@@ -596,9 +596,9 @@ export const TERMINATED_HEADERS:Header[] = [
   
 ]
 export const INVOICE_STATUSES:Option[] = [
-  { label: "Cancelled Invoices", value: "cancelledInvoices" },
-  { label: "Pending Invoices", value: "pendingInvoices" },
-  { label: "All Paid Invoices", value: "allPaidInvoices" }
+  { label: "Cancelled Invoices", value: "cancelled_invoices" },
+  { label: "Pending Invoices", value: "pending_invoices" },
+  { label: "All Paid Invoices", value: "paid_invoices" }
 ]
 
 export const ACCOUNTING_SECTOR_HEADERS:Header[] = [

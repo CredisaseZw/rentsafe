@@ -49,7 +49,7 @@ function AccountsLists() {
               accounts.map((a, idx)=>(
                 <TableRow
                   key={idx}
-                  className={`${a.preset ? "bg-gray-200 " : ""} hover:bg-transparent`}
+                  className={`${a.preset ? "bg-gray-200 dark:bg-zinc-900" : ""} hover:bg-transparent`}
                   >
                   <TableCell className="text-center">{a.account_number}</TableCell>
                   <TableCell className="text-center">{a.account_name}</TableCell>

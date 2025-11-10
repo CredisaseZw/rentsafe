@@ -18,6 +18,7 @@ export default function InvoicesFilter(){
         handleOnFilterChange,
         applyFilters,
         setOpen,
+        onClearFilter
     } = useInvoicesFilter()
     return (
         <Popover open = {open} onOpenChange={setOpen}>
@@ -86,7 +87,11 @@ export default function InvoicesFilter(){
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button className="w-full mb-5" type="submit">Apply</Button>
+                    <div className="flex flex-row justify-end gap-3">
+                        <Button className="" type="button" variant={"outline"} onClick={onClearFilter}>Clear</Button>
+                        <Button className="mb-3" type="submit">Apply</Button>
+                    </div>
+                   
                 </form>
             </PopoverContent>
         </Popover>

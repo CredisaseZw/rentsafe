@@ -1,5 +1,5 @@
 import type { Biller, BranchFull, IndividualMinimal } from "@/interfaces";
-import { formatAddress, getCurrentDate, handleAxiosError, handleTrackChangedFields, validateInvoices } from "@/lib/utils";
+import { formatAddress, getCurrentDate, handleAxiosError, validateInvoices } from "@/lib/utils";
 import type { Invoice, InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -8,7 +8,7 @@ import { MODES } from "@/constants";
 import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
 
-export default function useAddInvoiceForm(){
+export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined){
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchItem, setSearchItem] = useState("");
@@ -28,7 +28,7 @@ export default function useAddInvoiceForm(){
     biller_address : "",
     biller_vat_no : "",
     biller_tin_number : "",
-    invoice_type : "fiscal"
+    invoice_type : defaultInvoiceType ?? "fiscal"
   })
 
   const onSelectBiller = (item: IndividualMinimal | BranchFull) => {
@@ -60,7 +60,8 @@ export default function useAddInvoiceForm(){
 
   const onSave = (
     e: React.FormEvent<HTMLFormElement>,
-    mutate : UseMutationResult<any, Error, Payload, unknown>
+    mutate : UseMutationResult<any, Error, Payload, unknown>,
+    updateBiller? : UseMutationResult<any, Error, Payload, unknown>
   ) => {  
     e.preventDefault();
     const mode = "create";
@@ -68,18 +69,21 @@ export default function useAddInvoiceForm(){
     const totals = rowsRef.current?.getTotals();
     if(validateInvoices(rows, formData)) return;
 
-    //setLoading(true)
+    setLoading(true)
     const {biller_id, invoice_type, biller_type, ...BILLER} = formData
-    const isUpdated = useTrackBiller(
-      billerCopy,
-      BILLER, 
-      {
-        id : formData.biller_id,
-        type : formData.biller_type
-      });
+    const {UPDATE} = useTrackBiller( billerCopy, BILLER);
 
-      console.log(isUpdated)
-/* 
+    if (UPDATE){
+      const payload_ = {
+        mode : formData.biller_type,
+        id : Number(formData.biller_id),
+        data : UPDATE
+      }
+      console.log(payload_)
+      updateBiller?.mutate(payload_);
+    }
+
+     
     const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));
     const PayloadData = {
       invoice_type: formData.invoice_type,
@@ -112,22 +116,22 @@ export default function useAddInvoiceForm(){
       onError: (error)=> handleAxiosError(`Failed to ${mode  === "create" ? "create" : "update"} invoice`,error),
       onSettled: ()=> setLoading(false)
     })
- */
+
   };
 
 
  
   return { 
-    open,
-    loading,
-    formData,
-    searchItem,
-    rowsRef,
     handleOnChangeFormData,
+    onSelectBiller,
+    setSearchItem,
+    setFormData,
+    searchItem,
+    formData,
+    rowsRef,
+    loading,
     setOpen,
     onSave,
-    setFormData,
-    setSearchItem,
-    onSelectBiller,
+    open
   }
 }
