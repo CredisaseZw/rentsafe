@@ -24,7 +24,6 @@ import VATSettings from "@/routes/rent-safe/accounting/settings/VATSettings";
 import AccountsSectors from "@/routes/rent-safe/accounting/settings/GeneralLedger/AccountsSectors";
 import PaymentsTypes from "@/routes/rent-safe/accounting/settings/CashBooks/PaymentsTypes";
 import SubscriptionManagement from "@/routes/rent-safe/admin/SubscriptionManagement";
-import SalesInvoicing from "@/routes/rent-safe/accounting/sales/SalesInvoicing";
 import SalesCashSales from "@/routes/rent-safe/accounting/sales/SalesCashSales";
 import SalesCreditNote from "@/routes/rent-safe/accounting/sales/SalesCreditNote";
 import SalesItems from "@/routes/rent-safe/accounting/sales/SalesItems";
@@ -52,6 +51,7 @@ import CustomerSettings from "@/routes/rent-safe/accounting/settings/CustomerSet
 import CompanySettings from "@/routes/rent-safe/accounting/settings/CompanySettings";
 import CreditorSettings from "@/routes/rent-safe/accounting/settings/CreditorSettings";
 import OpeningBalances from "@/routes/rent-safe/accounting/settings/OpeningBalances";
+import SalesInvoices from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoices";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -174,7 +174,7 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
             label: "Invoicing",
             path: RENTSAFE_PRE_SEG + "/sales/invoicing",
             segment: RENTSAFE_PRE_SEG + "/accounting/sales/invoicing",
-            pageComponent: SalesInvoicing,
+            pageComponent: SalesInvoices,
          },
          {
             label: "Cash Sales",

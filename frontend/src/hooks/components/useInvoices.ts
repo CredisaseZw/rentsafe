@@ -27,6 +27,8 @@ function useInvoices(mode: string) {
     });
   }, [invoicesData, invoicesError]);
 
+
+
   return {
     page,
     pagination,

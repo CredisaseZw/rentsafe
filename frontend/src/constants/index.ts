@@ -430,6 +430,7 @@ export const SALES_INVOICES_HEADERS :Header[]=[
   {name : "Date Created"},
   {name : "Customer"},
   {name : "Currency"},
+  {name : "Status"},
   {name : "Invoice Total (Excluding VAT)"},
   {name : "Invoice VAT Total"},
   {name : "Invoice Total (Including VAT)", textAlign : "end"},
@@ -541,57 +542,37 @@ export const PROPERTY_STATUS_OPTIONS:Option[] = [
 ]
 
 export const COMMON_HEADERS:Header[] = [
-  {
-      name  :"Lease ID",
-  },
-  {
-      name : "Tenant",
-  },
-  {
-      name : "Landlord",
-  }, 
-  {
-      name : "Property Type"
-  },
-  {
-      name : "Address"
-  },
+  { name  :"Lease ID" },
+  { name : "Tenant" },
+  { name : "Landlord" }, 
+  { name : "Property Type" },
+  { name : "Address" },
 ]
 export const ACTIVE_HEADERS:Header[] = [
   ...COMMON_HEADERS, 
+  { name : "Rent owing" },
   {
-      name : "Rent owing"
-  },
-  {
-      name : "Actions",
-      colSpan : 3
+    name : "Actions",
+    colSpan : 3
   }
 ]
 export const RENEWAL_HEADERS:Header[] = [
   ...COMMON_HEADERS,
+  { name : "Lease start Date" },
+  { name : "Lease end Date" },
   {
-      name : "Lease start Date"
-  },
-  {
-      name : "Lease end Date"
-  },
-  {
-      name : "Actions",
-      colSpan : 2
+    name : "Actions",
+    colSpan : 2
   }
 ]
 
 export const TERMINATED_HEADERS:Header[] = [
   ...COMMON_HEADERS,
+  { name : "Rent owing" },
+  { name: "Date of termination" },
   {
-      name : "Rent owing"
-  },
-  {
-      name: "Date of termination"
-  },
-  {
-      name : "Actions",
-      colSpan : 2
+    name : "Actions",
+    colSpan : 2
   },
   
 ]
@@ -682,3 +663,10 @@ export const INVOICE_MUTATION_STATUSES = {
   },
 }
 
+export const INVOICE_STATUS_VARIANT: Record<string, any> = {
+    pending: "warning",
+    paid: "success",
+    partially_paid: "primary",
+    draft: "ghost",
+    cancelled: "danger",
+  };

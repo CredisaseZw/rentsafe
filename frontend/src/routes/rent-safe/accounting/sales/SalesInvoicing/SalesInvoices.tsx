@@ -4,7 +4,7 @@ import Invoices from "@/components/routes/rent-safe/accounting/sales/sales-invoi
 import RecurringInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/RecurringInvoices";
 import ProformaInvoices from "@/components/routes/rent-safe/accounting/sales/sales-invoice/ProformaInvoices";
 
-export default function SalesInvoicing() {
+export default function SalesInvoices() {
    const tabs = [
       { icon: FileText,
         value: "invoices",

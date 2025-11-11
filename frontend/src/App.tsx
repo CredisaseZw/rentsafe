@@ -10,6 +10,7 @@ import { RENTSAFE_PRE_SEG } from "./constants/navlinks";
 import TenantStatement from "./routes/rent-safe/tenants/TenantStatement";
 import Property from "./routes/rent-safe/properties/Property";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
+import SalesInvoice from "./routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoice";
 
 export default function App() {
    return (
@@ -22,22 +23,25 @@ export default function App() {
                         {ROOT_ROUTES.map((route) => (
                            <Route key={route.path} path={route.path} element={<route.pageComponent />} />
                         ))}
-                        <Route element={<ProtectRoute />}>
+                           <Route element={<ProtectRoute />}>
                               <Route element={<RentsafeLayout />}>
                                  {RENTSAFE_ROUTES.map((route) => (
                                     <Route key={route.path} path={route.path} element={<route.pageComponent />} />
                                  ))}
                               <Route 
-                                    path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
-                                    element={<TenantStatement />} 
-                                 />
-                                 <Route
+                                 path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
+                                 element={<TenantStatement />} 
+                              />
+                              <Route
                                  path = {`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`}
                                  element = {<Property/>}
-                                 />
-                                 {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
-                                 
-                              </Route>
+                              />
+                              <Route
+                                 path={`${RENTSAFE_PRE_SEG}/accounting/sales/invoicing/:invoice_id`}
+                                 element = {<SalesInvoice/>}
+                              />
+                              {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
+                           </Route>
                         </Route>
                      </Route>
                   </Routes>
