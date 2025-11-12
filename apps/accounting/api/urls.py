@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.accounting.api.views import (
-    CustomersViewSet,
     SalesCategoryViewSet,
     CashSaleViewSet,
     CashbookEntryViewSet,
@@ -22,6 +21,7 @@ from apps.accounting.api.views import (
     ServiceSpecialPricingViewSet,
     ServiceStandardPricingViewSet,
 )
+from apps.accounting.api.customer_views import CustomersViewSet
 
 router = DefaultRouter()
 router.register(
