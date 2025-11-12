@@ -104,7 +104,7 @@ class CompanyCustomerFilter(django_filters.FilterSet):
 
 
 def search_tenants_for_client(
-    client, search: Optional[str] = None, type: Optional[str] = None
+    client, search: Optional[str] = None, tenant_type: Optional[str] = None
 ) -> List[object]:
     """
     Return a deduplicated list of tenant model instances (Individual and CompanyBranch)
@@ -142,9 +142,9 @@ def search_tenants_for_client(
             | Q(company__trading_name__icontains=s)
             | Q(company__registration_number__icontains=s)
         )
-    if type == "individual":
+    if tenant_type == "individual":
         tenants = list(ind_qs)
-    elif type == "company":
+    elif tenant_type == "company":
         tenants = list(br_qs)
     else:
         tenants = list(ind_qs) + list(br_qs)
