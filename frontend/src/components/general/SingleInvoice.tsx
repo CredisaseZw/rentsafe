@@ -13,6 +13,7 @@ import { EllipsisVertical } from 'lucide-react'
 import MutateInvoiceStatus from '../routes/rent-safe/accounting/sales/sales-invoice/MutateInvoiceStatus'
 import DeleteDialogue from './DeleteDialogue'
 import { useSearchParams } from 'react-router'
+import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
 
 interface props{
     invoice: Invoice | undefined
@@ -23,25 +24,34 @@ interface props{
 function SingleInvoice({invoice, handleGoBack, markInvoice}:props) {
   const MODE =  invoice?.invoice_type === "fiscal"
   ? MODES.FISCAL
-  :  invoice?.invoice_type === "proforma"
+  : invoice?.invoice_type === "proforma"
   ? MODES.PROFORMA
   : MODES.RECURRING
   const [searchParams] = useSearchParams();
   const page = Number(searchParams.get(MODE_PAGES[MODE]) || 1);
+
   return (
     <div className='w-full'>
         <div className="flex justify-between border-b border-color pb-4">
             <span className="text-lg self-center">{capitalizeFirstLetter(invoice?.invoice_type ?? "-")} Invoice</span>
             <div className='flex flex-row gap-5'>
-                <span className="font-bold text-sm self-center">ID#: INV-1002</span>
+                <span className="font-bold text-sm self-center">ID#: {invoice?.document_number}</span>
                   <Popover >
                     <PopoverTrigger className='rounded-2xl border border-color p-1.5 hover:bg-gray-200 dark:hover:bg-zinc-900'>
                       <EllipsisVertical size={18}/>
                     </PopoverTrigger>
                     <PopoverContent className="space-y-2">
-                    
                       {
-                        invoice?.status === "pending" || invoice?.status === "draft" && 
+                        invoice?.status === "pending" ||
+                        invoice?.status === "draft" && 
+                        <AddInvoiceDialogue
+                          invoice={invoice}
+                          defaultInvoiceType={invoice?.invoice_type}
+                          title="Edit Invoice"/>
+                      }
+                      {
+                        invoice?.status === "pending" ||
+                        invoice?.status === "draft" && 
                         <>
                           <MutateInvoiceStatus 
                             mode="MARK"

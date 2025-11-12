@@ -6,6 +6,7 @@ export function useTrackBiller(
     BILLER:any,
   ) {
     let UPDATE = undefined
+    if (!billerCopy) return {UPDATE}
     const changed = handleTrackChangedFields(billerCopy, BILLER, false);
     
     if (changed) {

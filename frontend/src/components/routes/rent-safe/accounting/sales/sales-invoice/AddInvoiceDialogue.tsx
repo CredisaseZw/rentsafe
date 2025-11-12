@@ -7,13 +7,15 @@ import InvoiceTotalsTable from "@/components/general/InvoiceTotalsTable"
 import useCreateInvoice from "@/hooks/apiHooks/useCreateInvoice"
 import ButtonSpinner from "@/components/general/ButtonSpinner"
 import useRequestBillerUpdate from "@/hooks/apiHooks/useRequestBillerUpdate"
+import type { Invoice } from "@/interfaces"
 
 interface props {
+    invoice?:  Invoice
     title?: string | "Add Invoice"
-    defaultInvoiceType?: "proforma" | "fiscal" | "recurring"
+    defaultInvoiceType?: "proforma" | "fiscal" | "recurring" | undefined
 }
 
-function AddInvoiceDialogue({defaultInvoiceType, title = "Add Invoice"}: props) {
+function AddInvoiceDialogue({invoice, defaultInvoiceType, title = "Add Invoice"}: props) {
     const {
         handleOnChangeFormData,
         onSelectBiller,
@@ -26,7 +28,7 @@ function AddInvoiceDialogue({defaultInvoiceType, title = "Add Invoice"}: props) 
         setOpen,
         onSave,
         open,
-    } = useAddInvoiceForm(defaultInvoiceType)
+    } = useAddInvoiceForm(defaultInvoiceType, invoice)
     const updateBiller = useRequestBillerUpdate();
     const createInvoice = useCreateInvoice();
 
@@ -34,7 +36,11 @@ function AddInvoiceDialogue({defaultInvoiceType, title = "Add Invoice"}: props) 
     <div>
         <Dialog open = {open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button >{title} <Plus/></Button>
+                {
+                    invoice
+                    ? <span className="text-sm text-gray-700 dark:text-white cursor-pointer">Edit Invoice</span>
+                    : <Button >{title} <Plus/></Button>
+                }
             </DialogTrigger>
             <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[1100px] h-[90vh] overflow-y-auto">
                 <DialogHeader>
@@ -52,7 +58,10 @@ function AddInvoiceDialogue({defaultInvoiceType, title = "Add Invoice"}: props) 
                             isType
                         />
                         <div className="mt-5">
-                           <InvoiceTotalsTable ref = {rowsRef}/>
+                           <InvoiceTotalsTable
+                                ref = {rowsRef}
+                                invoice = {invoice}
+                            />
                         </div>
                         <div className="mt-5 flex flex-row justify-end gap-5">
                             <DialogClose asChild>

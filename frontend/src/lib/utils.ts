@@ -764,27 +764,42 @@ export const handleDeletion = async (prefixLink: string, id: number) => {
   return response.data
 }
 
-export const handleTrackChangedFields = (initial: any, payloadData: any, toastInfo = true) => {
-  let changedData: any = payloadData
-  changedData = Object.fromEntries(
-    Object.entries(payloadData).filter(([key, value]) => {
-      const original = (initial as any)[key]
-      if (typeof value === "string" && typeof original === "string") {
-        return value.trim() !== original.trim()
-      }
-      return value !== original
-    })
-  )
-  // No actual changes
+export const handleTrackChangedFields = (initial: any, payloadData: any, toastInfo = true): any => {
+  const deepDiff = (obj1: any, obj2: any): any => {
+    return Object.fromEntries(
+      Object.entries(obj2).filter(([key, value]) => {
+        const original = obj1?.[key];
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          const nestedDiff = deepDiff(original || {}, value);
+          if (Object.keys(nestedDiff).length > 0) return true;
+          return false;
+        }
+        if (Array.isArray(value)) {
+          return JSON.stringify(value) !== JSON.stringify(original);
+        }
+        if (typeof value === "string" && typeof original === "string") {
+          return value.trim() !== original.trim();
+        }
+        return value !== original;
+      }).map(([key, value]) => {
+        const original = obj1?.[key];
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          return [key, deepDiff(original || {}, value)];
+        }
+        return [key, value];
+      })
+    );
+  };
+
+  const changedData = deepDiff(initial, payloadData);
+
   if (Object.keys(changedData).length === 0) {
-    if(toastInfo){
-      toast.info("No changes made.")
-    }
+    if (toastInfo) toast.info("No changes made.");
     return undefined;
   }
-  
+
   return changedData;
-}
+};
 
 export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) => {
   const FORM_DATA = new FormData(e.currentTarget)

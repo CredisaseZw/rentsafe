@@ -1,15 +1,15 @@
 import type { Biller, BranchFull, IndividualMinimal } from "@/interfaces";
-import { formatAddress, getCurrentDate, handleAxiosError, validateInvoices } from "@/lib/utils";
+import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, handleTrackChangedFields, validateInvoices } from "@/lib/utils";
 import type { InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { Invoice } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useClient from "../general/useClient";
 import { MODES } from "@/constants";
 import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
 
-export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined){
+export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined, invoice?: Invoice){
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchItem, setSearchItem] = useState("");
@@ -29,8 +29,26 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     biller_address : "",
     biller_vat_no : "",
     biller_tin_number : "",
-    invoice_type : defaultInvoiceType ?? "fiscal"
+    invoice_type : defaultInvoiceType ?? "fiscal",
+    issue_date : getSummaryDate(getCurrentDate())
   })
+
+  useEffect(()=>{
+    if(!invoice) return;
+    setFormData((p)=>({
+      ...p,
+      biller_name : invoice.customer_details.full_name ?? "",
+      biller_id : Number(invoice.customer_details.id),
+      biller_email : invoice.customer_details.email ?? "",
+      biller_phone : invoice.customer_details.phone ?? "",
+      biller_address : invoice.customer_details.address ??"",
+      biller_tin_number : invoice.customer_details.tin_number ?? "",
+      biller_vat_no : invoice.customer_details.vat_number ?? "",
+      issue_date : getSummaryDate(invoice.date_created)
+    }))
+    setSearchItem(invoice.customer_details.full_name ?? "");
+
+  }, [invoice])
 
   const onSelectBiller = (item: IndividualMinimal | BranchFull) => {
     const isIndividual = "first_name" in item;
@@ -65,7 +83,9 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     updateBiller? : UseMutationResult<any, Error, Payload, unknown>
   ) => {  
     e.preventDefault();
-    const mode = "create";
+    const mode = !invoice
+    ? "create"
+    : "update";
     const rows = rowsRef.current ? rowsRef.current.getRows() : [];
     const totals = rowsRef.current?.getTotals();
     if(validateInvoices(rows, formData)) return;
@@ -83,7 +103,6 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
       updateBiller?.mutate(payload_);
     }
 
-     
     const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));
     const PayloadData = {
       invoice_type: formData.invoice_type,
@@ -95,12 +114,32 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
       sale_date: getCurrentDate(),
     };
 
+    if(mode === "update"){
+      const invoicePayload = {
+        invoice_type: invoice?.invoice_type,
+        is_individual: invoice?.customer_details.client_type === "individual",
+        customer_id: invoice?.customer_details.id,
+        currency_id: invoice?.currency.id,
+        discount: -Number(invoice?.discount || 0),
+        items: invoice?.line_items
+          ? invoice.line_items.map((item) => ({
+              sales_item_id: Number(item.sales_item.id),
+              quantity: Number(item.quantity),
+            }))
+          : [],
+        sale_date: new Date(invoice?.date_created ?? "").toISOString().split("T")[0]
+      }
+      const changes = handleTrackChangedFields(invoicePayload, PayloadData);
+      console.log(changes)
+      if(!changes) return toast.info("No changes made")
+    }
+
     const PAYLOAD:Payload= {
       ...(
-        mode === "create"
-        ? {data : PayloadData}
-        : {data : {}, id : 0}
+        mode === "update" &&
+        { id : invoice?.id}
       ), 
+      data : PayloadData,
       mode
     }
     mutate.mutate(PAYLOAD,{
@@ -115,7 +154,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
       },
       onError: (error)=> handleAxiosError(`Failed to ${mode  === "create" ? "create" : "update"} invoice`,error),
       onSettled: ()=> setLoading(false)
-    })
+    }) 
 
   };
 

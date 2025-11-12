@@ -7,7 +7,7 @@ export default function useCreateInvoice(){
         mutationFn : async(payload:Payload)=>{
             const response = payload.mode === "create"
             ? await api.post("/api/accounting/invoices/", payload.data)
-            : await api.post(`/api/accounting/invoices/${payload.id}/`, payload.data)
+            : await api.put(`/api/accounting/invoices/${payload.id}/`, payload.data)
             return response.data;
         }
     })

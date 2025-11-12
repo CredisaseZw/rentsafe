@@ -458,11 +458,12 @@ export interface Biller {
   biller_vat_no: string;
   biller_tin_number: string;
   invoice_type: "fiscal" | "proforma" | "recurring";
+  issue_date : string
 };
 export interface Invoice {
   id: number;
   document_number: string;
-  invoice_type: string;
+  invoice_type: "proforma" | "fiscal" | "recurring" | undefined;
   currency: Currency;
   discount: string;
   date_created: string;
@@ -484,12 +485,14 @@ export interface Invoice {
 export interface InvoiceCustomerDetails {
   id: number;
   full_name: string;
+  address : string | null;
   phone: string | null;
   email: string | null;
   tin_number: string | null;
   vat_number: string | null;
   account_number: string | null;
   industry: string | null;
+  client_type : "individual" | "company" | string
 }
 export interface LineItem {
   sales_item: SalesItem;

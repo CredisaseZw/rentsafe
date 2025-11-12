@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
-import { getCurrentDate } from "@/lib/utils"
 import type { Biller, BranchFull, IndividualMinimal } from '@/interfaces'
 
 interface props {
@@ -152,8 +151,8 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 }
                 <div className='flex justify-end'>
                     <div className="flex flex-row w-fit gap-5 justify-end mt-5">
-                        <Label className="text-gray-800 dark:text-white">Date:</Label>         
-                        <span className='text-sm'>{getCurrentDate()}</span>
+                        <Label className="text-gray-800 dark:text-white">Date:</Label> 
+                        <span className='text-sm'>{formData.issue_date}</span>
                     </div>
                 </div>
             </div>
