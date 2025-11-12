@@ -103,7 +103,9 @@ class CompanyCustomerFilter(django_filters.FilterSet):
         return queryset.filter(company__trading_name__icontains=value)
 
 
-def search_tenants_for_client(client, search: Optional[str] = None) -> List[object]:
+def search_tenants_for_client(
+    client, search: Optional[str] = None, type: Optional[str] = None
+) -> List[object]:
     """
     Return a deduplicated list of tenant model instances (Individual and CompanyBranch)
     for leases managed by the given client. Applies search if provided.
@@ -127,7 +129,6 @@ def search_tenants_for_client(client, search: Optional[str] = None) -> List[obje
         .select_related("company")
         .distinct()
     )
-
     if search:
         s = search.strip()
         ind_qs = ind_qs.filter(
@@ -141,8 +142,12 @@ def search_tenants_for_client(client, search: Optional[str] = None) -> List[obje
             | Q(company__trading_name__icontains=s)
             | Q(company__registration_number__icontains=s)
         )
-
-    tenants = list(ind_qs) + list(br_qs)
+    if type == "individual":
+        tenants = list(ind_qs)
+    elif type == "company":
+        tenants = list(br_qs)
+    else:
+        tenants = list(ind_qs) + list(br_qs)
     seen = set()
     unique_tenants = []
     for tenant in tenants:

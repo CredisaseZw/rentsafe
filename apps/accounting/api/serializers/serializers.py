@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from urllib3 import request
 from apps.accounting.models.models import (
     SalesCategory,
     SalesItem,
@@ -1520,11 +1521,12 @@ class CustomersSearchSerializer(serializers.Serializer):
     full_name = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
-    # address = serializers.SerializerMethodField()
     tin_number = serializers.SerializerMethodField()
     vat_number = serializers.SerializerMethodField()
     account_number = serializers.SerializerMethodField()
     industry = serializers.SerializerMethodField()
+    customer_type = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
         if isinstance(obj, Individual):
@@ -1555,6 +1557,12 @@ class CustomersSearchSerializer(serializers.Serializer):
                     IndividualAccounts.objects.filter(individual=obj).first()
                 )
             return self._individual_account_cache[individual_id]
+        return None
+
+    def get_customer_type(self, obj):
+        request = self.context.get("request")
+        if request:
+            return request.query_params.get("customer_type")
         return None
 
     def get_account_number(self, obj):
