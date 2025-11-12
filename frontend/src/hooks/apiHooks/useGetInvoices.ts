@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { api }  from "@/api/axios"
 import { MODES } from "@/constants";
 import type { Response } from "@/interfaces";
-import type { Invoice } from "@/types";
-
+import type { Invoice } from "@/interfaces";
 interface InvoiceResponse extends Response {
     results : Invoice[]
 }

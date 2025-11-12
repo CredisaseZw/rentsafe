@@ -5,13 +5,13 @@ import useDelete from '@/hooks/apiHooks/useDelete'
 import type { Delete } from '@/types'
 import { Trash } from 'lucide-react'
 
-function DeleteDialogue({mutationFunc, keyStore, value, trigger }: Delete) {
+function DeleteDialogue({mutationFunc, keyStore, value, trigger, successCallBack }: Delete) {
   const {
     loading,
     open,
     setOpen, 
     onHandleDelete
-  } = useDelete({mutationFunc, keyStore, value })
+  } = useDelete({mutationFunc, keyStore, value, successCallBack })
   return (
     <Dialog open = {open} onOpenChange={setOpen}>
         <DialogTrigger>

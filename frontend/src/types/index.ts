@@ -554,6 +554,7 @@ export type CurrencySetting = {
 
 export type Delete = {
    mutationFunc: () => Promise<AxiosResponse<any, any>>;
+   successCallBack?: ()=> void;
    keyStore: any;
    page?: number;
    value: string;
@@ -592,34 +593,6 @@ export type Cashbook = {
    general_ledger_account: GeneralLedgerAccount
 }
 
-export type Invoice = {
-  id: number;
-  document_number: string;
-  invoice_type: "fiscal" | "proforma" | "recurring" | string;
-  currency: Currency
-  discount: string;
-  date_created: string;
-  status: "paid" | "pending" | "cancelled" | string;
-  total_excluding_vat: number;
-  vat_total: number;
-  total_inclusive: number;
-  customer_details: {
-    id: number;
-    full_name: string;
-    identification_number: string | null;
-    email: string;
-    phone: string | null;
-  };
-  lease: number | null;
-  reference_number: string | null;
-  is_recurring: boolean;
-  frequency: "monthly" | "weekly" | "yearly" | string | null;
-  next_invoice_date: string | null;
-  original_invoice: number | null;
-  is_invoiced: boolean;
-  can_convert_to_fiscal: boolean;
-}
-
 export type InvoiceTotals = {  
    currency_id : number,
    subtotal: number,
@@ -627,3 +600,4 @@ export type InvoiceTotals = {
    total: number,
    discount : number 
 }
+

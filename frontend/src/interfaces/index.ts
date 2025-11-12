@@ -1,4 +1,4 @@
-import type {  Tenant } from "@/types";
+import type {  Currency, SalesItem, Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -459,3 +459,44 @@ export interface Biller {
   biller_tin_number: string;
   invoice_type: "fiscal" | "proforma" | "recurring";
 };
+export interface Invoice {
+  id: number;
+  document_number: string;
+  invoice_type: string;
+  currency: Currency;
+  discount: string;
+  date_created: string;
+  status: string;
+  total_excluding_vat: number;
+  vat_total: number;
+  total_inclusive: number;
+  customer_details: InvoiceCustomerDetails;
+  line_items: LineItem[];
+  lease: number;
+  reference_number: string | null;
+  is_recurring: boolean;
+  frequency: string;
+  next_invoice_date: string | null;
+  original_invoice: string | null;
+  is_invoiced: boolean;
+  can_convert_to_fiscal: boolean;
+}
+export interface InvoiceCustomerDetails {
+  id: number;
+  full_name: string;
+  phone: string | null;
+  email: string | null;
+  tin_number: string | null;
+  vat_number: string | null;
+  account_number: string | null;
+  industry: string | null;
+}
+export interface LineItem {
+  sales_item: SalesItem;
+  quantity: string;
+  unit_price: string;
+  vat_amount: string;
+  total_price: string;
+  date_created: string;
+  date_updated: string;
+}

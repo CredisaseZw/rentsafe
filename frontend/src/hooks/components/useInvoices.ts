@@ -4,7 +4,7 @@ import useGetInvoices from "../apiHooks/useGetInvoices";
 import { handleAxiosError } from "@/lib/utils";
 import { MODE_PAGES } from "@/constants";
 import type { PaginationData } from "@/interfaces";
-import type { Invoice } from "@/types";
+import type { Invoice } from "@/interfaces";
 
 function useInvoices(mode: string) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -26,8 +26,6 @@ function useInvoices(mode: string) {
       next: invoicesData.next,
     });
   }, [invoicesData, invoicesError]);
-
-
 
   return {
     page,

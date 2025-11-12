@@ -1,6 +1,7 @@
 import type { Biller, BranchFull, IndividualMinimal } from "@/interfaces";
 import { formatAddress, getCurrentDate, handleAxiosError, validateInvoices } from "@/lib/utils";
-import type { Invoice, InvoicePreview, InvoiceTotals, Payload } from "@/types";
+import type { InvoicePreview, InvoiceTotals, Payload } from "@/types";
+import type { Invoice } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import useClient from "../general/useClient";

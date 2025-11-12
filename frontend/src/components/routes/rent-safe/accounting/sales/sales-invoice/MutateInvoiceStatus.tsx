@@ -18,17 +18,18 @@ interface props {
     mode : string,
     invoiceID: number,
     invoiceMode : string
-    documentNumber : string
+    documentNumber : string,
+    successCallBack?: () => void
 }
 
-function MutateInvoiceStatus({ invoiceID, documentNumber, mode, invoiceMode}: props) {
+function MutateInvoiceStatus({ invoiceID, documentNumber, mode, invoiceMode, successCallBack}: props) {
     const INFO = INVOICE_MUTATION_STATUSES[mode as keyof typeof INVOICE_MUTATION_STATUSES]
     const {
         open,
         loading,
         setOpen,
         handleMarkInvoice
-    } = useMutateInvoiceStatus(invoiceID, mode, invoiceMode);
+    } = useMutateInvoiceStatus(invoiceID, mode, invoiceMode, successCallBack);
     const mutateInvoice = useInvoiceMutations();
 
     return (

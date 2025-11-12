@@ -670,3 +670,12 @@ export const INVOICE_STATUS_VARIANT: Record<string, any> = {
     draft: "ghost",
     cancelled: "danger",
   };
+
+export const INVOICE_SALES_HEADERS:Header[] = [
+  {name : "Sales Item"},
+  {name : "Quantity"},
+  {name : "Unit Price", textAlign : "end"},
+  {name : "VAT Amount", textAlign : "end"},
+  {name : "Total Price", textAlign : "end"}
+
+]

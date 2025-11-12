@@ -91,7 +91,7 @@ function ProformaInvoices() {
                         <span className="text-sm dark:text-white text-gray-600 ">View More</span>
                       </Link>
                        {
-                        i.status === "pending" && 
+                        i.status === "pending"  || i?.status === "draft" && 
                         <>
                           <MutateInvoiceStatus 
                             mode="MARK"
@@ -123,7 +123,7 @@ function ProformaInvoices() {
                           </div>
                         }
                         mutationFunc={()=> handleDeletion(DELETION_LINKS.INVOICE, i.id)}
-                        keyStore={["invoices", MODE, page]}
+                        keyStore={["invoices", MODE, page, ""]}
                         value=" Fiscal Invoice"
                       />
                     </PopoverContent>
