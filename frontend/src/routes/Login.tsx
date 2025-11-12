@@ -1,52 +1,20 @@
 import Logo from "@/components/general/Logo";
 import { LogInIcon } from "lucide-react";
 import { Link } from "react-router";
-import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/components/useAuth";
 import useLoginAuth from "@/hooks/apiHooks/useLogin";
 import Alert from "@/components/general/Alerts";
-import { useState } from "react";
 import ButtonSpinner from "@/components/general/ButtonSpinner";
 import Button from "@/components/general/Button";
-import { getCookie, setCookie } from "typescript-cookie";
-import { isAxiosError } from "axios";
 
 export default function Login() {
-   const { loginForm, validateForm, handleChange, error, setError } = useAuth();
+   const { loginForm, handleChange, error, onLogin, isLogin } = useAuth();
    const login = useLoginAuth();
-   const [isLogin, setIsLogin] = useState(false);
-   const navigate = useNavigate();
-
-   const onLogin = (e: React.FormEvent<HTMLFormElement>) => {
-      setIsLogin(true);
-      e.preventDefault();
-
-      const isValid = validateForm();
-      if (!isValid.isUsername || !isValid.isPassword) return;
-
-      login.mutate(loginForm, {
-         onSuccess: (data) => {
-            if(data.is_verified){
-               if(!getCookie("token")) setCookie("token", JSON.stringify(data), { expires: 4 });
-               const next = new URLSearchParams(location.search).get("next");
-               navigate(next || "/services/rent-safe", { replace: true });
-            } else{
-               setError("Account is Not verified")
-            }
-         },
-         onError: (error) => {
-            if(isAxiosError(error)){
-               setError(error.response?.data.error ?? error.response?.data.detail);
-            }
-            console.log(error);
-         },
-         onSettled: () => setIsLogin(false),
-      });
-   };
+  
    return (
       <div className={"flex min-h-screen items-center justify-center bg-gray-100 dark:bg-black"}>
          <div className="flex w-md flex-col items-center justify-center rounded-xl border border-gray-300 bg-white/90 p-6 shadow dark:border-zinc-800 dark:bg-zinc-950">
-            <form onSubmit={onLogin} className="h-full w-full" method="post">
+            <form onSubmit={(e)=> onLogin(e, login)} className="h-full w-full" method="post">
                <div className="mb-7">
                   <Logo />
                   <h2 className="mb-4 text-center text-lg">Login to proceed</h2>

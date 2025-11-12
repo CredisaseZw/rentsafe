@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.accounting.api.views import (
-    CustomersViewSet,
     SalesCategoryViewSet,
     CashSaleViewSet,
     CashbookEntryViewSet,
@@ -22,6 +21,7 @@ from apps.accounting.api.views import (
     ServiceSpecialPricingViewSet,
     ServiceStandardPricingViewSet,
 )
+from apps.accounting.api.customer_views import CustomersViewSet
 
 router = DefaultRouter()
 router.register(
@@ -63,13 +63,4 @@ router.register(
 router.register(r"customers", CustomersViewSet, basename="customers")
 urlpatterns = [
     path("", include(router.urls)),
-    # path("detailed-general-ledger/", detailed_general_ledger ,name="detailed_general_ledger"),
-    # path("cash-books-list/", cash_books_list ,name="cash_books_list"),
-    # path("credit-note/", credit_note ,name="credit_note"),
-    # path("creditor-invoice/", creditor_invoice ,name="creditor_invoice"),
-    # path("rate-audit-trail/", rate_audit_trail ,name="rate_audit_trail"),
-    # path("cashbook-receipts/", cashbook_receipts ,name="cashbook_receipts"),
-    # path("cashbook-payments/", cashbook_payments ,name="cashbook_payments"),
-    # path("accounts-sectors/", accounts_sectors ,name="accounts_sectors"),
-    # path("payment-types/", payment_types ,name="payment_types"),
 ]

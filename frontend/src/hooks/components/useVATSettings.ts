@@ -1,8 +1,26 @@
-import type { VATRows } from "@/types";
-import { useState } from "react";
+import type { VATRow } from "@/types";
+import { useEffect, useState } from "react";
+import useGetVATSettings from "../apiHooks/useGetVATSettings";
+import { handleAxiosError } from "@/lib/utils";
+import type { PaginationData } from "@/interfaces";
+import { useSearchParams } from "react-router";
 
 export default function useVATSettings(){
-    const [rows,setRows] = useState<VATRows[]>([{description: "", rate : ""}])
+    const [searchParams] = useSearchParams();
+    const page = Number(searchParams.get("page") || 1);
+    const [rows,setRows] = useState<VATRow[]>([{description: "", rate : ""}])
+    const [pagination, setPagination] = useState<PaginationData | undefined>(undefined)
+    const {data, isLoading, error} = useGetVATSettings(page)
+
+    useEffect(()=>{
+       if(handleAxiosError("Error fetching V.A.T Settings",error)) return;
+        if (data) {
+            setRows(data.results);
+            const { results, ...paginationMeta } = data;
+            setPagination(paginationMeta as PaginationData);
+        }
+
+    }, [data, error, page])
 
     const updateRow = (index: number, key: string, value: any) => {
         setRows((prev) =>
@@ -20,11 +38,16 @@ export default function useVATSettings(){
         
         setRows((prev) => prev.filter((_, i) => i !== index));
     };
+    
+
     return {
         rows,
-        addRow,
-        setRows,
+        error,
+        isLoading,
+        pagination,
         updateRow,
-        removeRow
+        removeRow,
+        setRows,
+        addRow,
     }
 }

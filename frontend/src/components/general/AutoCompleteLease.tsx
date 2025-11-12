@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import type { Lease} from "@/types";
-import useGetLeases from "@/hooks/apiHooks/useGetActiveLeases";
+import {useGetLeases} from "@/hooks/apiHooks/useGetActiveLeases";
 import { toast } from "sonner";
 
 interface Props {
@@ -17,6 +17,7 @@ interface Props {
 function AutoCompleteLease({ index, onSelectValue, searchItem, setSearchItem, checkReceipt }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
+  
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
     return () => clearTimeout(handler);
@@ -66,7 +67,7 @@ function AutoCompleteLease({ index, onSelectValue, searchItem, setSearchItem, ch
                     if (checkReceipt(lease.lease_id)) {
                       toast.error("Duplicate receipts detected", {description :`Receipt id ${lease.lease_id} is already selected`})
                     } else {
- if (onSelectValue) onSelectValue(index, lease);
+                    if (onSelectValue) onSelectValue(index, lease);
                     if (setSearchItem) setSearchItem(index, "customerName", primaryFullname);
                     setOpen(false)
                     } 

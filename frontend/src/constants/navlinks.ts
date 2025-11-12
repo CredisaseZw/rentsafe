@@ -23,7 +23,6 @@ import DebitJournals from "@/routes/rent-safe/accounting/creditors/CreditorJourn
 import CreditJournals from "@/routes/rent-safe/accounting/creditors/CreditorJournals/CreditJournals";
 import GeneralJournals from "@/routes/rent-safe/accounting/generalLedgers/GeneralJournals";
 import DefaultGeneralLedgerAccounts from "@/routes/rent-safe/accounting/generalLedgers/Reports/DefaultGeneralLedgerAccounts";
-import AccountingLists from "@/routes/rent-safe/accounting/generalLedgers/Reports/AccountingLists";
 import ReportsSettings from "@/routes/rent-safe/accounting/generalLedgers/Reports/ReportsSettings";
 import CommissionStatements from "@/routes/rent-safe/accounting/reports/CommissionStatements";
 import CashflowForecasts from "@/routes/rent-safe/accounting/reports/CashflowForecasts";
@@ -44,6 +43,8 @@ import CashbookPayments from "@/routes/rent-safe/accounting/cashbooks/CashbookPa
 import CashbookBankReconciliation from "@/routes/rent-safe/accounting/cashbooks/CashbookBankReconciliation";
 import CashbookRequisitions from "@/routes/rent-safe/accounting/cashbooks/CashbookRequisitions";
 import Lists from "@/routes/rent-safe/accounting/settings/CashBooks/Lists";
+import ReportsAccountingLists from "@/routes/rent-safe/accounting/generalLedgers/Reports/ReportsAccountingLists";
+import AccountsLists from "@/routes/rent-safe/accounting/settings/GeneralLedger/AccountsLists";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -339,7 +340,7 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
                   label: "Accounts List",
                   path : RENTSAFE_PRE_SEG + "/general-ledgers/general-journals/reports/accounts-list",
                   segment : RENTSAFE_PRE_SEG + "/accounting/general-ledgers/general-journals/reports/accounts-list",
-                  pageComponent : AccountingLists
+                  pageComponent : ReportsAccountingLists
                },
                {
                   label: "Settings",
@@ -403,7 +404,7 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
                   label : "Accounts List",
                   path : RENTSAFE_PRE_SEG + "/settings/general-ledger/accounts-list",
                   segment: RENTSAFE_PRE_SEG + "/accounting/settings/general-ledger/accounts-list",
-                  pageComponent: AccountingLists
+                  pageComponent: AccountsLists
                },
                {
                   label : "Accounts Sectors",

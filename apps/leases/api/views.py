@@ -59,13 +59,16 @@ class LeaseViewSet(viewsets.ModelViewSet):
         unless the user is a superuser or staff member.
         """
         user = self.request.user
-        queryset = Lease.objects.all().prefetch_related(
-            "lease_tenants__tenant_object", "unit__property", "landlord", "guarantor"
-        )
 
         if not user.is_authenticated:
-            return queryset.none()
+            return Lease.objects.none()
 
+        queryset = Lease.objects.filter(managing_client=user.client).prefetch_related(
+            "lease_tenants__tenant_object",
+            "unit__property",
+            "landlord",
+            "guarantor",
+        )
         if lease_status := self.request.query_params.get("status"):
             if lease_status == "EXPIRED":
                 return queryset.filter(end_date__lt=timezone.now().date())
@@ -78,19 +81,15 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 | Q(unit__unit_number__icontains=search_term)
                 | Q(unit__property__name__icontains=search_term)
             )
-        # Filter by staff/admin
-        if user.is_staff or user.is_superuser:
-            return queryset.filter(managing_client=user.client)
 
-        # Filter by client user
         try:
-            if hasattr(user, "client") and user.client:
-                return queryset.filter(managing_client=user.client)
+            if user.is_staff or user.is_superuser:
+                queryset = queryset.filter(managing_client=user.client)
             else:
-                return queryset.filter(created_by=user)
+                queryset = queryset.filter(created_by=user)
         except Exception as e:
             logger.error(f"Error filtering queryset for user {user.id}: {e}")
-            return queryset.none()
+        return queryset.order_by("-id")
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
@@ -128,22 +127,36 @@ class LeaseViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
 
-        # Set the request in the context for logging purposes
-        serializer.context["request"] = request
+            # Set the request in the context for logging purposes
+            serializer.context["request"] = request
 
-        lease = serializer.save()
+            lease = serializer.save()
 
-        # Update unit status based on lease status
-        if lease.status == "ACTIVE":
-            lease.unit.status = "occupied"
-        elif lease.status in ["TERMINATED", "EXPIRED"]:
-            lease.unit.status = "vacant"
-        lease.unit.save()
+            # Update unit status based on lease status
+            if lease.status == "ACTIVE":
+                lease.unit.status = "occupied"
+            elif lease.status in ["TERMINATED", "EXPIRED"]:
+                lease.unit.status = "vacant"
+            lease.unit.save()
 
-        return Response(LeaseDetailSerializer(lease).data)
+            return Response(LeaseDetailSerializer(lease).data)
+        except ValidationError as ve:
+            logger.error(f"Lease update failed: {str(ve)}", exc_info=True)
+            return Response(
+                {"error": extract_error_message(ve)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Lease update failed: {str(e)}", exc_info=True)
+            return Response(
+                {"error": "Lease update failed"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @action(detail=True, methods=["post"])
     def terminate(self, request, lease_id=None):

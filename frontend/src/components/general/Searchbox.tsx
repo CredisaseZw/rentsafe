@@ -1,24 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import useSearchBox from "@/hooks/components/useSearchBox";
 interface SearchboxProps {
    placeholder: string;
-   handleSearch: (value: string) => void;
-   clearSearch?: ()=> void
 }
 
-function Searchbox({ handleSearch, placeholder, clearSearch }: SearchboxProps) {
-   const [searchValue, setSearchValue] = useState("");
- 
-   const onClearSearch = () => {
-      setSearchValue("");
-      clearSearch?.()
-   };
+function Searchbox({placeholder }: SearchboxProps) {
+   const {
+      searchValue,
+      setSearchValue,
+      onClearSearch,
+      handleOnSearchValue,
+   } = useSearchBox()
 
    return (
       <form onSubmit={(e:React.FormEvent<HTMLFormElement>)=>{
          e.preventDefault()
-         if (searchValue.trim()) handleSearch(searchValue.trim());
+         if (searchValue.trim()) handleOnSearchValue();
       }} 
       className="border-color flex items-center h-fit self-center justify-between rounded-sm border bg-white sm:w-full md:w-fit dark:bg-zinc-900">
          <Button onClick={onClearSearch} className="h-full" type="button" variant="ghost" size="xs">

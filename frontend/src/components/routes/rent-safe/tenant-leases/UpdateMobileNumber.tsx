@@ -14,8 +14,8 @@ import { PHONE_TYPES } from '@/constants';
 import type {  TenantSelection } from '@/types';
 import useUpdateIndividual from '@/hooks/apiHooks/useUpdateIndividual';
 import { toast } from 'sonner';
-import { isAxiosError } from 'axios';
 import SelectElement from '@/components/general/SelectElement';
+import { handleAxiosError } from '@/lib/utils';
 
 interface Props {
   open: boolean,
@@ -51,13 +51,7 @@ function UpdateMobileNumber({ updateIndividual, open, setOpen, setUpdateIndividu
         toast.success("Update Status", { description: `${updateIndividual.full_name}'s mobile number successfully updated to ${updateIndividual.mobile_number}` });
   
       },
-      onError: (error) => {
-          if (isAxiosError(error)) {
-          const message = error.response?.data.error ?? error.response?.data.details ?? "Something wen't wrong";
-          toast.error("Update Status", { description: `Update failed: ${message}` })
-          console.log(message);
-          }
-      },
+      onError: (error) => { handleAxiosError("Update failed", error)},
       onSettled: ()=> setLoading(false)    
     })
   }

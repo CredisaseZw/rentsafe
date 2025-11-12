@@ -3,7 +3,7 @@ import { COLOR_CLASSES } from "@/constants";
 import type { LucideIcon } from "lucide-react";
 import React from "react";
 
-interface GSCProps {
+interface props {
   value: string | React.ReactElement;
   subTitle: number | string | React.ReactElement;
   layoutScheme: {
@@ -13,9 +13,7 @@ interface GSCProps {
   valueAsChild?: React.ReactNode | false;
 }
 
-
-
-function DashboardCard({ value, subTitle, layoutScheme, valueAsChild = false }: GSCProps) {
+function DashboardCard({ value, subTitle, layoutScheme, valueAsChild = false }: props) {
   const Icon = layoutScheme.icon;
   const color = COLOR_CLASSES[layoutScheme.color] ?? COLOR_CLASSES["blue"];
 
