@@ -14,7 +14,7 @@ from apps.accounting.utils.helpers import (
     generate_credit_note_document_number,
 )
 from apps.individuals.models.models import Individual
-from apps.companies.models.models import Company
+from apps.companies.models.models import CompanyBranch
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 
 User = get_user_model()
@@ -199,7 +199,7 @@ class Customer(BaseModel):
         Individual, on_delete=models.SET_NULL, null=True, blank=True
     )
     company = models.ForeignKey(
-        Company, on_delete=models.SET_NULL, null=True, blank=True
+        CompanyBranch, on_delete=models.SET_NULL, null=True, blank=True
     )
 
     def __str__(self):
@@ -466,7 +466,7 @@ class CashSale(BaseModelWithUser):
         Individual, on_delete=models.SET_NULL, null=True, blank=True
     )
     company = models.ForeignKey(
-        Company, on_delete=models.SET_NULL, null=True, blank=True
+        CompanyBranch, on_delete=models.SET_NULL, null=True, blank=True
     )
 
     # Items details
@@ -539,7 +539,7 @@ class CreditNote(BaseModelWithUser):
         Individual, on_delete=models.SET_NULL, null=True, blank=True
     )
     company = models.ForeignKey(
-        Company, on_delete=models.SET_NULL, null=True, blank=True
+        CompanyBranch, on_delete=models.SET_NULL, null=True, blank=True
     )
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
     total_amount = models.DecimalField(
