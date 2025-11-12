@@ -295,7 +295,7 @@ class GeneralLedgerAccountViewSet(BaseViewSet):
         queryset = GeneralLedgerAccount.objects.select_related("account_sector").filter(
             Q(created_by__client=self.request.user.client) | Q(created_by__isnull=True)
         )
-        return queryset.order_by("-id")
+        return queryset.order_by("-account_number")
 
     def update(self, request, *args, **kwargs):
         try:
