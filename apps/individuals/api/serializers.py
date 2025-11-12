@@ -25,6 +25,7 @@ from apps.common.utils.validators import (
     validate_future_dates,
 )
 from apps.individuals.utils.helpers import (
+    individual_account_details_helper,
     individual_notes_helper,
     create_address_helper,
     individual_contact_helper,
@@ -186,6 +187,16 @@ class IndividualAccountsSerializer(serializers.ModelSerializer):
             raise ValidationError("This TIN number is already registered")
         if IndividualAccounts.objects.filter(vat_number__iexact=vat_number).exists():
             raise ValidationError("This VAT number is already registered")
+        maximum_length = 20
+        if len(tin_number) > maximum_length:
+            raise ValidationError(
+                f"TIN number cannot exceed {maximum_length} characters"
+            )
+        maximum_length = 20
+        if len(vat_number) > maximum_length:
+            raise ValidationError(
+                f"VAT number cannot exceed {maximum_length} characters"
+            )
         return data
 
 
@@ -236,6 +247,7 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
     current_employment = serializers.SerializerMethodField()
     contact_details = ContactDetailsSerializer(many=True, required=True)
     addresses = serializers.SerializerMethodField()
+    account_details = IndividualAccountsSerializer(many=True)
 
     class Meta:
         model = Individual
@@ -248,8 +260,9 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "marital_status",
             "email",
-            "current_employment",
             "contact_details",
+            "current_employment",
+            "account_details",
             "addresses",
         ]
 
@@ -279,9 +292,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         write_only=True,
     )
     date_of_birth = serializers.DateField(allow_null=True, required=False)
-    account_details = IndividualAccountsSerializer(
-        many=False, required=False, write_only=True
-    )
+    account_data = IndividualAccountsSerializer(many=False, required=False)
 
     def to_internal_value(self, data):
         dob = data.get("date_of_birth")
@@ -306,7 +317,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             "employment_details",
             "next_of_kin",
             "phone",
-            "account_details",
+            "account_data",
         ]
 
     def validate(self, data):
@@ -395,6 +406,9 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         employment_data = validated_data.pop("employment_details", [])
         kin_data = validated_data.pop("next_of_kin", [])
         contact_data = validated_data.pop("contact_details", [])
+        documents_data = validated_data.pop("documents", [])
+        notes_data = validated_data.pop("notes", [])
+        accounts_data = validated_data.pop("account_data", {})
 
         individual = getattr(self, "_existing_individual", None)
         if individual:
@@ -408,16 +422,13 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
 
         individual_ct = ContentType.objects.get_for_model(individual)
         create_address_helper(individual_ct, address_data, individual.pk)
+        individual_documents_helper(individual_ct, documents_data, individual.pk)
+        individual_notes_helper(individual_ct, notes_data, individual.pk)
+
         individual_contact_helper(individual, contact_data)
         individual_employment_details_helper(individual, employment_data)
         individual_next_of_kin_helper(individual, kin_data)
-
-        if account_data := validated_data.pop("account_details", None):
-            IndividualAccounts.objects.create(
-                individual=individual,
-                vat_number=account_data.get("vat_number"),
-                tin_number=account_data.get("tin_number"),
-            )
+        individual_account_details_helper(individual, accounts_data)
 
         return individual
 
@@ -429,6 +440,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         contact_data = validated_data.pop("contact_details", [])
         documents_data = validated_data.pop("documents", [])
         notes_data = validated_data.pop("notes", [])
+        accounts_data = validated_data.pop("account_data", {})
 
         user = self.context.get("user")
 
@@ -445,6 +457,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         individual_contact_helper(instance, contact_data)
         individual_employment_details_helper(instance, employment_data)
         individual_next_of_kin_helper(instance, kin_data)
+        individual_account_details_helper(instance, accounts_data)
 
         return instance
 

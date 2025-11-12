@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -11,7 +12,6 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.utils.timezone import now
 from apps.accounting.utils.helpers import (
     generate_invoice_document_number,
-    generate_credit_note_document_number,
 )
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import Company
@@ -91,6 +91,14 @@ class SalesItem(BaseModelWithUser):
                     last_number = 0
                 self.item_id = f"ITEM{last_number + 1:04d}"
         super().save(*args, **kwargs)
+
+    @property
+    def price_including_vat(self):
+        """Calculate unit price including VAT for the line item."""
+        price_incl_vat = self.price + (
+            self.tax_configuration.rate / Decimal("100.00") * self.price
+        )
+        return price_incl_vat
 
 
 class SalesCategory(BaseModelWithUser):
@@ -199,6 +207,10 @@ class Customer(BaseModel):
     )
 
     def __str__(self):
+        if self.is_individual and self.individual:
+            return f"{self.individual.full_name}"
+        elif not self.is_individual and self.company:
+            return f"{self.company.full_name}"
         return f"{self.id} {self.is_individual}"
 
     @property
@@ -526,16 +538,13 @@ class CashSale(BaseModelWithUser):
 
 
 class CreditNote(BaseModelWithUser):
-    credit_date = models.DateField(default=now)
-    document_number = models.CharField(
-        max_length=20, unique=True, default=generate_credit_note_document_number
-    )
-    is_individual = models.BooleanField(default=True)
-    individual = models.ForeignKey(
-        Individual, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    company = models.ForeignKey(
-        Company, on_delete=models.SET_NULL, null=True, blank=True
+    credit_date = models.DateField(default=date.today)
+    document_number = models.CharField(max_length=20, unique=True)
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
     total_amount = models.DecimalField(
@@ -545,39 +554,17 @@ class CreditNote(BaseModelWithUser):
     line_items = GenericRelation(
         "TransactionLineItem", related_query_name="creditnotes"
     )
-
-    def save(self, *args, **kwargs):
-        # Ensure document_number is generated only once if not set already
-        if not self.pk and not self.document_number:
-            self.document_number = generate_credit_note_document_number()
-
-        # Ensure that only one of individual or company is set
-        if self.individual and self.company:
-            raise ValidationError(
-                "A credit note cannot be linked to both an individual and a company."
-            )
-        elif self.individual:
-            self.is_individual = True
-        elif self.company:
-            self.is_individual = False
-        self.total_amount = self.total_amount.quantize(
-            Decimal("0.00"), rounding=ROUND_HALF_UP
-        )
-
-        self.full_clean()
-        super().save(*args, **kwargs)
+    discount = models.DecimalField(
+        max_digits=10, decimal_places=2, default=Decimal("0.00")
+    )
 
     def __str__(self):
-        customer_id_str = ""
-        if self.is_individual and self.individual:
-            customer_id_str = (
-                f"Individual: {self.individual.firstname} {self.individual.surname}"
-            )
-        elif not self.is_individual and self.company:
-            customer_id_str = f"Company: {self.company.registration_name}"
+        customer_name_str = ""
+        if self.customer.is_individual:
+            customer_name_str = self.customer.individual.full_name
         else:
-            customer_id_str = "N/A"  # Changed to N/A for consistency
-        return f"Credit Note {self.document_number} for {customer_id_str}"
+            customer_name_str = self.customer.company.full_name
+        return f"Credit Note {self.document_number} for {customer_name_str}"
 
     class Meta:
         app_label = "accounting"
@@ -614,13 +601,23 @@ class TransactionLineItem(BaseModel):
 
     def save(self, *args, **kwargs):
         # Calculate total_price if not provided or if recalculated
+        unit_price = self.sales_item.price
+        vat_amount = (
+            self.sales_item.tax_configuration.rate / Decimal("100.00") * unit_price
+        )
         if (
             self.quantity is not None
             and self.unit_price is not None
             and self.vat_amount is not None
         ):
-            calculated_total_price = (self.quantity * self.unit_price) + self.vat_amount
+            calculated_total_price = self.quantity * (unit_price + vat_amount)
             self.total_price = calculated_total_price.quantize(
+                Decimal("0.00"), rounding=ROUND_HALF_UP
+            )
+            self.unit_price = unit_price.quantize(
+                Decimal("0.00"), rounding=ROUND_HALF_UP
+            )
+            self.vat_amount = vat_amount.quantize(
                 Decimal("0.00"), rounding=ROUND_HALF_UP
             )
         super().save(*args, **kwargs)
@@ -631,6 +628,24 @@ class TransactionLineItem(BaseModel):
             self.parent_document, "document_number", str(self.object_id)
         )
         return f"{parent_type_name} {parent_display_id} - {self.sales_item.name} (Qty: {self.quantity})"
+
+    @property
+    def total_vat(self):
+        """Calculate total VAT for the line item."""
+        total_vat = self.vat_amount * self.quantity
+        return total_vat
+
+    @property
+    def total_price_excluding_vat(self):
+        """Calculate total price excluding VAT for the line item."""
+        total_excl_vat = self.unit_price * self.quantity
+        return total_excl_vat
+
+    @property
+    def total_including_vat(self):
+        """Calculate total price including VAT for the line item."""
+        total_incl_vat = (self.unit_price + self.vat_amount) * self.quantity
+        return total_incl_vat
 
 
 class PaymentMethod(BaseModel):
