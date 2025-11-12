@@ -533,7 +533,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         except ValidationError as e:
             print(f"Validation error creating invoice: {e}")
             return Response(
-                {"errorr": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
+                {"error": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             print(f"Unexpected error creating invoice: {e}")

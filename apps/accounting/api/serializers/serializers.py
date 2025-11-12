@@ -343,7 +343,7 @@ class CompanyCustomerSerializer(serializers.ModelSerializer):
     tin_number = serializers.SerializerMethodField()
 
     class Meta:
-        model = Company
+        model = CompanyBranch
         fields = [
             "id",
             "full_name",
@@ -357,7 +357,7 @@ class CompanyCustomerSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def get_full_name(self, obj):
-        return obj.registration_name
+        return obj.branch_name
 
     def get_email(self, obj):
         new_ob = CompanyProfile.objects.filter(company=obj).first()
@@ -612,9 +612,9 @@ class InvoiceSerializer(BaseCompanySerializer):
                 data["customer"] = customer_instance
                 data["is_individual"] = True
             else:
-                customer_instance = Company.objects.get(id=customer_id)
+                customer_instance = CompanyBranch.objects.get(id=customer_id)
                 data["customer"] = customer_instance
-        except (Individual.DoesNotExist, Company.DoesNotExist) as e:
+        except (Individual.DoesNotExist, CompanyBranch.DoesNotExist) as e:
             raise serializers.ValidationError(
                 {"customer_id": "Customer not found."}
             ) from e
@@ -684,10 +684,14 @@ class InvoiceSerializer(BaseCompanySerializer):
         return data
 
     def get_customer_details(self, obj):
+        from apps.accounting.api.serializers.serializers import (
+            CustomersSearchSerializer,
+        )
+
         if hasattr(obj, "customer") and obj.customer.is_individual:
-            return IndividualCustomerSerializer(obj.customer.individual).data
+            return CustomersSearchSerializer(obj.customer.individual).data
         elif hasattr(obj, "customer"):
-            return CompanyCustomerSerializer(obj.customer.company).data
+            return CustomersSearchSerializer(obj.customer.company).data
         return None
 
     def get_can_convert_to_fiscal(self, obj):
