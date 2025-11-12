@@ -40,6 +40,7 @@ class CustomersViewSet(BaseViewSet):
 
         customer_type = self.request.query_params.get("customer_type", "tenant")
         search_key = self.request.query_params.get("search")
+        tenant_type = self.request.query_params.get("tenant_type")
 
         if customer_type == "individual":
             customers = Individual.objects.filter(is_active=True)
@@ -48,15 +49,17 @@ class CustomersViewSet(BaseViewSet):
             )
             return filterset.qs
 
-        elif customer_type == "company":
+        if customer_type == "company":
             customers = CompanyBranch.objects.filter(company__is_active=True)
             filterset = CompanyCustomerFilter(
                 self.request.query_params, queryset=customers
             )
             return filterset.qs
 
-        elif customer_type == "tenant":
-            return search_tenants_for_client(user.client, search=search_key)
+        if customer_type == "tenant":
+            return search_tenants_for_client(
+                user.client, search=search_key, tenant_type=tenant_type
+            )
 
         return []
 
