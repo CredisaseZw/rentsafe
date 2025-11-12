@@ -1559,9 +1559,10 @@ class CustomersSearchSerializer(serializers.Serializer):
         return None
 
     def get_customer_type(self, obj):
-        request = self.context.get("request")
-        if request:
-            return request.query_params.get("customer_type")
+        if isinstance(obj, Individual):
+            return "individual"
+        elif isinstance(obj, CompanyBranch):
+            return "company"
         return None
 
     def get_account_number(self, obj):
