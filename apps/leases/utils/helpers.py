@@ -310,11 +310,9 @@ def create_lease_tenant(lease, tenant_data, user=None):
             raise ValidationError("Tenant is already associated with this lease")
 
         # Create the association and return it
-        association = LeaseTenantAssociation.objects.create(
+        return LeaseTenantAssociation.objects.create(
             lease=lease, tenant=lease_tenant, is_primary_tenant=is_primary_tenant
         )
-
-        return association
 
     except ContentType.DoesNotExist:
         raise ValidationError(f"Invalid tenant type: {tenant_type}")

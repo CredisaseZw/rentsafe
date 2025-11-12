@@ -343,7 +343,7 @@ class CompanyCustomerSerializer(serializers.ModelSerializer):
     tin_number = serializers.SerializerMethodField()
 
     class Meta:
-        model = Company
+        model = CompanyBranch
         fields = [
             "id",
             "full_name",
@@ -357,7 +357,7 @@ class CompanyCustomerSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def get_full_name(self, obj):
-        return obj.registration_name
+        return obj.branch_name
 
     def get_email(self, obj):
         new_ob = CompanyProfile.objects.filter(company=obj).first()
@@ -451,6 +451,83 @@ class RecurringToFiscalSerializer(serializers.Serializer):
         return data
 
 
+class InvoiceDetailSerializer(BaseCompanySerializer):
+    currency = CurrencySerializer(read_only=True)
+    invoice_type = serializers.ChoiceField(choices=Invoice.INVOICE_TYPE_CHOICES)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(), source="currency", write_only=True
+    )
+    items = TransactionLineItemSerializer(many=True, required=False)
+    customer_details = serializers.SerializerMethodField()
+    customer_id = serializers.IntegerField(write_only=True)
+    is_individual = serializers.BooleanField(write_only=True)
+    line_items = TransactionLineItemSerializer(many=True, read_only=True)
+    total_excluding_vat = serializers.ReadOnlyField()
+    vat_total = serializers.ReadOnlyField()
+    total_inclusive = serializers.ReadOnlyField()
+    can_convert_to_fiscal = serializers.SerializerMethodField()
+
+    class Meta(BaseCompanySerializer.Meta):
+        model = Invoice
+        fields = [
+            "id",
+            "document_number",
+            "invoice_type",
+            "currency",
+            "currency_id",
+            "items",
+            "discount",
+            "date_created",
+            "status",
+            "total_excluding_vat",
+            "vat_total",
+            "total_inclusive",
+            "customer_details",
+            "customer_id",
+            "is_individual",
+            "line_items",
+            "lease",
+            "reference_number",
+            "is_recurring",
+            "frequency",
+            "next_invoice_date",
+            "original_invoice",
+            "is_invoiced",
+            "can_convert_to_fiscal",
+        ]
+
+        read_only_fields = [
+            "document_number",
+            "user",
+            "date_created",
+            "status",
+            "can_convert_to_fiscal",
+            "original_invoice",
+        ]
+        extra_kwargs = {
+            "lease": {"required": False, "allow_null": True},
+            "original_invoice": {"required": False, "allow_null": True},
+            "frequency": {"required": False, "allow_null": True},
+            "next_invoice_date": {"required": False, "allow_null": True},
+        }
+
+    def get_customer_details(self, obj):
+        from apps.accounting.api.serializers.serializers import (
+            CustomersSearchSerializer,
+        )
+
+        customer = getattr(obj, "customer", None)
+        if customer and customer.is_individual:
+            return CustomersSearchSerializer(customer.individual).data
+        elif customer:
+            return CustomersSearchSerializer(customer.company).data
+        return None
+
+    def get_can_convert_to_fiscal(self, obj):
+        """Check if this invoice can be converted to fiscal"""
+        return obj.can_generate_fiscal()
+
+
 class InvoiceSerializer(BaseCompanySerializer):
     currency = CurrencySerializer(read_only=True)
     invoice_type = serializers.ChoiceField(choices=Invoice.INVOICE_TYPE_CHOICES)
@@ -535,9 +612,9 @@ class InvoiceSerializer(BaseCompanySerializer):
                 data["customer"] = customer_instance
                 data["is_individual"] = True
             else:
-                customer_instance = Company.objects.get(id=customer_id)
+                customer_instance = CompanyBranch.objects.get(id=customer_id)
                 data["customer"] = customer_instance
-        except (Individual.DoesNotExist, Company.DoesNotExist) as e:
+        except (Individual.DoesNotExist, CompanyBranch.DoesNotExist) as e:
             raise serializers.ValidationError(
                 {"customer_id": "Customer not found."}
             ) from e
@@ -607,10 +684,14 @@ class InvoiceSerializer(BaseCompanySerializer):
         return data
 
     def get_customer_details(self, obj):
+        from apps.accounting.api.serializers.serializers import (
+            CustomersSearchSerializer,
+        )
+
         if hasattr(obj, "customer") and obj.customer.is_individual:
-            return IndividualCustomerSerializer(obj.customer.individual).data
+            return CustomersSearchSerializer(obj.customer.individual).data
         elif hasattr(obj, "customer"):
-            return CompanyCustomerSerializer(obj.customer.company).data
+            return CustomersSearchSerializer(obj.customer.company).data
         return None
 
     def get_can_convert_to_fiscal(self, obj):
