@@ -132,7 +132,6 @@ class LeaseInvoiceService:
                             name=sales_item_name[:255],
                             defaults={
                                 "category": sales_category,
-                                "item_id": f"LEASE_{charge.charge_type}_{charge.id}",
                                 "unit_price_currency": lease.currency,
                                 "price": charge.amount,
                                 "unit_name": "Unit",
@@ -201,7 +200,6 @@ class LeaseInvoiceService:
                 name="Opening Balance",
                 defaults={
                     "category": sales_category,
-                    "item_id": f"OPENBAL_{lease.lease_id}",
                     "unit_price_currency": lease.currency,
                     "price": Decimal("0.00"),
                     "unit_name": "Balance",
