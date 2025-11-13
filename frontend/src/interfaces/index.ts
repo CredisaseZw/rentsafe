@@ -449,9 +449,10 @@ export interface Response {
    previous : string | undefined
 }
 export interface Biller {
-  biller_id: number;
+  biller_id: number ;
   biller_name: string;
-  biller_type: "individual" | "company";
+  selector_type : "tenant" | "individual" | "company";
+  biller_type: "tenant" | "individual" | "company";
   biller_phone: string;
   biller_email: string;
   biller_address: string;
@@ -485,14 +486,14 @@ export interface Invoice {
 export interface InvoiceCustomerDetails {
   id: number;
   full_name: string;
-  address : string | null;
   phone: string | null;
   email: string | null;
   tin_number: string | null;
   vat_number: string | null;
   account_number: string | null;
   industry: string | null;
-  client_type : "individual" | "company" | string
+  customer_type : "individual" | "company" | "tenant",
+  address: Address | null
 }
 export interface LineItem {
   sales_item: SalesItem;

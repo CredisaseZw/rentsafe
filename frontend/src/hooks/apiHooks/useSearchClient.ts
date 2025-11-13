@@ -2,14 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 
 export default function useSearchClient(
-  type: "individual" | "company" |string,
+  type: "individual" | "company" | "tenant",
   query: string,
   enabled: boolean
 ) {
   const url =
     type === "individual"
-      ? "/api/individuals/search/?search="
-      : "/api/branches/?search=";
+    ? "/api/individuals/search/?search="
+    : type === "tenant"
+    ? "/api/accounting/customers/?customer_type=tenant&search="
+    : "/api/branches/?search=";
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["search_landlord", type, query],

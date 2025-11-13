@@ -118,7 +118,8 @@ export function formatDateToPythonSLiking(date: string): string {
   return `${year}-${month}-${day}`;
 }
 
-export function formatAddress(addr: Address): string {
+export function formatAddress(addr: Address | null): string {
+  if (!addr) return "";
   const parts: string[] = [];
 
   if (addr.street_address) parts.push(addr.street_address);
@@ -674,7 +675,7 @@ export const generateUpdatePayload = (
     }
   }
 
-  // deposits: only if currency/amount/holder/date changed
+  // deposits: only if currency/amounts/holder/date changed
   if (updated.deposits && original.deposits) {
     const changedDeposits = updated.deposits.filter((dep, idx) => {
       if (!original.deposits || !original.deposits[idx]) return true;

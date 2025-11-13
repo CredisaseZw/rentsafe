@@ -1,4 +1,4 @@
-import type { Biller, BranchFull, IndividualMinimal } from "@/interfaces";
+import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from "@/interfaces";
 import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, handleTrackChangedFields, validateInvoices } from "@/lib/utils";
 import type { InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { Invoice } from "@/interfaces";
@@ -23,53 +23,53 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
   const [formData, setFormData] = useState<Biller>({
     biller_id : 0,
     biller_name : "",
-    biller_type: "individual",
+    biller_type: "tenant",
     biller_phone : "",
     biller_email : "",
     biller_address : "",
     biller_vat_no : "",
     biller_tin_number : "",
+    selector_type : "tenant",
     invoice_type : defaultInvoiceType ?? "fiscal",
     issue_date : getSummaryDate(getCurrentDate())
   })
 
   useEffect(()=>{
     if(!invoice) return;
-    setFormData((p)=>({
-      ...p,
+    const BILLER: Partial<Biller> = {
       biller_name : invoice.customer_details.full_name ?? "",
       biller_id : Number(invoice.customer_details.id),
       biller_email : invoice.customer_details.email ?? "",
       biller_phone : invoice.customer_details.phone ?? "",
-      biller_address : invoice.customer_details.address ??"",
+      biller_type : invoice.customer_details.customer_type ?? "",
+      biller_address : formatAddress(invoice.customer_details.address!),
       biller_tin_number : invoice.customer_details.tin_number ?? "",
       biller_vat_no : invoice.customer_details.vat_number ?? "",
       issue_date : getSummaryDate(invoice.date_created)
-    }))
+    }
+    setFormData((p)=>({ ...p, ...BILLER }))
+    const {biller_id, invoice_type, biller_type, issue_date, ...rest} = BILLER
+    setBillerCopy(rest);
     setSearchItem(invoice.customer_details.full_name ?? "");
-
   }, [invoice])
 
-  const onSelectBiller = (item: IndividualMinimal | BranchFull) => {
-    const isIndividual = "first_name" in item;
-
-    const BILLER = {
-      biller_id: isIndividual ? item.id : item.company.id,
-      biller_name: isIndividual
-        ? `${item.first_name} ${item.last_name}`
-        : item.company.registration_name,
+  const onSelectBiller = (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => {
+    const isCustomer = "vat_number" in item;
+    const BILLER: Partial<Biller> = {
+      biller_id: isCustomer ? Number(item.id) : 0,
+      biller_name: isCustomer ? item.full_name : "",
       biller_phone: item.phone ?? "",
       biller_email: item.email ?? "",
-      biller_address: isIndividual
-        ? (item.primary_address ? formatAddress(item.primary_address) : "")
-        : item.summary_address ?? "",
-      biller_vat_no: item.account_data?.vat_number ?? "",
-      biller_tin_number: item.account_data?.tin_number ?? "",
+      biller_type: isCustomer ? item.customer_type as Biller['biller_type'] : "individual",
+      biller_address: isCustomer ? formatAddress(item.address) : "",
+      biller_vat_no: isCustomer ? item.vat_number ?? "" : "",
+      biller_tin_number: isCustomer ? item.tin_number ?? "" : "",
     };
+
     setBillerCopy(BILLER);
     setFormData((prev) => ({ ...prev, ...BILLER }));
   };
-
+  
   const handleOnChangeFormData = (key:string, val: string)=>{
     setFormData((prev)=>({
       ...prev,
@@ -91,16 +91,21 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     if(validateInvoices(rows, formData)) return;
 
     setLoading(true)
-    const {biller_id, invoice_type, biller_type, ...BILLER} = formData
-    const {UPDATE} = useTrackBiller( billerCopy, BILLER);
-
+    const {biller_id, invoice_type, biller_type, selector_type, issue_date,...BILLER} = formData
+    const { UPDATE } = useTrackBiller( billerCopy, BILLER);
+    
     if (UPDATE){
       const payload_ = {
         mode : formData.biller_type,
         id : Number(formData.biller_id),
         data : UPDATE
       }
-      updateBiller?.mutate(payload_);
+      updateBiller?.mutate(payload_, {
+        onSuccess : ()=>{
+          queryClient.invalidateQueries({queryKey : ["invoice", Number(invoice?.id)]});
+          toast.success("Biller information update successful.");
+        }
+      });
     }
 
     const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));
@@ -117,7 +122,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     if(mode === "update"){
       const invoicePayload = {
         invoice_type: invoice?.invoice_type,
-        is_individual: invoice?.customer_details.client_type === "individual",
+        is_individual: invoice?.customer_details.customer_type === "individual",
         customer_id: invoice?.customer_details.id,
         currency_id: invoice?.currency.id,
         discount: -Number(invoice?.discount || 0),
@@ -127,11 +132,14 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
               quantity: Number(item.quantity),
             }))
           : [],
-        sale_date: new Date(invoice?.date_created ?? "").toISOString().split("T")[0]
+      //  sale_date: new Date(invoice?.date_created ?? "").toISOString().split("T")[0]
       }
-      const changes = handleTrackChangedFields(invoicePayload, PayloadData);
-      console.log(changes)
-      if(!changes) return toast.info("No changes made")
+      const {sale_date, ...invoiceCopy} = PayloadData;
+      const changes = handleTrackChangedFields(invoicePayload, invoiceCopy);
+      if(!changes) {
+        setLoading(false);
+        return toast.info("No Invoice changes made")
+      }
     }
 
     const PAYLOAD:Payload= {
@@ -145,6 +153,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     mutate.mutate(PAYLOAD,{
       onSuccess : (data: Invoice)=> {
         queryClient.invalidateQueries({queryKey : ["invoices", MODES[PayloadData.invoice_type.toUpperCase() as keyof typeof MODES]]});
+        if(mode === "update") queryClient.invalidateQueries({queryKey : ["invoice", Number(invoice?.id)]});
         const m = mode === "create"
         ? `New invoice ${data.document_number} created successfully`
         : `Invoice ${data.document_number} updated successfully`

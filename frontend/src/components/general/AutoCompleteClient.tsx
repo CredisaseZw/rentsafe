@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import type { Address, BranchFull, IndividualMinimal } from "@/interfaces";
+import type { Address, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 import { Button } from "../ui/button";
@@ -12,12 +12,12 @@ interface Props {
   displayValue?: "name" | "ID"
   clientLabel?: string;
   searchItem: string;
-  clientType: string;
+  clientType: "tenant" | "individual" | "company";
   isRequired?: boolean;
   createClient?: boolean;
   disableSearch?: boolean;
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>;
-  onSelectValue?: (item: IndividualMinimal | BranchFull, index?: number) => void;
+  onSelectValue?: (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails, index?: number) => void;
   setSearchItem?: Dispatch<SetStateAction<string>>;
   multiSetSearchItem?: (index: number, key: string, value: string) => void;
 }
@@ -98,7 +98,7 @@ function AutoCompleteClient({
                   onClick={() => {
                     navigate(
                       `/services/rent-safe/?${
-                        clientType === "individual"
+                        clientType === "individual" || clientType === "tenant"
                           ? "addIndividual"
                           : "addCompany"
                       }=true&&next=${path.pathname}`
@@ -113,18 +113,22 @@ function AutoCompleteClient({
             </div>
           )}
           {Array.isArray(data) &&
-            data.map((item: IndividualMinimal | BranchFull) => {
+            data.map((item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => {
               const clientName =
                 "first_name" in item
                   ? `${item.identification_number} - ${item.first_name} ${item.last_name}`
-                  : `${item.company.registration_number} - ${item.company.registration_name}`;
+                  : "company" in item
+                  ? `${item.company.registration_number} - ${item.company.registration_name}`
+                  : item.full_name;
 
               const identificationNumber =
-                "first_name" in item
+                  "first_name" in item
                   ? item.identification_number
-                  : item.company.registration_number;
+                  : "company" in item 
+                  ? item.company.registration_number
+                  : ""
 
-              if (index === 0 && setPrimaryTenantAddress)
+              if (index === 0 && setPrimaryTenantAddress && "primary_address" in item)
                 setPrimaryTenantAddress(item.primary_address);
 
               return (

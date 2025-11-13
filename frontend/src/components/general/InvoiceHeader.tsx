@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
-import type { Biller, BranchFull, IndividualMinimal } from '@/interfaces'
+import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from '@/interfaces'
 
 interface props {
     formData: Biller,
@@ -15,7 +15,7 @@ interface props {
     isType?: boolean
     setFormData: React.Dispatch<React.SetStateAction<Biller>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
-    onSelectBiller: (item: IndividualMinimal | BranchFull) => void;
+    onSelectBiller: (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => void;
     handleOnChangeFormData : (key:string, val: string) => void
 }
 
@@ -28,8 +28,8 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                     <Label className='text-gray-800 dark:text-white'>Bill To</Label>
                     <div className="flex flex-row gap-5">
                         <Select
-                            value={formData.biller_type}
-                            onValueChange={(val: "individual" | "company") => {
+                            value={formData.selector_type}
+                            onValueChange={(val: "individual" | "company" | "tenant") => {
                                 setSearchItem("")
                                 setFormData((prev) => ({
                                     ...prev,
@@ -41,6 +41,8 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                                     biller_vat_no : "",
                                     biller_tin_number : "",
                                     biller_type: val,
+                                    selector_type : val
+
                                 }));
                             }}
                         >
@@ -48,6 +50,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                                 <SelectValue placeholder="Select ..." />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value={"tenant"}>Tenant</SelectItem>
                                 {
                                     IN_LEASE_CLIENT_TYPES.map((option:Option, index : number)=>
                                         <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
@@ -60,7 +63,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                             isRequired = {false}
                             searchItem = {searchItem}
                             setSearchItem = {setSearchItem}
-                            clientType = {formData.biller_type}
+                            clientType = {formData.selector_type}
                             onSelectValue = {onSelectBiller}
                         />
                     </div> 

@@ -1,8 +1,10 @@
+import { useCurrency } from "@/contexts/CurrencyContext"
 import { useState } from "react"
 import { useSearchParams } from "react-router"
 
 export default function useInvoicesFilter() {
   const [open, setOpen] = useState(false)
+  const {currencies} = useCurrency()
   const [searchParams, setSearchParams] = useSearchParams()
   const [filterPayload, setFilterPayload] = useState({
     status: "",
@@ -17,7 +19,7 @@ export default function useInvoicesFilter() {
     setFilterPayload((p) => ({ ...p, [filterKey]: value }))
   }
 
-  const applyFilters = () => {
+  const applyFilters = (e: React.FormEvent<HTMLFormElement>) => {
     const newParams = new URLSearchParams(searchParams)
 
     Object.keys(filterPayload).forEach((objectKey) => {
@@ -48,6 +50,7 @@ export default function useInvoicesFilter() {
   return {
     filterPayload,
     open,
+    currencies,
     setOpen,
     applyFilters,
     handleOnFilterChange,
