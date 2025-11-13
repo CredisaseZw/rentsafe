@@ -1520,11 +1520,12 @@ class CustomersSearchSerializer(serializers.Serializer):
     full_name = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
-    # address = serializers.SerializerMethodField()
     tin_number = serializers.SerializerMethodField()
     vat_number = serializers.SerializerMethodField()
     account_number = serializers.SerializerMethodField()
     industry = serializers.SerializerMethodField()
+    customer_type = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
         if isinstance(obj, Individual):
@@ -1555,6 +1556,13 @@ class CustomersSearchSerializer(serializers.Serializer):
                     IndividualAccounts.objects.filter(individual=obj).first()
                 )
             return self._individual_account_cache[individual_id]
+        return None
+
+    def get_customer_type(self, obj):
+        if isinstance(obj, Individual):
+            return "individual"
+        elif isinstance(obj, CompanyBranch):
+            return "company"
         return None
 
     def get_account_number(self, obj):
