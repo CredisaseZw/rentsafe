@@ -325,7 +325,7 @@ class CreditNoteAdmin(admin.ModelAdmin):
             customer_information = f"{individual.first_name} {individual.last_name} {individual.identification_number} {individual.email}"
             return customer_information
         elif not obj.customer.is_individual and obj.customer.company:
-            return obj.customer.company.registration_name
+            return obj.customer.company.company.registration_name
         return "N/A"
 
     def total_credit_note_amount(self, obj):

@@ -605,25 +605,27 @@ class TransactionLineItem(BaseModel):
 
     def save(self, *args, **kwargs):
         # Calculate total_price if not provided or if recalculated
-        unit_price = self.sales_item.price
-        vat_amount = (
-            self.sales_item.tax_configuration.rate / Decimal("100.00") * unit_price
-        )
+        unit_price = self.unit_price if self.unit_price else self.sales_item.price
+
         if (
-            self.quantity is not None
-            and self.unit_price is not None
-            and self.vat_amount is not None
+            self.sales_item.tax_configuration
+            and self.sales_item.tax_configuration.vat_applicable
         ):
+            vat_rate = self.sales_item.tax_configuration.rate / Decimal("100.00")
+        else:
+            vat_rate = Decimal("0.00")
+
+        vat_amount = (unit_price * vat_rate).quantize(
+            Decimal("0.00"), rounding=ROUND_HALF_UP
+        )
+
+        if self.quantity is not None:
             calculated_total_price = self.quantity * (unit_price + vat_amount)
             self.total_price = calculated_total_price.quantize(
                 Decimal("0.00"), rounding=ROUND_HALF_UP
             )
-            self.unit_price = unit_price.quantize(
-                Decimal("0.00"), rounding=ROUND_HALF_UP
-            )
-            self.vat_amount = vat_amount.quantize(
-                Decimal("0.00"), rounding=ROUND_HALF_UP
-            )
+        self.unit_price = unit_price.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        self.vat_amount = vat_amount
         super().save(*args, **kwargs)
 
     def __str__(self):

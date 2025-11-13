@@ -178,7 +178,7 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
 class IndividualAccountsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndividualAccounts
-        fields = ["vat_number", "tin_number"]
+        fields = ["id", "vat_number", "tin_number"]
 
     def validate(self, data):
         tin_number = data.get("tin_number", "").strip()
@@ -408,7 +408,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         contact_data = validated_data.pop("contact_details", [])
         documents_data = validated_data.pop("documents", [])
         notes_data = validated_data.pop("notes", [])
-        accounts_data = validated_data.pop("account_data", {})
+        accounts_data = validated_data.pop("account_data", [])
 
         individual = getattr(self, "_existing_individual", None)
         if individual:
@@ -440,14 +440,13 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         contact_data = validated_data.pop("contact_details", [])
         documents_data = validated_data.pop("documents", [])
         notes_data = validated_data.pop("notes", [])
-        accounts_data = validated_data.pop("account_data", {})
+        accounts_data = validated_data.pop("account_data", [])
 
         user = self.context.get("user")
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-
         individual_ct = ContentType.objects.get_for_model(instance)
 
         create_address_helper(individual_ct, address_data, instance.pk)
@@ -457,6 +456,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         individual_contact_helper(instance, contact_data)
         individual_employment_details_helper(instance, employment_data)
         individual_next_of_kin_helper(instance, kin_data)
+        print("creating accounts", accounts_data)
         individual_account_details_helper(instance, accounts_data)
 
         return instance

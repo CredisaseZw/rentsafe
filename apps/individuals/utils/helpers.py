@@ -104,7 +104,8 @@ def individual_notes_helper(content_type, notes_data, object_id):
 
 
 def individual_account_details_helper(instance, account_data):
-    for account in account_data:
+    accounts = [account_data] if isinstance(account_data, dict) else account_data
+    for account in accounts:
         account_id = account.get("id")
         lookup = (
             {"id": account_id, "individual": instance}

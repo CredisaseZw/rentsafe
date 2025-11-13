@@ -54,7 +54,6 @@ from apps.accounting.api.serializers.serializers import (
     CashBookSerializer,
     InvoiceDetailSerializer,
     CurrencySerializer,
-    CreditNoteSerializer,
     DisbursementSerializer,
 )
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
@@ -63,8 +62,6 @@ from apps.common.utils.helpers import extract_error_message
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
-
-from apps.leases.models.models import Lease
 
 logger = logging.getLogger("accounting")
 
@@ -934,12 +931,6 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         except Exception as e:
             # Don't let logging errors break the main transaction
             print(f"Failed to log invoice action: {str(e)}")
-
-
-class CreditNoteViewSet(BaseCompanyViewSet):
-    queryset = CreditNote.objects.all()
-    serializer_class = CreditNoteSerializer
-    filterset_class = CreditNoteFilter
 
 
 class PaymentViewSet(BaseCompanyViewSet):
