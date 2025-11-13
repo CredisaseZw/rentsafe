@@ -456,7 +456,6 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
         individual_contact_helper(instance, contact_data)
         individual_employment_details_helper(instance, employment_data)
         individual_next_of_kin_helper(instance, kin_data)
-        print("creating accounts", accounts_data)
         individual_account_details_helper(instance, accounts_data)
 
         return instance
