@@ -1,6 +1,6 @@
 import type { Invoice } from '@/interfaces'
 import Pill from './Pill'
-import { DELETION_LINKS, INVOICE_SALES_HEADERS, INVOICE_STATUS_VARIANT, MODE_PAGES, MODES } from '@/constants'
+import { DELETION_LINKS, INVOICE_SALES_HEADERS, INVOICE_STATUS_VARIANT, MODES } from '@/constants'
 import { capitalizeFirstLetter, getSummaryDate, handleDeletion } from '@/lib/utils'
 import { TableBase } from './TableBase'
 import { TableCell, TableRow } from '../ui/table'
@@ -12,8 +12,8 @@ import {
 import { EllipsisVertical } from 'lucide-react'
 import MutateInvoiceStatus from '../routes/rent-safe/accounting/sales/sales-invoice/MutateInvoiceStatus'
 import DeleteDialogue from './DeleteDialogue'
-import { useSearchParams } from 'react-router'
 import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
+import { getRefetchInvoices } from '@/store/invoiceStore'
 
 interface props{
     invoice: Invoice | undefined
@@ -27,8 +27,6 @@ function SingleInvoice({invoice, handleGoBack, markInvoice}:props) {
   : invoice?.invoice_type === "proforma"
   ? MODES.PROFORMA
   : MODES.RECURRING
-  const [searchParams] = useSearchParams();
-  const page = Number(searchParams.get(MODE_PAGES[MODE]) || 1);
 
   return (
     <div className='w-full'>
@@ -87,7 +85,7 @@ function SingleInvoice({invoice, handleGoBack, markInvoice}:props) {
                         }
                         successCallBack={()=> handleGoBack?.()}
                         mutationFunc={()=> handleDeletion(DELETION_LINKS.INVOICE, Number(invoice?.id))}
-                        keyStore={["invoices", MODE, page,""]}
+                        keyStore={()=>getRefetchInvoices?.()}
                         value={`${capitalizeFirstLetter(invoice?.invoice_type ?? "-")} Invoice`}
                         
                       />

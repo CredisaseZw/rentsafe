@@ -14,7 +14,7 @@ export default function useIndividualPaymentStatusTab() {
       const individuals = Array.isArray(data) ? data : data?.results;
 
       return (individuals as Omit<IndividualMinimal, "contact_details">[])?.map((cell) => {
-         const { addresses, primary_address, ...rest } = cell;
+         const { addresses, primary_address, account_data, ...rest } = cell;
          return {
             ...rest,
             select: <IndividualPaymentStatusReport individualId={cell.id} />,

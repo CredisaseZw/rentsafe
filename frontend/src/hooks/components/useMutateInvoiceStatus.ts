@@ -2,26 +2,20 @@ import type { UseMutationResult } from "@tanstack/react-query";
 import { useState } from "react"
 import type { InvoiceMutationParams } from "../apiHooks/useInvoiceMutations";
 import { toast } from "sonner";
-import { INVOICE_MUTATION_STATUSES, MODE_PAGES} from "@/constants";
-import useClient from "../general/useClient";
+import { INVOICE_MUTATION_STATUSES, } from "@/constants";
 import { handleAxiosError } from "@/lib/utils";
-import { useSearchParams } from "react-router";
+import { getRefetchInvoices } from "@/store/invoiceStore";
 
-export default function useMutateInvoiceStatus(id: number, mode: string, invoiceMode : string, successCallBack? : ()=>void){
+export default function useMutateInvoiceStatus(id: number, mode: string, invoiceMode? : string, successCallBack? : ()=>void){
     const [open, setOpen] = useState(false);
-    const [searchParams] = useSearchParams();
-    const page = Number(searchParams.get(MODE_PAGES[mode]) || 1);
     const [loading, setLoading] = useState(false);
-    const queryClient = useClient();
-
     const handleMarkInvoice = (
         mutateInvoice: UseMutationResult<any, Error, InvoiceMutationParams, unknown>
     )=>{
         setLoading(true);
-        
         mutateInvoice.mutate({ id, mode }, {
             onSuccess : ()=>{
-                queryClient.refetchQueries({queryKey : ["invoices", invoiceMode, page,""]});
+                getRefetchInvoices?.();
                 toast.success(INVOICE_MUTATION_STATUSES[mode as keyof typeof INVOICE_MUTATION_STATUSES].successMessage)
                 successCallBack?.()
                 setOpen(false);
@@ -31,6 +25,7 @@ export default function useMutateInvoiceStatus(id: number, mode: string, invoice
         })
     }
     return {
+        invoiceMode,
         loading,
         open,
         setOpen,

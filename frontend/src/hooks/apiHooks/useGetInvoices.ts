@@ -1,39 +1,39 @@
 import { useQuery } from "@tanstack/react-query"
-import { api }  from "@/api/axios"
-import { MODES } from "@/constants";
-import type { Response } from "@/interfaces";
-import type { Invoice } from "@/interfaces";
+import { api } from "@/api/axios"
+import { useSearchParams } from "react-router"
+import type { Response, Invoice } from "@/interfaces"
+import { setRefetchInvoices } from "@/store/invoiceStore"
+
 interface InvoiceResponse extends Response {
-    results : Invoice[]
+  results: Invoice[]
 }
 
-function useGetInvoices(page:number, mode:string, search?: string | undefined, id?:number | undefined) {    
-    const searchParam = search && search.trim().length > 0
-    ? `&search=${encodeURIComponent(search)}`
-    : "";
+function useGetInvoices(mode: string, page: number, search?: string) {
+  const [searchParams] = useSearchParams()
+  const params = new URLSearchParams(searchParams)
+  params.set("invoice_type__in", mode.split("_")[0])
+  params.set("page", String(page))
+  if (search) params.set("search", search)
 
-    const INVOICE_MODES = {
-        [MODES.FISCAL]: `/api/accounting/invoices/fiscal-invoices/?page=${page}${searchParam}`,
-        [MODES.RECURRING]: `/api/accounting/invoices/recurring-invoices/?page=${page}${searchParam}`,
-        [MODES.PROFORMA]: `/api/accounting/invoices/proforma-invoices/?page=${page}${searchParam}`,
-        [MODES.CANCELLED]: `/api/accounting/invoices/get-cancelled-invoices/?page=${page}${searchParam}`,
-        [MODES.PAID]: `/api/accounting/invoices/get-paid/?page=${page}${searchParam}`,
-        [MODES.PENDING]: `/api/accounting/invoices/get-unpaid/?page=${page}${searchParam}`,
-        [MODES.WITH_PAYMENTS]: `/api/accounting/invoices/${id}/with-payments?page=${page}${searchParam}`,
-    };
-    const {data, isLoading, isError} = useQuery<InvoiceResponse>({
-        queryKey : ["invoices", mode, page, search ?? ""],
-        queryFn : async () =>{
-            const response = await api.get<InvoiceResponse>(INVOICE_MODES[mode as keyof typeof INVOICE_MODES])
-            return response.data;
-        }
-    })
+  const queryString = params.toString() ? `?${params.toString()}` : ""
 
-    return {
-        invoicesData : data,
-        invoicesLoading : isLoading,
-        invoicesError: isError
-    }
+  const { data, isLoading, isError, refetch } = useQuery<InvoiceResponse>({
+    queryKey: ["invoices", mode, page, queryString],
+    queryFn: async () => {
+      const response = await api.get<InvoiceResponse>(
+        `/api/accounting/invoices/${queryString}`
+      )
+      return response.data
+    },
+  })
+
+  setRefetchInvoices(refetch)
+
+  return {
+    invoicesData: data,
+    invoicesLoading: isLoading,
+    invoicesError: isError,
+  }
 }
 
 export default useGetInvoices

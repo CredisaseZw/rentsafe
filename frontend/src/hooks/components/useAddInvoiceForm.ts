@@ -5,9 +5,9 @@ import type { Invoice } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import useClient from "../general/useClient";
-import { MODES } from "@/constants";
 import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
+import { getRefetchInvoices } from "@/store/invoiceStore";
 
 export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined, invoice?: Invoice){
   const [open, setOpen] = useState(false);
@@ -152,7 +152,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     }
     mutate.mutate(PAYLOAD,{
       onSuccess : (data: Invoice)=> {
-        queryClient.invalidateQueries({queryKey : ["invoices", MODES[PayloadData.invoice_type.toUpperCase() as keyof typeof MODES]]});
+        getRefetchInvoices?.();
         if(mode === "update") queryClient.invalidateQueries({queryKey : ["invoice", Number(invoice?.id)]});
         const m = mode === "create"
         ? `New invoice ${data.document_number} created successfully`

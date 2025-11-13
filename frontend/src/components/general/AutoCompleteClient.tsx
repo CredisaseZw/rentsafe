@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import type { Address, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from "@/interfaces";
+import type { Address} from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 import { Button } from "../ui/button";
@@ -12,12 +12,12 @@ interface Props {
   displayValue?: "name" | "ID"
   clientLabel?: string;
   searchItem: string;
-  clientType: "tenant" | "individual" | "company";
+  clientType: "tenant" | "individual" | "company" | string;
   isRequired?: boolean;
   createClient?: boolean;
   disableSearch?: boolean;
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>;
-  onSelectValue?: (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails, index?: number) => void;
+  onSelectValue?: (item: any, index?: number) => void;
   setSearchItem?: Dispatch<SetStateAction<string>>;
   multiSetSearchItem?: (index: number, key: string, value: string) => void;
 }
@@ -113,7 +113,7 @@ function AutoCompleteClient({
             </div>
           )}
           {Array.isArray(data) &&
-            data.map((item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => {
+            data.map((item: any) => {
               const clientName =
                 "first_name" in item
                   ? `${item.identification_number} - ${item.first_name} ${item.last_name}`

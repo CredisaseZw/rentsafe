@@ -13,9 +13,13 @@ export default function useDelete({mutationFunc, keyStore, value, successCallBac
   const queryClient = useClient()
   const { mutate } = useMutation({
     mutationFn: () => mutationFunc(),
-    onSuccess: () => {
-        const PAGE = Number(searchParams.get("page") || 1)
-        queryClient.refetchQueries({ queryKey: typeof(keyStore) === "string" ? [keyStore, PAGE] : keyStore })
+    onSuccess: () => {  
+        if(typeof(keyStore) !== "function"){
+          const PAGE = Number(searchParams.get("page") || 1)
+          queryClient.refetchQueries({ queryKey: typeof(keyStore) === "string" ? [keyStore, PAGE] : keyStore })
+        } else {
+          keyStore?.() 
+        }
         toast.success(`${value} deleted successfully`)
         successCallBack?.();
         setOpen(false)

@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
 import useGetInvoices from "../apiHooks/useGetInvoices";
 import { handleAxiosError } from "@/lib/utils";
-import { MODE_PAGES } from "@/constants";
 import type { PaginationData } from "@/interfaces";
 import type { Invoice } from "@/interfaces";
+import { useSearchParams } from "react-router";
+import { MODE_PAGES } from "@/constants";
 
 function useInvoices(mode: string) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams()
   const page = Number(searchParams.get(MODE_PAGES[mode]) || 1);
-  const search = searchParams.get("search") || undefined;
-  const status = searchParams.get("status") || undefined;
+  const search = searchParams.get("search") || undefined
   const [pagination, setPagination] = useState<PaginationData | undefined>();
-  const { invoicesData, invoicesError, invoicesLoading } = useGetInvoices( page, status ?? mode, search );
+  const { invoicesData, invoicesError, invoicesLoading } = useGetInvoices(mode, page, search);
 
   useEffect(() => {
     if (handleAxiosError(`Failed to fetch ${mode.replace("_", " ")}`, invoicesError)) return;

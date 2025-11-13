@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 
 export default function useSearchClient(
-  type: "individual" | "company" | "tenant",
+  type: "individual" | "company" | "tenant" | string,
   query: string,
   enabled: boolean
 ) {

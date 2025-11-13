@@ -20,12 +20,12 @@ import DeleteDialogue from "@/components/general/DeleteDialogue"
 import { Link } from "react-router"
 import MutateInvoiceStatus from "./MutateInvoiceStatus"
 import Pill from "@/components/general/Pill"
+import { getRefetchInvoices } from "@/store/invoiceStore"
 
 function RecurringInvoices() {
   
   const MODE = MODES.RECURRING;
   const {
-    page,
     pagination,
     invoices,
     invoicesError,
@@ -125,7 +125,7 @@ function RecurringInvoices() {
                           </div>
                         }
                         mutationFunc={()=> handleDeletion(DELETION_LINKS.INVOICE, i.id)}
-                        keyStore={["invoices", MODE, page, ""]}
+                        keyStore={()=>getRefetchInvoices?.()}
                         value=" Fiscal Invoice"
                       />
                     </PopoverContent>
