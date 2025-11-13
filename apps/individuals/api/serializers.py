@@ -213,6 +213,7 @@ class IndividualSerializer(serializers.ModelSerializer):
     contact_details = ContactDetailsSerializer(
         many=True, required=False, read_only=True
     )
+    account_details = IndividualAccountsSerializer(many=True, required=False)
 
     class Meta:
         model = Individual
@@ -230,6 +231,7 @@ class IndividualSerializer(serializers.ModelSerializer):
             "identification_number",
             "contact_details",
             "email",
+            "account_details",
             "is_verified",
             "is_active",
             "employment_details",
