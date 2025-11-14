@@ -98,7 +98,8 @@ function AutoCompleteClient({
                   onClick={() => {
                     navigate(
                       `/services/rent-safe/?${
-                        clientType === "individual" || clientType === "tenant"
+                        clientType === "individual" ||
+                        clientType === "tenant"
                           ? "addIndividual"
                           : "addCompany"
                       }=true&&next=${path.pathname}`
@@ -107,7 +108,12 @@ function AutoCompleteClient({
                   }}
                 >
                   Create{" "}
-                  {clientType === "individual" ? "Individual" : "Company"}
+                  {
+                    clientType === "individual" ||
+                    clientType === "tenant"
+                    ? "Individual" 
+                    : "Company"
+                  }
                 </Button>
               )}
             </div>

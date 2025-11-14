@@ -120,7 +120,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
 
     setLoading(true)
     const {biller_id, invoice_type, biller_type, selector_type, issue_date,...BILLER} = formData
-    const { UPDATE } = useTrackBiller( billerCopy, BILLER);
+    const { UPDATE } = useTrackBiller( billerCopy, BILLER, formData.biller_type);
     
     if (UPDATE){
       const payload_ = {

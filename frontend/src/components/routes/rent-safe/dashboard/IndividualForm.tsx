@@ -10,14 +10,19 @@ import { Button } from "@/components/ui/button";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
 import MultiIndividualContact from "@/components/general/MultiIndividualContact";
 
-export default function diviIndividualForm() {
-   const { showForm, isPending, handleSubmit, setShowForm } = useIndividualForm();
+interface props{
+   open : boolean;
+   setOpen : React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export default function IndividualForm({open, setOpen}:props) {
+   const {  isPending, handleSubmit } = useIndividualForm(setOpen);
 
    return (
       <Dialog
          modal
-         open={showForm}
-         onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
+         open={open}
+         onOpenChange={isPending ? () => toast("Processing form, please wait") : setOpen}
       >
          <DialogTrigger asChild>
             <Button>

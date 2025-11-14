@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusReport";
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import useMinimalIndividualsList from "@/hooks/apiHooks/useMinimalIndividualsList";
 import type { IndividualMinimal, PaginationData } from "@/interfaces";
 
 export default function useIndividualPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
+   const [open, setOpen] = useState(false)
    const { data, isLoading, searchQuery } = useMinimalIndividualsList();
+   const [params] = useSearchParams()
+
+   useEffect(()=>{
+      if (params.get("addIndividual")) setOpen(true); 
+   }, [])
 
    const rows: BaseTableRow[] = (() => {
       const individuals = Array.isArray(data) ? data : data?.results;
@@ -47,6 +53,7 @@ export default function useIndividualPaymentStatusTab() {
    const paginationData = data as PaginationData;
 
    return {
+      open,
       rows,
       headers,
       searchRef,
@@ -55,5 +62,6 @@ export default function useIndividualPaymentStatusTab() {
       paginationData,
       clearSearch,
       handleSearch,
+      setOpen
    };
 }

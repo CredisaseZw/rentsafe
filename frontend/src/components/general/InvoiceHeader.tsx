@@ -64,6 +64,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                             searchItem = {searchItem}
                             setSearchItem = {setSearchItem}
                             clientType = {formData.selector_type}
+                            createClient
                             onSelectValue = {onSelectBiller}
                         />
                     </div> 
