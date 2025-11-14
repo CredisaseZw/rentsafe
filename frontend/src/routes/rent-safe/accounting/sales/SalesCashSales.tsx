@@ -11,6 +11,7 @@ function SalesCashSales() {
     setFormData,
     onSelectBiller,
     setSearchItem,
+    handleOnChangeFormData
   } = useSalesCashSales()
 
   return (
@@ -18,6 +19,7 @@ function SalesCashSales() {
       <Header title = "Fiscal Tax Invoice"/>
       <div className="main-sm-card">
         <InvoiceHeader
+          handleOnChangeFormData={handleOnChangeFormData}
           searchItem={searchItem}
           formData={formData}
           setFormData={setFormData}

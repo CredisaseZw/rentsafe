@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ALL_POSSIBLE_COMPANY_LEGAL_STATUSES, INDUSTRIES } from "@/constants";
@@ -9,21 +9,27 @@ import { toast } from "sonner";
 import MultiAddressInput from "@/components/general/MultiAddressInput";
 import Button from "@/components/general/Button";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 
-interface props{
-   open : boolean;
-   setShowForm : (open: boolean) => void;
+interface props {
+   open: boolean
+   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function CompanyForm({ open, setShowForm}: props) {
-   const { isPending, handleSubmit } = useCompanyForm();
+export default function CompanyForm({open, setOpen}:props) {
+   const { isPending, handleSubmit } = useCompanyForm(setOpen);
 
    return (
       <Dialog
          modal
          open={open}
-         onOpenChange={isPending ? () => toast("Processing form, please wait") : setShowForm}
+         onOpenChange={isPending ? () => toast("Processing form, please wait") : setOpen}
       >
+         <DialogTrigger>
+            <Button asChild onClick={() => setOpen(true)} >
+               Add New Company <Plus size={15} />
+            </Button>
+         </DialogTrigger>
          <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 

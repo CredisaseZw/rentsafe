@@ -18,6 +18,7 @@ export default function InternalUsers() {
    const { data, isLoading, isError } = useGetInternalUserClients(useGetUserId());
 
    useEffect(() => {
+      
       if (data && Array.isArray(data)) {
          const trimmedClients: Clients = data.map((client: DataInternalUser) => ({
             id: client.id,

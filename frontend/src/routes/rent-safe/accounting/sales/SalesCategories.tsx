@@ -9,7 +9,7 @@ import AddSaleCategoryDialogue from "@/components/routes/rent-safe/accounting/sa
 import { TableCell, TableRow } from "@/components/ui/table"
 import { DELETION_LINKS, SALES_CATEGORIES_HEADERS } from "@/constants"
 import useSalesCategories from "@/hooks/components/useSalesCategories"
-import { getSummaryDate, handleDeletion } from "@/lib/utils"
+import { handleDeletion } from "@/lib/utils"
 
 function SalesCategories() {
   const {
@@ -58,8 +58,7 @@ function SalesCategories() {
               salesCategories.map((c, idx)=>
                 <TableRow key={idx}>
                   <TableCell className="text-center">{c.code}</TableCell>
-                  <TableCell className="text-center">{c.name}</TableCell>
-                  <TableCell className="text-center">{getSummaryDate(c.date_created ?? "")}</TableCell>
+                  <TableCell className="text-left">{c.name}</TableCell>
                   <TableCell className="flex justify-center items-center">
                     <div className="flex flex-row gap-5">
                       <AddSaleCategoryDialogue

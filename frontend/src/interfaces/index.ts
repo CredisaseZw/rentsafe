@@ -1,4 +1,4 @@
-import type {  Tenant } from "@/types";
+import type {  Currency, SalesItem, Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -188,11 +188,17 @@ export interface BranchContact {
 export interface BranchFull {
    id: number;
    branch_name: string;
+   email?:string;
    phone? : string;
    is_headquarters: boolean;
    company: CompanyMinimal;
    contacts: BranchContact[];
+   summary_address? : string
    primary_address: Address ;
+   account_data? : {
+      vat_number?: string,
+      tin_number?: string,
+   }
 }
 export interface IndividualReport {
    employmentHistory: { employer: string; position: string; startDate: string }[];
@@ -225,12 +231,17 @@ export interface IndividualMinimal {
    first_name: string;
    last_name: string;
    identification_number: string;
+   email?: string
    addresses? : Address,
    primary_address? :Address,
    search_value? : string,
    phone? :string,
    contact_details?: IndividualContact[]
    is_active: boolean;
+   account_data? : {
+      vat_number?: string,
+      tin_number?: string,
+   }
 }
 export interface IndividualFull {
    id: number;
@@ -436,4 +447,60 @@ export interface Response {
    count : number
    next : string | undefined
    previous : string | undefined
+}
+export interface Biller {
+  biller_id: number ;
+  biller_name: string;
+  selector_type : "tenant" | "individual" | "company";
+  biller_type: "tenant" | "individual" | "company";
+  biller_phone: string;
+  biller_email: string;
+  biller_address: string;
+  biller_vat_no: string;
+  biller_tin_number: string;
+  invoice_type: "fiscal" | "proforma" | "recurring";
+  issue_date : string
+};
+export interface Invoice {
+  id: number;
+  document_number: string;
+  invoice_type: "proforma" | "fiscal" | "recurring" | undefined;
+  currency: Currency;
+  discount: string;
+  date_created: string;
+  status: string;
+  total_excluding_vat: number;
+  vat_total: number;
+  total_inclusive: number;
+  customer_details: InvoiceCustomerDetails;
+  line_items: LineItem[];
+  lease: number;
+  reference_number: string | null;
+  is_recurring: boolean;
+  frequency: string;
+  next_invoice_date: string | null;
+  original_invoice: string | null;
+  is_invoiced: boolean;
+  can_convert_to_fiscal: boolean;
+}
+export interface InvoiceCustomerDetails {
+  id: number;
+  full_name: string;
+  phone: string | null;
+  email: string | null;
+  tin_number: string | null;
+  vat_number: string | null;
+  account_number: string | null;
+  industry: string | null;
+  customer_type : "individual" | "company" | "tenant",
+  address: Address | null
+}
+export interface LineItem {
+  sales_item: SalesItem;
+  quantity: string;
+  unit_price: string;
+  vat_amount: string;
+  total_price: string;
+  date_created: string;
+  date_updated: string;
 }

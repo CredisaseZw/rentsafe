@@ -3,7 +3,6 @@ import type { Service } from "@/interfaces";
 import { navlinksToRoutes } from "@/lib/utils";
 import { ChartColumnDecreasingIcon, House } from "lucide-react";
 import type {Option} from "@/types/index"
-
 import {
   RENT_ADMIN_PANEL_NAVLINKS,
   RENTSAFE_APP_NAVLINKS,
@@ -88,7 +87,8 @@ export const DELETION_LINKS = {
   SALES_CATEGORIES: "/api/accounting/sales-categories",
   ACCOUNT_SECTORS : "/api/accounting/account-sectors",
   CASH_BOOK : "/api/accounting/cash-books",
-  GENERAL_LEDGER : "/api/accounting/ledger-accounts"
+  GENERAL_LEDGER : "/api/accounting/ledger-accounts",
+  INVOICE : "/api/accounting/invoices"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -126,6 +126,13 @@ export const MINIMAL_TENANT_OBJECT: TenantSelection = {
   is_primary : false
 
 }
+
+export const INVOICE_TYPES: Option[] = [ 
+  { label: "FISCAL", value: "fiscal" },
+  { label: "PROFORMA", value: "proforma" },
+  { label: "RECURRING", value: "recurring" },
+
+];
 
 export const IN_LEASE_CLIENT_TYPES: Option[] = [
   { label: "Individual", value: "individual" },
@@ -185,6 +192,7 @@ export const TENANT_STATEMENT_HEADERS: Header[] = [
   {name : "Date"},
   {name : "Description", textAlign : "left"},
   {name : "Reference"},
+  {name : "Cashbook Name"},
   {name : "Amount", textAlign: "end"},
   {name : "Balance", textAlign :"end"}
 ]
@@ -422,7 +430,11 @@ export const SALES_INVOICES_HEADERS :Header[]=[
   {name : "Date Created"},
   {name : "Customer"},
   {name : "Currency"},
-  {name : "Invoice Total", textAlign : "end"}
+  {name : "Status"},
+  {name : "Invoice Total (Excluding VAT)"},
+  {name : "Invoice VAT Total"},
+  {name : "Invoice Total (Including VAT)", textAlign : "end"},
+  {name : "Actions"}
 ]
 
 export const CREDIT_NOTE_HEADERS :Header[]=[
@@ -435,7 +447,7 @@ export const CREDIT_NOTE_HEADERS :Header[]=[
 export const SALES_ITEMS_HEADERS :Header[]=[
   {name : "ID"},
   {name : "Category"},
-  {name : "Name"},
+  {name : "Name", textAlign:"left"},
   {name : "Unit Price"},
   {name : "Date Created"},
   {name : "Action",}
@@ -443,8 +455,7 @@ export const SALES_ITEMS_HEADERS :Header[]=[
 
 export const SALES_CATEGORIES_HEADERS:Header[] = [
   {name : "Code"},
-  {name : "Category"},
-  {name : "Date Created"},
+  {name : "Category", textAlign : "left"},
   {name : "Action"},
 ]
 
@@ -530,64 +541,43 @@ export const PROPERTY_STATUS_OPTIONS:Option[] = [
 ]
 
 export const COMMON_HEADERS:Header[] = [
-  {
-      name  :"Lease ID",
-  },
-  {
-      name : "Tenant",
-  },
-  {
-      name : "Landlord",
-  }, 
-  {
-      name : "Property Type"
-  },
-  {
-      name : "Address"
-  },
+  { name  :"Lease ID" },
+  { name : "Tenant" },
+  { name : "Landlord" }, 
+  { name : "Property Type" },
+  { name : "Address" },
 ]
 export const ACTIVE_HEADERS:Header[] = [
   ...COMMON_HEADERS, 
+  { name : "Rent owing" },
   {
-      name : "Rent owing"
-  },
-  {
-      name : "Actions",
-      colSpan : 3
+    name : "Actions",
+    colSpan : 3
   }
 ]
 export const RENEWAL_HEADERS:Header[] = [
   ...COMMON_HEADERS,
+  { name : "Lease start Date" },
+  { name : "Lease end Date" },
   {
-      name : "Lease start Date"
-  },
-  {
-      name : "Lease end Date"
-  },
-  {
-      name : "Actions",
-      colSpan : 2
+    name : "Actions",
+    colSpan : 2
   }
 ]
 
 export const TERMINATED_HEADERS:Header[] = [
   ...COMMON_HEADERS,
+  { name : "Rent owing" },
+  { name: "Date of termination" },
   {
-      name : "Rent owing"
-  },
-  {
-      name: "Date of termination"
-  },
-  {
-      name : "Actions",
-      colSpan : 2
+    name : "Actions",
+    colSpan : 2
   },
   
 ]
 export const INVOICE_STATUSES:Option[] = [
-  { label: "Cancelled Invoices", value: "cancelledInvoices" },
-  { label: "Pending Invoices", value: "pendingInvoices" },
-  { label: "All Paid Invoices", value: "allPaidInvoices" }
+  { label: "Pending Invoices", value: "pending" },
+  { label: "All Paid Invoices", value: "paid" }
 ]
 
 export const ACCOUNTING_SECTOR_HEADERS:Header[] = [
@@ -601,10 +591,10 @@ export const CASH_BOOK_HEADERS:Header[] = [
   {name : "Cashbook ID"},
   {name : "Cashbook Name"},
   {name : "Active Requisition"},
-  {name : "Account Type"},
-  {name : "Branch Name"},
-  {name : "General Ledger Account"},
-  {name : "Account Sector"},
+  {name : "Account Type", textAlign : "left"},
+  {name : "Branch Name",  textAlign : "left"},
+  {name : "General Ledger Account",  textAlign : "left"},
+  {name : "Account Sector", textAlign : "left"},
   {name : "Actions"}
 ]
 
@@ -615,8 +605,8 @@ export const PAYMENT_METHODS_HEADERS:Header[] = [
 ]
 
 export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
-  { name: "Account Name" },
   { name: "Account Number" },
+  { name: "Account Name", textAlign : "left"},
   { name: "Secondary Currency" },
   { name: "Accounts Sector" },
   { name: "Sector Name" },
@@ -626,4 +616,64 @@ export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
 export const CURRENCY_OPTIONS:Option[] = [
   { label: "Base Currency", value: "base_currency" },
   { label: "Secondary Currency", value: "secondary_currency" },
+]
+
+export const MODES = {
+  FISCAL: "fiscal_invoices",
+  RECURRING: "recurring_invoices",
+  PROFORMA: "proforma_invoices",
+  CANCELLED: "cancelled_invoices",
+  PAID: "paid_invoices",
+  PENDING: "pending_invoices",
+  WITH_PAYMENTS: "invoice_with_payments"
+};
+
+export const MODE_PAGES = {
+  [MODES.FISCAL]: "fiscal_page",
+  [MODES.RECURRING]: "recurring_page",
+  [MODES.PROFORMA]: "proforma_page",
+  [MODES.CANCELLED]: "cancelled_page",
+  [MODES.PAID]: "paid_page",
+  [MODES.PENDING]: "pending_page",
+  [MODES.WITH_PAYMENTS]: "invoice_payments_page"
+};
+
+export const INVOICE_MUTATION_STATUSES = {
+  MARK:{
+    heading : "Mark Invoice as Paid?",
+    description : "This action will mark the invoice as paid. This cannot be undone.",
+    btnText : "Mark as Paid",
+    successMessage : "Invoice successfully marked as paid"
+  },
+  CANCEL: {
+    heading :  "Cancel Invoice?",
+    description : "This action will cancel the invoice. This cannot be undone.",
+    btnText : "Cancel Invoice",
+    successMessage : "Invoice successfully cancelled"
+
+  },
+  CONVERT: {
+    heading :  "Convert Invoice from proforma to fiscal?",
+    description : "This action will convert the invoice from proforma. This cannot be undone.",
+    btnText : "Fiscalize Invoice",
+    successMessage : "Invoice successfully fiscalized"
+
+  },
+}
+
+export const INVOICE_STATUS_VARIANT: Record<string, any> = {
+    pending: "warning",
+    paid: "success",
+    partially_paid: "primary",
+    draft: "ghost",
+    cancelled: "danger",
+  };
+
+export const INVOICE_SALES_HEADERS:Header[] = [
+  {name : "Sales Item"},
+  {name : "Quantity"},
+  {name : "Unit Price", textAlign : "end"},
+  {name : "VAT Amount", textAlign : "end"},
+  {name : "Total Price", textAlign : "end"}
+
 ]

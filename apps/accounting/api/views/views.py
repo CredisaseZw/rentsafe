@@ -8,13 +8,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError, NotFound
 from django.db.models import Q, Sum, Prefetch
 from django.db import transaction
-from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from decimal import Decimal
 from rest_framework.permissions import IsAuthenticated
-from apps.accounting.filters.filters import CurrencyRateFilter
+from apps.accounting.filters.filters import CreditNoteFilter, CurrencyRateFilter
 from apps.accounting.models.models import (
     SalesItem,
     VATSetting,
@@ -36,7 +35,6 @@ from apps.accounting.models.models import (
     TransactionLineItem,
 )
 from apps.accounting.api.serializers.serializers import (
-    CustomersSearchSerializer,
     SalesItemSerializer,
     ServiceSpecialPricingSerializer,
     ServiceStandardPricingSerializer,
@@ -54,22 +52,16 @@ from apps.accounting.api.serializers.serializers import (
     PaymentMethodSerializer,
     TransactionTypeSerializer,
     CashBookSerializer,
-    RecurringToFiscalSerializer,
+    InvoiceDetailSerializer,
     CurrencySerializer,
-    CreditNoteSerializer,
     DisbursementSerializer,
 )
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
 from apps.common.api.views import BaseViewSet
-from apps.common.utils.caching import CacheService
 from apps.common.utils.helpers import extract_error_message
-from apps.companies.models.models import CompanyBranch
-from apps.individuals.models.models import Individual
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
-
-from apps.leases.models.models import Lease
 
 logger = logging.getLogger("accounting")
 
@@ -106,7 +98,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.error(f"Error creating object: {e}")
             return Response(
-                {"error": "Something went wrong"},
+                {"error": "Something went wrong", "details": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -128,10 +120,34 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    def update(self, request, *args, **kwargs):
+        """Update objects belonging to the user's company."""
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        except ValidationError as e:
+            logger.error(f"Validation error updating object: {e}")
+            return Response(
+                {"error": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating object: {e}")
+            return Response(
+                {"error": "Something went wrong"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
 
 class ItemViewSet(BaseCompanyViewSet):
     serializer_class = SalesItemSerializer
     queryset = SalesItem.objects.all()
+    search_fields = ["name", "^unit_name", "=item_id"]
 
 
 class VATSettingViewSet(BaseViewSet):
@@ -276,7 +292,7 @@ class GeneralLedgerAccountViewSet(BaseViewSet):
         queryset = GeneralLedgerAccount.objects.select_related("account_sector").filter(
             Q(created_by__client=self.request.user.client) | Q(created_by__isnull=True)
         )
-        return queryset.order_by("-id")
+        return queryset.order_by("-account_number")
 
     def update(self, request, *args, **kwargs):
         try:
@@ -406,7 +422,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         "document_number",
         "reference_number",
         "lease__lease_id",
-        "lease__unit__name",
+        "lease__unit__unit_number",
     ]
 
     # Ordering configuration
@@ -440,7 +456,6 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         Optimized queryset with select_related and prefetch_related for performance
         """
         queryset = Invoice.objects.filter(created_by__client=self.request.user.client)
-        print("Base Invoice Queryset Count:", queryset.count())
         # Optimize database queries
         queryset = queryset.select_related(
             "currency",
@@ -457,8 +472,12 @@ class InvoiceViewSet(viewsets.ModelViewSet):
                 ),
             )
         )
-        print("Optimized Invoice Queryset Count:", queryset.count())
         return queryset
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return InvoiceDetailSerializer
+        return InvoiceSerializer
 
     def filter_queryset(self, queryset):
         """
@@ -472,20 +491,14 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         if search_query:
             queryset = self._apply_custom_search(queryset, search_query)
 
-        # Filter by customer name
-        customer_name = request.query_params.get("customer_name", None)
-        if customer_name:
+        if customer_name := request.query_params.get("customer_name", None):
             queryset = self._filter_by_customer_name(queryset, customer_name)
 
-        # Filter by multiple statuses
-        status_in = request.query_params.get("status_in", None)
-        if status_in:
+        if status_in := request.query_params.get("status_in", None):
             status_list = [s.strip() for s in status_in.split(",")]
             queryset = queryset.filter(status__in=status_list)
 
-        # Filter by multiple invoice types
-        type_in = request.query_params.get("type_in", None)
-        if type_in:
+        if type_in := request.query_params.get("type_in", None):
             type_list = [t.strip() for t in type_in.split(",")]
             queryset = queryset.filter(invoice_type__in=type_list)
 
@@ -493,27 +506,29 @@ class InvoiceViewSet(viewsets.ModelViewSet):
 
     def _apply_custom_search(self, queryset, search_query):
         """
-        Apply comprehensive search across multiple fields
+        Apply comprehensive search across multiple fields including
+        document, lease, unit, and customer info.
         """
         return queryset.filter(
-            Q(document_number__icontains=search_query)
-            | Q(reference_number__icontains=search_query)
-            | Q(lease__lease_id__icontains=search_query)
-            | Q(lease__unit__name__icontains=search_query)
-            | Q(customer__tenant_object__full_name__icontains=search_query)
-            | Q(
-                customer__tenant_object__company__registration_name__icontains=search_query
-            )
-            | Q(customer__tenant_object__branch_name__icontains=search_query)
+            Q(document_number__iexact=search_query)
+            | Q(reference_number__iexact=search_query)
+            | Q(lease__lease_id__iexact=search_query)
+            | Q(lease__unit__unit_number__icontains=search_query)
+            | Q(customer__individual__first_name__icontains=search_query)
+            | Q(customer__individual__last_name__icontains=search_query)
+            | Q(customer__company__branch_name__icontains=search_query)
         )
 
     def _filter_by_customer_name(self, queryset, customer_name):
         """
-        Filter by customer name (individual or company)
+        Filter by customer name (individual or company branch).
+        Matches individual's first or last name,
+        or company's branch/trading name.
         """
         return queryset.filter(
-            Q(customer__full_name__icontains=customer_name)
-            | Q(customer__identification_number__icontains=customer_name)
+            Q(customer__individual__first_name__icontains=customer_name)
+            | Q(customer__individual__last_name__icontains=customer_name)
+            | Q(customer__company__branch_name__icontains=customer_name)
         )
 
     def create(self, request, *args, **kwargs):
@@ -538,7 +553,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         except ValidationError as e:
             print(f"Validation error creating invoice: {e}")
             return Response(
-                {"errorr": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
+                {"error": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             print(f"Unexpected error creating invoice: {e}")
@@ -918,11 +933,6 @@ class InvoiceViewSet(viewsets.ModelViewSet):
             print(f"Failed to log invoice action: {str(e)}")
 
 
-class CreditNoteViewSet(BaseCompanyViewSet):
-    queryset = CreditNote.objects.all()
-    serializer_class = CreditNoteSerializer
-
-
 class PaymentViewSet(BaseCompanyViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
@@ -1229,170 +1239,4 @@ class ServiceStandardPricingViewSet(BaseViewSet):
             logger.error(f"Error updating standard pricing: {e}")
             return self._create_rendered_response(
                 {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class CustomersViewSet(BaseViewSet):
-    """
-    ViewSet to retrieve customers (individuals, companies, tenants).
-
-    Query params:
-      - customer_type: 'individual', 'company', or 'tenant'
-      - search: search string (optional)
-      - tenant_type: 'individual' or 'company' (for retrieve when customer_type=tenant)
-    """
-
-    queryset = None
-    serializer_class = CustomersSearchSerializer
-
-    def get_queryset(self):
-        """
-        Return queryset or list based on customer_type:
-          - individual: filtered Individual queryset
-          - company: filtered CompanyBranch queryset
-          - tenant: deduplicated list of tenant instances from leases
-        """
-        user = getattr(self.request, "user", None)
-        if not user or not hasattr(user, "client"):
-            return []
-
-        customer_type = self.request.query_params.get("customer_type", "tenant")
-        search_key = self.request.query_params.get("search")
-
-        if customer_type == "individual":
-            customers = Individual.objects.filter(is_active=True)
-            filterset = IndividualCustomerFilter(
-                self.request.query_params, queryset=customers
-            )
-            return filterset.qs
-
-        elif customer_type == "company":
-            customers = CompanyBranch.objects.filter(company__is_active=True)
-            filterset = CompanyCustomerFilter(
-                self.request.query_params, queryset=customers
-            )
-            return filterset.qs
-
-        elif customer_type == "tenant":
-            return search_tenants_for_client(user.client, search=search_key)
-
-        return []
-
-    def list(self, request, *args, **kwargs):
-        """
-        List customers based on customer_type query param.
-        Supports pagination for all customer types.
-        """
-        try:
-            customer_type = request.query_params.get("customer_type")
-            if not customer_type:
-                return self._create_rendered_response(
-                    {
-                        "error": "customer type is required. Use 'individual', 'company', or 'tenant'."
-                    },
-                    status.HTTP_400_BAD_REQUEST,
-                )
-
-            if customer_type not in ["individual", "company", "tenant"]:
-                return self._create_rendered_response(
-                    {
-                        "error": "Invalid customer type. Must be 'individual', 'company', or 'tenant'."
-                    },
-                    status.HTTP_400_BAD_REQUEST,
-                )
-
-            queryset = self.get_queryset()
-            # Paginate the results
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-            serializer = self.get_serializer(queryset, many=True)
-            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
-
-        except Exception as e:
-            logger.error("Error listing customers: %s", e, exc_info=True)
-            return self._create_rendered_response(
-                {"error": "Something went wrong"},
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        """
-        Retrieve a single customer by ID and type.
-
-        For customer_type=tenant, requires tenant_type ('individual' or 'company') query param.
-        For customer_type=individual/company, uses standard DRF retrieve.
-        """
-        try:
-            customer_type = request.query_params.get("customer_type")
-
-            if not customer_type:
-                return self._create_rendered_response(
-                    {"error": "customer_type query parameter is required"},
-                    status.HTTP_400_BAD_REQUEST,
-                )
-
-            if customer_type == "individual":
-                try:
-                    instance = Individual.objects.get(pk=pk, is_active=True)
-                    serializer = self.get_serializer(instance)
-                    return self._create_rendered_response(
-                        serializer.data, status.HTTP_200_OK
-                    )
-                except Individual.DoesNotExist:
-                    return self._create_rendered_response(
-                        {"error": "Individual customer not found"},
-                        status.HTTP_404_NOT_FOUND,
-                    )
-
-            elif customer_type == "company":
-                try:
-                    instance = CompanyBranch.objects.select_related("company").get(
-                        pk=pk, company__is_active=True
-                    )
-                    serializer = self.get_serializer(instance)
-                    return self._create_rendered_response(
-                        serializer.data, status.HTTP_200_OK
-                    )
-                except CompanyBranch.DoesNotExist:
-                    return self._create_rendered_response(
-                        {"error": "Company customer not found"},
-                        status.HTTP_404_NOT_FOUND,
-                    )
-
-            elif customer_type == "tenant":
-                tenant_type = request.query_params.get("tenant_type")
-                if not tenant_type or tenant_type not in ["individual", "company"]:
-                    return self._create_rendered_response(
-                        {
-                            "error": "tenant_type query parameter is required for tenants. Use 'individual' or 'company'."
-                        },
-                        status.HTTP_400_BAD_REQUEST,
-                    )
-
-                instance = get_tenant_by_type_and_id(tenant_type, pk)
-                if not instance:
-                    return self._create_rendered_response(
-                        {"error": "Tenant not found"},
-                        status.HTTP_404_NOT_FOUND,
-                    )
-
-                serializer = self.get_serializer(instance)
-                return self._create_rendered_response(
-                    serializer.data, status.HTTP_200_OK
-                )
-
-            else:
-                return self._create_rendered_response(
-                    {"error": "Invalid customer_type"},
-                    status.HTTP_400_BAD_REQUEST,
-                )
-
-        except Exception as e:
-            logger.error("Error retrieving customer: %s", e, exc_info=True)
-            return self._create_rendered_response(
-                {"error": "Something went wrong"},
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

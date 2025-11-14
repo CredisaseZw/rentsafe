@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal, ROUND_HALF_UP
 from django.db import transaction
 from django.utils import timezone
@@ -305,11 +306,12 @@ class AccountSectorSerializer(serializers.ModelSerializer):
 
 
 class IndividualCustomerSerializer(serializers.ModelSerializer):
-    vat_number = serializers.CharField(required=False, allow_blank=True)
-    tin_number = serializers.CharField(required=False, allow_blank=True)
+    vat_number = serializers.SerializerMethodField()
+    tin_number = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
 
-    # primary_address = serializers.SerializerMethodField()
+    primary_address = serializers.SerializerMethodField()
+
     class Meta:
         model = Individual
         fields = [
@@ -320,7 +322,7 @@ class IndividualCustomerSerializer(serializers.ModelSerializer):
             "phone",
             "vat_number",
             "tin_number",
-            # "primary_address",
+            "primary_address",
         ]
         read_only_fields = ["id", "phone"]
 
@@ -330,6 +332,24 @@ class IndividualCustomerSerializer(serializers.ModelSerializer):
             if obj.first_name and obj.last_name
             else "N/A"
         )
+
+    def get_vat_number(self, obj):
+        account_details = IndividualAccounts.objects.filter(individual=obj).first()
+        return account_details.vat_number if account_details else "N/A"
+
+    def get_tin_number(self, obj):
+        account_details = IndividualAccounts.objects.filter(individual=obj).first()
+        return account_details.tin_number if account_details else "N/A"
+
+    def get_primary_address(self, obj):
+        if current_address := obj.addresses.filter(is_primary=True):
+            current_address = current_address.first()
+        else:
+            current_address = obj.addresses.last()
+        address_data = (
+            AddressSerializer(current_address).data if current_address else None
+        )
+        return address_data
 
 
 class CompanyCustomerSerializer(serializers.ModelSerializer):
@@ -343,43 +363,49 @@ class CompanyCustomerSerializer(serializers.ModelSerializer):
     tin_number = serializers.SerializerMethodField()
 
     class Meta:
-        model = Company
+        model = CompanyBranch
         fields = [
             "id",
             "full_name",
             "identification_number",
             "vat_number",
+            "tin_number",
             "email",
             "mobile",
             "address",
-            "tin_number",
         ]
         read_only_fields = ["id"]
 
     def get_full_name(self, obj):
-        return obj.registration_name
+        return obj.branch_name
 
     def get_email(self, obj):
-        new_ob = CompanyProfile.objects.filter(company=obj).first()
-        return new_ob.email if new_ob else "N/A"
+        return obj.email or "N/A"
 
     def get_address(self, obj):
-        new_ob = CompanyProfile.objects.filter(company=obj).first()
-        return new_ob.current_address if new_ob else "N/A"
+        current_address = obj.addresses.filter(is_primary=True).exists()
+        if not current_address:
+            current_address = obj.addresses.last()
+        else:
+            current_address = obj.addresses.order_by("-id").first()
+        address_data = (
+            AddressSerializer(current_address).data if current_address else None
+        )
+        return address_data
 
     def get_identification_number(self, obj):
-        return obj.registration_number or "N/A"
+        return obj.company.registration_number or "N/A"
 
     def get_vat_number(self, obj):
-        new_ob = CompanyProfile.objects.filter(company=obj).first()
+        new_ob = CompanyProfile.objects.filter(company=obj.company).first()
         return new_ob.vat_number if new_ob else "N/A"
 
     def get_mobile(self, obj):
-        new_ob = CompanyProfile.objects.filter(company=obj).first()
-        return new_ob.landline_phone if new_ob else "N/A"
+        return obj.phone or "N/A"
 
     def get_tin_number(self, obj):
-        return obj.tin_number or "N/A"
+        new_obj = CompanyProfile.objects.filter(company=obj.company).first()
+        return new_obj.tin_number if new_obj else "N/A"
 
 
 class JournalEntrySerializer(BaseCompanySerializer):
@@ -449,6 +475,83 @@ class RecurringToFiscalSerializer(serializers.Serializer):
                         {"items": "Quantity is required for all line items."}
                     )
         return data
+
+
+class InvoiceDetailSerializer(BaseCompanySerializer):
+    currency = CurrencySerializer(read_only=True)
+    invoice_type = serializers.ChoiceField(choices=Invoice.INVOICE_TYPE_CHOICES)
+    currency_id = serializers.PrimaryKeyRelatedField(
+        queryset=Currency.objects.all(), source="currency", write_only=True
+    )
+    items = TransactionLineItemSerializer(many=True, required=False)
+    customer_details = serializers.SerializerMethodField()
+    customer_id = serializers.IntegerField(write_only=True)
+    is_individual = serializers.BooleanField(write_only=True)
+    line_items = TransactionLineItemSerializer(many=True, read_only=True)
+    total_excluding_vat = serializers.ReadOnlyField()
+    vat_total = serializers.ReadOnlyField()
+    total_inclusive = serializers.ReadOnlyField()
+    can_convert_to_fiscal = serializers.SerializerMethodField()
+
+    class Meta(BaseCompanySerializer.Meta):
+        model = Invoice
+        fields = [
+            "id",
+            "document_number",
+            "invoice_type",
+            "currency",
+            "currency_id",
+            "items",
+            "discount",
+            "date_created",
+            "status",
+            "total_excluding_vat",
+            "vat_total",
+            "total_inclusive",
+            "customer_details",
+            "customer_id",
+            "is_individual",
+            "line_items",
+            "lease",
+            "reference_number",
+            "is_recurring",
+            "frequency",
+            "next_invoice_date",
+            "original_invoice",
+            "is_invoiced",
+            "can_convert_to_fiscal",
+        ]
+
+        read_only_fields = [
+            "document_number",
+            "user",
+            "date_created",
+            "status",
+            "can_convert_to_fiscal",
+            "original_invoice",
+        ]
+        extra_kwargs = {
+            "lease": {"required": False, "allow_null": True},
+            "original_invoice": {"required": False, "allow_null": True},
+            "frequency": {"required": False, "allow_null": True},
+            "next_invoice_date": {"required": False, "allow_null": True},
+        }
+
+    def get_customer_details(self, obj):
+        from apps.accounting.api.serializers.serializers import (
+            CustomersSearchSerializer,
+        )
+
+        customer = getattr(obj, "customer", None)
+        if customer and customer.is_individual:
+            return CustomersSearchSerializer(customer.individual).data
+        elif customer:
+            return CustomersSearchSerializer(customer.company).data
+        return None
+
+    def get_can_convert_to_fiscal(self, obj):
+        """Check if this invoice can be converted to fiscal"""
+        return obj.can_generate_fiscal()
 
 
 class InvoiceSerializer(BaseCompanySerializer):
@@ -535,9 +638,9 @@ class InvoiceSerializer(BaseCompanySerializer):
                 data["customer"] = customer_instance
                 data["is_individual"] = True
             else:
-                customer_instance = Company.objects.get(id=customer_id)
+                customer_instance = CompanyBranch.objects.get(id=customer_id)
                 data["customer"] = customer_instance
-        except (Individual.DoesNotExist, Company.DoesNotExist) as e:
+        except (Individual.DoesNotExist, CompanyBranch.DoesNotExist) as e:
             raise serializers.ValidationError(
                 {"customer_id": "Customer not found."}
             ) from e
@@ -607,10 +710,14 @@ class InvoiceSerializer(BaseCompanySerializer):
         return data
 
     def get_customer_details(self, obj):
+        from apps.accounting.api.serializers.serializers import (
+            CustomersSearchSerializer,
+        )
+
         if hasattr(obj, "customer") and obj.customer.is_individual:
-            return IndividualCustomerSerializer(obj.customer.individual).data
+            return CustomersSearchSerializer(obj.customer.individual).data
         elif hasattr(obj, "customer"):
-            return CompanyCustomerSerializer(obj.customer.company).data
+            return CustomersSearchSerializer(obj.customer.company).data
         return None
 
     def get_can_convert_to_fiscal(self, obj):
@@ -959,186 +1066,6 @@ class CashSaleSerializer(BaseCompanySerializer):
         return instance
 
 
-class CreditNoteSerializer(BaseCompanySerializer):
-    items = TransactionLineItemSerializer(many=True, required=False)
-    currency = CurrencySerializer(read_only=True)
-    currency_id = serializers.PrimaryKeyRelatedField(
-        queryset=Currency.objects.all(), source="currency", write_only=True
-    )
-    customer_details = serializers.SerializerMethodField()
-    customer_id = serializers.IntegerField(write_only=True)
-    is_individual = serializers.BooleanField(write_only=True)
-
-    class Meta(BaseCompanySerializer.Meta):
-        model = CreditNote
-        fields = [
-            "id",
-            "document_number",
-            "credit_date",
-            "total_amount",
-            "description",
-            "currency",
-            "currency_id",
-            "items",
-            "customer_details",
-            "customer_id",
-            "is_individual",
-        ]
-        read_only_fields = ["document_number", "total_amount", "credit_date"]
-
-    def validate(self, data):
-        request_user = self.context["request"].user
-        user_company = request_user.client
-
-        # Validate customer relationship
-        customer_id = data.get("customer_id")
-        is_individual = data.get("is_individual")
-
-        if not customer_id:
-            raise serializers.ValidationError(
-                {"customer_id": "Customer ID is required."}
-            )
-
-        if is_individual is None:
-            raise serializers.ValidationError(
-                {"is_individual": "Specify if customer is an individual or company."}
-            )
-
-        try:
-            if is_individual:
-                customer = Individual.objects.get(id=customer_id)
-                data["individual"] = customer
-                data["company"] = None
-            else:
-                customer = Company.objects.get(id=customer_id)
-                data["company"] = customer
-                data["individual"] = None
-        except (Individual.DoesNotExist, Company.DoesNotExist) as e:
-            raise serializers.ValidationError(
-                {"customer_id": "Customer not found."}
-            ) from e
-
-        # Validate items and calculate preliminary total_amount for credit note
-        total_amount = Decimal("0")
-        items_data = data.get("items", [])
-        for item_data in items_data:
-            sales_item = item_data.get("sales_item")
-
-            if not sales_item:
-                raise serializers.ValidationError(
-                    "Invalid sales item provided in line items."
-                )
-
-            if (
-                hasattr(sales_item, "user")
-                and sales_item.user
-                and sales_item.created_by.client != user_company
-            ):
-                raise serializers.ValidationError(
-                    {"items": "One or more sales items do not belong to your company."}
-                )
-
-            vat_setting = sales_item.tax_configuration
-            vat_rate = (
-                vat_setting.rate / Decimal("100")
-                if vat_setting and vat_setting.vat_applicable
-                else Decimal("0")
-            )
-
-            quantity = item_data.get("quantity")
-            unit_price = sales_item.price
-
-            if quantity is None:
-                raise serializers.ValidationError(
-                    {
-                        "items": "Quantity and unit price are required for all line items."
-                    }
-                )
-
-            item_total_excl_vat = (quantity * unit_price).quantize(
-                Decimal("0.00"), rounding=ROUND_HALF_UP
-            )
-            item_vat_amount = (item_total_excl_vat * vat_rate).quantize(
-                Decimal("0.00"), rounding=ROUND_HALF_UP
-            )
-
-            item_data["vat_amount"] = item_vat_amount
-            item_data["total_price"] = (item_total_excl_vat + item_vat_amount).quantize(
-                Decimal("0.00"), rounding=ROUND_HALF_UP
-            )
-
-            total_amount += item_data["total_price"]
-
-        data["total_amount"] = total_amount.quantize(
-            Decimal("0.00"), rounding=ROUND_HALF_UP
-        )
-
-        data.pop("customer_id", None)
-        data.pop("is_individual", None)
-
-        return data
-
-    def get_customer_details(self, obj):
-        if obj.individual:
-            return IndividualCustomerSerializer(obj.individual).data
-        elif obj.company:
-            return CompanyCustomerSerializer(obj.company).data
-        return None
-
-    @transaction.atomic
-    def create(self, validated_data):
-        items_data = validated_data.pop("items", [])
-        credit_note = CreditNote.objects.create(**validated_data)
-
-        for item_data in items_data:
-            sales_item = item_data["sales_item"]
-            TransactionLineItem.objects.create(
-                parent_document=credit_note,
-                sales_item=sales_item,
-                user=credit_note.user,
-                quantity=item_data["quantity"],
-                unit_price=sales_item.price,
-                vat_amount=item_data["vat_amount"],
-                total_price=item_data["total_price"],
-            )
-        return credit_note
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        items_data = validated_data.pop("items", [])
-
-        if "individual" in validated_data:
-            instance.individual = validated_data.pop("individual")
-        if "company" in validated_data:
-            instance.company = validated_data.pop("company")
-        if "is_individual" in validated_data:
-            instance.is_individual = validated_data.pop("is_individual")
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        instance.line_items.all().delete()  # Clear existing and recreate
-        total_amount = Decimal("0")
-        for item_data in items_data:
-            line_item = TransactionLineItem.objects.create(
-                parent_document=instance,
-                sales_item=item_data["sales_item"],
-                user=instance.user,
-                quantity=item_data["quantity"],
-                unit_price=item_data["unit_price"],
-                vat_amount=item_data["vat_amount"],
-                total_price=item_data["total_price"],
-            )
-            total_amount += line_item.total_price
-
-        instance.total_amount = total_amount.quantize(
-            Decimal("0.00"), rounding=ROUND_HALF_UP
-        )
-        instance.save()
-        return instance
-
-
 class PaymentSerializer(BaseCompanySerializer):
     class Meta(BaseCompanySerializer.Meta):
         model = Payment
@@ -1439,11 +1366,12 @@ class CustomersSearchSerializer(serializers.Serializer):
     full_name = serializers.SerializerMethodField()
     phone = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
-    # address = serializers.SerializerMethodField()
     tin_number = serializers.SerializerMethodField()
     vat_number = serializers.SerializerMethodField()
     account_number = serializers.SerializerMethodField()
     industry = serializers.SerializerMethodField()
+    customer_type = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
         if isinstance(obj, Individual):
@@ -1474,6 +1402,13 @@ class CustomersSearchSerializer(serializers.Serializer):
                     IndividualAccounts.objects.filter(individual=obj).first()
                 )
             return self._individual_account_cache[individual_id]
+        return None
+
+    def get_customer_type(self, obj):
+        if isinstance(obj, Individual):
+            return "individual"
+        elif isinstance(obj, CompanyBranch):
+            return "company"
         return None
 
     def get_account_number(self, obj):

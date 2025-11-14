@@ -33,7 +33,7 @@ function AddInternalUsersForm({successCallbackFN} : props) {
       addInternalUser.mutate(addInternalUsersFormData, {
          onSuccess: () => {
             toast.success("User added successfully")
-            queryClient.invalidateQueries({queryKey : ["clients_for", useGetUserId()]})
+            queryClient.invalidateQueries({queryKey : ["clients", useGetUserId()]})
             successCallbackFN(true)
          },
          onError: (error) => {
@@ -44,7 +44,6 @@ function AddInternalUsersForm({successCallbackFN} : props) {
             }
          },
          onSettled: ()=> setLoading(false)
-         
       });
    };
 
@@ -53,6 +52,7 @@ function AddInternalUsersForm({successCallbackFN} : props) {
          setUserRoles(data);
       }
    }, [data]);
+   
    return (
       <form onSubmit={submitAddInternalUsersForm} method="post">
          <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2">

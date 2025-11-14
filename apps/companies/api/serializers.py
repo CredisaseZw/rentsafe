@@ -346,7 +346,6 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
         user = self.context.get("user")
         addresses_data = validated_data.pop("addresses", None)
         profile_data = validated_data.pop("profile", None)
-
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -365,7 +364,7 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
 
         if profile_data is not None:
             try:
-                profile = CompanyProfile.objects.get(user=user, company=instance)
+                profile = CompanyProfile.objects.get(company=instance)
 
                 for attr, value in profile_data.items():
                     setattr(profile, attr, value)

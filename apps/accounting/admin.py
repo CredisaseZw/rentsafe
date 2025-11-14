@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.contrib import admin
 from django.contrib.contenttypes.admin import (
     GenericTabularInline,
@@ -43,6 +44,7 @@ class TransactionLineItemInline(GenericTabularInline):
     readonly_fields = [
         "vat_amount",
         "total_price",
+        "unit_price",
     ]  # These are calculated in the model's save method
     raw_id_fields = [
         "sales_item"
@@ -275,22 +277,20 @@ class CreditNoteAdmin(admin.ModelAdmin):
         "id",
         "document_number",
         "credit_date",
-        "total_amount",
-        "customer_display",
+        "total_credit_note_amount",
+        "customer",
         "currency",
         "created_by",
+        "customer_details",
     )
     list_display_links = ("document_number",)
     search_fields = (
         "document_number",
-        "individual__firstname",
-        "individual__surname",
-        "company__name",
+        "customer",
     )
-    list_filter = ("credit_date", "is_individual", "currency")
-    ordering = ("-credit_date", "document_number")
-    inlines = [TransactionLineItemInline]  # Add inline for line items
-    raw_id_fields = ("created_by", "individual", "company", "currency")
+    list_filter = ("credit_date", "customer", "currency")
+    ordering = ("-id",)
+    inlines = [TransactionLineItemInline]  # `` Add inline for line items
     list_per_page = 25
 
     fieldsets = (
@@ -298,24 +298,44 @@ class CreditNoteAdmin(admin.ModelAdmin):
         (
             "Customer Details",
             {
-                "fields": ("is_individual", "individual", "company"),
-                "description": "Select either an individual or a company customer.",
+                "fields": ("customer", "customer_details"),
+                "description": "Select a customer.",
             },
         ),
-        ("Financials", {"fields": ("currency", "total_amount")}),
+        ("Financial", {"fields": ("currency", "total_credit_note_amount", "discount")}),
         ("System Info", {"fields": ("created_by",), "classes": ("collapse",)}),
     )
 
-    readonly_fields = ("document_number", "total_amount")
+    readonly_fields = (
+        "document_number",
+        "total_credit_note_amount",
+        "customer_details",
+    )
 
-    def customer_display(self, obj):
-        if obj.is_individual and obj.individual:
-            return f"{obj.individual.firstname} {obj.individual.surname}"
-        elif not obj.is_individual and obj.company:
-            return obj.company.name
+    def get_full_name(self, obj):
+        if obj.customer.is_individual is True:
+            return obj.customer.individual.full_name
+        elif not obj.customer.is_individual and obj.customer.company:
+            return obj.customer.company.full_name
         return "N/A"
 
-    customer_display.short_description = "Customer"
+    def customer_details(self, obj):
+        if obj.customer.is_individual is True and obj.customer.individual:
+            individual = obj.customer.individual
+            customer_information = f"{individual.first_name} {individual.last_name} {individual.identification_number} {individual.email}"
+            return customer_information
+        elif not obj.customer.is_individual and obj.customer.company:
+            return obj.customer.company.company.registration_name
+        return "N/A"
+
+    def total_credit_note_amount(self, obj):
+        total = Decimal("0.00")
+        for line_item in obj.line_items.all():
+            total += line_item.total_price_excluding_vat + line_item.vat_amount
+        total -= obj.discount or Decimal("0.00")
+        return total
+
+    total_credit_note_amount.display_description = "Total Amount"
 
 
 @admin.register(TransactionLineItem)  # New: Register TransactionLineItem directly

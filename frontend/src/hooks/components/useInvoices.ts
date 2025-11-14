@@ -1,12 +1,38 @@
-import { useState } from "react"
+import { useEffect, useState } from "react";
+import useGetInvoices from "../apiHooks/useGetInvoices";
+import { handleAxiosError } from "@/lib/utils";
+import type { PaginationData } from "@/interfaces";
+import type { Invoice } from "@/interfaces";
+import { useSearchParams } from "react-router";
+import { MODE_PAGES } from "@/constants";
 
-function useInvoices() {
-    const [invoices, setInvoices] = useState([])
-    
-    return {
-        invoices,
-        setInvoices,
-    }
+function useInvoices(mode: string) {
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [searchParams] = useSearchParams()
+  const page = Number(searchParams.get(MODE_PAGES[mode]) || 1);
+  const search = searchParams.get("search") || undefined
+  const [pagination, setPagination] = useState<PaginationData | undefined>();
+  const { invoicesData, invoicesError, invoicesLoading } = useGetInvoices(mode, page, search);
+
+  useEffect(() => {
+    if (handleAxiosError(`Failed to fetch ${mode.replace("_", " ")}`, invoicesError)) return;
+    if (!invoicesData) return;
+
+    setInvoices(invoicesData.results);
+    setPagination({
+      count: invoicesData.count,
+      previous: invoicesData.previous,
+      next: invoicesData.next,
+    });
+  }, [invoicesData, invoicesError]);
+
+  return {
+    page,
+    pagination,
+    invoices,
+    invoicesError,
+    invoicesLoading,
+  };
 }
 
-export default useInvoices
+export default useInvoices;
