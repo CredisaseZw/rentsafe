@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -118,7 +118,8 @@ export function formatDateToPythonSLiking(date: string): string {
   return `${year}-${month}-${day}`;
 }
 
-export function formatAddress(addr: Address): string {
+export function formatAddress(addr: Address | null | undefined): string {
+  if (!addr) return "";
   const parts: string[] = [];
 
   if (addr.street_address) parts.push(addr.street_address);
@@ -229,9 +230,9 @@ export function extractReceipts(data: { [k: string]: FormDataEntryValue }, inclu
       payment_date: data[`date_${i}`] as string,
       ...(includeRentVariables
         ? {
-          rent: data[`rent_${i}`] as string,
-          opx: data[`opx_${i}`] as string,
-        }
+            rent: data[`rent_${i}`] as string,
+            opc: data[`opc_${i}`] as string,
+          }
         : {}),
     };
     if (receipt.cashbook_id === 0) delete receipt.cashbook_id
@@ -674,7 +675,7 @@ export const generateUpdatePayload = (
     }
   }
 
-  // deposits: only if currency/amount/holder/date changed
+  // deposits: only if currency/amounts/holder/date changed
   if (updated.deposits && original.deposits) {
     const changedDeposits = updated.deposits.filter((dep, idx) => {
       if (!original.deposits || !original.deposits[idx]) return true;
@@ -764,28 +765,92 @@ export const handleDeletion = async (prefixLink: string, id: number) => {
   return response.data
 }
 
-export const handleTrackChangedFields = (initial: any, payloadData: any) => {
-  let changedData: any = payloadData
-  changedData = Object.fromEntries(
-    Object.entries(payloadData).filter(([key, value]) => {
-      const original = (initial as any)[key]
-      if (typeof value === "string" && typeof original === "string") {
-        return value.trim() !== original.trim()
-      }
-      return value !== original
-    })
-  )
-  // No actual changes
+export const handleTrackChangedFields = (initial: any, payloadData: any, toastInfo = true): any => {
+  const deepDiff = (obj1: any, obj2: any): any => {
+    return Object.fromEntries(
+      Object.entries(obj2).filter(([key, value]) => {
+        const original = obj1?.[key];
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          const nestedDiff = deepDiff(original || {}, value);
+          if (Object.keys(nestedDiff).length > 0) return true;
+          return false;
+        }
+        if (Array.isArray(value)) {
+          return JSON.stringify(value) !== JSON.stringify(original);
+        }
+        if (typeof value === "string" && typeof original === "string") {
+          return value.trim() !== original.trim();
+        }
+        return value !== original;
+      }).map(([key, value]) => {
+        const original = obj1?.[key];
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          return [key, deepDiff(original || {}, value)];
+        }
+        return [key, value];
+      })
+    );
+  };
+
+  const changedData = deepDiff(initial, payloadData);
+
   if (Object.keys(changedData).length === 0) {
-    toast.info("No changes made.")
+    if (toastInfo) toast.info("No changes made.");
     return undefined;
   }
 
   return changedData;
-}
+};
 
 export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) => {
   const FORM_DATA = new FormData(e.currentTarget)
   const DATA = Object.fromEntries(FORM_DATA.entries())
   return DATA
+}
+
+export const validateInvoices = (rows:InvoicePreview[], formData:Record<string, any>) =>{
+  if (rows.length === 0) {
+    toast.error("Add at least one item to the invoice");
+    return true;
+  }
+
+  if (!formData.biller_id) {
+    toast.error("Select a biller for the invoice");
+    return true;
+  }
+
+  if (!formData.invoice_type) {
+    toast.error("Select an invoice type");
+    return true;
+  }
+
+  for (const [index, item] of rows.entries()) {
+    const salesItemId = Number(item.salesItem);
+    const quantity = Number(item.quantity);
+
+    if (!salesItemId || isNaN(salesItemId)) {
+      toast.error(`Invalid sales item at row ${index + 1}`);
+      return true;
+    }
+
+    if (!quantity || isNaN(quantity) || quantity <= 0) {
+      toast.error(`Invalid quantity at row ${index + 1}`);
+      return true;
+    }
+  }
+  return false
+}
+
+export const onClearFilter = (setSearchParams: any) => {
+  setSearchParams((prev: URLSearchParams) => {
+    const params = new URLSearchParams(prev)
+    const keys = Array.from(params.keys())
+
+    keys.forEach((key) => {
+      if (key === "invoice_type__in") return
+      params.delete(key)
+    })
+
+    return params
+  })
 }

@@ -9,6 +9,7 @@ export default function useCompanyBranches() {
    const [searchParams] = useSearchParams();
    const q = searchParams.get("company_q")?.trim() || "";
    const page = searchParams.get("company_page") || "1";
+   const hasQuery = q.length > 0;
 
    const { data, isLoading, error } = useQuery<BranchApiResponse>({
       queryKey: ["company-branches", q, page],
@@ -21,7 +22,7 @@ export default function useCompanyBranches() {
          const res = await api.get<BranchApiResponse>(url);
          return res.data;
       },
-      enabled: !!page,
+      enabled: hasQuery,
    });
 
    useEffect(() => {
@@ -31,5 +32,8 @@ export default function useCompanyBranches() {
       }
    }, [error, q]);
 
-   return { data, isLoading, searchQuery: q };
+   return {
+      data : hasQuery ? data : [],
+      isLoading,
+      searchQuery: q };
 }

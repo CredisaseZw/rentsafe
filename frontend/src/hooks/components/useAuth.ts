@@ -58,7 +58,7 @@ export default function useAuth() {
          },
          onError: (error) => {
             if(isAxiosError(error)){
-               setError(error.response?.data.error ?? error.response?.data.detail);
+               setError(error.response?.data.error ?? error.response?.data.detail ?? error.message);
             }
             console.log(error);
          },

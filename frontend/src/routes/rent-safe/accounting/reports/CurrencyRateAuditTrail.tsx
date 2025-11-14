@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { MONTHS, RATE_AUDIT_TRAIL } from "@/constants";
 
-function RateAuditTrail() {
+function CurrencyRateAuditTrail() {
   return (
     <div>
       <Header title="Rate Audit Trail" variant="danger"/>
@@ -63,4 +63,4 @@ function RateAuditTrail() {
   )
 }
 
-export default RateAuditTrail
+export default CurrencyRateAuditTrail

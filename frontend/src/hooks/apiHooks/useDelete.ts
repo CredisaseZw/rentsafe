@@ -6,17 +6,22 @@ import { handleAxiosError } from "@/lib/utils"
 import { useSearchParams } from "react-router"
 import type { Delete } from "@/types"
 
-export default function useDelete({mutationFunc, keyStore, value }: Delete) {
+export default function useDelete({mutationFunc, keyStore, value, successCallBack }: Delete) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [searchParams] = useSearchParams();
   const queryClient = useClient()
   const { mutate } = useMutation({
     mutationFn: () => mutationFunc(),
-    onSuccess: () => {
-        const PAGE = Number(searchParams.get("page") || 1)
-        queryClient.invalidateQueries({ queryKey: [keyStore, PAGE] })
+    onSuccess: () => {  
+        if(typeof(keyStore) !== "function"){
+          const PAGE = Number(searchParams.get("page") || 1)
+          queryClient.refetchQueries({ queryKey: typeof(keyStore) === "string" ? [keyStore, PAGE] : keyStore })
+        } else {
+          keyStore?.() 
+        }
         toast.success(`${value} deleted successfully`)
+        successCallBack?.();
         setOpen(false)
     },
     onError: (error) => handleAxiosError(`Failed to delete ${value.toLocaleLowerCase()}`, error),

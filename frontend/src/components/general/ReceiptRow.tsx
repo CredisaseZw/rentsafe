@@ -143,7 +143,7 @@ export default function ReceiptRow({paymentMethods, index, lease, cashbooks, isC
                         step={0.01}
                         onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         onKeyDown={validateAmounts}
-                        name={`received_${index}`}
+                        name={`rent_${index}`}
                         value={lease.rent ?? ""}
                         onChange={(e) => updateReceipt(index, "rent", e.target.value, true)}
                         />
@@ -156,7 +156,7 @@ export default function ReceiptRow({paymentMethods, index, lease, cashbooks, isC
                         step={0.01}
                         onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         onKeyDown={validateAmounts}
-                        name={`received_${index}`}
+                        name={`opc_${index}`}
                         value={lease.opc ?? ""}
                         onChange={(e) => updateReceipt(index, "opc", e.target.value, true)}
                         />

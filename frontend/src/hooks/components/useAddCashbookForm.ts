@@ -1,5 +1,4 @@
 import { useCurrency } from '@/contexts/CurrencyContext'
-import type { PaginationData } from '@/interfaces';
 import type { Cashbook, GeneralLedgerAccount, Payload } from '@/types'
 import { useEffect, useState } from 'react'
 import {useGetGeneralLedgerAccounts} from '../apiHooks/useGetGeneralLedgerAccounts';
@@ -14,33 +13,26 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
     const {currencies, currencyLoading, currency} = useCurrency()
     const {generalLedgers, generalLedgersLoading, generalLedgersError} = useGetGeneralLedgerAccounts(page);
     const [generalLedgerAccounts, setGeneralLedgerAccounts] = useState<GeneralLedgerAccount[]>([]);
-    const [pagination, setPagination] = useState<PaginationData | undefined>(undefined)
     const [loading, setLoading] = useState(false);
+    
     useEffect(()=>{
         if(handleAxiosError("Failed to fetch general ledger accounts", generalLedgersError)) return;
-        if(generalLedgers){
-            setGeneralLedgerAccounts((p)=>
-                page === 1
+        if(!generalLedgers) return;
+        
+        setGeneralLedgerAccounts((p)=>
+            page === 1
             ? generalLedgers.results
             : [...p, ...generalLedgers.results]
-            )
-            setPagination({
-                count : generalLedgers.count,
-                next : generalLedgers.next
-            })
+        )
+        
+        if(generalLedgers.next){
+            const page_ = new URL(generalLedgers.next).searchParams.get("page");
+            setPage(Number(page_))
         }
+        
 
-    },[generalLedgers, generalLedgersError])
+    },[generalLedgers, generalLedgersError, page])
 
-    const handleLoadMoreGLS = () => {
-        if(pagination?.next){
-            const nextPage = new URL(pagination.next).searchParams.get("page")
-            setPage(Number(nextPage))
-            }        
-            return;
-            
-    }
-    
     const handleSubmit = (
         e:React.FormEvent<HTMLFormElement>, 
         mutation: UseMutationResult<any, Error, Payload, unknown>) => {
@@ -100,10 +92,8 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
         currencyLoading,
         generalLedgerAccounts,
         generalLedgersLoading,
-        pagination,
         loading,
         handleSubmit,
-        handleLoadMoreGLS
     }
 
 }

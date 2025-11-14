@@ -6,7 +6,18 @@ import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function IndividualPaymentStatusTab() {
-   const { rows, headers, isLoading, searchRef, searchQuery, paginationData, clearSearch, handleSearch } =
+   const { 
+      open,
+      rows,
+      headers,
+      isLoading,
+      searchRef,
+      searchQuery,
+      paginationData,
+      clearSearch,
+      handleSearch,
+      setOpen
+   } =
       useIndividualPaymentStatusTab();
 
    return (
@@ -18,7 +29,10 @@ export default function IndividualPaymentStatusTab() {
             isLoading={isLoading}
             noDataNode = {
                <div className="mt-2 flex flex-row items-center justify-center">
-                  <IndividualForm/>
+                  <IndividualForm 
+                     open = {open}
+                     setOpen = {setOpen}
+                  />
                </div>
             }
             paginationData={paginationData}
@@ -57,8 +71,10 @@ export default function IndividualPaymentStatusTab() {
                      <Search />
                   </Button>
                </form>
-
-                  <IndividualForm />
+                  <IndividualForm 
+                     open = {open}
+                     setOpen = {setOpen}
+                  />
                </div>
             }
          />
