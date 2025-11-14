@@ -1,18 +1,20 @@
 import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from "@/interfaces";
-import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, handleTrackChangedFields, validateInvoices } from "@/lib/utils";
+import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, handleTrackChangedFields, onClearFilter, validateInvoices } from "@/lib/utils";
 import type { InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { Invoice } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import useClient from "../general/useClient";
 import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
-import { getRefetchInvoices } from "@/store/invoiceStore";
+import { useSearchParams } from "react-router";
 
 export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined, invoice?: Invoice){
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchItem, setSearchItem] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
   const queryClient = useClient();
   const [billerCopy, setBillerCopy] = useState<any>(null);
   const rowsRef = useRef<{
@@ -34,6 +36,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     issue_date : getSummaryDate(getCurrentDate())
   })
 
+/* FOR INVOICE EDITING 
   useEffect(()=>{
     if(!invoice) return;
     const BILLER: Partial<Biller> = {
@@ -52,24 +55,49 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     setBillerCopy(rest);
     setSearchItem(invoice.customer_details.full_name ?? "");
   }, [invoice])
+ */
 
   const onSelectBiller = (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => {
-    const isCustomer = "vat_number" in item;
+    const id = Number((item as any).id) || 0;
+    const phone = (item as any).phone ?? "";
+    const email = (item as any).email ?? "";
+
+    let biller_name = "";
+    let biller_type: Biller["biller_type"] = "tenant";
+    let rawAddress: any = (item as any).primary_address ?? (item as any).address ?? null;
+    const vat_no = (item as any).vat_number ?? (item as any).account_data?.vat_number ?? "";
+    const tin_number = (item as any).tin_number ?? (item as any).account_data?.tin_number ?? "";
+
+    if ("vat_number" in item) {
+      biller_name = (item as InvoiceCustomerDetails).full_name ?? "";
+      biller_type = ((item as InvoiceCustomerDetails).customer_type as Biller["biller_type"]) ?? biller_type;
+      rawAddress = (item as InvoiceCustomerDetails).address ?? rawAddress;
+    } else if ("first_name" in item) {
+      const ind = item as IndividualMinimal;
+      biller_name = `${ind.first_name} ${ind.last_name ?? ""}`.trim();
+      biller_type = "individual";
+      rawAddress = ind.primary_address ?? rawAddress;
+    } else if ("branch_name" in item) {
+      const br = item as BranchFull;
+      biller_name = br.branch_name ?? "";
+      biller_type = "company";
+      rawAddress = br.summary_address ?? rawAddress;
+    }
+
     const BILLER: Partial<Biller> = {
-      biller_id: isCustomer ? Number(item.id) : 0,
-      biller_name: isCustomer ? item.full_name : "",
-      biller_phone: item.phone ?? "",
-      biller_email: item.email ?? "",
-      biller_type: isCustomer ? item.customer_type as Biller['biller_type'] : "individual",
-      biller_address: isCustomer ? formatAddress(item.address) : "",
-      biller_vat_no: isCustomer ? item.vat_number ?? "" : "",
-      biller_tin_number: isCustomer ? item.tin_number ?? "" : "",
+      biller_id: id,
+      biller_name,
+      biller_phone: phone,
+      biller_email: email,
+      biller_type,
+      biller_address: formatAddress(rawAddress),
+      biller_vat_no: vat_no,
+      biller_tin_number: tin_number,
     };
 
-    setBillerCopy(BILLER);
     setFormData((prev) => ({ ...prev, ...BILLER }));
+    setBillerCopy(BILLER);
   };
-  
   const handleOnChangeFormData = (key:string, val: string)=>{
     setFormData((prev)=>({
       ...prev,
@@ -152,7 +180,8 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     }
     mutate.mutate(PAYLOAD,{
       onSuccess : (data: Invoice)=> {
-        getRefetchInvoices?.();
+        onClearFilter?.(setSearchParams);
+        queryClient.invalidateQueries({queryKey : ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]})
         if(mode === "update") queryClient.invalidateQueries({queryKey : ["invoice", Number(invoice?.id)]});
         const m = mode === "create"
         ? `New invoice ${data.document_number} created successfully`

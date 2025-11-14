@@ -12,7 +12,7 @@ import {
 import { EllipsisVertical } from 'lucide-react'
 import MutateInvoiceStatus from '../routes/rent-safe/accounting/sales/sales-invoice/MutateInvoiceStatus'
 import DeleteDialogue from './DeleteDialogue'
-import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
+//import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
 import { getRefetchInvoices } from '@/store/invoiceStore'
 
 interface props{
@@ -39,14 +39,15 @@ function SingleInvoice({invoice, handleGoBack, markInvoice}:props) {
                       <EllipsisVertical size={18}/>
                     </PopoverTrigger>
                     <PopoverContent className="space-y-2">
-                      {
+                   {/* IN CASE EDIT FUNCTIONALITY IS NEEDED IN THE FUTURE 
+                   { 
                         invoice?.status === "pending" ||
                         invoice?.status === "draft" && 
                         <AddInvoiceDialogue
                           invoice={invoice}
                           defaultInvoiceType={invoice?.invoice_type}
                           title="Edit Invoice"/>
-                      }
+                      } */}
                       {
                         invoice?.status === "pending" ||
                         invoice?.status === "draft" && 

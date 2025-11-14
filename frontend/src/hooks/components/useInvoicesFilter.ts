@@ -61,7 +61,7 @@ export default function useInvoicesFilter() {
       const params = new URLSearchParams(prev)
       const keys = Array.from(params.keys())
       keys.forEach((key) => {
-        if (key === "invoice") return
+        if (key === "invoice_type__in") return
         params.delete(key)
       })
       return params

@@ -118,7 +118,7 @@ export function formatDateToPythonSLiking(date: string): string {
   return `${year}-${month}-${day}`;
 }
 
-export function formatAddress(addr: Address | null): string {
+export function formatAddress(addr: Address | null | undefined): string {
   if (!addr) return "";
   const parts: string[] = [];
 
@@ -839,4 +839,18 @@ export const validateInvoices = (rows:InvoicePreview[], formData:Record<string, 
     }
   }
   return false
+}
+
+export const onClearFilter = (setSearchParams: any) => {
+  setSearchParams((prev: URLSearchParams) => {
+    const params = new URLSearchParams(prev)
+    const keys = Array.from(params.keys())
+
+    keys.forEach((key) => {
+      if (key === "invoice_type__in") return
+      params.delete(key)
+    })
+
+    return params
+  })
 }

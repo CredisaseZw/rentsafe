@@ -42,7 +42,7 @@ export default function InvoicesFilter() {
           }}
         >
           <div className="form-group">
-            <Label>Customer Name</Label>
+            <Label >Customer Name</Label>
             <Input
               name="customer_name"
               value={filter.customer_name}

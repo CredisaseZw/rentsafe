@@ -447,7 +447,7 @@ export const CREDIT_NOTE_HEADERS :Header[]=[
 export const SALES_ITEMS_HEADERS :Header[]=[
   {name : "ID"},
   {name : "Category"},
-  {name : "Name"},
+  {name : "Name", textAlign:"left"},
   {name : "Unit Price"},
   {name : "Date Created"},
   {name : "Action",}
@@ -455,8 +455,7 @@ export const SALES_ITEMS_HEADERS :Header[]=[
 
 export const SALES_CATEGORIES_HEADERS:Header[] = [
   {name : "Code"},
-  {name : "Category"},
-  {name : "Date Created"},
+  {name : "Category", textAlign : "left"},
   {name : "Action"},
 ]
 
@@ -592,10 +591,10 @@ export const CASH_BOOK_HEADERS:Header[] = [
   {name : "Cashbook ID"},
   {name : "Cashbook Name"},
   {name : "Active Requisition"},
-  {name : "Account Type"},
-  {name : "Branch Name"},
-  {name : "General Ledger Account"},
-  {name : "Account Sector"},
+  {name : "Account Type", textAlign : "left"},
+  {name : "Branch Name",  textAlign : "left"},
+  {name : "General Ledger Account",  textAlign : "left"},
+  {name : "Account Sector", textAlign : "left"},
   {name : "Actions"}
 ]
 
@@ -607,7 +606,7 @@ export const PAYMENT_METHODS_HEADERS:Header[] = [
 
 export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
   { name: "Account Number" },
-  { name: "Account Name" },
+  { name: "Account Name", textAlign : "left"},
   { name: "Secondary Currency" },
   { name: "Accounts Sector" },
   { name: "Sector Name" },

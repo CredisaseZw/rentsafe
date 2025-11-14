@@ -117,14 +117,14 @@ function AutoCompleteClient({
               const clientName =
                 "first_name" in item
                   ? `${item.identification_number} - ${item.first_name} ${item.last_name}`
-                  : "company" in item
-                  ? `${item.company.registration_number} - ${item.company.registration_name}`
+                  : "branch_name" in item
+                  ? `${item.company.registration_number} - ${item.branch_name}`
                   : item.full_name;
 
               const identificationNumber =
                   "first_name" in item
                   ? item.identification_number
-                  : "company" in item 
+                  : "branch_name" in item 
                   ? item.company.registration_number
                   : ""
 
