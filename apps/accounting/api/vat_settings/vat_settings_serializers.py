@@ -12,6 +12,7 @@ class VATSettingSerializer(serializers.ModelSerializer):
     rate = serializers.DecimalField(
         max_digits=5,
         decimal_places=2,
+        allow_null=True,
         error_messages={
             "required": "Rate: This field is required.",
             "invalid": "Rate: A valid decimal number is required.",

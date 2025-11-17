@@ -18,7 +18,7 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"Created VAT: {vat.description} with rate {vat.rate}%"
+                        f"Created VAT: {vat.description} with rate {'Exempt' if vat.rate is None else f'{vat.rate}%'}"
                     )
                 )
             else:

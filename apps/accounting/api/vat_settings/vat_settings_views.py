@@ -102,9 +102,7 @@ class VATSettingViewSet(BaseViewSet):
     def update(self, request, *args, **kwargs):
         try:
             partial = kwargs.pop("partial", False)
-            instance = VATSetting.objects.get(
-                pk=kwargs.get("pk"), created_by__client=request.user.client
-            )
+            instance = self.get_object()
             if instance.created_by is None:
                 return self._create_rendered_response(
                     {"error": "This VAT cannot be modified."},
