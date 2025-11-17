@@ -13,11 +13,11 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 
 interface props {
    open: boolean
-   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+   setOpen: (value: boolean) => void
 }
 
 export default function CompanyForm({open, setOpen}:props) {
-   const { isPending, handleSubmit } = useCompanyForm(setOpen);
+   const { isPending, handleSubmit } = useCompanyForm();
 
    return (
       <Dialog
@@ -299,7 +299,7 @@ export default function CompanyForm({open, setOpen}:props) {
                   </ColumnsContainer>
                </details>
                <div className="mt-10 text-right">
-                  <Button disabled={isPending} type="submit">
+                  <Button disabled={isPending} type="submit" asChild>
                      {isPending ? (
                         <>
                            <Loader2 className="animate-spin" /> Adding Company...

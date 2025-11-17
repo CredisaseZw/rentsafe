@@ -1,10 +1,9 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
-import type { Invoice } from "@/interfaces";
 import type { cashSalesRow, InvoicePreview, SalesItem } from "@/types";
 import {  useState, useImperativeHandle, useEffect } from "react";
 import { toast } from "sonner";
 
-function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>, invoice?: Invoice | undefined) {
+function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>) {
     const {currencies, currencyLoading, currency} = useCurrency()
     const [discount, setDiscount] = useState("0")
     const [rows, setRows] = useState<InvoicePreview[]>([{quantity : "1"} as InvoicePreview])
@@ -16,29 +15,6 @@ function useInvoiceTotalsTables(ref:React.ForwardedRef<unknown>, invoice?: Invoi
         vat: 0.00,
         total: 0.00,
     });
-
-    useEffect(()=>{
-        if (!invoice) return;
-        setCalculatedTotals({
-            subtotal: Number(invoice?.total_excluding_vat ?? 0),
-            vat: Number(invoice?.vat_total ?? 0),
-            total: Number(invoice?.total_inclusive ?? 0),
-        });
-        const rows:InvoicePreview[] = invoice.line_items.map((item)=>({
-            searchSalesItem : item.sales_item.name,
-            salesItem: item.sales_item.id,
-            itemCode: item.sales_item.sales_account_object.account_number,
-            price: Number(item.sales_item.price.replace("$", "")),
-            quantity: String(Math.floor(Number(item.quantity))),
-            vat_amount: Number(item.vat_amount),
-            total: Number(item.total_price),
-        }))
-        setRows(rows);
-        setDiscount(invoice?.discount)
-        setDefaultCurrency(String(invoice.currency.id))
-        setCurrencyCode(invoice.currency.currency_code)
-
-    }, [invoice])
 
     const handleOnRowChange = (
         index: number,

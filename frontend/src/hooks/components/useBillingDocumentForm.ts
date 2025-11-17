@@ -1,5 +1,5 @@
 import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from "@/interfaces";
-import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, handleTrackChangedFields, onClearFilter, validateInvoices } from "@/lib/utils";
+import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, onClearFilter, validateBill } from "@/lib/utils";
 import type { InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { Invoice } from "@/interfaces";
 import type { UseMutationResult } from "@tanstack/react-query";
@@ -9,7 +9,11 @@ import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
 import { useSearchParams } from "react-router";
 
-export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined, invoice?: Invoice){
+export default function useBillingDocumentForm(
+  defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined,
+  type? : "invoice" | "creditNote"
+
+){
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchItem, setSearchItem] = useState("");
@@ -32,30 +36,10 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     biller_vat_no : "",
     biller_tin_number : "",
     selector_type : "tenant",
+    description : "",
     invoice_type : defaultInvoiceType ?? "fiscal",
-    issue_date : getSummaryDate(getCurrentDate())
+    issue_date : getSummaryDate(getCurrentDate()),
   })
-
-/* FOR INVOICE EDITING 
-  useEffect(()=>{
-    if(!invoice) return;
-    const BILLER: Partial<Biller> = {
-      biller_name : invoice.customer_details.full_name ?? "",
-      biller_id : Number(invoice.customer_details.id),
-      biller_email : invoice.customer_details.email ?? "",
-      biller_phone : invoice.customer_details.phone ?? "",
-      biller_type : invoice.customer_details.customer_type ?? "",
-      biller_address : formatAddress(invoice.customer_details.address!),
-      biller_tin_number : invoice.customer_details.tin_number ?? "",
-      biller_vat_no : invoice.customer_details.vat_number ?? "",
-      issue_date : getSummaryDate(invoice.date_created)
-    }
-    setFormData((p)=>({ ...p, ...BILLER }))
-    const {biller_id, invoice_type, biller_type, issue_date, ...rest} = BILLER
-    setBillerCopy(rest);
-    setSearchItem(invoice.customer_details.full_name ?? "");
-  }, [invoice])
- */
 
   const onSelectBiller = (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => {
     const id = Number((item as any).id) || 0;
@@ -111,12 +95,10 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
     updateBiller? : UseMutationResult<any, Error, Payload, unknown>
   ) => {  
     e.preventDefault();
-    const mode = !invoice
-    ? "create"
-    : "update";
+    const mode = "create"
     const rows = rowsRef.current ? rowsRef.current.getRows() : [];
     const totals = rowsRef.current?.getTotals();
-    if(validateInvoices(rows, formData)) return;
+    if(validateBill(rows, formData)) return;
 
     setLoading(true)
     const {biller_id, invoice_type, biller_type, selector_type, issue_date,...BILLER} = formData
@@ -128,12 +110,7 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
         id : Number(formData.biller_id),
         data : UPDATE
       }
-      updateBiller?.mutate(payload_, {
-        onSuccess : ()=>{
-          queryClient.invalidateQueries({queryKey : ["invoice", Number(invoice?.id)]});
-          toast.success("Biller information update successful.");
-        }
-      });
+      updateBiller?.mutate(payload_);
     }
 
     const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));
@@ -142,58 +119,42 @@ export default function useAddInvoiceForm(defaultInvoiceType : "proforma" | "fis
       is_individual: formData.biller_type === "individual",
       customer_id: formData.biller_id,
       currency_id: totals?.currency_id,
-      discount: -Number(totals?.discount || 0),
+      discount: type === "invoice" 
+      ? -Number(totals?.discount || 0) 
+      : Number(totals?.discount || 0),
       items: ITEMS,
-      sale_date: getCurrentDate(),
+      ...(
+        type === "creditNote"
+        ? {
+          description : formData.description,
+          credit_date : getCurrentDate()
+        } 
+        :{
+          sale_date: getCurrentDate(),
+        }
+      )
+
     };
 
-    if(mode === "update"){
-      const invoicePayload = {
-        invoice_type: invoice?.invoice_type,
-        is_individual: invoice?.customer_details.customer_type === "individual",
-        customer_id: invoice?.customer_details.id,
-        currency_id: invoice?.currency.id,
-        discount: -Number(invoice?.discount || 0),
-        items: invoice?.line_items
-          ? invoice.line_items.map((item) => ({
-              sales_item_id: Number(item.sales_item.id),
-              quantity: Number(item.quantity),
-            }))
-          : [],
-      //  sale_date: new Date(invoice?.date_created ?? "").toISOString().split("T")[0]
-      }
-      const {sale_date, ...invoiceCopy} = PayloadData;
-      const changes = handleTrackChangedFields(invoicePayload, invoiceCopy);
-      if(!changes) {
-        setLoading(false);
-        return toast.info("No Invoice changes made")
-      }
-    }
-
     const PAYLOAD:Payload= {
-      ...(
-        mode === "update" &&
-        { id : invoice?.id}
-      ), 
       data : PayloadData,
       mode
     }
     mutate.mutate(PAYLOAD,{
       onSuccess : (data: Invoice)=> {
         onClearFilter?.(setSearchParams);
-        queryClient.invalidateQueries({queryKey : ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]})
-        if(mode === "update") queryClient.invalidateQueries({queryKey : ["invoice", Number(invoice?.id)]});
-        const m = mode === "create"
-        ? `New invoice ${data.document_number} created successfully`
-        : `Invoice ${data.document_number} updated successfully`
+        const key = type === "invoice"
+        ? ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]
+        : ["creditNotes", page,`?page=${page}`]
+        queryClient.invalidateQueries({queryKey : key})
+
+        const m =  `New ${type} ${data.document_number} created successfully`
         toast.success(m)
         setOpen(false)
-        
       },
-      onError: (error)=> handleAxiosError(`Failed to ${mode  === "create" ? "create" : "update"} invoice`,error),
+      onError: (error)=> handleAxiosError(`Failed to create ${type}`,error),
       onSettled: ()=> setLoading(false)
     }) 
-
   };
 
 

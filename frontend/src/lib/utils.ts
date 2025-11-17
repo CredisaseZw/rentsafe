@@ -808,7 +808,7 @@ export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) => {
   return DATA
 }
 
-export const validateInvoices = (rows:InvoicePreview[], formData:Record<string, any>) =>{
+export const validateBill = (rows:InvoicePreview[], formData:Record<string, any>) =>{
   if (rows.length === 0) {
     toast.error("Add at least one item to the invoice");
     return true;

@@ -8,22 +8,37 @@ import {
 import { SlidersHorizontal } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { INVOICE_STATUSES } from "@/constants"
-import useInvoicesFilter from "@/hooks/components/useInvoicesFilter"
 import { Input } from "@/components/ui/input"
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import Fieldset from "@/components/general/Fieldset"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useState } from "react"
+import useFilter from "@/hooks/components/useFilter"
 
 export default function InvoicesFilter() {
+  const [filter, setFilter] = useState({
+    status_in: "",
+    ordering : "",
+    customer_name: "",
+    currency__currency_code: "",
+    due_date__lte: "",
+    sale_date__lte: "",
+    sale_date__gte: "",
+    date_created__lte: "",
+    date_created__gte: "",
+    total_inclusive__gte: "",
+    total_inclusive__lte: "",
+    is_recurring: "",
+    is_invoiced: "",
+  })
   const {
     open,
     setOpen,
     currencies,
-    filter,
     handleChange,
     applyFilters,
     onClearFilter,
-  } = useInvoicesFilter()
+  } = useFilter(filter, setFilter)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

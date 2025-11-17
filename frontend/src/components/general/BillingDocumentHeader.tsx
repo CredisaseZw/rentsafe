@@ -11,15 +11,16 @@ import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } fr
 interface props {
     formData: Biller,
     searchItem: string;
-    isRep?: boolean
-    isType?: boolean
+    isRep?: boolean;
+    isType?: boolean;
+    isDescription?:boolean;
     setFormData: React.Dispatch<React.SetStateAction<Biller>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
     onSelectBiller: (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => void;
     handleOnChangeFormData : (key:string, val: string) => void
 }
 
-function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSearchItem, onSelectBiller, handleOnChangeFormData}: props) {
+function BillingDocumentHeader({isRep, formData, searchItem, isType, isDescription, setFormData, setSearchItem, onSelectBiller, handleOnChangeFormData}: props) {
   return (
     <div className='w-full'>
         <ColumnsContainer numberOfCols={2} marginClass='mt-0' gapClass="gap-5">
@@ -117,6 +118,17 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                         name="tinNumber"
                     />
                 </div>
+                { isDescription &&
+                    <div className="flex flex-row gap-5 justify-between">
+                        <Label className="text-gray-800 dark:text-white">Description</Label>
+                        <Input
+                            onChange={(e)=> handleOnChangeFormData("description", e.target.value)}
+                            value={formData.description}
+                            className="w-[400px]"
+                            name="rep"
+                        />
+                    </div>
+                }
                 {
                     isRep &&
                     <div className="flex flex-row gap-5 justify-between">
@@ -167,4 +179,4 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
   )
 }
 
-export default InvoiceHeader
+export default BillingDocumentHeader
