@@ -18,6 +18,7 @@ function PaymentRow({ payment, balance }: Props) {
         {payment.description ?? "-"}
       </TableCell>
       <TableCell className="text-center">{payment.reference}</TableCell>
+      <TableCell className="text-center">{payment?.cashbook_name ?? "-"}</TableCell>
       <TableCell className="text-end">
         {
           payment.type === "Payment" ?

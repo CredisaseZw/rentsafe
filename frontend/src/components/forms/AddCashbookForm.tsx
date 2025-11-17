@@ -20,12 +20,10 @@ function AddCashbookForm({initial, successCallback}:props) {
     const {
         generalLedgerAccounts,
         generalLedgersLoading,
-        pagination,
         currencies,
         currency,
         loading,
         currencyLoading,
-        handleLoadMoreGLS,
         handleSubmit,
     } = useAddCashbookForm(initial, successCallback)
     const createCashBook = useCreateCashbook()
@@ -80,7 +78,7 @@ function AddCashbookForm({initial, successCallback}:props) {
                     <SelectContent>
                         {
                             ACCOUNT_TYPES.map((a, idx)=>
-                                <SelectItem value={String(a.value)} key={idx} >{a.label}</SelectItem>   
+                                <SelectItem value={String(a.value)} key={idx} > {a.label}</SelectItem>   
                             )
                         }
                     </SelectContent>
@@ -124,22 +122,13 @@ function AddCashbookForm({initial, successCallback}:props) {
                         {
                             generalLedgerAccounts.length !== 0 && 
                             generalLedgerAccounts.map((s, idx:number)=>(
-                                <SelectItem value={String(s.id)} key={idx}>{s.account_name}</SelectItem>
+                                <SelectItem value={String(s.id)} key={idx}>{s.account_number} - { s.account_name}</SelectItem>
                             ))
                         }
                         {
                             generalLedgerAccounts.length === 0 && 
                             !!generalLedgersLoading && 
                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
-                        }
-                        {
-                            generalLedgerAccounts.length !== 0 && 
-                            pagination?.next &&
-                            <div className="flex justify-center p-2">
-                                <Button variant="ghost" onClick={handleLoadMoreGLS}>
-                                Load More
-                                </Button>
-                            </div>
                         }
                     </SelectContent>
                 </Select>

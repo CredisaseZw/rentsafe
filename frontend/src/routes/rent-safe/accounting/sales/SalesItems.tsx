@@ -55,7 +55,7 @@ function SalesItems() {
                 <TableRow key={s.id}>
                   <TableCell className="text-center">{s.id}</TableCell>
                   <TableCell className="text-center">{s.category_object.name}</TableCell>
-                  <TableCell className="text-center">{s.name}</TableCell>
+                  <TableCell className="text-left">{s.name}</TableCell>
                   <TableCell className="text-center">{s.price}</TableCell>
                   <TableCell className="text-center">{getSummaryDate(s.date_created)}</TableCell>
                   <TableCell className="flex flex-row gap-5 justify-center items-center">

@@ -447,7 +447,8 @@ export interface PaymentHistory {
    amount: string,
    method: string,
    payment_date: string,
-   reference: string
+   reference: string,
+   cashbook_name?: string | null,
    description: string
    type: "Payment" | string
 }
@@ -487,11 +488,12 @@ export type VATPayload = {
 }
 
 export type InvoicePreview = {
-   salesItem: string,
+   searchSalesItem : string
+   salesItem: number,
    itemCode: string,
    price: number,
-   quantity: number,
-   vat_amount: string,
+   quantity:  string,
+   vat_amount: number,
    total: number,
 }
 
@@ -552,13 +554,14 @@ export type CurrencySetting = {
 
 export type Delete = {
    mutationFunc: () => Promise<AxiosResponse<any, any>>;
-   keyStore: string; //QUERY KEY 
+   successCallBack?: ()=> void;
+   keyStore: any;
    page?: number;
    value: string;
    trigger?: React.ReactNode
 };
 export type Payload = {
-   mode: "update" | "create",
+   mode: "update" | "create" | string,
    id?: number
    data: any
 }
@@ -589,3 +592,12 @@ export type Cashbook = {
    branch_name: string
    general_ledger_account: GeneralLedgerAccount
 }
+
+export type InvoiceTotals = {  
+   currency_id : number,
+   subtotal: number,
+   vat: number,
+   total: number,
+   discount : number 
+}
+

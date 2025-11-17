@@ -1,13 +1,13 @@
-import { Plus, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import BaseTable from "@/components/general/BaseTable";
 import CompanyForm from "./CompanyForm";
 import SectionHeading from "@/components/general/SectionHeading";
 import useCompanyPaymentStatusTab from "@/hooks/pages/dashboard/useCompanyPaymentStatusTab";
 import { Button } from "@/components/ui/button";
 import BranchForm from "./BranchForm";
-import useCompanyForm from "@/hooks/components/useCompanyForm";
 export default function CompanyPaymentStatusTab() {
   const {
+    open,
     paginationData,
     rows,
     headers,
@@ -16,9 +16,9 @@ export default function CompanyPaymentStatusTab() {
     searchQuery,
     clearSearch,
     handleSearch,
+    setOpen
   } = useCompanyPaymentStatusTab();
 
-  const { showForm, setShowForm } = useCompanyForm();
 
   return (
     <div>
@@ -29,9 +29,10 @@ export default function CompanyPaymentStatusTab() {
         rows={rows}
         noDataNode={
           <div className="mt-2 flex flex-row items-center justify-center">
-            <Button onClick={() => setShowForm(true)} variant={"outline"}>
-               Add New Company 
-            </Button>
+            <CompanyForm
+              open = {open}
+              setOpen = {setOpen}
+            />
           </div>
         }
         paginationData={paginationData}
@@ -69,18 +70,17 @@ export default function CompanyPaymentStatusTab() {
                 <Search />
               </Button>
             </form>
-
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-between lg:justify-end">
-              <BranchForm setCompanyFormOpen={setShowForm} />
-              <Button onClick={() => setShowForm(true)} >
-                  Add New Company <Plus size={18} />
-              </Button>
+              <BranchForm />
+              <CompanyForm
+                open = {open}
+                setOpen = {setOpen}
+              />
             </div>
           </div>
         }
       />
 
-      <CompanyForm open={showForm} setShowForm={setShowForm} />
     </div>
   );
 }

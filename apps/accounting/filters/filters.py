@@ -4,7 +4,7 @@ Filters for the accounting app.
 
 import django_filters
 from django.db.models import Q
-from apps.accounting.models.models import CurrencyRate
+from apps.accounting.models.models import CreditNote, CurrencyRate
 
 
 class CurrencyRateFilter(django_filters.FilterSet):
@@ -67,3 +67,45 @@ class CurrencyRateFilter(django_filters.FilterSet):
         Filter by target currency code.
         """
         return queryset.filter(currency__currency_code__icontains=value)
+
+
+class CreditNoteFilter(django_filters.FilterSet):
+    """
+    Filter for CreditNote model.
+    """
+
+    year = django_filters.NumberFilter(field_name="credit_date", lookup_expr="year")
+    month = django_filters.NumberFilter(field_name="credit_date", lookup_expr="month")
+    document_number = django_filters.CharFilter(
+        field_name="document_number", lookup_expr="icontains", label="Document Number"
+    )
+    search = django_filters.CharFilter(method="filter_search", label="search")
+    customer = django_filters.CharFilter(method="get_customer", label="customer_name")
+
+    class Meta:
+        """
+        Meta class for CreditNoteFilter.
+        """
+
+        model = CreditNote
+        fields = ["search", "customer"]
+
+    def filter_search(self, queryset, name, value):
+        """
+        Search across document number.
+        """
+        return queryset.filter(Q(document_number__icontains=value)).distinct()
+
+    def get_customer(self, queryset, customer_name, value):
+        """
+        Filter by customer name.
+        """
+        queryset = queryset.filter(
+            Q(customer__individual__first_name__icontains=value)
+            | Q(customer__individual__last_name__icontains=value)
+            | Q(customer__company__registration_name__icontains=value)
+            | Q(customer__company__trading_name__icontains=value)
+            | Q(customer__company__registration_number__icontains=value)
+        )
+        print("hello_world", queryset.query)
+        return queryset

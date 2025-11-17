@@ -13,7 +13,7 @@ from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from decimal import Decimal
 from rest_framework.permissions import IsAuthenticated
-from apps.accounting.filters.filters import CurrencyRateFilter
+from apps.accounting.filters.filters import CreditNoteFilter, CurrencyRateFilter
 from apps.accounting.models.models import (
     SalesItem,
     VATSetting,
@@ -54,7 +54,6 @@ from apps.accounting.api.serializers.serializers import (
     CashBookSerializer,
     InvoiceDetailSerializer,
     CurrencySerializer,
-    CreditNoteSerializer,
     DisbursementSerializer,
 )
 from apps.accounting.models.pricing import ServiceSpecialPricing, ServiceStandardPricing
@@ -63,8 +62,6 @@ from apps.common.utils.helpers import extract_error_message
 from apps.leases.models import Landlord
 from apps.clients.models import Client
 from apps.accounting.models.disbursements import Disbursement
-
-from apps.leases.models.models import Lease
 
 logger = logging.getLogger("accounting")
 
@@ -101,7 +98,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.error(f"Error creating object: {e}")
             return Response(
-                {"error": "Something went wrong"},
+                {"error": "Something went wrong", "details": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -118,6 +115,29 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except Exception as e:
             logger.error(f"Error retrieving objects: {e}")
+            return Response(
+                {"error": "Something went wrong"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def update(self, request, *args, **kwargs):
+        """Update objects belonging to the user's company."""
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        except ValidationError as e:
+            logger.error(f"Validation error updating object: {e}")
+            return Response(
+                {"error": extract_error_message(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating object: {e}")
             return Response(
                 {"error": "Something went wrong"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -911,11 +931,6 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         except Exception as e:
             # Don't let logging errors break the main transaction
             print(f"Failed to log invoice action: {str(e)}")
-
-
-class CreditNoteViewSet(BaseCompanyViewSet):
-    queryset = CreditNote.objects.all()
-    serializer_class = CreditNoteSerializer
 
 
 class PaymentViewSet(BaseCompanyViewSet):

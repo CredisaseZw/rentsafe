@@ -92,7 +92,7 @@ export default function BaseTable({
                      ))
                   ) : (
                      <TableRow noHover>
-                        <TableCell colSpan={headers.length} className="text-muted-foreground py-5 text-center">
+                        <TableCell colSpan={headers.length} className="text-muted-foreground py-5 text-center h-[25vh]">
                            No data
                            {
                               noDataNode

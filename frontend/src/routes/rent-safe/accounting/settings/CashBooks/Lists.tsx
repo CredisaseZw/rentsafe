@@ -47,10 +47,10 @@ function Lists() {
                   <TableCell className="text-center">{c.cashbook_id}</TableCell>
                   <TableCell className="text-center">{c.cashbook_name}</TableCell>
                   <TableCell className="text-center">{c.requisition_status ? "Yes" : "None"}</TableCell>
-                  <TableCell className="text-center">{c.account_type}</TableCell>
-                  <TableCell className="text-center">{c.branch_name}</TableCell>
-                  <TableCell className="text-center">{`${c.general_ledger_account.account_name}`}</TableCell>
-                  <TableCell className="text-center">{`${c.general_ledger_account.account_sector.code} - ${c.general_ledger_account.account_sector.name}`}</TableCell>
+                  <TableCell className="text-left">{c.account_type}</TableCell>
+                  <TableCell className="text-left">{c.branch_name}</TableCell>
+                  <TableCell className="text-left">{`${c.general_ledger_account.account_name}`}</TableCell>
+                  <TableCell className="text-left">{`${c.general_ledger_account.account_sector.code} - ${c.general_ledger_account.account_sector.name}`}</TableCell>
                   <TableCell className="flex flex-row justify-center items-center gap-5">
                     <AddCashbookDialog
                       initial = {c}

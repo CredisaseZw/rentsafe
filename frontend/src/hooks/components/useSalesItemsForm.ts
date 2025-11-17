@@ -147,7 +147,7 @@ export default function useSalesItemsForm(initial : SalesItem | undefined, succe
             onSuccess : ()=>{
                 const page = Number(searchParams.get("page") || 1)
                 queryClient.invalidateQueries({queryKey : ["salesItems", page]})
-                toast.success("Sales items created successfully");
+                toast.success(`Sales items ${mode}d successfully`);
                 successCallBack?.();      
             },
             onError : (error)=> handleAxiosError("Failed to create sales item", error),
