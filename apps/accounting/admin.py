@@ -107,11 +107,18 @@ class SalesCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(VATSetting)
 class VATSettingAdmin(admin.ModelAdmin):
-    list_display = ("id", "rate", "description", "vat_applicable", "created_by")
+    list_display = (
+        "id",
+        "rate",
+        "description",
+        "vat_applicable",
+        "created_by",
+        "date_created",
+    )
     list_display_links = ("description",)
     search_fields = ("description",)
     list_filter = ("vat_applicable", "rate")
-    ordering = ("rate",)
+    ordering = ("-date_created", "-date_updated")
     raw_id_fields = ("created_by",)
     list_per_page = 25
 
