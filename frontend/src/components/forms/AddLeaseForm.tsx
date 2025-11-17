@@ -209,29 +209,30 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
             </div>
 
           </ColumnsContainer>
-          {
-            (addressState === "client" || addressState === "manual") &&
-            primaryTenantAddress !== undefined && (
-              <>
-                <ColumnsContainer numberOfCols={2} marginClass="mt-6" gapClass="gap-6">
-                  <div className="flex flex-col justify-baseline form-group">
-                    <Label className="px-2 font-normal required" htmlFor="">
-                      Property Type
-                    </Label>
-                    <Select name="propertyTypeName" required>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select ..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {propertyType &&
-                          propertyType.map((property_type) => (
-                            <SelectItem
-                              value={property_type.name || ""}
-                              key={property_type.id}
-                            >
-                              {property_type.name}
-                            </SelectItem>
-                          ))}
+           {
+              (addressState === "client" || addressState === "manual") &&
+              primaryTenantAddress !== undefined && (
+                <>
+                  <ColumnsContainer numberOfCols={2} marginClass="mt-6" gapClass="gap-6">
+                    <div className="flex flex-col justify-baseline form-group">
+                      <Label className="px-2 font-normal required" >
+                        Property Type
+                      </Label>
+                      <Select name="propertyTypeName" required>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select ..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {propertyType &&
+                            propertyType.map((property_type) => (
+                              <SelectItem
+                                value={property_type.name || ""}
+                                key={property_type.id}
+                              >
+                                {property_type.name}
+                              </SelectItem>
+                            ))}
+                      
                         {!propertyType && isLoading && (
                           <SelectItem
                             disabled
@@ -252,7 +253,8 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                   </div>
                 </ColumnsContainer>
 
-                {addressState === "client" && (
+                {
+                addressState === "client" && (
                   <ColumnsContainer numberOfCols={3}>
                     <div className="form-group">
                       <Label className="px-2 font-normal" htmlFor="streetAddress">
@@ -321,20 +323,91 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                       />
                     </div>
                   </ColumnsContainer>
-                )}
-                <div className="form-group mt-6">
-                  <Label className="px-2 font-normal required" htmlFor="">
-                    Property Details
-                  </Label>
-                  <Textarea name="propertyDetails" required placeholder="" />
-                </div>
-                {
-                  addressState === "manual" &&
-                  <MultiAddressInput className="mt-5" isMultiple={false} />
-                }
-              </>
-            )
-          }
+                  )}
+                  {
+                    addressState === "client" && (
+                    <ColumnsContainer numberOfCols={3}>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" htmlFor="streetAddress">
+                          Street Address
+                        </Label>
+                        <Input
+                          name="streetAddress"
+                          value={primaryTenantAddress.street_address}
+                          disabled
+                          id="streetAddress"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" >
+                          Suburb
+                        </Label>
+                        <Input
+                          name="suburb"
+                          value={primaryTenantAddress.suburb?.name}
+                          disabled
+                          id="suburb"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" >
+                          City
+                        </Label>
+                        <Input
+                          name="city"
+                          value={primaryTenantAddress.city?.name}
+                          disabled
+                          id="city"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" >
+                          Province
+                        </Label>
+                        <Input
+                          name="province"
+                          value={primaryTenantAddress.province?.name}
+                          disabled
+                          id="province"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" >
+                          Country
+                        </Label>
+                        <Input
+                          name="country"
+                          value={primaryTenantAddress.country?.name}
+                          disabled
+                          id="country"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <Label className="px-2 font-normal" >
+                          Area Code
+                        </Label>
+                        <Input
+                          name="postal_code"
+                          defaultValue={primaryTenantAddress.postal_code?.toString()}
+                          disabled
+                          id="postal_code"
+                        />
+                      </div>
+                    </ColumnsContainer>
+                  )}
+                   <div className="form-group mt-6">
+                    <Label className="px-2 font-normal required" >
+                      Property Details
+                    </Label>
+                    <Textarea name="propertyDetails" required placeholder="" />
+                  </div>
+                  {
+                    addressState ===  "manual" &&
+                    <MultiAddressInput className="mt-5" isMultiple={false} />
+                  }
+                </>
+              )
+            }
 
         </Fieldset>
       </div>
@@ -342,15 +415,15 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
         <Fieldset legendTitle="Lease Details">
           <ColumnsContainer numberOfCols={3} marginClass="mt-5" gapClass="gap-6">
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor=""> Lease Start Date</Label>
-              <Input defaultValue={leaseObject?.start_date ?? ""} name="leaseStartDate" id="leaseStartDate" type={"date"} />
+                <Label className="px-2 font-normal" > Lease Start Date</Label>
+                <Input defaultValue={leaseObject?.start_date ?? ""} name="leaseStartDate" id = "leaseStartDate" type={"date"}/>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor=""> Lease end Date</Label>
-              <Input defaultValue={leaseObject?.end_date ?? ""} name="leaseEndDate" id="leaseEndDate" type={"date"} />
+                <Label className="px-2 font-normal" > Lease end Date</Label>
+                <Input defaultValue={leaseObject?.end_date ?? ""} name="leaseEndDate" id = "leaseEndDate" type={"date"}/>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="">Lease Status</Label>
+              <Label className="px-2 font-normal" >Lease Status</Label>
               <Select name="leaseStatus" defaultValue={LEASE_STATUS_OPTIONS[0].value}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select ..." />
@@ -366,7 +439,7 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
               </Select>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor=""> Currency</Label>
+              <Label className="px-2 font-normal required" > Currency</Label>
               <Select name="currencyType" key={defaultCurrency} required defaultValue={defaultCurrency.toString()}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select ..." />
@@ -388,7 +461,7 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
               </Select>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal" htmlFor="">Payment frequency</Label>
+              <Label className="px-2 font-normal" >Payment frequency</Label>
               <Select name="paymentFrequency" defaultValue={leaseObject?.payment_frequency ?? PAYMENT_FREQUENCY_OPTIONS[0].value}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select ..." />
@@ -418,36 +491,35 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                 required />
             </div>
             <div className="form-group">
-              <Label className="px-2  font-normal" htmlFor="">Other standing Charges</Label>
-              <Input
-                name="otherStandingCharging"
-                id="otherStandingCharging"
-                type="number"
-                defaultValue={formData.defaultUtility}
-                step={0.01}
-                onWheel={(e) => { (e.target as HTMLInputElement).blur() }}
-                onKeyDown={validateAmounts} />
+                <Label className="px-2  font-normal" >Other standing Charges</Label>
+                <Input 
+                  name="otherStandingCharging"
+                  id = "otherStandingCharging"
+                  type= "number"
+                  defaultValue={formData.defaultUtility}
+                  step={0.01} 
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  onKeyDown={validateAmounts}/>
             </div>
             <div className="form-group">
-              <Label className="px-2 font-normal required" htmlFor=""> Payment Start Date</Label>
-              <Input name="effectiveStartDate" required id="effectiveStartDate" value={25} readOnly />
+                <Label className="px-2 font-normal required" > Payment Start Date</Label>
+                <Input name="effectiveStartDate" required id = "effectiveStartDate" value={25} readOnly/>
             </div>
             <div className="form-group">
-              <Label className="px-2 required font-normal" htmlFor=""> Payment end Date</Label>
-              <Input
-                name="effectiveEndDate"
-                required
-                id="effectiveEndDate" type={"number"}
-                onWheel={(e) => { (e.target as HTMLInputElement).blur() }}
-                defaultValue={leaseObject?.grace_period_days ?? formData.effectiveEndDate}
-                onChange={(e) => handleUpdateForm("effectiveEndDate", e.target.value)} />
+                <Label className="px-2 required font-normal" > Payment end Date</Label>
+                <Input
+                  name="effectiveEndDate"
+                  required
+                  id = "effectiveEndDate" type={"number"}
+                  onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
+                  defaultValue={leaseObject?.grace_period_days ?? formData.effectiveEndDate}
+                  onChange={(e)=> handleUpdateForm("effectiveEndDate", e.target.value)}/>
             </div>
             <div className="flex flex-row gap-2 items-center justify-center">
               <Checkbox
-                className="self-center"
-                name="vatInclusive"
-                id="vatInclusive"
-
+                  className="self-center"
+                  name="vatInclusive"
+                  id="vatInclusive" 
               />
               <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
                 VAT Inclusive
@@ -461,10 +533,10 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
                 key={String(leaseObject?.is_rent_variable)}
                 defaultChecked={!!leaseObject?.is_rent_variable}
               />
-              <Label className="px-2 font-normal self-center" htmlFor="vatInclusive">
-                Is Rent Variable
+              <Label className="px-2 font-normal self-center" htmlFor="rentVariable">
+                  Is Rent Variable
               </Label>
-            </div>
+          </div>
           </ColumnsContainer>
         </Fieldset>
       </div>

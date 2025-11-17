@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import type { Address, BranchFull, IndividualMinimal } from "@/interfaces";
+import type { Address} from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 import { Button } from "../ui/button";
@@ -9,19 +9,21 @@ import { useLocation, useNavigate } from "react-router";
 
 interface Props {
   index?: number;
+  displayValue?: "name" | "ID"
   clientLabel?: string;
   searchItem: string;
-  clientType: string;
+  clientType: "tenant" | "individual" | "company" | string;
   isRequired?: boolean;
   createClient?: boolean;
   disableSearch?: boolean;
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>;
-  onSelectValue?: (item: IndividualMinimal | BranchFull, index?: number) => void;
+  onSelectValue?: (item: any, index?: number) => void;
   setSearchItem?: Dispatch<SetStateAction<string>>;
   multiSetSearchItem?: (index: number, key: string, value: string) => void;
 }
 
 function AutoCompleteClient({
+  displayValue = "ID",
   index,
   createClient,
   searchItem,
@@ -96,7 +98,8 @@ function AutoCompleteClient({
                   onClick={() => {
                     navigate(
                       `/services/rent-safe/?${
-                        clientType === "individual"
+                        clientType === "individual" ||
+                        clientType === "tenant"
                           ? "addIndividual"
                           : "addCompany"
                       }=true&&next=${path.pathname}`
@@ -105,24 +108,33 @@ function AutoCompleteClient({
                   }}
                 >
                   Create{" "}
-                  {clientType === "individual" ? "Individual" : "Company"}
+                  {
+                    clientType === "individual" ||
+                    clientType === "tenant"
+                    ? "Individual" 
+                    : "Company"
+                  }
                 </Button>
               )}
             </div>
           )}
           {Array.isArray(data) &&
-            data.map((item: IndividualMinimal | BranchFull) => {
+            data.map((item: any) => {
               const clientName =
                 "first_name" in item
                   ? `${item.identification_number} - ${item.first_name} ${item.last_name}`
-                  : `${item.company.registration_number} - ${item.company.registration_name}`;
+                  : "branch_name" in item
+                  ? `${item.company.registration_number} - ${item.branch_name}`
+                  : item.full_name;
 
               const identificationNumber =
-                "first_name" in item
+                  "first_name" in item
                   ? item.identification_number
-                  : item.company.registration_number;
+                  : "branch_name" in item 
+                  ? item.company.registration_number
+                  : ""
 
-              if (index === 0 && setPrimaryTenantAddress)
+              if (index === 0 && setPrimaryTenantAddress && "primary_address" in item)
                 setPrimaryTenantAddress(item.primary_address);
 
               return (
@@ -133,12 +145,16 @@ function AutoCompleteClient({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     if (onSelectValue) onSelectValue(item, index);
-                    if (setSearchItem)
-                      setSearchItem(
-                        clientType === "individual"
-                          ? identificationNumber || ""
-                          : clientName
-                      );
+                    if (setSearchItem){
+                      setSearchItem(()=>{
+                        if (clientType === "individual"){ 
+                          return displayValue === "ID" ? identificationNumber : clientName
+                        }
+                        return clientName
+                      });
+                      setHasUserInteracted(false)
+                    }
+                    
                     if (multiSetSearchItem)
                       multiSetSearchItem(
                         index ?? 0,

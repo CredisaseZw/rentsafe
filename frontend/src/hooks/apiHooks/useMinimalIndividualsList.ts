@@ -5,25 +5,37 @@ import { useSearchParams } from "react-router";
 import { api } from "@/api/axios";
 
 export default function useMinimalIndividualsList(individualQuery?: string) {
-   const [searchParams] = useSearchParams();
-   const q = searchParams.get("individual_q")?.trim() || individualQuery?.trim();
-   const page = searchParams.get("individual_page") || "1";
-   const { data, isLoading, error } = useQuery({
-      queryKey: ["individuals-minimal", q, page],
-      queryFn: () => {
-         const query = q ? `?search=${encodeURIComponent(q)}` : "";
-         return api
-            .get(`/api/individuals/${query ? query + (page ? "&page=" + page : "") : page ? "?page=" + page : ""}`)
-            .then((res) => res.data);
-      },
-   });
+  const [searchParams] = useSearchParams();
 
-   useEffect(() => {
-      if (error) {
-         console.log(error);
-         toast.error(q ? `Search failed for query "${q}"` : "Could not fetch individuals");
-      }
-   }, [error, q]);
+  const q = searchParams.get("individual_q")?.trim() || individualQuery?.trim() || "";
+  const page = searchParams.get("individual_page") || "1";
 
-   return { data, isLoading, searchQuery: q, currentPage: page };
+  const hasQuery = q.length > 0;
+
+  const { data = [], isLoading, error } = useQuery({
+    queryKey: ["individuals-minimal", q, page],
+    queryFn: async () => {
+      const query = q ? `?search=${encodeURIComponent(q)}` : "";
+      const pageQuery = page ? `${query ? "&" : "?"}page=${page}` : "";
+      const url = `/api/individuals/${query}${pageQuery}`;
+
+      const res = await api.get(url);
+      return res.data;
+    },
+
+    enabled: hasQuery,
+  });
+
+  useEffect(() => {
+    if (error && hasQuery) {
+      toast.error(`Search failed for "${q}"`);
+    }
+  }, [error, hasQuery, q]);
+
+  return {
+    data: hasQuery ? data : [], 
+    isLoading: hasQuery ? isLoading : false,
+    searchQuery: q,
+    currentPage: page,
+  };
 }

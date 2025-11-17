@@ -19,13 +19,11 @@ interface Props{
 export default function AddGeneralLedgerAccountDialogue({initial}:Props){
     const {
         open,
-        pagination,
         sectors,
         isLoading,
         loading,
         setOpen,
         handleSubmit,
-        handleLoadMoreSectors,
     } = useAddGeneralLedgerAccountDialogue(initial);
     const createAccount = useCreateGeneralAccount();
 
@@ -118,15 +116,6 @@ export default function AddGeneralLedgerAccountDialogue({initial}:Props){
                                             sectors.length === 0 && 
                                             !!isLoading && 
                                             <SelectItem disabled value="empty">Nothing to Show</SelectItem>
-                                        }
-                                        {
-                                            sectors.length !== 0 && 
-                                            pagination?.next &&
-                                            <div className="flex justify-center p-2">
-                                                <Button variant="ghost" onClick={handleLoadMoreSectors}>
-                                                Load More
-                                                </Button>
-                                            </div>
                                         }
                                     </SelectContent>
                                 </Select>

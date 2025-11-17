@@ -1,18 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import type { PaginationData } from "@/interfaces";
 import ExpandableText from "@/components/general/ExpandableText";
 
 export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
+   const [params] = useSearchParams();
+   const [open , setOpen] = useState(false);
+
    const { data, isLoading, searchQuery } = useCompanyBranches();
 
+   useEffect(()=>{
+      if (params.get("addCompany")) setOpen(true); 
+   }, [])
+
    const rows: BaseTableRow[] =
-      data?.results?.map((cell) => {
+      data && 
+      typeof data === "object" &&
+      "results" in data &&
+      data.results?.map((cell) => {
          return {
             registration_name: `${cell.branch_name || ""} - ${cell.company?.registration_number || ""}`,
             trading_name: cell.company.trading_name ?? "-",
@@ -52,6 +62,7 @@ export default function useCompanyPaymentStatusTab() {
    const paginationData = data as PaginationData;
 
    return {
+      open,
       rows,
       headers,
       searchRef,
@@ -60,5 +71,6 @@ export default function useCompanyPaymentStatusTab() {
       paginationData,
       clearSearch,
       handleSearch,
+      setOpen
    };
 }

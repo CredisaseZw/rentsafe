@@ -10,10 +10,8 @@ import MultiContactInput from "@/components/general/MultiContactInput";
 import AutoCompleteCompanySearchInput from "@/components/general/AutoCompleteCompanySearchInput";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
 
-interface props{
-   setCompanyFormOpen : (open: boolean) => void;
-}
-export default function BranchForm({setCompanyFormOpen} :props) {
+
+export default function BranchForm() {
    const { showForm, isPending, handleSubmit, setShowForm } = useBranchForm();
    
    return (
@@ -42,7 +40,6 @@ export default function BranchForm({setCompanyFormOpen} :props) {
                      <AutoCompleteCompanySearchInput
                         closeDialogue={() =>{
                            setShowForm(false)
-                           setCompanyFormOpen(true)
                         }}
                         elementName="companyId" />
                   </div>

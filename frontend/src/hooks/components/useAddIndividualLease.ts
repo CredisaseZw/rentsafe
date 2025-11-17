@@ -127,23 +127,27 @@ function useAddIndividualLease() {
       [name]: value,
     }));
   };
-  const onSelectGuarantor = (item: IndividualMinimal | BranchFull) => {
-    if ("first_name" in item) {
+  const onSelectGuarantor = (item: any) => {
+    const itemCopy :IndividualMinimal | BranchFull = item
+
+    if ("first_name" in itemCopy) {
       setFormData((prev) => ({
         ...prev,
-        guarantor_id: item.id,
-        guarantor_name: `${item.first_name} ${item.last_name}`,
+        guarantor_id: itemCopy.id,
+        guarantor_name: `${itemCopy.first_name} ${itemCopy.last_name}`,
       }));
       return;
+    } 
+    if ("branch_name" in itemCopy){
+      setFormData((prev) => ({
+        ...prev,
+        guarantor_id: itemCopy.company.id,
+        guarantor_name: itemCopy.company.registration_name,
+      }));
     }
-    setFormData((prev) => ({
-      ...prev,
-      guarantor_id: item.company.id,
-      guarantor_name: item.company.registration_name,
-    }));
     return
   }
-  const onSelectLandlord = (item: IndividualMinimal | BranchFull) => {
+  const onSelectLandlord = (item: any) => {
     if ("first_name" in item) {
       setFormData((prev) => ({
       ...prev,
@@ -152,6 +156,7 @@ function useAddIndividualLease() {
       }));
       return;
     }
+    
     setFormData((prev) => ({
       ...prev,
       landlord_id: item.company.id,
@@ -388,12 +393,13 @@ function useAddIndividualLease() {
     if (!payload) return;
 
     useMutate.mutate({
-      leaseID: leaseID,
-      data: payload
-    }, {
-      onError: (error: AxiosError | Error | unknown) => { handleAxiosError("Failed to create new lease", error, "Failed to create lease. Please try again.") },
+        leaseID : leaseID,
+        data : payload
+      }, {
+      onError: (error: AxiosError | Error | unknown) => { handleAxiosError("Failed to create new lease", error,"Failed to create lease. Please try again.") },
       onSuccess :async() => {
-        queryClient.invalidateQueries({ queryKey: isUpdate ? ["lease", leaseID] : ["leases"], exact : false });
+        queryClient.invalidateQueries({ queryKey: ["lease", leaseID]});
+        queryClient.invalidateQueries({ queryKey: ["leases"], exact : false });
         toast.success(isUpdate ? "Lease successfully updated" : "Lease successfully created")
         successCallback()
       },

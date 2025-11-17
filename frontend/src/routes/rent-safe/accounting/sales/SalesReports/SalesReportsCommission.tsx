@@ -10,7 +10,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { MONTHS, SALES_REPORTS_HEADERS } from "@/constants";
 import useSalesReports from "@/hooks/components/useSalesReports";
 
-export default function SalesReports() {
+export default function SalesReportsCommission() {
   const {
     currencyLoading,
     currencies,
