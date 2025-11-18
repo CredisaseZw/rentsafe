@@ -7,6 +7,7 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
     dependencies = [
+        ("accounting", "0023_alter_cashsale_company_alter_creditnote_company_and_more"),
         ("accounting", "0022_merge_0017_payment_cashbook_0021_merge_20251029_1047"),
     ]
 
