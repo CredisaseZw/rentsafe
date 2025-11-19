@@ -91,7 +91,14 @@ class IndividualAccountsAdmin(admin.ModelAdmin):
 class EmploymentDetailInline(admin.TabularInline):
     model = EmploymentDetail
     extra = 0
-    fields = ("job_title", "employer_name", "industry", "start_date", "end_date", "is_current")
+    fields = (
+        "job_title",
+        "employer_name",
+        "industry",
+        "start_date",
+        "end_date",
+        "is_current",
+    )
     show_change_link = True
 
 
@@ -112,7 +119,7 @@ class NextOfKinInline(admin.TabularInline):
 class ContactDetailInline(admin.TabularInline):
     model = IndividualContactDetail
     extra = 0
-    fields = ("type", "phone_number")
+    fields = ("id", "type", "phone_number")
     show_change_link = True
 
 
