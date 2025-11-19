@@ -119,7 +119,9 @@ class SalesCategory(BaseModelWithUser):
 
 
 class VATSetting(BaseModelWithUser):
-    rate = models.DecimalField(max_digits=5, decimal_places=2)
+    """Model to store VAT settings."""
+
+    rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     description = models.CharField(max_length=255)
     vat_applicable = models.BooleanField(default=True)
 
