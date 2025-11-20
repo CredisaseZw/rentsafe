@@ -285,6 +285,28 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
             "profile",
         ]
 
+    def validate(self, attrs):
+        registration_number = attrs.get("registration_number")
+        if (
+            registration_number
+            and Company.objects.filter(registration_number=registration_number).exists()
+        ):
+            raise serializers.ValidationError(
+                "A company with this registration number already exists."
+            )
+        registartion_name = attrs.get("registration_name")
+        trading_name = attrs.get("trading_name")
+        if (
+            registartion_name
+            and Company.objects.filter(
+                Q(registration_name=registartion_name) | Q(trading_name=trading_name)
+            ).exists()
+        ):
+            raise serializers.ValidationError(
+                "A company with this registration/trading name already exists."
+            )
+        return super().validate(attrs)
+
     @transaction.atomic
     def create(self, validated_data):
         addresses_data = validated_data.pop("addresses", [])
