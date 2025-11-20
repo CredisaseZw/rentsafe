@@ -103,6 +103,7 @@ class LeaseInvoiceService:
                         lease=lease,
                         currency=lease.currency,
                         sale_date=today,
+                        next_invoice_date=today,
                         customer=Customer_obj,
                         is_invoiced=is_invoiced,
                         created_by=lease.created_by,
@@ -230,6 +231,7 @@ class LeaseInvoiceService:
                     currency=lease.currency,
                     customer=Customer_obj,
                     sale_date=get_opening_balance_oldest_date(lease),
+                    next_invoice_date=get_opening_balance_oldest_date(lease),
                     is_invoiced=True,
                     created_by=lease.created_by,
                 )
@@ -277,6 +279,7 @@ class LeaseInvoiceService:
                             currency=lease.currency,
                             customer=Customer_obj,
                             sale_date=sale_date,
+                            next_invoice_date=sale_date,
                             is_invoiced=True,
                             created_by=lease.created_by,
                         )

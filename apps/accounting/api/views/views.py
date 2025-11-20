@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError, NotFound
-from django.db.models import Q, Sum, Prefetch
+from django.db.models import F, Q, Sum, Prefetch
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -323,6 +323,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         Optimized queryset with select_related and prefetch_related for performance
         """
         queryset = Invoice.objects.filter(created_by__client=self.request.user.client)
+        queryset = queryset.exclude(sale_date=F("next_invoice_date"))
         # Optimize database queries
         queryset = queryset.select_related(
             "currency",
@@ -353,9 +354,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         queryset = super().filter_queryset(queryset)
         request = self.request
 
-        # Custom search across customer names
-        search_query = request.query_params.get("search", None)
-        if search_query:
+        if search_query := request.query_params.get("search", None):
             queryset = self._apply_custom_search(queryset, search_query)
 
         if customer_name := request.query_params.get("customer_name", None):
