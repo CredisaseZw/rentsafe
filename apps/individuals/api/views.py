@@ -75,6 +75,7 @@ class IndividualViewSet(BaseViewSet):
         if self.action in ["update", "partial_update", "create"]:
             return IndividualCreateSerializer
         elif self.action in ["search_individuals", "details", "list"]:
+            print("returning search serializer")
             return IndividualSearchSerializer
         elif self.action == "retrieve_full_individual_details":
             return IndividualSerializer
