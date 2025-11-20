@@ -41,9 +41,18 @@ def validate_email(email: str) -> bool:
 
 def normalize_zimbabwe_mobile(phone, type="mobile"):
     phone = re.sub(r"[\s-]", "", phone.strip())
-    if re.match(r"^(?:.*?)(77|78|71|73)\d{7}$", phone):
-        if type in ["mobile", "whatsapp", "combined", "other"]:
+    if type in ["mobile", "whatsapp", "combined"]:
+        if re.match(r"^(?:.*?)(77|78|71|73)\d{7}$", phone):
             phone = phone[-9:]
+            return f"+263{phone}"
+        else:
+            return False
+    elif type in ["home", "work"]:
+        if re.match(r"^\d{3,15}$", phone):
+            return f"+263{phone}"
+        else:
+            return False
+    elif len(phone) <= 10:
         return f"+263{phone}"
     return False
 
