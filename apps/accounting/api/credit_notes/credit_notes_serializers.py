@@ -39,6 +39,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
     total_vat = serializers.SerializerMethodField()
     total_excluding_vat = serializers.SerializerMethodField()
     credit_note_total = serializers.SerializerMethodField()
+    line_items = TransactionLineItemSerializer(many=True, read_only=True)
 
     class Meta(BaseCompanySerializer.Meta):
         """Class Meta for Credit Note Serializer"""
@@ -54,6 +55,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
             "currency",
             "currency_id",
             "items",
+            "line_items",
             "customer_details",
             "customer_id",
             "is_individual",

@@ -140,35 +140,24 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
             phone_number=formatted
         ).first()
         if existing_contact:
-
             current_individual_id = (
                 getattr(self.instance, "individual_id", None)
                 or _get_parent_individual_id()
             )
-
-            if self.instance and existing_contact.pk == getattr(
-                self.instance, "pk", None
-            ):
-                data["phone_number"] = formatted
-                data["type"] = phone_type
-                return data
-
-            if (
-                current_individual_id
-                and existing_contact.individual_id == current_individual_id
-            ):
+            if existing_contact.individual.id != current_individual_id:
+                raise ValidationError(
+                    "This phone number is already registered to another individual"
+                )
+            else:
                 if existing_contact.type == phone_type:
                     raise ValidationError(
                         "Phone number already exists for this individual"
                     )
-                data["id"] = existing_contact.id
-                data["type"] = phone_type
-                data["phone_number"] = formatted
-                return data
-
-            raise ValidationError(
-                f"This phone number is already registered {formatted}"
-            )
+                else:
+                    data["id"] = existing_contact.id
+                    data["type"] = phone_type
+                    data["phone_number"] = formatted
+                    return data
 
         data["phone_number"] = formatted
         data["type"] = phone_type
@@ -244,6 +233,14 @@ class IndividualSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["date_created", "date_updated"]
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation.get("date_of_birth"):
+            representation["date_of_birth"] = instance.date_of_birth.strftime(
+                "%d-%b-%Y"
+            )
+        return representation
+
 
 class IndividualMinimalSerializer(serializers.ModelSerializer):
     current_employment = serializers.SerializerMethodField()
@@ -267,6 +264,14 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
             "account_details",
             "addresses",
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation.get("date_of_birth"):
+            representation["date_of_birth"] = instance.date_of_birth.strftime(
+                "%d-%b-%Y"
+            )
+        return representation
 
     # Get the primary address
     def get_addresses(self, obj):
@@ -295,6 +300,7 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
     )
     date_of_birth = serializers.DateField(allow_null=True, required=False)
     account_data = IndividualAccountsSerializer(many=False, required=False)
+    phone = serializers.CharField(read_only=True)
 
     def to_internal_value(self, data):
         dob = data.get("date_of_birth")
@@ -321,6 +327,14 @@ class IndividualCreateSerializer(serializers.ModelSerializer):
             "phone",
             "account_data",
         ]
+
+    def get_phone(self, instance):
+        contact = (
+            instance.contact_details.filter(type="mobile").first()
+            or instance.contact_details.filter(type="combined").first()
+            or instance.contact_details.filter(type="whatsapp").first()
+        )
+        return contact.phone_number if contact else None
 
     def validate(self, data):
         id_type = data.get("identification_type")

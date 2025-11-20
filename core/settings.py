@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlparse
 import sys
 
 load_dotenv(override=True)
@@ -194,16 +194,26 @@ else:
         DATABASES = {
             "default": {
                 "ENGINE": "django.db.backends.postgresql",
-                "NAME": parsed.path[1:].split("?")[0],
+                "NAME": parsed.path.replace("/", ""),
                 "USER": parsed.username,
                 "PASSWORD": parsed.password,
-                "HOST": migration_host,
-                "PORT": parsed.port or 5432,
-                "OPTIONS": {
-                    "sslmode": "require",
-                    "options": "-c statement_timeout=30000",
-                },
+                "HOST": parsed.hostname,
+                "PORT": 5432,
+                "OPTIONS": dict(parse_qsl(parsed.query)),
             },
+            # "default": {
+            #     "ENGINE": "django.db.backends.postgresql",
+            #     "NAME": parsed.path[1:].split("?")[0],
+            #     "USER": parsed.username,
+            #     "PASSWORD": parsed.password,
+            #     "HOST": migration_host,
+            #     "PORT": parsed.port or 5432,
+            #     "OPTIONS": {
+            #         "sslmode": "require",
+            #         # "options": "-c statement_timeout=30000",
+            #         "options": "-c search_path=public,shared_extensions",
+            #     },
+            # },
             "pooler": {
                 "ENGINE": "django.db.backends.postgresql",
                 "NAME": parsed.path[1:].split("?")[0],
