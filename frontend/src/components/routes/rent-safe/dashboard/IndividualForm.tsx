@@ -53,7 +53,7 @@ export default function IndividualForm({open, setOpen}:props) {
                      <Label className="px-2 font-normal required" htmlFor="identificationType">
                         Identification Type
                      </Label>
-                     <Select name="identificationType" required>
+                     <Select name="identificationType" required defaultValue="national_id">
                         <SelectTrigger id="identificationType" className="border-color w-full bg-white">
                            <SelectValue placeholder="Identification type" />
                         </SelectTrigger>
@@ -69,6 +69,7 @@ export default function IndividualForm({open, setOpen}:props) {
                         Identification Number 
                      </Label>
                      <Input
+                        placeholder="e.g 631021010M45"
                         id="identificationNumber"
                         name="identificationNumber"
                         required

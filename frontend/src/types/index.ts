@@ -492,6 +492,7 @@ export type InvoicePreview = {
    salesItem: number,
    itemCode: string,
    price: number,
+   basePrice: number,
    quantity:  string,
    vat_amount: number,
    total: number,

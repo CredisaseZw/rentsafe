@@ -8,6 +8,7 @@ import useClient from "../general/useClient";
 import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
 import { useSearchParams } from "react-router";
+import { updateBillerStore } from "@/store/updateBillerStore";
 
 export default function useBillingDocumentForm(
   defaultInvoiceType : "proforma" | "fiscal" | "recurring" | undefined,
@@ -105,12 +106,30 @@ export default function useBillingDocumentForm(
     const { UPDATE } = useTrackBiller( billerCopy, BILLER, formData.biller_type);
     
     if (UPDATE){
-      const payload_ = {
-        mode : formData.biller_type,
-        id : Number(formData.biller_id),
-        data : UPDATE
+      const permission = updateBillerStore.state.permission
+      const openConfirmation = updateBillerStore.state.openDialogue
+      const closeConfirmation = updateBillerStore.state.closeDialogue
+      const settle = updateBillerStore.state.onSettle
+      openConfirmation();
+
+
+      if(permission === "allow"){
+        const payload_ = {
+          mode : formData.biller_type,
+          id : Number(formData.biller_id),
+          data : UPDATE
       }
-      updateBiller?.mutate(payload_);
+        updateBiller?.mutate(payload_, {
+          onSuccess : ()=>{
+            toast.success("Biller updated Successfully")
+            setTimeout(()=>{
+              closeConfirmation();
+            }, 900)
+          },
+          onSettled : ()=>settle()
+        })
+        ;
+      }
     }
 
     const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));

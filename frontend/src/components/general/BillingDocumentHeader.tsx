@@ -7,7 +7,7 @@ import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
 import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from '@/interfaces'
-
+import UpdateBillerConfirmationDialogue from '@/components/routes/rent-safe/accounting/sales/sales-invoice/UpdateBillerConfirmationDialogue'
 interface props {
     formData: Biller,
     searchItem: string;
@@ -20,7 +20,16 @@ interface props {
     handleOnChangeFormData : (key:string, val: string) => void
 }
 
-function BillingDocumentHeader({isRep, formData, searchItem, isType, isDescription, setFormData, setSearchItem, onSelectBiller, handleOnChangeFormData}: props) {
+function BillingDocumentHeader({
+    isRep,
+    formData,
+    searchItem,
+    isType,
+    isDescription,
+    setFormData,
+    setSearchItem,
+    onSelectBiller,
+    handleOnChangeFormData}: props) {
   return (
     <div className='w-full'>
         <ColumnsContainer numberOfCols={2} marginClass='mt-0' gapClass="gap-5">
@@ -63,6 +72,7 @@ function BillingDocumentHeader({isRep, formData, searchItem, isType, isDescripti
                             displayValue='name'
                             isRequired = {false}
                             searchItem = {searchItem}
+                            placeHolder='e.g John Doe'
                             setSearchItem = {setSearchItem}
                             clientType = {formData.selector_type}
                             createClient
@@ -173,7 +183,9 @@ function BillingDocumentHeader({isRep, formData, searchItem, isType, isDescripti
                 </div>
             </div>
         </ColumnsContainer>
-        
+        {
+            <UpdateBillerConfirmationDialogue/>
+        }
     </div>
   
   )

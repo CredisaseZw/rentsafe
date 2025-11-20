@@ -854,3 +854,14 @@ export const onClearFilter = (setSearchParams: any) => {
     return params
   })
 }
+
+export const parseMoney = (value: string | number | null | undefined): number => {
+  if (typeof value === "number") return value || 0;
+  if (!value) return 0;
+  const cleaned = String(value).replace("$", "").trim();
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+};
+
+export const round2 = (value: number): number =>
+  Math.round((value + Number.EPSILON) * 100) / 100;

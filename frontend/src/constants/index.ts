@@ -333,7 +333,7 @@ export const PHONE_TYPES = [
   { label: "Combined", value: "combined" },
   { label: "Home", value: "home" },
   { label: "Work", value: "work" },
-  { label: "Other", value: "Other" }
+  { label: "Other", value: "other" }
 ]
 
 export const COLOR_THEMES = {
@@ -437,7 +437,7 @@ export const SALES_INVOICES_HEADERS :Header[]=[
   {name : "Actions"}
 ]
 export const SALES_CREDIT_NOTE_HEADERS :Header[]=[
-  {name : "Inv #"},
+  {name : "Cr #"},
   {name : "Date Created"},
   {name : "Customer", textAlign : "left"},
   {name : "Description", textAlign : "left"},
@@ -447,13 +447,6 @@ export const SALES_CREDIT_NOTE_HEADERS :Header[]=[
   {name : "Actions"}
 ]
 
-export const CREDIT_NOTE_HEADERS :Header[]=[
-  {name : "Cr Note #"},
-  {name : "Date Created"},
-  {name : "Customer"},
-  {name : "Currency"},
-  {name : "Amount", textAlign : "end"}
-]
 export const SALES_ITEMS_HEADERS :Header[]=[
   {name : "ID"},
   {name : "Category"},
@@ -611,7 +604,6 @@ export const CASH_BOOK_HEADERS:Header[] = [
 export const PAYMENT_METHODS_HEADERS:Header[] = [
   {name : "ID"},
   {name : "Payment Method"},
-  {name : "Action"}
 ]
 
 export const GENERAL_ACCOUNTS_HEADERS: Header[] = [

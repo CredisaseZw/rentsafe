@@ -16,6 +16,7 @@ interface Props {
   isRequired?: boolean;
   createClient?: boolean;
   disableSearch?: boolean;
+  placeHolder?: string;
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>;
   onSelectValue?: (item: any, index?: number) => void;
   setSearchItem?: Dispatch<SetStateAction<string>>;
@@ -31,6 +32,7 @@ function AutoCompleteClient({
   isRequired,
   clientLabel,
   disableSearch,
+  placeHolder,
   setSearchItem,
   onSelectValue,
   multiSetSearchItem,
@@ -65,6 +67,7 @@ function AutoCompleteClient({
         type="text"
         required={isRequired === false ? false : true}
         name="search_client"
+        placeholder={placeHolder ?? "e.g John Doe"}
         autoComplete="off"
         onChange={(e) => {
           const { value } = e.target;
