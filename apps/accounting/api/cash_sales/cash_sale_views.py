@@ -19,5 +19,4 @@ class CashSaleViewSet(BaseCompanyViewSet):
             )
             .prefetch_related("line_items")
         )
-        print("CashSaleViewSet queryset called", queryset.query)
         return queryset
