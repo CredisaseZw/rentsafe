@@ -86,7 +86,7 @@ class CashSaleSerializer(BaseCompanySerializer):
         representation["sale_date"] = date
         return representation
 
-    def get_customer_details(self, obj):
+    def get_customer_details(self, obj: CashSale) -> dict:
         """Retrieve customer details based on whether it's an individual or company."""
         if obj.customer.is_individual:
             serializer = CustomersSearchSerializer(obj.customer.individual)
@@ -94,28 +94,29 @@ class CashSaleSerializer(BaseCompanySerializer):
             serializer = CustomersSearchSerializer(obj.customer.company)
         return serializer.data
 
-    def get_vat_total(self, obj):
+    def get_vat_total(self, obj: CashSale) -> str:
         """Calculate the total VAT for the cash sale."""
         vat_total = Decimal("0.00")
-        currency_code = obj.currency.currency_code if obj.currency else None
+        currency_code = obj.currency.currency_code if obj.currency else ""
         for item in obj.line_items.all():
             vat_total += item.vat_amount
-        return f"{vat_total.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)} {currency_code}"
+        return f"{vat_total.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)} {currency_code}".strip()
 
-    def get_total_excluding_vat(self, obj):
+    def get_total_excluding_vat(self, obj: CashSale) -> str:
         """Calculate the total amount excluding VAT for the cash sale."""
         total_excl_vat = Decimal("0.00")
-        currency_code = obj.currency.currency_code if obj.currency else None
+        currency_code = obj.currency.currency_code if obj.currency else ""
         for item in obj.line_items.all():
             total_excl_vat += item.total_price - item.vat_amount
-        return f"{total_excl_vat.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)} {currency_code}"
+        return f"{total_excl_vat.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)} {currency_code}".strip()
 
-    def get_change(self, obj):
+    def get_change(self, obj: CashSale) -> str:
         """Calculate the change to be given back to the customer."""
+        currency_code = obj.currency.currency_code if obj.currency else ""
         if obj.amount_received and obj.invoice_total:
             change_amount = obj.amount_received - obj.invoice_total
-            return change_amount.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
-        return Decimal("0.00")
+            return f"{change_amount.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)} {currency_code}".strip()
+        return f"0.00 {currency_code}".strip()
 
     def validate(self, attrs):
 
