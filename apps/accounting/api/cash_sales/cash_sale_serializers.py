@@ -86,13 +86,15 @@ class CashSaleSerializer(BaseCompanySerializer):
         representation["sale_date"] = date
         return representation
 
-    def get_customer_details(self, obj: CashSale) -> dict:
+    def get_customer_details(self, obj: CashSale):
         """Retrieve customer details based on whether it's an individual or company."""
-        if obj.customer.is_individual:
-            serializer = CustomersSearchSerializer(obj.customer.individual)
-        else:
-            serializer = CustomersSearchSerializer(obj.customer.company)
-        return serializer.data
+        if obj.customer:
+            if obj.customer.is_individual:
+                serializer = CustomersSearchSerializer(obj.customer.individual)
+            else:
+                serializer = CustomersSearchSerializer(obj.customer.company)
+            return serializer.data
+        return None
 
     def get_vat_total(self, obj: CashSale) -> str:
         """Calculate the total VAT for the cash sale."""
