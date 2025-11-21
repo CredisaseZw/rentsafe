@@ -117,29 +117,28 @@ class CashSaleSerializer(BaseCompanySerializer):
             return change_amount.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
         return Decimal("0.00")
 
-    def validate(self, data):
-        from apps.accounting.models.models import CurrencyRate
+    def validate(self, attrs):
 
         request = self.context.get("request")
         if not request or not hasattr(request, "user"):
             raise ValidationError("Request context is required.")
         total_amount = Decimal("0")
-        items_data = data.get("items", [])
+        items_data = attrs.get("items", [])
         user_company = request.user.client
-        currency = data.get("currency")
-        discount = data.get("discount", Decimal("0"))
-        customer_id = data.get("customer_id")
-        is_individual = data.get("is_individual")
-        cash_book = data.get("cashbook")
+        currency = attrs.get("currency")
+        discount = attrs.get("discount", Decimal("0"))
+        customer_id = attrs.get("customer_id")
+        is_individual = attrs.get("is_individual")
+        cash_book = attrs.get("cashbook")
 
         if isinstance(self.instance, CashSale):
             currency = (
                 self.instance.currency
-                if not data.get("currency")
-                else data.get("currency")
+                if not attrs.get("currency")
+                else attrs.get("currency")
             )
         else:
-            currency = data.get("currency")
+            currency = attrs.get("currency")
 
         if cash_book.currency != currency:
             raise ValidationError(
@@ -154,12 +153,12 @@ class CashSaleSerializer(BaseCompanySerializer):
         try:
             if is_individual:
                 customer = Individual.objects.get(id=customer_id)
-                data["customer"] = customer
-                data["is_individual"] = True
+                attrs["customer"] = customer
+                attrs["is_individual"] = True
             else:
                 customer = CompanyBranch.objects.get(id=customer_id)
-                data["customer"] = customer
-                data["is_individual"] = False
+                attrs["customer"] = customer
+                attrs["is_individual"] = False
         except (Individual.DoesNotExist, CompanyBranch.DoesNotExist) as e:
             raise ValidationError({"customer_id": "Customer not found."}) from e
 
@@ -171,7 +170,7 @@ class CashSaleSerializer(BaseCompanySerializer):
             created_by__client=user_company,
             customer__in=Customer.objects.filter(**customer_filter),
             line_items__sales_item__in=[item.get("sales_item") for item in items_data],
-            sale_date=data.get("sale_date", date.today()),
+            sale_date=attrs.get("sale_date", date.today()),
         )
         if self.instance:
             existing_qs = existing_qs.exclude(id=self.instance.id)
@@ -179,57 +178,27 @@ class CashSaleSerializer(BaseCompanySerializer):
             raise ValidationError(
                 "A cash sale with the same customer, items, and sale date already exists."
             )
-        latest_rate = (
-            CurrencyRate.objects.filter(
-                created_by__client=user_company,
-            )
-            .order_by("-id")
-            .first()
-        )
-        rate = latest_rate.current_rate
         if items_data:
             total_amount = Decimal("0")
             for item_data in items_data:
                 sales_item = item_data.get("sales_item")
                 if not sales_item:
                     raise ValidationError("Please select at least one item")
-
-                item_price = sales_item.price
-                if sales_item.unit_price_currency != currency:
-                    if provided_rate := item_data.get("conversion_rate"):
-                        if currency == latest_rate.base_currency:
-                            item_price = Decimal(sales_item.price) / Decimal(
-                                provided_rate
-                            )
-                        else:
-                            item_price = Decimal(sales_item.price) * Decimal(
-                                provided_rate
-                            )
-                    elif not provided_rate:
-                        if currency == latest_rate.base_currency:
-                            item_price = Decimal(sales_item.price) / Decimal(rate)
-                        else:
-                            item_price = Decimal(sales_item.price) * Decimal(rate)
-                    else:
-                        raise ValidationError(
-                            {
-                                "items": "Sales item currency does not match credit note currency."
-                            }
-                        )
-                    item_data["unit_price"] = item_price
-                else:
-                    item_data["unit_price"] = sales_item.price
-
-                if (
-                    hasattr(sales_item, "user")
-                    and sales_item.user
-                    and sales_item.created_by.client != user_company
-                ):
+                if sales_item.created_by.client != user_company:
                     raise ValidationError(
                         {
-                            "items": "One or more sales items do not belong to your company."
+                            "items": f"Sales item '{sales_item.name}' does not exist in your company."
                         }
                     )
+                item_price = sales_item.price
+                if currency != sales_item.unit_price_currency:
+                    if not item_data["unit_price"]:
+                        raise ValidationError(
+                            {
+                                "items": "Unit price is required for items with different currency."
+                            }
+                        )
+                item_data["unit_price"] = sales_item.price
 
                 if item_data.get("quantity") is None:
                     raise ValidationError(
@@ -240,19 +209,18 @@ class CashSaleSerializer(BaseCompanySerializer):
                 )
                 line_total = (item_price + vat_amount) * item_data["quantity"]
                 total_amount += line_total
-                print(line_total, "line total", sales_item.name)
 
         if items_data:
-            data["invoice_total"] = total_amount - (discount or Decimal("0"))
+            attrs["invoice_total"] = total_amount - (discount or Decimal("0"))
 
         if discount and discount > total_amount:
             raise ValidationError(
                 {"discount": "Discount cannot be greater than total amount."}
             )
-        if not data.get("amount_received"):
-            data["amount_received"] = data["invoice_total"]
-        data.pop("customer_id", None)
-        return data
+        if not attrs.get("amount_received"):
+            attrs["amount_received"] = attrs["invoice_total"]
+        attrs.pop("customer_id", None)
+        return attrs
 
     @transaction.atomic
     def create(self, validated_data):

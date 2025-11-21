@@ -37,7 +37,6 @@ from apps.accounting.api.serializers.serializers import (
     ServiceSpecialPricingSerializer,
     ServiceStandardPricingSerializer,
     SalesCategorySerializer,
-    CashSaleSerializer,
     CashbookEntrySerializer,
     GeneralLedgerAccountSerializer,
     JournalEntrySerializer,
@@ -95,7 +94,7 @@ class BaseCompanyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logger.error(f"Error creating object: {e}")
             return Response(
-                {"error": "Something went wrong", "details": str(e)},
+                {"error": "Something went wrong"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -180,11 +179,6 @@ class GeneralLedgerAccountViewSet(BaseViewSet):
             return self._create_rendered_response(
                 {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
-class CashSaleViewSet(BaseCompanyViewSet):
-    queryset = CashSale.objects.all()
-    serializer_class = CashSaleSerializer
 
 
 class CashbookEntryViewSet(BaseCompanyViewSet):

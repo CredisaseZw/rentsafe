@@ -5,14 +5,13 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
-from apps.accounting.api.serializers.serializers import BaseCompanySerializer
-from apps.accounting.api.serializers.serializers import (
-    TransactionLineItemSerializer,
-)
-from apps.accounting.api.serializers.serializers import CurrencySerializer
+
 from apps.accounting.api.serializers.serializers import (
     IndividualCustomerSerializer,
     CompanyCustomerSerializer,
+    TransactionLineItemSerializer,
+    BaseCompanySerializer,
+    CurrencySerializer,
 )
 from apps.accounting.models.models import (
     CreditNote,
@@ -205,7 +204,12 @@ class CreditNoteSerializer(BaseCompanySerializer):
                 sales_item = item_data.get("sales_item")
                 if not sales_item:
                     raise serializers.ValidationError("Please select at least one item")
-
+                if sales_item.created_by.client != user_company:
+                    raise ValidationError(
+                        {
+                            "items": f"Sales item '{sales_item.name}' does not exist in your company."
+                        }
+                    )
                 item_price = sales_item.price_including_vat
                 if sales_item.unit_price_currency != currency:
                     if provided_rate := item_data.get("conversion_rate"):
@@ -231,17 +235,6 @@ class CreditNoteSerializer(BaseCompanySerializer):
                     item_data["unit_price"] = item_price
                 else:
                     item_data["unit_price"] = sales_item.price
-
-                if (
-                    hasattr(sales_item, "user")
-                    and sales_item.user
-                    and sales_item.created_by.client != user_company
-                ):
-                    raise serializers.ValidationError(
-                        {
-                            "items": "One or more sales items do not belong to your company."
-                        }
-                    )
 
                 if item_data.get("quantity") is None:
                     raise serializers.ValidationError(
@@ -304,7 +297,7 @@ class CreditNoteSerializer(BaseCompanySerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-
+        validated_data["updated_by"] = self.context["request"].user
         instance.line_items.all().delete()  # Clear existing and recreate
         if items_data:
             for item_data in items_data:
