@@ -12,24 +12,27 @@ import ColumnsContainer from "@/components/general/ColumnsContainer";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 
 interface props {
-   open: boolean
-   setOpen: (value: boolean) => void
+   trigger? : boolean
 }
 
-export default function CompanyForm({open, setOpen}:props) {
-   const { isPending, handleSubmit } = useCompanyForm();
+export default function CompanyForm({trigger = true}:props) {
+   const { isPending, handleSubmit, open, setOpen } = useCompanyForm();
 
    return (
       <Dialog
          modal
          open={open}
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setOpen}
-      >
-         <DialogTrigger>
-            <Button asChild onClick={() => setOpen(true)} >
-               Add New Company <Plus size={15} />
-            </Button>
-         </DialogTrigger>
+      >  
+         {
+            trigger &&
+            <DialogTrigger>
+               <Button asChild onClick={() => setOpen(true)} >
+                  Add New Company <Plus size={15} />
+               </Button>
+            </DialogTrigger>
+         }
+        
          <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[900px] sm:max-w-[default]`}>
             <DialogTitle>Add New Company</DialogTitle>
 

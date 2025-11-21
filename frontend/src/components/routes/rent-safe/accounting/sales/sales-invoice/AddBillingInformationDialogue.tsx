@@ -15,6 +15,8 @@ interface props {
 }
 
 function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice", type = "invoice"}: props) {
+    const updateBiller = useRequestBillerUpdate();
+    const createInvoice = useCreateBillingDocument(type);
     const {
         handleOnChangeFormData,
         onSelectBiller,
@@ -27,9 +29,7 @@ function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice
         setOpen,
         onSave,
         open,
-    } = useBillingDocumentForm(defaultInvoiceType, type)
-    const updateBiller = useRequestBillerUpdate();
-    const createInvoice = useCreateBillingDocument(type);
+    } = useBillingDocumentForm(defaultInvoiceType,createInvoice, type, updateBiller)
     
     return (
     <div>
@@ -42,7 +42,7 @@ function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader> 
                 <div className="w-full">
-                    <form onSubmit={(e)=> onSave(e, createInvoice, updateBiller)}>
+                    <form onSubmit={(e)=> onSave(e)}>
                         <BillingDocumentHeader
                             formData={formData}
                             searchItem={searchItem}

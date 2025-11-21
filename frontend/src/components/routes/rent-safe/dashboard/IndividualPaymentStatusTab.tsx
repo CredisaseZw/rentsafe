@@ -7,16 +7,15 @@ import { Button } from "@/components/ui/button";
 
 export default function IndividualPaymentStatusTab() {
    const { 
-      open,
       rows,
       headers,
       isLoading,
       searchRef,
       searchQuery,
       paginationData,
+      isSearching,
       clearSearch,
       handleSearch,
-      setOpen
    } =
       useIndividualPaymentStatusTab();
 
@@ -28,11 +27,13 @@ export default function IndividualPaymentStatusTab() {
             rows={rows}
             isLoading={isLoading}
             noDataNode = {
-               <div className="mt-2 flex flex-row items-center justify-center">
-                  <IndividualForm 
-                     open = {open}
-                     setOpen = {setOpen}
-                  />
+               isSearching ?
+               <div className="mt-2 flex flex-col gap-5 items-center justify-center">
+                  No Individual found.
+                  <IndividualForm />
+               </div>
+               : <div className="mt-2 flex flex-row items-center justify-center">
+                  Search an individual
                </div>
             }
             paginationData={paginationData}
@@ -71,10 +72,7 @@ export default function IndividualPaymentStatusTab() {
                      <Search />
                   </Button>
                </form>
-                  <IndividualForm 
-                     open = {open}
-                     setOpen = {setOpen}
-                  />
+                  <IndividualForm />
                </div>
             }
          />

@@ -5,7 +5,11 @@ import type { Address} from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 import { Button } from "../ui/button";
-import { useLocation, useNavigate } from "react-router";
+//import { useLocation, useNavigate } from "react-router";
+import IndividualForm from "../routes/rent-safe/dashboard/IndividualForm";
+import { useIndividualContextDialog } from "@/contexts/IndividualDialogueContext";
+import { useCompanyContextDialog } from "@/contexts/CompanyDialogueContext";
+import CompanyForm from "../routes/rent-safe/dashboard/CompanyForm";
 
 interface Props {
   index?: number;
@@ -41,8 +45,8 @@ function AutoCompleteClient({
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const path = useLocation();
-  const navigate = useNavigate();
+  const {setOpen:setOpenIndividualDialogue} = useIndividualContextDialog();
+  const {setOpen:setOpenCompanyDialogue} = useCompanyContextDialog();
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
@@ -57,6 +61,11 @@ function AutoCompleteClient({
 
   return (
     <div className="form-group relative">
+      <IndividualForm
+        trigger = {false}
+      />
+      <CompanyForm trigger = {false}/>
+
       {clientLabel && (
         <label className={isRequired === false ? "" : "required"}>
           {clientLabel}
@@ -99,14 +108,10 @@ function AutoCompleteClient({
                   className="mt-2"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
-                    navigate(
-                      `/services/rent-safe/?${
-                        clientType === "individual" ||
-                        clientType === "tenant"
-                          ? "addIndividual"
-                          : "addCompany"
-                      }=true&&next=${path.pathname}`
-                    );
+                    clientType === "individual" ||
+                    clientType === "tenant"
+                    ? setOpenIndividualDialogue(true)
+                    : setOpenCompanyDialogue(true)
                     setOpen(false);
                   }}
                 >

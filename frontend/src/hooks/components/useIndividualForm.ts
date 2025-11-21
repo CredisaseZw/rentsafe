@@ -4,20 +4,11 @@ import { extractAddresses, extractPhones, formatDateToPythonSLiking, getFormData
 import type { IndividualMaritalStatus } from "@/types";
 import useCreateIndividual from "../apiHooks/useCreateIndividual";
 import { toast } from "sonner";
-import { useNavigate, useSearchParams } from "react-router";
+import { useIndividualContextDialog } from "@/contexts/IndividualDialogueContext";
 
-export default function useIndividualForm(setOpen? : React.Dispatch<React.SetStateAction<boolean>>) {
-   const [params] = useSearchParams();
-   const router = useNavigate();
-   const { isPending, createIndividual } = useCreateIndividual(successCallback);
-
-   function successCallback(){
-      const nextParam = params.get("next");
-      if (params.get("addIndividual") && nextParam) {
-         router(nextParam.trim());
-      }
-      setOpen?.(false)
-   }
+export default function useIndividualForm() {
+   const {open, setOpen} = useIndividualContextDialog()
+   const { isPending, createIndividual } = useCreateIndividual();
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
@@ -82,5 +73,5 @@ export default function useIndividualForm(setOpen? : React.Dispatch<React.SetSta
       createIndividual(individualPayload);
    }
 
-   return {isPending, handleSubmit, };
+   return {isPending, handleSubmit,open , setOpen};
 }

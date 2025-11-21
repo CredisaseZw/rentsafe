@@ -6,27 +6,29 @@ function UpdateBillerConfirmationDialogue() {
     const {
         dialogueStatus,
         updateStatus,
-        openDialogue,
         onAccept,
+        closeDialogue,
         onDecline
     } = useUpdateBillerDialog()
     return (
     <Dialog
         open={dialogueStatus}
-        onOpenChange={(open) => (open ? openDialogue() : onDecline())}
     >
-        <DialogContent>
+        <DialogContent
+            onInteractOutside={(e)=>e.preventDefault()}
+            onEscapeKeyDown={(e) => e.preventDefault()}
+            onPointerDownOutside={(e) => e.preventDefault()}
+        >
             <DialogHeader>
                 <DialogTitle>Confirm Biller Update</DialogTitle>
-                <DialogDescription>
+                <DialogDescription className='mt-5'>
                     We detected changes to the biller information. Do you want to update it?
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-                <Button variant="outline" onClick={() => onDecline()}>
-                    Cancel
-                </Button>
-                <Button onClick={() => onAccept()} disabled = {Boolean(updateStatus)}>
+                <Button variant="ghost" type='button' onClick={() => onDecline()} disabled = {Boolean(updateStatus)}> Cancel </Button>
+                <Button onClick={()=> closeDialogue()} variant={"outline"}>Edit Changes</Button>
+                <Button onClick={() => onAccept()}  disabled = {Boolean(updateStatus)}>
                     {
                         Boolean(updateStatus) 
                         ? "Updating ..."

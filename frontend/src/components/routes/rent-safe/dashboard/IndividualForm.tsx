@@ -11,25 +11,27 @@ import ColumnsContainer from "@/components/general/ColumnsContainer";
 import MultiIndividualContact from "@/components/general/MultiIndividualContact";
 
 interface props{
-   open : boolean;
-   setOpen : React.Dispatch<React.SetStateAction<boolean>>
+   trigger?: boolean
 }
 
-export default function IndividualForm({open, setOpen}:props) {
-   const {  isPending, handleSubmit } = useIndividualForm(setOpen);
+export default function IndividualForm({trigger = true}:props) {
+   const {  isPending, handleSubmit, open, setOpen } = useIndividualForm();
 
    return (
       <Dialog
          modal
          open={open}
          onOpenChange={isPending ? () => toast("Processing form, please wait") : setOpen}
-      >
+      >  {
+         trigger &&
          <DialogTrigger asChild>
             <Button>
                Add New Individual <Plus />
             </Button>
          </DialogTrigger>
 
+      }
+         
          <DialogContent onInteractOutside={(e) => e.preventDefault()} className={`max-w-[1000px] sm:max-w-[default]`}>
             <DialogTitle>Add New Individual</DialogTitle>
 

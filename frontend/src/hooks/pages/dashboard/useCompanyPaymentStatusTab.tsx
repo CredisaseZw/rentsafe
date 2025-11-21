@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import CompanyPaymentStatusReport from "@/components/routes/rent-safe/dashboard/CompanyPaymentStatusReport";
 import { type BaseTableColumn, type BaseTableRow } from "@/components/general/BaseTable";
 import useCompanyBranches from "@/hooks/apiHooks/useCompanyBranches";
@@ -10,13 +10,9 @@ export default function useCompanyPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
    const [params] = useSearchParams();
-   const [open , setOpen] = useState(false);
+   const isSearching = Boolean(params.get("company_q")?.trim())
 
    const { data, isLoading, searchQuery } = useCompanyBranches();
-
-   useEffect(()=>{
-      if (params.get("addCompany")) setOpen(true); 
-   }, [])
 
    const rows: BaseTableRow[] =
       data && 
@@ -62,15 +58,14 @@ export default function useCompanyPaymentStatusTab() {
    const paginationData = data as PaginationData;
 
    return {
-      open,
       rows,
       headers,
       searchRef,
       isLoading,
       searchQuery,
+      isSearching,
       paginationData,
       clearSearch,
       handleSearch,
-      setOpen
    };
 }

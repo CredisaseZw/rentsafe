@@ -1,23 +1,14 @@
-import { useEffect, useState } from 'react';
-import { updateBillerStore } from '@/store/updateBillerStore';
+import { useUpdateBillerStore } from "@/store/updateBillerStore";
 
 export function useUpdateBillerDialog() {
-  const [state, setState] = useState(updateBillerStore.state);
-
-  useEffect(() => {
-    const unsubscribe = updateBillerStore.subscribe(() => {
-      setState(updateBillerStore.state);
-    });
-    return () => unsubscribe();
-  }, []);
-
+  const {dialogueStatus, permission, updateStatus, openDialogue, closeDialogue, onAccept, onDecline } = useUpdateBillerStore()
   return {
-    dialogueStatus: state.dialogueStatus,
-    updateStatus: state.updateStatus,
-    permission: state.permission,
-    openDialogue: state.openDialogue,
-    closeDialogue: state.closeDialogue,
-    onAccept: state.onAccept,
-    onDecline: state.onDecline,
+    dialogueStatus,
+    updateStatus,
+    permission,
+    openDialogue,
+    closeDialogue,
+    onAccept,
+    onDecline,
   };
 }

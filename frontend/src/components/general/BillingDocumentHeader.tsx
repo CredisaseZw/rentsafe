@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Label } from "@/components/ui/label"
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import { Input } from "@/components/ui/input"
@@ -30,6 +30,22 @@ function BillingDocumentHeader({
     setSearchItem,
     onSelectBiller,
     handleOnChangeFormData}: props) {
+    useEffect(()=>{
+        setSearchItem("")
+        setFormData((p)=>({
+            ...p,
+            biller_id : 0,
+            biller_name : "",
+            biller_type: "tenant",
+            biller_phone : "",
+            biller_email : "",
+            biller_address : "",
+            biller_vat_no : "",
+            biller_tin_number : "",
+            selector_type : "tenant",
+            description : "",
+        }))
+    }, [])
   return (
     <div className='w-full'>
         <ColumnsContainer numberOfCols={2} marginClass='mt-0' gapClass="gap-5">

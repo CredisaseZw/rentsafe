@@ -1,7 +1,6 @@
-// updateBiller.store.ts
-import { Store } from "@tanstack/store";
+import { create } from "zustand";
 
-type Permission = "allow" | "deny";
+type Permission = "allow" | "deny" | null;
 
 interface UpdateBillerStore {
   dialogueStatus: boolean;
@@ -12,50 +11,39 @@ interface UpdateBillerStore {
   closeDialogue: () => void;
   onAccept: () => void;
   onDecline: () => void;
-  onSettle : () =>void;
+  onSettle: () => void;
+  clearPermission: () => void
 }
 
-export const updateBillerStore = new Store<UpdateBillerStore>({
+export const useUpdateBillerStore = create<UpdateBillerStore>((set) => ({
   dialogueStatus: false,
   updateStatus: false,
-  permission: "deny",
+  permission: null,
 
-  openDialogue() {
-    updateBillerStore.setState((s) => ({
-      ...s,
+  openDialogue: () =>
+    set({
       dialogueStatus: true,
-      permission: "deny",
-    }));
-  },
-
-  closeDialogue() {
-    updateBillerStore.setState((s) => ({
-      ...s,
-      dialogueStatus: false,
-      permission: "deny",
-    }));
-  },
-
-  onAccept() {
-    updateBillerStore.setState((s) => ({
-      ...s,
-      permission: "allow",
-      updateStatus: true,
-    }));
-  },
-
-  onDecline() {
-    updateBillerStore.setState((s) => ({
-      ...s,
+    }),
+  closeDialogue: () =>
+    set({
+      dialogueStatus: false
+    }),
+  onDecline: () =>
+    set({
       permission: "deny",
       updateStatus: false,
       dialogueStatus: false,
-    }));
-    },
-    onSettle() {
-        updateBillerStore.setState((s)=>({
-            ...s,
-            updateStatus: false
-        }))
-    },
-});
+    }),
+  onAccept: () =>
+    set({
+      permission: "allow",
+      updateStatus: true,
+    }),
+  onSettle: () =>
+    set({
+      updateStatus: false,
+    }),
+  clearPermission: () => set({
+    permission : null
+  })
+}));
