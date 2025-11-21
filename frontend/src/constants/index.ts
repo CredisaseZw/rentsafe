@@ -333,7 +333,7 @@ export const PHONE_TYPES = [
   { label: "Combined", value: "combined" },
   { label: "Home", value: "home" },
   { label: "Work", value: "work" },
-  { label: "Other", value: "Other" }
+  { label: "Other", value: "other" }
 ]
 
 export const COLOR_THEMES = {
@@ -428,22 +428,25 @@ export const MONTHS: Option[] = [
 export const SALES_INVOICES_HEADERS :Header[]=[
   {name : "Inv #"},
   {name : "Date Created"},
-  {name : "Customer"},
-  {name : "Currency"},
+  {name : "Customer", textAlign : "left"},
+  {name : "Currency", textAlign : "left"},
   {name : "Status"},
-  {name : "Invoice Total (Excluding VAT)"},
-  {name : "Invoice VAT Total"},
+  {name : "Invoice Total (Excluding VAT)", textAlign : "end"},
+  {name : "Invoice VAT Total", textAlign : "end"},
   {name : "Invoice Total (Including VAT)", textAlign : "end"},
   {name : "Actions"}
 ]
-
-export const CREDIT_NOTE_HEADERS :Header[]=[
-  {name : "Cr Note #"},
+export const SALES_CREDIT_NOTE_HEADERS :Header[]=[
+  {name : "Cr #"},
   {name : "Date Created"},
-  {name : "Customer"},
-  {name : "Currency"},
-  {name : "Amount", textAlign : "end"}
+  {name : "Customer", textAlign : "left"},
+  {name : "Description", textAlign : "left"},
+  {name : "Cr Note Total (Excluding VAT)", textAlign : "end"},
+  {name : "Cr Note VAT Total", textAlign : "end"},
+  {name : "Cr Note Total (Including VAT)", textAlign : "end"},
+  {name : "Actions"}
 ]
+
 export const SALES_ITEMS_HEADERS :Header[]=[
   {name : "ID"},
   {name : "Category"},
@@ -601,7 +604,6 @@ export const CASH_BOOK_HEADERS:Header[] = [
 export const PAYMENT_METHODS_HEADERS:Header[] = [
   {name : "ID"},
   {name : "Payment Method"},
-  {name : "Action"}
 ]
 
 export const GENERAL_ACCOUNTS_HEADERS: Header[] = [
@@ -677,3 +679,4 @@ export const INVOICE_SALES_HEADERS:Header[] = [
   {name : "Total Price", textAlign : "end"}
 
 ]
+

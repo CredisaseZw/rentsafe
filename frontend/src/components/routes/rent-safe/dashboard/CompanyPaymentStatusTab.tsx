@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import BranchForm from "./BranchForm";
 export default function CompanyPaymentStatusTab() {
   const {
-    open,
+    isSearching,
     paginationData,
     rows,
     headers,
@@ -15,8 +15,7 @@ export default function CompanyPaymentStatusTab() {
     searchRef,
     searchQuery,
     clearSearch,
-    handleSearch,
-    setOpen
+    handleSearch
   } = useCompanyPaymentStatusTab();
 
 
@@ -28,12 +27,14 @@ export default function CompanyPaymentStatusTab() {
         headers={headers}
         rows={rows}
         noDataNode={
-          <div className="mt-2 flex flex-row items-center justify-center">
-            <CompanyForm
-              open = {open}
-              setOpen = {setOpen}
-            />
-          </div>
+            isSearching ?
+            <div className="mt-2 flex flex-col gap-5 items-center justify-center">
+              No Company found.
+              <CompanyForm />
+            </div>
+            : <div className="mt-2 flex flex-row items-center justify-center">
+              Search a company / branch
+            </div>
         }
         paginationData={paginationData}
         paginationName="company_page"
@@ -72,10 +73,7 @@ export default function CompanyPaymentStatusTab() {
             </form>
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-between lg:justify-end">
               <BranchForm />
-              <CompanyForm
-                open = {open}
-                setOpen = {setOpen}
-              />
+              <CompanyForm />
             </div>
           </div>
         }

@@ -6,9 +6,11 @@ import { type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { CompanyCreationResponse } from "@/interfaces";
 import { handleAxiosError } from "@/lib/utils";
+import { useCompanyContextDialog } from "@/contexts/CompanyDialogueContext";
 
-export default function useCreateCompany(successCallback?: () => void) {
-   const client = useClient();
+export default function useCreateCompany() {
+   const client = useClient();   
+   const {setOpen} = useCompanyContextDialog();
 
    const { mutate, isPending } = useMutation({
       mutationFn: (companyPayload: CompanyPayload) =>
@@ -36,7 +38,7 @@ export default function useCreateCompany(successCallback?: () => void) {
          keys.forEach((key) => client.invalidateQueries({ queryKey: key }));
 
          toast.success("Company created successfully!");
-         if (successCallback) successCallback();
+         setOpen(false);
       },
    });
 

@@ -3,21 +3,11 @@ import React from "react";
 import useCreateCompany from "../apiHooks/useCreateCompany";
 import { extractAddresses, formatDateToPythonSLiking, getFormDataObject } from "@/lib/utils";
 import type { CompanyLegalStatus } from "@/types";
-import { useNavigate, useSearchParams } from "react-router";
+import { useCompanyContextDialog } from "@/contexts/CompanyDialogueContext";
 
-export default function useCompanyForm( setOpen?: React.Dispatch<React.SetStateAction<boolean>>) {
-   const { isPending, createCompany } = useCreateCompany(successCallback);
-   const [params] = useSearchParams();
-   const router = useNavigate()
-
-
-   function successCallback(){
-      const nextParam = params.get("next");
-      if (params.get("addCompany") && nextParam) {
-         router(nextParam.trim());
-      }
-      setOpen?.(false)
-   }
+export default function useCompanyForm() {
+   const { isPending, createCompany } = useCreateCompany();
+   const {open, setOpen} = useCompanyContextDialog()
 
    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
       event.preventDefault();
@@ -65,6 +55,8 @@ export default function useCompanyForm( setOpen?: React.Dispatch<React.SetStateA
    }
 
    return { 
+      open,
+      setOpen,
       isPending,
       handleSubmit };
 }
