@@ -808,7 +808,7 @@ export const getFormDataObject = (e: React.FormEvent<HTMLFormElement>) => {
   return DATA
 }
 
-export const validateInvoices = (rows:InvoicePreview[], formData:Record<string, any>) =>{
+export const validateBill = (rows:InvoicePreview[], formData:Record<string, any>) =>{
   if (rows.length === 0) {
     toast.error("Add at least one item to the invoice");
     return true;
@@ -854,3 +854,14 @@ export const onClearFilter = (setSearchParams: any) => {
     return params
   })
 }
+
+export const parseMoney = (value: string | number | null | undefined): number => {
+  if (typeof value === "number") return value || 0;
+  if (!value) return 0;
+  const cleaned = String(value).replace("$", "").trim();
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+};
+
+export const round2 = (value: number): number =>
+  Math.round((value + Number.EPSILON) * 100) / 100;

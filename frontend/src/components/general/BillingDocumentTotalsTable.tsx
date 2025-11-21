@@ -9,14 +9,12 @@ import { forwardRef } from "react"
 import AutoCompleteSalesItem from "./AutoCompleteSalesItem"
 import type { SalesItem } from "@/types"
 import { validateAmounts } from "@/lib/utils"
-import type { Invoice } from "@/interfaces"
 
 interface props{
-    invoice?: Invoice 
     isCashSales? : boolean
 }
 
-const InvoiceTotalsTable = forwardRef(({isCashSales, invoice}: props, ref) => {
+const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
     const {
         rows,
         discount,
@@ -35,7 +33,7 @@ const InvoiceTotalsTable = forwardRef(({isCashSales, invoice}: props, ref) => {
         AddCashSaleRow,
         AddInvoiceRow,
         setDiscount,    
-    } = useInvoiceTotalsTables(ref, invoice)
+    } = useInvoiceTotalsTables(ref)
    
     return (
     <Table className="border-color rounded border w-full">
@@ -247,4 +245,4 @@ const InvoiceTotalsTable = forwardRef(({isCashSales, invoice}: props, ref) => {
   )
 })
 
-export default InvoiceTotalsTable
+export default BillingDocumentTotalsTable

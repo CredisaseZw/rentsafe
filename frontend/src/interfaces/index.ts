@@ -459,7 +459,8 @@ export interface Biller {
   biller_vat_no: string;
   biller_tin_number: string;
   invoice_type: "fiscal" | "proforma" | "recurring";
-  issue_date : string
+  issue_date : string,
+  description :string
 };
 export interface Invoice {
   id: number;
@@ -503,4 +504,17 @@ export interface LineItem {
   total_price: string;
   date_created: string;
   date_updated: string;
+}
+export interface CreditNote {
+  id: number;
+  document_number: string;
+  credit_date: string;
+  total_amount: string;
+  description: string | null;
+  discount: string;
+  currency: Currency;
+  customer_details: InvoiceCustomerDetails;
+  total_vat: string;
+  total_excluding_vat: string;
+  credit_note_total: string;
 }

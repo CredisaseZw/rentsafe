@@ -2,7 +2,6 @@ import ColumnsContainer from "@/components/general/ColumnsContainer"
 import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
 import InvoicesFilter from "./InvoicesFilter"
-import AddInvoiceDialogue from "./AddInvoiceDialogue"
 import { TableBase } from "@/components/general/TableBase"
 import { DELETION_LINKS, INVOICE_STATUS_VARIANT, MODE_PAGES, MODES, SALES_INVOICES_HEADERS } from "@/constants"
 import { TableCell, TableRow } from "@/components/ui/table"
@@ -21,6 +20,7 @@ import { Link } from "react-router"
 import MutateInvoiceStatus from "./MutateInvoiceStatus"
 import Pill from "@/components/general/Pill"
 import { getRefetchInvoices } from "@/store/invoiceStore"
+import AddBillingInformationDialogue from "./AddBillingInformationDialogue"
 
 function ProformaInvoices() {
  const MODE = MODES.PROFORMA;
@@ -47,7 +47,7 @@ function ProformaInvoices() {
             <InvoicesFilter/>
           </div>
            <div className="self-center">
-            <AddInvoiceDialogue 
+            <AddBillingInformationDialogue 
               defaultInvoiceType= "proforma"
             />
           </div>
@@ -71,15 +71,16 @@ function ProformaInvoices() {
               <TableRow key={i.id}> 
                 <TableCell className="text-center">{i.document_number}</TableCell>
                 <TableCell className="text-center">{getSummaryDate(i.date_created)}</TableCell>
-                <TableCell className="text-center">{i.customer_details.full_name}</TableCell>
-                <TableCell className="text-center">{i.currency.currency_name} ({i.currency.currency_code})</TableCell>
+                <TableCell className="text-left">{i.customer_details.full_name}</TableCell>
+                <TableCell className="text-left">{i.currency.currency_name} ({i.currency.currency_code})</TableCell>
                 <TableCell className="text-center">
                   <Pill variant={INVOICE_STATUS_VARIANT[i.status as keyof typeof INVOICE_STATUS_VARIANT]} >
                     {i.status.replace("_", " ")}
                   </Pill>
                 </TableCell>
-                <TableCell className="text-center">{i.currency.symbol}{i.total_excluding_vat}</TableCell>
-                <TableCell className="text-center">{i.currency.symbol}{i.vat_total}</TableCell>
+
+                <TableCell className="text-end">{i.currency.symbol}{i.total_excluding_vat}</TableCell>
+                <TableCell className="text-end">{i.currency.symbol}{i.vat_total}</TableCell>
                 <TableCell className="text-end">{i.currency.symbol}{i.total_inclusive}</TableCell>
                 <TableCell className="flex justify-center items-center">
                   <Popover>

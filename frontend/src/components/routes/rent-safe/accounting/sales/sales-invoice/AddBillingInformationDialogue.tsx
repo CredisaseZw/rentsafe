@@ -1,21 +1,22 @@
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Plus, Send } from "lucide-react"
-import useAddInvoiceForm from "@/hooks/components/useAddInvoiceForm"
-import InvoiceHeader from "@/components/general/InvoiceHeader"
-import InvoiceTotalsTable from "@/components/general/InvoiceTotalsTable"
-import useCreateInvoice from "@/hooks/apiHooks/useCreateInvoice"
 import ButtonSpinner from "@/components/general/ButtonSpinner"
 import useRequestBillerUpdate from "@/hooks/apiHooks/useRequestBillerUpdate"
-import type { Invoice } from "@/interfaces"
+import BillingDocumentTotalsTable from "@/components/general/BillingDocumentTotalsTable"
+import BillingDocumentHeader from "@/components/general/BillingDocumentHeader"
+import useBillingDocumentForm from "@/hooks/components/useBillingDocumentForm"
+import useCreateBillingDocument from "@/hooks/apiHooks/useCreateBillingDocument"
 
 interface props {
-    invoice?:  Invoice
     title?: string | "Add Invoice"
     defaultInvoiceType?: "proforma" | "fiscal" | "recurring" | undefined
+    type? : "invoice" | "creditNote"
 }
 
-function AddInvoiceDialogue({invoice, defaultInvoiceType, title = "Add Invoice"}: props) {
+function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice", type = "invoice"}: props) {
+    const updateBiller = useRequestBillerUpdate();
+    const createInvoice = useCreateBillingDocument(type);
     const {
         handleOnChangeFormData,
         onSelectBiller,
@@ -28,39 +29,33 @@ function AddInvoiceDialogue({invoice, defaultInvoiceType, title = "Add Invoice"}
         setOpen,
         onSave,
         open,
-    } = useAddInvoiceForm(defaultInvoiceType, invoice)
-    const updateBiller = useRequestBillerUpdate();
-    const createInvoice = useCreateInvoice();
+    } = useBillingDocumentForm(defaultInvoiceType,createInvoice, type, updateBiller)
     
     return (
     <div>
         <Dialog open = {open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                {
-                    invoice
-                    ? <span className="text-sm text-gray-700 dark:text-white cursor-pointer">Edit Invoice</span>
-                    : <Button >{title} <Plus/></Button>
-                }
+                <Button >{title} <Plus/></Button>
             </DialogTrigger>
             <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[1100px] h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader> 
                 <div className="w-full">
-                    <form onSubmit={(e)=> onSave(e, createInvoice, updateBiller)}>
-                        <InvoiceHeader
+                    <form onSubmit={(e)=> onSave(e)}>
+                        <BillingDocumentHeader
                             formData={formData}
                             searchItem={searchItem}
                             handleOnChangeFormData={handleOnChangeFormData}
                             onSelectBiller={onSelectBiller}   
                             setSearchItem={setSearchItem}
                             setFormData={setFormData}
-                            isType
+                            isType = {type === "invoice"}
+                            isDescription = {type === "creditNote"}
                         />
                         <div className="mt-5">
-                           <InvoiceTotalsTable
+                           <BillingDocumentTotalsTable
                                 ref = {rowsRef}
-                                invoice = {invoice}
                             />
                         </div>
                         <div className="mt-5 flex flex-row justify-end gap-5">
@@ -88,4 +83,4 @@ function AddInvoiceDialogue({invoice, defaultInvoiceType, title = "Add Invoice"}
   )
 }
 
-export default AddInvoiceDialogue
+export default AddBillingInformationDialogue

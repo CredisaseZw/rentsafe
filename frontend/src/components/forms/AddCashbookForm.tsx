@@ -24,6 +24,8 @@ function AddCashbookForm({initial, successCallback}:props) {
         currency,
         loading,
         currencyLoading,
+        accountType,
+        setAccountType,
         handleSubmit,
     } = useAddCashbookForm(initial, successCallback)
     const createCashBook = useCreateCashbook()
@@ -69,7 +71,8 @@ function AddCashbookForm({initial, successCallback}:props) {
                 <Label className="required">Account Type</Label>
                 <Select
                     required
-                    defaultValue={initial?.account_type}
+                    value={accountType}
+                    onValueChange={(v)=> setAccountType(v)}
                     name="accountType"
                 >
                     <SelectTrigger className="w-full">
@@ -84,20 +87,22 @@ function AddCashbookForm({initial, successCallback}:props) {
                     </SelectContent>
                 </Select>
             </div>
+            {
+                accountType === "Bank Account" &&
+                <div className="form-group">
+                    <Label className="required">Bank Account Number</Label>
+                    <Input 
+                        defaultValue={initial?.bank_account_number}
+                        required
+                        name="bankAccountNumber"
+                        type="text"
+                    />
+                </div>
+            } 
             <div className="form-group">
-                <Label className="required">Bank Account Number</Label>
-                <Input 
-                    defaultValue={initial?.bank_account_number}
-                    required
-                    name="bankAccountNumber"
-                    type="text"
-                />
-            </div>
-            <div className="form-group">
-                <Label className="required">Branch Name</Label>
+                <Label>Branch Name</Label>
                 <Input 
                     defaultValue={initial?.branch_name}
-                    required
                     name="branch"
                     type="text"
                 />
@@ -138,20 +143,20 @@ function AddCashbookForm({initial, successCallback}:props) {
                 <div className="flex flex-row gap-4">
                     <div className="flex flex-row gap-3">
                         <Input
-                        type="radio"
-                        name="activeRequisition"
-                        value="true"
-                        defaultChecked={initial?.requisition_status === true}
+                            type="radio"
+                            name="activeRequisition"
+                            value="true"
+                            defaultChecked={initial?.requisition_status === true}
                         />
                         <Label>Yes</Label>
                     </div>
                     <div className="flex flex-row gap-3">
                         <Input
-                        type="radio"
-                        name="activeRequisition"
-                        value="false"
-                        defaultChecked={
-                        initial?.requisition_status === false || initial?.requisition_status === undefined
+                            type="radio"
+                            name="activeRequisition"
+                            value="false"
+                            defaultChecked={
+                            initial?.requisition_status === false || initial?.requisition_status === undefined
                         }
                         />
                         <Label>No</Label>
