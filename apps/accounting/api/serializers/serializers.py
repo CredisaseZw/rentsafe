@@ -661,10 +661,11 @@ class InvoiceSerializer(BaseCompanySerializer):
             CustomersSearchSerializer,
         )
 
-        if hasattr(obj, "customer") and obj.customer.is_individual:
-            return CustomersSearchSerializer(obj.customer.individual).data
-        elif hasattr(obj, "customer"):
-            return CustomersSearchSerializer(obj.customer.company).data
+        if hasattr(obj, "customer"):
+            if obj.customer.is_individual:
+                return CustomersSearchSerializer(obj.customer.individual).data
+            else:
+                return CustomersSearchSerializer(obj.customer.company).data
         return None
 
     def get_can_convert_to_fiscal(self, obj):
@@ -683,7 +684,7 @@ class InvoiceSerializer(BaseCompanySerializer):
             validated_data["customer"], _ = Customer.objects.get_or_create(
                 is_individual=is_individual,
                 individual=(validated_data["customer"] if is_individual else None),
-                company=(validated_data["customer"] if not is_individual else None),
+                company=(None if is_individual else validated_data["customer"]),
             )
 
         # return

@@ -233,6 +233,14 @@ class IndividualSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["date_created", "date_updated"]
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation.get("date_of_birth"):
+            representation["date_of_birth"] = instance.date_of_birth.strftime(
+                "%d-%b-%Y"
+            )
+        return representation
+
 
 class IndividualMinimalSerializer(serializers.ModelSerializer):
     current_employment = serializers.SerializerMethodField()
@@ -256,6 +264,14 @@ class IndividualMinimalSerializer(serializers.ModelSerializer):
             "account_details",
             "addresses",
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation.get("date_of_birth"):
+            representation["date_of_birth"] = instance.date_of_birth.strftime(
+                "%d-%b-%Y"
+            )
+        return representation
 
     # Get the primary address
     def get_addresses(self, obj):

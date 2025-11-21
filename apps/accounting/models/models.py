@@ -593,22 +593,26 @@ class TransactionLineItem(BaseModel):
 
     def save(self, *args, **kwargs):
         # Calculate total_price if not provided or if recalculated
-        unit_price = self.unit_price if self.unit_price else self.sales_item.price
+        unit_price = self.unit_price or self.sales_item.price
 
         if (
             self.sales_item.tax_configuration
             and self.sales_item.tax_configuration.vat_applicable
         ):
-            vat_rate = self.sales_item.tax_configuration.rate / Decimal("100.00")
+            try:
+                vat_rate = self.sales_item.tax_configuration.rate / Decimal("100.00")
+            except Exception:
+                vat_rate = Decimal("0.00")
         else:
             vat_rate = Decimal("0.00")
 
-        vat_amount = (unit_price * vat_rate).quantize(
-            Decimal("0.00"), rounding=ROUND_HALF_UP
-        )
+        vat_amount = vat_rate.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
 
         if self.quantity is not None:
-            calculated_total_price = self.quantity * (unit_price + vat_amount)
+            calculated_total_price = self.quantity * (
+                unit_price.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+                + vat_amount
+            )
             self.total_price = calculated_total_price.quantize(
                 Decimal("0.00"), rounding=ROUND_HALF_UP
             )
@@ -626,20 +630,17 @@ class TransactionLineItem(BaseModel):
     @property
     def total_vat(self):
         """Calculate total VAT for the line item."""
-        total_vat = self.vat_amount * self.quantity
-        return total_vat
+        return self.vat_amount * self.quantity
 
     @property
     def total_price_excluding_vat(self):
         """Calculate total price excluding VAT for the line item."""
-        total_excl_vat = self.unit_price * self.quantity
-        return total_excl_vat
+        return self.unit_price * self.quantity
 
     @property
     def total_including_vat(self):
         """Calculate total price including VAT for the line item."""
-        total_incl_vat = (self.unit_price + self.vat_amount) * self.quantity
-        return total_incl_vat
+        return (self.unit_price + self.vat_amount) * self.quantity
 
 
 class PaymentMethod(BaseModel):
