@@ -5,7 +5,11 @@ import type { Address} from "@/interfaces";
 import type { Dispatch, SetStateAction } from "react";
 import useSearchClient from "@/hooks/apiHooks/useSearchClient";
 import { Button } from "../ui/button";
-import { useLocation, useNavigate } from "react-router";
+//import { useLocation, useNavigate } from "react-router";
+import IndividualForm from "../routes/rent-safe/dashboard/IndividualForm";
+import { useIndividualContextDialog } from "@/contexts/IndividualDialogueContext";
+import { useCompanyContextDialog } from "@/contexts/CompanyDialogueContext";
+import CompanyForm from "../routes/rent-safe/dashboard/CompanyForm";
 
 interface Props {
   index?: number;
@@ -16,6 +20,7 @@ interface Props {
   isRequired?: boolean;
   createClient?: boolean;
   disableSearch?: boolean;
+  placeHolder?: string;
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>;
   onSelectValue?: (item: any, index?: number) => void;
   setSearchItem?: Dispatch<SetStateAction<string>>;
@@ -31,6 +36,7 @@ function AutoCompleteClient({
   isRequired,
   clientLabel,
   disableSearch,
+  placeHolder,
   setSearchItem,
   onSelectValue,
   multiSetSearchItem,
@@ -39,8 +45,8 @@ function AutoCompleteClient({
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
   const [open, setOpen] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const path = useLocation();
-  const navigate = useNavigate();
+  const {setOpen:setOpenIndividualDialogue} = useIndividualContextDialog();
+  const {setOpen:setOpenCompanyDialogue} = useCompanyContextDialog();
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchItem), 300);
@@ -55,6 +61,11 @@ function AutoCompleteClient({
 
   return (
     <div className="form-group relative">
+      <IndividualForm
+        trigger = {false}
+      />
+      <CompanyForm trigger = {false}/>
+
       {clientLabel && (
         <label className={isRequired === false ? "" : "required"}>
           {clientLabel}
@@ -65,6 +76,7 @@ function AutoCompleteClient({
         type="text"
         required={isRequired === false ? false : true}
         name="search_client"
+        placeholder={placeHolder ?? "e.g John Doe"}
         autoComplete="off"
         onChange={(e) => {
           const { value } = e.target;
@@ -96,14 +108,10 @@ function AutoCompleteClient({
                   className="mt-2"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
-                    navigate(
-                      `/services/rent-safe/?${
-                        clientType === "individual" ||
-                        clientType === "tenant"
-                          ? "addIndividual"
-                          : "addCompany"
-                      }=true&&next=${path.pathname}`
-                    );
+                    clientType === "individual" ||
+                    clientType === "tenant"
+                    ? setOpenIndividualDialogue(true)
+                    : setOpenCompanyDialogue(true)
                     setOpen(false);
                   }}
                 >

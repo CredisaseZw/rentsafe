@@ -24,7 +24,6 @@ class Company(BaseModelWithUser):
         max_length=50,
         blank=True,
         null=True,
-        unique=True,
         help_text=_("Unique registration number of the company."),
     )
     registration_name = models.CharField(

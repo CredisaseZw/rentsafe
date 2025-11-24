@@ -25,7 +25,7 @@ export function useTrackBiller(
         ...(biller_tin_number && { tin_number: biller_tin_number }),
       },
     };
-
+    if (Object.keys(UPDATE.profile).length === 0 ) return {UPDATE: undefined}
     return { UPDATE };
   }
 

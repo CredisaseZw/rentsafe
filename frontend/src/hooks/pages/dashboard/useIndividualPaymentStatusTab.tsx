@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import IndividualPaymentStatusReport from "@/components/routes/rent-safe/dashboard/IndividualPaymentStatusReport";
 import type { BaseTableColumn, BaseTableRow } from "@/components/general/BaseTable";
 import { useNavigate, useSearchParams } from "react-router";
@@ -8,13 +8,9 @@ import type { IndividualMinimal, PaginationData } from "@/interfaces";
 export default function useIndividualPaymentStatusTab() {
    const navigate = useNavigate();
    const searchRef = React.useRef<HTMLInputElement>(null);
-   const [open, setOpen] = useState(false)
    const { data, isLoading, searchQuery } = useMinimalIndividualsList();
    const [params] = useSearchParams()
-
-   useEffect(()=>{
-      if (params.get("addIndividual")) setOpen(true); 
-   }, [])
+   const isSearching  = Boolean(params.get("individual_q")?.trim())
 
    const rows: BaseTableRow[] = (() => {
       const individuals = Array.isArray(data) ? data : data?.results;
@@ -53,15 +49,15 @@ export default function useIndividualPaymentStatusTab() {
    const paginationData = data as PaginationData;
 
    return {
-      open,
       rows,
       headers,
       searchRef,
       isLoading,
       searchQuery,
       paginationData,
+      isSearching,
       clearSearch,
       handleSearch,
-      setOpen
+      
    };
 }

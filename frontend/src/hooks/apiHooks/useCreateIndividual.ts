@@ -6,9 +6,11 @@ import { type AxiosError } from "axios";
 import useClient from "../general/useClient";
 import type { IndividualContact, IndividualFull, IndividualMinimal } from "@/interfaces";
 import { handleAxiosError } from "@/lib/utils";
+import { useIndividualContextDialog } from "@/contexts/IndividualDialogueContext";
 
-export default function useCreateIndividual(successCallback?: () => void) {
+export default function useCreateIndividual() {
     const client = useClient();
+    const {setOpen} = useIndividualContextDialog();
     const { mutate, isPending } = useMutation({
       mutationFn: (individualPayload: IndividualPayload) =>
         api.post<IndividualFull>("/api/individuals/", individualPayload).then((res) => res.data),
@@ -22,9 +24,7 @@ export default function useCreateIndividual(successCallback?: () => void) {
           client.getQueryCache().findAll({
             predicate: (query) => query.queryKey[0] === "individuals-minimal"
           }).forEach((query) => {
-            client.setQueryData(query.queryKey, (old: any) => {
-              console.log("Current cache data structure:", old);
-              
+            client.setQueryData(query.queryKey, (old: any) => {              
               const minimalIndividual: IndividualMinimal = {
                 id: individual.id,
                 first_name: individual.first_name,
@@ -54,8 +54,7 @@ export default function useCreateIndividual(successCallback?: () => void) {
           });
 
       toast.success("Individual created successfully!");
-      if (successCallback) successCallback();
-
+      setOpen(false);
         } catch (error) {
           console.error("Error in onSuccess callback:", error);
           toast.error("Individual created but cache update failed. Please reload the page");
