@@ -52,9 +52,6 @@ def normalize_zimbabwe_mobile(phone, type="mobile"):
             return f"+263{phone}"
         else:
             return False
-    else:
-        if len(phone) < 3:
-            return True
     return False
 
 
