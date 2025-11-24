@@ -8,7 +8,7 @@ export default function useSearchClient(
 ) {
   const url =
     type === "individual"
-    ? "/api/individuals/search/?search="
+    ? "/api/individuals/?search="
     : type === "tenant"
     ? "/api/accounting/customers/?customer_type=tenant&search="
     : "/api/branches/?search=";
@@ -17,7 +17,7 @@ export default function useSearchClient(
     queryKey: ["search_landlord", type, query],
     queryFn: async () => {
       const { data } = await api.get(`${url}${query}`);
-      return type === "individual" ? data : data.results;
+      return data.results;
     },
     enabled: enabled && query.trim().length > 0
   });

@@ -18,6 +18,7 @@ export default function useSalesCashSales(){
         biller_tin_number : "",
         selector_type : "tenant",
         invoice_type : "fiscal",
+        description: "",
         issue_date : getSummaryDate(getCurrentDate())
     })
 

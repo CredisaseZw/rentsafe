@@ -23,7 +23,7 @@ function MultiIndividualContact() {
                         <ColumnsContainer numberOfCols={2} marginClass={ index === 0 ? "mt-0" : "mt-5" }>
                             <div className="form-group">
                                 <Label className="required">Phone Type</Label>
-                                <Select name={"type" + index} required>
+                                <Select name={"type" + index} required defaultValue="mobile">
                                     <SelectTrigger id={"address_type" + index} className="border-color w-full bg-white">
                                         <SelectValue placeholder="Select ..." />
                                     </SelectTrigger>
@@ -40,6 +40,7 @@ function MultiIndividualContact() {
                                 <div className="form-group">
                                     <Label className="required">Contact Number</Label>
                                     <Input
+                                        placeholder="e.g 0781234567"
                                         required 
                                         name={`number${index}`}
                                         id={`number${index}`}

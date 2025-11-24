@@ -3,26 +3,10 @@ import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router"
 import type { ChangeEvent } from "react"
 
-export default function useInvoicesFilter() {
+export default function useFilter(filter:any, setFilter:any) {
   const [open, setOpen] = useState(false)
   const { currencies } = useCurrency()
   const [searchParams, setSearchParams] = useSearchParams()
-
-  const [filter, setFilter] = useState({
-    status_in: "",
-    ordering : "",
-    customer_name: "",
-    currency__currency_code: "",
-    due_date__lte: "",
-    sale_date__lte: "",
-    sale_date__gte: "",
-    date_created__lte: "",
-    date_created__gte: "",
-    total_inclusive__gte: "",
-    total_inclusive__lte: "",
-    is_recurring: "",
-    is_invoiced: "",
-  })
 
   useEffect(() => {
     const newFilter = { ...filter }
@@ -39,7 +23,7 @@ export default function useInvoicesFilter() {
       { name: string; type?: string; checked?: boolean; value?: string } }
   ) => {
     const { name, type, checked, value } = e.target as unknown as { name: string; type?: string; checked?: boolean; value?: string }
-    setFilter((prev) => ({
+    setFilter((prev:any) => ({
       ...prev,
       [name]: type === "checkbox" ? (checked ? "true" : "") : value,
     }))
@@ -50,7 +34,7 @@ export default function useInvoicesFilter() {
     e.preventDefault()
     const newParams = new URLSearchParams(searchParams)
     Object.entries(filter).forEach(([key, value]) => {
-      if (value && value !== "false") newParams.set(key, value)
+      if (value && value !== "false") newParams.set(key, String(value))
       else newParams.delete(key)
     })
     setSearchParams(newParams)

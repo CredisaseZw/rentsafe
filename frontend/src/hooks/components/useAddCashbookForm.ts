@@ -11,10 +11,12 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
     const [page, setPage]= useState(1);
     const queryClient = useClient();
     const {currencies, currencyLoading, currency} = useCurrency()
+    const [accountType, setAccountType] = useState(initial?.account_type ?? "Bank Account");
     const {generalLedgers, generalLedgersLoading, generalLedgersError} = useGetGeneralLedgerAccounts(page);
     const [generalLedgerAccounts, setGeneralLedgerAccounts] = useState<GeneralLedgerAccount[]>([]);
     const [loading, setLoading] = useState(false);
-    
+
+
     useEffect(()=>{
         if(handleAxiosError("Failed to fetch general ledger accounts", generalLedgersError)) return;
         if(!generalLedgers) return;
@@ -45,8 +47,10 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
             currency_id: Number(data.currency),
             requisition_status: data.activeRequisition === "true",
             account_type: data.accountType,
-            bank_account_number: data.bankAccountNumber,
-            branch_name: data.branch,
+            ...( accountType === "Bank Account" && 
+                { bank_account_number: data.bankAccountNumber } ),
+            ...( data.branch &&
+                { branch_name: data.branch } ),
             general_ledger_account_id: Number(data.generalLedgerAccount),
         }
 
@@ -56,8 +60,10 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
                 currency_id: Number(initial?.currency.id),
                 requisition_status: initial?.requisition_status,
                 account_type: initial?.account_type,
-                bank_account_number: initial?.bank_account_number,
-                branch_name: initial?.branch_name,
+                ...( initial?.bank_account_number && 
+                    {bank_account_number: initial?.bank_account_number}),
+                ...( initial?.branch_name && 
+                    {branch_name: initial?.branch_name} ),
                 general_ledger_account_id: Number(initial?.general_ledger_account.id),
             }
             changedData = handleTrackChangedFields(initialPayload, payloadData);
@@ -77,7 +83,7 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
         mutation.mutate(payload, {
             onSuccess : ()=>{
                 queryClient.invalidateQueries({queryKey : ["cashBooks", 1]})
-                toast.success("Cashbook created successfully.")
+                toast.success(`Cashbook ${mode}d successfully.`)
                 successCallback?.();
             },
             onError : (error) => handleAxiosError("Failed to create a new cash book", error),
@@ -93,6 +99,8 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
         generalLedgerAccounts,
         generalLedgersLoading,
         loading,
+        accountType,
+        setAccountType,
         handleSubmit,
     }
 

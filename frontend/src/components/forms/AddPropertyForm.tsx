@@ -259,6 +259,7 @@ function AddPropertyForm({successCallback}:props) {
             clientType = {addPropertyForm.landlord_type}
             clientLabel= {landlordIdentifier}
             onSelectValue = {onSelectValue}
+            createClient
          />
         <div className="form-group">
           <label>Landlord Name</label>

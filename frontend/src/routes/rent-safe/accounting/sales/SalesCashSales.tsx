@@ -1,6 +1,6 @@
 import Header from "@/components/general/Header"
-import InvoiceHeader from "@/components/general/InvoiceHeader"
-import InvoiceTotalsTable from "@/components/general/InvoiceTotalsTable"
+import InvoiceHeader from "@/components/general/BillingDocumentHeader"
+import InvoiceTotalsTable from "@/components/general/BillingDocumentTotalsTable"
 import useSalesCashSales from "@/hooks/components/useSalesCashSales"
 
 function SalesCashSales() {

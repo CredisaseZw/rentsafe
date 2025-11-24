@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Label } from "@/components/ui/label"
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import { Input } from "@/components/ui/input"
@@ -7,19 +7,45 @@ import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
 import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from '@/interfaces'
-
+import UpdateBillerConfirmationDialogue from '@/components/routes/rent-safe/accounting/sales/sales-invoice/UpdateBillerConfirmationDialogue'
 interface props {
     formData: Biller,
     searchItem: string;
-    isRep?: boolean
-    isType?: boolean
+    isRep?: boolean;
+    isType?: boolean;
+    isDescription?:boolean;
     setFormData: React.Dispatch<React.SetStateAction<Biller>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
     onSelectBiller: (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => void;
     handleOnChangeFormData : (key:string, val: string) => void
 }
 
-function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSearchItem, onSelectBiller, handleOnChangeFormData}: props) {
+function BillingDocumentHeader({
+    isRep,
+    formData,
+    searchItem,
+    isType,
+    isDescription,
+    setFormData,
+    setSearchItem,
+    onSelectBiller,
+    handleOnChangeFormData}: props) {
+    useEffect(()=>{
+        setSearchItem("")
+        setFormData((p)=>({
+            ...p,
+            biller_id : 0,
+            biller_name : "",
+            biller_type: "tenant",
+            biller_phone : "",
+            biller_email : "",
+            biller_address : "",
+            biller_vat_no : "",
+            biller_tin_number : "",
+            selector_type : "tenant",
+            description : "",
+        }))
+    }, [])
   return (
     <div className='w-full'>
         <ColumnsContainer numberOfCols={2} marginClass='mt-0' gapClass="gap-5">
@@ -62,6 +88,7 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                             displayValue='name'
                             isRequired = {false}
                             searchItem = {searchItem}
+                            placeHolder='e.g John Doe'
                             setSearchItem = {setSearchItem}
                             clientType = {formData.selector_type}
                             createClient
@@ -117,6 +144,17 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                         name="tinNumber"
                     />
                 </div>
+                { isDescription &&
+                    <div className="flex flex-row gap-5 justify-between">
+                        <Label className="text-gray-800 dark:text-white">Description</Label>
+                        <Input
+                            onChange={(e)=> handleOnChangeFormData("description", e.target.value)}
+                            value={formData.description}
+                            className="w-[400px]"
+                            name="rep"
+                        />
+                    </div>
+                }
                 {
                     isRep &&
                     <div className="flex flex-row gap-5 justify-between">
@@ -161,10 +199,12 @@ function InvoiceHeader({isRep, formData, searchItem, isType,setFormData, setSear
                 </div>
             </div>
         </ColumnsContainer>
-        
+        {
+            <UpdateBillerConfirmationDialogue/>
+        }
     </div>
   
   )
 }
 
-export default InvoiceHeader
+export default BillingDocumentHeader

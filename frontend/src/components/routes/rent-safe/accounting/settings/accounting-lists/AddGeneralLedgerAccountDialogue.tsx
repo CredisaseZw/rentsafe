@@ -50,6 +50,7 @@ export default function AddGeneralLedgerAccountDialogue({initial}:Props){
                                 <div className="form-group">
                                     <Label className="required">Account Name</Label>
                                     <Input
+                                        required
                                         defaultValue={initial?.account_name ?? ""}
                                         name="accountName"
                                     />
@@ -57,13 +58,14 @@ export default function AddGeneralLedgerAccountDialogue({initial}:Props){
                                 <div className="form-group">
                                     <Label className="required">Account Number</Label>
                                     <Input
+                                        required
                                         defaultValue={initial?.account_number ?? ""}
                                         name="accountNumber"
                                     />
                                 </div>
                             </ColumnsContainer>
                             <div className="form-group">
-                                <label className="required">Currency</label>
+                                <label className="required text-left">Currency</label>
                                 <Select 
                                     key={String(initial?.is_secondary_currency)}
                                     defaultValue={

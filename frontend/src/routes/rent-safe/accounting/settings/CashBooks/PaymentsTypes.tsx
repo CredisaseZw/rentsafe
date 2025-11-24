@@ -40,10 +40,7 @@ function PaymentsTypes() {
                 paymentMethods.map((method, idx)=>(
                   <TableRow key={idx} >
                     <TableCell className="text-center">{method.id}</TableCell>
-                    <TableCell className="text-center">{method.payment_method_name}</TableCell>
-                    <TableCell>
-                        {/* Actions such as edit or delete can be placed here */}
-                    </TableCell>
+                    <TableCell className="text-center">{method.payment_method_name.toUpperCase()}</TableCell>
                   </TableRow>
                 ))
               }
