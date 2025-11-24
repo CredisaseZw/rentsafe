@@ -9,6 +9,7 @@ import { forwardRef } from "react"
 import AutoCompleteSalesItem from "./AutoCompleteSalesItem"
 import type { SalesItem } from "@/types"
 import { validateAmounts } from "@/lib/utils"
+import ConfirmRateSwitchDialogue from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRateSwitchDialogue"
 
 interface props{
     isCashSales? : boolean
@@ -18,12 +19,17 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
     const {
         rows,
         discount,
+        baseRate,
         currencies,
         currencyCode,
         cashSalesRows,
         currencyLoading,
         defaultCurrency,
         calculatedTotals,
+        openConfirmation,  
+        prevCurrencyCode, 
+        setPrevCurrencyCode,
+        setOpenConfirmation,
         RemoveCashSalesRows,
         handleOnSelectItem,
         setDefaultCurrency,
@@ -33,6 +39,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         AddCashSaleRow,
         AddInvoiceRow,
         setDiscount,    
+        setBaseRate
     } = useInvoiceTotalsTables(ref)
    
     return (
@@ -48,9 +55,16 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     name="currency"
                     value={defaultCurrency}
                     onValueChange={(v)=> {
-                        setCurrencyCode(()=> currencies.find(c=> c.id === Number(v))?.currency_code)
+                        let previous = ""; 
+                        setCurrencyCode((prev)=> {
+                            previous = prev ?? "";
+                            return currencies.find(c=> c.id === Number(v))?.currency_code
+                        })
+                        setPrevCurrencyCode(previous)
                         setDefaultCurrency(v)
-                        }
+                        setOpenConfirmation(true)
+
+                    }
                     }
                     required>
                     <SelectTrigger className="w-full bg-red-600 text-white">
@@ -238,9 +252,18 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     </TableCell>
                 </TableRow> 
                
-            </>
-            
+            </>   
         }
+        <ConfirmRateSwitchDialogue
+            open = {openConfirmation}
+            setOpen={setOpenConfirmation}
+            updateBase={setBaseRate}
+            switchRate={{
+                to: currencyCode,
+                from : prevCurrencyCode,
+                rate : baseRate
+            }}
+        />
     </Table>
   )
 })

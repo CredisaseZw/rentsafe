@@ -51,6 +51,7 @@ const computeTotals = (rows: InvoicePreview[], discount: string) => {
 
 
 function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
+    const [openConfirmation, setOpenConfirmation] = useState(false);
     const { currencies, currencyLoading, currency } = useCurrency();
     const [discount, setDiscount] = useState("0");
     const [rows, setRows] = useState<InvoicePreview[]>([
@@ -64,17 +65,25 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
         ? String(currency.id) 
         : "");
     const [currencyCode, setCurrencyCode] = useState(currency?.currency_code);
+    const [prevCurrencyCode, setPrevCurrencyCode] = useState("")
     const [calculatedTotals, setCalculatedTotals] = useState({
         subtotal: 0.0,
         vat: 0.0,
         total: 0.0,
     });
-
     const {
         rate: currencyRate,
         error: currencyError,
         isLoading: currencyRateLoading,
     } = useGetCurrencyRate(Number(defaultCurrency));
+    
+    const [baseRate, setBaseRate] = useState<number>();
+
+    useEffect(()=>{
+        if(currencyRate) {
+            setBaseRate(currencyRate)
+        }
+    }, [currencyRate, currencyRateLoading, currencyError])
 
     const handleOnRowChange = (
         index: number,
@@ -181,8 +190,10 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
         if (currencyRateLoading) return;
 
         const effectiveRate =
-        currencyRate && currencyRate > 0 ? currencyRate : 1;
-
+        baseRate && baseRate > 0 ? baseRate : 1;
+        console.log({baseRate})
+        console.log(effectiveRate)
+        
         setRows((prev) =>
         prev.map((row) => {
             if (row.basePrice == null) return row;
@@ -201,7 +212,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
             };
         })
         );
-    }, [currencyRate, currencyRateLoading, currencyError, rows.length]);
+    }, [baseRate, rows.length]);
 
 
     useImperativeHandle(
@@ -223,12 +234,18 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
     return {
         rows,
         discount,
+        baseRate,
         currencies,
         currencyCode,
         cashSalesRows,
         currencyLoading,
         defaultCurrency,
         calculatedTotals,
+        openConfirmation,
+        prevCurrencyCode, 
+        currencyRateLoading,
+        setPrevCurrencyCode,
+        setOpenConfirmation,
         RemoveCashSalesRows,
         handleOnSelectItem,
         setDefaultCurrency,
@@ -238,7 +255,8 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
         AddCashSaleRow,
         AddInvoiceRow,
         setDiscount,
-        currencyRateLoading,
+        setBaseRate
+
   };
 }
 

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { IN_LEASE_CLIENT_TYPES, INVOICE_TYPES } from "@/constants"
 import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
-import type { Biller, BranchFull, IndividualMinimal, InvoiceCustomerDetails } from '@/interfaces'
+import type { Biller, InvoiceCustomerDetails } from '@/interfaces'
 import UpdateBillerConfirmationDialogue from '@/components/routes/rent-safe/accounting/sales/sales-invoice/UpdateBillerConfirmationDialogue'
 interface props {
     formData: Biller,
@@ -16,7 +16,7 @@ interface props {
     isDescription?:boolean;
     setFormData: React.Dispatch<React.SetStateAction<Biller>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
-    onSelectBiller: (item: IndividualMinimal | BranchFull | InvoiceCustomerDetails) => void;
+    onSelectBiller: (item: InvoiceCustomerDetails) => void;
     handleOnChangeFormData : (key:string, val: string) => void
 }
 
@@ -85,14 +85,15 @@ function BillingDocumentHeader({
                             </SelectContent>
                         </Select>
                         <AutoCompleteClient
-                            displayValue='name'
-                            isRequired = {false}
-                            searchItem = {searchItem}
-                            placeHolder='e.g John Doe'
-                            setSearchItem = {setSearchItem}
                             clientType = {formData.selector_type}
-                            createClient
                             onSelectValue = {onSelectBiller}
+                            setSearchItem = {setSearchItem}
+                            placeHolder='e.g John Doe'
+                            searchItem = {searchItem}
+                            isRequired = {false}
+                            displayValue='name'
+                            sector="customer"                        
+                            createClient
                         />
                     </div> 
                 </div>

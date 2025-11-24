@@ -21,6 +21,7 @@ interface Props {
   createClient?: boolean;
   disableSearch?: boolean;
   placeHolder?: string;
+  sector?: "norm" | "customer"
   setPrimaryTenantAddress?: React.Dispatch<React.SetStateAction<Address | undefined>>;
   onSelectValue?: (item: any, index?: number) => void;
   setSearchItem?: Dispatch<SetStateAction<string>>;
@@ -29,6 +30,7 @@ interface Props {
 
 function AutoCompleteClient({
   displayValue = "ID",
+  sector = "norm",
   index,
   createClient,
   searchItem,
@@ -56,7 +58,8 @@ function AutoCompleteClient({
   const { data, isLoading } = useSearchClient(
     clientType,
     debouncedSearch,
-    hasUserInteracted && !!debouncedSearch
+    hasUserInteracted && !!debouncedSearch,
+    sector
   );
 
   return (

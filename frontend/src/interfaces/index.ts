@@ -518,3 +518,9 @@ export interface CreditNote {
   total_excluding_vat: string;
   credit_note_total: string;
 }
+
+export interface SwitchRate {
+   from : string | undefined
+   to : string | undefined,
+   rate : number | undefined
+}
