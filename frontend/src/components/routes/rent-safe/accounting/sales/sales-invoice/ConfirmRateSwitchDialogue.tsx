@@ -15,11 +15,11 @@ interface props {
 function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props) {
     const [rate, setRate] = useState("")
     useEffect(()=>{
-        if(switchRate.rate)setRate(String(switchRate.rate))
+        if(switchRate.rate) setRate(String(switchRate.rate))
     }, [switchRate.rate])
 
     const onSwitch = () =>{
-        const newRate = Number(rate)
+        const newRate = parseFloat(rate)
         if(newRate > 0 &&
             !isNaN(newRate)
         )
@@ -42,7 +42,7 @@ function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props
                     <DialogDescription>Set the desired rate</DialogDescription>
                 </DialogHeader>
                 
-                <div className="mt-5">
+                <div id="switchRate" className="mt-5">
                     <div className="form-group">
                         <Label>{switchRate.from ?? ""} to {switchRate.to ?? ""}</Label>
                         <Input
@@ -54,9 +54,9 @@ function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props
                 </div>
                 <DialogFooter>
                     <DialogClose>
-                        <Button variant="ghost">Cancel</Button>
+                        <Button type="button" variant="ghost">Cancel</Button>
                     </DialogClose>
-                    <Button onClick={onSwitch}>Set Rate</Button>
+                    <Button  onClick={onSwitch}>Set Rate</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

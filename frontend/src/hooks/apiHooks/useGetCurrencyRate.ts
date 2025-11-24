@@ -13,17 +13,9 @@ function useGetCurrencyRate(id: number) {
     },
   });
 
-  let rate = 1;
-  if (!error && data?.current_rate) {
-    const parsed = parseFloat(data.current_rate);
-    rate = isNaN(parsed) ? 1 : parsed;
-  }
-  if (error) {
-    rate = 1
-  }; 
 
   return {
-    rate,
+    data,
     error,
     isLoading,
     isFetching,

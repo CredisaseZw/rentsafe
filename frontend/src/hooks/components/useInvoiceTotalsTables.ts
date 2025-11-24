@@ -72,7 +72,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
         total: 0.0,
     });
     const {
-        rate: currencyRate,
+        data: currencyRate,
         error: currencyError,
         isLoading: currencyRateLoading,
     } = useGetCurrencyRate(Number(defaultCurrency));
@@ -80,9 +80,8 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
     const [baseRate, setBaseRate] = useState<number>();
 
     useEffect(()=>{
-        if(currencyRate) {
-            setBaseRate(currencyRate)
-        }
+        if(currencyError) return setBaseRate(1);
+        if(currencyRate !== undefined) return setBaseRate(parseMoney(currencyRate.current_rate));
     }, [currencyRate, currencyRateLoading, currencyError])
 
     const handleOnRowChange = (
@@ -133,7 +132,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
         }
 
         const basePrice = parseMoney(item.price);
-        const effectiveRate = currencyRate && currencyRate > 0 ? currencyRate : 1;
+        const effectiveRate = baseRate && baseRate > 0 ? baseRate : 1;
         const convertedPrice = round2(basePrice / effectiveRate);
         const vatRate = Number(item.tax_configuration_object?.rate) || 0;
         const quantity = Number(rows[index]?.quantity) || 1;
@@ -191,29 +190,26 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>) {
 
         const effectiveRate =
         baseRate && baseRate > 0 ? baseRate : 1;
-        console.log({baseRate})
-        console.log(effectiveRate)
         
         setRows((prev) =>
-        prev.map((row) => {
-            if (row.basePrice == null) return row;
+            prev.map((row) => {
+                if (row.basePrice == null) return row;
 
-            const basePrice = parseMoney(row.basePrice);
-            if (!basePrice) return row;
+                const basePrice = parseMoney(row.basePrice);
+                if (!basePrice) return row;
+                console.log(basePrice / effectiveRate)
+                const price = round2(basePrice / effectiveRate);
+                const qty = Number(row.quantity) || 1;
+                const vatRate = row.vat_amount || 0;
 
-            const price = round2(basePrice / effectiveRate);
-            const qty = Number(row.quantity) || 1;
-            const vatRate = row.vat_amount || 0;
-
-            return {
-            ...row,
-            price,
-            total: computeRowTotal(price, qty, vatRate),
-            };
-        })
+                return {
+                ...row,
+                price,
+                total: computeRowTotal(price, qty, vatRate),
+                };
+            })
         );
     }, [baseRate, rows.length]);
-
 
     useImperativeHandle(
         ref,
