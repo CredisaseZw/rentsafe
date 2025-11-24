@@ -2,12 +2,14 @@
 
 from apps.accounting.api.cash_sales.cash_sale_serializers import CashSaleSerializer
 from apps.accounting.api.views.views import BaseCompanyViewSet
+from apps.accounting.filters.cash_sale_filters import CashSaleFilter
 from apps.accounting.models.models import CashSale
 
 
 class CashSaleViewSet(BaseCompanyViewSet):
     queryset = CashSale.objects.all()
     serializer_class = CashSaleSerializer
+    filterset_class = CashSaleFilter
 
     def get_queryset(self):
         """Override to filter cash sales by company."""
