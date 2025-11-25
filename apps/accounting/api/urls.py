@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from apps.accounting.api.cash_sales.cash_sale_views import CashSaleViewSet
 from apps.accounting.api.credit_notes.credit_notes_views import CreditNoteViewSet
 from apps.accounting.api.vat_settings.vat_settings_views import VATSettingViewSet
 from apps.accounting.api.views.views import (
     SalesCategoryViewSet,
-    CashSaleViewSet,
     CashbookEntryViewSet,
     GeneralLedgerAccountViewSet,
     JournalEntryViewSet,
