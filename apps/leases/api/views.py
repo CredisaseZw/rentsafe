@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q, Sum
 from django.utils import timezone
 from apps.leases.models.models import Lease, LeaseTenant, LeaseTermination
-from apps.accounting.models import Payment, PaymentMethod, CashBook
+from apps.accounting.models import Payment, PaymentMethod
 from decimal import Decimal
 from apps.leases.api.serializers import (
     LeaseCreateUpdateSerializer,
@@ -515,6 +515,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path="bulk-payments")
     def bulk_make_payment(self, request):
+        from apps.accounting.models.models import Cashbook
+
         results = []
         errors = []
         for payment_data in request.data.get("payments", []):

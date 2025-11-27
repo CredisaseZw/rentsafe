@@ -391,6 +391,8 @@ class Lease(BaseModelWithUser):
         description=None,
         cashbook=None,
     ):
+        from apps.accounting.models import Payment
+
         """
         Apply a payment to the lease, allocating to the oldest debts first.
         Allows overpayments which will create a negative balance.

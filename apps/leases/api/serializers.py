@@ -22,17 +22,15 @@ from apps.properties.models.models import Property, Unit, PropertyType
 from apps.individuals.models.models import Individual
 from apps.companies.models.models import CompanyBranch
 from apps.common.models.models import Address
-from apps.accounting.models import Currency, Payment, PaymentMethod
-from apps.accounting.api.serializers.serializers import CurrencySerializer
+from apps.accounting.models.models import Currency, Payment, PaymentMethod
+
+from apps.accounting.api.serializers.serializers import (
+    CurrencySerializer,
+    PaymentMethodSerializer,
+)
 from apps.common.api.serializers import AddressSerializer
 from apps.leases.utils.helpers import create_lease_with_dependencies
 from apps.properties.utils.helpers import process_address_data
-
-
-class PaymentMethodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PaymentMethod
-        fields = ["id", "payment_method_name"]
 
 
 class PaymentSerializer(serializers.ModelSerializer):
