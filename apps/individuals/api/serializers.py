@@ -123,7 +123,11 @@ class ContactDetailsSerializer(serializers.ModelSerializer):
         phone_number = data.get("phone_number", "")
         phone_type = data.get("type", "mobile")
 
+        if phone_type == "other":
+            raise serializers.SkipField()
         formatted = normalize_zimbabwe_mobile(phone_number, phone_type)
+        if phone_number in ["", None]:
+            raise ValidationError("Phone number is required")
         if not formatted:
             raise ValidationError(f"Invalid phone number provided: {phone_number}")
 

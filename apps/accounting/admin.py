@@ -127,22 +127,74 @@ class VATSettingAdmin(admin.ModelAdmin):
 class CashSaleAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "document_number",
         "sale_date",
         "created_by",
         "currency",
-        "total_excluding_vat",
         "discount",
-        "vat_total",
         "invoice_total",
         "amount_received",
+        "customer_details",
     )
-    list_display_links = ("id",)
-    search_fields = ("created_by__username",)
-    list_filter = ("sale_date",)
+    list_display_links = ("id", "document_number")
+    search_fields = (
+        "created_by__username",
+        "document_number",
+        "customer__individual__full_name",
+        "customer__company__full_name",
+    )
+    list_filter = ("sale_date", "created_by")
     ordering = ("-sale_date",)
     inlines = [TransactionLineItemInline]  # Add inline for line items
     raw_id_fields = ("created_by",)
     list_per_page = 25
+
+    fieldsets = (
+        (None, {"fields": ("document_number", "sale_date", "details")}),
+        (
+            "Customer Details",
+            {
+                "fields": ("customer", "customer_details"),
+                "description": "Select a customer.",
+            },
+        ),
+        (
+            "Financial",
+            {
+                "fields": (
+                    "currency",
+                    "discount",
+                    "amount_received",
+                    "invoice_total",
+                    "payment_type",
+                    "cashbook",
+                )
+            },
+        ),
+        ("System Info", {"fields": ("created_by",), "classes": ("collapse",)}),
+    )
+
+    readonly_fields = (
+        "customer_details",
+        "sale_date",
+        "invoice_total",
+    )
+
+    def get_full_name(self, obj):
+        if obj.customer.is_individual is True:
+            return obj.customer.individual.full_name
+        elif not obj.customer.is_individual and obj.customer.company:
+            return obj.customer.company.full_name
+        return "N/A"
+
+    def customer_details(self, obj):
+        if obj.customer.is_individual is True and obj.customer.individual:
+            individual = obj.customer.individual
+            customer_information = f"{individual.first_name} {individual.last_name} {individual.identification_number} {individual.email}"
+            return customer_information
+        elif not obj.customer.is_individual and obj.customer.company:
+            return obj.customer.company.company.registration_name
+        return "N/A"
 
 
 @admin.register(CashbookEntry)
