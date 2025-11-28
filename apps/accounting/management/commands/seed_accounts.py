@@ -2,12 +2,16 @@
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from apps.accounting.models.models import GeneralLedgerAccount, AccountSector
+from apps.accounting.models.models import GeneralLedgerAccount, AccountType
 
 CustomUser = get_user_model()
 
 
 class Command(BaseCommand):
+    """
+    Django management command to seed the database with predefined accounts and sectors.
+    """
+
     help = "Seeds the database with predefined accounts and sectors"
 
     ACCOUNTS_DATA = [
@@ -448,19 +452,22 @@ class Command(BaseCommand):
         }
 
         for code, name in unique_sectors:
-            AccountSector.objects.get_or_create(code=code, defaults={"name": name})
+            AccountType.objects.get_or_create(
+                code=code,
+                defaults={"name": name, "account_type": self.get_sector_type(name)},
+            )
 
         self.stdout.write(self.style.SUCCESS("Account sectors seeded."))
 
         self.stdout.write(self.style.SUCCESS("Seeding sales accounts..."))
 
         for entry in self.ACCOUNTS_DATA:
-            sector = AccountSector.objects.get(code=entry["sector_code"])
+            sector = AccountType.objects.get(code=entry["sector_code"])
             GeneralLedgerAccount.objects.get_or_create(
                 account_number=entry["account_number"],
                 defaults={
                     "account_name": entry["account_name"],
-                    "account_sector": sector,
+                    "account_type": sector,
                 },
             )
 
@@ -469,3 +476,24 @@ class Command(BaseCommand):
                 "Successfully seeded sectors and general ledger accounts."
             )
         )
+
+    def get_sector_type(self, name):
+        """Helper method to determine sector type based on sector name."""
+        if "contra asset" in name.lower():
+            return "contra_asset"
+        elif "contra liability" in name.lower():
+            return "contra_liability"
+        elif "contra equity" in name.lower():
+            return "contra_equity"
+        elif "asset" in name.lower():
+            return "asset"
+        elif "liabilities" in name.lower():
+            return "liability"
+        elif "equity" in name.lower():
+            return "equity"
+        elif "revenue" in name.lower():
+            return "revenue"
+        elif "expense" in name.lower():
+            return "expense"
+        else:
+            return "other"

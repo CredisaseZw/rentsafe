@@ -128,7 +128,7 @@ class AccountingPeriod(BaseModel):
         return self.start_date <= today <= self.end_date and self.is_open
 
 
-class AccountType(BaseModel):
+class AccountType(BaseModelWithUser):
     """Standard accounting account types (Assets, Liabilities, Equity, Revenue, Expenses)"""
 
     TYPE_CHOICES = [
@@ -140,12 +140,18 @@ class AccountType(BaseModel):
         ("contra_asset", _("Contra Asset")),
         ("contra_liability", _("Contra Liability")),
         ("contra_equity", _("Contra Equity")),
+        ("other", _("Other")),
     ]
-
+    code = models.CharField(max_length=20, null=True)
     name = models.CharField(max_length=100)
-    account_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    account_type = models.CharField(
+        max_length=20, choices=TYPE_CHOICES, default="other"
+    )
     normal_balance = models.CharField(
-        max_length=10, choices=[("debit", "Debit"), ("credit", "Credit")]
+        max_length=10,
+        choices=[("debit", "Debit"), ("credit", "Credit")],
+        blank=True,
+        null=True,
     )
     description = models.TextField(blank=True, null=True)
 
@@ -185,7 +191,7 @@ class GeneralLedgerAccount(BaseModelWithUser):
         ("income_statement", _("Income Statement")),
     ]
 
-    account_number = models.CharField(max_length=10, unique=True)
+    account_number = models.CharField(max_length=10)
     account_name = models.CharField(max_length=255)
     account_type = models.ForeignKey(
         "AccountType",
