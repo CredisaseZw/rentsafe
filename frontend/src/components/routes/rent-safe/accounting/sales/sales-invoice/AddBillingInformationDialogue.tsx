@@ -29,7 +29,12 @@ function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice
         setOpen,
         onSave,
         open,
-    } = useBillingDocumentForm(defaultInvoiceType,createInvoice, type, updateBiller)
+    } = useBillingDocumentForm({
+        createBillMutation:createInvoice,
+        defaultInvoiceType,
+        type,
+        updateBiller
+    })
     
     return (
     <div>

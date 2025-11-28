@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { CashSalesRow, CurrencySetting, InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -840,7 +840,30 @@ export const validateBill = (rows:InvoicePreview[], formData:Record<string, any>
   }
   return false
 }
+export const validateCashSale = (cashSale : CashSalesRow | undefined)=>{
+  if (!cashSale) return true;
+  if (Number(cashSale.cashBook) === 0){
+    toast.error("Cash book required.")
+    return true;
+  }
 
+  if(Number(cashSale.paymentType) === 0 ){
+    toast.error("Payment method required.")
+    return true;
+  }
+
+  if(!cashSale.detail){
+    toast.error("Cash sale detail required.")
+    return true;
+  }
+
+  if (!cashSale.ref){
+    toast.error("Cash sale reference required.")
+    return true;
+  }
+
+  return false
+}
 export const onClearFilter = (setSearchParams: any) => {
   setSearchParams((prev: URLSearchParams) => {
     const params = new URLSearchParams(prev)
@@ -858,10 +881,33 @@ export const onClearFilter = (setSearchParams: any) => {
 export const parseMoney = (value: string | number | null | undefined): number => {
   if (typeof value === "number") return value || 0;
   if (!value) return 0;
-  const cleaned = String(value).replace("$", "").trim();
-  const n = parseFloat(cleaned);
+
+  const k = String(value).replace(/[^0-9.-]/g, "").trim();
+  const n = parseFloat(k);
   return isNaN(n) ? 0 : n;
 };
 
 export const round2 = (value: number): number =>
 Math.floor(value * 100) / 100;
+
+export function convertCurrency(amount: number, from: string, to: string | undefined, rateObj: CurrencySetting){
+  console.log({
+    amount,
+    from,
+    to,
+    rateObj
+  })
+  const rate = parseFloat(rateObj.current_rate);
+
+  if (from === rateObj.base_currency && to === rateObj.currency) {
+    return round2(amount * rate);
+  }
+
+  if (from === rateObj.currency && to === rateObj.base_currency) {
+    return round2(amount / rate);
+  }
+
+  return amount
+
+}
+

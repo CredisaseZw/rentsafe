@@ -33,6 +33,7 @@ export default function useFilter(filter:any, setFilter:any) {
   const applyFilters = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const newParams = new URLSearchParams(searchParams)
+    newParams.delete("page") 
     Object.entries(filter).forEach(([key, value]) => {
       if (value && value !== "false") newParams.set(key, String(value))
       else newParams.delete(key)
@@ -54,11 +55,12 @@ export default function useFilter(filter:any, setFilter:any) {
 
   return {
     open,
-    currencies,
-    setOpen,
     filter,
+    currencies,
+    onClearFilter,
     handleChange,
     applyFilters,
-    onClearFilter,
+    setOpen,
+
   }
 }

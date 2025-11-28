@@ -13,6 +13,7 @@ import { CurrencyProvider } from "./contexts/CurrencyContext";
 import SalesInvoice from "./routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoice";
 import { IndividualDialogProvider } from "./contexts/IndividualDialogueContext";
 import { CompanyDialogProvider } from "./contexts/CompanyDialogueContext";
+import SalesCreditNote from "./routes/rent-safe/accounting/sales/SalesCreditNotes/SalesCreditNote";
 
 export default function App() {
    return (
@@ -43,6 +44,10 @@ export default function App() {
                                     <Route
                                        path={`${RENTSAFE_PRE_SEG}/accounting/sales/invoicing/:invoice_id`}
                                        element = {<SalesInvoice/>}
+                                    />
+                                    <Route
+                                       path={`${RENTSAFE_PRE_SEG}/accounting/sales/credit_note/:credit_note_id`}
+                                       element = {<SalesCreditNote/>}
                                     />
                                     {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
                                  </Route>

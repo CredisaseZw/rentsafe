@@ -86,7 +86,7 @@ export default function CreditNotesFilter() {
               </SelectTrigger>
               <SelectContent>
                 {
-                  MONTHS.map((m, idx)=> <SelectItem value={m.value} key={idx}>{m.label}</SelectItem>)
+                  MONTHS.map((m, idx)=> <SelectItem value={String(idx + 1)} key={idx}>{m.label}</SelectItem>)
                 }
               </SelectContent>
             </Select>

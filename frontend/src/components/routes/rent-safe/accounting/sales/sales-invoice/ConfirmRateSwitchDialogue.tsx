@@ -1,12 +1,14 @@
 import Button from "@/components/general/Button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogDescription, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { RENTSAFE_PRE_SEG } from "@/constants/navlinks"
 import type { SwitchRate } from "@/interfaces"
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router"
 
 interface props {
-    updateBase: React.Dispatch<React.SetStateAction<number | undefined>>
+    updateBase: React.Dispatch<React.SetStateAction<number>>
     open :  boolean,
     setOpen :React.Dispatch<React.SetStateAction<boolean>>
     switchRate : SwitchRate
@@ -14,6 +16,8 @@ interface props {
 
 function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props) {
     const [rate, setRate] = useState("")
+    const navigate = useNavigate()
+
     useEffect(()=>{
         if(switchRate.rate) setRate(String(switchRate.rate))
     }, [switchRate.rate])
@@ -21,13 +25,14 @@ function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props
     const onSwitch = () =>{
         const newRate = parseFloat(rate)
         if(newRate > 0 &&
-            !isNaN(newRate)
-        )
-        {   
+        !isNaN(newRate)){   
             updateBase(newRate);
             setOpen(false);
         }
     }
+
+    const editRate = () => navigate(`${RENTSAFE_PRE_SEG}/settings/currency`)
+
     return (
         <Dialog 
             open = {open}
@@ -53,9 +58,10 @@ function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props
                     </div>
                 </div>
                 <DialogFooter>
-                    <DialogClose>
-                        <Button type="button" variant="ghost">Cancel</Button>
-                    </DialogClose>
+                    {
+                        Number(switchRate.rate) === 1 &&
+                        <Button variant="outline" onClick={editRate}>Edit Currency Setting</Button>
+                    }
                     <Button  onClick={onSwitch}>Set Rate</Button>
                 </DialogFooter>
             </DialogContent>

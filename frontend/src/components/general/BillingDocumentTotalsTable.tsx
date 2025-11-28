@@ -10,6 +10,7 @@ import AutoCompleteSalesItem from "./AutoCompleteSalesItem"
 import type { SalesItem } from "@/types"
 import { validateAmounts } from "@/lib/utils"
 import ConfirmRateSwitchDialogue from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRateSwitchDialogue"
+//import ConfirmRedirectToCurrencySettings from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRedirectToCurrencySettings"
 
 interface props{
     isCashSales? : boolean
@@ -20,27 +21,30 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         rows,
         discount,
         baseRate,
+        cashBooks,
         currencies,
+        cashSalesRow,
         currencyCode,
-        cashSalesRows,
+        paymentMethods,
         currencyLoading,
         defaultCurrency,
         calculatedTotals,
         openConfirmation,  
         prevCurrencyCode, 
+        isCashbookLoading,
+        paymentMethodsLoading,
         setPrevCurrencyCode,
         setOpenConfirmation,
-        RemoveCashSalesRows,
         handleOnSelectItem,
         setDefaultCurrency,
         handleOnRowChange,
         RemoveInvoiceRow,
+        onCashSaleChange,
         setCurrencyCode,
-        AddCashSaleRow,
         AddInvoiceRow,
         setDiscount,    
         setBaseRate
-    } = useInvoiceTotalsTables(ref)
+    } = useInvoiceTotalsTables(ref,isCashSales)
    
     return (
     <Table className="border-color rounded border w-full">
@@ -57,13 +61,11 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     onValueChange={(v)=> {
                         let previous = ""; 
                         setCurrencyCode((prev)=> {
-                            previous = prev ?? "";
+                            previous = prev ?? "USD";
                             return currencies.find(c=> c.id === Number(v))?.currency_code
                         })
                         setPrevCurrencyCode(previous)
                         setDefaultCurrency(v)
-                        setOpenConfirmation(true)
-
                     }
                     }
                     required>
@@ -206,52 +208,89 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     <TableCell className="text-center border-r border-color w-2/12">Amount Received</TableCell>
                     <TableCell className="text-center w-2/12"></TableCell>
                 </TableRow>
-                {
-                    cashSalesRows.map((row, index)=>(
-                    <TableRow key={index} noHover>
-                        <TableCell className="border-r border-color text-center"> 
-                            <Button type="button" variant={"ghost"} onClick={()=>RemoveCashSalesRows(index)}>
-                                <X className="text-red-600"/>
-                            </Button>
-                        </TableCell>
-                        <TableCell className="border-r border-color" > 
-                            <Select  name="currency" value={row.paymentType}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select ..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                </SelectContent>
-                            </Select>
-                        </TableCell>
-                        <TableCell className="border-r border-color"> 
-                            <Select  name="currency" value={row.cashBook}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select ..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                </SelectContent>
-                            </Select>
-                        </TableCell>
-                        <TableCell className="border-r border-color"> 
-                            <Input value={row.detail} name="detail"/>
-                        </TableCell>
-                        <TableCell className="border-r border-color"> 
-                            <Input value={row.ref} name="detail"/>
-                        </TableCell>
-                        <TableCell className="border-r border-color">    
-                            <Input value={row.amountReceived} name="detail"/>
-                        </TableCell>
-                        <TableCell> 
-                        </TableCell>
-                    </TableRow>
-                    ))
-                }     
-                <TableRow>
-                    <TableCell rowSpan={7}>
-                        <Button variant={"outline"} onClick={AddCashSaleRow}>Add Row</Button>
+                <TableRow noHover>
+                    <TableCell className="border-r border-color text-center"></TableCell>
+                    <TableCell className="border-r border-color" > 
+                        <Select  
+                            onValueChange={(val)=> onCashSaleChange("paymentType", val)}
+                            name="currency"
+                            value={cashSalesRow.paymentType}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select ..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {
+                                    paymentMethods.length === 0 &&
+                                    paymentMethodsLoading &&
+                                    <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                                        <LoadingIndicator />
+                                    </SelectItem>
+                                }
+                                {
+                                    paymentMethods.length !== 0 &&
+                                    !paymentMethodsLoading &&
+                                    paymentMethods.map((p, idx)=>(
+                                        <SelectItem value={p.id.toString()} key={idx}>{p.payment_method_name.toUpperCase()}</SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
                     </TableCell>
-                </TableRow> 
-               
+                    <TableCell className="border-r border-color"> 
+                        <Select 
+                            onValueChange={(val)=> onCashSaleChange("cashBook", val)}
+                            name="currency"
+                            value={cashSalesRow.cashBook}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select ..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {
+                                    cashBooks.length === 0 &&
+                                    !isCashbookLoading &&
+                                    <SelectItem disabled value="disabled">
+                                        No cashbook was found for currency {currencyCode}
+                                    </SelectItem>
+                                }
+                                {
+                                    cashBooks.length === 0 &&
+                                    isCashbookLoading &&
+                                    <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                                        <LoadingIndicator />
+                                    </SelectItem>
+                                }
+                                {   
+                                    cashBooks.length !== 0 &&
+                                    cashBooks.map((c) => (
+                                        <SelectItem value={String(c.id)} key={c.id}>
+                                            {c.cashbook_name}
+                                        </SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
+                    </TableCell>
+                    <TableCell className="border-r border-color"> 
+                        <Input 
+                            onChange={(e)=> onCashSaleChange("detail", e.target.value)}
+                            value={cashSalesRow.detail}
+                            name="detail"/>
+                    </TableCell>
+                    <TableCell className="border-r border-color"> 
+                        <Input 
+                            onChange={(e)=> onCashSaleChange("ref", e.target.value)}
+                            value={cashSalesRow.ref}
+                            name="ref"/>
+                    </TableCell>
+                    <TableCell className="border-r border-color">    
+                        <Input 
+                            type="number"
+                            onChange={(e)=> onCashSaleChange("amountReceived", e.target.value)}
+                            value={cashSalesRow.amountReceived}
+                            name="amountReceived"/>
+                    </TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
             </>   
         }
         <ConfirmRateSwitchDialogue

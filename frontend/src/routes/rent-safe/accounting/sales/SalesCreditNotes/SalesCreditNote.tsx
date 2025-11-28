@@ -1,17 +1,21 @@
 import ErrorResults from "@/components/general/ErrorResults"
-import SingleInvoice from "@/components/routes/rent-safe/accounting/sales/sales-invoice/SingleInvoice"
 import LoadingIndicator from "@/components/general/LoadingIndicator"
-import useSalesInvoice from "@/hooks/components/useSalesInvoice"
+import SingleCreditNote from "@/components/routes/rent-safe/accounting/sales/sales-invoice/CreditNote"
+import useCreditNote from "@/hooks/components/useCreditNote"
 import { MoveLeft } from "lucide-react"
 
-function SalesInvoice() {
-  const { invoice, isLoading, error, handleGoBack, markStatus } = useSalesInvoice()
-
+function SalesCreditNote() {
+  const {
+    handleGoBack,
+    isLoading,
+    error,
+    creditNote
+  } = useCreditNote()
   return (
     <div>
       <div className="flex flex-row space-x-4 mt-3">
         <MoveLeft size={15} className="self-center cursor-pointer" onClick={handleGoBack}/>
-        <span className="font-bold text-2xl">Invoice</span>
+        <span className="font-bold text-2xl">Credit Note</span>
       </div>
 
       <div className="main-sm-card mt-5">
@@ -23,10 +27,9 @@ function SalesInvoice() {
 
         {!isLoading && error && <ErrorResults message="Failed to fetch Invoice" />}
 
-        {!isLoading && invoice && (
-          <SingleInvoice
-            invoice={invoice}
-            markInvoice={markStatus}
+        {!isLoading && creditNote && (
+          <SingleCreditNote
+            creditNote={creditNote}
             handleGoBack={handleGoBack}
           />
         )}
@@ -35,4 +38,4 @@ function SalesInvoice() {
   )
 }
 
-export default SalesInvoice
+export default SalesCreditNote

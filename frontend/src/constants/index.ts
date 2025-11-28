@@ -88,7 +88,8 @@ export const DELETION_LINKS = {
   ACCOUNT_SECTORS : "/api/accounting/account-sectors",
   CASH_BOOK : "/api/accounting/cash-books",
   GENERAL_LEDGER : "/api/accounting/ledger-accounts",
-  INVOICE : "/api/accounting/invoices"
+  INVOICE : "/api/accounting/invoices",
+  CREDIT_NOTE : "/api/accounting/credit-notes"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -671,12 +672,11 @@ export const INVOICE_STATUS_VARIANT: Record<string, any> = {
     cancelled: "danger",
   };
 
-export const INVOICE_SALES_HEADERS:Header[] = [
+export const SALES_ITEM_HEADERS:Header[] = [
   {name : "Sales Item"},
   {name : "Quantity"},
   {name : "Unit Price", textAlign : "end"},
   {name : "VAT Amount", textAlign : "end"},
   {name : "Total Price", textAlign : "end"}
-
 ]
 

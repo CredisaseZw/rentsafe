@@ -161,6 +161,8 @@ function BillingDocumentHeader({
                     <div className="flex flex-row gap-5 justify-between">
                         <Label className="text-gray-800 dark:text-white">Rep</Label>
                         <Input
+                            onChange={(e)=> handleOnChangeFormData("rep", e.target.value)}
+                            value={formData.rep}
                             className="w-[400px]"
                             name="rep"
                         />
@@ -200,9 +202,7 @@ function BillingDocumentHeader({
                 </div>
             </div>
         </ColumnsContainer>
-        {
-            <UpdateBillerConfirmationDialogue/>
-        }
+        <UpdateBillerConfirmationDialogue/>
     </div>
   
   )
