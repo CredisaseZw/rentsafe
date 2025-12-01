@@ -10,6 +10,7 @@ import AutoCompleteSalesItem from "./AutoCompleteSalesItem"
 import type { SalesItem } from "@/types"
 import { validateAmounts } from "@/lib/utils"
 import ConfirmRateSwitchDialogue from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRateSwitchDialogue"
+import ButtonSpinner from "./ButtonSpinner"
 //import ConfirmRedirectToCurrencySettings from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRedirectToCurrencySettings"
 
 interface props{
@@ -24,26 +25,26 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         cashBooks,
         currencies,
         cashSalesRow,
-        currencyCode,
         paymentMethods,
         currencyLoading,
         defaultCurrency,
         calculatedTotals,
         openConfirmation,  
         prevCurrencyCode, 
+        billCurrencyCode,
         isCashbookLoading,
         paymentMethodsLoading,
         setPrevCurrencyCode,
+        setBillCurrencyCode,
         setOpenConfirmation,
         handleOnSelectItem,
         setDefaultCurrency,
         handleOnRowChange,
         RemoveInvoiceRow,
         onCashSaleChange,
-        setCurrencyCode,
+        handleUpdateRate,
         AddInvoiceRow,
         setDiscount,    
-        setBaseRate
     } = useInvoiceTotalsTables(ref,isCashSales)
    
     return (
@@ -60,7 +61,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     value={defaultCurrency}
                     onValueChange={(v)=> {
                         let previous = ""; 
-                        setCurrencyCode((prev)=> {
+                        setBillCurrencyCode((prev)=> {
                             previous = prev ?? "USD";
                             return currencies.find(c=> c.id === Number(v))?.currency_code
                         })
@@ -119,7 +120,13 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     <TableCell className="text-end border-r border-color">
                         {row.itemCode}
                     </TableCell>
-                    <TableCell className="text-end border-r border-color">{row.price}</TableCell>
+                    <TableCell className="text-end border-r border-color">
+                        {
+                            String(row.price) === "NaN"
+                            ? <ButtonSpinner/>
+                            :row.price
+                        }
+                    </TableCell>
                     <TableCell className="text-end border-r border-color">
                         <Input 
                             name={"item_qty_"+index}
@@ -187,7 +194,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             <TableCell className="border-r border-color w-1/12"></TableCell>
             <TableCell colSpan={5} className="border-r border-color w-9/12">
                 <div className="flex flex-row justify-end">
-                    <span className="text-sm">Invoice Total ({currencyCode})</span>
+                    <span className="text-sm">Invoice Total ({billCurrencyCode})</span>
                 </div>
             </TableCell>
             <TableCell className="w-2/12">
@@ -199,7 +206,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         {
             isCashSales &&
             <>
-                <TableRow>
+                <TableRow noHover>
                     <TableCell className="text-center border-r border-color w-1/12"></TableCell>
                     <TableCell className="text-center border-r border-color w-2/12">Payment Type</TableCell>
                     <TableCell className="text-center border-r border-color w-2/12">Cash book</TableCell>
@@ -249,7 +256,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                                     cashBooks.length === 0 &&
                                     !isCashbookLoading &&
                                     <SelectItem disabled value="disabled">
-                                        No cashbook was found for currency {currencyCode}
+                                        No cashbook was found for currency {billCurrencyCode}
                                     </SelectItem>
                                 }
                                 {
@@ -296,9 +303,9 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         <ConfirmRateSwitchDialogue
             open = {openConfirmation}
             setOpen={setOpenConfirmation}
-            updateBase={setBaseRate}
+            updateBase={handleUpdateRate}
             switchRate={{
-                to: currencyCode,
+                to: billCurrencyCode,
                 from : prevCurrencyCode,
                 rate : baseRate
             }}

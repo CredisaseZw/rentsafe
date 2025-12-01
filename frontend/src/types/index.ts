@@ -602,4 +602,3 @@ export type InvoiceTotals = {
    total: number,
    discount : number 
 }
-

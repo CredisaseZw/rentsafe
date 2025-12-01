@@ -1,12 +1,30 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
-import type { Cashbook, CashSalesRow, CurrencySetting, InvoicePreview, PaymentMethod, SalesItem } from "@/types";
-import { useState, useImperativeHandle, useEffect } from "react";
+import type { Cashbook, CashSalesRow, CurrencyResponse, InvoicePreview, PaymentMethod, SalesItem } from "@/types";
+import { useState, useImperativeHandle, useEffect, useRef } from "react";
 import type React from "react";
 import { toast } from "sonner";
 import { convertCurrency, handleAxiosError, parseMoney, round2 } from "@/lib/utils";
 import useGetPaymentMethods from "../apiHooks/useGetPaymentMethods";
 import useGetCashbook from "../apiHooks/useGetCashbook";
 import { useGetCurrencyRate } from "../apiHooks/useGetCurrencyRate";
+import { api } from "@/api/axios";
+
+const getCurrencyRate = async(from: string, to: string) => {
+    let data:CurrencyResponse | null = null;
+    let error = null
+
+    try {
+        const query = `ordering=-date_created&target_currency=${to}&base_currency=${from}`;
+        const res = await api.get<CurrencyResponse>(
+        `/api/accounting/currency-settings/?${query}`
+        );
+        data = res.data
+    } catch (err) {
+        error
+    }
+
+    return {data, error}
+}
 
 const checkCurrency = (currencyCode : string | undefined) => {
     if (!currencyCode) {
@@ -62,15 +80,15 @@ const computeTotals = (rows: InvoicePreview[], discount: string) => {
 
 function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: boolean | undefined) {
     // VARIABLES 
-    const [baseRate, setBaseRate] = useState<number>(1);
+    const rates = useRef<Record<string, number>>({});
     const [ openConfirmationRedirect, setOpenConfirmationRedirect] = useState(false)
-    const [openConfirmation, setOpenConfirmation] = useState(false);
+    const [ openConfirmation, setOpenConfirmation] = useState(false);
     const { currencies, currencyLoading, currency } = useCurrency();
     const [discount, setDiscount] = useState("0");
+    const [rowsToDelete, setRowsToDelete] = useState([]);
     const [rows, setRows] = useState<InvoicePreview[]>([{ quantity: "1" } as InvoicePreview]);
     const [defaultCurrency, setDefaultCurrency] = useState(currency?.id ? String(currency.id) : "");
-    const [currencySetting, setCurrencySetting] = useState<CurrencySetting | undefined>(undefined);
-    const [currencyCode, setCurrencyCode] = useState(currency?.currency_code);
+    const [billCurrencyCode, setBillCurrencyCode] = useState(currency?.currency_code);
     const [prevCurrencyCode, setPrevCurrencyCode] = useState(currency?.currency_code ?? "USD")
     const [cashBookPage, setCashBookPage] = useState(1);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
@@ -92,7 +110,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         data: currencyRate,
         error: currencyError,
         isLoading: currencyRateLoading,
-    } = useGetCurrencyRate(prevCurrencyCode, currencyCode);
+    } = useGetCurrencyRate(prevCurrencyCode, billCurrencyCode);
 
     const {        
         data : paymentMethodsData,
@@ -106,6 +124,14 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         cashbookError} = useGetCashbook(cashBookPage, isCashSale);
    
     // FUNCTIONS
+    
+    const handleUpdateRate = (from:string, to: string, rate: number) => {
+        rates.current = {
+            ...rates.current,
+            [`${from}_${to}`]: rate
+        };
+    };
+
     const handleOnRowChange = (
         index: number,
         key: string,
@@ -159,28 +185,22 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
             toast.error("Invalid item data");
             return;
         }
-        if(!checkCurrency(currencyCode)) return;
+        if(!checkCurrency(billCurrencyCode)) return;
 
         const basePrice = parseMoney(item.price);
-        const effectiveRate = baseRate && baseRate > 0 ? baseRate : 1;
         const vatRate = Number(item.tax_configuration_object?.rate) || 0;
         const quantity = Number(rows[index]?.quantity) || 1;
         const itemCurrencyCode = item.currency_object.currency_code;
-      
+        const effectiveRate = rates.current[`${itemCurrencyCode}_${billCurrencyCode}`];
+
         let convertedPrice = 0.00;
-        if(itemCurrencyCode !== currencyCode){
+        if(itemCurrencyCode !== billCurrencyCode){
             setPrevCurrencyCode(itemCurrencyCode);
-            const settingObj =  {
-                base_currency: currencySetting?.base_currency ?? itemCurrencyCode,
-                currency: currencyCode,
-                current_rate: currencySetting?.current_rate ??  String(effectiveRate) 
-            } as CurrencySetting
-        
             const convertedCurrency = convertCurrency(
                 basePrice,
+                String(effectiveRate) ,
                 itemCurrencyCode,
-                currencyCode,
-                settingObj
+                billCurrencyCode,
             )
             convertedPrice = convertedCurrency;
         } else {
@@ -226,25 +246,27 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
     // USE-EFFECTS
 
     useEffect(() => {
-        checkCurrency(currencyCode);
-    }, [currencyCode]);
+        checkCurrency(billCurrencyCode);
+    }, [billCurrencyCode]);
     
     useEffect(() => {
-        if (prevCurrencyCode === currencyCode) return;
+        if (prevCurrencyCode === billCurrencyCode) return;
         if(currencyRateLoading) return;
 
-        setCurrencySetting(undefined);
         if (currencyError) return setOpenConfirmation(true);        
         if(!currencyRate) return setOpenConfirmation(true);
         if (currencyRate.results.length  === 0) return setOpenConfirmation(true);
  
         if(currencyRate){ 
             const setting = currencyRate?.results?.[0];
-            setCurrencySetting(setting);
-            setBaseRate(parseMoney(setting?.current_rate));
+            const r = {
+                ...rates.current,
+                [`${prevCurrencyCode}_${billCurrencyCode}`] : parseFloat(setting.current_rate)
+            }
+            rates.current = r;
             setOpenConfirmation(true)
         }
-    }, [currencyRate, currencyError, prevCurrencyCode, currencyCode]);
+    }, [currencyRate, currencyError, prevCurrencyCode, billCurrencyCode]);
 
     useEffect(() => {
         calculateTotals();
@@ -254,30 +276,25 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         if (!rows.length || rows.every((r) => !r.itemCode)) return;
         if (currencyRateLoading) return;
 
-        const effectiveRate =
-        baseRate && baseRate > 0 ? baseRate : 1;
-        
-        setRows((prev) =>
-            prev.map((row) => {
+        setRows((prev) =>{
+            let toDelete = [];
+            const rows_ = prev.map((row, idx) => {
                 if (row.basePrice === null) return row;
                 
                 const basePrice = parseMoney(row.basePrice);
                 if (!basePrice) return row;
+                const rate = rates.current[`${row.itemCurrency}_${billCurrencyCode}`]
+                
+            
 
                 let price = 0.00 
-                if (row.itemCurrency === currencyCode ){ price = basePrice }
+                if (row.itemCurrency === billCurrencyCode ){ price = basePrice }
                 else{
-                    const settingObj = {
-                        base_currency: currencySetting?.base_currency ?? prevCurrencyCode,
-                        currency: currencyCode,
-                        current_rate: currencySetting?.current_rate ??  String(effectiveRate) 
-                    } as CurrencySetting 
-
                     const convertedCurrency = convertCurrency(
                         row.basePrice,
+                        String(rate) ,
                         row.itemCurrency,
-                        currencyCode,
-                        settingObj
+                        billCurrencyCode,
                     )
                     if (typeof(convertedCurrency) === "number"){
                         price = convertedCurrency;
@@ -286,7 +303,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
                         toast.error(convertedCurrency);
                     }
                 }
-                round2(basePrice * effectiveRate);
+                round2(basePrice * rate);
                 const qty = Number(row.quantity) || 1;
                 const vatRate = row.vat_amount || 0;
 
@@ -296,9 +313,24 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
                 total: computeRowTotal(price, qty, vatRate),
                 };
             })
+
+            return rows_;
+        }
         );
-    }, [baseRate, rows.length]);
-    
+    }, [rates.current,  rows.length, billCurrencyCode ]);
+
+   /*  useEffect(()=>{
+        const checkRates = async()=>{
+            rows.forEach(async(row)=>{
+                if(String(row.price) === "NaN"){
+                    const {data, error} = await getCurrencyRate(row.itemCurrency, billCurrencyCode ?? "USD");
+                    console.log(data, error)
+                }
+            })
+        }
+        checkRates();
+    }, [billCurrencyCode]) */
+
     useEffect(()=>{
         if(!isCashSale) return;
         if(handleAxiosError("Failed to fetch payment methods", paymentMethodsError)) return;
@@ -313,7 +345,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         if(handleAxiosError("Failed to fetch Cashbooks", cashbookError)) return;
 
         if(cashBooksData){
-            const data = cashBooksData.results.filter((cashbook)=> cashbook.currency.currency_code === currencyCode)
+            const data = cashBooksData.results.filter((cashbook)=> cashbook.currency.currency_code === billCurrencyCode)
             setCashBooks((p)=>
                 cashBookPage === 1 
                 ? data
@@ -324,7 +356,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
                 setCashBookPage(Number(nextPage))
             }
         }
-    }, [cashBooksData, cashbookError, cashBookPage, currencyCode])
+    }, [cashBooksData, cashbookError, cashBookPage, billCurrencyCode])
 
     useImperativeHandle(
         ref,
@@ -345,11 +377,10 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
     return {
         rows,
         discount,
-        baseRate,
         cashBooks,
         currencies,
         cashSalesRow,
-        currencyCode,
+        billCurrencyCode,
         paymentMethods,
         currencyLoading,
         defaultCurrency,
@@ -360,7 +391,9 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         currencyRateLoading,
         paymentMethodsLoading,
         openConfirmationRedirect,
+        baseRate: rates.current[`${prevCurrencyCode}_${billCurrencyCode}`] ?? 1,
         setOpenConfirmationRedirect,
+        setBillCurrencyCode,
         setPrevCurrencyCode,
         setOpenConfirmation,
         handleOnSelectItem,
@@ -368,11 +401,9 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         handleOnRowChange,
         RemoveInvoiceRow,
         onCashSaleChange,
-        setCurrencyCode,
+        handleUpdateRate,
         AddInvoiceRow,
         setDiscount,
-        setBaseRate
-
   };
 }
 

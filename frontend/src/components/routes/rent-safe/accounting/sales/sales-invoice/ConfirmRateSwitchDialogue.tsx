@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 
 interface props {
-    updateBase: React.Dispatch<React.SetStateAction<number>>
+    updateBase: (from:string, to: string, rate: number) => void
     open :  boolean,
     setOpen :React.Dispatch<React.SetStateAction<boolean>>
     switchRate : SwitchRate
@@ -26,7 +26,7 @@ function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props
         const newRate = parseFloat(rate)
         if(newRate > 0 &&
         !isNaN(newRate)){   
-            updateBase(newRate);
+            updateBase(switchRate.from ?? "", switchRate.to ?? "", newRate);
             setOpen(false);
         }
     }
@@ -39,6 +39,7 @@ function ConfirmRateSwitchDialogue({switchRate, open, setOpen, updateBase}:props
             onOpenChange={setOpen}
         >
             <DialogContent 
+                showCloseButton = {false}
                 onEscapeKeyDown={(e) => e.preventDefault()}
                 onPointerDownOutside={(e) => e.preventDefault()}            
                 onInteractOutside={(e)=>e.preventDefault()}>

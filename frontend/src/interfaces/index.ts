@@ -524,7 +524,7 @@ export interface CreditNote {
 export interface SwitchRate {
    from : string | undefined
    to : string | undefined,
-   rate : number | undefined
+   rate : string | number | undefined
 }
 
 export interface CashSale {

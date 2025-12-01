@@ -1,7 +1,7 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
 import type { Address, BranchContact } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
-import type { CashSalesRow, CurrencySetting, InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
+import type { CashSalesRow, InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { QueryClient } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import type { PropertiesResponse, Property } from "@/types";
 import { isAxiosError, type AxiosError } from "axios";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
+import { CURRENCY_OPERATIONS } from "@/constants/currencyPairs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -890,23 +891,13 @@ export const parseMoney = (value: string | number | null | undefined): number =>
 export const round2 = (value: number): number =>
 Math.floor(value * 100) / 100;
 
-export function convertCurrency(amount: number, from: string, to: string | undefined, rateObj: CurrencySetting){
-  console.log({
-    amount,
-    from,
-    to,
-    rateObj
-  })
-  const rate = parseFloat(rateObj.current_rate);
+export function convertCurrency(amount: number, rate: string, from: string, to: string | undefined){
+  const cleanedRate = parseFloat(rate);
+  const operation = CURRENCY_OPERATIONS[`${from.toUpperCase()}_${to?.toUpperCase()}`]
 
-  if (from === rateObj.base_currency && to === rateObj.currency) {
-    return round2(amount * rate);
-  }
-
-  if (from === rateObj.currency && to === rateObj.base_currency) {
-    return round2(amount / rate);
-  }
-
+  if(operation === "none" || !operation) return round2(amount);
+  if (operation === "multiply") return round2(amount * cleanedRate);
+  if (operation === "divide") return round2(amount / cleanedRate);
   return amount
 
 }
