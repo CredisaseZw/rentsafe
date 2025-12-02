@@ -21,30 +21,30 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
     const {
         rows,
         discount,
-        baseRate,
         cashBooks,
-        currencies,
+        billCurrencies,
         cashSalesRow,
         paymentMethods,
-        currencyLoading,
+        promptIndex,
+        prompts,
         defaultCurrency,
+        currencyLoading,
         calculatedTotals,
         openConfirmation,  
-        prevCurrencyCode, 
         billCurrencyCode,
         isCashbookLoading,
         paymentMethodsLoading,
-        setPrevCurrencyCode,
-        setBillCurrencyCode,
         setOpenConfirmation,
         handleOnSelectItem,
         setDefaultCurrency,
         handleOnRowChange,
         RemoveInvoiceRow,
         onCashSaleChange,
+        setPromptIndex,
         handleUpdateRate,
         AddInvoiceRow,
         setDiscount,    
+        ResetPrompts,
     } = useInvoiceTotalsTables(ref,isCashSales)
    
     return (
@@ -60,13 +60,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     name="currency"
                     value={defaultCurrency}
                     onValueChange={(v)=> {
-                        let previous = ""; 
-                        setBillCurrencyCode((prev)=> {
-                            previous = prev ?? "USD";
-                            return currencies.find(c=> c.id === Number(v))?.currency_code
-                        })
-                        setPrevCurrencyCode(previous)
-                        setDefaultCurrency(v)
+                        setDefaultCurrency(v);
                     }
                     }
                     required>
@@ -75,11 +69,11 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     </SelectTrigger>
                     <SelectContent className="bg-red-600 text-white border-white">
                         {
-                            currencies.map((c)=>
+                            billCurrencies.map((c)=>
                             <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>)
                         }
                         { 
-                            currencies.length === 0 &&
+                            billCurrencies.length === 0 &&
                             currencyLoading &&
                             <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
                                 <LoadingIndicator />
@@ -139,7 +133,13 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                         />
                     </TableCell>
                     <TableCell className="border-r border-color text-center">{row.vat_amount}</TableCell>
-                    <TableCell className="text-end border-r border-color">{row.total ?? 0.00}</TableCell>
+                    <TableCell className="text-end border-r border-color">
+                        {
+                            String(row.total) === "NaN"
+                            ? <ButtonSpinner/>
+                            :row.total
+                        }
+                    </TableCell>
                 </TableRow>
             ))
         }      
@@ -300,16 +300,20 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                 </TableRow>
             </>   
         }
-        <ConfirmRateSwitchDialogue
-            open = {openConfirmation}
-            setOpen={setOpenConfirmation}
-            updateBase={handleUpdateRate}
-            switchRate={{
-                to: billCurrencyCode,
-                from : prevCurrencyCode,
-                rate : baseRate
-            }}
-        />
+        {
+            prompts.length >= 1 &&
+            <ConfirmRateSwitchDialogue
+                current={promptIndex}
+                open = {openConfirmation}    
+                ResetPrompts={ResetPrompts}
+                setOpen={setOpenConfirmation}
+                updateBase={handleUpdateRate}
+                prompt = { prompts[promptIndex] }
+                limit = {prompts.length - 1 }
+                next = {setPromptIndex}
+            />
+        }
+      
     </Table>
   )
 })

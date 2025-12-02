@@ -9,7 +9,6 @@ import type { PropertiesResponse, Property } from "@/types";
 import { isAxiosError, type AxiosError } from "axios";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
-import { CURRENCY_OPERATIONS } from "@/constants/currencyPairs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -890,15 +889,3 @@ export const parseMoney = (value: string | number | null | undefined): number =>
 
 export const round2 = (value: number): number =>
 Math.floor(value * 100) / 100;
-
-export function convertCurrency(amount: number, rate: string, from: string, to: string | undefined){
-  const cleanedRate = parseFloat(rate);
-  const operation = CURRENCY_OPERATIONS[`${from.toUpperCase()}_${to?.toUpperCase()}`]
-
-  if(operation === "none" || !operation) return round2(amount);
-  if (operation === "multiply") return round2(amount * cleanedRate);
-  if (operation === "divide") return round2(amount / cleanedRate);
-  return amount
-
-}
-

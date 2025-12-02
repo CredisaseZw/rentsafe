@@ -546,3 +546,9 @@ export interface CashSale {
   change: string;
   created_by: string;
 }
+export interface ConfirmRatePrompt {
+    itemName : string,
+    from: string,
+    to: string,
+    rate : string
+}

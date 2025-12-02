@@ -45,7 +45,8 @@ export const CurrencyProvider = ({
   }, [currencyData, currencyError, defaultCurrencyCode]);
 
   const onCurrencyRetch = () => currencyRefetch();
-
+  
+  
   return (
     <CurrencyContext.Provider
       value={{ currencies, currency, setCurrency, currencyLoading, onCurrencyRetch }}
