@@ -1,14 +1,26 @@
 # views/__init__.py
+import logging
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from apps.accounting.filters.general_ledgers_filter import (
+    AccountSubTypeFilter,
+    AccountTypeFilter,
+    GeneralLedgerFilter,
+)
+from django.utils import timezone
+from decimal import Decimal
 from apps.accounting.models import *
 from apps.accounting.api.serializers.standard_serializers import *
+from apps.common.api.views import BaseViewSet
+from apps.common.utils.helpers import extract_error_message
 
 # ==================== CORE ACCOUNTING VIEWSETS ====================
+
+logger = logging.getLogger(__name__)
 
 
 class FinancialYearViewSet(viewsets.ModelViewSet):
@@ -65,25 +77,90 @@ class AccountingPeriodViewSet(viewsets.ModelViewSet):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AccountTypeViewSet(viewsets.ModelViewSet):
+class AccountTypeViewSet(BaseViewSet):
+    """ViewSet for AccountType model."""
+
     queryset = AccountType.objects.all()
     serializer_class = AccountTypeSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = AccountTypeFilter
+
+    def get_queryset(self):
+        queryset = AccountType.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=self.request.user.client)
+        )
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating AccountType: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
-class AccountSubTypeViewSet(viewsets.ModelViewSet):
+class AccountSubTypeViewSet(BaseViewSet):
+    """ViewSet for AccountSubType model."""
+
     queryset = AccountSubType.objects.all()
     serializer_class = AccountSubTypeSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = AccountSubTypeFilter
+
+    def get_queryset(self):
+        queryset = AccountSubType.objects.filter(
+            created_by__client=self.request.user.client
+        )
+        account_type = self.request.query_params.get("account_type")
+
+        if account_type:
+            queryset = queryset.filter(account_type_id=account_type)
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating AccountSubType: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
-class GeneralLedgerAccountViewSet(viewsets.ModelViewSet):
+class GeneralLedgerAccountViewSet(BaseViewSet):
     queryset = GeneralLedgerAccount.objects.all()
     serializer_class = GeneralLedgerAccountSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = GeneralLedgerFilter
 
     def get_queryset(self):
-        queryset = GeneralLedgerAccount.objects.all()
+        queryset = GeneralLedgerAccount.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=self.request.user.client)
+        )
         account_type = self.request.query_params.get("account_type")
         is_active = self.request.query_params.get("is_active")
 
@@ -94,8 +171,22 @@ class GeneralLedgerAccountViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating GeneralLedgerAccount: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=["get"])
     def balance(self, request, pk=None):

@@ -454,7 +454,10 @@ class Command(BaseCommand):
         for code, name in unique_sectors:
             AccountType.objects.get_or_create(
                 code=code,
-                defaults={"name": name, "account_type": self.get_sector_type(name)},
+                defaults={
+                    "name": name,
+                    "account_type": self.get_sector_type(name),
+                },
             )
 
         self.stdout.write(self.style.SUCCESS("Account sectors seeded."))
@@ -468,6 +471,10 @@ class Command(BaseCommand):
                 defaults={
                     "account_name": entry["account_name"],
                     "account_type": sector,
+                    "is_system_account": True,
+                    "is_contra_account": (
+                        False if "ZWG" not in entry["account_name"] else True
+                    ),
                 },
             )
 
@@ -491,9 +498,13 @@ class Command(BaseCommand):
             return "liability"
         elif "equity" in name.lower():
             return "equity"
-        elif "revenue" in name.lower():
+        elif (
+            "revenue" in name.lower()
+            or "income" in name.lower()
+            or "sales" in name.lower()
+        ):
             return "revenue"
-        elif "expense" in name.lower():
+        elif "expense" in name.lower() or "cost " in name.lower():
             return "expense"
         else:
             return "other"

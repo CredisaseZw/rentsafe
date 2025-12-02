@@ -164,14 +164,14 @@ class AccountType(BaseModelWithUser):
         return f"{self.name} ({self.get_account_type_display()})"
 
 
-class AccountSubType(BaseModel):
+class AccountSubType(BaseModelWithUser):
     """More specific account categorization"""
 
     account_type = models.ForeignKey(
         AccountType, on_delete=models.CASCADE, related_name="subtypes"
     )
     name = models.CharField(max_length=100)
-    code_prefix = models.CharField(max_length=3)
+    code_prefix = models.CharField(max_length=10)
     description = models.TextField(blank=True, null=True)
 
     class Meta:

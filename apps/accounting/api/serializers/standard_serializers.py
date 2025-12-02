@@ -1,7 +1,9 @@
 # serializers/__init__.py
-from rest_framework import serializers
-from django.db import transaction
 from decimal import Decimal
+from django.db.models import Q
+from django.db import transaction
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from apps.accounting.models import *
 
 # ==================== CORE ACCOUNTING SERIALIZERS ====================
@@ -43,40 +45,160 @@ class AccountingPeriodSerializer(serializers.ModelSerializer):
 
 
 class AccountTypeSerializer(serializers.ModelSerializer):
+    """Serializer for account types or sectors"""
+
+    is_system = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
+        """Class meta for account type serializer"""
+
         model = AccountType
-        fields = "__all__"
+        fields = ["id", "code", "name", "account_type", "is_system"]
+
+    def get_is_system(self, obj):
+        """Determine if account type is seeded by system"""
+        if obj.created_by is None:
+            return True
+        return False
+
+    def validate(self, attrs: dict) -> dict:
+        name = attrs.get("name")
+        code = attrs.get("code")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = AccountType.objects.filter(
+            Q(created_by__client=user_company) | Q(created_by__isnull=True)
+        )
+
+        if instance:
+            if instance.created_by is None:
+                raise ValidationError(
+                    "You don't have permission to modify this system account"
+                )
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            if not name:
+                raise ValidationError("Sector name is required")
+            if not code:
+                raise ValidationError("Sector code is required")
+
+        if name and queryset.filter(name=name).exists():
+            raise ValidationError("An account sector with this name already exists.")
+
+        if code and queryset.filter(code=code).exists():
+            raise ValidationError("An account sector with this code already exists.")
+
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
 
 
 class AccountSubTypeSerializer(serializers.ModelSerializer):
+    """Serializer for account subtypes or classifications"""
+
     account_type_name = serializers.CharField(
         source="account_type.name", read_only=True
     )
+    account_type_id = serializers.PrimaryKeyRelatedField(
+        source="account_type",
+        queryset=AccountType.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Account type is required.",
+            "does_not_exist": "Selected account type does not exist.",
+            "incorrect_type": "Invalid account type.",
+        },
+    )
 
     class Meta:
+        """Class meta for account subtype serializer"""
+
         model = AccountSubType
-        fields = "__all__"
+        fields = ["id", "name", "code_prefix", "account_type_name", "account_type_id"]
+
+    def validate(self, attrs):
+        """Validate account subtype data"""
+        name = attrs.get("name")
+        code_prefix = attrs.get("code_prefix")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = AccountSubType.objects.filter(created_by__client=user_company)
+
+        if instance:
+            if instance.created_by is None:
+                raise ValidationError(
+                    "You don't have permission to modify this system account subtype"
+                )
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            if not name:
+                raise ValidationError("Account subtype name is required")
+            if not code_prefix:
+                raise ValidationError("Account subtype code prefix is required")
+
+        if name and queryset.filter(name=name).exists():
+            raise ValidationError("An account subtype with this name already exists.")
+
+        if code_prefix and queryset.filter(code_prefix=code_prefix).exists():
+            raise ValidationError(
+                "An account subtype with this code prefix already exists."
+            )
+
+        return attrs
+    
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
 
 
 class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
-    account_type_name = serializers.CharField(
-        source="account_type.name", read_only=True
+    account_type = AccountTypeSerializer(read_only=True)
+    account_type_id = serializers.PrimaryKeyRelatedField(
+        source="account_type",
+        queryset=AccountType.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Account type is required.",
+            "does_not_exist": "Selected account type does not exist.",
+            "incorrect_type": "Invalid account type.",
+        },
     )
-    parent_account_name = serializers.CharField(
-        source="parent_account.account_name", read_only=True
+    account_subtype = AccountSubTypeSerializer(read_only=True)
+    account_subtype_id = serializers.PrimaryKeyRelatedField(
+        source="account_subtype",
+        queryset=AccountSubType.objects.all(),
+        write_only=True,
+        allow_null=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected account subtype does not exist.",
+            "incorrect_type": "Invalid account subtype.",
+        },
     )
-    current_balance_display = serializers.SerializerMethodField()
+    # parent_account_name = serializers.CharField(
+    #     source="parent_account.account_name", read_only=True
+    # )
+    # current_balance_display = serializers.SerializerMethodField()
 
     class Meta:
         model = GeneralLedgerAccount
-        fields = "__all__"
-        read_only_fields = (
+        fields = [
             "id",
-            "date_created",
-            "date_updated",
-            "current_balance",
-            "balance_last_updated",
-        )
+            "account_name",
+            "account_number",
+            "account_type",
+            "account_type_id",
+            "account_subtype",
+            "account_subtype_id",
+            "is_contra_account",
+            "is_system_account",
+        ]
 
     def get_current_balance_display(self, obj):
         return obj.get_balance()
@@ -85,6 +207,43 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
         if not value.isdigit():
             raise serializers.ValidationError("Account number must contain only digits")
         return value
+
+    def validate(self, attrs):
+        account_number = attrs.get("account_number")
+        account_name = attrs.get("account_name")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = GeneralLedgerAccount.objects.filter(
+            Q(created_by__client=user_company) | Q(created_by__isnull=True)
+        )
+
+        if instance:
+            if instance.created_by is None:
+                raise ValidationError(
+                    "You don't have permission to modify this system account."
+                )
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            required_fields = ["account_number", "account_name", "account_type"]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        f"{field.replace('_', ' ').title()} is required."
+                    )
+
+        if account_number and queryset.filter(account_number=account_number).exists():
+            raise ValidationError("An account with this number already exists.")
+
+        if account_name and queryset.filter(account_name=account_name).exists():
+            raise ValidationError("An account with this name already exists.")
+
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
 
 
 class CostCenterSerializer(serializers.ModelSerializer):

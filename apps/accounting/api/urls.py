@@ -1,8 +1,8 @@
 """accounting urls"""
 
+from typing import Any
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from typing import Any
 from apps.accounting.api.views.standard_views import (
     FinancialYearViewSet,
     AccountingPeriodViewSet,
