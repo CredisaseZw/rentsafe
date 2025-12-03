@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.accounting.models.models import VATSetting
+from apps.accounting.models.models import TaxType
 
 
 class Command(BaseCommand):
@@ -7,13 +7,29 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         vat_rates = [
-            {"name": "Exemption Rate", "rate": None},
-            {"name": "Zero Rate", "rate": 0.0},
+            {
+                "name": "Zero Rate",
+                "rate": 0.0,
+                "description": "Zero percent VAT",
+                "code": "ZR",
+            },
+            {
+                "name": "Exemption Rate",
+                "rate": None,
+                "description": "Exempt from VAT",
+                "code": "EX",
+            },
         ]
 
         for vat_data in vat_rates:
-            vat, created = VATSetting.objects.get_or_create(
-                description=vat_data["name"], defaults={"rate": vat_data["rate"]}
+            vat, created = TaxType.objects.get_or_create(
+                description=vat_data["name"],
+                defaults={
+                    "name": vat_data["name"],
+                    "rate": vat_data["rate"],
+                    "description": vat_data["description"],
+                    "code": vat_data["code"],
+                },
             )
             if created:
                 self.stdout.write(

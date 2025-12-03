@@ -150,7 +150,7 @@ class AccountSubTypeSerializer(serializers.ModelSerializer):
             )
 
         return attrs
-    
+
     def create(self, validated_data):
         user = self.context["request"].user
         validated_data["created_by"] = user
@@ -426,10 +426,107 @@ class TaxTypeSerializer(serializers.ModelSerializer):
     receivable_account_name = serializers.CharField(
         source="receivable_account.account_name", read_only=True
     )
+    payable_account_id = serializers.PrimaryKeyRelatedField(
+        source="payable_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "required": "Payable account is required.",
+            "does_not_exist": "Selected payable account does not exist.",
+            "incorrect_type": "Invalid payable account.",
+        },
+    )
+    receivable_account_id = serializers.PrimaryKeyRelatedField(
+        source="receivable_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "required": "Receivable account is required.",
+            "does_not_exist": "Selected receivable account does not exist.",
+            "incorrect_type": "Invalid receivable account.",
+        },
+    )
 
     class Meta:
         model = TaxType
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "rate",
+            "description",
+            "code",
+            "is_active",
+            "payable_account_name",
+            "receivable_account_name",
+            "payable_account_id",
+            "receivable_account_id",
+        ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.rate is None:
+            representation["rate"] = "Exempt"
+        return representation
+
+    def validate(self, attrs):
+        """
+        Validate that name and code are unique for the client.
+        This is called for each item in a list.
+        """
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            raise ValidationError("Request context is required for validation.")
+
+        client = request.user.client
+        name = attrs.get("name")
+        code = attrs.get("code")
+        rate = attrs.get("rate")
+
+        # Base queryset for uniqueness checks, including system-level entries.
+        queryset = TaxType.objects.filter(
+            Q(created_by__client=client) | Q(created_by__isnull=True)
+        )
+
+        # Handle updates
+        if self.instance:
+            if self.instance.created_by is None:
+                raise ValidationError(
+                    "You don't have permission to modify this system tax type."
+                )
+            queryset = queryset.exclude(pk=self.instance.pk)
+        else:
+            if not name:
+                raise ValidationError({"name": "Name is required."})
+            if not code:
+                raise ValidationError({"code": "Code is required."})
+            if not rate:
+                raise ValidationError({"rate": "Rate is required."})
+
+        if name and queryset.filter(name__iexact=name).exists():
+            raise ValidationError(
+                {"name": f"A tax type with the name '{name}' already exists."}
+            )
+
+        if code and queryset.filter(code__iexact=code).exists():
+            raise ValidationError(
+                {"code": f"A tax type with the code '{code}' already exists."}
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+        return super().update(instance, validated_data)
 
 
 # ==================== PRODUCT/SERVICE CATALOG SERIALIZERS ====================

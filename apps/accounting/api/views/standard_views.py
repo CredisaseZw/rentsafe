@@ -392,10 +392,139 @@ class VendorViewSet(viewsets.ModelViewSet):
 # ==================== TAX VIEWSETS ====================
 
 
-class TaxTypeViewSet(viewsets.ModelViewSet):
+class TaxTypeViewSet(BaseViewSet):
     queryset = TaxType.objects.all()
     serializer_class = TaxTypeSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = TaxType.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=self.request.user.client)
+        )
+        is_active = self.request.query_params.get("is_active")
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        invalid_data = []
+        valid_data = []
+        try:
+            for item in data:
+                serializer = self.get_serializer(data=item)
+                if serializer.is_valid():
+                    serializer.save()
+                    valid_data.append(serializer.data)
+                else:
+                    invalid_data.append(extract_error_message(serializer.errors))
+
+            if invalid_data and valid_data:
+                return self._create_rendered_response(
+                    {"created": valid_data, "errors": invalid_data},
+                    status.HTTP_207_MULTI_STATUS,
+                )
+            elif not invalid_data:
+                return self._create_rendered_response(
+                    valid_data, status.HTTP_201_CREATED
+                )
+            elif not valid_data:
+                return self._create_rendered_response(
+                    {"errors": invalid_data}, status.HTTP_400_BAD_REQUEST
+                )
+
+        except ValidationError as e:
+            logger.error(f"Validation error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def list(self, request, *args, **kwargs):
+        try:
+            vat = self.get_queryset()
+            page = self.paginate_queryset(vat)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(vat, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT settings: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+
+        except ValidationError as ve:
+            logger.error(f"Validation error updating VAT setting: {ve}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error updating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            if instance.created_by is None:
+                return self._create_rendered_response(
+                    {"error": "You do not have permission to delete this VAT setting."},
+                    status.HTTP_403_FORBIDDEN,
+                )
+            self.perform_destroy(instance)
+            return self._create_rendered_response(
+                {"success": "VAT setting deleted successfully"},
+                status.HTTP_204_NO_CONTENT,
+            )
+
+        except Http404:
+            return self._create_rendered_response(
+                {"error": "VAT not found"},
+                status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"Error deleting VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 # ==================== PRODUCT/SERVICE VIEWSETS ====================

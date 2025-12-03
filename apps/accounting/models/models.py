@@ -802,11 +802,11 @@ class Vendor(BaseModelWithUser):
 # ==================== TAX CONFIGURATION ====================
 
 
-class TaxType(BaseModel):
+class TaxType(BaseModelWithUser):
     """Different types of taxes (VAT, Sales Tax, etc.)"""
 
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     rate = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -814,6 +814,8 @@ class TaxType(BaseModel):
             MinValueValidator(Decimal("0.00")),
             MaxValueValidator(Decimal("100.00")),
         ],
+        blank=True,
+        null=True,
     )
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
