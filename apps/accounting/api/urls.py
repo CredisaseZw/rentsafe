@@ -1,4 +1,6 @@
-# urls.py
+"""accounting urls"""
+
+from typing import Any
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.accounting.api.views.standard_views import (
@@ -25,7 +27,7 @@ from apps.accounting.api.views.standard_views import (
     CashSaleViewSet,
 )
 
-router = DefaultRouter()
+router: Any = DefaultRouter()
 
 # Core Accounting
 router.register("financial-years", FinancialYearViewSet)
