@@ -9,6 +9,9 @@ import { forwardRef } from "react"
 import AutoCompleteSalesItem from "./AutoCompleteSalesItem"
 import type { SalesItem } from "@/types"
 import { validateAmounts } from "@/lib/utils"
+import ConfirmRateSwitchDialogue from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRateSwitchDialogue"
+import ButtonSpinner from "./ButtonSpinner"
+//import ConfirmRedirectToCurrencySettings from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRedirectToCurrencySettings"
 
 interface props{
     isCashSales? : boolean
@@ -18,22 +21,31 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
     const {
         rows,
         discount,
-        currencies,
-        currencyCode,
-        cashSalesRows,
-        currencyLoading,
+        cashBooks,
+        billCurrencies,
+        cashSalesRow,
+        paymentMethods,
+        promptIndex,
+        prompts,
         defaultCurrency,
+        currencyLoading,
         calculatedTotals,
-        RemoveCashSalesRows,
+        openConfirmation,  
+        billCurrencyCode,
+        isCashbookLoading,
+        paymentMethodsLoading,
+        setOpenConfirmation,
         handleOnSelectItem,
         setDefaultCurrency,
         handleOnRowChange,
         RemoveInvoiceRow,
-        setCurrencyCode,
-        AddCashSaleRow,
+        onCashSaleChange,
+        setPromptIndex,
+        handleUpdateRate,
         AddInvoiceRow,
         setDiscount,    
-    } = useInvoiceTotalsTables(ref)
+        ResetPrompts,
+    } = useInvoiceTotalsTables(ref,isCashSales)
    
     return (
     <Table className="border-color rounded border w-full">
@@ -48,9 +60,8 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     name="currency"
                     value={defaultCurrency}
                     onValueChange={(v)=> {
-                        setCurrencyCode(()=> currencies.find(c=> c.id === Number(v))?.currency_code)
-                        setDefaultCurrency(v)
-                        }
+                        setDefaultCurrency(v);
+                    }
                     }
                     required>
                     <SelectTrigger className="w-full bg-red-600 text-white">
@@ -58,11 +69,11 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     </SelectTrigger>
                     <SelectContent className="bg-red-600 text-white border-white">
                         {
-                            currencies.map((c)=>
+                            billCurrencies.map((c)=>
                             <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>)
                         }
                         { 
-                            currencies.length === 0 &&
+                            billCurrencies.length === 0 &&
                             currencyLoading &&
                             <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
                                 <LoadingIndicator />
@@ -103,7 +114,13 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     <TableCell className="text-end border-r border-color">
                         {row.itemCode}
                     </TableCell>
-                    <TableCell className="text-end border-r border-color">{row.price}</TableCell>
+                    <TableCell className="text-end border-r border-color">
+                        {
+                            String(row.price) === "NaN"
+                            ? <ButtonSpinner/>
+                            :row.price
+                        }
+                    </TableCell>
                     <TableCell className="text-end border-r border-color">
                         <Input 
                             name={"item_qty_"+index}
@@ -116,7 +133,13 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                         />
                     </TableCell>
                     <TableCell className="border-r border-color text-center">{row.vat_amount}</TableCell>
-                    <TableCell className="text-end border-r border-color">{row.total ?? 0.00}</TableCell>
+                    <TableCell className="text-end border-r border-color">
+                        {
+                            String(row.total) === "NaN"
+                            ? <ButtonSpinner/>
+                            :row.total
+                        }
+                    </TableCell>
                 </TableRow>
             ))
         }      
@@ -171,7 +194,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
             <TableCell className="border-r border-color w-1/12"></TableCell>
             <TableCell colSpan={5} className="border-r border-color w-9/12">
                 <div className="flex flex-row justify-end">
-                    <span className="text-sm">Invoice Total ({currencyCode})</span>
+                    <span className="text-sm">Invoice Total ({billCurrencyCode})</span>
                 </div>
             </TableCell>
             <TableCell className="w-2/12">
@@ -183,7 +206,7 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
         {
             isCashSales &&
             <>
-                <TableRow>
+                <TableRow noHover>
                     <TableCell className="text-center border-r border-color w-1/12"></TableCell>
                     <TableCell className="text-center border-r border-color w-2/12">Payment Type</TableCell>
                     <TableCell className="text-center border-r border-color w-2/12">Cash book</TableCell>
@@ -192,55 +215,105 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     <TableCell className="text-center border-r border-color w-2/12">Amount Received</TableCell>
                     <TableCell className="text-center w-2/12"></TableCell>
                 </TableRow>
-                {
-                    cashSalesRows.map((row, index)=>(
-                    <TableRow key={index} noHover>
-                        <TableCell className="border-r border-color text-center"> 
-                            <Button type="button" variant={"ghost"} onClick={()=>RemoveCashSalesRows(index)}>
-                                <X className="text-red-600"/>
-                            </Button>
-                        </TableCell>
-                        <TableCell className="border-r border-color" > 
-                            <Select  name="currency" value={row.paymentType}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select ..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                </SelectContent>
-                            </Select>
-                        </TableCell>
-                        <TableCell className="border-r border-color"> 
-                            <Select  name="currency" value={row.cashBook}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select ..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                </SelectContent>
-                            </Select>
-                        </TableCell>
-                        <TableCell className="border-r border-color"> 
-                            <Input value={row.detail} name="detail"/>
-                        </TableCell>
-                        <TableCell className="border-r border-color"> 
-                            <Input value={row.ref} name="detail"/>
-                        </TableCell>
-                        <TableCell className="border-r border-color">    
-                            <Input value={row.amountReceived} name="detail"/>
-                        </TableCell>
-                        <TableCell> 
-                        </TableCell>
-                    </TableRow>
-                    ))
-                }     
-                <TableRow>
-                    <TableCell rowSpan={7}>
-                        <Button variant={"outline"} onClick={AddCashSaleRow}>Add Row</Button>
+                <TableRow noHover>
+                    <TableCell className="border-r border-color text-center"></TableCell>
+                    <TableCell className="border-r border-color" > 
+                        <Select  
+                            onValueChange={(val)=> onCashSaleChange("paymentType", val)}
+                            name="currency"
+                            value={cashSalesRow.paymentType}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select ..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {
+                                    paymentMethods.length === 0 &&
+                                    paymentMethodsLoading &&
+                                    <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                                        <LoadingIndicator />
+                                    </SelectItem>
+                                }
+                                {
+                                    paymentMethods.length !== 0 &&
+                                    !paymentMethodsLoading &&
+                                    paymentMethods.map((p, idx)=>(
+                                        <SelectItem value={p.id.toString()} key={idx}>{p.payment_method_name.toUpperCase()}</SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
                     </TableCell>
-                </TableRow> 
-               
-            </>
-            
+                    <TableCell className="border-r border-color"> 
+                        <Select 
+                            onValueChange={(val)=> onCashSaleChange("cashBook", val)}
+                            name="currency"
+                            value={cashSalesRow.cashBook}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select ..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {
+                                    cashBooks.length === 0 &&
+                                    !isCashbookLoading &&
+                                    <SelectItem disabled value="disabled">
+                                        No cashbook was found for currency {billCurrencyCode}
+                                    </SelectItem>
+                                }
+                                {
+                                    cashBooks.length === 0 &&
+                                    isCashbookLoading &&
+                                    <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
+                                        <LoadingIndicator />
+                                    </SelectItem>
+                                }
+                                {   
+                                    cashBooks.length !== 0 &&
+                                    cashBooks.map((c) => (
+                                        <SelectItem value={String(c.id)} key={c.id}>
+                                            {c.cashbook_name}
+                                        </SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
+                    </TableCell>
+                    <TableCell className="border-r border-color"> 
+                        <Input 
+                            onChange={(e)=> onCashSaleChange("detail", e.target.value)}
+                            value={cashSalesRow.detail}
+                            name="detail"/>
+                    </TableCell>
+                    <TableCell className="border-r border-color"> 
+                        <Input 
+                            onChange={(e)=> onCashSaleChange("ref", e.target.value)}
+                            value={cashSalesRow.ref}
+                            name="ref"/>
+                    </TableCell>
+                    <TableCell className="border-r border-color">    
+                        <Input 
+                            type="number"
+                            onChange={(e)=> onCashSaleChange("amountReceived", e.target.value)}
+                            value={cashSalesRow.amountReceived}
+                            name="amountReceived"/>
+                    </TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
+            </>   
         }
+        {
+            prompts.length >= 1 &&
+            <ConfirmRateSwitchDialogue
+                current={promptIndex}
+                open = {openConfirmation}    
+                ResetPrompts={ResetPrompts}
+                setOpen={setOpenConfirmation}
+                updateBase={handleUpdateRate}
+                prompt = { prompts[promptIndex] }
+                limit = {prompts.length - 1 }
+                next = {setPromptIndex}
+            />
+        }
+      
     </Table>
   )
 })

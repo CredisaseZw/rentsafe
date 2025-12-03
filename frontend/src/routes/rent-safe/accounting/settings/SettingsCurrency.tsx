@@ -65,6 +65,7 @@ function SettingsCurrency() {
                     <Label className="text-sm text-gray-400 required">Currency</Label>
                   </div>
                   <Select name="current" 
+                    key={currencySetting.currentID}
                     value={currencySetting.currentID}
                     required
                     onValueChange={(value)=>handleOnChange("currentID", value)}

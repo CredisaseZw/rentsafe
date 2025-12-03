@@ -461,6 +461,7 @@ export interface Biller {
   invoice_type: "fiscal" | "proforma" | "recurring";
   issue_date : string,
   description :string
+  rep?: string
 };
 export interface Invoice {
   id: number;
@@ -512,9 +513,42 @@ export interface CreditNote {
   total_amount: string;
   description: string | null;
   discount: string;
+  line_items: LineItem[];
   currency: Currency;
   customer_details: InvoiceCustomerDetails;
   total_vat: string;
   total_excluding_vat: string;
   credit_note_total: string;
+}
+
+export interface SwitchRate {
+   from : string | undefined
+   to : string | undefined,
+   rate : string | number | undefined
+}
+
+export interface CashSale {
+  id: number;
+  document_number: number;
+  customer_details: InvoiceCustomerDetails;
+  sale_date: string;
+  currency: Currency;
+  line_items: LineItem[];
+  discount: string;
+  vat_total: string;
+  total_excluding_vat: string;
+  invoice_total: string;
+  payment_type: number;
+  cashbook: number;
+  details: string | null;
+  reference: string | null;
+  amount_received: string;
+  change: string;
+  created_by: string;
+}
+export interface ConfirmRatePrompt {
+    itemName : string,
+    from: string,
+    to: string,
+    rate : string
 }

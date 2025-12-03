@@ -4,15 +4,19 @@ import { api } from "@/api/axios";
 export default function useSearchClient(
   type: "individual" | "company" | "tenant" | string,
   query: string,
-  enabled: boolean
+  enabled: boolean,
+  sector : "norm" | "customer"
 ) {
-  const url =
-    type === "individual"
+  
+  let url:string;
+  if(sector === "norm"){
+    url = type === "individual"
     ? "/api/individuals/?search="
-    : type === "tenant"
-    ? "/api/accounting/customers/?customer_type=tenant&search="
     : "/api/branches/?search=";
-
+  } else if (sector === "customer"){
+      url = `/api/accounting/customers/?customer_type=${type}&search=`
+  }
+   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["search_landlord", type, query],
     queryFn: async () => {

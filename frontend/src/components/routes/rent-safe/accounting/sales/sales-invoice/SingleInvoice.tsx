@@ -1,17 +1,17 @@
 import type { Invoice } from '@/interfaces'
-import Pill from './Pill'
-import { DELETION_LINKS, INVOICE_SALES_HEADERS, INVOICE_STATUS_VARIANT, MODES } from '@/constants'
+import Pill from '../../../../../general/Pill'
+import { DELETION_LINKS, INVOICE_STATUS_VARIANT, MODES, SALES_ITEM_HEADERS } from '@/constants'
 import { capitalizeFirstLetter, getSummaryDate, handleDeletion } from '@/lib/utils'
-import { TableBase } from './TableBase'
-import { TableCell, TableRow } from '../ui/table'
+import { TableBase } from '../../../../../general/TableBase'
+import { TableCell, TableRow } from '../../../../../ui/table'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { EllipsisVertical } from 'lucide-react'
-import MutateInvoiceStatus from '../routes/rent-safe/accounting/sales/sales-invoice/MutateInvoiceStatus'
-import DeleteDialogue from './DeleteDialogue'
+import MutateInvoiceStatus from './MutateInvoiceStatus'
+import DeleteDialogue from '../../../../../general/DeleteDialogue'
 //import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
 import { getRefetchInvoices } from '@/store/invoiceStore'
 
@@ -115,7 +115,7 @@ function SingleInvoice({invoice, handleGoBack, markInvoice}:props) {
 
         <div className='mt-10'>
             <TableBase 
-                headers={INVOICE_SALES_HEADERS}>
+                headers={SALES_ITEM_HEADERS}>
                 {
                     invoice?.line_items.map((item, idx)=>(
                         <TableRow key={idx} noHover>

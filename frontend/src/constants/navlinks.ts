@@ -25,7 +25,7 @@ import AccountsSectors from "@/routes/rent-safe/accounting/settings/GeneralLedge
 import PaymentsTypes from "@/routes/rent-safe/accounting/settings/CashBooks/PaymentsTypes";
 import SubscriptionManagement from "@/routes/rent-safe/admin/SubscriptionManagement";
 import SalesCashSales from "@/routes/rent-safe/accounting/sales/SalesCashSales";
-import SalesCreditNote from "@/routes/rent-safe/accounting/sales/SalesCreditNote";
+import SalesCreditNotes from "@/routes/rent-safe/accounting/sales/SalesCreditNotes/SalesCreditNotes";
 import SalesItems from "@/routes/rent-safe/accounting/sales/SalesItems";
 import SalesCategories from "@/routes/rent-safe/accounting/sales/SalesCategories";
 import CashbookReceipts from "@/routes/rent-safe/accounting/cashbooks/CashbookReceipts";
@@ -186,7 +186,7 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
             label: "Credit Note",
             path: RENTSAFE_PRE_SEG + "/sales/credit-note",
             segment: RENTSAFE_PRE_SEG + "/accounting/sales/credit-note",
-            pageComponent: SalesCreditNote,
+            pageComponent: SalesCreditNotes,
          },
          {
             label: "Sales Items",

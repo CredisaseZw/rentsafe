@@ -496,14 +496,15 @@ export type InvoicePreview = {
    quantity:  string,
    vat_amount: number,
    total: number,
+   itemCurrency : string,
 }
 
-export type cashSalesRow = {
+export type CashSalesRow = {
    paymentType: string,
    cashBook: string,
    detail: string,
    ref: string,
-   amountReceived: number
+   amountReceived: string
 }
 export type Category = {
    id?: number;
@@ -601,4 +602,3 @@ export type InvoiceTotals = {
    total: number,
    discount : number 
 }
-

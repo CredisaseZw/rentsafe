@@ -1,33 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/axios";
+import type { Response } from "@/interfaces";
 import type { CurrencySetting } from "@/types";
+import type { AxiosError } from "axios";
 
-function useGetCurrencyRate(id: number) {
-  const { data, error, isLoading, isFetching } = useQuery<CurrencySetting>({
-    queryKey: ["currencyRate", id],
-    queryFn: async () => {
-      const response = await api.get<CurrencySetting>(
-        `/api/accounting/currency-settings/${id}/`
-      );
-      return response.data;
-    },
-  });
+ interface CurrencySettingResponse extends Response{
+        results: CurrencySetting[];
+    }
+export const fetchRate = async (from:string, to:string) => {
+   
+    let data:  CurrencySettingResponse | null = null;
+    let error: AxiosError | unknown | null = null;
+    try {
+        const query = `ordering=-date_created&target_currency=${to}&base_currency=${from}`;
+        const res = await api.get<CurrencySettingResponse>(
+          `/api/accounting/currency-settings/?${query}`
+        );
+        data = res.data;
+    } catch (err) {
+        error = err;
+    } 
+    return {data, error}
+};
 
-  let rate = 1;
-  if (!error && data?.current_rate) {
-    const parsed = parseFloat(data.current_rate);
-    rate = isNaN(parsed) ? 1 : parsed;
-  }
-  if (error) {
-    rate = 1
-  }; 
-
-  return {
-    rate,
-    error,
-    isLoading,
-    isFetching,
-  };
-}
-
-export default useGetCurrencyRate;

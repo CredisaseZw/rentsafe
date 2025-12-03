@@ -11,19 +11,24 @@ import { Trash } from "lucide-react"
 
 function MultiIndividualContact() {
     const {
-        counts, setCounts, handleRemove
+        counts, setCounts, updateType,handleRemove
     } = useMultiIndividualContact()
 
     return (
        
         <Fieldset legendTitle="Contact Numbers">
             {
-                counts.map((_, index:number)=>(
+                counts.map((c, index:number)=>(
                     <div key={index}>
                         <ColumnsContainer numberOfCols={2} marginClass={ index === 0 ? "mt-0" : "mt-5" }>
                             <div className="form-group">
                                 <Label className="required">Phone Type</Label>
-                                <Select name={"type" + index} required defaultValue="mobile">
+                                <Select
+                                    name={"type" + index}
+                                    required
+                                    value=  {c.phoneType}
+                                    onValueChange={(val)=> updateType(val, index)}
+                                >
                                     <SelectTrigger id={"address_type" + index} className="border-color w-full bg-white">
                                         <SelectValue placeholder="Select ..." />
                                     </SelectTrigger>
@@ -38,10 +43,10 @@ function MultiIndividualContact() {
                             </div>
                             <div className="flex flex-row">
                                 <div className="form-group">
-                                    <Label className="required">Contact Number</Label>
+                                    <Label className={c.phoneType !== "other" ? "required" : ""}>Contact Number</Label>
                                     <Input
                                         placeholder="e.g 0781234567"
-                                        required 
+                                        required ={(!(c.phoneType === "other"))}
                                         name={`number${index}`}
                                         id={`number${index}`}
                                     />
@@ -58,7 +63,7 @@ function MultiIndividualContact() {
                     </div>
                  ))
             }
-        <Button variant="outline" className="mt-2" onClick={()=> setCounts((p)=>[...p, undefined])}>
+        <Button variant="outline" className="mt-2" onClick={()=> setCounts((p)=>[...p, {phoneType : "mobile"}])}>
             Add another
         </Button>
         </Fieldset>
