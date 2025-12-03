@@ -789,7 +789,7 @@ class CashReceiptSerializer(serializers.ModelSerializer):
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = "__all__"
+        exclude = ("date_created", "date_updated")
 
 
 class ExchangeRateSerializer(serializers.ModelSerializer):
