@@ -4,5 +4,10 @@
       "editor.formatOnSave": true
    },
    "editor.fontFamily": "Jetbrains Mono, Fira Code, 'Courier New', monospace",
-   "editor.fontLigatures": true
+   "editor.fontLigatures": true,
+   "cSpell.words": [
+      "Fincheck",
+      "navlinks",
+      "RENTSAFE"
+   ]
 }

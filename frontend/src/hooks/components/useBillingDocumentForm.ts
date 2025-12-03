@@ -26,6 +26,8 @@ export default function useBillingDocumentForm({
   type
 }:props){
   const [open, setOpen] = useState(false);
+  const [openPrintCashSale, setOpenPrintCashSale] = useState(false)
+  const [newCashSale, setNewCashSale] = useState<CashSale>({} as CashSale);
   const [loading, setLoading] = useState(false);
   const [searchItem, setSearchItem] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,8 +85,9 @@ export default function useBillingDocumentForm({
   const onCreateCashSale = () => {
     createCashSale?.mutate(billPayload.current!, {
       onSuccess: (data: CashSale) =>{
-        console.log(data)
+        setNewCashSale(data)
         toast.success(`Cash sale ${data.document_number} successfully created.`);
+        setOpenPrintCashSale(true);
       },
       onError : (error) => handleAxiosError("Failed to create cash sale", error),
       onSettled : ()=> setLoading(false)
@@ -230,9 +233,12 @@ export default function useBillingDocumentForm({
  
   return { 
     handleOnChangeFormData,
+    setOpenPrintCashSale,
+    openPrintCashSale, 
     onSelectBiller,
     setSearchItem,
     setFormData,
+    newCashSale,
     searchItem,
     formData,
     rowsRef,

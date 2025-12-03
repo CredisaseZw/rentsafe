@@ -52,6 +52,7 @@ import CompanySettings from "@/routes/rent-safe/accounting/settings/CompanySetti
 import CreditorSettings from "@/routes/rent-safe/accounting/settings/CreditorSettings";
 import OpeningBalances from "@/routes/rent-safe/accounting/settings/OpeningBalances";
 import SalesInvoices from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoices";
+import ToDoList from "@/routes/rent-safe/to-do-list/ToDoList";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -93,6 +94,12 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
       path: RENTSAFE_PRE_SEG + "/",
       segment: RENTSAFE_PRE_SEG + "/",
       pageComponent: RentSafeDashboard,
+   },
+   {
+      label: "To-Do List",
+      path: RENTSAFE_PRE_SEG + "/to-do-list",
+      segment: RENTSAFE_PRE_SEG + "/to-do-list",
+      pageComponent: ToDoList,
    },
    {
       label: "Tenants",

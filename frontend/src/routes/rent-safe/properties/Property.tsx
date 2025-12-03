@@ -75,7 +75,7 @@ function Property() {
                                 "Backup Power Available"}
                                 />
                         </div>
-                        <p className="text-gray-500 dark:text-white mt-5">{property?.description}</p>             
+                        <p className="text-gray-700 dark:text-white mt-5">{property?.description}</p>             
                         <ColumnsContainer numberOfCols={4} marginClass="mt-5" gapClass="gap-5">
                             <div className="flex flex-col">
                                 <span className="text-sm font-semibold text-gray-700 dark:text-white">STATUS</span>
@@ -98,8 +98,8 @@ function Property() {
                 }
             </div>
             <div className="main-sm-card">
-                <div className="flex justify-between">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">Units</h2>
+                <div className="flex flex-row gap-5">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white self-center">Units</h2>
                     <CreateUnitDialog open = {open} setOpen = {setOpen}/>
                 </div>
                 <div className="mt-5">

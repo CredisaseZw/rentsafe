@@ -73,7 +73,7 @@ function PropertyList() {
                   <div className="flex flex-row justify-end gap-3">
                      <Button onClick={openModal} className="flex flex-row gap-3">
                         <Plus size={15} className="self-center" />
-                        <span className="self-center">Add Property</span>
+                     <span className="self-center">Add Property</span>
                      </Button>
                      <Select defaultValue={PROPERTY_STATUS_OPTIONS[0].value}>
                         <SelectTrigger className="w-[180px]">
@@ -97,11 +97,11 @@ function PropertyList() {
                            ? properties.map((property: Property) => (
                               <TableRow key={property.id}>
                                  <TableCell className="text-center">{property.id}</TableCell>
-                                 <TableCell className="text-center">{property.name}</TableCell>
-                                 <TableCell className="text-center">{property.full_address?.[0]?.city?.name || "-"}</TableCell>
-                                 <TableCell className="text-center">{property.full_address?.[0]?.suburb?.name || "-"}</TableCell>
-                                 <TableCell className="text-center">{property.full_address?.[0]?.street_address || "-"}</TableCell>
-                                 <TableCell className="text-center">{typeof(property.property_type) === "string" ? property.property_type : ""}</TableCell>
+                                 <TableCell className="text-left">{property.name}</TableCell>
+                                 <TableCell className="text-left">{property.full_address?.[0]?.city?.name || "-"}</TableCell>
+                                 <TableCell className="text-left">{property.full_address?.[0]?.suburb?.name || "-"}</TableCell>
+                                 <TableCell className="text-left">{property.full_address?.[0]?.street_address || "-"}</TableCell>
+                                 <TableCell className="text-left">{typeof(property.property_type) === "string" ? property.property_type : ""}</TableCell>
                                  <TableCell className="flex justify-center items-center">
                                     <Popover>
                                        <PopoverTrigger>

@@ -80,11 +80,11 @@ function usePropertyList() {
 
    const headers: Header[] = [
       { name: "Property No." },
-      { name: "Property Name" },
-      { name: "City/Town" },
-      { name: "Suburb/Area" },
-      { name: "Street Address" },
-      { name: "Property Type" },
+      { name: "Property Name", textAlign : "left" },
+      { name: "City/Town" , textAlign : "left"},
+      { name: "Suburb/Area" , textAlign : "left"},
+      { name: "Street Address" , textAlign : "left"},
+      { name: "Property Type" , textAlign : "left"},
       { name: "Actions" }
    ];
    const [properties, setProperties] = useState<Property[]>([]);

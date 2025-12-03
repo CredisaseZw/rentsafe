@@ -32,11 +32,11 @@ function LeaseRow({ lease, refetch, onSuccessCallback }: Props) {
 
   return (
     <TableRow>
-      <TableCell className="text-center">{lease.lease_id}</TableCell>
-      <TableCell className="text-center">{primaryFullname}</TableCell>
-      <TableCell className="text-center">{landlordName}</TableCell>
-      <TableCell className="text-center">{lease.unit.property.type ?? "-"}</TableCell>
-      <TableCell className="text-center whitespace-normal break-words max-w-[250px]">
+      <TableCell className="text-left">{lease.lease_id}</TableCell>
+      <TableCell className="text-left">{primaryFullname}</TableCell>
+      <TableCell className="text-left">{landlordName}</TableCell>
+      <TableCell className="text-left">{lease.unit.property.type ?? "-"}</TableCell>
+      <TableCell className="text-left whitespace-normal break-words max-w-[250px]">
         {lease.unit.property.addresses[0]
           ? summarizeAddress(lease.unit.property.addresses[0])
           : "-"}

@@ -552,3 +552,11 @@ export interface ConfirmRatePrompt {
     to: string,
     rate : string
 }
+
+export interface CashSaleProps {
+   dialogueControl : {
+      open : boolean,
+      setOpen :  React.Dispatch<React.SetStateAction<boolean>>
+   },
+   cashSale:CashSale
+}

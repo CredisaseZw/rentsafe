@@ -128,3 +128,13 @@
 .border-color {
    @apply border-gray-300 dark:border-zinc-700;
 }
+
+@layer utilities {
+  @media print {
+    .print-A4 {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+    }
+  }
+}
