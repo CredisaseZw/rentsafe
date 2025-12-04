@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from apps.accounting.filters.exchange_rate_filters import ExchangeRateFilter
 from apps.accounting.filters.general_ledgers_filter import (
     AccountSubTypeFilter,
     AccountTypeFilter,
@@ -752,17 +753,39 @@ class CurrencyViewSet(viewsets.ModelViewSet):
     serializer_class = CurrencySerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = Currency.objects.all()
+        is_active = self.request.query_params.get("is_active")
+        is_base = self.request.query_params.get("is_base")
 
-class ExchangeRateViewSet(viewsets.ModelViewSet):
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+        if is_base is not None:
+            queryset = queryset.filter(is_base_currency=is_base.lower() == "true")
+
+        return queryset
+
+    def delete(self, request, *args, **kwargs):
+        return Response(
+            {"error": "you cannot delete currencies."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class ExchangeRateViewSet(BaseViewSet):
     queryset = ExchangeRate.objects.all()
     serializer_class = ExchangeRateSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = ExchangeRateFilter
 
     def get_queryset(self):
-        queryset = ExchangeRate.objects.all()
+        queryset = ExchangeRate.objects.filter(
+            created_by__client=self.request.user.client
+        )
         base_currency = self.request.query_params.get("base_currency")
         target_currency = self.request.query_params.get("target_currency")
         is_active = self.request.query_params.get("is_active")
+        latest_rate = self.request.query_params.get("latest_rate")
 
         if base_currency:
             queryset = queryset.filter(base_currency_id=base_currency)
@@ -770,8 +793,27 @@ class ExchangeRateViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(target_currency_id=target_currency)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
+        if latest_rate is not None and latest_rate.lower() == "true":
+            queryset = queryset.order_by("-date_created")[:1]
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating ExchangeRate: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # ==================== REPORT VIEWSETS ====================

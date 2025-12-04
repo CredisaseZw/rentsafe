@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_HALF_UP
-from django.utils.timezone import now
+from django.utils.timezone import now, localdate
 from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 import uuid
@@ -1596,7 +1596,7 @@ class Currency(BaseModel):
         super().save(*args, **kwargs)
 
 
-class ExchangeRate(BaseModel):
+class ExchangeRate(BaseModelWithUser):
     """Currency exchange rates"""
 
     base_currency = models.ForeignKey(
@@ -1606,14 +1606,16 @@ class ExchangeRate(BaseModel):
         Currency, on_delete=models.CASCADE, related_name="target_rates"
     )
     rate = models.DecimalField(max_digits=10, decimal_places=6)
-    effective_date = models.DateField(default=now)
+    effective_date = models.DateField(default=localdate)
+    source = models.CharField(max_length=255, default="Currency Settings")
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        """Class meta information for ExchangeRate model"""
+
         verbose_name = _("Exchange Rate")
         verbose_name_plural = _("Exchange Rates")
         ordering = ["-effective_date", "base_currency", "target_currency"]
-        unique_together = ["base_currency", "target_currency", "effective_date"]
 
     def __str__(self):
         return f"{self.base_currency.currency_code}/{self.target_currency.currency_code}: {self.rate}"

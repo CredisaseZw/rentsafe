@@ -14,7 +14,6 @@ class Command(BaseCommand):
                 "currency_code": "USD",
                 "currency_name": "United States Dollar",
                 "symbol": "$",
-                "is_base_currency": True,
             },
             {
                 "currency_code": "ZiG",
@@ -50,7 +49,6 @@ class Command(BaseCommand):
                 defaults={
                     "currency_name": currency["currency_name"],
                     "symbol": currency["symbol"],
-                    "is_base_currency": currency.get("is_base_currency", False),
                 },
             )
             if created:

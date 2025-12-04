@@ -1,4 +1,5 @@
 # serializers/__init__.py
+from datetime import date
 from decimal import Decimal
 from django.db.models import Q
 from django.db import transaction
@@ -787,22 +788,140 @@ class CashReceiptSerializer(serializers.ModelSerializer):
 
 
 class CurrencySerializer(serializers.ModelSerializer):
+    """Serializer for currencies"""
+
     class Meta:
+        """Meta class for CurrencySerializer"""
+
         model = Currency
         exclude = ("date_created", "date_updated")
 
+    def validate(self, data):
+        code = data.get("currency_code")
+        symbol = data.get("symbol")
+        instance = self.instance
+
+        queryset = Currency.objects.all()
+
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            if not code:
+                raise ValidationError("Currency code is required")
+            if not symbol:
+                raise ValidationError("Currency symbol is required")
+
+        if code and queryset.filter(currency_code=code).exists():
+            raise ValidationError("A currency with this code already exists.")
+
+        return data
+
 
 class ExchangeRateSerializer(serializers.ModelSerializer):
+    """Serializer for currency exchange rates"""
+
     base_currency_code = serializers.CharField(
         source="base_currency.currency_code", read_only=True
     )
     target_currency_code = serializers.CharField(
         source="target_currency.currency_code", read_only=True
     )
+    base_currency_id = serializers.PrimaryKeyRelatedField(
+        source="base_currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "Base currency is required.",
+            "does_not_exist": "Selected base currency does not exist.",
+            "incorrect_type": "Invalid base currency.",
+        },
+    )
+    target_currency_id = serializers.PrimaryKeyRelatedField(
+        source="target_currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "Target currency is required.",
+            "does_not_exist": "Selected target currency does not exist.",
+            "incorrect_type": "Invalid target currency.",
+        },
+    )
 
     class Meta:
+        """Meta class for ExchangeRateSerializer"""
+
         model = ExchangeRate
-        fields = "__all__"
+        exclude = ("date_created", "date_updated")
+        read_only_fields = ("base_currency", "target_currency")
+
+    def to_representation(self, instance):
+        date = (
+            instance.effective_date.strftime("%d-%b-%Y")
+            if instance.effective_date
+            else instance.date_created.strftime("%d-%b-%Y")
+        )
+        created_by = instance.created_by
+        if (
+            created_by
+            and hasattr(created_by, "first_name")
+            and hasattr(created_by, "last_name")
+            and created_by.first_name
+            and created_by.last_name
+        ):
+            created_by_display = (
+                f"{created_by.first_name[0].upper()}. {created_by.last_name}"
+            )
+        else:
+            created_by_display = None
+        return {
+            "id": instance.id,
+            "base_currency": instance.base_currency.currency_code,
+            "target_currency": instance.target_currency.currency_code,
+            "rate": str(instance.rate),
+            "effective_date": date,
+            "created_by": created_by_display,
+        }
+
+    def validate(self, attrs):
+        base_currency = attrs.get("base_currency")
+        target_currency = attrs.get("target_currency")
+        rate = attrs.get("rate")
+        user = self.context["request"].user.client
+        if rate is not None and rate <= -0:
+            raise ValidationError("Current Rate must be greater than zero.")
+
+        if self.instance:
+            return attrs
+
+        for fields in ["target_currency", "base_currency", "rate"]:
+            if not attrs.get(fields):
+                raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+        today = date.today()
+        last_rate = (
+            ExchangeRate.objects.filter(
+                created_by__client=user,
+                base_currency=base_currency,
+                target_currency=target_currency,
+            )
+            .order_by("-date_updated", "-date_created")
+            .first()
+        )
+        if last_rate and last_rate.effective_date == today:
+            raise ValidationError(
+                {
+                    "error": "An exchange rate for these currencies has already been set today."
+                }
+            )
+        if last_rate and last_rate.rate == rate:
+            raise ValidationError({"error": "This rate is already the latest."})
+
+        if target_currency == base_currency:
+            raise ValidationError(
+                "Base Currency and Counter Currency cannot be the same."
+            )
+        return attrs
 
 
 # ==================== REPORT SERIALIZERS ====================
