@@ -198,7 +198,7 @@ export const TENANT_STATEMENT_HEADERS: Header[] = [
   {name : "Balance", textAlign :"end"}
 ]
 
-export const PROPERTY_HEADERS:Header[] = [
+export const PROPERTY_UNIT_HEADERS:Header[] = [
   {name  :"Id"},
   {name  :"Unit Number"},
   {name  :"Unit Type"},
@@ -680,3 +680,12 @@ export const SALES_ITEM_HEADERS:Header[] = [
   {name : "Total Price", textAlign : "end"}
 ]
 
+export const PROPERTY_HEADERS: Header[] = [
+  { name: "Property No." },
+  { name: "Property Name", textAlign : "left" },
+  { name: "City/Town" , textAlign : "left"},
+  { name: "Suburb/Area" , textAlign : "left"},
+  { name: "Street Address" , textAlign : "left"},
+  { name: "Property Type" , textAlign : "left"},
+  { name: "Actions" }
+];

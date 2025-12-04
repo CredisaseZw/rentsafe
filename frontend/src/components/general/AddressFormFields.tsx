@@ -6,14 +6,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useAddressFormFields from "@/hooks/components/useAddressFormFields";
 import AutoCompleteSuburb from "./AutoCompleteSuburb";
 import ColumnsContainer from "./ColumnsContainer";
+import type { Address } from "@/interfaces";
 
-export default function AddressFormFields({ number }: { number: number }) {
+interface props{
+   address: Address | undefined,
+   number : number
+}
+
+export default function AddressFormFields({ number, address }: props) {
    const {
       suburb,
       searchValue,
       setSearchValue,
       onSelectSuburb
-   } = useAddressFormFields();
+   } = useAddressFormFields(address);
 
    return (
       <ColumnsContainer  numberOfCols={3} gapClass="gap-5"> 
@@ -69,6 +75,8 @@ export default function AddressFormFields({ number }: { number: number }) {
                name={"street_address" + number}
                placeholder="e.g. 22 Cnr Sam Nujoma Str"
                className="border-color bg-white"
+               defaultValue={address?.street_address ?? ""}
+
             />
          </div>
 
@@ -77,6 +85,7 @@ export default function AddressFormFields({ number }: { number: number }) {
                Postal Code
             </Label>
             <Input
+               defaultValue={address?.postal_code ?? ""}
                id={"postal_code" + number}
                name={"postal_code" + number}
                className="border-color bg-white"
@@ -87,7 +96,9 @@ export default function AddressFormFields({ number }: { number: number }) {
             <Label className="px-2 font-normal" htmlFor={"address_type" + number}>
                Address Type
             </Label>
-            <Select name={"address_type" + number} defaultValue={ALL_ADDRESS_TYPES[0]}>
+            <Select 
+               name={"address_type" + number} 
+               defaultValue={address?.address_type?.toString() ?? ALL_ADDRESS_TYPES[0]}>
                <SelectTrigger id={"address_type" + number} className="border-color w-full bg-white">
                   <SelectValue placeholder="Select address type" />
                </SelectTrigger>

@@ -31,31 +31,33 @@ function SidebarFooterContent({ username }: SDFooter) {
      
    } 
    return (
-      <HoverCard openDelay={0} closeDelay={100}>
-         <HoverCardTrigger>
-            <div className="p-2">
-               <div className="flex cursor-pointer flex-row justify-between gap-3 border-t border-gray-300 pt-5 pb-2.5 text-gray-900 dark:border-zinc-900 dark:text-white">
-                  <div className="flex flex-row gap-4">
-                     <User className="self-center" size={18} />
-                     <h6 className="">{username}</h6>
-                  </div>
-                  <div className="self-center">
+      <div>
+         <div className="p-2">
+            <div className="flex flex-row justify-between gap-3 border-t border-gray-300 pt-5 pb-2.5 text-gray-900 dark:border-zinc-900 dark:text-white">
+               <div className="flex flex-row gap-4">
+                  <User className="self-center" size={18} />
+                  <h6 className="">{username}</h6>
+               </div>
+               <div className="self-center">
+               <HoverCard openDelay={0} closeDelay={100}>
+                  <HoverCardTrigger className="cursor-pointer">
                      <EllipsisVertical size={15} />
-                  </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="flex w-64 flex-col gap-2 border border-gray-300 bg-white p-2 text-gray-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100">
+                     <Button onClick={logOut} disabled = {onLogout} variant="danger" asChild>
+                        {
+                           onLogout ?
+                           <ButtonSpinner/> :
+                           <LogOut size={18} />
+                        }
+                        Log out
+                     </Button>
+                  </HoverCardContent>
+               </HoverCard>   
                </div>
             </div>
-         </HoverCardTrigger>
-         <HoverCardContent className="flex w-64 flex-col gap-2 border border-gray-300 bg-white p-2 text-gray-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100">
-            <Button onClick={logOut} disabled = {onLogout} variant="danger" asChild>
-               {
-                  onLogout ?
-                  <ButtonSpinner/> :
-                  <LogOut size={18} />
-               }
-               Log out
-            </Button>
-         </HoverCardContent>
-      </HoverCard>
+         </div>
+      </div>
    );
 }
 
