@@ -1682,7 +1682,7 @@ class BalanceSheet(BaseModel):
         ordering = ["-as_of_date"]
 
 
-class PaymentMethod(BaseModel):
+class PaymentMethod(BaseModelWithUser):
     """Payment methods for disbursements and payments"""
 
     name = models.CharField(max_length=100, unique=True, blank=True, null=True)

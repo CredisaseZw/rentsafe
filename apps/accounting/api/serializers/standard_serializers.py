@@ -957,9 +957,22 @@ class TrialBalanceSerializer(serializers.ModelSerializer):
 class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentMethod
-        fields = "__all__"
+        fields = ["id", "name", "description"]
 
-        # serializers.py
+    def validate(self, attrs):
+        name = attrs.get("name")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+        queryset = PaymentMethod.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=user_company)
+        )
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+
+        if queryset.filter(name__iexact=name).exists():
+            raise ValidationError("A payment method with this name already exists.")
+
+        return attrs
 
 
 class CashSaleLineItemSerializer(serializers.ModelSerializer):
