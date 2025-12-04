@@ -1,6 +1,6 @@
 # apps/properties/views.py
 
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, filters
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -16,6 +16,7 @@ from apps.properties.api.serializers import (
     UnitListSerializer,
     PropertyTypeSerializer,
 )
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class PropertyTypeViewSet(viewsets.ModelViewSet):
@@ -134,40 +135,74 @@ class PropertyViewSet(BaseViewSet):
 
 class UnitViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for Units, nested under a specific Property.
+    API endpoint for Units nested under a Property.
+    Supports search, ordering, and filtering.
     """
 
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Unit.objects.all()
+
+    # filtering, ordering, search
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
+
+    search_fields = ["name", "unit_number", "description"]
+
+    # fields users can order by: ?ordering=unit_number or ?ordering=-unit_number
+    ordering_fields = [
+        "unit_number",
+        "unit_type",
+        "number_of_rooms",
+        "status",
+        "created_at",
+    ]
+    ordering = ["unit_number"]
+
+    # fields users can filter by: ?status=vacant&unit_type=apartment
+    filterset_fields = [
+        "status",
+        "unit_type",
+        "number_of_rooms",
+        "property",
+    ]
 
     def get_serializer_class(self):
-        """
-        Return the serializer class based on the action.
-        """
-        return UnitListSerializer if self.action == "list" else UnitDetailSerializer
+        return (
+            UnitListSerializer
+            if self.action in ["list", "retrieve"]
+            else UnitDetailSerializer
+        )
 
     def get_queryset(self):
         """
-        This view should only return units for the property
-        specified in the URL.
+        Return units only for the user's client and
+        only inside the property from the URL.
         """
-        property_id = self.kwargs.get("property_pk")
-        user_client = None
-        if hasattr(self.request.user, "client"):
-            user_client = self.request.user.client
+        user = self.request.user
+        user_client = getattr(user, "client", None)
 
-        if property_id:
-            return self.queryset.filter(property_id=self.kwargs["property_pk"])
-        return (
-            Unit.objects.filter(created_by__client=user_client)
-            .select_related("property", "created_by")
-            .all()
+        queryset = Unit.objects.filter(created_by__client=user_client).select_related(
+            "property", "created_by"
         )
+
+        property_id = self.kwargs.get("property_pk")
+        if property_id:
+            queryset = queryset.filter(property_id=property_id)
+
+        return queryset
 
     def perform_create(self, serializer):
         """
-        Automatically associate the unit with the property from the URL
-        and the logged-in user.
+        Ensure created unit is attached to the correct property + user.
         """
         property_instance = get_object_or_404(Property, pk=self.kwargs["property_pk"])
         serializer.save(user=self.request.user, property=property_instance)
+
+    def perform_update(self, serializer):
+        """
+        Ensure updates do not accidentally detach units from their property.
+        """
+        property_instance = get_object_or_404(Property, pk=self.kwargs["property_pk"])
+        serializer.save(property=property_instance)
