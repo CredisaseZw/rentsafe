@@ -187,7 +187,7 @@ class UnitViewSet(viewsets.ModelViewSet):
             "property", "created_by"
         )
 
-        property_id = self.kwargs.get("property_pk")
+        property_id = self.request.query_params.get("property_pk")
         if property_id:
             queryset = queryset.filter(property_id=property_id)
 
