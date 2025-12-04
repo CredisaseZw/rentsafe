@@ -31,7 +31,7 @@ class PropertyTypeSerializer(serializers.ModelSerializer):
 class LandlordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Landlord
-        fields = ("id", "landlord_name", "landlord_type")
+        fields = ("id", "landlord_name", "landlord_id", "landlord_type")
 
 
 class UnitListSerializer(serializers.ModelSerializer):
@@ -41,7 +41,14 @@ class UnitListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Unit
-        fields = ("id", "unit_number", "unit_type", "status")
+        fields = (
+            "id",
+            "unit_number",
+            "features",
+            "number_of_rooms",
+            "unit_type",
+            "status",
+        )
 
 
 class UnitDetailSerializer(serializers.ModelSerializer):

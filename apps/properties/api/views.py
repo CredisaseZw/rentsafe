@@ -151,7 +151,18 @@ class UnitViewSet(viewsets.ModelViewSet):
         This view should only return units for the property
         specified in the URL.
         """
-        return self.queryset.filter(property_id=self.kwargs["property_pk"])
+        property_id = self.kwargs.get("property_pk")
+        user_client = None
+        if hasattr(self.request.user, "client"):
+            user_client = self.request.user.client
+
+        if property_id:
+            return self.queryset.filter(property_id=self.kwargs["property_pk"])
+        return (
+            Unit.objects.filter(created_by__client=user_client)
+            .select_related("property", "created_by")
+            .all()
+        )
 
     def perform_create(self, serializer):
         """
