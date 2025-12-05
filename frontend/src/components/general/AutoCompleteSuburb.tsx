@@ -14,6 +14,7 @@ interface Props {
 
 function AutoCompleteSuburb({ searchItem, setSearchItem, onSelectValue }: Props) {
   const [debouncedSearch, setDebouncedSearch] = useState(searchItem);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -23,7 +24,8 @@ function AutoCompleteSuburb({ searchItem, setSearchItem, onSelectValue }: Props)
 
   const { data, isLoading, error } = useSearchSuburb(
     debouncedSearch,
-    !!debouncedSearch
+    hasUserInteracted && !!debouncedSearch,
+  
   );
 
   useEffect(() => {handleAxiosError("Failed to fetch suburbs", error)}, [error]);
@@ -37,9 +39,11 @@ function AutoCompleteSuburb({ searchItem, setSearchItem, onSelectValue }: Props)
         autoComplete="off"
         value={searchItem}
         onChange={(e) => {
+          setHasUserInteracted(true);
           const { value } = e.target;
           setSearchItem(value);
           setOpen(!!value);
+
         }}
         onBlur={() => setTimeout(() => setOpen(false), 100)}
         name="suburb_name"

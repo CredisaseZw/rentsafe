@@ -27,7 +27,7 @@ export default function NavLinkItem({ navLink, expandedSegment, expandThisSegmen
                <CollapsibleTrigger asChild>
                   <SidebarMenuButton
                      className={cn(
-                        "text-md flex w-full items-center justify-between px-4 py-3 font-medium",
+                        "text-md flex w-full items-center justify-between px-4 py-3 font-semibold",
                         baseColor?.hover ,
                         isActive && baseColor.active,
                         isActive ? baseColor.activeText : baseColor?.inactiveText,

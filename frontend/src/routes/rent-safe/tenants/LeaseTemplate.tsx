@@ -82,9 +82,9 @@ function LeaseTemplate() {
                   leases?.length
                   ? leases.map((lease:Lease)=>(
                   <TableRow key={lease.id}>
-                        <TableCell className="text-center">{lease.lease_id}</TableCell>
-                        <TableCell className="text-center">{getPrimaryTenantName(lease.tenants)}</TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-left">{lease.lease_id}</TableCell>
+                        <TableCell className="text-left">{getPrimaryTenantName(lease.tenants)}</TableCell>
+                        <TableCell className="text-left">
                            {lease.unit.property.addresses[0]
                            ? summarizeAddress(lease.unit.property.addresses[0])
                            : "-"}</TableCell>

@@ -5,12 +5,13 @@ import { TableBase } from "@/components/general/TableBase"
 import CreateUnitDialog from "@/components/routes/rent-safe/properties/CreateUnitDialog"
 import PropertyDetail from "@/components/routes/rent-safe/properties/PropertyDetail"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { PROPERTY_HEADERS } from "@/constants"
+import { PROPERTY_UNIT_HEADERS } from "@/constants"
 import useProperty from "@/hooks/components/useProperty"
-import {  Edit, MapPin, ParkingSquare, Power, Shield, TrashIcon, User } from "lucide-react"
+import {  Edit, Folder, MapPin, ParkingSquare, Power, Shield, TrashIcon, User } from "lucide-react"
 import LoadingIndicator from "@/components/general/LoadingIndicator"
 import { capitalizeFirstLetter, formatLandlords, summarizeAddress } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import CreatePropertyDialogue from "@/components/routes/rent-safe/properties/CreatePropertyDialogue"
 
 function Property() {
     const {
@@ -49,9 +50,13 @@ function Property() {
                                 property?.addresses && summarizeAddress(property?.addresses[0]) :
                                 property?.name
                             } 
-                            <Button variant={"ghost"} className="self-center">
-                                <Edit className="self-center text-gray-800 dark:text-white" size={20}/>
-                            </Button>
+                            <CreatePropertyDialogue
+                                property={property}
+                                trigger = {
+                                    <Button variant={"ghost"} className="self-center">
+                                        <Edit className="self-center text-gray-800 dark:text-white" size={20}/>
+                                    </Button>
+                                }/>
                         </h2>
                         {
                             property?.name?.length !== 0 &&
@@ -75,7 +80,7 @@ function Property() {
                                 "Backup Power Available"}
                                 />
                         </div>
-                        <p className="text-gray-500 dark:text-white mt-5">{property?.description}</p>             
+                        <p className="text-gray-700 dark:text-white mt-5">{property?.description}</p>             
                         <ColumnsContainer numberOfCols={4} marginClass="mt-5" gapClass="gap-5">
                             <div className="flex flex-col">
                                 <span className="text-sm font-semibold text-gray-700 dark:text-white">STATUS</span>
@@ -98,18 +103,18 @@ function Property() {
                 }
             </div>
             <div className="main-sm-card">
-                <div className="flex justify-between">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">Units</h2>
+                <div className="flex flex-row gap-5">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white self-center">Units</h2>
                     <CreateUnitDialog open = {open} setOpen = {setOpen}/>
                 </div>
                 <div className="mt-5">
-                    <TableBase headers={PROPERTY_HEADERS} isLoading={unitsLoading} isError={!!unitsError}>
+                    <TableBase headers={PROPERTY_UNIT_HEADERS} isLoading={unitsLoading} isError={!!unitsError}>
                         {
                             propertyUnits.length === 0 && !unitsLoading && !unitsError &&
                             <TableRow>
-                                <TableCell colSpan={PROPERTY_HEADERS.length} className="text-center">
+                                <TableCell colSpan={PROPERTY_UNIT_HEADERS.length} className="text-center">
                                     <div className="flex h-[25vh] flex-col gap-3 justify-center items-center">
-                                        <TrashIcon className="w-10 h-10 text-gray-300"/>    
+                                        <Folder className="w-10 h-10 text-gray-300"/>    
                                         <p className="text-gray-500 dark:text-white">No units found</p>
                                     </div>
                                 </TableCell>

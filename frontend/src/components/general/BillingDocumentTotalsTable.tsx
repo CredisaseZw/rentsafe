@@ -11,13 +11,14 @@ import type { SalesItem } from "@/types"
 import { validateAmounts } from "@/lib/utils"
 import ConfirmRateSwitchDialogue from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRateSwitchDialogue"
 import ButtonSpinner from "./ButtonSpinner"
-//import ConfirmRedirectToCurrencySettings from "../routes/rent-safe/accounting/sales/sales-invoice/ConfirmRedirectToCurrencySettings"
-
+import PrintCashSaleInvoiceDialogue from "../routes/rent-safe/accounting/sales/sales-invoice/PrintCashSaleInvoiceDialogue"
+import type { CashSaleProps } from "@/interfaces"
 interface props{
+    cashSaleProps? : CashSaleProps, 
     isCashSales? : boolean
 }
 
-const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
+const BillingDocumentTotalsTable = forwardRef(({isCashSales, cashSaleProps}: props, ref) => {
     const {
         rows,
         discount,
@@ -298,6 +299,14 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales}: props, ref) => {
                     </TableCell>
                     <TableCell></TableCell>
                 </TableRow>
+                {
+                    cashSaleProps &&
+                    <PrintCashSaleInvoiceDialogue
+                        open = {cashSaleProps.dialogueControl.open}
+                        setOpen = {cashSaleProps.dialogueControl.setOpen}
+                        cashSale = {cashSaleProps.cashSale}
+                    />
+                }
             </>   
         }
         {

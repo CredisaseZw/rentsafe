@@ -29,7 +29,7 @@ function DashboardCard({ value, subTitle, layoutScheme, valueAsChild = false }: 
           ) : (
             <h1 className="text-2xl font-semibold text-gray-700 dark:text-gray-100">{value}</h1>
           )}
-          <span className="mt-1 text-sm uppercase text-gray-500">{subTitle}</span>
+          <span className="mt-1 text-sm uppercase text-gray-500 dark:text-gray-2001">{subTitle}</span>
         </div>
       </CardContent>
     </Card>

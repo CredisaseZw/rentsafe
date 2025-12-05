@@ -782,7 +782,7 @@ function AddLeaseForm({ clientType, successCallback, leaseID }: props) {
             className="self-center"
             name="operatingCostsIncluded"
             id="operatingCostsIncluded"
-            checked={leaseObject?.landlord_opening_balances_data?.[0]?.operating_costs_inclusive ?? false}
+            defaultChecked={leaseObject?.landlord_opening_balances_data?.[0]?.operating_costs_inclusive ?? false}
           />
           <Label className="px-2 font-normal self-center" htmlFor="operatingCostsIncluded">
             Operating Costs Included

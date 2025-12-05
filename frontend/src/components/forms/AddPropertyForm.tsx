@@ -1,6 +1,5 @@
 import Button from "../general/Button";
 import { Plus } from "lucide-react";
-import usePropertyList from "@/hooks/components/usePropertyList";
 import FormSectionHeader from "../general/FormSectionHeader";
 import {
   Select,
@@ -16,33 +15,35 @@ import MultiAddressInput from "../general/MultiAddressInput";
 import LoadingIndicator from "../general/LoadingIndicator";
 import { Label } from "../ui/label";
 import { Checkbox } from "@/components/ui/checkbox"
-import useCreateProperty from "@/hooks/apiHooks/useCreateProperty";
 import ButtonSpinner from "../general/ButtonSpinner";
-import type { Option } from "@/types";
+import type { Option, Property } from "@/types";
 import Fieldset from "../general/Fieldset";
 import AutoCompleteClient from "../general/AutoCompleteClient";
-import {  validateAmounts } from "@/lib/utils";
+import { validateAmounts } from "@/lib/utils";
 import { BACKUP_POWER_OPTIONS, PARKING_OPTIONS, PROPERTY_STATUS_OPTIONS, SECURITY_OPTIONS } from "@/constants";
+import useCreateProperty from "@/hooks/components/useCreateProperty";
+import useAddProperty from "@/hooks/apiHooks/useAddProperty";
 interface props{
+  property?: Property | null,
   successCallback : ()=>void
 }
 
-function AddPropertyForm({successCallback}:props) {
+function AddPropertyForm({property, successCallback}:props) {
   const { 
     addPropertyForm,
     landlordIdentifier,
     searchItem,
-    propertyTypes,
     loading,
     isLoading,
+    propertyTypes,
     onSelectValue,
     handleFeatureChange,
     handleAddProperty,
     setSearchItem, 
     onSelectChange, 
     setAddPropertyForm,
-    setLandlordIdentifier } = usePropertyList();
-  const newProperty = useCreateProperty();
+    setLandlordIdentifier, } = useCreateProperty(property);
+  const newProperty = useAddProperty();
 
   return (
     <form onSubmit={(e: React.FormEvent<HTMLFormElement>)=>{
@@ -52,6 +53,7 @@ function AddPropertyForm({successCallback}:props) {
        <div className="form-group">
           <label className="required">Property Type</label>
           <Select
+            key={addPropertyForm.property_type}
             name="property_type"
             value={addPropertyForm.property_type}
             onValueChange={(val) => onSelectChange("property_type", val)}
@@ -63,7 +65,7 @@ function AddPropertyForm({successCallback}:props) {
               {
                 propertyTypes &&
                 propertyTypes.map((property_type)=>
-                  <SelectItem value={property_type.id && property_type.id.toString() || ""} key={property_type.id}>{property_type.name}</SelectItem>
+                  <SelectItem value={property_type.id.toString()} key={property_type.id}>{property_type.name}</SelectItem>
                 )
               }
               { 
@@ -79,6 +81,7 @@ function AddPropertyForm({successCallback}:props) {
         <div className="form-group"> 
           <label >Property Details</label>
           <Textarea
+            defaultValue={property?.description ?? ""}
             name="property_details"
             placeholder="i.e Rooms, Size,"
           />
@@ -89,6 +92,7 @@ function AddPropertyForm({successCallback}:props) {
           <label>Total number of units</label>
           <Input
             step={0.01}
+            defaultValue={property?.total_number_of_units ?? ""}
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
             type="number"
@@ -98,6 +102,7 @@ function AddPropertyForm({successCallback}:props) {
         <div className=" form-group">
           <label>Building/Complex Name</label>
           <Input
+            defaultValue={property?.name ?? ""}
             type="text"
             name="building_name"
           />
@@ -107,6 +112,7 @@ function AddPropertyForm({successCallback}:props) {
            <Input
             name="total_area"
             type= "number"
+            defaultValue={property?.total_area ?? ""}
             step={0.01}
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
@@ -118,6 +124,11 @@ function AddPropertyForm({successCallback}:props) {
             name="year_built"
             type= "number"
             step={0.01}
+            defaultValue={
+              property?.year_built === 0
+              ? ""
+              : property?.year_built
+            }
             onWheel={(e) => {(e.target as HTMLInputElement).blur()}}
             onKeyDown={validateAmounts}
           />
@@ -126,6 +137,8 @@ function AddPropertyForm({successCallback}:props) {
           <label className="required">Status</label>
           <Select
               required
+              key={addPropertyForm.status}
+              value= {addPropertyForm.status}
               onValueChange={(val) => {
                 setAddPropertyForm((prev) => ({
                   ...prev,
@@ -149,6 +162,7 @@ function AddPropertyForm({successCallback}:props) {
             <label >Furnished</label>
           <div className="flex flex-row gap-2 items-center">
             <Checkbox
+              id="is_furnished"
               checked={addPropertyForm.is_furnished}
               onCheckedChange={(checked: boolean) => {
                 setAddPropertyForm((prev) => ({
@@ -156,9 +170,9 @@ function AddPropertyForm({successCallback}:props) {
                   is_furnished: checked,
                 }));
               }}
-              className="h-4 w-4 self-center"
+              className="h-4 w-4 "
             />
-            <label className="ml-2">Yes</label>
+            <label className="ml-2 self-center mt-1.5" htmlFor="is_furnished">Yes</label>
           </div>
         </div>
       </div>
@@ -169,6 +183,7 @@ function AddPropertyForm({successCallback}:props) {
               <div className="flex flex-col gap-2">
                 <Label htmlFor="parking">Parking</Label>
                 <Select
+                  key={addPropertyForm.features.parking}
                   value={addPropertyForm.features.parking}
                   onValueChange={(val) => handleFeatureChange("parking", val)}>
                 <SelectTrigger id="parking" className="w-full">
@@ -186,6 +201,7 @@ function AddPropertyForm({successCallback}:props) {
               <div className="flex flex-col gap-2">
                 <Label htmlFor="security">Security</Label>
                 <Select
+                  key={addPropertyForm.features.security}
                   value={addPropertyForm.features.security}
                   onValueChange={(val) => handleFeatureChange("security", val)}
                 >
@@ -204,6 +220,7 @@ function AddPropertyForm({successCallback}:props) {
               <div className="flex flex-col gap-2">
                 <Label htmlFor="backup_power">Backup Power</Label>
                 <Select
+                  key={addPropertyForm.features.backup_power}
                   value={addPropertyForm.features.backup_power}
                   onValueChange={(val) => handleFeatureChange("backup_power", val)}
                   >
@@ -224,7 +241,7 @@ function AddPropertyForm({successCallback}:props) {
         </Fieldset>
       </div>
       <div>
-        <MultiAddressInput isMultiple = {false}/>
+        <MultiAddressInput isMultiple = {false} addressesContainer={property?.addresses}/>
       </div>
       <FormSectionHeader title="Landlord" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -240,7 +257,7 @@ function AddPropertyForm({successCallback}:props) {
                   landlord_name : "",
                   landlord_type: val,
                 }));
-                setLandlordIdentifier(val === "individual" ? "National ID" : "Registration Number");
+                setLandlordIdentifier(val === "individual" ? "National ID" : "Registered Number / Trading Name");
               }}
             >
               <SelectTrigger className="w-full">

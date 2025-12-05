@@ -68,7 +68,7 @@ export function friendlyDate(date: string | Date, format?: "second" | "third") {
       return Intl.DateTimeFormat("en-GB", {
         month: "short",
         day: "2-digit",
-        year: "2-digit",
+        year: "numeric",
       }).format(date);
   }
 }
@@ -452,10 +452,14 @@ export function validateBalances(
   return { valid: valid, message: message };
 };
 
-export const getCurrentDate = (): string => {
+export const getCurrentDate = (dateFormat?: "long" | "short"): string => {
   const today = new Date();
+  const options = { year: "numeric", month: "long", day: "numeric" } as const;
+
+  if (dateFormat === "long") return today.toLocaleDateString("en-US", options);
   return today.toISOString().split("T")[0];
 }
+
 export const validateAmounts = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (["e", "E", "+", "-"].includes(e.key)) {
     e.preventDefault();

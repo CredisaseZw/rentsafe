@@ -48,10 +48,11 @@ import ReportsFinancialStatementsProfitLoss from "@/routes/rent-safe/accounting/
 import ReportsFinancialStatementsBalanceSheet from "@/routes/rent-safe/accounting/reports/FinancialStatements/ReportsFinancialStatementsBalanceSheet";
 import ReportsFinancialStatementsCashflowStatements from "@/routes/rent-safe/accounting/reports/FinancialStatements/ReportsFinancialStatementsCashflowStatements";
 import CustomerSettings from "@/routes/rent-safe/accounting/settings/CustomerSettings";
-import CompanySettings from "@/routes/rent-safe/accounting/settings/CompanySettings";
 import CreditorSettings from "@/routes/rent-safe/accounting/settings/CreditorSettings";
 import OpeningBalances from "@/routes/rent-safe/accounting/settings/OpeningBalances";
 import SalesInvoices from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoices";
+import ToDoList from "@/routes/rent-safe/to-do-list/ToDoList";
+import CompanySettings from "@/routes/rent-safe/admin/CompanySettings";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -93,6 +94,12 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
       path: RENTSAFE_PRE_SEG + "/",
       segment: RENTSAFE_PRE_SEG + "/",
       pageComponent: RentSafeDashboard,
+   },
+   {
+      label: "To-Do List",
+      path: RENTSAFE_PRE_SEG + "/to-do-list",
+      segment: RENTSAFE_PRE_SEG + "/to-do-list",
+      pageComponent: ToDoList,
    },
    {
       label: "Tenants",
@@ -439,12 +446,6 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
             pageComponent: CustomerSettings,
          },
          {
-            label: "Company Settings",
-            path: RENTSAFE_PRE_SEG + "/settings/company-settings",
-            segment: RENTSAFE_PRE_SEG + "/accounting/settings/company-settings",
-            pageComponent: CompanySettings,
-         },
-         {
             label: "Creditor Settings",
             path: RENTSAFE_PRE_SEG + "/settings/creditor-settings",
             segment: RENTSAFE_PRE_SEG + "/accounting/settings/creditor-settings",
@@ -526,6 +527,13 @@ export const RENT_ADMIN_PANEL_NAVLINKS: NavLink[] = [
             segment: RENTSAFE_PRE_SEG + "/admin/subscription-management",
             pageComponent: SubscriptionManagement,
          },
+         {
+            label: "Company Settings",
+            path: RENTSAFE_PRE_SEG + "/admin/company-settings",
+            segment: RENTSAFE_PRE_SEG + "/admin/company-settings",
+            pageComponent: CompanySettings,
+         },
+         
       ],
    },
 ];

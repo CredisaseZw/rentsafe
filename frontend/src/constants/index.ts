@@ -89,7 +89,8 @@ export const DELETION_LINKS = {
   CASH_BOOK : "/api/accounting/cash-books",
   GENERAL_LEDGER : "/api/accounting/ledger-accounts",
   INVOICE : "/api/accounting/invoices",
-  CREDIT_NOTE : "/api/accounting/credit-notes"
+  CREDIT_NOTE : "/api/accounting/credit-notes",
+  PROPERTIES : "/api/properties"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -182,9 +183,9 @@ export const UNIT_STATUS:Option[] = [
 ]
 
 export const TENANT_STATEMENTS_HEADERS: Header[] = [
-  {name : "Lease ID"},
-  {name : "Customer name"},
-  {name : "Address"},
+  {name : "Lease ID", textAlign : "left"},
+  {name : "Customer name", textAlign : "left"},
+  {name : "Address", textAlign : "left"},
   {name : "Rent Owing"},
   {name : "Action"}
 ]
@@ -198,7 +199,7 @@ export const TENANT_STATEMENT_HEADERS: Header[] = [
   {name : "Balance", textAlign :"end"}
 ]
 
-export const PROPERTY_HEADERS:Header[] = [
+export const PROPERTY_UNIT_HEADERS:Header[] = [
   {name  :"Id"},
   {name  :"Unit Number"},
   {name  :"Unit Type"},
@@ -545,11 +546,11 @@ export const PROPERTY_STATUS_OPTIONS:Option[] = [
 ]
 
 export const COMMON_HEADERS:Header[] = [
-  { name  :"Lease ID" },
-  { name : "Tenant" },
-  { name : "Landlord" }, 
-  { name : "Property Type" },
-  { name : "Address" },
+  { name  :"Lease ID", textAlign : "left"},
+  { name : "Tenant", textAlign : "left" },
+  { name : "Landlord", textAlign : "left" }, 
+  { name : "Property Type", textAlign : "left" },
+  { name : "Address", textAlign : "left" },
 ]
 export const ACTIVE_HEADERS:Header[] = [
   ...COMMON_HEADERS, 
@@ -680,3 +681,12 @@ export const SALES_ITEM_HEADERS:Header[] = [
   {name : "Total Price", textAlign : "end"}
 ]
 
+export const PROPERTY_HEADERS: Header[] = [
+  { name: "Property No." },
+  { name: "Property Name", textAlign : "left" },
+  { name: "City/Town" , textAlign : "left"},
+  { name: "Suburb/Area" , textAlign : "left"},
+  { name: "Street Address" , textAlign : "left"},
+  { name: "Property Type" , textAlign : "left"},
+  { name: "Actions" }
+];

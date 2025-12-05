@@ -2,18 +2,20 @@ import { Button } from "../ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import useMultiAddressInput from "@/hooks/components/useMultiAddressInput";
 import AddressFormFields from "./AddressFormFields";
+import type { Address } from "@/interfaces";
 
 interface props {
    isMultiple?: boolean;
-   className? : string
+   className? : string;
+   addressesContainer? :Address[]
 }
 
-export default function MultiAddressInput({ isMultiple = true, className }: props) {
-   const { addresses, addAddress, removeAddress } = useMultiAddressInput();
+export default function MultiAddressInput({ isMultiple = true, className, addressesContainer }: props) {
+   const { addresses, addAddress, removeAddress } = useMultiAddressInput(addressesContainer);
 
    return (
       <div className={className}>
-         {addresses.map((_, index) => (
+         {addresses.map((address, index) => (
             <fieldset
                key={index}
                className="border-color relative w-full mb-5 rounded-xl border bg-white/50 p-5 dark:bg-transparent"
@@ -22,7 +24,9 @@ export default function MultiAddressInput({ isMultiple = true, className }: prop
                   {index === 0 ? "Primary Address" : `Address ${index + 1}`}
                </legend>
 
-               <AddressFormFields number={index + 1} />
+               <AddressFormFields number={index + 1}
+                  address = {address}
+               />
                {isMultiple && (
                   <div className="absolute right-0 bottom-0 translate-x-1/3 translate-y-1/3 transform">
                      <Button

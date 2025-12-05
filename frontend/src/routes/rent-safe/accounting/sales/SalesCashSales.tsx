@@ -16,7 +16,10 @@ function SalesCashSales() {
     loading,
     formData,
     searchItem,
+    newCashSale,
+    openPrintCashSale,
     handleOnChangeFormData,
+    setOpenPrintCashSale,
     onSelectBiller,
     setSearchItem,
     setFormData,
@@ -42,7 +45,17 @@ function SalesCashSales() {
             isRep
           />
           <div className="my-10 ">
-            <BillingDocumentTotalsTable ref={rowsRef} isCashSales = {true}/>
+            <BillingDocumentTotalsTable 
+              ref={rowsRef}
+              isCashSales = {true}
+              cashSaleProps={{
+                dialogueControl : {
+                  open : openPrintCashSale,
+                  setOpen : setOpenPrintCashSale
+                },
+                cashSale : newCashSale
+              }}
+            />
           </div>
           <div className="mt-5 flex justify-end w-full">
             <Button type="submit" asChild disabled={loading}>

@@ -13,9 +13,7 @@ import LoadingIndicator from "@/components/general/LoadingIndicator";
 export default function IndividualPaymentStatusReport({ individualId }: { individualId: number }) {
    const { error, show, report, isLoading, ratingColor, showFullAddress, fullMobile, setFullMobile,  handleOpenChange, setShowFullAddress } =
       useIndividualPaymentStatusReport(individualId);
-
-
-
+      
    return (
       <Dialog modal open={show} onOpenChange={handleOpenChange}>
          <DialogTrigger asChild>

@@ -18,7 +18,7 @@ export default function CreateUnitDialog({open, setOpen}: CreateUnitDialogProps)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Unit</Button>
+        <Button variant="success" className="self-center">Create Unit</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px]"  onInteractOutside={(event) => event.preventDefault()}>
         <DialogHeader>
