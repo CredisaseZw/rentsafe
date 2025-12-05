@@ -18,8 +18,11 @@ import DashboardCard from "@/components/general/DashboardCard";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
 import { Link } from "react-router";
-import { PROPERTY_HEADERS, PROPERTY_STATUS_OPTIONS } from "@/constants";
+import { DELETION_LINKS, PROPERTY_HEADERS, PROPERTY_STATUS_OPTIONS } from "@/constants";
 import CreatePropertyDialogue from "@/components/routes/rent-safe/properties/CreatePropertyDialogue";
+import DeleteDialogue from "@/components/general/DeleteDialogue";
+import { handleDeletion } from "@/lib/utils";
+import { getPropertiesStore } from "@/store/propertiesStore";
 
 function PropertyList() {
    const {
@@ -94,10 +97,18 @@ function PropertyList() {
                                        <PopoverTrigger>
                                           <EllipsisVertical size={18}/>
                                        </PopoverTrigger>
-                                       <PopoverContent>
+                                       <PopoverContent className="space-y-2">
                                           <Link to={`${RENTSAFE_PRE_SEG}/properties/property-list/${property.id}`} className="flex flex-row gap-3 justify-center items-center hover:text-green-600">
                                              <span className="text-sm dark:text-white text-gray-600">View More</span>
                                           </Link>
+                                          <DeleteDialogue
+                                             mutationFunc={()=>handleDeletion(DELETION_LINKS.PROPERTIES, Number(property.id))}
+                                             keyStore={getPropertiesStore}
+                                             value="Property"
+                                             trigger={
+                                                <span className="text-red-600">Delete</span>
+                                             }
+                                          />
                                        </PopoverContent>
                                     </Popover>
                                  </TableCell>

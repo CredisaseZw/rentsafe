@@ -20,7 +20,7 @@ function useCreateProperty(property?: Property | null) {
         landlord_type: property?.landlords?.[0]?.landlord_type ?? "individual",
         landlord_id: property?.landlords?.[0]?.landlord_id ?? "", 
         landlord_name: property?.landlords?.[0]?.landlord_name ?? "",  
-        status : property?.status ?? "", 
+        status : property?.status ?? "vacant", 
         is_furnished : property?.is_furnished ?? false, 
         features : {
             parking : property?.features?.parking ?? "",

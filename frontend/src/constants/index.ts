@@ -89,7 +89,8 @@ export const DELETION_LINKS = {
   CASH_BOOK : "/api/accounting/cash-books",
   GENERAL_LEDGER : "/api/accounting/ledger-accounts",
   INVOICE : "/api/accounting/invoices",
-  CREDIT_NOTE : "/api/accounting/credit-notes"
+  CREDIT_NOTE : "/api/accounting/credit-notes",
+  PROPERTIES : "/api/properties"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
