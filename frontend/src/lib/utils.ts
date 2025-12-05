@@ -68,7 +68,7 @@ export function friendlyDate(date: string | Date, format?: "second" | "third") {
       return Intl.DateTimeFormat("en-GB", {
         month: "short",
         day: "2-digit",
-        year: "2-digit",
+        year: "numeric",
       }).format(date);
   }
 }

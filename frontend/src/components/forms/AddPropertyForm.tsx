@@ -257,7 +257,7 @@ function AddPropertyForm({property, successCallback}:props) {
                   landlord_name : "",
                   landlord_type: val,
                 }));
-                setLandlordIdentifier(val === "individual" ? "National ID" : "Registration Number");
+                setLandlordIdentifier(val === "individual" ? "National ID" : "Registered Number / Trading Name");
               }}
             >
               <SelectTrigger className="w-full">
