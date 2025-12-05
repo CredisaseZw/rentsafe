@@ -531,13 +531,42 @@ class TaxTypeViewSet(BaseViewSet):
 # ==================== PRODUCT/SERVICE VIEWSETS ====================
 
 
-class SalesCategoryViewSet(viewsets.ModelViewSet):
+class SalesCategoryViewSet(BaseViewSet):
     queryset = SalesCategory.objects.all()
     serializer_class = SalesCategorySerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+    def get_queryset(self):
+        queryset = SalesCategory.objects.filter(
+            created_by__client=self.request.user.client
+        )
+        is_active = self.request.query_params.get("is_active")
+        search_params = self.request.query_params.get("search")
+        if search_params:
+            queryset = queryset.filter(
+                Q(name__icontains=search_params) | Q(code__iexact=search_params)
+            )
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating SalesCategory: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class SalesItemViewSet(viewsets.ModelViewSet):
@@ -878,10 +907,58 @@ class TrialBalanceViewSet(viewsets.ModelViewSet):
 # ==================== COMPATIBILITY VIEWSETS ====================
 
 
-class PaymentMethodViewSet(viewsets.ModelViewSet):
+class PaymentMethodViewSet(BaseViewSet):
     queryset = PaymentMethod.objects.all()
     serializer_class = PaymentMethodSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = PaymentMethod.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=self.request.user.client)
+        )
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating PaymentMethod: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.created_by is None:
+            return self._create_rendered_response(
+                {"error": "You do not have permission to update this payment method."},
+                status.HTTP_403_FORBIDDEN,
+            )
+        return super().update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.created_by is None:
+            return self._create_rendered_response(
+                {"error": "You do not have permission to delete this payment method."},
+                status.HTTP_403_FORBIDDEN,
+            )
+        self.perform_destroy(instance)
+        return self._create_rendered_response(
+            {"success": "Payment method deleted successfully"},
+            status.HTTP_204_NO_CONTENT,
+        )
 
 
 class CashSaleViewSet(viewsets.ModelViewSet):
