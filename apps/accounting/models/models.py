@@ -1302,8 +1302,8 @@ class Payment(BaseModelWithUser):
 class SalesCategory(BaseModelWithUser):
     """Categories for sales items"""
 
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     parent_category = models.ForeignKey(
         "self",
@@ -1315,6 +1315,8 @@ class SalesCategory(BaseModelWithUser):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        """Class meta data"""
+
         verbose_name = _("Sales Category")
         verbose_name_plural = _("Sales Categories")
         ordering = ["code"]

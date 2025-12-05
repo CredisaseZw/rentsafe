@@ -540,7 +540,34 @@ class SalesCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SalesCategory
-        fields = "__all__"
+        fields = ["id", "code", "name", "parent_category_name"]
+
+    def validate(self, attrs):
+        name = attrs.get("name")
+        code = attrs.get("code")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = SalesCategory.objects.filter(created_by__client=user_company)
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            required_fields = ["name", "code"]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        {"error": f"{field.replace('_', ' ').title()} is required."}
+                    )
+
+        if name and queryset.filter(name__iexact=name).exists():
+            raise ValidationError(
+                {"error": "A sales category with this name already exists."}
+            )
+        if code and queryset.filter(code__iexact=code).exists():
+            raise ValidationError(
+                {"error": "A sales category with this code already exists."}
+            )
+        return attrs
 
 
 class SalesItemSerializer(serializers.ModelSerializer):
