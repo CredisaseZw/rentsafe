@@ -22,7 +22,7 @@ export default function AddressFormFields({ number, address }: props) {
    } = useAddressFormFields(address);
 
    return (
-      <ColumnsContainer  numberOfCols={3} gapClass="gap-5"> 
+      <ColumnsContainer  numberOfCols={3} marginClass="" gapClass="gap-5"> 
          <div className="flex flex-col gap-2">
             <Input hidden value={suburb?.id} required name={"suburb_id" + number}/>
             <AutoCompleteSuburb

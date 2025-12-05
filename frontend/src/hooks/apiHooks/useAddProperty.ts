@@ -11,7 +11,7 @@ export default function useAddProperty() {
     mutationFn: async (payload: Payload) => {     
       const { data } = payload.mode === "create"
       ? await api.post("/api/properties/", payload.data)
-      : await api.patch( `/api/properties/${payload.id}/`, payload.data)
+      : await api.put( `/api/properties/${payload.id}/`, payload.data)
       return { response: data };
     },
   });

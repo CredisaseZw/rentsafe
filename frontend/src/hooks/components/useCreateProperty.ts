@@ -1,5 +1,5 @@
 import type { BranchFull, IndividualMinimal } from "@/interfaces";
-import { extractAddresses, getFormDataObject, handleAxiosError, handleTrackChangedFields, validateYear } from "@/lib/utils";
+import { extractAddresses, getFormDataObject, handleAxiosError, /* handleTrackChangedFields */ validateYear } from "@/lib/utils";
 import type { AddPropertyForm, Payload, Property, PropertyType } from "@/types";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -77,7 +77,7 @@ function useCreateProperty(property?: Property | null) {
         const data = getFormDataObject(e);
         const addresses = extractAddresses(data);
         const mode = property ? "update" : "create";
-        let changed;
+        //let changed;
         if (data.year_built && (data.year_built as string).length > 0) {
             if (!validateYear(data.year_built as string)) {
             toast.error("Invalid Year", {
@@ -115,7 +115,7 @@ function useCreateProperty(property?: Property | null) {
             addresses_input: addresses[0],
             landlords_input: landlords
         };
-        if(mode === "update"){
+        /* if(mode === "update"){
             const addresses_ = property?.addresses?.map((a)=>({
                 is_primary: !a.is_primary,
                 address_type: a.address_type,
@@ -138,7 +138,7 @@ function useCreateProperty(property?: Property | null) {
                 is_furnished: property?.is_furnished,
                 total_number_of_units: property?.total_number_of_units ,
                 features: {
-                    parking: property?.features?.parking,
+                    park3ing: property?.features?.parking,
                     security: property?.features?.security,
                     backup_power: property?.features?.backup_power
                 },
@@ -153,16 +153,14 @@ function useCreateProperty(property?: Property | null) {
             if(changed.features) changed.features = features;
             
         }
-
+ */
         const PAYLOAD:Payload = {
             ...(
-                mode === "create"
-                ? { data : propertyPayload }
-                : {
+                mode === "update" && {
                     id : Number(property?.id),
-                    data: changed
                 }
             ),
+            data: propertyPayload,
             mode
         }
         
@@ -174,7 +172,7 @@ function useCreateProperty(property?: Property | null) {
                 if(mode === "create"){
                     getPropertiesStore?.();
                 }else{
-                    queryClient.invalidateQueries({queryKey : ["property-details", property?.id]});
+                    queryClient.invalidateQueries({queryKey : ["property-details", String(property?.id)]});
                 }
                 successCallback()
             },
