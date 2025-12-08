@@ -695,7 +695,6 @@ class SalesItemSerializer(serializers.ModelSerializer):
                 "category",
                 "tax_type",
                 "unit_price",
-                "unit_name",
             ]
             for field in required_fields:
                 if not attrs.get(field):
@@ -708,6 +707,18 @@ class SalesItemSerializer(serializers.ModelSerializer):
                 {"error": "A sales item with this name already exists."}
             )
         return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
+
+    @transaction.atomic
+    def update(self, validated_data):
+        user = self.context["request"].user
+        validated_data["updated_by"] = user
+        return super().update(validated_data)
 
 
 # ==================== INVOICE SERIALIZERS ====================

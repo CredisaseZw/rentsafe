@@ -14,6 +14,7 @@ from apps.accounting.filters.general_ledgers_filter import (
 )
 from django.utils import timezone
 from decimal import Decimal
+from apps.accounting.filters.sales_items_filters import SalesItemFilter
 from apps.accounting.models import *
 from apps.accounting.api.serializers.standard_serializers import *
 from apps.common.api.views import BaseViewSet
@@ -569,10 +570,11 @@ class SalesCategoryViewSet(BaseViewSet):
             )
 
 
-class SalesItemViewSet(viewsets.ModelViewSet):
+class SalesItemViewSet(BaseViewSet):
     queryset = SalesItem.objects.all()
     serializer_class = SalesItemSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = SalesItemFilter
 
     def get_queryset(self):
         queryset = SalesItem.objects.filter(
@@ -585,21 +587,51 @@ class SalesItemViewSet(viewsets.ModelViewSet):
             "inventory_account",
             "cost_of_sales_account",
         )
-        category = self.request.query_params.get("category")
+        # category = self.request.query_params.get("category")
         is_active = self.request.query_params.get("is_active")
 
-        if category:
-            queryset = queryset.filter(category_id=category)
+        # if category:
+        #     queryset = queryset.filter(category_id=category)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
-        print(queryset.query)
         return queryset.select_related("category", "tax_type", "income_account")
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating SalesItem: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-    def perform_update(self, serializer):
-        serializer.save(updated_by=self.request.user)
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating SalesItem: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # ==================== INVOICE VIEWSETS ====================
