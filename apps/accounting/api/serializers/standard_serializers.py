@@ -579,11 +579,98 @@ class SalesItemSerializer(serializers.ModelSerializer):
     price_including_tax = serializers.DecimalField(
         max_digits=12, decimal_places=2, read_only=True
     )
+    currency_id = serializers.PrimaryKeyRelatedField(
+        source="currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Currency is required.",
+            "does_not_exist": "Selected currency does not exist.",
+            "incorrect_type": "Invalid currency.",
+        },
+    )
+    category_id = serializers.PrimaryKeyRelatedField(
+        source="category",
+        queryset=SalesCategory.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Category is required.",
+            "does_not_exist": "Selected category does not exist.",
+            "incorrect_type": "Invalid category.",
+        },
+    )
+    tax_type_id = serializers.PrimaryKeyRelatedField(
+        source="tax_type",
+        queryset=TaxType.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Tax type is required.",
+            "does_not_exist": "Selected tax type does not exist.",
+            "incorrect_type": "Invalid tax type.",
+        },
+    )
+    income_account_id = serializers.PrimaryKeyRelatedField(
+        source="income_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected income account does not exist.",
+            "incorrect_type": "Invalid income account.",
+        },
+    )
+    cost_of_sales_account_id = serializers.PrimaryKeyRelatedField(
+        source="cost_of_sales_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected cost of sales account does not exist.",
+            "incorrect_type": "Invalid cost of sales account.",
+        },
+    )
+    inventory_account_id = serializers.PrimaryKeyRelatedField(
+        source="inventory_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected inventory account does not exist.",
+            "incorrect_type": "Invalid inventory account.",
+        },
+    )
 
     class Meta:
         model = SalesItem
-        fields = "__all__"
-        read_only_fields = ("id", "date_created", "date_updated", "item_code")
+        exclude = ["date_created", "date_updated"]
+        read_only_fields = (
+            "id",
+            "item_code",
+            "category",
+            "tax_type",
+            "income_account",
+            "cost_of_sales_account",
+            "inventory_account",
+            "currency",
+        )
+
+    def validate(self, attrs):
+        name = attrs.get("name")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = SalesItem.objects.filter(created_by__client=user_company)
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            if not name:
+                raise ValidationError({"error": "Item name is required."})
+
+        if name and queryset.filter(name__iexact=name).exists():
+            raise ValidationError(
+                {"error": "A sales item with this name already exists."}
+            )
+        return attrs
 
 
 # ==================== INVOICE SERIALIZERS ====================

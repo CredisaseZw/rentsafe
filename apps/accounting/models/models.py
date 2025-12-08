@@ -1328,7 +1328,7 @@ class SalesCategory(BaseModelWithUser):
 class SalesItem(BaseModelWithUser):
     """Products or services for sale"""
 
-    item_code = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    item_code = models.CharField(max_length=50, blank=True, null=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(
@@ -1415,7 +1415,11 @@ class SalesItem(BaseModelWithUser):
 
     def save(self, *args, **kwargs):
         if not self.item_code:
-            last_item = SalesItem.objects.order_by("-id").first()
+            last_item = (
+                SalesItem.objects.filter(created_by__client=self.created_by.client)
+                .order_by("-id")
+                .first()
+            )
             if last_item and last_item.item_code.startswith("ITEM"):
                 try:
                     last_number = int(last_item.item_code[4:])

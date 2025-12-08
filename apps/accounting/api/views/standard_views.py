@@ -166,7 +166,7 @@ class GeneralLedgerAccountViewSet(BaseViewSet):
         is_active = self.request.query_params.get("is_active")
 
         if account_type:
-            queryset = queryset.filter(account_type_id=account_type)
+            queryset = queryset.filter(account_type__account_type__iexact=account_type)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
 
@@ -575,7 +575,7 @@ class SalesItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = SalesItem.objects.all()
+        queryset = SalesItem.objects.filter(created_by__client=self.request.user.client)
         category = self.request.query_params.get("category")
         is_active = self.request.query_params.get("is_active")
 
