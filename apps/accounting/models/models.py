@@ -1409,9 +1409,19 @@ class SalesItem(BaseModelWithUser):
 
     @property
     def price_including_tax(self):
-        if self.tax_type:
-            return self.unit_price * (1 + self.tax_type.rate / Decimal("100.00"))
-        return self.unit_price
+        if self.tax_type and self.tax_type.rate is not None:
+            price = self.unit_price * (1 + self.tax_type.rate / Decimal("100.00"))
+            return price.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        return self.unit_price.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+
+    @property
+    def vat_price(self):
+        if self.tax_type and self.tax_type.rate is not None:
+            tax_amount = (
+                self.unit_price * self.tax_type.rate / Decimal("100.00")
+            ).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+            return tax_amount
+        return Decimal("0.00")
 
     def save(self, *args, **kwargs):
         if not self.item_code:

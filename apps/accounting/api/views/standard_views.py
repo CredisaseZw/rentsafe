@@ -575,7 +575,16 @@ class SalesItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = SalesItem.objects.filter(created_by__client=self.request.user.client)
+        queryset = SalesItem.objects.filter(
+            created_by__client=self.request.user.client
+        ).select_related(
+            "category",
+            "tax_type",
+            "income_account",
+            "currency",
+            "inventory_account",
+            "cost_of_sales_account",
+        )
         category = self.request.query_params.get("category")
         is_active = self.request.query_params.get("is_active")
 
@@ -583,11 +592,14 @@ class SalesItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(category_id=category)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
-
+        print(queryset.query)
         return queryset.select_related("category", "tax_type", "income_account")
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)
 
 
 # ==================== INVOICE VIEWSETS ====================

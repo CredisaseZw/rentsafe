@@ -571,14 +571,8 @@ class SalesCategorySerializer(serializers.ModelSerializer):
 
 
 class SalesItemSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source="category.name", read_only=True)
-    tax_type_name = serializers.CharField(source="tax_type.name", read_only=True)
-    income_account_name = serializers.CharField(
-        source="income_account.account_name", read_only=True
-    )
-    price_including_tax = serializers.DecimalField(
-        max_digits=12, decimal_places=2, read_only=True
-    )
+    """Serializer for sales items (products/services)"""
+
     currency_id = serializers.PrimaryKeyRelatedField(
         source="currency",
         queryset=Currency.objects.all(),
@@ -641,8 +635,10 @@ class SalesItemSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """Class meta for sales item serializer"""
+
         model = SalesItem
-        exclude = ["date_created", "date_updated"]
+        exclude = ["date_created", "date_updated", "created_by", "updated_by"]
         read_only_fields = (
             "id",
             "item_code",
@@ -654,6 +650,37 @@ class SalesItemSerializer(serializers.ModelSerializer):
             "currency",
         )
 
+    def to_representation(self, instance):
+        represantation = {
+            "id": instance.id,
+            "item_code": instance.item_code,
+            "name": instance.name,
+            "description": instance.description,
+            "category": instance.category.name if instance.category else None,
+            "price": str(instance.unit_price),
+            "price_including_tax": str(instance.price_including_tax),
+            "vat_price": str(instance.vat_price),
+            "currency": instance.currency.currency_code if instance.currency else None,
+            "is_active": instance.is_active,
+            "tax_type": instance.tax_type.name if instance.tax_type else None,
+            "income_account": (
+                instance.income_account.account_name
+                if instance.income_account
+                else None
+            ),
+            "cost_of_sales_account": (
+                instance.cost_of_sales_account.account_name
+                if instance.cost_of_sales_account
+                else None
+            ),
+            "inventory_account": (
+                instance.inventory_account.account_name
+                if instance.inventory_account
+                else None
+            ),
+        }
+        return represantation
+
     def validate(self, attrs):
         name = attrs.get("name")
         user_company = self.context["request"].user.client
@@ -663,8 +690,18 @@ class SalesItemSerializer(serializers.ModelSerializer):
         if instance:
             queryset = queryset.exclude(pk=instance.pk)
         else:
-            if not name:
-                raise ValidationError({"error": "Item name is required."})
+            required_fields = [
+                "name",
+                "category",
+                "tax_type",
+                "unit_price",
+                "unit_name",
+            ]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        {"error": f"{field.replace('_', ' ').title()} is required."}
+                    )
 
         if name and queryset.filter(name__iexact=name).exists():
             raise ValidationError(
