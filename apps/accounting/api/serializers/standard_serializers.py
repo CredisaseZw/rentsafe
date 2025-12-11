@@ -84,10 +84,10 @@ class AccountTypeSerializer(serializers.ModelSerializer):
             if not code:
                 raise ValidationError("Sector code is required")
 
-        if name and queryset.filter(name=name).exists():
+        if name and queryset.filter(name__iexact=name).exists():
             raise ValidationError("An account sector with this name already exists.")
 
-        if code and queryset.filter(code=code).exists():
+        if code and queryset.filter(code__iexact=code).exists():
             raise ValidationError("An account sector with this code already exists.")
 
         return attrs
@@ -142,10 +142,10 @@ class AccountSubTypeSerializer(serializers.ModelSerializer):
             if not code_prefix:
                 raise ValidationError("Account subtype code prefix is required")
 
-        if name and queryset.filter(name=name).exists():
+        if name and queryset.filter(name__iexact=name).exists():
             raise ValidationError("An account subtype with this name already exists.")
 
-        if code_prefix and queryset.filter(code_prefix=code_prefix).exists():
+        if code_prefix and queryset.filter(code_prefix__iexact=code_prefix).exists():
             raise ValidationError(
                 "An account subtype with this code prefix already exists."
             )
@@ -236,7 +236,7 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
         if account_number and queryset.filter(account_number=account_number).exists():
             raise ValidationError("An account with this number already exists.")
 
-        if account_name and queryset.filter(account_name=account_name).exists():
+        if account_name and queryset.filter(account_name__iexact=account_name).exists():
             raise ValidationError("An account with this name already exists.")
 
         return attrs
@@ -903,17 +903,115 @@ class BankAccountSerializer(serializers.ModelSerializer):
     gl_account_number = serializers.CharField(
         source="gl_account.account_number", read_only=True
     )
-    current_balance = serializers.DecimalField(
-        max_digits=15, decimal_places=2, read_only=True
+    gl_account_id = serializers.PrimaryKeyRelatedField(
+        source="gl_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "GL Account is required.",
+            "does_not_exist": "Selected GL Account does not exist.",
+            "incorrect_type": "Invalid GL Account.",
+        },
     )
+    # current_balance = serializers.DecimalField(
+    #     max_digits=15, decimal_places=2, read_only=True
+    # )
     currency_code = serializers.CharField(
         source="currency.currency_code", read_only=True
+    )
+    currency_id = serializers.PrimaryKeyRelatedField(
+        source="currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "Currency is required.",
+            "does_not_exist": "Selected currency does not exist.",
+            "incorrect_type": "Invalid currency.",
+        },
     )
 
     class Meta:
         model = BankAccount
-        fields = "__all__"
-        read_only_fields = ("id", "date_created", "date_updated")
+        exclude = [
+            "date_created",
+            "date_updated",
+            "opening_balance",
+            "opening_balance_date",
+        ]
+        read_only_fields = (
+            "id",
+            "date_created",
+            "date_updated",
+            "currency",
+            "cashbook_id",
+            "gl_account",
+        )
+
+    def validate(self, attrs):
+        account_name = attrs.get("account_name")
+        account_type = attrs.get("account_type")
+        user_company = self.context["request"].user.client
+        gl_account = attrs.get("gl_account")
+        instance = self.instance
+
+        if not instance:
+            required_fields = ["account_name", "account_type"]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        f"{field.replace('_', ' ').title()} is required."
+                    )
+
+        check_name = (
+            account_name
+            if account_name is not None
+            else (instance.account_name if instance else None)
+        )
+        check_type = (
+            account_type
+            if account_type is not None
+            else (instance.account_type if instance else None)
+        )
+
+        if check_name and check_type:
+            queryset = BankAccount.objects.filter(
+                created_by__client=user_company,
+                account_name__iexact=check_name,
+                account_type=check_type,
+            )
+
+            if instance:
+                queryset = queryset.exclude(pk=instance.pk)
+
+            if queryset.exists():
+                raise ValidationError(
+                    "A cashbook account with this name and type already exists."
+                )
+
+        if gl_account:
+            gl_account_used = BankAccount.objects.filter(
+                created_by__client=user_company,
+                gl_account=gl_account,
+            )
+            if instance:
+                gl_account_used = gl_account_used.exclude(pk=instance.pk)
+            if gl_account_used.exists():
+                raise ValidationError(
+                    "The selected Ledger Account is already linked to another cash book."
+                )
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        validated_data["updated_by"] = user
+        return super().update(instance, validated_data)
 
 
 class CashReceiptSerializer(serializers.ModelSerializer):

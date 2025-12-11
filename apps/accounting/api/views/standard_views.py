@@ -759,13 +759,62 @@ class PaymentViewSet(viewsets.ModelViewSet):
 # ==================== CASH MANAGEMENT VIEWSETS ====================
 
 
-class BankAccountViewSet(viewsets.ModelViewSet):
+class BankAccountViewSet(BaseViewSet):
+    """Viewset for cash books"""
+
     queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+    def get_queryset(self):
+        queryset = BankAccount.objects.filter(
+            created_by__client=self.request.user.client
+        ).select_related("gl_account", "currency")
+        is_active = self.request.query_params.get("is_active")
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+
+        return queryset.select_related("gl_account", "currency")
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ValidationError as ve:
+            logger.error(f"Validation error creating BankAccount: {ve}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating BankAccount: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating BankAccount: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=["get"])
     def transactions(self, request, pk=None):

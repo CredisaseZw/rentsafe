@@ -1449,37 +1449,54 @@ class SalesItem(BaseModelWithUser):
 class BankAccount(BaseModelWithUser):
     """Bank accounts for cash management"""
 
-    account_number = models.CharField(max_length=50, unique=True)
+    cashbook_id = models.CharField(max_length=50)
     account_name = models.CharField(max_length=255)
     bank_name = models.CharField(max_length=255)
+    bank_account_number = models.CharField(max_length=50, blank=True, null=True)
     branch_name = models.CharField(max_length=255, blank=True, null=True)
     currency = models.ForeignKey("Currency", on_delete=models.PROTECT)
 
     # GL Integration
-    gl_account = models.OneToOneField(
+    gl_account = models.ForeignKey(
         GeneralLedgerAccount,
         on_delete=models.PROTECT,
-        limit_choices_to={
-            "account_type__account_type": "asset",
-            "account_number__startswith": "10",
-        },
         related_name="bank_account",
     )
+    account_type = models.CharField(max_length=250)
 
     # Status
     is_active = models.BooleanField(default=True)
     opening_balance = models.DecimalField(
         max_digits=15, decimal_places=2, default=Decimal("0.00")
     )
-    opening_balance_date = models.DateField(default=now)
+    opening_balance_date = models.DateField(default=localdate)
 
     class Meta:
+        """Class meta information for BankAccount model"""
+
         verbose_name = _("Bank Account")
         verbose_name_plural = _("Bank Accounts")
-        ordering = ["bank_name", "account_number"]
+        ordering = ["cashbook_id", "bank_name"]
 
     def __str__(self):
-        return f"{self.bank_name} - {self.account_number}"
+        return f"{self.bank_name} - {self.cashbook_id}"
+
+    def save(self, *args, **kwargs):
+        if not self.cashbook_id:
+            last_cashbook = (
+                BankAccount.objects.filter(created_by__client=self.created_by.client)
+                .order_by("-id")
+                .first()
+            )
+            if not last_cashbook or not last_cashbook.cashbook_id.startswith("CB"):
+                self.cashbook_id = "CB0001"
+            else:
+                try:
+                    last_number = int(last_cashbook.cashbook_id.replace("CB", ""))
+                except ValueError:
+                    last_number = 0
+                self.cashbook_id = f"CB{last_number + 1:04d}"
+        super().save(*args, **kwargs)
 
     @property
     def current_balance(self):
