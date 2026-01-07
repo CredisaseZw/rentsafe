@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from apps.accounting.filters.exchange_rate_filters import ExchangeRateFilter
 from apps.accounting.filters.general_ledgers_filter import (
     AccountSubTypeFilter,
     AccountTypeFilter,
@@ -13,6 +14,7 @@ from apps.accounting.filters.general_ledgers_filter import (
 )
 from django.utils import timezone
 from decimal import Decimal
+from apps.accounting.filters.sales_items_filters import SalesItemFilter
 from apps.accounting.models import *
 from apps.accounting.api.serializers.standard_serializers import *
 from apps.common.api.views import BaseViewSet
@@ -165,7 +167,7 @@ class GeneralLedgerAccountViewSet(BaseViewSet):
         is_active = self.request.query_params.get("is_active")
 
         if account_type:
-            queryset = queryset.filter(account_type_id=account_type)
+            queryset = queryset.filter(account_type__account_type__iexact=account_type)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
 
@@ -392,43 +394,244 @@ class VendorViewSet(viewsets.ModelViewSet):
 # ==================== TAX VIEWSETS ====================
 
 
-class TaxTypeViewSet(viewsets.ModelViewSet):
+class TaxTypeViewSet(BaseViewSet):
     queryset = TaxType.objects.all()
     serializer_class = TaxTypeSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = TaxType.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=self.request.user.client)
+        )
+        is_active = self.request.query_params.get("is_active")
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        invalid_data = []
+        valid_data = []
+        try:
+            for item in data:
+                serializer = self.get_serializer(data=item)
+                if serializer.is_valid():
+                    serializer.save()
+                    valid_data.append(serializer.data)
+                else:
+                    invalid_data.append(extract_error_message(serializer.errors))
+
+            if invalid_data and valid_data:
+                return self._create_rendered_response(
+                    {"created": valid_data, "errors": invalid_data},
+                    status.HTTP_207_MULTI_STATUS,
+                )
+            elif not invalid_data:
+                return self._create_rendered_response(
+                    valid_data, status.HTTP_201_CREATED
+                )
+            elif not valid_data:
+                return self._create_rendered_response(
+                    {"errors": invalid_data}, status.HTTP_400_BAD_REQUEST
+                )
+
+        except ValidationError as e:
+            logger.error(f"Validation error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(e)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error creating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def list(self, request, *args, **kwargs):
+        try:
+            vat = self.get_queryset()
+            page = self.paginate_queryset(vat)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(vat, many=True)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving VAT settings: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return self._create_rendered_response(serializer.data, status.HTTP_200_OK)
+
+        except ValidationError as ve:
+            logger.error(f"Validation error updating VAT setting: {ve}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Error updating VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            if instance.created_by is None:
+                return self._create_rendered_response(
+                    {"error": "You do not have permission to delete this VAT setting."},
+                    status.HTTP_403_FORBIDDEN,
+                )
+            self.perform_destroy(instance)
+            return self._create_rendered_response(
+                {"success": "VAT setting deleted successfully"},
+                status.HTTP_204_NO_CONTENT,
+            )
+
+        except Http404:
+            return self._create_rendered_response(
+                {"error": "VAT not found"},
+                status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            logger.error(f"Error deleting VAT setting: {e}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"},
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 # ==================== PRODUCT/SERVICE VIEWSETS ====================
 
 
-class SalesCategoryViewSet(viewsets.ModelViewSet):
+class SalesCategoryViewSet(BaseViewSet):
     queryset = SalesCategory.objects.all()
     serializer_class = SalesCategorySerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
-
-class SalesItemViewSet(viewsets.ModelViewSet):
-    queryset = SalesItem.objects.all()
-    serializer_class = SalesItemSerializer
-    permission_classes = [IsAuthenticated]
-
     def get_queryset(self):
-        queryset = SalesItem.objects.all()
-        category = self.request.query_params.get("category")
+        queryset = SalesCategory.objects.filter(
+            created_by__client=self.request.user.client
+        )
         is_active = self.request.query_params.get("is_active")
+        search_params = self.request.query_params.get("search")
+        if search_params:
+            queryset = queryset.filter(
+                Q(name__icontains=search_params) | Q(code__iexact=search_params)
+            )
 
-        if category:
-            queryset = queryset.filter(category_id=category)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
 
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating SalesCategory: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class SalesItemViewSet(BaseViewSet):
+    queryset = SalesItem.objects.all()
+    serializer_class = SalesItemSerializer
+    permission_classes = [IsAuthenticated]
+    filterset_class = SalesItemFilter
+
+    def get_queryset(self):
+        queryset = SalesItem.objects.filter(
+            created_by__client=self.request.user.client
+        ).select_related(
+            "category",
+            "tax_type",
+            "income_account",
+            "currency",
+            "inventory_account",
+            "cost_of_sales_account",
+        )
+        # category = self.request.query_params.get("category")
+        is_active = self.request.query_params.get("is_active")
+
+        # if category:
+        #     queryset = queryset.filter(category_id=category)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
         return queryset.select_related("category", "tax_type", "income_account")
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating SalesItem: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating SalesItem: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # ==================== INVOICE VIEWSETS ====================
@@ -556,13 +759,62 @@ class PaymentViewSet(viewsets.ModelViewSet):
 # ==================== CASH MANAGEMENT VIEWSETS ====================
 
 
-class BankAccountViewSet(viewsets.ModelViewSet):
+class BankAccountViewSet(BaseViewSet):
+    """Viewset for cash books"""
+
     queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+    def get_queryset(self):
+        queryset = BankAccount.objects.filter(
+            created_by__client=self.request.user.client
+        ).select_related("gl_account", "currency")
+        is_active = self.request.query_params.get("is_active")
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+
+        return queryset.select_related("gl_account", "currency")
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ValidationError as ve:
+            logger.error(f"Validation error creating BankAccount: {ve}")
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating BankAccount: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop("partial", False)
+            instance = self.get_object()
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error updating BankAccount: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=["get"])
     def transactions(self, request, pk=None):
@@ -623,17 +875,39 @@ class CurrencyViewSet(viewsets.ModelViewSet):
     serializer_class = CurrencySerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = Currency.objects.all()
+        is_active = self.request.query_params.get("is_active")
+        is_base = self.request.query_params.get("is_base")
 
-class ExchangeRateViewSet(viewsets.ModelViewSet):
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == "true")
+        if is_base is not None:
+            queryset = queryset.filter(is_base_currency=is_base.lower() == "true")
+
+        return queryset
+
+    def delete(self, request, *args, **kwargs):
+        return Response(
+            {"error": "you cannot delete currencies."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class ExchangeRateViewSet(BaseViewSet):
     queryset = ExchangeRate.objects.all()
     serializer_class = ExchangeRateSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = ExchangeRateFilter
 
     def get_queryset(self):
-        queryset = ExchangeRate.objects.all()
+        queryset = ExchangeRate.objects.filter(
+            created_by__client=self.request.user.client
+        )
         base_currency = self.request.query_params.get("base_currency")
         target_currency = self.request.query_params.get("target_currency")
         is_active = self.request.query_params.get("is_active")
+        latest_rate = self.request.query_params.get("latest_rate")
 
         if base_currency:
             queryset = queryset.filter(base_currency_id=base_currency)
@@ -641,8 +915,27 @@ class ExchangeRateViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(target_currency_id=target_currency)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
+        if latest_rate is not None and latest_rate.lower() == "true":
+            queryset = queryset.order_by("-date_created")[:1]
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating ExchangeRate: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # ==================== REPORT VIEWSETS ====================
@@ -707,10 +1000,58 @@ class TrialBalanceViewSet(viewsets.ModelViewSet):
 # ==================== COMPATIBILITY VIEWSETS ====================
 
 
-class PaymentMethodViewSet(viewsets.ModelViewSet):
+class PaymentMethodViewSet(BaseViewSet):
     queryset = PaymentMethod.objects.all()
     serializer_class = PaymentMethodSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = PaymentMethod.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=self.request.user.client)
+        )
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return self._create_rendered_response(
+                serializer.data, status.HTTP_201_CREATED
+            )
+
+        except ValidationError as ve:
+            return self._create_rendered_response(
+                {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Error creating PaymentMethod: {str(e)}")
+            return self._create_rendered_response(
+                {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.created_by is None:
+            return self._create_rendered_response(
+                {"error": "You do not have permission to update this payment method."},
+                status.HTTP_403_FORBIDDEN,
+            )
+        return super().update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.created_by is None:
+            return self._create_rendered_response(
+                {"error": "You do not have permission to delete this payment method."},
+                status.HTTP_403_FORBIDDEN,
+            )
+        self.perform_destroy(instance)
+        return self._create_rendered_response(
+            {"success": "Payment method deleted successfully"},
+            status.HTTP_204_NO_CONTENT,
+        )
 
 
 class CashSaleViewSet(viewsets.ModelViewSet):

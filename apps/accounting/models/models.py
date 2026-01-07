@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_HALF_UP
-from django.utils.timezone import now
+from django.utils.timezone import now, localdate
 from django.core.validators import MinValueValidator, MaxValueValidator
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 import uuid
@@ -802,11 +802,11 @@ class Vendor(BaseModelWithUser):
 # ==================== TAX CONFIGURATION ====================
 
 
-class TaxType(BaseModel):
+class TaxType(BaseModelWithUser):
     """Different types of taxes (VAT, Sales Tax, etc.)"""
 
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     rate = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -814,6 +814,8 @@ class TaxType(BaseModel):
             MinValueValidator(Decimal("0.00")),
             MaxValueValidator(Decimal("100.00")),
         ],
+        blank=True,
+        null=True,
     )
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
@@ -1300,8 +1302,8 @@ class Payment(BaseModelWithUser):
 class SalesCategory(BaseModelWithUser):
     """Categories for sales items"""
 
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField(blank=True, null=True)
     parent_category = models.ForeignKey(
         "self",
@@ -1313,6 +1315,8 @@ class SalesCategory(BaseModelWithUser):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        """Class meta data"""
+
         verbose_name = _("Sales Category")
         verbose_name_plural = _("Sales Categories")
         ordering = ["code"]
@@ -1324,7 +1328,7 @@ class SalesCategory(BaseModelWithUser):
 class SalesItem(BaseModelWithUser):
     """Products or services for sale"""
 
-    item_code = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    item_code = models.CharField(max_length=50, blank=True, null=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(
@@ -1405,13 +1409,27 @@ class SalesItem(BaseModelWithUser):
 
     @property
     def price_including_tax(self):
-        if self.tax_type:
-            return self.unit_price * (1 + self.tax_type.rate / Decimal("100.00"))
-        return self.unit_price
+        if self.tax_type and self.tax_type.rate is not None:
+            price = self.unit_price * (1 + self.tax_type.rate / Decimal("100.00"))
+            return price.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        return self.unit_price.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+
+    @property
+    def vat_price(self):
+        if self.tax_type and self.tax_type.rate is not None:
+            tax_amount = (
+                self.unit_price * self.tax_type.rate / Decimal("100.00")
+            ).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+            return tax_amount
+        return Decimal("0.00")
 
     def save(self, *args, **kwargs):
         if not self.item_code:
-            last_item = SalesItem.objects.order_by("-id").first()
+            last_item = (
+                SalesItem.objects.filter(created_by__client=self.created_by.client)
+                .order_by("-id")
+                .first()
+            )
             if last_item and last_item.item_code.startswith("ITEM"):
                 try:
                     last_number = int(last_item.item_code[4:])
@@ -1431,37 +1449,54 @@ class SalesItem(BaseModelWithUser):
 class BankAccount(BaseModelWithUser):
     """Bank accounts for cash management"""
 
-    account_number = models.CharField(max_length=50, unique=True)
+    cashbook_id = models.CharField(max_length=50)
     account_name = models.CharField(max_length=255)
     bank_name = models.CharField(max_length=255)
+    bank_account_number = models.CharField(max_length=50, blank=True, null=True)
     branch_name = models.CharField(max_length=255, blank=True, null=True)
     currency = models.ForeignKey("Currency", on_delete=models.PROTECT)
 
     # GL Integration
-    gl_account = models.OneToOneField(
+    gl_account = models.ForeignKey(
         GeneralLedgerAccount,
         on_delete=models.PROTECT,
-        limit_choices_to={
-            "account_type__account_type": "asset",
-            "account_number__startswith": "10",
-        },
         related_name="bank_account",
     )
+    account_type = models.CharField(max_length=250)
 
     # Status
     is_active = models.BooleanField(default=True)
     opening_balance = models.DecimalField(
         max_digits=15, decimal_places=2, default=Decimal("0.00")
     )
-    opening_balance_date = models.DateField(default=now)
+    opening_balance_date = models.DateField(default=localdate)
 
     class Meta:
+        """Class meta information for BankAccount model"""
+
         verbose_name = _("Bank Account")
         verbose_name_plural = _("Bank Accounts")
-        ordering = ["bank_name", "account_number"]
+        ordering = ["cashbook_id", "bank_name"]
 
     def __str__(self):
-        return f"{self.bank_name} - {self.account_number}"
+        return f"{self.bank_name} - {self.cashbook_id}"
+
+    def save(self, *args, **kwargs):
+        if not self.cashbook_id:
+            last_cashbook = (
+                BankAccount.objects.filter(created_by__client=self.created_by.client)
+                .order_by("-id")
+                .first()
+            )
+            if not last_cashbook or not last_cashbook.cashbook_id.startswith("CB"):
+                self.cashbook_id = "CB0001"
+            else:
+                try:
+                    last_number = int(last_cashbook.cashbook_id.replace("CB", ""))
+                except ValueError:
+                    last_number = 0
+                self.cashbook_id = f"CB{last_number + 1:04d}"
+        super().save(*args, **kwargs)
 
     @property
     def current_balance(self):
@@ -1594,7 +1629,7 @@ class Currency(BaseModel):
         super().save(*args, **kwargs)
 
 
-class ExchangeRate(BaseModel):
+class ExchangeRate(BaseModelWithUser):
     """Currency exchange rates"""
 
     base_currency = models.ForeignKey(
@@ -1604,14 +1639,16 @@ class ExchangeRate(BaseModel):
         Currency, on_delete=models.CASCADE, related_name="target_rates"
     )
     rate = models.DecimalField(max_digits=10, decimal_places=6)
-    effective_date = models.DateField(default=now)
+    effective_date = models.DateField(default=localdate)
+    source = models.CharField(max_length=255, default="Currency Settings")
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        """Class meta information for ExchangeRate model"""
+
         verbose_name = _("Exchange Rate")
         verbose_name_plural = _("Exchange Rates")
         ordering = ["-effective_date", "base_currency", "target_currency"]
-        unique_together = ["base_currency", "target_currency", "effective_date"]
 
     def __str__(self):
         return f"{self.base_currency.currency_code}/{self.target_currency.currency_code}: {self.rate}"
@@ -1678,7 +1715,7 @@ class BalanceSheet(BaseModel):
         ordering = ["-as_of_date"]
 
 
-class PaymentMethod(BaseModel):
+class PaymentMethod(BaseModelWithUser):
     """Payment methods for disbursements and payments"""
 
     name = models.CharField(max_length=100, unique=True, blank=True, null=True)

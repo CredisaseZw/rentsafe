@@ -1,4 +1,5 @@
 # serializers/__init__.py
+from datetime import date
 from decimal import Decimal
 from django.db.models import Q
 from django.db import transaction
@@ -83,10 +84,10 @@ class AccountTypeSerializer(serializers.ModelSerializer):
             if not code:
                 raise ValidationError("Sector code is required")
 
-        if name and queryset.filter(name=name).exists():
+        if name and queryset.filter(name__iexact=name).exists():
             raise ValidationError("An account sector with this name already exists.")
 
-        if code and queryset.filter(code=code).exists():
+        if code and queryset.filter(code__iexact=code).exists():
             raise ValidationError("An account sector with this code already exists.")
 
         return attrs
@@ -141,16 +142,16 @@ class AccountSubTypeSerializer(serializers.ModelSerializer):
             if not code_prefix:
                 raise ValidationError("Account subtype code prefix is required")
 
-        if name and queryset.filter(name=name).exists():
+        if name and queryset.filter(name__iexact=name).exists():
             raise ValidationError("An account subtype with this name already exists.")
 
-        if code_prefix and queryset.filter(code_prefix=code_prefix).exists():
+        if code_prefix and queryset.filter(code_prefix__iexact=code_prefix).exists():
             raise ValidationError(
                 "An account subtype with this code prefix already exists."
             )
 
         return attrs
-    
+
     def create(self, validated_data):
         user = self.context["request"].user
         validated_data["created_by"] = user
@@ -235,7 +236,7 @@ class GeneralLedgerAccountSerializer(serializers.ModelSerializer):
         if account_number and queryset.filter(account_number=account_number).exists():
             raise ValidationError("An account with this number already exists.")
 
-        if account_name and queryset.filter(account_name=account_name).exists():
+        if account_name and queryset.filter(account_name__iexact=account_name).exists():
             raise ValidationError("An account with this name already exists.")
 
         return attrs
@@ -426,10 +427,107 @@ class TaxTypeSerializer(serializers.ModelSerializer):
     receivable_account_name = serializers.CharField(
         source="receivable_account.account_name", read_only=True
     )
+    payable_account_id = serializers.PrimaryKeyRelatedField(
+        source="payable_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "required": "Payable account is required.",
+            "does_not_exist": "Selected payable account does not exist.",
+            "incorrect_type": "Invalid payable account.",
+        },
+    )
+    receivable_account_id = serializers.PrimaryKeyRelatedField(
+        source="receivable_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "required": "Receivable account is required.",
+            "does_not_exist": "Selected receivable account does not exist.",
+            "incorrect_type": "Invalid receivable account.",
+        },
+    )
 
     class Meta:
         model = TaxType
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "rate",
+            "description",
+            "code",
+            "is_active",
+            "payable_account_name",
+            "receivable_account_name",
+            "payable_account_id",
+            "receivable_account_id",
+        ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.rate is None:
+            representation["rate"] = "Exempt"
+        return representation
+
+    def validate(self, attrs):
+        """
+        Validate that name and code are unique for the client.
+        This is called for each item in a list.
+        """
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            raise ValidationError("Request context is required for validation.")
+
+        client = request.user.client
+        name = attrs.get("name")
+        code = attrs.get("code")
+        rate = attrs.get("rate")
+
+        # Base queryset for uniqueness checks, including system-level entries.
+        queryset = TaxType.objects.filter(
+            Q(created_by__client=client) | Q(created_by__isnull=True)
+        )
+
+        # Handle updates
+        if self.instance:
+            if self.instance.created_by is None:
+                raise ValidationError(
+                    "You don't have permission to modify this system tax type."
+                )
+            queryset = queryset.exclude(pk=self.instance.pk)
+        else:
+            if not name:
+                raise ValidationError({"name": "Name is required."})
+            if not code:
+                raise ValidationError({"code": "Code is required."})
+            if not rate:
+                raise ValidationError({"rate": "Rate is required."})
+
+        if name and queryset.filter(name__iexact=name).exists():
+            raise ValidationError(
+                {"name": f"A tax type with the name '{name}' already exists."}
+            )
+
+        if code and queryset.filter(code__iexact=code).exists():
+            raise ValidationError(
+                {"code": f"A tax type with the code '{code}' already exists."}
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and request.user.is_authenticated:
+            validated_data["updated_by"] = request.user
+        return super().update(instance, validated_data)
 
 
 # ==================== PRODUCT/SERVICE CATALOG SERIALIZERS ====================
@@ -442,23 +540,185 @@ class SalesCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SalesCategory
-        fields = "__all__"
+        fields = ["id", "code", "name", "parent_category_name"]
+
+    def validate(self, attrs):
+        name = attrs.get("name")
+        code = attrs.get("code")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = SalesCategory.objects.filter(created_by__client=user_company)
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            required_fields = ["name", "code"]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        {"error": f"{field.replace('_', ' ').title()} is required."}
+                    )
+
+        if name and queryset.filter(name__iexact=name).exists():
+            raise ValidationError(
+                {"error": "A sales category with this name already exists."}
+            )
+        if code and queryset.filter(code__iexact=code).exists():
+            raise ValidationError(
+                {"error": "A sales category with this code already exists."}
+            )
+        return attrs
 
 
 class SalesItemSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source="category.name", read_only=True)
-    tax_type_name = serializers.CharField(source="tax_type.name", read_only=True)
-    income_account_name = serializers.CharField(
-        source="income_account.account_name", read_only=True
+    """Serializer for sales items (products/services)"""
+
+    currency_id = serializers.PrimaryKeyRelatedField(
+        source="currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Currency is required.",
+            "does_not_exist": "Selected currency does not exist.",
+            "incorrect_type": "Invalid currency.",
+        },
     )
-    price_including_tax = serializers.DecimalField(
-        max_digits=12, decimal_places=2, read_only=True
+    category_id = serializers.PrimaryKeyRelatedField(
+        source="category",
+        queryset=SalesCategory.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Category is required.",
+            "does_not_exist": "Selected category does not exist.",
+            "incorrect_type": "Invalid category.",
+        },
+    )
+    tax_type_id = serializers.PrimaryKeyRelatedField(
+        source="tax_type",
+        queryset=TaxType.objects.all(),
+        write_only=True,
+        error_messages={
+            "required": "Tax type is required.",
+            "does_not_exist": "Selected tax type does not exist.",
+            "incorrect_type": "Invalid tax type.",
+        },
+    )
+    income_account_id = serializers.PrimaryKeyRelatedField(
+        source="income_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected income account does not exist.",
+            "incorrect_type": "Invalid income account.",
+        },
+    )
+    cost_of_sales_account_id = serializers.PrimaryKeyRelatedField(
+        source="cost_of_sales_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected cost of sales account does not exist.",
+            "incorrect_type": "Invalid cost of sales account.",
+        },
+    )
+    inventory_account_id = serializers.PrimaryKeyRelatedField(
+        source="inventory_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=False,
+        error_messages={
+            "does_not_exist": "Selected inventory account does not exist.",
+            "incorrect_type": "Invalid inventory account.",
+        },
     )
 
     class Meta:
+        """Class meta for sales item serializer"""
+
         model = SalesItem
-        fields = "__all__"
-        read_only_fields = ("id", "date_created", "date_updated", "item_code")
+        exclude = ["date_created", "date_updated", "created_by", "updated_by"]
+        read_only_fields = (
+            "id",
+            "item_code",
+            "category",
+            "tax_type",
+            "income_account",
+            "cost_of_sales_account",
+            "inventory_account",
+            "currency",
+        )
+
+    def to_representation(self, instance):
+        represantation = {
+            "id": instance.id,
+            "item_code": instance.item_code,
+            "name": instance.name,
+            "description": instance.description,
+            "category": instance.category.name if instance.category else None,
+            "price": str(instance.unit_price),
+            "price_including_tax": str(instance.price_including_tax),
+            "vat_price": str(instance.vat_price),
+            "currency": instance.currency.currency_code if instance.currency else None,
+            "is_active": instance.is_active,
+            "tax_type": instance.tax_type.name if instance.tax_type else None,
+            "income_account": (
+                instance.income_account.account_name
+                if instance.income_account
+                else None
+            ),
+            "cost_of_sales_account": (
+                instance.cost_of_sales_account.account_name
+                if instance.cost_of_sales_account
+                else None
+            ),
+            "inventory_account": (
+                instance.inventory_account.account_name
+                if instance.inventory_account
+                else None
+            ),
+        }
+        return represantation
+
+    def validate(self, attrs):
+        name = attrs.get("name")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+
+        queryset = SalesItem.objects.filter(created_by__client=user_company)
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            required_fields = [
+                "name",
+                "category",
+                "tax_type",
+                "unit_price",
+            ]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        {"error": f"{field.replace('_', ' ').title()} is required."}
+                    )
+
+        if name and queryset.filter(name__iexact=name).exists():
+            raise ValidationError(
+                {"error": "A sales item with this name already exists."}
+            )
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
+
+    @transaction.atomic
+    def update(self, validated_data):
+        user = self.context["request"].user
+        validated_data["updated_by"] = user
+        return super().update(validated_data)
 
 
 # ==================== INVOICE SERIALIZERS ====================
@@ -643,17 +903,115 @@ class BankAccountSerializer(serializers.ModelSerializer):
     gl_account_number = serializers.CharField(
         source="gl_account.account_number", read_only=True
     )
-    current_balance = serializers.DecimalField(
-        max_digits=15, decimal_places=2, read_only=True
+    gl_account_id = serializers.PrimaryKeyRelatedField(
+        source="gl_account",
+        queryset=GeneralLedgerAccount.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "GL Account is required.",
+            "does_not_exist": "Selected GL Account does not exist.",
+            "incorrect_type": "Invalid GL Account.",
+        },
     )
+    # current_balance = serializers.DecimalField(
+    #     max_digits=15, decimal_places=2, read_only=True
+    # )
     currency_code = serializers.CharField(
         source="currency.currency_code", read_only=True
+    )
+    currency_id = serializers.PrimaryKeyRelatedField(
+        source="currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "Currency is required.",
+            "does_not_exist": "Selected currency does not exist.",
+            "incorrect_type": "Invalid currency.",
+        },
     )
 
     class Meta:
         model = BankAccount
-        fields = "__all__"
-        read_only_fields = ("id", "date_created", "date_updated")
+        exclude = [
+            "date_created",
+            "date_updated",
+            "opening_balance",
+            "opening_balance_date",
+        ]
+        read_only_fields = (
+            "id",
+            "date_created",
+            "date_updated",
+            "currency",
+            "cashbook_id",
+            "gl_account",
+        )
+
+    def validate(self, attrs):
+        account_name = attrs.get("account_name")
+        account_type = attrs.get("account_type")
+        user_company = self.context["request"].user.client
+        gl_account = attrs.get("gl_account")
+        instance = self.instance
+
+        if not instance:
+            required_fields = ["account_name", "account_type"]
+            for field in required_fields:
+                if not attrs.get(field):
+                    raise ValidationError(
+                        f"{field.replace('_', ' ').title()} is required."
+                    )
+
+        check_name = (
+            account_name
+            if account_name is not None
+            else (instance.account_name if instance else None)
+        )
+        check_type = (
+            account_type
+            if account_type is not None
+            else (instance.account_type if instance else None)
+        )
+
+        if check_name and check_type:
+            queryset = BankAccount.objects.filter(
+                created_by__client=user_company,
+                account_name__iexact=check_name,
+                account_type=check_type,
+            )
+
+            if instance:
+                queryset = queryset.exclude(pk=instance.pk)
+
+            if queryset.exists():
+                raise ValidationError(
+                    "A cashbook account with this name and type already exists."
+                )
+
+        if gl_account:
+            gl_account_used = BankAccount.objects.filter(
+                created_by__client=user_company,
+                gl_account=gl_account,
+            )
+            if instance:
+                gl_account_used = gl_account_used.exclude(pk=instance.pk)
+            if gl_account_used.exists():
+                raise ValidationError(
+                    "The selected Ledger Account is already linked to another cash book."
+                )
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["created_by"] = user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        validated_data["updated_by"] = user
+        return super().update(instance, validated_data)
 
 
 class CashReceiptSerializer(serializers.ModelSerializer):
@@ -690,22 +1048,140 @@ class CashReceiptSerializer(serializers.ModelSerializer):
 
 
 class CurrencySerializer(serializers.ModelSerializer):
+    """Serializer for currencies"""
+
     class Meta:
+        """Meta class for CurrencySerializer"""
+
         model = Currency
-        fields = "__all__"
+        exclude = ("date_created", "date_updated")
+
+    def validate(self, data):
+        code = data.get("currency_code")
+        symbol = data.get("symbol")
+        instance = self.instance
+
+        queryset = Currency.objects.all()
+
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+        else:
+            if not code:
+                raise ValidationError("Currency code is required")
+            if not symbol:
+                raise ValidationError("Currency symbol is required")
+
+        if code and queryset.filter(currency_code=code).exists():
+            raise ValidationError("A currency with this code already exists.")
+
+        return data
 
 
 class ExchangeRateSerializer(serializers.ModelSerializer):
+    """Serializer for currency exchange rates"""
+
     base_currency_code = serializers.CharField(
         source="base_currency.currency_code", read_only=True
     )
     target_currency_code = serializers.CharField(
         source="target_currency.currency_code", read_only=True
     )
+    base_currency_id = serializers.PrimaryKeyRelatedField(
+        source="base_currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "Base currency is required.",
+            "does_not_exist": "Selected base currency does not exist.",
+            "incorrect_type": "Invalid base currency.",
+        },
+    )
+    target_currency_id = serializers.PrimaryKeyRelatedField(
+        source="target_currency",
+        queryset=Currency.objects.all(),
+        write_only=True,
+        required=True,
+        error_messages={
+            "required": "Target currency is required.",
+            "does_not_exist": "Selected target currency does not exist.",
+            "incorrect_type": "Invalid target currency.",
+        },
+    )
 
     class Meta:
+        """Meta class for ExchangeRateSerializer"""
+
         model = ExchangeRate
-        fields = "__all__"
+        exclude = ("date_created", "date_updated")
+        read_only_fields = ("base_currency", "target_currency")
+
+    def to_representation(self, instance):
+        date = (
+            instance.effective_date.strftime("%d-%b-%Y")
+            if instance.effective_date
+            else instance.date_created.strftime("%d-%b-%Y")
+        )
+        created_by = instance.created_by
+        if (
+            created_by
+            and hasattr(created_by, "first_name")
+            and hasattr(created_by, "last_name")
+            and created_by.first_name
+            and created_by.last_name
+        ):
+            created_by_display = (
+                f"{created_by.first_name[0].upper()}. {created_by.last_name}"
+            )
+        else:
+            created_by_display = None
+        return {
+            "id": instance.id,
+            "base_currency": instance.base_currency.currency_code,
+            "target_currency": instance.target_currency.currency_code,
+            "rate": str(instance.rate),
+            "effective_date": date,
+            "created_by": created_by_display,
+        }
+
+    def validate(self, attrs):
+        base_currency = attrs.get("base_currency")
+        target_currency = attrs.get("target_currency")
+        rate = attrs.get("rate")
+        user = self.context["request"].user.client
+        if rate is not None and rate <= -0:
+            raise ValidationError("Current Rate must be greater than zero.")
+
+        if self.instance:
+            return attrs
+
+        for fields in ["target_currency", "base_currency", "rate"]:
+            if not attrs.get(fields):
+                raise ValidationError(f"{fields.replace('_', ' ').title()} is required")
+        today = date.today()
+        last_rate = (
+            ExchangeRate.objects.filter(
+                created_by__client=user,
+                base_currency=base_currency,
+                target_currency=target_currency,
+            )
+            .order_by("-date_updated", "-date_created")
+            .first()
+        )
+        if last_rate and last_rate.effective_date == today:
+            raise ValidationError(
+                {
+                    "error": "An exchange rate for these currencies has already been set today."
+                }
+            )
+        if last_rate and last_rate.rate == rate:
+            raise ValidationError({"error": "This rate is already the latest."})
+
+        if target_currency == base_currency:
+            raise ValidationError(
+                "Base Currency and Counter Currency cannot be the same."
+            )
+        return attrs
 
 
 # ==================== REPORT SERIALIZERS ====================
@@ -741,9 +1217,22 @@ class TrialBalanceSerializer(serializers.ModelSerializer):
 class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentMethod
-        fields = "__all__"
+        fields = ["id", "name", "description"]
 
-        # serializers.py
+    def validate(self, attrs):
+        name = attrs.get("name")
+        user_company = self.context["request"].user.client
+        instance = self.instance
+        queryset = PaymentMethod.objects.filter(
+            Q(created_by__isnull=True) | Q(created_by__client=user_company)
+        )
+        if instance:
+            queryset = queryset.exclude(pk=instance.pk)
+
+        if queryset.filter(name__iexact=name).exists():
+            raise ValidationError("A payment method with this name already exists.")
+
+        return attrs
 
 
 class CashSaleLineItemSerializer(serializers.ModelSerializer):
