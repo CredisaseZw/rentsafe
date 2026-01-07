@@ -53,6 +53,20 @@ import OpeningBalances from "@/routes/rent-safe/accounting/settings/OpeningBalan
 import SalesInvoices from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoices";
 import ToDoList from "@/routes/rent-safe/to-do-list/ToDoList";
 import CompanySettings from "@/routes/rent-safe/admin/CompanySettings";
+import TrustAccountingSalesInvoicing from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesInvoicing";
+import TrustAccountingSalesCashSales from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesCashSales";
+import TrustAccountingSalesReports from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesReports";
+import TrustAccountingTenantDebitJournal from "@/routes/rent-safe/trust-accounting/tenant/tenant-journals/TrustAccountingTenantDebitJournal";
+import TrustAccountingTenantCreditJournal from "@/routes/rent-safe/trust-accounting/tenant/tenant-journals/TrustAccountingTenantCreditJournal";
+import TrustAccountingTenantStatement from "@/routes/rent-safe/trust-accounting/tenant/tenant-report/TrustAccountingTenantStatement";
+import TrustAccountingTenantAgedAnalysis from "@/routes/rent-safe/trust-accounting/tenant/tenant-report/TrustAccountingTenantAgedAnalysis";
+import TrustAccountingLandlordsCreditJournal from "@/routes/rent-safe/trust-accounting/landlords/landlord-journals/TrustAccountingLandlordsCreditJournal";
+import TrustAccountingLandlordsDebitJournals from "@/routes/rent-safe/trust-accounting/landlords/landlord-journals/TrustAccountingLandlordsDebitJournals";
+import TrustAccountingLandlordsStatement from "@/routes/rent-safe/trust-accounting/landlords/landlord-report/TrustAccountingLandlordsStatement";
+import TrustAccountingLandlordsAgedAnalysis from "@/routes/rent-safe/trust-accounting/landlords/landlord-report/TrustAccountingLandlordsAgedAnalysis";
+import TrustAccountingLandlordsProfitAndLoss from "@/routes/rent-safe/trust-accounting/landlords/landlord-report/TrustAccountingLandlordsProfitAndLoss";
+import TrustAccountingTenantBalances from "@/routes/rent-safe/trust-accounting/tenant/TrustAccountingTenantBalances";
+import TrustAccountPropertySettings from "@/routes/rent-safe/trust-accounting/settings/gl-listings/TrustAccountPropertySettings";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -86,7 +100,6 @@ export const ROOT_NAVLINKS: NavLink[] = [
       pageComponent: NotFound,
    },
 ];
-
 export const RENTSAFE_PRE_SEG = "/services/rent-safe";
 export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    {
@@ -170,7 +183,6 @@ export const RENTSAFE_APP_NAVLINKS: NavLink[] = [
    },
 
 ];
-
 export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
    {
       label: "Sales",
@@ -510,6 +522,147 @@ export const RENTSAFE_ACCOUNTING_NAVLINKS: NavLink[] = [
       ],
    },
 ];
+export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
+   {
+      label: "Sales",
+      segment : RENTSAFE_PRE_SEG + "/trust-accounting",
+      subLinks : [
+         {
+            label : "Invoicing",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/invoicing",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/invoicing",
+            pageComponent : TrustAccountingSalesInvoicing
+         },
+         {
+            label : "Cash Sales",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/cash-sales",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/cash-sales",
+            pageComponent : TrustAccountingSalesCashSales
+         },
+         {
+            label : "Sales Reports",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-reports",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-reports",
+            pageComponent : TrustAccountingSalesReports
+         },
+
+      ]
+   },
+   {
+      label: "Tenants",
+      segment : RENTSAFE_PRE_SEG + "/trust-accounting",
+      subLinks : [
+         {
+            label : "Tenants Balances",
+            path :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-balances",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-balances",
+            pageComponent : TrustAccountingTenantBalances
+         },
+         {
+            label : "Tenants Journals",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-journals",
+            subLinks : [
+               {
+                  label : "Debit Journal",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-journals/debit-journals",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-journals/debit-journals",
+                  pageComponent : TrustAccountingTenantDebitJournal
+               },
+               {
+                  label : "Credit Journal",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-journals/credit-journals",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-journals/credit-journals",
+                  pageComponent : TrustAccountingTenantCreditJournal
+               }
+            ]
+         },
+         {
+            label : "Tenant Reports",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-reports",
+            subLinks : [
+               {
+                  label : "Tenant Statements",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-reports/tenant-statements",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-reports/tenant-statements",
+                  pageComponent : TrustAccountingTenantStatement
+               },
+               {
+                  label : "Tenant Aged Analysis",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-reports/tenant-aged-analysis",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/tenants/tenant-reports/tenant-aged-analysis",
+                  pageComponent : TrustAccountingTenantAgedAnalysis
+               }
+            ]
+         },
+      ]
+   },
+   {
+      label : "Landlords",
+      segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords",
+      subLinks : [
+         {
+            label : "Landlord Journals",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-journals",
+            subLinks : [
+               {
+                  label : "Credit Journals",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-journals/credit-journals",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-journals/credit-journals",
+                  pageComponent : TrustAccountingLandlordsCreditJournal
+               }, 
+               {
+                  label : "Debit Journals",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-journals/debit-journals",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-journals/debit-journals",
+                  pageComponent : TrustAccountingLandlordsDebitJournals
+               },
+            ]
+         },
+         {
+            label : "Landlord Reports",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports",
+            subLinks : [
+               {
+                  label : "Landlord Statements",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports/landlord-statements",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports/landlord-statements",
+                  pageComponent : TrustAccountingLandlordsStatement
+               },
+               {
+                  label : "Landlord Aged Analysis",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports/landlord-aged-analysis",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports/landlord-aged-analysis",
+                  pageComponent : TrustAccountingLandlordsAgedAnalysis
+               },
+               {
+                  label : "Landlord Profit & Loss",
+                  segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports/landlord-profit-loss",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/landlord-reports/landlord-profit-loss",
+                  pageComponent : TrustAccountingLandlordsProfitAndLoss
+               }
+            ]
+         },
+      ]
+   },
+   {
+      label : "Settings",
+      segment :  RENTSAFE_PRE_SEG + "/trust-accounting/settings/",
+      subLinks : [
+         {
+            label : "GL Listings",
+            segment : RENTSAFE_PRE_SEG + "/trust-accounting/settings/gl-listings",
+            subLinks: [
+               {  
+                  label : "Property Settings",
+                  segment : RENTSAFE_PRE_SEG + "/trust-accounting/settings/gl-listings/property-settings",
+                  path : RENTSAFE_PRE_SEG + "/trust-accounting/settings/gl-listings/property-settings",
+                  pageComponent : TrustAccountPropertySettings
+               }
+            ]
+         }
+      ]
+   }
+]
 export const RENT_ADMIN_PANEL_NAVLINKS: NavLink[] = [
    {
       label: "Admin",

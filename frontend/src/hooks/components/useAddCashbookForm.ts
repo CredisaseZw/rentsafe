@@ -37,6 +37,7 @@ function useAddCashbookForm(initial: Cashbook | undefined, successCallback:  (()
 
     const handleSubmit = (
         e:React.FormEvent<HTMLFormElement>, 
+        // eslint-disable-next-line
         mutation: UseMutationResult<any, Error, Payload, unknown>) => {
         e.preventDefault();
         let changedData;

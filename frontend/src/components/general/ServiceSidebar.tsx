@@ -17,12 +17,15 @@ import { getCookie } from "typescript-cookie";
 type SidebarProps = {
    title?: string;
    rentsafeAppNavlinks: NavLink[];
+   rentsafeTrustAccountingNavlinks: NavLink[];
    rentsafeAccountingNavlinks: NavLink[];
    rentsafeAdminPanelNavlinks: NavLink[];
+
 };
 
 export default function ServiceSidebar({
    rentsafeAppNavlinks,
+   rentsafeTrustAccountingNavlinks,
    rentsafeAccountingNavlinks,
    rentsafeAdminPanelNavlinks,
 }: SidebarProps) {
@@ -72,6 +75,27 @@ export default function ServiceSidebar({
                </SidebarGroupContent>
             </SidebarGroup>
 
+            {/* TRUST  ACCOUNTING */}
+            <SidebarGroup>
+               <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">
+                  TRUST ACCOUNTING
+               </SidebarGroupLabel>
+               <SidebarGroupContent>
+                  <SidebarMenu>
+                     {
+                        rentsafeTrustAccountingNavlinks.map((link, idx)=> (
+                           <NavLinkItem
+                              key={idx}
+                              navLink={link}
+                              expandedSegment={expandedSegment}
+                              expandThisSegment={expandThisSegment}
+                           />
+                        ))
+                     }
+                  </SidebarMenu>
+               </SidebarGroupContent>
+            </SidebarGroup>
+            
             {/* ACCOUNTING */}
             <SidebarGroup>
                <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">

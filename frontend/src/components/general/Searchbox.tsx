@@ -17,7 +17,8 @@ function Searchbox({placeholder }: SearchboxProps) {
    return (
       <form onSubmit={(e:React.FormEvent<HTMLFormElement>)=>{
          e.preventDefault()
-         if (searchValue.trim()) handleOnSearchValue();
+         if (!searchValue.trim()) return onClearSearch();
+         handleOnSearchValue();
       }} 
       className="border-color flex items-center h-fit self-center justify-between rounded-sm border bg-white sm:w-full md:w-fit dark:bg-zinc-900">
          <Button onClick={onClearSearch} className="h-full" type="button" variant="ghost" size="xs">

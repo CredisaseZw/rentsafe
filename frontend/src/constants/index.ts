@@ -8,6 +8,7 @@ import {
   RENTSAFE_APP_NAVLINKS,
   RENTSAFE_ACCOUNTING_NAVLINKS,
   ROOT_NAVLINKS,
+  RENTSAFE_TRUST_ACCOUNTING_NAVLINKS,
 } from "./navlinks";
 
 export const SERVICES: Service[] = [
@@ -29,6 +30,7 @@ export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([
   ...RENTSAFE_APP_NAVLINKS,
   ...RENTSAFE_ACCOUNTING_NAVLINKS,
   ...RENT_ADMIN_PANEL_NAVLINKS,
+  ...RENTSAFE_TRUST_ACCOUNTING_NAVLINKS
 ]);
 
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
@@ -665,6 +667,7 @@ export const INVOICE_MUTATION_STATUSES = {
   },
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const INVOICE_STATUS_VARIANT: Record<string, any> = {
     pending: "warning",
     paid: "success",
@@ -689,4 +692,31 @@ export const PROPERTY_HEADERS: Header[] = [
   { name: "Street Address" , textAlign : "left"},
   { name: "Property Type" , textAlign : "left"},
   { name: "Actions" }
+];
+
+export const TENANT_BALANCES_HEADERS: Header[] = [
+  {name: "Lease ID"},
+  {name: "Tenant", textAlign : "end"},
+  {name: "Rent Owing", textAlign : "end"},
+  {name: "Actions", textAlign : "end"}
+]
+
+export const TRUST_ACCOUNTS_TENANT_STATEMENT_HEADERS:Header[] =[
+  {name:"Customer #"},
+  {name:"Customer Name", textAlign : "left"},
+  {name:"Address", textAlign : "left"},
+  {name:"Rent Owing", textAlign :"end"},
+  {name:"Action"},
+]
+export const TRUST_ACCOUNTS_PROPERTY_EXPENSES_HEADERS:Header[] =[
+  { name : "Expense", textAlign:"left"},
+  { name : "Actions", textAlign: "end"}
+]
+export const TRUST_ACCOUNTS_TENANT_DC_JOURNAL_HEADERS: Header[] = [
+  { name: "Date", textAlign: "center" },        
+  { name: "Ref Tenant", textAlign: "center" },  
+  { name: "TGL Account", textAlign: "left" },
+  { name: "Details", textAlign: "left" },
+  { name: "Debit Amount", textAlign: "end" }, 
+  { name: "Action", textAlign: "center" },
 ];
