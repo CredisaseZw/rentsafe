@@ -1,12 +1,30 @@
-import type { CashSale } from "@/interfaces";
+import type { CashSale, CreditNote, Invoice } from "@/interfaces";
 import { formatAddress, getCurrentDate } from "@/lib/utils";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-interface InvoiceProps {
-    cashSale:CashSale
+interface props {
+    bill:CashSale | Invoice | CreditNote
 }
 
-const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSale }, ref) => {
+const BillingPrint = React.forwardRef<HTMLDivElement, props>(({ bill }, ref) => {
+    const [billTotal, setBillTotal] = useState("");
+    const [vatTotal, setVatTotal] = useState("");
+    useEffect(()=>{
+      setBillTotal(
+        "invoice_total" in bill
+          ? bill.invoice_total
+          : "credit_note_total" in bill
+          ? bill.credit_note_total
+          : String(bill.total_inclusive)
+      );
+
+      setVatTotal(
+        ("total_vat" in bill)
+        ? String(bill.total_vat)
+        : String(bill.vat_total)
+      );
+                 
+    }, [bill])
     return (
       <div
         ref={ref}
@@ -32,13 +50,13 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
         </div>
 
         <div className="my-8">
-            <p>Document Number: {cashSale.document_number}</p>
-            <p className="font-semibold">Bill To: {cashSale.customer_details.full_name}</p>
-            <p className="text-sm text-gray-600 mt-2">Address: {formatAddress(cashSale.customer_details.address)}</p>
-            <p className="text-sm text-gray-600">Phone: {cashSale.customer_details.phone}</p>
-            <p className="text-sm text-gray-600">Email: {cashSale.customer_details.email}</p>
-            <p className="text-sm text-gray-600">VAT No.: {cashSale.customer_details.vat_number}</p>
-            <p className="text-sm text-gray-600">TIN: {cashSale.customer_details.tin_number}</p>
+            <p>Document Number: {bill.document_number ?? "-"}</p>
+            <p className="font-semibold">Bill To: {bill.customer_details.full_name ?? "-"}</p>
+            <p className="text-sm text-gray-600 mt-2">Address: {formatAddress(bill.customer_details.address)}</p>
+            <p className="text-sm text-gray-600">Phone: {bill.customer_details.phone?? "-"}</p>
+            <p className="text-sm text-gray-600">Email: {bill.customer_details.email?? "-"}</p>
+            <p className="text-sm text-gray-600">VAT No.: {bill.customer_details.vat_number?? "-"}</p>
+            <p className="text-sm text-gray-600">TIN: {bill.customer_details.tin_number?? "-"}</p>
             <p className="text-sm text-gray-600 mt-4">Rep: {}</p>
             <p className="text-sm text-gray-600">Date: {getCurrentDate("long")}</p>
         </div>
@@ -54,7 +72,7 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
             </tr>
           </thead>
           <tbody>
-            {cashSale.line_items.map((i, idx) => (
+            {bill.line_items.map((i, idx) => (
               <tr key={idx} className="border-b border-r border-l border-gray-600">
                 <td className="p-2">{i.sales_item.name}</td>
                 <td className="p-2 text-right">{i.quantity}</td>
@@ -68,7 +86,7 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
                     Total (Excluding VAT)
                 </td>
                 <td className="border border-gray-600 p-2 text-right">
-                    {cashSale.total_excluding_vat ?? "-"}
+                    {bill.total_excluding_vat ?? "-"}
                 </td>
             </tr>
             <tr>
@@ -76,7 +94,7 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
                     Discount
                 </td>
                 <td className="border border-gray-600 p-2 text-right">
-                    {cashSale.discount ?? "-" }
+                    {bill.discount ?? "-" }
                 </td>
             </tr>
                         <tr>
@@ -84,7 +102,7 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
                    VAT Total
                 </td>
                 <td className="border border-gray-600 p-2 text-right">
-                    {cashSale.vat_total ?? "-"}
+                    {vatTotal ?? "-"}
                 </td>
             </tr>
                         <tr>
@@ -92,7 +110,7 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
                     Invoice Total USD
                 </td>
                 <td className="border border-gray-600 p-2 text-right">
-                    {cashSale.invoice_total ?? "-"}
+                  { billTotal ?? "-" }
                 </td>
             </tr>
           </tbody>
@@ -102,4 +120,4 @@ const CashSaleInvoice = React.forwardRef<HTMLDivElement, InvoiceProps>(({ cashSa
   }
 );
 
-export default CashSaleInvoice;
+export default BillingPrint;

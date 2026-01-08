@@ -14,6 +14,7 @@ import MutateInvoiceStatus from './MutateInvoiceStatus'
 import DeleteDialogue from '../../../../../general/DeleteDialogue'
 //import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
 import { getRefetchInvoices } from '@/store/invoiceStore'
+import PrintBillingDocument from './PrintBillingDocument'
 
 interface props{
     invoice: Invoice | undefined
@@ -144,7 +145,15 @@ function SingleInvoice({invoice, handleGoBack, markInvoice}:props) {
                     <TableCell className='text-end font-bold'>{invoice?.currency.symbol}{invoice?.total_inclusive}</TableCell>
                 </TableRow>
             </TableBase>
-        
+            <div className='flex justify-end'>
+              {
+                invoice &&
+                <PrintBillingDocument 
+                  bill={invoice}
+                  billTitle='Invoice'
+                />
+              }
+            </div>
         </div>
     </div>
   )

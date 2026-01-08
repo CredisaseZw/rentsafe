@@ -12,7 +12,7 @@ import NavLinkItem from "./NavLinkItem";
 import { useEffect, useState } from "react";
 import type { NavLink } from "@/types";
 import SidebarFooterContent from "./SidebarFooterContent";
-import { getCookie } from "typescript-cookie";
+import { getUsername } from "@/lib/utils";
 
 type SidebarProps = {
    title?: string;
@@ -33,15 +33,8 @@ export default function ServiceSidebar({
    const [username, setUsername] = useState<string>("");
 
    useEffect(() => {
-      const token = getCookie("token");
-      if (token) {
-         try {
-            const parsedToken = JSON.parse(token);
-            setUsername(parsedToken.username);
-         } catch {
-            console.log("Error parsing token");
-         }
-      }
+      const username_ = getUsername();
+      if(username_) return setUsername(username_);
    }, []);
 
    return (

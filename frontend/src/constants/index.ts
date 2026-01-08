@@ -667,7 +667,6 @@ export const INVOICE_MUTATION_STATUSES = {
   },
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const INVOICE_STATUS_VARIANT: Record<string, any> = {
     pending: "warning",
     paid: "success",
@@ -711,7 +710,7 @@ export const TRUST_ACCOUNTS_TENANT_STATEMENT_HEADERS:Header[] =[
 export const TRUST_ACCOUNTS_PROPERTY_EXPENSES_HEADERS:Header[] =[
   { name : "Expense", textAlign:"left"},
   { name : "Actions", textAlign: "end"}
-]
+];
 export const TRUST_ACCOUNTS_TENANT_DC_JOURNAL_HEADERS: Header[] = [
   { name: "Date", textAlign: "center" },        
   { name: "Ref Tenant", textAlign: "center" },  
@@ -720,3 +719,26 @@ export const TRUST_ACCOUNTS_TENANT_DC_JOURNAL_HEADERS: Header[] = [
   { name: "Debit Amount", textAlign: "end" }, 
   { name: "Action", textAlign: "center" },
 ];
+export const CASH_BOOK_PAYMENT_HEADERS: Header[] = [
+  { name: "Date", textAlign: "center" },           
+  { name: "Pay Ref.", textAlign: "center" },       
+  { name: "Type", textAlign: "left" },
+  { name: "GL/Cr Account", textAlign: "left" },
+  { name: "Details", textAlign: "left" },
+  { name: "Total Pay (Inc. VAT)", textAlign: "end" },
+  { name: "VAT", textAlign: "end" },                 
+  { name: "Matching", textAlign: "center" },
+  { name: "Invoice Rate", textAlign: "end" },
+  { name: "Action"}        
+];
+
+export const CASH_BOOK_RECEIPT_HEADERS: Header[] = [
+  { name: "Date", textAlign: "center" },
+  { name: "Receipt Number", textAlign: "center" },
+  { name: "Type", textAlign: "left" },
+  { name: "GL/C Account", textAlign: "left" },
+  { name: "Details", textAlign: "left" },
+  { name: "Amount", textAlign: "end" },      
+  { name: "Matching", textAlign: "center" },
+  { name: "Invoice Rate", textAlign: "end" }, 
+]
