@@ -1,6 +1,6 @@
 function TrustAccountRecurringInvoices() {
   return (
-    <div>TrustAccountRecurringInvoices</div>
+    <div></div>
   )
 }
 

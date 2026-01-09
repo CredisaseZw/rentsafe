@@ -742,3 +742,15 @@ export const CASH_BOOK_RECEIPT_HEADERS: Header[] = [
   { name: "Matching", textAlign: "center" },
   { name: "Invoice Rate", textAlign: "end" }, 
 ]
+
+export const TRUST_ACCOUNT_INVOICE_LIST_HEADERS: Header[] = [
+  { name: "Date Created", textAlign: "center" },
+  { name: "Invoice No.", textAlign: "center" },
+  { name: "Landlord", textAlign: "left" },
+  { name: "Tenant", textAlign: "left" },
+  { name: "Currency", textAlign: "center" },
+  { name: "Amount (Excl. VAT)", textAlign: "end" },
+  { name: "VAT", textAlign: "end" },
+  { name: "Amount (Incl. VAT)", textAlign: "end" },
+  { name: "Action", textAlign: "center" },
+]
