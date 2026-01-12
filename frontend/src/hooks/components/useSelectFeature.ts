@@ -1,6 +1,7 @@
 import { UNIT_FEATURES } from "@/constants";
 import type { SelectedFeature } from "@/types";
 import { useState, type Dispatch, type SetStateAction } from "react";
+import { toast } from "sonner";
 
 interface Props {
   selectedList: SelectedFeature[]
@@ -16,11 +17,15 @@ function useSelectFeature({selectedList, setSelectedList}: Props) {
     )
     const handleAdd = () => {
         if (selectedCategory && selectedFeature) {
-        setSelectedList((prev) => [
-            ...prev,
-            { category: selectedCategory, feature: selectedFeature },
-        ])
-        setSelectedFeature("") 
+            const isDuplicate = selectedList.some(
+                (item) => item.category === selectedCategory && item.feature === selectedFeature
+            )
+            if (isDuplicate) return toast.info("Feature already selected")
+            setSelectedList((prev) => [
+                ...prev,
+                { category: selectedCategory, feature: selectedFeature },
+            ])
+            setSelectedFeature("") 
         }
     }
 
