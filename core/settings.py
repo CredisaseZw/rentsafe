@@ -119,6 +119,7 @@ INSTALLED_APPS = [
     "apps.credit_control",
     "apps.legal",
     "apps.clients",
+    "apps.trust_accounting",
 ]
 
 MIDDLEWARE = [

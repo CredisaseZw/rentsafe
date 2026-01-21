@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from .webhook import github_webhook
@@ -29,31 +30,39 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('webhooks/rentsafe/', github_webhook, name='github_webhook'),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'), 
-    path('api/individuals/', include('apps.individuals.api.urls')),
-    path('api/leases/', include('apps.leases.api.urls')),
-    path('api/', include('apps.companies.api.urls')),
-    path('api/maintenance/', include('apps.maintenance.api.urls')),
-    path('api/reports/', include('apps.reporting.api.urls')),
-    path('api/auth/', include('apps.users.api.urls')),
+    path("admin/", admin.site.urls),
+    path("webhooks/rentsafe/", github_webhook, name="github_webhook"),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("api/individuals/", include("apps.individuals.api.urls")),
+    path("api/leases/", include("apps.leases.api.urls")),
+    path("api/", include("apps.companies.api.urls")),
+    path("api/maintenance/", include("apps.maintenance.api.urls")),
+    path("api/reports/", include("apps.reporting.api.urls")),
+    path("api/auth/", include("apps.users.api.urls")),
     # path('api/inspections/', include('apps.inspections.api.urls')),
-    path('api/communication/', include('apps.communications.api.urls')),
-    path('api/common/', include('apps.common.api.urls')),
-    path('api/legal/', include('apps.legal.api.urls')),
-    path('api/credit-control/', include('apps.credit_control.api.urls')),
-    path('api/clients/', include('apps.clients.api.urls')),
-    path('api/properties/', include('apps.properties.api.urls')),
-    path('api/subscriptions/', include('apps.subscriptions.api.urls')),
-    path('api/accounting/', include('apps.accounting.api.urls')),
-
+    path("api/communication/", include("apps.communications.api.urls")),
+    path("api/common/", include("apps.common.api.urls")),
+    path("api/legal/", include("apps.legal.api.urls")),
+    path("api/credit-control/", include("apps.credit_control.api.urls")),
+    path("api/clients/", include("apps.clients.api.urls")),
+    path("api/properties/", include("apps.properties.api.urls")),
+    path("api/subscriptions/", include("apps.subscriptions.api.urls")),
+    path("api/accounting/", include("apps.accounting.api.urls")),
+    path("api/trust-accounting/", include("apps.trust_accounting.api.urls")),
     # API Documentation URLs
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Swagger UI
-    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
     # ReDoc UI
-    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path(
+        "api/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
 ]

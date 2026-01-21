@@ -16,6 +16,7 @@ COMMANDS=(
     "services_and_periods"
     "seed_roles"
     "seed_vats"
+    "seed_trust_general_ledgers"
 )
 
 # Function to run a Django management command
