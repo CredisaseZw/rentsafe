@@ -1,8 +1,7 @@
 """Management command to seed Trust General Ledger accounts and sectors."""
 
 from django.core.management.base import BaseCommand
-from apps.accounting.models.models import AccountType
-from apps.trust_accounting.models.models import TrustGeneralLedger
+from apps.trust_accounting.models.models import TrustGeneralLedger, TrustAccountType
 
 
 class Command(BaseCommand):
@@ -126,7 +125,7 @@ class Command(BaseCommand):
         }
 
         for code, name in unique_sectors:
-            AccountType.objects.get_or_create(
+            TrustAccountType.objects.get_or_create(
                 code=code,
                 defaults={
                     "name": name,
@@ -141,7 +140,7 @@ class Command(BaseCommand):
         )
 
         for entry in self.ACCOUNTS_DATA:
-            sector = AccountType.objects.get(code=entry["sector_code"])
+            sector = TrustAccountType.objects.get(code=entry["sector_code"])
             TrustGeneralLedger.objects.get_or_create(
                 account_number=entry["account_number"],
                 defaults={

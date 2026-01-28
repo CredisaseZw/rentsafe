@@ -4,6 +4,8 @@ from django.db import transaction
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.utils.text import slugify
+from django.db.models.manager import BaseManager
+from django.core.exceptions import FieldError
 
 from apps.leases.models import (
     Lease,
@@ -19,8 +21,12 @@ from apps.leases.models import (
 )
 from apps.subscriptions.models import Subscription
 from apps.properties.models.models import Property, Unit, PropertyType
-from apps.individuals.models.models import Individual
-from apps.companies.models.models import CompanyBranch
+from apps.individuals.models.models import (
+    Individual,
+    IndividualAccounts,
+    IndividualContactDetail,
+)
+from apps.companies.models.models import CompanyBranch, CompanyProfile
 from apps.common.models.models import Address
 from apps.accounting.models.models import Currency, Payment, PaymentMethod
 
@@ -86,19 +92,100 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 # Helper serializers for related objects
 class IndividualSerializer(serializers.ModelSerializer):
+    phone_number = serializers.SerializerMethodField()
+    primary_address = serializers.SerializerMethodField()
+    tin_number = serializers.SerializerMethodField()
+    vat_number = serializers.SerializerMethodField()
+
     class Meta:
         model = Individual
-        fields = ["id", "full_name", "identification_number"]
+        fields = [
+            "id",
+            "full_name",
+            "email",
+            "phone_number",
+            "tin_number",
+            "vat_number",
+            "primary_address",
+        ]
+
+    def get_tin_number(self, obj):
+        account_details = getattr(obj, "account_details", None)
+        if not account_details:
+            return None
+
+        if isinstance(account_details, BaseManager) or hasattr(
+            account_details, "values_list"
+        ):
+            return (
+                account_details.order_by("-id")
+                .values_list("tin_number", flat=True)
+                .first()
+            )
+
+        return getattr(account_details, "tin_number", None)
+
+    def get_vat_number(self, obj):
+        account_details = getattr(obj, "account_details", None)
+        if not account_details:
+            return None
+
+        if isinstance(account_details, BaseManager) or hasattr(
+            account_details, "values_list"
+        ):
+            return (
+                account_details.order_by("-id")
+                .values_list("vat_number", flat=True)
+                .first()
+            )
+
+        return getattr(account_details, "vat_number", None)
+
+    def get_primary_address(self, obj):
+        if obj.primary_address:
+            return AddressSerializer(obj.primary_address).data
+        return None
+
+    def get_phone_number(self, obj):
+        qs = IndividualContactDetail.objects.filter(individual=obj).order_by("-id")
+        if qs.exists():
+            contact = qs.first()
+            return contact.mobile_number or contact.whatsapp_number
 
 
 class CompanyBranchSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(
         source="company.registration_name", read_only=True
     )
+    vat_number = serializers.SerializerMethodField()
+    tin_number = serializers.SerializerMethodField()
+    primary_address = serializers.SerializerMethodField()
 
     class Meta:
         model = CompanyBranch
-        fields = ["id", "full_name", "company_name"]
+        fields = [
+            "id",
+            "full_name",
+            "company_name",
+            "phone",
+            "email",
+            "primary_address",
+            "vat_number",
+            "tin_number",
+        ]
+
+    def get_tin_number(self, obj):
+        profile = getattr(obj.company, "profile", None)
+        return getattr(profile, "tin_number", None) if profile else None
+
+    def get_vat_number(self, obj):
+        profile = getattr(obj.company, "profile", None)
+        return getattr(profile, "vat_number", None) if profile else None
+
+    def get_primary_address(self, obj):
+        if obj.primary_address:
+            return AddressSerializer(obj.primary_address).data
+        return None
 
 
 class MinimalLeaseSerializer(serializers.ModelSerializer):
@@ -750,3 +837,89 @@ class LeaseCreateUpdateSerializer(serializers.ModelSerializer):
             return update_lease_with_dependencies(instance, validated_data, user)
         except Exception as e:
             raise serializers.ValidationError(f"Lease update failed: {str(e)}")
+
+
+class TenantsSerializer(serializers.ModelSerializer):
+    """Serializer for Tenant model."""
+
+    tenant_object = serializers.SerializerMethodField()
+    tenant_type = serializers.CharField(source="content_type.model", read_only=True)
+
+    class Meta:
+        model = LeaseTenant
+        fields = [
+            "id",
+            "tenant_type",
+            "tenant_object",
+        ]
+
+    def get_tenant_object(self, obj):
+        if obj.tenant_object:
+            if isinstance(obj.tenant_object, Individual):
+                return IndividualSerializer(obj.tenant_object).data
+            elif isinstance(obj.tenant_object, CompanyBranch):
+                return CompanyBranchSerializer(obj.tenant_object).data
+        return None
+
+
+class LandlordsSerializer(serializers.ModelSerializer):
+    """Serializer for Landlord model with additional read-only fields."""
+
+    landlord_object = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Landlord
+        fields = ["id", "landlord_name", "landlord_type", "landlord_object"]
+
+    def _is_int_like(self, value) -> bool:
+        try:
+            int(value)
+            return True
+        except (TypeError, ValueError):
+            return False
+
+    def _get_individual(self, landlord_id):
+        if self._is_int_like(landlord_id):
+            return Individual.objects.filter(pk=int(landlord_id)).first()
+        return Individual.objects.filter(identification_number=str(landlord_id)).first()
+
+    def _get_company_branch(self, landlord_id):
+        if self._is_int_like(landlord_id):
+            return (
+                CompanyBranch.objects.filter(pk=int(landlord_id))
+                .select_related("company", "company__profile")
+                .first()
+            )
+        candidates = [
+            {"company__company_id": str(landlord_id)},
+            {"company__code": str(landlord_id)},
+            {"company__registration_number": str(landlord_id)},
+            {"branch_code": str(landlord_id)},
+        ]
+
+        for kwargs in candidates:
+            try:
+                branch = (
+                    CompanyBranch.objects.filter(**kwargs)
+                    .select_related("company", "company__profile")
+                    .first()
+                )
+                if branch:
+                    return branch
+            except (FieldError, ValueError):
+                continue
+
+        return None
+
+    def get_landlord_object(self, obj):
+        landlord_id = getattr(obj, "landlord_id", None)
+
+        if obj.landlord_type == "individual":
+            person = self._get_individual(landlord_id)
+            return IndividualSerializer(person).data if person else None
+
+        if obj.landlord_type == "company":
+            branch = self._get_company_branch(landlord_id)
+            return CompanyBranchSerializer(branch).data if branch else None
+
+        return None

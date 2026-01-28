@@ -2,6 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.contenttypes.models import ContentType
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -10,6 +11,8 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Sum
 from django.utils import timezone
+from apps.common.api.views import BaseViewSet
+from apps.leases.models.landlord import Landlord
 from apps.leases.models.models import Lease, LeaseTenant, LeaseTermination
 from apps.accounting.models import Payment, PaymentMethod
 from decimal import Decimal
@@ -24,6 +27,8 @@ from apps.leases.api.serializers import (
     PaymentSerializer,
     TenantStatementsListSerializer,
     LeaseTenantAssociationSerializer,
+    TenantsSerializer,
+    LandlordsSerializer,
 )
 from apps.common.utils import extract_error_message
 from apps.common.services.tasks import send_notification
@@ -962,3 +967,45 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 sms_template_name="LEASE_RENEWAL_REMINDER",
                 subject=f"Lease Renewal Reminder - {lease.lease_id}",
             )
+
+
+class TenantViewSet(BaseViewSet):
+    """
+    ViewSet for managing tenants
+    """
+
+    queryset = LeaseTenant.objects.all().select_related("content_type")
+    serializer_class = TenantsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned tenants to a given lease,
+        by filtering against a `lease_id` query parameter in the URL.
+        """
+        queryset = super().get_queryset()
+        lease_id = self.request.query_params.get("lease_id")
+        if lease_id is not None:
+            queryset = queryset.filter(lease__id=lease_id)
+        return queryset
+
+
+class LandlordViewSet(BaseViewSet):
+    """
+    ViewSet for managing landlords
+    """
+
+    queryset = Landlord.objects.all()
+    serializer_class = LandlordsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned landlords to those associated with the client's leases.
+        """
+        queryset = super().get_queryset()
+        client = self.request.user.client
+        queryset = queryset.filter(
+            properties__units__leases__managing_client=client
+        ).distinct()
+        return queryset

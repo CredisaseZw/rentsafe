@@ -16,7 +16,13 @@ COMMANDS=(
     "services_and_periods"
     "seed_roles"
     "seed_vats"
+
+    # Trust Accounting seeders
     "seed_trust_general_ledgers"
+    "seed_trust_main_accounts"
+    "seed_trust_vats"
+    "seed_trust_currencies"
+    # "seed_invoice_types" :TODO to be implemented later
 )
 
 # Function to run a Django management command
