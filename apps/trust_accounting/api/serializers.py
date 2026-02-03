@@ -1,11 +1,13 @@
 """Serializers for Trust Accounting API."""
 
 from datetime import date
-from jsonschema import ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from django.db import transaction
 from django.db.models import Q
 
+from apps.leases.api.serializers import MinimalLeaseSerializer
+from apps.leases.models.models import Lease
 from apps.trust_accounting.models import (
     TrustAccountType,
     TrustAccountSubType,
@@ -610,7 +612,7 @@ class TrustSalesItemSerializer(serializers.ModelSerializer):
             "id": instance.id,
             "item_code": instance.item_code,
             "name": instance.name,
-            "description": instance.description,
+            "unit_name": instance.unit_name,
             "category": instance.category.name if instance.category else None,
             "price": str(instance.unit_price),
             "price_including_tax": str(instance.price_including_tax),
@@ -670,10 +672,11 @@ class TrustSalesItemSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     @transaction.atomic
-    def update(self, validated_data):
+    def update(self, instance, validated_data):
         user = self.context["request"].user
         validated_data["updated_by"] = user
-        return super().update(validated_data)
+        print(validated_data)
+        return super().update(instance, validated_data)
 
 
 # ===================== TRUST GENERAL LEDGERS SERIALIZERS  ====================
@@ -820,23 +823,23 @@ class TrustPropertyExpenseSerializer(serializers.ModelSerializer):
 class TrustInvoiceLineItemSerializer(serializers.ModelSerializer):
     """Serializer for Trust Invoice Line Items"""
 
+    sales_item_name = serializers.CharField(source="sales_item.name", read_only=True)
+
     class Meta:
         model = TrustInvoiceLineItem
         fields = [
             "invoice",
-            "sales_item",
+            "sales_item_name",
             "quantity",
             "unit_price",
             "vat_amount",
-            "total_price",
             "total_vat",
             "total_price_excluding_vat",
-            "total_including_vat",
+            "total_price",
         ]
         read_only_fields = [
             "total_vat",
             "total_price_excluding_vat",
-            "total_including_vat",
             "date_created",
             "date_updated",
         ]
@@ -870,6 +873,7 @@ class TrustInvoiceSerializer(serializers.ModelSerializer):
     )
     is_overdue = serializers.BooleanField(read_only=True)
     line_items = TrustInvoiceLineItemSerializer(many=True, read_only=True)
+    lease = MinimalLeaseSerializer(read_only=True)
 
     class Meta:
         model = TrustInvoice
@@ -897,22 +901,29 @@ class TrustInvoiceListSerializer(serializers.ModelSerializer):
     )
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     invoice_type_display = serializers.CharField(
-        source="get_invoice_type_display", read_only=True
+        source="invoice_type.code", read_only=True
     )
     is_overdue = serializers.BooleanField(read_only=True)
+    tenant_name = serializers.CharField(source="tenant.display_name", read_only=True)
+    landlord_name = serializers.CharField(source="landlord.full_name", read_only=True)
 
     class Meta:
         model = TrustInvoice
         fields = [
             "id",
+            "document_number",
+            "is_taxed",
             "invoice_number",
             "invoice_type_display",
             "status_display",
             "invoice_date",
-            "due_date",
+            "tenant_name",
+            "landlord_name",
+            "subtotal",
+            "tax_total",
             "total_amount",
-            "balance_due",
             "currency_code",
+            "invoice_date",
             "is_overdue",
         ]
 
@@ -920,13 +931,25 @@ class TrustInvoiceListSerializer(serializers.ModelSerializer):
 class TrustInvoiceCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Trust Invoices with line items"""
 
-    line_items = TrustInvoiceLineItemCreateSerializer(many=True, required=False)
+    line_items = TrustInvoiceLineItemCreateSerializer(many=True, required=True)
+    lease = serializers.PrimaryKeyRelatedField(
+        queryset=Lease.objects.all(),
+        required=False,
+        allow_null=True,
+        error_messages={
+            "does_not_exist": "Selected lease does not exist.",
+            "incorrect_type": "Invalid lease.",
+        },
+    )
+    document_number = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = TrustInvoice
         fields = [
+            "id",
+            "document_number",
             "invoice_type",
-            "property_reference",
+            "lease",
             "invoice_date",
             "tenant",
             "landlord",
@@ -935,12 +958,72 @@ class TrustInvoiceCreateSerializer(serializers.ModelSerializer):
             "period_to",
             "currency",
             "exchange_rate",
-            "discount_percentage",
+            "discount_amount",
             "terms",
             "notes",
             "reference",
             "line_items",
         ]
+
+    def validate(self, attrs):
+        line_items = attrs.get("line_items", [])
+        lease_reference = attrs.get("lease")
+        tenant = attrs.get("tenant") if attrs.get("tenant") else None
+        landlord = attrs.get("landlord") if attrs.get("landlord") else None
+        invoice_date = attrs.get("invoice_date")
+        invoice_type = attrs.get("invoice_type")
+
+        if not line_items:
+            raise ValidationError(
+                "At least one line item is required to create an invoice."
+            )
+
+        if not self.instance:
+            line_items_signature = sorted(
+                [(item["sales_item"].id, str(item["quantity"])) for item in line_items]
+            )
+
+            duplicate_candidates = TrustInvoice.objects.filter(
+                tenant=tenant,
+                landlord=landlord,
+                invoice_date=invoice_date,
+                invoice_type=invoice_type,
+            )
+
+            for candidate in duplicate_candidates:
+                existing_line_items = candidate.line_items.all()
+                existing_signature = sorted(
+                    [
+                        (item.sales_item.id, str(item.quantity))
+                        for item in existing_line_items
+                    ]
+                )
+
+                if line_items_signature == existing_signature:
+                    raise ValidationError("This invoice already exists")
+
+        # Auto-assign lease if not provided but tenant and landlord are
+        if lease_reference is None and tenant and landlord:
+            related_lease = (
+                Lease.objects.filter(
+                    landlord=landlord,
+                    lease_tenants=tenant,
+                )
+                .select_related("landlord", "unit")
+                .prefetch_related("lease_tenants")
+                .order_by("-signed_date")
+                .first()
+            )
+
+            if related_lease:
+                attrs["lease"] = related_lease
+            else:
+                raise ValidationError(
+                    "A lease between the specified landlord and tenant does not exist. "
+                    "Please specify a valid lease."
+                )
+
+        return attrs
 
     def create(self, validated_data):
         line_items_data = validated_data.pop("line_items", [])
@@ -948,8 +1031,8 @@ class TrustInvoiceCreateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             invoice = TrustInvoice.objects.create(**validated_data)
 
-            for line_item_data in line_items_data:
-                TrustInvoiceLineItem.objects.create(invoice=invoice, **line_item_data)
+            for item_data in line_items_data:
+                TrustInvoiceLineItem.objects.create(invoice=invoice, **item_data)
 
             if line_items_data:
                 invoice.update_totals()

@@ -35,6 +35,19 @@ class Landlord(BaseModel):
         return f"Landlord: {self.landlord_name}" if self.landlord_name else None
 
     @property
+    def full_name(self):
+        """Return the full name of the landlord based on type."""
+        if self.landlord_type == "individual":
+            individual = Individual.objects.filter(pk=self.landlord_id).first()
+            if individual:
+                return individual.full_name
+        else:
+            company = CompanyBranch.objects.filter(company=self.landlord_id).first()
+            if company:
+                return company.full_name
+        return self.landlord_name
+
+    @property
     def phone_number(self):
         phone = None
         if self.landlord_type == "individual":

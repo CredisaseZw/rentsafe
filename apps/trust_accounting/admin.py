@@ -18,7 +18,6 @@ from apps.trust_accounting.models import (
     TrustSalesItem,
     TrustJournalEntry,
     TrustLedgerTransaction,
-    InvoiceType,
     TrustInvoice,
     TrustInvoiceLineItem,
 )
@@ -174,7 +173,7 @@ class TrustSalesItemAdmin(admin.ModelAdmin):
     search_fields = ["item_code", "name"]
     ordering = ["item_code"]
     fieldsets = (
-        ("Basic Info", {"fields": ("item_code", "name", "description", "category")}),
+        ("Basic Info", {"fields": ("item_code", "name", "unit_name", "category")}),
         ("Pricing", {"fields": ("unit_price", "currency", "cost_price", "tax_type")}),
         (
             "Accounting",
@@ -192,14 +191,6 @@ class TrustSalesItemAdmin(admin.ModelAdmin):
         ),
         ("Status", {"fields": ("is_active",)}),
     )
-
-
-@admin.register(InvoiceType)
-class InvoiceTypeAdmin(admin.ModelAdmin):
-    list_display = ["code", "name", "is_active"]
-    list_filter = ["is_active"]
-    search_fields = ["code", "name"]
-    ordering = ["code"]
 
 
 class TrustInvoiceLineItemInline(admin.TabularInline):

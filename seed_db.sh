@@ -22,7 +22,7 @@ COMMANDS=(
     "seed_trust_main_accounts"
     "seed_trust_vats"
     "seed_trust_currencies"
-    # "seed_invoice_types" :TODO to be implemented later
+    "seed_invoice_types" # TODO to be implemented later
 )
 
 # Function to run a Django management command

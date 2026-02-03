@@ -17,7 +17,6 @@ from apps.trust_accounting.models.models import (
     TrustInvoiceLineItem,
     TrustJournalEntry,
     TrustLedgerTransaction,
-    InvoiceType,
 )
 
 __all__ = [
@@ -37,5 +36,4 @@ __all__ = [
     "TrustInvoiceLineItem",
     "TrustJournalEntry",
     "TrustLedgerTransaction",
-    "InvoiceType",
 ]

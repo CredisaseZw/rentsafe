@@ -11,7 +11,6 @@ Key Principles:
 
 from decimal import Decimal, ROUND_HALF_UP
 from django.db import models, transaction
-from django.db.models import Sum
 from django.db.models import F, Sum, Q, CheckConstraint
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -24,8 +23,7 @@ from django.contrib.auth import get_user_model
 
 from apps.common.models.base_models import BaseModel, BaseModelWithUser
 from apps.leases.models.landlord import Landlord
-from apps.leases.models.models import LeaseTenant
-from apps.properties.models.models import Property
+from apps.leases.models.models import Lease, LeaseTenant
 
 User = get_user_model()
 
@@ -605,7 +603,7 @@ class TrustSalesItem(BaseModelWithUser):
 
     item_code = models.CharField(max_length=50, blank=True, null=True)
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
+    unit_name = models.CharField(max_length=50)
     category = models.ForeignKey(
         TrustSalesCategory, on_delete=models.PROTECT, related_name="trust_items"
     )
@@ -1026,35 +1024,6 @@ class TrustLedgerTransaction(BaseModel):
 # ==================== TRUST INVOICES ====================
 
 
-class InvoiceType(BaseModelWithUser):
-    """
-    Types of Trust Invoices.
-
-    This model defines various types of trust-related invoices
-    that can be issued to beneficiaries (landlords, property owners).
-    """
-
-    code = models.CharField(
-        max_length=20,
-        unique=True,
-        help_text=_("Unique code for the invoice type"),
-    )
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        """Class meta for InvoiceType"""
-
-        verbose_name = _("Invoice Type")
-        verbose_name_plural = _("Invoice Types")
-        ordering = ["code"]
-
-    def __str__(self):
-        return f"{self.code} - {self.name}"
-
-
 class TrustInvoice(BaseModelWithUser):
     """
     Used for:
@@ -1074,16 +1043,24 @@ class TrustInvoice(BaseModelWithUser):
         ("cancelled", _("Cancelled")),
         ("written_off", _("Written Off")),
     ]
+    FREQUENCY_CHOICES = [
+        ("monthly", "Monthly"),
+        ("quarterly", "Quarterly"),
+        ("yearly", "Yearly"),
+    ]
+    INVOICE_TYPES = [
+        ("fiscal", _("Fiscal Invoice")),
+        ("proforma", _("Proforma Invoice")),
+        ("recurring", _("Recurring Invoice")),
+    ]
 
     # Core fields
     invoice_number = models.CharField(
         max_length=30, unique=True, editable=False, blank=True
     )
-    invoice_type = models.ForeignKey(
-        InvoiceType,
-        on_delete=models.PROTECT,
-        related_name="trust_invoices",
-        help_text=_("Type of the trust invoice"),
+    document_number = models.CharField(max_length=30)
+    invoice_type = models.CharField(
+        max_length=20, choices=INVOICE_TYPES, default="fiscal"
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
 
@@ -1106,12 +1083,29 @@ class TrustInvoice(BaseModelWithUser):
     )
 
     # Property reference (optional)
-    property_reference = models.ForeignKey(
-        Property,
+    lease = models.ForeignKey(
+        Lease,
         on_delete=models.PROTECT,
-        help_text=_("Property or lease reference for this invoice"),
+        help_text=_("Lease reference for this invoice"),
     )
 
+    # Recurring Fields
+    is_recurring = models.BooleanField(default=False)
+    frequency = models.CharField(
+        max_length=20,
+        choices=FREQUENCY_CHOICES,
+        default="monthly",
+        blank=True,
+        null=True,
+    )
+    next_invoice_date = models.DateField(null=True, blank=True)
+    original_invoice = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="child_invoices",
+    )
     # Dates
     invoice_date = models.DateField(default=localdate)
     due_date = models.DateField(null=True, blank=True)
@@ -1144,6 +1138,7 @@ class TrustInvoice(BaseModelWithUser):
             MaxValueValidator(Decimal("100.00")),
         ],
     )
+    is_taxed = models.BooleanField(default=False)
 
     # Totals
     subtotal = models.DecimalField(
@@ -1242,24 +1237,37 @@ class TrustInvoice(BaseModelWithUser):
 
             self.invoice_number = f"TINV-{year}-{new_number:06d}"
 
-        # Calculate due date if not set (default 30 days)
         if not self.due_date and self.invoice_date:
             from dateutil.relativedelta import relativedelta
 
             self.due_date = self.invoice_date + relativedelta(days=30)
-
-        # Update balance due
         self.balance_due = self.total_amount - self.amount_paid
 
+        if self.invoice_type == "recurring":
+            self.is_recurring = True
+            if not self.next_invoice_date:
+                self.next_invoice_date = self._next_recurrence_date()
+
         super().save(*args, **kwargs)
+
+    def _next_recurrence_date(self):
+        if not self.next_invoice_date:
+            return None
+
+        if self.frequency == "monthly":
+            return self.next_invoice_date + relativedelta(months=+1)
+        if self.frequency == "quarterly":
+            return self.next_invoice_date + relativedelta(months=+3)
+        if self.frequency == "yearly":
+            return self.next_invoice_date + relativedelta(years=+1)
+        return None
 
     def update_totals(self):
         """Update invoice totals from line items"""
         line_items = self.line_items.all()
 
-        self.subtotal = sum(item.total_price for item in line_items)
+        self.subtotal = sum(item.total_price_excluding_vat for item in line_items)
 
-        # Apply discount
         if self.discount_percentage > 0:
             discount_amount = (
                 self.subtotal * self.discount_percentage / Decimal("100.00")
@@ -1268,13 +1276,50 @@ class TrustInvoice(BaseModelWithUser):
         else:
             self.discount_amount = self.discount_amount or Decimal("0.00")
 
-        discounted_subtotal = self.subtotal - self.discount_amount
+        vat_total = Decimal("0.00")
 
-        # Calculate tax
-        self.tax_total = sum(item.vat_amount for item in line_items)
+        for item in line_items:
+            if item.sales_item.tax_type and item.sales_item.tax_type.is_active:
+                item_vat = item.total_vat
+                vat_total += item_vat
 
-        self.total_amount = discounted_subtotal + self.tax_total
+        if vat_total <= 0:
+            self.is_taxed = False
+        else:
+            self.is_taxed = True
+
+        self.tax_total = vat_total
+        self.total_amount = (self.subtotal + self.tax_total) - self.discount_amount
         self.balance_due = self.total_amount - self.amount_paid
+
+        # Generate document number if not set
+        if not self.document_number:
+            last_object = (
+                TrustInvoice.objects.filter(created_by__client=self.created_by.client)
+                .exclude(id=self.id)
+                .exclude(document_number__isnull=True)
+                .exclude(document_number="")
+                .only("document_number", "id")
+                .order_by("-id")
+                .first()
+            )
+
+            if last_object and last_object.document_number:
+                try:
+                    last_digits = last_object.document_number[-6:]
+                    last_number = int(last_digits)
+                    print("lasrt_number", last_number)
+                    new_number = last_number + 1
+                except (ValueError, IndexError):
+                    new_number = 1
+            else:
+                new_number = 1
+            print("new_number", new_number)
+
+            if self.is_taxed:
+                self.document_number = f"W-{new_number:06d}"
+            else:
+                self.document_number = f"N-{new_number:06d}"
 
         self.save(
             update_fields=[
@@ -1283,6 +1328,8 @@ class TrustInvoice(BaseModelWithUser):
                 "tax_total",
                 "total_amount",
                 "balance_due",
+                "is_taxed",
+                "document_number",
             ]
         )
 
@@ -1295,6 +1342,15 @@ class TrustInvoice(BaseModelWithUser):
         self.approved_by = user
         self.approved_date = timezone.now()
         self.save()
+
+    def fiscalize(self):
+        """Convert proforma invoice to fiscal invoice"""
+        if self.invoice_type == "proforma":
+            self.invoice_type = "fiscal"
+            self.status = "pending"
+            self.save()
+            return self
+        raise ValidationError("Only proforma invoices can be converted to fiscal.")
 
     def post_to_ledger(self):
         """Create journal entry for the invoice"""
@@ -1391,14 +1447,9 @@ class TrustInvoiceLineItem(BaseModel):
         unit_price = self.unit_price or self.sales_item.unit_price
 
         if self.sales_item.tax_type and self.sales_item.tax_type.is_active:
-            try:
-                vat_rate = self.sales_item.tax_type.rate / Decimal("100.00")
-            except Exception:
-                vat_rate = Decimal("0.00")
+            vat_amount = self.sales_item.vat_price
         else:
-            vat_rate = Decimal("0.00")
-
-        vat_amount = vat_rate.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+            vat_amount = Decimal("0.00")
 
         if self.quantity is not None:
             calculated_total_price = self.quantity * (

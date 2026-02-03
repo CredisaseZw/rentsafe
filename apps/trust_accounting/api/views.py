@@ -542,11 +542,13 @@ class TrustSalesItemViewSet(BaseViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as ve:
+            print(str(ve))
             return self._create_rendered_response(
                 {"error": extract_error_message(ve)}, status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
-            logger.error(f"Error creating SalesItem: {str(e)}")
+            # logger.error(f"Error creating SalesItem: {str(e)}")
+            print(str(e))
             return self._create_rendered_response(
                 {"error": "Something went wrong"}, status.HTTP_500_INTERNAL_SERVER_ERROR
             )
@@ -629,13 +631,13 @@ class TrustInvoiceViewSet(BaseViewSet):
 
         except ValidationError as e:
             return self._create_rendered_response(
-                {"error": str(e)}, status.HTTP_400_BAD_REQUEST
+                {"error": extract_error_message(e)}, status.HTTP_400_BAD_REQUEST
             )
 
         except Exception as e:
             logger.error(f"Error creating trust invoice: {e}")
             return self._create_rendered_response(
-                {"error": str(e)},
+                {"error": extract_error_message(e)},
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -748,13 +750,13 @@ class TrustInvoiceViewSet(BaseViewSet):
         try:
             journal_entry = invoice.post_to_ledger()
 
-            log_trust_audit(
-                request.user,
-                "post",
-                invoice,
-                f"Posted trust invoice to ledger: {invoice.invoice_number}",
-                request=request,
-            )
+            # log_trust_audit(
+            #     request.user,
+            #     "post",
+            #     invoice,
+            #     f"Posted trust invoice to ledger: {invoice.invoice_number}",
+            #     request=request,
+            # )
 
             return Response(
                 {
