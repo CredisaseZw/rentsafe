@@ -15,6 +15,7 @@ const fileApi = axios.create({
 }); // USE THIS ONE FOR FILE TYPE UPLOADS
 
 api.defaults.withCredentials = true
+fileApi.defaults.withCredentials = true
 
 const apis = {
    api,

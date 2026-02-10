@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import useGetLatestCurrentSetting from "../apiHooks/useGetLatestCurrentSetting";
 
 export default function useCurrencySettings(){
-    const { currencies, currencyLoading, currency } = useCurrency("ZWL");
+    const { currencies, currencyLoading, currency } = useCurrency("ZiG");
     const [currencySetting, setCurrencySetting] = useState({
         currentRate: "",
         currentID: "",
@@ -44,8 +44,9 @@ export default function useCurrencySettings(){
     const handleOnChange = (key: "currentRate" | "currentID" | "baseCurrencyID", value: string | number) => {
         setCurrencySetting((p)=> ({...p, [key] : value}))
     }
-
-    const handleSubmit =(
+    
+    const handleSubmit =(   
+        // eslint-disable-next-line
         setCurrencySettings : UseMutationResult<any, Error, SetCurrencySettings, unknown>,
         e : React.FormEvent<HTMLFormElement>
     ) => {

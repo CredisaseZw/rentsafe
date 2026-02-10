@@ -9,6 +9,7 @@ import type { PropertiesResponse, Property } from "@/types";
 import { isAxiosError, type AxiosError } from "axios";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
+import { getCookie } from "typescript-cookie";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -893,3 +894,17 @@ export const parseMoney = (value: string | number | null | undefined): number =>
 
 export const round2 = (value: number): number =>
 Math.floor(value * 100) / 100;
+
+export const getUsername = (): string | undefined =>{
+  const token = getCookie("token");
+  if (token) {
+    try {
+      const parsedToken = JSON.parse(token);
+      return parsedToken.username;
+    } catch {
+      console.log("Error parsing token");
+    }
+  }
+
+  return undefined;
+}

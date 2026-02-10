@@ -182,7 +182,7 @@ export default function CompanyPaymentStatusReport({ branchID }: { branchID: num
 
                               <div className="col-span-3 flex items-start gap-1">
                                  <div className={showFullAddress ? "grow" : "line-clamp-1 grow"}>
-                                    {report?.branchDetails.address}
+                                    {report?.branchDetails?.address ?? " -"}
                                  </div>
                                  <Button
                                     ref={expandAddress}

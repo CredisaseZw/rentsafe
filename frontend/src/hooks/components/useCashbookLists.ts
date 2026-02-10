@@ -13,13 +13,14 @@ export default function useCashbookLists(){
     const {cashBooksData, isCashbookLoading, cashbookError} = useGetCashbook(page);
 
     useEffect(()=>{
+
         if(handleAxiosError("Failed to fetch cash books",cashbookError)) return;
         if(cashBooksData) {
             const {results, ...paginationMeta} = cashBooksData;
-            setCashBooks(cashBooksData.results)
+            setCashBooks(results)
             setPagination(paginationMeta as PaginationData)
         }
-    }, [cashBooksData, cashbookError])
+    }, [cashBooksData, cashbookError, isCashbookLoading])
 
     return {
         pagination,

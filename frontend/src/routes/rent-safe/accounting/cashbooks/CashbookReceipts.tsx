@@ -1,49 +1,77 @@
+import ColumnsContainer from "@/components/general/ColumnsContainer"
 import Header from "@/components/general/Header"
-import LoadingIndicator from "@/components/general/LoadingIndicator"
+import SectionHeader from "@/components/general/SectionHeader"
+import { TableBase } from "@/components/general/TableBase"
+import { Button } from "@/components/ui/button"
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select"
-import { useCurrency } from "@/contexts/CurrencyContext"
+import { TableCell, TableRow } from "@/components/ui/table"
+import { CASH_BOOK_RECEIPT_HEADERS } from "@/constants"
+import useCashbookReceipt from "@/hooks/components/useCashbookReceipt"
+import { Plus, X } from "lucide-react"
 
 function CashbookReceipts() {
-  const {currencies, currencyLoading, currency} = useCurrency()
+  const {  
+    receipts,
+    cashbooks,
+    cashbookCurrency,
+    adjustPaymentCurrency,
+    addRow} = useCashbookReceipt();
   return (
     <div>
+
       <Header title="Receipts" />
       <div className="main-card">
-        <div className="flex flex-row gap-5 justify-center items-center">
-          <div className="flex flex-row gap-5">
-            <span className="text-sm self-center">Cashbook: </span>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select ..."></SelectValue>
+        <ColumnsContainer numberOfCols={2} marginClass="">
+          <SectionHeader
+            title="Receipts"
+            total={0}
+            subTotal={0}
+         />
+         <div className="flex flex-row justify-end gap-3">
+            <Select onValueChange={(v)=>{
+              adjustPaymentCurrency(v);
+            }}>
+              <SelectTrigger className="self-center w-[250px]">
+                <SelectValue placeholder = "Select Cashbook..."/>
               </SelectTrigger>
               <SelectContent>
+                {
+                  cashbooks.map((c)=>(
+                  <SelectItem value={String(c.cashbook_id)}>{c.cashbook_name}</SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
+            <span className="text-sm self-center">Currency: <span className="text-green-600">{cashbookCurrency}</span></span>
+         </div>
+        </ColumnsContainer>
+        <div className="mt-10">
+          <TableBase headers={CASH_BOOK_RECEIPT_HEADERS}>
+              {
+                receipts.map(pr=>(
+                  <TableRow>
+                    <TableCell className="text-center">{pr.date ?? ""}</TableCell>
+                    <TableCell className="text-center">{pr.receiptNumber ?? ""}</TableCell>
+                    <TableCell className="text-left">{pr.type ?? ""}</TableCell>
+                    <TableCell className="text-left">{pr.glAccount ?? ""}</TableCell>
+                    <TableCell className="text-left">{pr.details ?? ""}</TableCell>
+                    <TableCell className="text-end">{pr.amount ?? ""}</TableCell>
+                    <TableCell className="text-end">{pr.matching ?? ""}</TableCell>
+                    <TableCell className="text-center">{pr.matching ?? ""}</TableCell>
+                    <TableCell className="text-end">{pr.invoiceRate ?? ""}</TableCell>
+                    <TableCell>
+                      <div className="flex justify-center items-center">
+                        <Button variant={"ghost"}><X/></Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))  
+              }
+          </TableBase>
+          <div className="flex flex-row mt-3 gap-3 justify-end">
+            <Button variant={"outline"} onClick={addRow}><Plus/> Add Row</Button>
+            <Button>Submit</Button>
           </div>
-          <div className="flex flex-row gap-5">
-            <span className="text-sm self-center">Cashbook: </span>
-            <Select key={currency?.id}  name="currency" required defaultValue={String(currency?.id)}>
-              <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select ..." />
-              </SelectTrigger>
-              <SelectContent>
-                  {
-                      currencies.map((c)=>
-                      <SelectItem value={String(c.id)} key={c.id} >{c.currency_code + " " +  c.currency_name}</SelectItem>)
-                  }
-                  { 
-                      currencies.length === 0 &&
-                      currencyLoading &&
-                      <SelectItem disabled value="loading" className="text-center flex flex-col justify-center items-center">
-                          <LoadingIndicator />
-                      </SelectItem>
-                  }
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="mt-5">
-          
         </div>
       </div>
     </div>

@@ -7,9 +7,9 @@ import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
 interface CurrencyContextType {
   currencies: Currency[];
   currency?: Currency;
-  setCurrency: (c: Currency) => void;
   currencyLoading: boolean;
   onCurrencyRetch? : ()=> void
+  setCurrency: (c: Currency) => void;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
@@ -56,8 +56,7 @@ export const CurrencyProvider = ({
   );
 };
 
-
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCurrency = (defaultCurrencyCode = "USD"): CurrencyContextType => {
   const context = useContext(CurrencyContext);
   if (!context)

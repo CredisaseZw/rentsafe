@@ -19,6 +19,18 @@ export default function useCompanyPaymentStatusReport(branchID: number) {
          }
       }
    }
+   const parts = [
+      branch?.primary_address?.street_address,
+      branch?.primary_address?.suburb?.name,
+      branch?.primary_address?.city?.name,
+      branch?.primary_address?.province?.name,
+      branch?.primary_address?.country?.name,
+   ];
+
+   const address =
+   parts.every(p => !p)
+   ? "-"
+   : parts.map(p => p ?? "-").join(", ");
 
    const report: CompanyReport = {
       claims: [],
@@ -38,7 +50,7 @@ export default function useCompanyPaymentStatusReport(branchID: number) {
          website: branch?.profile?.website || "",
          isHeadquaters: false,
          industrySector: "",
-         address: `${branch?.primary_address?.street_address}, ${branch?.primary_address?.suburb?.name}, ${branch?.primary_address?.city?.name}, ${branch?.primary_address?.province?.name}, ${branch?.primary_address?.country?.name}`,
+         address: address,
       },
    };
 

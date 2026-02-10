@@ -6,6 +6,7 @@ import { UNIT_FEATURES } from '@/constants'
 import { Button } from '../ui/button'
 import type { SelectedFeature } from '@/types'
 import type { Dispatch, SetStateAction } from 'react'
+import { Plus } from 'lucide-react'
 
 interface Props {
   selectedList: SelectedFeature[]
@@ -21,7 +22,7 @@ function SelectFeatures({selectedList, setSelectedList}: Props) {
         setSelectedCategory,
     } = useSelectFeature({selectedList, setSelectedList})
   return (
-      <Fieldset legendTitle='Features'>
+      <Fieldset legendTitle='Unit Features'>
         <ColumnsContainer marginClass='mt-0' numberOfCols={3}>
             <Select
                 value={selectedCategory}
@@ -30,7 +31,7 @@ function SelectFeatures({selectedList, setSelectedList}: Props) {
                 setSelectedFeature("") }}
             >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Feature Categories" />
                 </SelectTrigger>
                 <SelectContent>
                     {UNIT_FEATURES.map((cat) => (
@@ -47,7 +48,7 @@ function SelectFeatures({selectedList, setSelectedList}: Props) {
                 disabled={!selectedCategory}
             >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select feature" />
+                    <SelectValue placeholder="Feature Selection" />
                 </SelectTrigger>
                 <SelectContent>
                     {currentCategory?.subOptions &&
@@ -58,7 +59,7 @@ function SelectFeatures({selectedList, setSelectedList}: Props) {
                     ))}
                 </SelectContent>
             </Select>
-            <Button onClick={handleAdd} variant={"outline"} type='button' disabled={!selectedFeature}>Add</Button>
+            <Button onClick={handleAdd} variant={"outline"} type='button' disabled={!selectedFeature}><Plus/> Add More Features</Button>
         </ColumnsContainer>
         <div className="mt-4 border border-color rounded-md p-3 space-y-2">
             <h4 className="font-semibold text-gray-600 dark:text-white">Selected Features</h4>

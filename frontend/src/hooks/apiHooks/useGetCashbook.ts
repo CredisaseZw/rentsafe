@@ -7,14 +7,14 @@ interface CBResponse extends Response{
     results: Cashbook[]
 }
 
-export default function useGetCashbook(page:Number, enabled?:boolean){
+export default function useGetCashbook(page:number){
     const {data, isLoading, error} = useQuery<CBResponse>({
         queryKey : ["cashBooks", page],
         queryFn : async()=>{
             const response = await api.get<CBResponse>(`/api/accounting/cash-books/?page=${page}`);
             return response.data;
         },
-        enabled: !!enabled
+        
     })
     return {cashBooksData : data, isCashbookLoading : isLoading, cashbookError : error};
 }

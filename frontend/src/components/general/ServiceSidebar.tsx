@@ -12,17 +12,20 @@ import NavLinkItem from "./NavLinkItem";
 import { useEffect, useState } from "react";
 import type { NavLink } from "@/types";
 import SidebarFooterContent from "./SidebarFooterContent";
-import { getCookie } from "typescript-cookie";
+import { getUsername } from "@/lib/utils";
 
 type SidebarProps = {
    title?: string;
    rentsafeAppNavlinks: NavLink[];
+   rentsafeTrustAccountingNavlinks: NavLink[];
    rentsafeAccountingNavlinks: NavLink[];
    rentsafeAdminPanelNavlinks: NavLink[];
+
 };
 
 export default function ServiceSidebar({
    rentsafeAppNavlinks,
+   rentsafeTrustAccountingNavlinks,
    rentsafeAccountingNavlinks,
    rentsafeAdminPanelNavlinks,
 }: SidebarProps) {
@@ -30,15 +33,8 @@ export default function ServiceSidebar({
    const [username, setUsername] = useState<string>("");
 
    useEffect(() => {
-      const token = getCookie("token");
-      if (token) {
-         try {
-            const parsedToken = JSON.parse(token);
-            setUsername(parsedToken.username);
-         } catch {
-            console.log("Error parsing token");
-         }
-      }
+      const username_ = getUsername();
+      if(username_) return setUsername(username_);
    }, []);
 
    return (
@@ -72,6 +68,27 @@ export default function ServiceSidebar({
                </SidebarGroupContent>
             </SidebarGroup>
 
+            {/* TRUST  ACCOUNTING */}
+            <SidebarGroup>
+               <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">
+                  TRUST ACCOUNTING
+               </SidebarGroupLabel>
+               <SidebarGroupContent>
+                  <SidebarMenu>
+                     {
+                        rentsafeTrustAccountingNavlinks.map((link, idx)=> (
+                           <NavLinkItem
+                              key={idx}
+                              navLink={link}
+                              expandedSegment={expandedSegment}
+                              expandThisSegment={expandThisSegment}
+                           />
+                        ))
+                     }
+                  </SidebarMenu>
+               </SidebarGroupContent>
+            </SidebarGroup>
+            
             {/* ACCOUNTING */}
             <SidebarGroup>
                <SidebarGroupLabel className="sidebar-labels text-gray-800 dark:text-white/50">
