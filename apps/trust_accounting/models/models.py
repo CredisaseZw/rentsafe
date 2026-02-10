@@ -9,6 +9,7 @@ Key Principles:
 - Proper beneficiary tracking
 """
 
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal, ROUND_HALF_UP
 from django.db import models, transaction
 from django.db.models import F, Sum, Q, CheckConstraint
@@ -367,7 +368,7 @@ class TrustGeneralLedgerAccount(BaseModelWithUser):
             as_of_date = timezone.now().date()
 
         # Base query for transactions
-        transactions = LedgerTransaction.objects.filter(
+        transactions = TrustLedgerTransaction.objects.filter(
             account=self,
             journal_entry__entry_date__lte=as_of_date,
             journal_entry__is_posted=True,
@@ -918,7 +919,6 @@ class TrustJournalEntry(BaseModelWithUser):
                     debit_amount=original_transaction.credit_amount,  # Swap debits and credits
                     credit_amount=original_transaction.debit_amount,
                     description=f"Reversal: {original_transaction.description}",
-                    cost_center=original_transaction.cost_center,
                     reference=original_transaction.reference,
                 )
 
@@ -1190,6 +1190,7 @@ class TrustInvoice(BaseModelWithUser):
         related_name="approved_trust_invoices",
     )
     approved_date = models.DateTimeField(null=True, blank=True)
+    is_invoiced = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Trust Invoice")
@@ -1250,16 +1251,95 @@ class TrustInvoice(BaseModelWithUser):
 
         super().save(*args, **kwargs)
 
+    def generate_recurring_invoice(self):
+        """Generate the next recurring invoice"""
+        if not self.is_recurring or not self.next_invoice_date:
+            raise ValidationError(_("Invoice is not set as recurring"))
+
+        new_invoice = TrustInvoice.objects.create(
+            invoice_type="recurring",
+            status="draft",
+            landlord=self.landlord,
+            tenant=self.tenant,
+            lease=self.lease,
+            invoice_date=self.next_invoice_date,
+            due_date=self.next_invoice_date + relativedelta(days=30),
+            period_from=(
+                self.period_from
+                + relativedelta(
+                    months=(
+                        +1
+                        if self.frequency == "monthly"
+                        else (
+                            3
+                            if self.frequency == "quarterly"
+                            else 12 if self.frequency == "yearly" else 0
+                        )
+                    )
+                )
+                if self.period_from
+                else None
+            ),
+            period_to=(
+                self.period_to
+                + relativedelta(
+                    months=(
+                        +1
+                        if self.frequency == "monthly"
+                        else (
+                            3
+                            if self.frequency == "quarterly"
+                            else 12 if self.frequency == "yearly" else 0
+                        )
+                    )
+                )
+                if self.period_to
+                else None
+            ),
+            currency=self.currency,
+            exchange_rate=self.exchange_rate,
+            discount_percentage=self.discount_percentage,
+            terms=self.terms,
+            notes=self.notes,
+            reference=self.reference,
+            created_by=self.created_by,
+        )
+
+        # Copy line items
+        for item in self.line_items.all():
+            TrustInvoiceLineItem.objects.create(
+                invoice=new_invoice,
+                sales_item=item.sales_item,
+                quantity=item.quantity,
+                unit_price=item.unit_price,
+                created_by=self.created_by,
+            )
+
+        new_invoice.update_totals()
+
+        # Update next invoice date
+        self.next_invoice_date = self._next_recurrence_date()
+        self.save(update_fields=["next_invoice_date"])
+
+        return new_invoice
+
     def _next_recurrence_date(self):
-        if not self.next_invoice_date:
+        """Calculate the next invoice date based on current invoice date and frequency"""
+        if not self.invoice_date:
             return None
 
+        base_date = self.invoice_date
+
+        if self.next_invoice_date:
+            base_date = self.next_invoice_date
+
         if self.frequency == "monthly":
-            return self.next_invoice_date + relativedelta(months=+1)
-        if self.frequency == "quarterly":
-            return self.next_invoice_date + relativedelta(months=+3)
-        if self.frequency == "yearly":
-            return self.next_invoice_date + relativedelta(years=+1)
+            return base_date + relativedelta(months=+1)
+        elif self.frequency == "quarterly":
+            return base_date + relativedelta(months=+3)
+        elif self.frequency == "yearly":
+            return base_date + relativedelta(years=+1)
+
         return None
 
     def update_totals(self):
@@ -1308,13 +1388,11 @@ class TrustInvoice(BaseModelWithUser):
                 try:
                     last_digits = last_object.document_number[-6:]
                     last_number = int(last_digits)
-                    print("lasrt_number", last_number)
                     new_number = last_number + 1
                 except (ValueError, IndexError):
                     new_number = 1
             else:
                 new_number = 1
-            print("new_number", new_number)
 
             if self.is_taxed:
                 self.document_number = f"W-{new_number:06d}"
@@ -1380,6 +1458,7 @@ class TrustInvoice(BaseModelWithUser):
 
             self.journal_entry = journal_entry
             self.posted_date = timezone.now()
+            self.is_posted = True
             self.save()
 
         return journal_entry
@@ -1397,6 +1476,20 @@ class TrustInvoice(BaseModelWithUser):
 
     def apply_payment(self, amount, payment_date=None):
         """Apply payment to invoice"""
+
+        if self.status == "cancelled":
+            raise ValidationError("Cannot apply payment to cancelled invoice")
+
+        if self.status == "draft":
+            raise ValidationError(
+                "Cannot apply payment to draft invoice. Must be approved first."
+            )
+
+        if self.status not in ["approved", "partially_paid"]:
+            raise ValidationError(
+                f"Cannot apply payment to invoice with status: {self.status}"
+            )
+
         if amount <= Decimal("0.00"):
             raise ValidationError(_("Payment amount must be positive"))
 

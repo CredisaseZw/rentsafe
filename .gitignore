@@ -19,3 +19,4 @@ settings.json
 staticfiles/
 static/
 media/
+tests.py
