@@ -100,7 +100,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
     const {
         cashBooksData,
         isCashbookLoading,
-        cashbookError} = useGetCashbook(cashBookPage, isCashSale);
+        cashbookError} = useGetCashbook(cashBookPage);
    
     // FUNCTIONS
     const onFilterCurrencies = (arr: string[]) => {
