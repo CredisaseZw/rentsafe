@@ -6,7 +6,7 @@ export default function useCreateCashSale(){
     return useMutation({
         mutationFn : async(payload:Payload)=>{
             const response = await api.post("/api/accounting/cash-sales/", payload.data);
-            return response.data
+            return response
         }
     })
 }

@@ -24,7 +24,7 @@ function useInvoices(mode: string) {
       previous: invoicesData.previous,
       next: invoicesData.next,
     });
-  }, [invoicesData, invoicesError]);
+  }, [invoicesData, invoicesError, mode]);
 
   return {
     page,

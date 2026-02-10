@@ -100,13 +100,14 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
     const {
         cashBooksData,
         isCashbookLoading,
-        cashbookError} = useGetCashbook(cashBookPage, isCashSale);
+        cashbookError} = useGetCashbook(cashBookPage);
    
     // FUNCTIONS
     const onFilterCurrencies = (arr: string[]) => {
         const filtered = dataCurrencies.filter((c)=> {
             if(arr.includes(c.currency_code)) return c;
         })
+        
         setBillCurrencies(filtered)
     }
 
@@ -211,7 +212,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         let convertedPrice = 0.00;
         
         if(itemCurrencyCode !== billCurrencyCode){
-            let effectiveRate = rates.current[`${itemCurrencyCode}_${billCurrencyCode}`];
+            const effectiveRate = rates.current[`${itemCurrencyCode}_${billCurrencyCode}`];
             if (!effectiveRate){
                 const {data, error} = await fetchRate(itemCurrencyCode, billCurrencyCode ?? "USD");
                 if(error){
