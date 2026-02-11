@@ -50,7 +50,6 @@ class LeaseInvoiceService:
             },
         )
 
-        # Get or create tax type (default to 0% for now, can be enhanced later)
         tax_type, _ = TrustTaxType.objects.get_or_create(
             code="ZR",
             defaults={
@@ -62,17 +61,15 @@ class LeaseInvoiceService:
         )
 
         # Get default income account (should be configured properly in production) :TODO
-        income_account = TrustGeneralLedgerAccount.objects.filter(
-            account_type__account_type="revenue", is_active=True
-        ).first()
+        income_account = TrustGeneralLedgerAccount.objects.get(
+            account_number="T10001", is_active=True
+        )
 
-        # Get or create TrustCurrency mapping
         try:
             trust_currency = TrustCurrency.objects.get(
                 currency_code=charge.currency.currency_code
             )
         except TrustCurrency.DoesNotExist:
-            # Create trust currency from accounting currency
             trust_currency = TrustCurrency.objects.create(
                 currency_code=charge.currency.currency_code,
                 currency_name=charge.currency.currency_name,
@@ -80,12 +77,10 @@ class LeaseInvoiceService:
                 is_active=True,
             )
 
-        # Create unique name for sales item
         item_name = f"{charge_display_name}"
         if charge.description:
             item_name = f"{charge_display_name} - {charge.description[:100]}"
 
-        # Get or create the sales item
         sales_item, created = TrustSalesItem.objects.get_or_create(
             name=item_name[:255],
             category=sales_category,
