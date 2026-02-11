@@ -25,7 +25,6 @@ class Command(BaseCommand):
 
         for vat_data in vat_rates:
             vat, created = TrustTaxType.objects.get_or_create(
-                description=vat_data["name"],
                 defaults={
                     "name": vat_data["name"],
                     "rate": vat_data["rate"],

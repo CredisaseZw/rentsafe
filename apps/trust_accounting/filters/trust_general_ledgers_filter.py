@@ -1,4 +1,4 @@
-""" "
+"""
 Filters for the trust general ledgers and account sectors/types and subtypes.
 """
 

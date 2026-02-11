@@ -6,7 +6,11 @@ from rest_framework import serializers
 from django.db import transaction
 from django.db.models import Q
 
-from apps.leases.api.serializers import MinimalLeaseSerializer
+from apps.leases.api.serializers import (
+    LandlordSerializer,
+    MinimalLeaseSerializer,
+    TenantsSerializer,
+)
 from apps.leases.models.models import Lease
 from apps.trust_accounting.models import (
     TrustAccountType,
@@ -874,6 +878,8 @@ class TrustInvoiceSerializer(serializers.ModelSerializer):
     is_overdue = serializers.BooleanField(read_only=True)
     line_items = TrustInvoiceLineItemSerializer(many=True, read_only=True)
     lease = MinimalLeaseSerializer(read_only=True)
+    tenant = TenantsSerializer(read_only=True)
+    landlord = LandlordSerializer(read_only=True)
 
     class Meta:
         model = TrustInvoice
@@ -1068,6 +1074,14 @@ class TrustInvoiceApproveSerializer(serializers.Serializer):
 class TrustInvoicePaymentSerializer(serializers.Serializer):
     """Serializer for applying payment to Trust Invoices"""
 
-    amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2, required=True)
     payment_date = serializers.DateField(required=False)
     payment_reference = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        if attrs.get("amount", 0) <= 0:
+            raise ValidationError(
+                {"error": "Payment amount must be greater than zero."}
+            )
+
+        return attrs
