@@ -10,6 +10,8 @@ from django.utils import timezone
 from datetime import date, datetime
 from decimal import Decimal
 from apps.accounting.models import Payment
+from apps.companies.models.models import CompanyProfile
+from apps.individuals.models.models import IndividualAccounts
 from apps.subscriptions.models.models import Subscription
 from apps.properties.models.models import Unit
 from apps.common.models.models import Document, Note
@@ -723,18 +725,80 @@ class LeaseTenant(BaseModel):
         return None
 
     @property
-    def phone(self):
-        if self.tenant_object and isinstance(
-            self.tenant_object, (Individual, CompanyBranch)
-        ):
-            return self.tenant_object.phone[0]
-        return None
+    def display_name(self):
+        tenant_info = self.tenant_info()
+        return tenant_info.get("name", "N/A") if tenant_info else "N/A"
+
+    @property
+    def phone_number(self):
+        phone = None
+        if self.content_type == "individual":
+            queryset = IndividualContactDetail.objects.filter(individual=self.object_id)
+            if queryset.exists():
+                phone = queryset.last().mobile_number
+        else:
+            queryset = CompanyBranch.objects.filter(company=self.object_id)
+            if queryset.exists():
+                phone = queryset.last().phone
+
+        return phone
 
     @property
     def email(self):
-        if self.tenant_object and isinstance(self.tenant_object, CompanyBranch):
-            return self.tenant_object.email
-        return None
+        email = None
+        if self.content_type == "individual":
+            queryset = Individual.objects.filter(individual=self.object_id)
+            if queryset.exists():
+                email = queryset.last().email
+        else:
+            queryset = CompanyBranch.objects.filter(company=self.object_id)
+            if queryset.exists():
+                email = queryset.last().email
+
+        return email
+
+    @property
+    def address(self):
+        if self.content_type == "individual":
+            individual = Individual.objects.filter(pk=self.object_id).first()
+            return individual.primary_address if individual else None
+
+        branch = (
+            CompanyBranch.objects.filter(company=self.object_id)
+            # .order_by("-is_headquarters", "-id")
+            .first()
+        )
+        return branch.primary_address if branch else None
+
+    @property
+    def tin_number(self):
+        if self.content_type == "individual":
+            return (
+                IndividualAccounts.objects.filter(individual_id=self.object_id)
+                # .order_by("-id")
+                .values_list("tin_number", flat=True).first()
+            )
+
+        return (
+            CompanyProfile.objects.filter(company_id=self.object_id)
+            # .order_by("-id")
+            .values_list("tin_number", flat=True).first()
+        )
+
+    @property
+    def vat_number(self):
+        if self.content_type == "individual":
+            return (
+                IndividualAccounts.objects.filter(individual_id=self.object_id)
+                # .order_by("-id")
+                .values_list("vat_number", flat=True).first()
+            )
+
+        return (
+            CompanyProfile.objects.filter(company_id=self.object_id)
+            # .order_by("-id")
+            .values_list("vat_number", flat=True).first()
+        )
 
 
 class LeaseCharge(BaseModel):

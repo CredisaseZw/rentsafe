@@ -2,6 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.contenttypes.models import ContentType
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -10,6 +11,8 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Sum
 from django.utils import timezone
+from apps.common.api.views import BaseViewSet
+from apps.leases.models.landlord import Landlord
 from apps.leases.models.models import Lease, LeaseTenant, LeaseTermination
 from apps.accounting.models import Payment, PaymentMethod
 from decimal import Decimal
@@ -24,12 +27,18 @@ from apps.leases.api.serializers import (
     PaymentSerializer,
     TenantStatementsListSerializer,
     LeaseTenantAssociationSerializer,
+    TenantsSerializer,
+    LandlordsSerializer,
 )
 from apps.common.utils import extract_error_message
 from apps.common.services.tasks import send_notification
 from apps.leases.utils import CommissionHandler
 from apps.leases.utils.helpers import create_lease_tenant
 from apps.accounting.api.serializers.serializers import DisbursementSerializer
+from apps.trust_accounting.services.invoice_generation_service import (
+    LeaseInvoiceService,
+)
+from apps.trust_accounting.api.serializers import TrustInvoiceSerializer
 import logging
 from django.conf import settings
 
@@ -962,3 +971,135 @@ class LeaseViewSet(viewsets.ModelViewSet):
                 sms_template_name="LEASE_RENEWAL_REMINDER",
                 subject=f"Lease Renewal Reminder - {lease.lease_id}",
             )
+
+    @action(detail=True, methods=["post"], url_path="generate-invoice")
+    def generate_invoice(self, request, lease_id=None):
+        """
+        Generate a trust invoice for a specific lease on demand.
+
+        POST /api/leases/{lease_id}/generate-invoice/
+
+        Request body:
+        {
+            "invoice_type": "fiscal" | "proforma" | "recurring",  // optional, default: "fiscal"
+            "status": "draft" | "pending" | "approved",  // optional, default: "pending"
+            "period_from": "2024-01-01",  // optional, defaults to current month start
+            "period_to": "2024-01-31"  // optional, defaults to current month end
+        }
+
+        Returns:
+            TrustInvoice object with auto-generated line items from lease charges
+        """
+        lease = self.get_object()
+
+        try:
+            # Extract parameters from request
+            invoice_type = request.data.get("invoice_type", "fiscal")
+            invoice_status = request.data.get("status", "pending")
+            period_from = request.data.get("period_from")
+            period_to = request.data.get("period_to")
+
+            # Convert date strings to date objects if provided
+            if period_from:
+                from datetime import datetime
+
+                period_from = datetime.strptime(period_from, "%Y-%m-%d").date()
+            if period_to:
+                from datetime import datetime
+
+                period_to = datetime.strptime(period_to, "%Y-%m-%d").date()
+
+            # Validate invoice type
+            valid_types = ["fiscal", "proforma", "recurring"]
+            if invoice_type not in valid_types:
+                return Response(
+                    {
+                        "error": f"Invalid invoice_type. Must be one of: {', '.join(valid_types)}"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Validate status
+            valid_statuses = ["draft", "pending", "approved"]
+            if invoice_status not in valid_statuses:
+                return Response(
+                    {
+                        "error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Generate the invoice
+            invoice = LeaseInvoiceService.generate_lease_invoice_on_demand(
+                lease=lease,
+                invoice_type=invoice_type,
+                status=invoice_status,
+                period_from=period_from,
+                period_to=period_to,
+                created_by=request.user,
+            )
+
+            # Serialize and return
+            serializer = TrustInvoiceSerializer(invoice)
+            return Response(
+                {
+                    "message": "Invoice generated successfully",
+                    "invoice": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        except ValidationError as ve:
+            logger.error(f"Invoice generation failed: {str(ve)}", exc_info=True)
+            return Response(
+                {"error": extract_error_message(ve)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger.error(f"Invoice generation failed: {str(e)}", exc_info=True)
+            return Response(
+                {"error": f"Invoice generation failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class TenantViewSet(BaseViewSet):
+    """
+    ViewSet for managing tenants
+    """
+
+    queryset = LeaseTenant.objects.all().select_related("content_type")
+    serializer_class = TenantsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned tenants to a given lease,
+        by filtering against a `lease_id` query parameter in the URL.
+        """
+        queryset = super().get_queryset()
+        lease_id = self.request.query_params.get("lease_id")
+        if lease_id is not None:
+            queryset = queryset.filter(lease__id=lease_id)
+        return queryset
+
+
+class LandlordViewSet(BaseViewSet):
+    """
+    ViewSet for managing landlords
+    """
+
+    queryset = Landlord.objects.all()
+    serializer_class = LandlordsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned landlords to those associated with the client's leases.
+        """
+        queryset = super().get_queryset()
+        client = self.request.user.client
+        queryset = queryset.filter(
+            properties__units__leases__managing_client=client
+        ).distinct()
+        return queryset
