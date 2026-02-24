@@ -158,7 +158,13 @@ export default function Index({ leases, total_pages, current_page }) {
                   ? sortFunc(leases).map((lease, index) => (
                       <tr
                         className={
-                          lease.terminated ? "c-terminated" : lease.expired ? "c-expired" : ""
+                          lease.terminated
+                            ? "c-terminated"
+                            : lease.expired
+                              ? "c-expired"
+                              : lease.expiring
+                                ? "c-expiring"
+                                : ""
                         }
                         key={lease.lease_id + "-" + index}
                       >
@@ -169,7 +175,15 @@ export default function Index({ leases, total_pages, current_page }) {
                             title="double click to view client"
                             type="button"
                             onDoubleClick={() => clientViewProps.openClientView(lease)}
-                            className={`custom-btn text-decoration-underline ${lease.terminated ? "c-terminated" : ""}`}
+                            className={`custom-btn text-decoration-underline ${
+                              lease.terminated
+                                ? "c-terminated"
+                                : lease.expired
+                                  ? "c-expired"
+                                  : lease.expiring
+                                    ? "c-expiring"
+                                    : ""
+                            }`}
                           >
                             {lease.name}
                           </button>
@@ -211,7 +225,14 @@ export default function Index({ leases, total_pages, current_page }) {
                           <>
                             {lease.expired ? (
                               <td
-                                className="bg-gold text-center c-pointer"
+                                className="bg-pink text-white text-center c-pointer"
+                                onClick={() => showLeaseFormFor(lease)}
+                              >
+                                Expired
+                              </td>
+                            ) : lease.expiring ? (
+                              <td
+                                className="bg-warning text-white text-center c-pointer"
                                 onClick={() => showLeaseFormFor(lease)}
                               >
                                 Renew
