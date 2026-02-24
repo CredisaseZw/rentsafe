@@ -20,12 +20,12 @@ app.conf.beat_schedule = {
         "task": "rentsafe.helper.run_tasks",
         "schedule": crontab(hour=9, minute=0),
     },
-    "send-reminder-notifications": {
-        "task": "rentsafe.helper.send_reminder_notifications",
-        "schedule": crontab(hour=7, minute=45),
-    },
     "send-lease-renewal-notifications": {
         "task": "rentsafe.helper.send_lease_renewal_notifications",
         "schedule": crontab(hour=7, minute=30),
+    },
+    "send-reminder-notifications": {
+        "task": "rentsafe.helper.send_reminder_notifications",
+        "schedule": crontab(hour=7, minute=45),
     },
 }

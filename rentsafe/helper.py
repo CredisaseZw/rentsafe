@@ -824,7 +824,7 @@ def send_reminder_notifications():
             receiver_email = (
                 getattr(receiver_obj, "email", None) if receiver_obj else None
             )
-            message = f"Reminder - scheduled maintenance at '{property_address}' on  {schedule.scheduled_day}"
+            message = f"Reminder - scheduled maintenance at '{property_address}' on {schedule.scheduled_day}"
             if receiver_email:
                 send_email_helper.delay(
                     context={
@@ -835,7 +835,7 @@ def send_reminder_notifications():
                         "property": property_address,
                         "maintenance_detail": getattr(schedule, "details", ""),
                         "contractor_name": getattr(schedule, "contractor", ""),
-                        "inputs_required": getattr(schedule, "required_material", ""),
+                        "inputs_required": getattr(schedule, "required_materials", ""),
                         "budget": getattr(schedule, "budget", ""),
                         "reason": getattr(schedule, "reason", ""),
                     },
@@ -870,7 +870,7 @@ def send_reminder_notifications():
                         "property": property_address,
                         "maintenance_detail": getattr(schedule, "details", ""),
                         "contractor_name": getattr(schedule, "contractor", ""),
-                        "inputs_required": getattr(schedule, "required_material", ""),
+                        "inputs_required": getattr(schedule, "required_materials", ""),
                         "budget": getattr(schedule, "budget", ""),
                         "reason": getattr(schedule, "reason", ""),
                     },
@@ -899,7 +899,7 @@ def send_reminder_notifications():
                 else "Property"
             )
             subject = (
-                "upcoming Inspection Reminder"
+                "Upcoming Inspection Reminder"
                 if reminder.action_date == tomorrow
                 else "Due Inspection Reminder"
             )
@@ -989,7 +989,7 @@ def send_lease_renewal_notifications():
             send_email_helper.delay(
                 context={
                     "subject": "Lease Expired",
-                    "message": f"Lease for '{tenant_name}' has expired {expiry.strftime('%d %B %Y')}. Please take some action.",
+                    "message": f"Lease for '{tenant_name}' expired on {expiry.strftime('%d %B %Y')}. Please review this lease and take the necessary renewal, termination, or follow-up action.",
                     "recipient_name": agent_username,
                     "tenant_name": tenant_name,
                     "property_address": lease.address,

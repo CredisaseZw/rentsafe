@@ -228,7 +228,15 @@ class Lease(models.Model):
 
     @cached_property
     def tenant_name(self):
-        """Get the tenant name for the lease based on whether it's an individual or a company."""
+        """
+        Get the tenant name for the lease based on whether it's an individual or a company.
+
+        This value is cached per Lease instance using ``cached_property``. If the related
+        Individual or Company record is updated after this property is first accessed,
+        the cached value on this Lease instance will not automatically reflect those
+        changes. To refresh it, reload the Lease instance from the database or delete
+        the ``tenant_name`` attribute on the instance before accessing it again.
+        """
         tenant_name = None
         if self.is_individual:
             tenant_name = (
