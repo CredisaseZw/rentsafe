@@ -30,8 +30,8 @@ ACCOUNT_SID = os.environ["ACCOUNT_SID"]
 AUTH_TOKEN = os.environ["AUTH_TOKEN"]
 # SECURITY WARNING: don't run with debug turned on in production!
 
-#Whatsapp bot Settings
-WHATSAPP_API_MEDIA_URL= os.environ["WHATSAPP_API_MEDIA_URL"]
+# Whatsapp bot Settings
+WHATSAPP_API_MEDIA_URL = os.environ["WHATSAPP_API_MEDIA_URL"]
 WHATSAPP_API_URL = os.environ["WHATSAPP_API_URL"]
 WHATSAPP_ACCESS_TOKEN = os.environ["WHATSAPP_ACCESS_TOKEN"]
 WHATSAPP_VERIFY_TOKEN = os.environ["WHATSAPP_VERIFY_TOKEN"]
@@ -67,7 +67,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     # 'django.middleware.csrf.CsrfViewMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -76,7 +76,7 @@ MIDDLEWARE = [
     # user defined middleware
     "core.middleware.AuthPropsMiddleware",
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = "core.urls"
 
@@ -103,29 +103,29 @@ WSGI_APPLICATION = "core.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
-DB_USERNAME = os.getenv('DB_USERNAME' , None)
-DB_PASS     = os.getenv('DB_PASS'     , None)
-DB_HOST     = os.getenv('DB_HOST'     , None)
-DB_PORT     = os.getenv('DB_PORT'     , None)
-DB_NAME     = os.getenv('DB_NAME'     , None)
+DB_ENGINE = os.getenv("DB_ENGINE", None)
+DB_USERNAME = os.getenv("DB_USERNAME", None)
+DB_PASS = os.getenv("DB_PASS", None)
+DB_HOST = os.getenv("DB_HOST", None)
+DB_PORT = os.getenv("DB_PORT", None)
+DB_NAME = os.getenv("DB_NAME", None)
 
 # if DB_ENGINE and DB_NAME and DB_USERNAME:
-# DATABASES = { 
+# DATABASES = {
 #     'default': {
-#     'ENGINE'  : 'django.db.backends.mysql', 
+#     'ENGINE'  : 'django.db.backends.mysql',
 #     'NAME'    : 'finchec1_rentsafe',
 #     'USER'    : 'finchec1_admin',
 #     'PASSWORD': 'n2(&lJweshvu',
 #     'HOST'    : '129.232.213.107',
 #     'PORT'    : '3306',
-#     }, 
+#     },
 # }
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "7July",
+        "NAME": BASE_DIR / "13Nov",
     }
 }
 
@@ -152,14 +152,13 @@ CRON_CLASSES = [
 ]
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.SessionAuthentication', 
-#         'rest_framework.authentication.TokenAuthentication', 
+#         'rest_framework.authentication.SessionAuthentication',
+#         'rest_framework.authentication.TokenAuthentication',
 #     ),
 #     'DEFAULT_PERMISSION_CLASSES': (
 #         'rest_framework.permissions.IsAuthenticated',
 #     ),
 # }
-
 
 
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -207,7 +206,7 @@ DJANGO_VITE_ASSETS_PATH = BASE_DIR / "react-app" / "dist"
 DJANGO_VITE_DEV_MODE = DEBUG
 
 # we need this to get around cors issues
-DJANGO_VITE_DEV_SERVER_HOST = "localhost"                                                           
+DJANGO_VITE_DEV_SERVER_HOST = "localhost"
 
 # this is the default, but I'm leaving this here, so you know what to change if you want to run on a different port
 # DJANGO_VITE_PORT = 5173
@@ -221,8 +220,6 @@ STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_DIRS = [DJANGO_VITE_ASSETS_PATH]
 
 JS_ROUTES_INCLUSION_LIST = [
-    
-    
     # New Accounting routes
     "products_list",  # GET /accounting/products/
     "products_detail",  # GET/PUT/DELETE /accounting/products/{id}/
@@ -242,8 +239,7 @@ JS_ROUTES_INCLUSION_LIST = [
     "journal_entries_detail",
     "ledger_transactions_list",
     "ledger_transactions_detail",
-    "customer_invoice_details", #TODO: url for viewing invoice details | Sales side
-    
+    "customer_invoice_details",  # TODO: url for viewing invoice details | Sales side
     "debit_journal",
     "credit_journal",
     "get_client_company_journals",
@@ -383,12 +379,12 @@ JS_ROUTES_INCLUSION_LIST = [
     "resolve_task",
     "delete_work_schedule",
     "forecasts",
-    "admin_leases", # <str: leases_type> as the url parameter
-    #CREDITORS BALANCES
+    "admin_leases",  # <str: leases_type> as the url parameter
+    # CREDITORS BALANCES
     "creditor_debit_journal",
     "creditor_credit_journal",
     "get_creditor_journals",
-    "save_inspection_document", # save inspection document
+    "save_inspection_document",  # save inspection document
     # acounting -> sales
     "sales_categories",
     "products_and_services",

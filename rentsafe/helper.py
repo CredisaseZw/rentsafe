@@ -492,7 +492,7 @@ def run_tasks():
 
 
 def track_lease_balances():
-    leases = Lease.objects.filter(is_active=True, is_government=False).all()
+    leases = Lease.objects.filter(is_active=True).all()
     today = date.today()
     count = 0
     MAX_MESSAGES_PER_SECOND = 90
@@ -502,10 +502,11 @@ def track_lease_balances():
             can_send_message =True
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
             lease_giver_name = (
-                lease_giver.trading_name or lease_giver.registration_name
+                lease_giver.trading_name  if lease_giver else "Creditor"
             )
-            custom_day = today.replace(day=int(lease.payment_period_end))
-            limit_day = today.replace(day=int(lease.payment_period_end) + 1)
+            payment_period_end = lease.payment_period_end if lease.payment_period_end and int(lease.payment_period_end) <= 28 else 7
+            custom_day = today.replace(day=int(payment_period_end))
+            limit_day = today.replace(day=int(payment_period_end) + 1)
             if custom_day < today <= limit_day:
                 if opening_balance_object := Opening_balance.objects.filter(
                     lease_id=lease_id
@@ -530,9 +531,8 @@ def track_lease_balances():
                             opening_balance_object.two_months_back = one_months_ago
                             opening_balance_object.one_month_back = current_month
                             opening_balance_object.current_month = 0
-                            opening_balance_object.outstanding_balance = (
-                                outstanding_balance
-                            )
+                            opening_balance_object.outstanding_balance = outstanding_balance
+                            
                             opening_balance_object.save()
 
                             if float(opening_balance_object.three_months_plus) > 0:
@@ -543,11 +543,13 @@ def track_lease_balances():
                                 lease.status = "HIGH"
                             elif float(opening_balance_object.one_month_back) > 0:
                                 lease.status = "MEDIUM"
+                            lease.status_cache= lease.status
                             lease.save()
                         except Exception as e:
                             pass
-                    lease.status = lease.status_cache
-                    lease.save()
+                    else:
+                        lease.status_cache = lease.status
+                        lease.save()
 
                     if lease.is_company:
                         requested_user_ob = "company"
@@ -590,7 +592,6 @@ def track_lease_balances():
                         registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to MEDIUM RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
                     else:
                         registration_message = None
-                 
                     try:
                         can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
                     except Exception as e:
