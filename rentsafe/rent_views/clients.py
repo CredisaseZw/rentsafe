@@ -3586,6 +3586,49 @@ def write_off(request):
     lease_id = data.get('lease_id')
     return credit_journal(request,lease_id) if lease_id else JsonResponse({'error':'lease not found'},status=400)
 
+def get_lease_expiration_status(lease):
+    """
+    Determine the expiration status of a lease based on its end_date.
+    
+    Timeline:
+        - 3 months before expiry: status = "expiring" (orange/gold row, "Renew" button)
+        - 7+ days after expiry (not renewed): status = "expired" (pink row, "Expired" label)
+        - More than 3 months to expiry: status = None (normal display)
+    
+    The orange/gold or pink highlight disappears when lease dates are updated
+    to a current period (end_date pushed beyond 3 months from today).
+    
+    Returns:
+        str or None: "expiring", "expired", or None
+    """
+    if not lease.end_date:
+        return None
+    
+    today = date.today()
+    
+    if isinstance(lease.end_date, datetime):
+        end_date = lease.end_date.date()
+    elif isinstance(lease.end_date, date):
+        end_date = lease.end_date
+    else:
+        try:
+            end_date = datetime.strptime(str(lease.end_date), "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            return None
+    
+    days_until_expiry = (end_date - today).days
+    
+    if days_until_expiry > 90:
+        return None
+    
+    if days_until_expiry < -7:
+        return "expired"
+    
+    if days_until_expiry <= 90:
+        return "expiring"
+    
+    return None
+
 def client_leases_new(request,leases_type=None):
     # get query parameters
     search_value = request.GET.get("name", "").lower()
@@ -3691,6 +3734,13 @@ def client_leases_new(request,leases_type=None):
 
         agent_info = Landlord.objects.filter(lease_id=i.lease_id).first()
         hundred_days_ago = date.today() - timedelta(days=90)
+        
+        try:
+            expiration_status = get_lease_expiration_status(i) if i.is_active else None
+        except Exception:
+            expiration_status = None
+        expired = True if expiration_status == "expired" else False
+        expiring = True if expiration_status == "expiring" else False
 
         is_3_months_ago = check_lease_termination_eligibility(i, hundred_days_ago)
         if i.is_terminated and (is_3_months_ago or owing_amount <= 0):
@@ -3725,10 +3775,12 @@ def client_leases_new(request,leases_type=None):
                 "rent_variable": i.rent_variables,
                 "status": i.status,
                 "terminated": True if i.is_terminated else False,
+                "expired": expired,
+                "expiring": expiring,
+                "expiration_status": expiration_status,
                 "color": color,
                 "start_date": i.start_date,
                 "end_date": i.end_date,
-                "expired": True if date.today() > i.end_date else False,
                 "payment_period_start": i.payment_period_start,
                 "payment_period_end": i.payment_period_end,
             }
