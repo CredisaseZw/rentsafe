@@ -1,9 +1,11 @@
 from datetime import date, datetime, timedelta
+from django.utils.functional import cached_property
 from enum import Enum
 import json
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
 # from simple_history.models import HistoricalRecords
 
 
@@ -24,27 +26,29 @@ class Company(models.Model):
     company_uploader = models.CharField(max_length=255, blank=True, null=True)
     tin_number = models.CharField(max_length=255, blank=True, null=True)
     is_government = models.BooleanField(default=False)  # is government company
-    #history = HistoricalRecords()
+    # history = HistoricalRecords()
 
     class Meta:
         db_table = "company"
 
+
 class ContactPerson(models.Model):
-    identification_number=models.CharField(max_length=255,blank=True,null=True)
-    lease_id = models.CharField(max_length=255,blank=True,null=True)
-    client_id = models.CharField(max_length=255,blank=True,null=True)
-    first_name = models.CharField(max_length=255,blank=True,null=True)
-    surname = models.CharField(max_length=255,blank=True,null=True)
-    email = models.CharField(max_length=255,blank=True,null=True)
-    phone = models.CharField(max_length=255,blank=True,null=True)
-    other_phone = models.CharField(max_length=255,blank=True,null=True)
-    address = models.TextField(blank=True,null=True)
+    identification_number = models.CharField(max_length=255, blank=True, null=True)
+    lease_id = models.CharField(max_length=255, blank=True, null=True)
+    client_id = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=255, blank=True, null=True)
+    surname = models.CharField(max_length=255, blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    other_phone = models.CharField(max_length=255, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    #history = HistoricalRecords()
+    # history = HistoricalRecords()
 
     def __str__(self) -> int:
         return str(self.client_id)
+
 
 class CompanyProfile(models.Model):
     company = models.CharField(max_length=255)  # company id
@@ -82,8 +86,7 @@ class CompanyProfile(models.Model):
     updated = models.DateTimeField(auto_now=True)
     is_suspended = models.BooleanField(default=False)
     note = models.TextField(blank=True, null=True)
-    #history = HistoricalRecords()
-    
+    # history = HistoricalRecords()
 
     class Meta:
         db_table = "company_profile"
@@ -116,8 +119,7 @@ class Individual(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_verified = models.BooleanField(default=False)
     is_user = models.BooleanField(default=False)
-    #history = HistoricalRecords()
-    
+    # history = HistoricalRecords()
 
     class Meta:
         db_table = "individual"
@@ -145,8 +147,7 @@ class IndividualProfile(models.Model):
     relationship = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    #history = HistoricalRecords()
-    
+    # history = HistoricalRecords()
 
     class Meta:
         db_table = "individual_profile"
@@ -207,7 +208,9 @@ class Lease(models.Model):
     start_date = models.DateField(max_length=255, null=True, blank=True)
     end_date = models.DateField(max_length=255, null=True, blank=True)
     created_date = models.DateField(auto_now_add=True)
-    termination_date = models.DateField(max_length=255, null=True, blank=True,default=date.today)
+    termination_date = models.DateField(
+        max_length=255, null=True, blank=True, default=date.today
+    )
     is_government = models.BooleanField(default=False)  # is government lease
     date_updated = models.DateTimeField(auto_now=True)
     leasee_mobile = models.CharField(max_length=255, blank=True, null=True)
@@ -218,11 +221,32 @@ class Lease(models.Model):
     is_active = models.BooleanField(default=True)
     is_terminated = models.BooleanField(default=False)
     landlord_id = models.IntegerField(null=True, blank=True)
-    #history = HistoricalRecords()
-    
+    # history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.lease_id)
+
+    @cached_property
+    def tenant_name(self):
+        """Get the tenant name for the lease based on whether it's an individual or a company."""
+        tenant_name = None
+        if self.is_individual:
+            tenant_name = (
+                Individual.objects.filter(identification_number=self.reg_ID_Number)
+                .values("firstname", "surname")
+                .first()
+            )
+            if tenant_name:
+                tenant_name = f"{tenant_name['firstname']} {tenant_name['surname']}"
+        elif self.is_company:
+            tenant_name = (
+                Company.objects.filter(id=self.reg_ID_Number)
+                .values("trading_name")
+                .first()
+            )
+            if tenant_name:
+                tenant_name = tenant_name["trading_name"]
+        return tenant_name
 
 
 class Services(models.Model):
@@ -307,6 +331,7 @@ class OTP(models.Model):
         max_length=100, choices=REQUESTED_USER_TYPE, default="individual"
     )
     expire_at = models.DateTimeField(default=get_default_time)
+
     def __str__(self):
         return self.otp_code
 
@@ -320,6 +345,8 @@ class Receipt(models.Model):
 
     def __str__(self):
         return self.lease_id
+
+
 class LeasePayments(models.Model):
     lease_id = models.CharField(max_length=255)  # FK to lease table
     payment_amount = models.CharField(max_length=255)
@@ -335,6 +362,8 @@ class LeasePayments(models.Model):
 
     def __str__(self):
         return self.lease_id
+
+
 class LeaseReceiptBreakdown(models.Model):
     landlord_id = models.CharField(max_length=255)
     lease_id = models.CharField(max_length=255)
@@ -351,6 +380,7 @@ class LeaseReceiptBreakdown(models.Model):
     def __str__(self) -> str:
         return f"LeaseReceiptBreakdown(lease_id={self.lease_id}, total_amount={self.total_amount}, base_amount={self.base_amount}, commission={self.commission}, operating_costs={self.operating_costs})"
 
+
 # Rental payment receipted
 class Enquiries(models.Model):
     enquirer = models.CharField(max_length=255)  # enquirer user id
@@ -365,6 +395,7 @@ class Enquiries(models.Model):
     def __str__(self):
         return self.enquirer
 
+
 class Special_pricing(models.Model):
     service_name = models.CharField(max_length=255)
     individual_charge = models.CharField(max_length=255)
@@ -376,6 +407,7 @@ class Special_pricing(models.Model):
 
     def __str__(self):
         return self.service_name
+
 
 class Standard_pricing(models.Model):
     service_name = models.CharField(max_length=255)
@@ -389,16 +421,19 @@ class Standard_pricing(models.Model):
     def __str__(self):
         return self.service_name
 
+
 class LeaseCurrencyRate(models.Model):
     company_id = models.CharField(max_length=255)  # FK to company table
     current_rate = models.FloatField(max_length=255, default=0)
-    base_currency = models.CharField(max_length=255,default="USD")
+    base_currency = models.CharField(max_length=255, default="USD")
     currency = models.CharField(max_length=255)
     date_created = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Company {self.company_id} Latest Rate {self.current_rate}"
+
+
 class Subscription_charge_pricing(models.Model):
 
     individual_monthly_charge = models.CharField(max_length=255)
@@ -409,6 +444,8 @@ class Subscription_charge_pricing(models.Model):
 
     def __str__(self):
         return self.individual_monthly_charge
+
+
 class Opening_balance(models.Model):
     lease_id = models.CharField(max_length=255)  # FK to lease table
     current_month = models.CharField(max_length=255, default=0, null=True)
@@ -419,11 +456,12 @@ class Opening_balance(models.Model):
     outstanding_balance = models.CharField(max_length=255, default=0, null=True)
     date_updated = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    #history = HistoricalRecords()
-    
+    # history = HistoricalRecords()
 
     def __str__(self):
         return self.lease_id
+
+
 class ActiveCredit(models.Model):  # loans and payments
     date_time = models.DateTimeField(auto_now=True)
     dr_company = models.CharField(null=True, blank=True, max_length=255)
@@ -450,6 +488,7 @@ class ActiveCredit(models.Model):  # loans and payments
     class Meta:
         db_table = "active_credit"
 
+
 class Invoicing(models.Model):
     lease_id = models.CharField(max_length=255)  # FK to lease
     description = models.CharField(max_length=255)
@@ -460,9 +499,12 @@ class Invoicing(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     is_invoiced = models.BooleanField(default=False)
     account_number = models.CharField(max_length=255, null=True, blank=True)
-    invoice_number = models.CharField(max_length=255, null=True, blank=True, default="0")
+    invoice_number = models.CharField(
+        max_length=255, null=True, blank=True, default="0"
+    )
     invoice_date = models.DateField(null=True, blank=True)
-    #history = HistoricalRecords()
+    # history = HistoricalRecords()
+
 
 class PaymentPlan(models.Model):
     client_id = models.CharField(max_length=255, null=True, blank=True)
@@ -475,14 +517,14 @@ class PaymentPlan(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_creditor = models.BooleanField(default=False)
-    status = models.CharField(max_length=255, blank=True, null=True,default="PENDING")
-    
+    status = models.CharField(max_length=255, blank=True, null=True, default="PENDING")
 
     def __str__(self):
         return f"PayementPlan(payment_plan_id={self.id}, client_id={self.client_id}, user_id={self.user_id}, spoke_with={self.spoke_with}, expected_pay_date={self.expected_pay_date}, amount={self.amount}, created_at={self.created_at}, updated_at={self.updated_at})"
 
     def __repr__(self):
         return self.__str__()
+
 
 class DebtorIntelligenceNote(models.Model):
     user_id = models.CharField(max_length=255)
@@ -495,12 +537,14 @@ class DebtorIntelligenceNote(models.Model):
     def __str__(self):
         return self.lease_id
 
+
 class CommunicationHistoryReminderType(str, Enum):
     # PAYMENT_PLAN = "PAYMENT_PLAN"
     SMS = "SMS"
     EMAIL = "EMAIL"
     NOTE = "NOTE"
-    REMINDER="REMINDER"
+    REMINDER = "REMINDER"
+
 
 class CommunicationHistoryReminder(models.Model):
     user_id = models.CharField(max_length=255)
@@ -513,13 +557,15 @@ class CommunicationHistoryReminder(models.Model):
     message_sent = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_creditor= models.BooleanField(default=False)
+    is_creditor = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Reminder(user_id={self.user_id}, action_date={self.action_date})"
 
     def __repr__(self):
         return self.__str__()
+
+
 class CommsHistMessage(models.Model):
     user_id = models.CharField(max_length=255)
     user = models.CharField(max_length=255, null=True, blank=True)
@@ -529,7 +575,7 @@ class CommsHistMessage(models.Model):
     is_email = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_creditor= models.BooleanField(default=False)
+    is_creditor = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Reminder(user_id={self.user_id}, created_at={self.created_at})"
@@ -537,14 +583,17 @@ class CommsHistMessage(models.Model):
     def __repr__(self):
         return self.__str__()
 
+
 class Currency(str, Enum):
     USD = "USD"
     ZWL = "ZWL"
     ZAR = "ZAR"
 
+
 class ClaimDebtorType(str, Enum):
     INDIVIDUAL = "INDIVIDUAL"
     COMPANY = "COMPANY"
+
 
 class Claim(models.Model):
     creditor_id = models.CharField(max_length=255)
@@ -558,20 +607,23 @@ class Claim(models.Model):
     date = models.DateField(default=date.today)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
 class LandLordType(str, Enum):
     INDIVIDUAL = "INDIVIDUAL"
     COMPANY = "COMPANY"
 
+
 class Landlord(models.Model):
     user_id = models.CharField(max_length=255)
     lease_id = models.CharField(max_length=255)
-    landlord_id = models.CharField(max_length=255,blank=True, null=True)
+    landlord_id = models.CharField(max_length=255, blank=True, null=True)
     is_individual = models.BooleanField(default=False)
     is_company = models.BooleanField(default=False)
     landlord_name = models.CharField(max_length=255, blank=True, null=True)
-    opening_balance = models.FloatField(null=True, blank=True,default=0)
+    opening_balance = models.FloatField(null=True, blank=True, default=0)
     reg_ID_Number = models.CharField(max_length=255, blank=True, null=True)
-    agent_commission = models.FloatField(null=True, blank=True,default=0)
+    agent_commission = models.FloatField(null=True, blank=True, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -586,13 +638,14 @@ class Disbursement(models.Model):
     amount_paid = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+
 class WorkSchedule(models.Model):
     user_id = models.CharField(max_length=255, blank=True, null=True)
     company_id = models.CharField(max_length=255, blank=True, null=True)
     property = models.CharField(max_length=255, blank=True, null=True)
     details = models.TextField(blank=True, null=True)
-    title=models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
     tradesman = models.CharField(max_length=255, blank=True, null=True)
     contractor = models.CharField(max_length=255, blank=True, null=True)
     required_materials = models.TextField(blank=True, null=True)
@@ -605,14 +658,15 @@ class WorkSchedule(models.Model):
     tenant_landlord = models.CharField(max_length=250, null=True, blank=True)
     lease_id = models.CharField(max_length=255, blank=True, null=True)
     is_creditor = models.BooleanField(default=False)
-    status = models.CharField(max_length=255, blank=True, null=True,default="PENDING")
-    
+    status = models.CharField(max_length=255, blank=True, null=True, default="PENDING")
+
+
 class MaintenanceSchedule(models.Model):
     user_id = models.CharField(max_length=255, blank=True, null=True)
     company_id = models.CharField(max_length=255, blank=True, null=True)
     property = models.CharField(max_length=255, blank=True, null=True)
     details = models.TextField(blank=True, null=True)
-    title=models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
     tradesman = models.CharField(max_length=255, blank=True, null=True)
     contractor = models.CharField(max_length=255, blank=True, null=True)
     required_materials = models.TextField(blank=True, null=True)
@@ -623,8 +677,8 @@ class MaintenanceSchedule(models.Model):
     scheduled_day = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    tenant_landlord = models.CharField(max_length=255, null=True, blank=True)    
-    month_frequency =models.IntegerField(null=True, blank=True)
+    tenant_landlord = models.CharField(max_length=255, null=True, blank=True)
+    month_frequency = models.IntegerField(null=True, blank=True)
     lease_id = models.CharField(max_length=255, blank=True, null=True)
     is_creditor = models.BooleanField(default=False)
-    status = models.CharField(max_length=255, blank=True, null=True,default="PENDING")
+    status = models.CharField(max_length=255, blank=True, null=True, default="PENDING")
