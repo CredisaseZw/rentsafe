@@ -65,24 +65,30 @@ def send_otp(
                 "sms": f"{registration_message}" + f" {otp}",
             }
         )
-        response = request.get(url, params=params)
+        try:
+            response = request.get(url, params=params)
+            error = False
+        except Exception as e:
+            error = True
+            ...
+
         # Save OTP to the OTP model
-        if otp:
+        if otp and not error:
             otpFile = OTP.objects.create(
                 otp_code=otp,
                 otp_type=otp_type,
                 request_user=request_user,
                 requested_user=requested_user,
             )
-
-        add_msg_to_comms_hist(
-            user_id=request_user,
-            client_id=requested_user,
-            message=registration_message,
-            is_sms=True,
-            is_email=False,
-            is_creditor=is_creditor,
-        )
+        if not error:
+            add_msg_to_comms_hist(
+                user_id=request_user,
+                client_id=requested_user,
+                message=registration_message,
+                is_sms=True,
+                is_email=False,
+                is_creditor=is_creditor,
+            )
 
     elif request_user_type == "company" and otp_type == settings.ADD_COMPANY:
         # Save OTP to the OTP model
@@ -108,7 +114,7 @@ def send_otp(
         )
 
         # send email to company
-        subject = "Login Credentials Link - credisafe."
+        subject = "Login Credentials Link - Fincheck."
         otp_link = f"{url_path}/clients/company-verify-otp/{random_string}T{generated_otp}L{random_string}!{requested_user}B/"
         message = f"{registration_message}\nClick here to enter your login details : {otp_link}"
         mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
@@ -141,7 +147,7 @@ def send_otp(
                 )
 
             # send email to company
-            subject = "New Lease - credisafe."
+            subject = "New Lease - Fincheck."
             message = registration_message
             try:
                 mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
@@ -176,7 +182,7 @@ def send_otp(
                 )
                 otp_link = f"{url_path}/clients/cl-verify-lease/{random_string}T{generated_otp}L{random_string}!{requested_user}B/"
                 # send email to company
-                subject = "New Lease - credisafe."
+                subject = "New Lease - Fincheck."
                 try:
                     message = f"{registration_message}  "  # + otp_link
                     mail = EmailMessage(
@@ -205,9 +211,9 @@ def send_otp(
             )
             otpFile.save()
 
-            subject = "Payment Status Update - credisafe."
+            subject = "Payment Status Update - Fincheck."
         else:
-            subject = "Payment Receipt - credisafe."
+            subject = "Payment Receipt - Fincheck."
 
         add_msg_to_comms_hist(
             user_id=request_user,
@@ -223,6 +229,7 @@ def send_otp(
             # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
             # creating a pdf reader object
             # mail.attach('manual.pdf', pdf, 'application/pdf')
+            mail.content_subtype = "html"
             mail.send(fail_silently=False)
         except Exception as e:
             pass
@@ -265,6 +272,7 @@ def send_auth_email(username, password, email, firstname):
     # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
     # # creating a pdf reader object
     # mail.attach('manual.pdf', pdf, 'application/pdf')
+    # mail.content_subtype = "html"
     mail.send(fail_silently=False)
 
 
@@ -524,6 +532,7 @@ def track_lease_balances():
     leases = Lease.objects.filter(is_active=True).all()
     today = date.today()
     count = 0
+    helper_text = ""
     MAX_MESSAGES_PER_SECOND = 90
     if leases:
         for lease in leases:
@@ -600,6 +609,7 @@ def track_lease_balances():
                             contact_detail = company_email.email
                         else:
                             contact_detail = "gtkandeya@gmail.com"
+                        helper_text = f"If have any queries please contact us at <a href='mailto:{contact_detail}'>here</a>"
                     else:
                         count += 1
 
@@ -608,7 +618,7 @@ def track_lease_balances():
                             identification_number=lease.reg_ID_Number
                         ).first()
                         lease_receiver_name = (
-                            lease_receiver.firstname + " " + lease_receiver.surname
+                            f"{lease_receiver.firstname} {lease_receiver.surname}"
                             if lease_receiver
                             else "Creditor"
                         )
@@ -658,16 +668,19 @@ def track_lease_balances():
                             if rent_guarantor_mobile := Individual.objects.filter(
                                 identification_number=lease.rent_guarantor_id
                             ).first():
-                                send_otp.delay(
-                                    "",
-                                    lease_id,
-                                    rent_guarantor_mobile.mobile,
-                                    lease.lease_giver,
-                                    lease.reg_ID_Number,
-                                    "individual",
-                                    settings.LEASE_STATUS,
-                                    registration_message,
-                                )
+                                try:
+                                    send_otp.delay(
+                                        "",
+                                        lease_id,
+                                        rent_guarantor_mobile.mobile,
+                                        lease.lease_giver,
+                                        lease.reg_ID_Number,
+                                        "individual",
+                                        settings.LEASE_STATUS,
+                                        registration_message,
+                                    )
+                                except Exception as e:
+                                    ...
                     else:
                         ...
 
@@ -956,23 +969,22 @@ def send_lease_renewal_notifications():
         if lease_status in ["HIGH", "HIGH-HIGH"]:
             lease_status = "HIGH"
 
-
         context = {
-                "subject": "Lease Expiry Notification",
-                "message": f"Lease for {tenant_name} will expire on {lease.end_date.strftime('%d %B %Y')}.",
-                "recipient_name": agent_username,
-                "tenant_name": tenant_name,
-                "property_address": lease.address,
-                "start_date": (
-                    lease.start_date.strftime("%d %B %Y") if lease.start_date else "N/A"
-                ),
-                "end_date": lease.end_date.strftime("%d %B %Y"),
-                "monthly_rentals": lease.monthly_rentals,
-                "status": "expiring soon",
-                "currency": lease.currency,
-                "payment_status": f"{lease_status} RISK",
-                "is_expiring_soon": True,
-            }
+            "subject": "Lease Expiry Notification",
+            "message": f"Lease for {tenant_name} will expire on {lease.end_date.strftime('%d %B %Y')}.",
+            "recipient_name": agent_username,
+            "tenant_name": tenant_name,
+            "property_address": lease.address,
+            "start_date": (
+                lease.start_date.strftime("%d %B %Y") if lease.start_date else "N/A"
+            ),
+            "end_date": lease.end_date.strftime("%d %B %Y"),
+            "monthly_rentals": lease.monthly_rentals,
+            "status": "expiring soon",
+            "currency": lease.currency,
+            "payment_status": f"{lease_status} RISK",
+            "is_expiring_soon": True,
+        }
 
         if lease.end_date != today - timedelta(days=7):
             send_email_helper.delay(
@@ -985,7 +997,7 @@ def send_lease_renewal_notifications():
             # context = context[0]
             context["is_expired"] = True
             context["status"] = "expired"
-            message=  context.get("message", "")
+            message = context.get("message", "")
             context["message"] = message.replace("will expire", " has expired")
             send_email_helper.delay(
                 context=context,
