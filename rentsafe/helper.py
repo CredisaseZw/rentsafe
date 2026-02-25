@@ -996,9 +996,8 @@ def send_lease_renewal_notifications():
         else:
             # context = context[0]
             context["is_expired"] = True
-            context["status"] = "expired"
             message = context.get("message", "")
-            context["message"] = message.replace("will expire", " has expired")
+            context["message"] = message.replace("will expire", "expired")
             send_email_helper.delay(
                 context=context,
                 from_email=EMAIL_HOST_USER,

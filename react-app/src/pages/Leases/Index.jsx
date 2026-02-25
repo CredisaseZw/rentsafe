@@ -157,11 +157,6 @@ export default function Index({ leases, total_pages, current_page }) {
                 {leases
                   ? sortFunc(leases).map((lease, index) => (
                       <tr
-                        className={
-                          lease.terminated
-                            ? "c-terminated"
-                                : ""
-                        }
                         key={lease.lease_id + "-" + index}
                       >
                         <th className="ps-3">{lease.lease_id || ""}</th>
