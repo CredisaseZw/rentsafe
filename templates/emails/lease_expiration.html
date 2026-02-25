@@ -177,12 +177,6 @@
                 {% endif %}
 
                 <table class="details-table" role="presentation" cellspacing="0" cellpadding="0">
-                  {% if remaining_days %}
-                  <tr>
-                    <td class="label">Remaining Days</td>
-                    <td class="value">{{remaining_days}}</td>
-                  </tr>
-                  {% endif %}
                   <tr>
                     <td class="label">Tenant</td>
                     <td class="value">{{tenant_name}}</td>
@@ -200,12 +194,15 @@
                     <td class="value">{{end_date}}</td>
                   </tr>
                   <tr>
-                    <td class="label">Monthly Rentals</td>
+                    <td class="label">Monthly Rent</td>
                     <td class="value">{{currency}} {{monthly_rentals}}</td>
                   </tr>
+                  <tr>
+                    <td class="label">Payment Status</td>
+                    <td class="value">{{payment_status}}</td>
                 </table>
 
-                <p>If the lease has already been renewed, please ignore this message; otherwise, take the necessary actions regarding this lease.</p>
+                <p>If the lease has been renewed, please update on Rentsafe.</p>
 
               </td>
             </tr>
