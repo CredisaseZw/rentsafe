@@ -42,6 +42,7 @@ def send_otp(
             return
     except Exception as e:
         ...
+        ...
     # Send OTP message
 
     otp = generated_otp
