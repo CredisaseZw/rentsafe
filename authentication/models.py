@@ -1,13 +1,16 @@
 from django.db import models
+from django.utils.functional import cached_property
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
 
+
 from .manager import CustomUserManager
 
-def generate_id(length,letters,id):
+
+def generate_id(length, letters, id):
     zeros = (length - len(letters)) * "0"
-    return '{letters}{zeros}{id}'.format(letters=letters,zeros=zeros, id=str(id))
+    return "{letters}{zeros}{id}".format(letters=letters, zeros=zeros, id=str(id))
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -18,9 +21,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         (4, "individual"),
     )
     email = models.CharField(max_length=50, unique=True)
-    user_id = models.CharField(_('username'),max_length=50,default="00",unique=True,null=True)
+    user_id = models.CharField(
+        _("username"), max_length=50, default="00", unique=True, null=True
+    )
     individual = models.CharField(
-        _("individual_id"), max_length=255,default=0
+        _("individual_id"), max_length=255, default=0
     )  # from individual model
     company = models.CharField(_("company_id"), max_length=255)  # from company model
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=1)
@@ -43,10 +48,48 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         super(CustomUser, self).save(*args, **kwargs)
-        if self.user_id == "00" : 
+        if self.user_id == "00":
             CustomUser.objects.filter(id=self.id).update(
-                user_id=generate_id(5, 'A', self.id))
-
+                user_id=generate_id(5, "A", self.id)
+            )
 
     def __str__(self):
         return str(self.user_id)
+
+    @cached_property
+    def username(self):
+        """_get the username for the user_
+
+        Returns:
+            _str_: _username for the Individual or Company name_
+        """
+        from rentsafe.models import Company, CompanyProfile, Individual
+
+        if self.individual != "0":
+            user_obj = Individual.objects.filter(id=self.individual).first()
+            username = user_obj.firstname if user_obj else "User"
+        else:
+            user_obj = Company.objects.filter(id=self.company).first()
+            username = f"{user_obj.trading_name} Admin" if user_obj else "Company Admin"
+        return username
+
+    @cached_property
+    def email_address(self):
+        """_get the email address for the user_
+
+        Returns:
+            _str_: _email address for the Individual or Company email_
+        """
+        from rentsafe.models import Company, CompanyProfile, Individual
+
+        if self.individual != "0":
+            user_obj = Individual.objects.filter(id=self.individual).first()
+            email_address = user_obj.email if user_obj else None
+        else:
+            user_obj = (
+                CompanyProfile.objects.filter(company=self.company)
+                .values("email")
+                .first()
+            )
+            email_address = user_obj["email"] if user_obj else None
+        return email_address

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{subject}}</title>
+<style>
+    body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f8;
+    font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .email-wrapper {
+    width: 100%;
+    padding: 40px 0;
+    }
+
+    .email-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    }
+
+    /* ====== Brand Styles ====== */
+    .header {
+    background-color: #2c949f;
+    color: #ffffff;
+    padding: 20px 30px;
+    text-align: center;
+    }
+
+    .header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    }
+
+    .content {
+    padding: 30px;
+    color: #333333;
+    font-size: 15px;
+    line-height: 1.6;
+    }
+
+    .details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    }
+
+    .details-table tr {
+    border-bottom: 1px solid #e8e8e8;
+    }
+
+    .details-table tr:last-child {
+    border-bottom: none;
+    }
+
+    .details-table td {
+    padding: 12px 15px;
+    vertical-align: top;
+    }
+
+    .details-table .label {
+    width: 40%;
+    font-weight: bold;
+    color: #2c949f;
+    background-color: #f7fcfc;
+    white-space: nowrap;
+    }
+
+    .details-table .value {
+    width: 60%;
+    color: #333333;
+    }
+
+    .highlight-box {
+    background-color: #e2f3f4;
+    padding: 20px;
+    border-radius: 6px;
+    margin: 20px 0;
+    }
+
+    .button-wrapper {
+    text-align: center;
+    margin: 30px 0;
+    }
+
+    .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #2c949f;
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    }
+
+    .footer {
+    text-align: center;
+    font-size: 12px;
+    color: #777777;
+    padding: 20px 30px;
+    background-color: #f9f9f9;
+    }
+
+    /* ====== Responsive ====== */
+    @media only screen and (max-width: 600px) {
+    .content {
+        padding: 20px;
+    }
+    .header h1 {
+        font-size: 18px;
+    }
+    .details-table .label,
+    .details-table .value {
+        display: block;
+        width: 100%;
+    }
+    .details-table .label {
+        padding-bottom: 4px;
+    }
+    .details-table .value {
+        padding-top: 0;
+        padding-bottom: 12px;
+    }
+    }
+</style>
+</head>
+
+<body>
+  <div class="email-wrapper">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center">
+          <table class="email-container" role="presentation" width="100%" cellspacing="0" cellpadding="0">
+
+            <!-- Header -->
+            <tr>
+              <td class="header">
+                <h1>{{subject}}</h1>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td class="content">
+                <p>Hello, {{recipient_name}},</p>
+
+                {% if message %}
+                <div class="highlight-box">
+                  {{message}}
+                </div>
+                {% endif %}
+
+                <table class="details-table" role="presentation" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td class="label">Property</td>
+                    <td class="value">{{property}}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Maintenance Title</td>
+                    <td class="value">{{maintenance_title}}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Maintenance Detail</td>
+                    <td class="value">{{maintenance_detail}}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Reason</td>
+                    <td class="value">{{reason}}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Contractor Name</td>
+                    <td class="value">{{contractor_name}}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Inputs Required</td>
+                    <td class="value">{{inputs_required}}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Budget</td>
+                    <td class="value">{{budget}}</td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="footer">
+                © {% now "Y" %} Credisafe. All rights reserved.
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

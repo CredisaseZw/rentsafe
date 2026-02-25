@@ -516,6 +516,28 @@
   background-color: goldenrod;
 }
 
+.c-expiring {
+  background-color: #ffb300 !important;
+  color: #ffffff;
+}
+
+.c-expiring:hover {
+  background-color: #ffb300 !important;
+}
+
+.c-expired {
+  background-color: #f87171 !important;
+  color: #ffffff;
+}
+
+.c-expired:hover {
+  background-color: #f87171 !important;
+}
+
+
+.bg-warning {
+  background-color: #ffb300 !important;
+}
 .c-once-per-months {
   display: inline-block;
   margin: 0 0.2rem;

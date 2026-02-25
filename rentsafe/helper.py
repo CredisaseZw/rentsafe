@@ -41,7 +41,7 @@ def send_otp(
         if int(request_user) == 152:
             return
     except Exception as e:
-        ... 
+        ...
     # Send OTP message
 
     otp = generated_otp
@@ -139,7 +139,6 @@ def send_otp(
                     requested_user_type="company",
                 )
 
-
             # send email to company
             subject = "New Lease - credisafe."
             message = registration_message
@@ -179,7 +178,9 @@ def send_otp(
                 subject = "New Lease - credisafe."
                 try:
                     message = f"{registration_message}  "  # + otp_link
-                    mail = EmailMessage(subject, message, EMAIL_HOST_USER, [phone_or_email])
+                    mail = EmailMessage(
+                        subject, message, EMAIL_HOST_USER, [phone_or_email]
+                    )
                     # pdf = open(MEDIA_ROOT + '/manuals/manual.pdf', 'rb').read()
                     # creating a pdf reader object
                     # mail.attach('manual.pdf', pdf, 'application/pdf')
@@ -203,11 +204,10 @@ def send_otp(
             )
             otpFile.save()
 
-
             subject = "Payment Status Update - credisafe."
         else:
             subject = "Payment Receipt - credisafe."
-            
+
         add_msg_to_comms_hist(
             user_id=request_user,
             client_id=requested_user,
@@ -231,6 +231,7 @@ def generate_random_password(length=10):
     characters = string.ascii_letters + string.digits + string.punctuation
     password = "".join(random.choice(characters) for _ in range(length))
     return password
+
 
 def check_lease_termination_eligibility(i, hundred_days_ago):
     """
@@ -389,43 +390,54 @@ def validate_bulk_email_addresses(value):
 def get_creditor_helper(data, request, creditors_data):
     searchValue = data["searchValue"].upper()
     first_name = searchValue.split()[0]
-    surname  = searchValue.split()[1] if len(searchValue.split()) > 1 else "" 
+    surname = searchValue.split()[1] if len(searchValue.split()) > 1 else ""
     if searchValue[:4].isdigit():
         result = Landlord.objects.filter(
             Q(reg_ID_Number__icontains=searchValue)
         ).first()
     elif surname != first_name:
-        result = Landlord.objects.filter(
-            landlord_name__icontains=first_name).first()
-    uploader_user_company = CustomUser.objects.filter(id=result.user_id).first() 
+        result = Landlord.objects.filter(landlord_name__icontains=first_name).first()
+    uploader_user_company = CustomUser.objects.filter(id=result.user_id).first()
     # if request.user.company == uploader_user_company.company:
-    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(lease_id=result.lease_id)
+    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(
+        lease_id=result.lease_id
+    )
     creditors_data = {
-        "opening_balance": creditor_opening_balance.last().total_amount if creditor_opening_balance else 0,
-        "opening_balance_date": creditor_opening_balance.first().created_at if creditor_opening_balance else None,
+        "opening_balance": (
+            creditor_opening_balance.last().total_amount
+            if creditor_opening_balance
+            else 0
+        ),
+        "opening_balance_date": (
+            creditor_opening_balance.first().created_at
+            if creditor_opening_balance
+            else None
+        ),
         "full_name": f"{result.landlord_name}",
-        "lease_id": creditor_opening_balance.first().lease_id if creditor_opening_balance else None,
+        "lease_id": (
+            creditor_opening_balance.first().lease_id
+            if creditor_opening_balance
+            else None
+        ),
     }
     return JsonResponse([creditors_data], safe=False)
-
-
 
 
 def get_individual_journals_helper(data, request, individual_data):
     searchValue = data["searchValue"].upper()
     first_name = searchValue.split()[0]
-    surname  = searchValue.split()[1] if len(searchValue.split()) > 1 else first_name 
+    surname = searchValue.split()[1] if len(searchValue.split()) > 1 else first_name
     if searchValue[:4].isdigit():
         result = Individual.objects.filter(
             Q(identification_number__icontains=searchValue)
         ).first()
     elif surname != first_name:
         result = Individual.objects.filter(
-            firstname__icontains=first_name,surname__icontains=surname).first()
+            firstname__icontains=first_name, surname__icontains=surname
+        ).first()
     else:
         result = Individual.objects.filter(
-            Q(firstname__icontains=first_name)
-            | Q(surname__icontains=surname)
+            Q(firstname__icontains=first_name) | Q(surname__icontains=surname)
         ).first()
     individual_lease = Lease.objects.filter(
         reg_ID_Number=result.identification_number,
@@ -438,8 +450,16 @@ def get_individual_journals_helper(data, request, individual_data):
     )
     # individual_invoice = Invoicing.objects.filter(lease_id=individual_lease.lease_id).last()
     individuls_data = {
-        "opening_balance": individual_opening_balance.last().outstanding_balance if individual_opening_balance else 0,
-        "opening_balance_date": individual_opening_balance.first().date_created if individual_opening_balance else None,
+        "opening_balance": (
+            individual_opening_balance.last().outstanding_balance
+            if individual_opening_balance
+            else 0
+        ),
+        "opening_balance_date": (
+            individual_opening_balance.first().date_created
+            if individual_opening_balance
+            else None
+        ),
         "full_name": f"{result.firstname} {result.surname}",
         "lease_id": individual_lease.lease_id,
     }
@@ -466,8 +486,16 @@ def get_company_journals_helper(data, request, company_data):
     )
     # company_invoice = Invoicing.objects.filter(lease_id=company_lease.lease_id).last()
     companies_data = {
-        "company_opening_balance": company_opening_balance.last().outstanding_balance if company_opening_balance else 0,
-        "company_opening_balance_date": company_opening_balance.first().date_created if company_opening_balance else None,
+        "company_opening_balance": (
+            company_opening_balance.last().outstanding_balance
+            if company_opening_balance
+            else 0
+        ),
+        "company_opening_balance_date": (
+            company_opening_balance.first().date_created
+            if company_opening_balance
+            else None
+        ),
         "company_name": result.registration_name,
         "lease_id": company_lease.lease_id,
     }
@@ -499,12 +527,14 @@ def track_lease_balances():
     if leases:
         for lease in leases:
             lease_id = lease.lease_id
-            can_send_message =True
+            can_send_message = True
             lease_giver = Company.objects.filter(id=lease.lease_giver).first()
-            lease_giver_name = (
-                lease_giver.trading_name  if lease_giver else "Creditor"
+            lease_giver_name = lease_giver.trading_name if lease_giver else "Creditor"
+            payment_period_end = (
+                lease.payment_period_end
+                if lease.payment_period_end and int(lease.payment_period_end) <= 28
+                else 7
             )
-            payment_period_end = lease.payment_period_end if lease.payment_period_end and int(lease.payment_period_end) <= 28 else 7
             custom_day = today.replace(day=int(payment_period_end))
             limit_day = today.replace(day=int(payment_period_end) + 1)
             if custom_day < today <= limit_day:
@@ -524,15 +554,17 @@ def track_lease_balances():
                         and float(opening_balance_object.outstanding_balance) > 0
                     ):
                         try:
-                            opening_balance_object.three_months_plus = (    
+                            opening_balance_object.three_months_plus = (
                                 four_months_ago + three_months_ago
                             )
                             opening_balance_object.three_months_back = two_months_ago
                             opening_balance_object.two_months_back = one_months_ago
                             opening_balance_object.one_month_back = current_month
                             opening_balance_object.current_month = 0
-                            opening_balance_object.outstanding_balance = outstanding_balance
-                            
+                            opening_balance_object.outstanding_balance = (
+                                outstanding_balance
+                            )
+
                             opening_balance_object.save()
 
                             if float(opening_balance_object.three_months_plus) > 0:
@@ -543,7 +575,7 @@ def track_lease_balances():
                                 lease.status = "HIGH"
                             elif float(opening_balance_object.one_month_back) > 0:
                                 lease.status = "MEDIUM"
-                            lease.status_cache= lease.status
+                            lease.status_cache = lease.status
                             lease.save()
                         except Exception as e:
                             pass
@@ -557,7 +589,8 @@ def track_lease_balances():
                             id=lease.reg_ID_Number
                         ).first()
                         lease_receiver_name = (
-                            lease_receiver.trading_name or lease_receiver.registration_name
+                            lease_receiver.trading_name
+                            or lease_receiver.registration_name
                         )
                         if lease_receiver:
                             company_email = CompanyProfile.objects.filter(
@@ -568,7 +601,7 @@ def track_lease_balances():
                             contact_detail = "gtkandeya@gmail.com"
                     else:
                         count += 1
-                        
+
                         requested_user_ob = "individual"
                         lease_receiver = Individual.objects.filter(
                             identification_number=lease.reg_ID_Number
@@ -578,9 +611,13 @@ def track_lease_balances():
                             if lease_receiver
                             else "Creditor"
                         )
-                        contact_detail = lease_receiver.mobile if lease_receiver else None
+                        contact_detail = (
+                            lease_receiver.mobile if lease_receiver else None
+                        )
                     if float(opening_balance_object.outstanding_balance) > 0:
-                        left_balance = round(float(opening_balance_object.outstanding_balance), 2)
+                        left_balance = round(
+                            float(opening_balance_object.outstanding_balance), 2
+                        )
                     else:
                         left_balance = 0
 
@@ -592,12 +629,15 @@ def track_lease_balances():
                         registration_message = f"Hi {lease_receiver_name}, Your Payment status to {lease_giver_name} has downgraded to MEDIUM RISK. Please pay your balance of {lease.currency} {left_balance}0 to upgrade your payment status.\nLease ID: {lease_id}"
                     else:
                         registration_message = None
+
                     try:
-                        can_send_message_ob = CustomUser.objects.filter(company=lease.lease_giver,can_send_email=False).first()
+                        can_send_message_ob = CustomUser.objects.filter(
+                            company=lease.lease_giver, can_send_email=False
+                        ).first()
                     except Exception as e:
                         ...
                     can_send_message = False if can_send_message_ob else True
-                    if registration_message and  can_send_message:
+                    if registration_message and can_send_message:
                         if count % MAX_MESSAGES_PER_SECOND == 0:
                             time.sleep(1)
                         send_otp.delay(
@@ -610,7 +650,10 @@ def track_lease_balances():
                             settings.LEASE_STATUS,
                             registration_message,
                         )
-                        if requested_user_ob == "company" and lease.status_cache not in ["SAFE", "MEDIUM"]:
+                        if (
+                            requested_user_ob == "company"
+                            and lease.status_cache not in ["SAFE", "MEDIUM"]
+                        ):
                             if rent_guarantor_mobile := Individual.objects.filter(
                                 identification_number=lease.rent_guarantor_id
                             ).first():
@@ -626,7 +669,6 @@ def track_lease_balances():
                                 )
                     else:
                         ...
-                
 
 
 def send_message():
@@ -678,11 +720,15 @@ def track_lease_end_date():
 
     for lease in all_leases:
         end_date = lease.end_date
-       
-        if (end_date == threshold_60_days or end_date == threshold_30_days) or (end_date == timezone.now().date()):
+
+        if (end_date == threshold_60_days or end_date == threshold_30_days) or (
+            end_date == timezone.now().date()
+        ):
             if lease.is_company:
                 lease_receiver = Company.objects.filter(id=lease.reg_ID_Number).first()
-                lease_receiver_name = lease_receiver.trading_name if lease_receiver else None
+                lease_receiver_name = (
+                    lease_receiver.trading_name if lease_receiver else None
+                )
                 if lease.rent_guarantor_id:
                     rent_guarantor = Individual.objects.filter(
                         identification_number=lease.rent_guarantor_id
@@ -718,6 +764,7 @@ def track_lease_end_date():
                     registration_message,
                 )
 
+
 def add_msg_to_comms_hist(
     user_id: str,
     client_id: str,
@@ -732,7 +779,263 @@ def add_msg_to_comms_hist(
         message=message,
         is_sms=is_sms,
         is_email=is_email,
-        is_creditor =True if is_creditor else False
+        is_creditor=True if is_creditor else False,
     )
 
     new_message.save()
+
+
+@shared_task
+def send_reminder_notifications():
+    """Celery task for sending reminder notifications - runs daily at 07:30"""
+
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
+    weekday = today.strftime("%A").lower()
+    day_of_month = today.day
+    month = today.month
+    year = today.year
+
+    weekly = MaintenanceSchedule.objects.filter(
+        frequency__iexact="weekly", scheduled_day__iexact=weekday
+    )
+    monthly = MaintenanceSchedule.objects.filter(
+        frequency__iexact="monthly", scheduled_day=str(day_of_month)
+    )
+    every_n = MaintenanceSchedule.objects.filter(
+        frequency__startswith="every", scheduled_day=str(day_of_month)
+    )
+
+    due_every_n = []
+    for sched in every_n:
+        if sched.month_frequency and sched.created_at:
+            months_since = (year - sched.created_at.year) * 12 + (
+                month - sched.created_at.month
+            )
+            if months_since % sched.month_frequency == 0:
+                due_every_n.append(sched)
+
+    due_maintenance_schedules = list(weekly) + list(monthly) + due_every_n
+    if due_maintenance_schedules:
+        for schedule in due_maintenance_schedules:
+            property_address = (
+                schedule.property if hasattr(schedule, "property") else "Property"
+            )
+            subject = "Maintenance Reminder"
+            receiver_obj = CustomUser.objects.filter(id=schedule.user_id).first()
+            receiver_name = (
+                getattr(receiver_obj, "username", "User") if receiver_obj else "User"
+            )
+            receiver_email = (
+                getattr(receiver_obj, "email", None) if receiver_obj else None
+            )
+            message = f"Reminder - scheduled maintenance at '{property_address}' on {schedule.scheduled_day}"
+            if receiver_email:
+                send_email_helper.delay(
+                    context={
+                        "subject": subject,
+                        "message": message,
+                        "recipient_name": receiver_name,
+                        "maintenance_title": getattr(schedule, "title", "Maintenance"),
+                        "property": property_address,
+                        "maintenance_detail": getattr(schedule, "details", ""),
+                        "contractor_name": getattr(schedule, "contractor", ""),
+                        "inputs_required": getattr(schedule, "required_materials", ""),
+                        "budget": getattr(schedule, "budget", ""),
+                        "reason": getattr(schedule, "reason", ""),
+                    },
+                    from_email=EMAIL_HOST_USER,
+                    recipient_list=[receiver_email],
+                    template="emails/maintenance.html",
+                )
+
+    due_work_schedules = WorkSchedule.objects.filter(scheduled_date=today)
+    if due_work_schedules:
+        for schedule in due_work_schedules:
+            property_address = (
+                schedule.property if hasattr(schedule, "property") else "Property"
+            )
+            subject = "Work Schedule Reminder"
+            receiver_obj = CustomUser.objects.filter(id=schedule.user_id).first()
+            receiver_name = (
+                getattr(receiver_obj, "username", "User") if receiver_obj else "User"
+            )
+            receiver_email = (
+                getattr(receiver_obj, "email", None) if receiver_obj else None
+            )
+            message = f"Reminder - work schedule reminder at '{property_address}' on {schedule.scheduled_date.strftime('%d %b %Y')}"
+            if receiver_email:
+
+                send_email_helper.delay(
+                    context={
+                        "subject": subject,
+                        "message": message,
+                        "recipient_name": receiver_name,
+                        "maintenance_title": getattr(schedule, "title", "Maintenance"),
+                        "property": property_address,
+                        "maintenance_detail": getattr(schedule, "details", ""),
+                        "contractor_name": getattr(schedule, "contractor", ""),
+                        "inputs_required": getattr(schedule, "required_materials", ""),
+                        "budget": getattr(schedule, "budget", ""),
+                        "reason": getattr(schedule, "reason", ""),
+                    },
+                    from_email=EMAIL_HOST_USER,
+                    recipient_list=[receiver_email],
+                    template="emails/maintenance.html",
+                )
+
+    # ================ DUE REMINDERS FOR EXPIRING LEASES ============================
+
+    due_reminders = CommunicationHistoryReminder.objects.filter(
+        message__icontains="#REMINDER", action_date=today
+    )
+
+    due_reminders_tomorrow = CommunicationHistoryReminder.objects.filter(
+        message__icontains="#REMINDER", action_date=tomorrow
+    )
+    combined_reminders = due_reminders | due_reminders_tomorrow
+    if combined_reminders:
+        for reminder in combined_reminders:
+            user_obj = CustomUser.objects.filter(id=reminder.user_id).first()
+            user_name = getattr(user_obj, "username", "User")
+            property_address = (
+                getattr(reminder, "property_address", "Property")
+                if hasattr(reminder, "property_address")
+                else "Property"
+            )
+            subject = (
+                "Upcoming Inspection Reminder"
+                if reminder.action_date == tomorrow
+                else "Due Inspection Reminder"
+            )
+            receiver_email = getattr(user_obj, "email", None) if user_obj else None
+            reminder_date = getattr(reminder, "reminder_date", tomorrow)
+            original_message = (
+                getattr(reminder, "message", "").replace("#REMINDER", "").strip()
+            )
+            message = (
+                f"Reminder - {original_message} on {reminder_date.strftime('%d %B %Y')}"
+            )
+            if receiver_email:
+                send_email_helper.delay(
+                    context={
+                        "subject": subject,
+                        "message": message,
+                        "recipient_name": user_name,
+                    },
+                    from_email=EMAIL_HOST_USER,
+                    recipient_list=[receiver_email],
+                    template="emails/reminders.html",
+                )
+
+
+@shared_task
+def send_lease_renewal_notifications():
+    """Celery task for lease renewal notifications - runs daily at 07:45"""
+    today = timezone.now().date()
+    leases = Lease.objects.filter(
+        is_active=True, end_date__lte=today + timedelta(days=90)
+    )
+    for lease in leases:
+        expiry = lease.end_date
+        if not expiry:
+            continue
+        three_months_before = expiry - timedelta(days=90)
+        two_months_before = expiry - timedelta(days=60)
+        five_days_before = expiry - timedelta(days=5)
+        seven_days_after = expiry + timedelta(days=7)
+
+        if today in [three_months_before, two_months_before, five_days_before]:
+            managing_user_obj = CustomUser.objects.filter(
+                id=lease.lease_activator
+            ).first()
+            agent_email = getattr(managing_user_obj, "email", None)
+            agent_username = getattr(managing_user_obj, "username", "Admin")
+            tenant_name = lease.tenant_name if lease.tenant_name else "Tenant"
+            remaining_days = 0
+            if three_months_before == today:
+                remaining_days = 90
+            elif two_months_before == today:
+                remaining_days = 60
+            else:
+                remaining_days = 5
+
+            send_email_helper.delay(
+                context={
+                    "subject": "Lease Expiry Notification",
+                    "message": f"Lease for '{tenant_name}' will expire on {expiry.strftime('%d %B %Y')}. Please take necessary action.",
+                    "recipient_name": agent_username,
+                    "tenant_name": tenant_name,
+                    "property_address": lease.address,
+                    "start_date": (
+                        lease.start_date.strftime("%d %B %Y")
+                        if lease.start_date
+                        else "N/A"
+                    ),
+                    "end_date": expiry.strftime("%d %B %Y"),
+                    "monthly_rentals": lease.monthly_rentals,
+                    "status": "expiring soon",
+                    "remaining_days": f"{remaining_days} days",
+                    "currency": lease.currency,
+                    "is_expiring_soon": True,
+                },
+                from_email=EMAIL_HOST_USER,
+                recipient_list=[agent_email],
+                template="emails/lease_expiration.html",
+            )
+
+        if today == seven_days_after:
+            managing_user_obj = CustomUser.objects.filter(
+                id=lease.lease_activator
+            ).first()
+            agent_email = getattr(managing_user_obj, "email", None)
+            agent_username = getattr(managing_user_obj, "username", "Admin")
+            tenant_name = lease.tenant_name if lease.tenant_name else "Tenant"
+            send_email_helper.delay(
+                context={
+                    "subject": "Lease Expired",
+                    "message": f"Lease for '{tenant_name}' expired on {expiry.strftime('%d %B %Y')}. Please review this lease and take the necessary renewal, termination, or follow-up action.",
+                    "recipient_name": agent_username,
+                    "tenant_name": tenant_name,
+                    "property_address": lease.address,
+                    "start_date": (
+                        lease.start_date.strftime("%d %B %Y")
+                        if lease.start_date
+                        else "N/A"
+                    ),
+                    "end_date": expiry.strftime("%d %B %Y"),
+                    "monthly_rentals": lease.monthly_rentals,
+                    "currency": lease.currency,
+                    "is_expired": True,
+                    "status": "expired",
+                },
+                from_email=EMAIL_HOST_USER,
+                recipient_list=[agent_email],
+                template="emails/lease_expiration.html",
+            )
+
+
+@shared_task
+def send_email_helper(context, from_email, recipient_list, template):
+    """_send email helper function_
+
+    Args:
+        context (_type_): _subject, message, recipient_name_
+        from_email (_type_): _Sender email address_
+        recipient_list (list): _recipient email addresses_
+        template (_type_): _relative path to the email template_
+    """
+    try:
+        from django.template.loader import render_to_string
+
+        html_message = render_to_string(template, context)
+        mail = EmailMessage(
+            subject=context.get("subject", ""),
+            body=html_message,
+            from_email=from_email,
+            to=recipient_list,
+        )
+        mail.content_subtype = "html"
+        mail.send(fail_silently=False)
+    except Exception as e:
+        pass
