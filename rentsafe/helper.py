@@ -42,6 +42,7 @@ def send_otp(
             return
     except Exception as e:
         ...
+        ...
     # Send OTP message
 
     otp = generated_otp
@@ -928,82 +929,61 @@ def send_reminder_notifications():
 def send_lease_renewal_notifications():
     """Celery task for lease renewal notifications - runs daily at 07:45"""
     today = timezone.now().date()
+    three_months_before = timedelta(days=90)
+    two_months_before = timedelta(days=60)
+    five_days_before = timedelta(days=5)
+    seven_days_after = timedelta(days=7)
     leases = Lease.objects.filter(
-        is_active=True, end_date__lte=today + timedelta(days=90)
+        Q(end_date=today + three_months_before)
+        | Q(end_date=today + two_months_before)
+        | Q(end_date=today + five_days_before)
+        | Q(end_date=today - seven_days_after),
+        is_active=True,
     )
     for lease in leases:
-        expiry = lease.end_date
-        if not expiry:
+        if not lease.end_date:
             continue
-        three_months_before = expiry - timedelta(days=90)
-        two_months_before = expiry - timedelta(days=60)
-        five_days_before = expiry - timedelta(days=5)
-        seven_days_after = expiry + timedelta(days=7)
+        managing_user_obj = CustomUser.objects.filter(id=lease.lease_activator).first()
+        agent_email = getattr(managing_user_obj, "email", None)
+        agent_username = getattr(managing_user_obj, "username", "Admin")
+        tenant_name = lease.tenant_name if lease.tenant_name else "Tenant"
+        lease_status = lease.status if lease.status else "N/A"
+        if lease_status in ["HIGH", "HIGH-HIGH"]:
+            lease_status = "HIGH"
 
-        if today in [three_months_before, two_months_before, five_days_before]:
-            managing_user_obj = CustomUser.objects.filter(
-                id=lease.lease_activator
-            ).first()
-            agent_email = getattr(managing_user_obj, "email", None)
-            agent_username = getattr(managing_user_obj, "username", "Admin")
-            tenant_name = lease.tenant_name if lease.tenant_name else "Tenant"
-            remaining_days = 0
-            if three_months_before == today:
-                remaining_days = 90
-            elif two_months_before == today:
-                remaining_days = 60
-            else:
-                remaining_days = 5
 
+        context = {
+                "subject": "Lease Expiry Notification",
+                "message": f"Lease for {tenant_name} will expire on {lease.end_date.strftime('%d %B %Y')}.",
+                "recipient_name": agent_username,
+                "tenant_name": tenant_name,
+                "property_address": lease.address,
+                "start_date": (
+                    lease.start_date.strftime("%d %B %Y") if lease.start_date else "N/A"
+                ),
+                "end_date": lease.end_date.strftime("%d %B %Y"),
+                "monthly_rentals": lease.monthly_rentals,
+                "status": "expiring soon",
+                "currency": lease.currency,
+                "payment_status": f"{lease_status} RISK",
+                "is_expiring_soon": True,
+            }
+
+        if lease.end_date != today - timedelta(days=7):
             send_email_helper.delay(
-                context={
-                    "subject": "Lease Expiry Notification",
-                    "message": f"Lease for '{tenant_name}' will expire on {expiry.strftime('%d %B %Y')}. Please take necessary action.",
-                    "recipient_name": agent_username,
-                    "tenant_name": tenant_name,
-                    "property_address": lease.address,
-                    "start_date": (
-                        lease.start_date.strftime("%d %B %Y")
-                        if lease.start_date
-                        else "N/A"
-                    ),
-                    "end_date": expiry.strftime("%d %B %Y"),
-                    "monthly_rentals": lease.monthly_rentals,
-                    "status": "expiring soon",
-                    "remaining_days": f"{remaining_days} days",
-                    "currency": lease.currency,
-                    "is_expiring_soon": True,
-                },
+                context=context,
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[agent_email],
                 template="emails/lease_expiration.html",
             )
-
-        if today == seven_days_after:
-            managing_user_obj = CustomUser.objects.filter(
-                id=lease.lease_activator
-            ).first()
-            agent_email = getattr(managing_user_obj, "email", None)
-            agent_username = getattr(managing_user_obj, "username", "Admin")
-            tenant_name = lease.tenant_name if lease.tenant_name else "Tenant"
+        else:
+            # context = context[0]
+            context["is_expired"] = True
+            context["status"] = "expired"
+            message=  context.get("message", "")
+            context["message"] = message.replace("will expire", " has expired")
             send_email_helper.delay(
-                context={
-                    "subject": "Lease Expired",
-                    "message": f"Lease for '{tenant_name}' expired on {expiry.strftime('%d %B %Y')}. Please review this lease and take the necessary renewal, termination, or follow-up action.",
-                    "recipient_name": agent_username,
-                    "tenant_name": tenant_name,
-                    "property_address": lease.address,
-                    "start_date": (
-                        lease.start_date.strftime("%d %B %Y")
-                        if lease.start_date
-                        else "N/A"
-                    ),
-                    "end_date": expiry.strftime("%d %B %Y"),
-                    "monthly_rentals": lease.monthly_rentals,
-                    "currency": lease.currency,
-                    "is_expired": True,
-                    "status": "expired",
-                },
+                context=context,
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[agent_email],
                 template="emails/lease_expiration.html",
@@ -1033,4 +1013,5 @@ def send_email_helper(context, from_email, recipient_list, template):
         mail.content_subtype = "html"
         mail.send(fail_silently=False)
     except Exception as e:
+        print(f"Error sending email: {e}")
         pass
