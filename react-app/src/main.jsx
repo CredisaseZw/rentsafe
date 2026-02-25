@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
     color: "#FF0000",
     showSpinner: true,
   });
-
   createInertiaApp({
     title: (title) => `${title} | ${appName}`,
     resolve: async (name) => {
