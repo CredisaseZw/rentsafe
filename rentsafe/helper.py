@@ -969,7 +969,7 @@ def send_lease_renewal_notifications():
             }
 
         if lease.end_date != today - timedelta(days=7):
-            send_email_helper(
+            send_email_helper.delay(
                 context=context,
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[agent_email],
@@ -981,7 +981,7 @@ def send_lease_renewal_notifications():
             context["status"] = "expired"
             message=  context.get("message", "")
             context["message"] = message.replace("will expire", " has expired")
-            send_email_helper(
+            send_email_helper.delay(
                 context=context,
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[agent_email],
