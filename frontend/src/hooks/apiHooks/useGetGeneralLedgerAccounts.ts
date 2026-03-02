@@ -6,7 +6,7 @@ interface GLResponse extends Response {
     results : GeneralLedgerAccount[]
 }
 
-export function useGetGeneralLedgerAccounts(page:Number){
+export function useGetGeneralLedgerAccounts(page:number){
     const {data, isLoading, error} = useQuery<GLResponse>({
         queryKey : ["generalLedgerAccounts", page],
         queryFn : async() =>{

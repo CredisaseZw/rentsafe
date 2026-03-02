@@ -1,58 +1,79 @@
+import ButtonSpinner from "@/components/general/ButtonSpinner"
+import SearchSubTrustGeneralLedger from "@/components/general/SearchSubTrustGeneralLedger"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import useAddPropertyExpense from "@/hooks/components/useAddPropertyExpense"
-import { Plus } from "lucide-react"
+import useAddPropertyExpense from "@/hooks/apiHooks/useAddPropertyExpense"
+import useAddPropertyExpenseDialogue from "@/hooks/components/useAddPropertyExpenseDialogue"
+import type { PropertyExpense } from "@/interfaces"
+import { Edit, Plus } from "lucide-react"
 
-function AddPropertyListingDialogue() {
-    const {open, setOpen, generalLedgerAccounts} = useAddPropertyExpense();
-  return (
+function AddPropertyListingDialogue({propertyExpense}: {propertyExpense?:PropertyExpense}) {
+    const {
+        open, 
+        loading,
+        defaultValue,
+        setOpen,
+        onSubmit,
+        onSelectAccount,
+    } = useAddPropertyExpenseDialogue(propertyExpense);
+    const {mutate} = useAddPropertyExpense();
+    return (
     <Dialog
         open = {open}
         onOpenChange={setOpen}
     >
         <DialogTrigger>
-            <Button>
-              <Plus/>
-              Add Expense
-            </Button>
+            {
+                propertyExpense 
+                ? <Button>
+                    <Edit/>
+                    Edit
+                </Button>
+                : <Button>
+                    <Plus/>
+                    Add Expense
+                </Button>
+            }
         </DialogTrigger>
+
         <DialogContent onInteractOutside={(e)=> e.preventDefault()}>
             <DialogHeader>
                 <DialogTitle>Add Property expense</DialogTitle>
                 <DialogDescription>Click submit when done filling the required fields.</DialogDescription>
             </DialogHeader>
-            <form action=""  id="addExpense" className="mt-5 space-y-5">
+            <form id="addExpense" className="mt-5 space-y-5"
+                onSubmit={(e)=>{
+                    e.preventDefault()
+                    onSubmit(e, mutate)
+                }}
+            >
                 <div className="form-group">
-                    <Label>Expense Name</Label>
+                    <Label className="required">Expense Name</Label>
                     <Input 
+                        defaultValue={propertyExpense?.expense ?? ""}
+                        required
                         placeholder="Levy"
-                        name="name" 
+                        name="expense_name" 
                     />
                 </div>
-                <div className="form-group">
-                    <Label>General Ledger Account</Label>
-                    <Select>
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder= "Select ..." ></SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {
-                                generalLedgerAccounts.map((g, idx) => (
-                                    <SelectItem key={idx} value={String(g.id)}>{g.account_sector.code } - {g.account_name}</SelectItem>
-                                ))
-                            }
-                        </SelectContent>
-                    </Select>
-                </div>
+                <SearchSubTrustGeneralLedger
+                    defaultValue = {defaultValue}
+                    onSelectAccount={onSelectAccount}
+                />
             </form>
             <DialogFooter>
                 <DialogClose>
                     <Button variant={"ghost"}>Cancel</Button>
                 </DialogClose>
-                <Button form="addExpense">Submit</Button>
+                <Button form="addExpense" disabled = {loading}>
+                    {
+                        loading 
+                        ?  <ButtonSpinner/>
+                        : "Submit"
+                    }
+                </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

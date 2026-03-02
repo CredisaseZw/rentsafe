@@ -92,7 +92,8 @@ export const DELETION_LINKS = {
   GENERAL_LEDGER : "/api/accounting/ledger-accounts",
   INVOICE : "/api/accounting/invoices",
   CREDIT_NOTE : "/api/accounting/credit-notes",
-  PROPERTIES : "/api/properties"
+  PROPERTIES : "/api/properties",
+  PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -709,6 +710,8 @@ export const TRUST_ACCOUNTS_TENANT_STATEMENT_HEADERS:Header[] =[
 ]
 export const TRUST_ACCOUNTS_PROPERTY_EXPENSES_HEADERS:Header[] =[
   { name : "Expense", textAlign:"left"},
+  { name : "Account Expense Name", textAlign : "left"},
+  { name : "Date Created", textAlign : "left"},
   { name : "Actions", textAlign: "end"}
 ];
 export const TRUST_ACCOUNTS_TENANT_DC_JOURNAL_HEADERS: Header[] = [

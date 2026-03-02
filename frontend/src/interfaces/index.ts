@@ -1,4 +1,4 @@
-import type {  Currency, SalesItem, Tenant } from "@/types";
+import type {  AccountSector, Currency, SalesItem, Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -559,4 +559,27 @@ export interface CashSaleProps {
       setOpen :  React.Dispatch<React.SetStateAction<boolean>>
    },
    cashSale:CashSale
+}
+export interface TrustGLAccount {
+  id: number;
+  account_number: string;
+  account_name: string;
+  account_type: AccountSector;
+  account_type_id: number;
+  is_system_account: boolean;
+}
+
+export interface TrustSubGLAccount extends TrustGLAccount{
+   account_subtype: string | null,
+   is_contra_account: boolean,
+}
+
+export interface PropertyExpense{
+  id: number;
+  expense: string;
+  expense_account: number;
+  expense_account_name: string;
+  expense_account_number: string;
+  date_created: string;
+  date_updated: string; 
 }

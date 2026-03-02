@@ -392,7 +392,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         if(handleAxiosError("Failed to fetch payment methods", paymentMethodsError)) return;
 
         if(paymentMethodsData){
-            setPaymentMethods(paymentMethodsData);
+            setPaymentMethods(paymentMethodsData.results);
         }
     }, [paymentMethodsData, paymentMethodsError])
 
