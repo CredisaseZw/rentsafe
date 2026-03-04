@@ -1,6 +1,7 @@
 import ColumnsContainer from "@/components/general/ColumnsContainer"
 import DeleteDialogue from "@/components/general/DeleteDialogue"
 import Header from "@/components/general/Header"
+import Searchbox from "@/components/general/Searchbox"
 import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
 import AddPropertyListingDialogue from "@/components/routes/rent-safe/trust-accounting/gl-listings/AddPropertyListingDialogue"
@@ -30,13 +31,17 @@ function TrustAccountPropertySettings() {
             total={pagination?.count ?? 0}
             subTotal={propertyExpenses.length}
           />
-          <div className="flex justify-end">
+          <div className="flex md:flex-row flex-col gap-3 justify-end">
+            <Searchbox
+              placeholder="Search by name"
+            />
             <AddPropertyListingDialogue/>
           </div>
         </ColumnsContainer>
 
         <div className="mt-5">
           <TableBase 
+            isEmpty = {propertyExpenses.length === 0}
             isError = {isError}
             isLoading = {isLoading}
             paginationData={pagination}

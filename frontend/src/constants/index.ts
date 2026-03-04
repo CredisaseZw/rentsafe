@@ -93,7 +93,8 @@ export const DELETION_LINKS = {
   INVOICE : "/api/accounting/invoices",
   CREDIT_NOTE : "/api/accounting/credit-notes",
   PROPERTIES : "/api/properties",
-  PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses"
+  PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses",
+  TRUST_ACC_GENERAL_LEDGER : "/api/trust-accounting/general-ledgers"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -757,3 +758,11 @@ export const TRUST_ACCOUNT_INVOICE_LIST_HEADERS: Header[] = [
   { name: "Amount (Incl. VAT)", textAlign: "end" },
   { name: "Action", textAlign: "center" },
 ]
+
+export const TRUST_ACCOUNT_GENERAL_LEDGERS: Header[] = [
+  { name: "Account Number", textAlign: "left" },
+  { name: "Account Name", textAlign: "left", },
+  { name: "Type", textAlign: "left", },
+  { name: "System Account", textAlign: "center", },
+  {name : "Action"}
+];

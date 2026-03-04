@@ -42,7 +42,7 @@ function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice
             <DialogTrigger asChild>
                 <Button >{title} <Plus/></Button>
             </DialogTrigger>
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[1100px] h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[1100px] h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader> 

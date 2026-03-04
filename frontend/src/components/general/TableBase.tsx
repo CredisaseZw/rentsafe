@@ -5,17 +5,27 @@ import { TriangleAlert } from "lucide-react";
 import type { Header } from "@/types";
 import type { PaginationData } from "@/interfaces";
 import Paginator from "./Paginator";
+import EmptyTableResponse from "./EmptyTableResponse";
 interface TableBaseProps {
    isError?: false | true;
    isLoading?: false | true;
    headers?: Header[];
+   isEmpty?: boolean
    children: React.ReactNode;
    headerClass?: string;
    paginationData?: PaginationData,
    paginationName?: string
 }
 
-export function TableBase({ paginationData, paginationName, isLoading, headers, children, headerClass, isError}: TableBaseProps) {
+export function TableBase({ 
+   paginationData, 
+   paginationName, 
+   isLoading, 
+   headers, 
+   children, 
+   isEmpty, 
+   headerClass, 
+   isError}: TableBaseProps) {
    return (
      <div>
          <Table className="border-color rounded border">
@@ -33,7 +43,7 @@ export function TableBase({ paginationData, paginationName, isLoading, headers, 
                </TableRow>
             </TableHeader>
             <TableBody>
-               {isLoading ? (
+               {isLoading && (
                   <TableRow>
                      <TableCell colSpan={headers && headers.length}>
                         <div className="flex items-center justify-center py-4">
@@ -41,7 +51,11 @@ export function TableBase({ paginationData, paginationName, isLoading, headers, 
                         </div>
                      </TableCell>
                   </TableRow>
-               ) : isError ? (
+               )
+               } 
+               {
+                  !isLoading && 
+                  isError && (
                   <TableRow>
                      <TableCell colSpan={headers && headers.length}>
                         <div className="flex flex-row items-center justify-center gap-3 py-4 text-red-600">
@@ -50,9 +64,20 @@ export function TableBase({ paginationData, paginationName, isLoading, headers, 
                         </div>
                      </TableCell>
                   </TableRow>
-               ) : (
-                  children
                )}
+               {
+                  !isLoading &&
+                  isEmpty && (
+                     <EmptyTableResponse colSpan={headers?.length ?? 1}/>
+                  )
+               } 
+               {
+                  !isLoading &&
+                  !isError &&
+                  !isEmpty &&
+                  children
+                }
+               
             </TableBody>
          </Table>
          <div className="mt-4">

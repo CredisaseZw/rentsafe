@@ -41,7 +41,6 @@ function PrintBillingDocument({open, bill, setOpen, billTitle}:props) {
         </DialogTrigger>
       }
       <DialogContent 
-        onInteractOutside={(e)=> e.preventDefault()}
         className="sm:max-w-[1000px] sm:max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Print {billTitle.toLowerCase() ?? "invoice"}.</DialogTitle>

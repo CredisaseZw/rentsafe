@@ -20,7 +20,7 @@ function AddSaleItemDialogue({initial}:props) {
                     : <Button>Add Sale Item <Plus/></Button> 
                 }
             </DialogTrigger>
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[900px]">
+            <DialogContent className="sm:max-w-[900px]">
                 <DialogHeader>
                     <DialogTitle>Add Sale Item</DialogTitle>
                 </DialogHeader>

@@ -35,7 +35,7 @@ function RenewLeaseDialog({ tenantName, lease_id, refetch }: Props) {
                 </StaticBadge>
             </DialogTrigger>
 
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()}>
+            <DialogContent>
                 <DialogHeader>
                 <DialogTitle className="text-gray-800 dark:text-white">
                     Are you absolutely sure?

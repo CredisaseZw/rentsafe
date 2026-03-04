@@ -67,6 +67,8 @@ import TrustAccountingLandlordsAgedAnalysis from "@/routes/rent-safe/trust-accou
 import TrustAccountingLandlordsProfitAndLoss from "@/routes/rent-safe/trust-accounting/landlords/landlord-report/TrustAccountingLandlordsProfitAndLoss";
 import TrustAccountingTenantBalances from "@/routes/rent-safe/trust-accounting/tenant/TrustAccountingTenantBalances";
 import TrustAccountPropertySettings from "@/routes/rent-safe/trust-accounting/settings/gl-listings/TrustAccountPropertySettings";
+import TrustAccountingGLDetailedStatements from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLDetailedStatements";
+import TrustAccountingGLListing from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLListing";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -642,6 +644,25 @@ export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
                }
             ]
          },
+         {
+            label : "General Ledger",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers",
+            subLinks: [
+               {
+                  label : "Detailed Statement",
+                  segment : RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/detailed-statements",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/detailed-statements",
+                  pageComponent : TrustAccountingGLDetailedStatements
+               },
+               {
+                  label : "General Ledgers Listing",
+                  segment : RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/gl-listing",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/gl-listing",
+                  pageComponent : TrustAccountingGLListing
+               },
+
+            ]  
+         }
       ]
    },
    {

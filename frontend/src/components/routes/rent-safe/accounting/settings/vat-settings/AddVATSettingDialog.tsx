@@ -39,7 +39,7 @@ export default function AddVATSettingDialog({vatSetting}: props) {
                     : <Button asChild >Add VAT <Plus size={15}/></Button>
                 }
             </DialogTrigger>
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[560px]">
+            <DialogContent className="sm:max-w-[560px]">
                 <DialogHeader>
                     <DialogTitle>VAT Settings</DialogTitle>
                     <DialogDescription className="text-gray-500 dark:text-white">

@@ -14,10 +14,9 @@ function useGetTrustACCSubLedgers(
         getUrlParams
     }  =useURLParamFilter()
     
-    if(!params){
-        params = getUrlParams()
-    }
-    
+    if(!params) params = getUrlParams();
+    if(params?.search) delete params.page;
+
     const {data, isLoading, error} = useQuery({
         queryKey : ["trust-sub-general-ledgers", params],
         queryFn : async() =>{

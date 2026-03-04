@@ -7,17 +7,16 @@ interface GLResponse extends Response {
     results : TrustGLAccount[]
 }
 function useGetTrustACCGeneralLedgers(
-    params: Record<string, string> | undefined, 
+    params?: Record<string, string>, 
     enabled = true) {
     const {
         getUrlParams
     }  =useURLParamFilter()
     
-    if(!params){
-        params = getUrlParams()
-    }
+    if(params?.search) delete params.page;
+    if(!params)params = getUrlParams();
     
-    const {data, isLoading, error} = useQuery({
+    const {data, isLoading, isError, error} = useQuery({
         queryKey : ["trust-general-ledgers", params],
         queryFn : async() =>{
             const response = api.get<GLResponse>("/api/trust-accounting/general-ledgers/", {
@@ -28,6 +27,7 @@ function useGetTrustACCGeneralLedgers(
         enabled
     })
     return {
+        isError,
         data,
         isLoading,
         error

@@ -38,7 +38,7 @@ function AddPropertyListingDialogue({propertyExpense}: {propertyExpense?:Propert
             }
         </DialogTrigger>
 
-        <DialogContent onInteractOutside={(e)=> e.preventDefault()}>
+        <DialogContent>
             <DialogHeader>
                 <DialogTitle>Add Property expense</DialogTitle>
                 <DialogDescription>Click submit when done filling the required fields.</DialogDescription>
