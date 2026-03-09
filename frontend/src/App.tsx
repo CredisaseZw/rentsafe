@@ -1,19 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import { RENTSAFE_ROUTES, ROOT_ROUTES } from "./constants";
+import { ROOT_ROUTES, SYSTEM_ROUTES } from "./constants";
 import RentsafeLayout from "./components/routes/rent-safe/Layout";
 import RootLayout from "./components/general/RootLayout";
 import ProtectRoute from "./lib/PrivateRoute";
 import { Toaster } from "@/components/ui/sonner";
 import ReactQueryProvider from "./providers/ReactQueryProvider";
 import { ThemeProvider } from "next-themes";
-import { RENTSAFE_PRE_SEG } from "./constants/navlinks";
-import TenantStatement from "./routes/rent-safe/tenants/TenantStatement";
-import Property from "./routes/rent-safe/properties/Property";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
-import SalesInvoice from "./routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoice";
 import { IndividualDialogProvider } from "./contexts/IndividualDialogueContext";
 import { CompanyDialogProvider } from "./contexts/CompanyDialogueContext";
-import SalesCreditNote from "./routes/rent-safe/accounting/sales/SalesCreditNotes/SalesCreditNote";
 
 export default function App() {
    return (
@@ -30,26 +25,9 @@ export default function App() {
                               ))}
                                  <Route element={<ProtectRoute />}>
                                     <Route element={<RentsafeLayout />}>
-                                       {RENTSAFE_ROUTES.map((route) => (
+                                       {SYSTEM_ROUTES.map((route) => (
                                           <Route key={route.path} path={route.path} element={<route.pageComponent />} />
                                        ))}
-                                    <Route 
-                                       path={`${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`} 
-                                       element={<TenantStatement />} 
-                                    />
-                                    <Route
-                                       path = {`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`}
-                                       element = {<Property/>}
-                                    />
-                                    <Route
-                                       path={`${RENTSAFE_PRE_SEG}/accounting/sales/invoicing/:invoice_id`}
-                                       element = {<SalesInvoice/>}
-                                    />
-                                    <Route
-                                       path={`${RENTSAFE_PRE_SEG}/accounting/sales/credit_note/:credit_note_id`}
-                                       element = {<SalesCreditNote/>}
-                                    />
-                                    {/* NEW ROUTES SHOULD BE IN THIS ROUTE */}
                                  </Route>
                               </Route>
                            </Route>

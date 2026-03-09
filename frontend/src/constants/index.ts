@@ -9,7 +9,12 @@ import {
   RENTSAFE_ACCOUNTING_NAVLINKS,
   ROOT_NAVLINKS,
   RENTSAFE_TRUST_ACCOUNTING_NAVLINKS,
+  RENTSAFE_PRE_SEG,
 } from "./navlinks";
+import TenantStatement from "@/routes/rent-safe/tenants/TenantStatement";
+import Property from "@/routes/rent-safe/properties/Property";
+import SalesInvoice from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoice";
+import SalesCreditNote from "@/routes/rent-safe/accounting/sales/SalesCreditNotes/SalesCreditNote";
 
 export const SERVICES: Service[] = [
   {
@@ -33,6 +38,30 @@ export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([
   ...RENTSAFE_TRUST_ACCOUNTING_NAVLINKS
 ]);
 
+export const SYSTEM_ROUTES: Route[] = [
+  ...RENTSAFE_ROUTES,
+  {
+    label : "Tenant Statement",
+    path : `${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`,
+    pageComponent : TenantStatement
+  },
+  {
+    label : "Property",
+    path :`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`,
+    pageComponent : Property
+  },
+  {
+    label : "Sales Invoice",
+    path:`${RENTSAFE_PRE_SEG}/accounting/sales/invoicing/:invoice_id`,
+    pageComponent : SalesInvoice
+  },
+  {
+    label : "Sales Credit Note",
+    path : `${RENTSAFE_PRE_SEG}/accounting/sales/credit_note/:credit_note_id`,
+    pageComponent : SalesCreditNote
+  }
+]
+
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 
 export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
@@ -44,6 +73,8 @@ export const PAYMENT_STATUS_CLASSIFICATIONS = [
   { label: "High Risk+", className: "bg-[firebrick] text-white" },
   { label: "Non Payer", className: "bg-[black] text-white" },
 ];
+
+export const DEFAULT_CURRENCY_CODE = "USD"
 
 export const INDUSTRIES = [
   "Agriculture",
@@ -94,7 +125,8 @@ export const DELETION_LINKS = {
   CREDIT_NOTE : "/api/accounting/credit-notes",
   PROPERTIES : "/api/properties",
   PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses",
-  TRUST_ACC_GENERAL_LEDGER : "/api/trust-accounting/general-ledgers"
+  TRUST_ACC_GENERAL_LEDGER : "/api/trust-accounting/general-ledgers",
+  TRUST_ACC_VAT_SETTING : "/api/trust-accounting/tax-rates"
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -766,3 +798,12 @@ export const TRUST_ACCOUNT_GENERAL_LEDGERS: Header[] = [
   { name: "System Account", textAlign: "center", },
   {name : "Action"}
 ];
+
+export const TRUST_ACC_VAT_SETTINGS_HEADERS: Header[] = [
+  {name: "ID"},
+  {name : "Name", textAlign : "left"},
+  {name : "Code", textAlign : "left"},
+  {name : "Description", textAlign : "left"},
+  {name : "Rate"},
+  {name : "Action"}
+]

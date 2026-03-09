@@ -15,8 +15,8 @@ export default function useVATSettings(){
     useEffect(()=>{
        if(handleAxiosError("Error fetching V.A.T Settings",error)) return;
         if (data) {
-            setRows(data.results);
             const { results, ...paginationMeta } = data;
+            setRows(results);
             setPagination(paginationMeta as PaginationData);
         }
 

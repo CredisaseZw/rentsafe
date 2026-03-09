@@ -291,6 +291,8 @@ export interface Currency {
    currency_code: string;
    symbol: string;
    currency_name: string;
+   is_active?: boolean;
+   is_base_currency?: boolean
 }
 
 export interface LeaseResponse {
@@ -478,9 +480,12 @@ export type SetCurrencySettings = {
 
 export type VATRow = {
    id?: number,
-   rate?: string | number,
+   name?: string,
+   code?:string
    description?: string,
+   rate?: string | number,
    vat_applicable?: boolean
+   is_active?: boolean
 }
 
 export type VATPayload = {

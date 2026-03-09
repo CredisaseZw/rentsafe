@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { isAxiosError } from "axios";
 import type { Currency } from "@/types";
 import useGetCurrencies from "@/hooks/apiHooks/useGetCurrencies";
+import { DEFAULT_CURRENCY_CODE } from "@/constants";
 
 interface CurrencyContextType {
   currencies: Currency[];
@@ -20,7 +21,7 @@ interface CurrencyProviderProps {
 
 export const CurrencyProvider = ({
   children,
-  defaultCurrencyCode = "USD",
+  defaultCurrencyCode = DEFAULT_CURRENCY_CODE,
 }: CurrencyProviderProps) => {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currency, setCurrency] = useState<Currency>();
@@ -36,11 +37,11 @@ export const CurrencyProvider = ({
      }
 
     if (currencyData) {
-      const defaultCurrency = currencyData.find(
+      const defaultCurrency = currencyData.results.find(
         (c) => c.currency_code === defaultCurrencyCode
       );
-      setCurrencies(currencyData);
-      setCurrency(defaultCurrency ?? currencyData[0]);
+      setCurrencies(currencyData.results);
+      setCurrency(defaultCurrency ?? currencyData.results[0]);
     }
   }, [currencyData, currencyError, defaultCurrencyCode]);
 
@@ -57,17 +58,21 @@ export const CurrencyProvider = ({
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useCurrency = (defaultCurrencyCode = "USD"): CurrencyContextType => {
+export const useCurrency = (defaultCurrencyCode = DEFAULT_CURRENCY_CODE): CurrencyContextType => {
   const context = useContext(CurrencyContext);
   if (!context)
     throw new Error("useCurrency must be used within a CurrencyProvider");
-    const { currencies, setCurrency } = context;
-    if (currencies.length && defaultCurrencyCode) {
+
+  const { currencies, setCurrency } = context;
+
+  useEffect(() => {
+    if (currencies.length && defaultCurrencyCode !== DEFAULT_CURRENCY_CODE) {
       const newDefault = currencies.find(
         (c) => c.currency_code === defaultCurrencyCode
       );
       if (newDefault) setCurrency(newDefault);
     }
+  }, [defaultCurrencyCode, currencies]);
 
   return context;
 };

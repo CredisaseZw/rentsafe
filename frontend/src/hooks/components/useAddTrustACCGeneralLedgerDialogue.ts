@@ -72,6 +72,7 @@ function useAddTrustACCGeneralLedgerDialogue(
                     response :  response,
                     mode : mode
                 });
+                setOpen(false)
                 return
             },
             onError : (error) => handleAxiosError("Failed to add general ledger", error),

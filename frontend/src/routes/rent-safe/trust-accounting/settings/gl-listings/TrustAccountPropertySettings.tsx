@@ -22,7 +22,7 @@ function TrustAccountPropertySettings() {
   } = usePropertyExpenses()
   return (
     <div>
-      <Header title="Property Expenses"/>
+      <Header title="Property Expenses" variant="success"/>
       <div className="main-card">
         <ColumnsContainer numberOfCols={2} marginClass="">
           <SectionHeader

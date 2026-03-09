@@ -29,7 +29,7 @@ function VATSettings() {
   return (
     <div>
       <Header title="VAT Settings"/>
-      <div className="flex flex-row gap-5">
+      <div className="flex md:flex-row flex-col gap-5">
         <div className="main-sm-card w-1/4">
           <h6 className="text-center font-semibold">Registration</h6>
           <div className="mt-5">
