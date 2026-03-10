@@ -583,3 +583,11 @@ export interface PropertyExpense{
   date_created: string;
   date_updated: string; 
 }
+export interface TrustAccExchangeRate {
+  id: number
+  base_currency: string
+  target_currency: string
+  rate: string
+  effective_date: string
+  created_by: string
+}

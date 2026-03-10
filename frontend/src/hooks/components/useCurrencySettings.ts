@@ -46,7 +46,6 @@ export default function useCurrencySettings(){
     }
     
     const handleSubmit =(   
-        // eslint-disable-next-line
         setCurrencySettings : UseMutationResult<any, Error, SetCurrencySettings, unknown>,
         e : React.FormEvent<HTMLFormElement>
     ) => {

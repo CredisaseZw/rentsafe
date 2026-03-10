@@ -70,6 +70,7 @@ import TrustAccountPropertySettings from "@/routes/rent-safe/trust-accounting/se
 import TrustAccountingGLDetailedStatements from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLDetailedStatements";
 import TrustAccountingGLListing from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLListing";
 import TrustAccountVatSettings from "@/routes/rent-safe/trust-accounting/settings/TrustAccountVatSettings";
+import TrustAccountCurrencyRates from "@/routes/rent-safe/trust-accounting/settings/TrustAccountCurrencyRates";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -687,6 +688,12 @@ export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
             path: RENTSAFE_PRE_SEG + "/trust-accounting/settings/vat-settings",
             segment: RENTSAFE_PRE_SEG + "/trust-accounting/settings/vat-settings",
             pageComponent : TrustAccountVatSettings
+         },
+         {
+            label :"Currency Rates",
+            path: RENTSAFE_PRE_SEG + "/trust-accounting/settings/currency-rates",
+            segment: RENTSAFE_PRE_SEG + "/trust-accounting/settings/currency-rates",
+            pageComponent : TrustAccountCurrencyRates
          }
       ]
    }
