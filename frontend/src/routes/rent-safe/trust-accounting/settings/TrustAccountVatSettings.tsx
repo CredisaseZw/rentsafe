@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { DELETION_LINKS, TRUST_ACC_VAT_SETTINGS_HEADERS } from "@/constants"
+import { TRUST_ACC_VAT_SETTINGS_HEADERS } from "@/constants"
+import { TRUST_ACC_VAT_SETTINGS } from "@/constants/base-links"
 import useOptimisticCacheUpdate from "@/hooks/components/useOptimisticCacheUpdate"
 import useTrustAccVatSettings from "@/hooks/components/useTrustAccVatSettings"
 import { handleDeletion } from "@/lib/utils"
@@ -83,7 +84,7 @@ function TrustAccountVatSettings() {
                                                     Delete
                                                 </div>
                                             }
-                                            mutationFunc={()=>handleDeletion(DELETION_LINKS.TRUST_ACC_VAT_SETTING, Number(item.id))}
+                                            mutationFunc={()=>handleDeletion(TRUST_ACC_VAT_SETTINGS.link, Number(item.id))}
                                             value="VAT Setting"
                                             keyStore={()=> updateCache({
                                                 key : ["trust-acc-vat-settings"],

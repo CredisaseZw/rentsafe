@@ -106,6 +106,8 @@ export const MODAL_WIDTHS = {
 
 export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];
 
+export const DIALOG_DESCRIPTION =  "Complete all mandatory fields to proceed with saving."
+
 export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] = [
   "private",
   "public",
@@ -115,18 +117,16 @@ export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] 
 ];
 
 export const DELETION_LINKS = {
-  SALES_ITEMS : "/api/accounting/items",
-  VAT_SETTINGS : "/api/accounting/vat-settings",
-  SALES_CATEGORIES: "/api/accounting/sales-categories",
-  ACCOUNT_SECTORS : "/api/accounting/account-sectors",
-  CASH_BOOK : "/api/accounting/cash-books",
-  GENERAL_LEDGER : "/api/accounting/ledger-accounts",
-  INVOICE : "/api/accounting/invoices",
-  CREDIT_NOTE : "/api/accounting/credit-notes",
-  PROPERTIES : "/api/properties",
-  PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses",
-  TRUST_ACC_GENERAL_LEDGER : "/api/trust-accounting/general-ledgers",
-  TRUST_ACC_VAT_SETTING : "/api/trust-accounting/tax-rates"
+  SALES_ITEMS : "/api/accounting/items/",
+  VAT_SETTINGS : "/api/accounting/vat-settings/",
+  SALES_CATEGORIES: "/api/accounting/sales-categories/",
+  ACCOUNT_SECTORS : "/api/accounting/account-sectors/",
+  CASH_BOOK : "/api/accounting/cash-books/",
+  GENERAL_LEDGER : "/api/accounting/ledger-accounts/",
+  INVOICE : "/api/accounting/invoices/",
+  CREDIT_NOTE : "/api/accounting/credit-notes/",
+  PROPERTIES : "/api/properties/",
+  PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses/",
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -806,4 +806,21 @@ export const TRUST_ACC_VAT_SETTINGS_HEADERS: Header[] = [
   {name : "Description", textAlign : "left"},
   {name : "Rate"},
   {name : "Action"}
+]
+
+export const TRUST_ACC_SALES_ITEMS_HEADERS:Header[] = [
+  {name: "Item Code", textAlign : "left"},
+  {name : "Name", textAlign : "left"},
+  {name : "Unit Name", textAlign : "left"},
+  {name : "Category", textAlign : "left"},
+  {name : "Tax Acc", textAlign : "left"},
+  {name : "Price", textAlign : "end"},
+  {name : "Price inc Tax", textAlign : "end"},
+  {name : "Action", textAlign : "center"},
+]
+
+export const TRUST_ACC_SALES_CATEGORIES_HEADERS:Header[] = [
+  {name: "Code", textAlign : "left"},
+  {name: "Name", textAlign : "left"},
+  {name: "Action"}
 ]

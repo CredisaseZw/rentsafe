@@ -3,33 +3,33 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { handleAxiosError } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import type { TrustGLAccount, TrustSubGLAccount } from "@/interfaces";
-import type { Response } from "@/interfaces";
+import type { Category } from "@/types";
 import useQueryResults from "@/hooks/apiHooks/useQueryResults";
-import { TRUST_ACC_SUB_GENERAL_LEDGER } from "@/constants/base-links";
-interface SubGLResponse extends Response {
-    results : TrustSubGLAccount[]
+import { BASE_TRUST_ACC_SALES_CATEGORIES } from "@/constants/base-links";
+import type { Response } from "@/interfaces";
+
+interface TrustAccountCategoriesResponse extends Response {
+  results : Category[]
 }
+
 interface props {
-    onSelectAccount?: (acc: TrustGLAccount) => void
+    onSelectAccount?: (item: Category) => void
     defaultValue? : string
 }
 
-function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
+function AutoCompleteTrustAccSalesCategories({defaultValue, onSelectAccount }:props) {
     const [searchValue, setSearchValue] = useState(defaultValue ?? "");
     const [open, setOpen] = useState(false);
     const [debouncedSearch, setDebouncedSearch] = useState("")
     const [hasUserInteracted, setHasUserInteracted] = useState(false)
-    const { data, error, isLoading } = useQueryResults<SubGLResponse>({
-        link :TRUST_ACC_SUB_GENERAL_LEDGER.link,
-        keyStoreValue: TRUST_ACC_SUB_GENERAL_LEDGER.keyStoreValue,
+    const { data, error, isLoading } = useQueryResults<TrustAccountCategoriesResponse>({
+        link : BASE_TRUST_ACC_SALES_CATEGORIES.link,
+        keyStoreValue: BASE_TRUST_ACC_SALES_CATEGORIES.keyStoreValue,
         params : {
-            account_type : "expense",
             ...( debouncedSearch &&
-                { search : debouncedSearch }
-            )
-        },
-        enabled : hasUserInteracted && !!debouncedSearch
+            { search : debouncedSearch }
+            )},
+        enabled : hasUserInteracted && !!debouncedSearch   
     })
 
     useEffect(() => {
@@ -41,13 +41,14 @@ function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
     }, [searchValue])
     
     useEffect(()=>{
-        if(handleAxiosError("Error fetching trust-general-ledgers", error)) return;
+        if(handleAxiosError("Error fetching category.", error)) return;
     }, [error])
 
     return (
     <div className="form-group w-full relative">
-        <Label>General Ledger Account</Label>
+        <Label className="required">Category</Label>
         <Input
+            required
             value={searchValue}
             name =""
             onChange={(e)=> {  
@@ -56,7 +57,7 @@ function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
                 setSearchValue(value);
                 setOpen(!!value);
             }}
-            placeholder="e.g rental income"
+            placeholder="e.g Accessories"
             onFocus={()=>setOpen(true)}
         />
         {
@@ -78,19 +79,19 @@ function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
                 }
                 {
                     !isLoading &&
-                    data?.results?.map((acc)=>(
+                    data?.results?.map((item)=>(
                     <button
-                        key={acc.id}
+                        key={item.id}
                         type="button"
                         className="border-color text-left w-full border-b px-2 py-3 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
-                           onSelectAccount?.(acc);
+                           onSelectAccount?.(item);
                            setOpen(false);
-                           setSearchValue(acc.account_name)
+                           setSearchValue(item.name ?? "")
                         }}
                      >
-                        {acc.account_number} - {acc.account_name}
+                        {item.code} - {item.name}
                      </button>
                 ))}
             </div>
@@ -100,4 +101,4 @@ function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
   )
 }
 
-export default SearchSubTrustGeneralLedger
+export default AutoCompleteTrustAccSalesCategories

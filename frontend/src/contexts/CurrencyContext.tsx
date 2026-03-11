@@ -72,7 +72,7 @@ export const useCurrency = (defaultCurrencyCode = DEFAULT_CURRENCY_CODE): Curren
       );
       if (newDefault) setCurrency(newDefault);
     }
-  }, [defaultCurrencyCode, currencies]);
+  }, [defaultCurrencyCode]);
 
   return context;
 };

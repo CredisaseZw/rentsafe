@@ -9,7 +9,7 @@ interface Response  {
     results: SalesItem[]
 }
 
-export default function useGetSalesItems(page:Number, search?:string | null, enabled=true){
+export default function useGetSalesItems(page:number, search?:string | null, enabled=true){
     const {data, isLoading, error, refetch } = useQuery<Response>({
         queryKey :!search 
         ? ["salesItems", page] 

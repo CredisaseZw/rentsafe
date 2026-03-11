@@ -6,11 +6,11 @@ import { toast } from "sonner";
 import useGetLatestTrustAccCurrencyRate from "./useGetLatestTrustAccCurrencyRate";
 
 function useTrustAccountCurrencyRates() {
-    const {currencies, currency, currencyLoading} = useCurrency()
+    const {currencies, currency, currencyLoading} = useCurrency();
     const [loading, setLoading] = useState(false);
     const {mutate} = useAddTrustAccountCurrencyRates()
     const [currencySetting, setCurrencySetting] = useState({
-        base_currency_id: String(currency?.id), 
+        base_currency_id: String(currency?.id ?? ""), 
         target_currency_id: "",
         rate: "",
         base_date :  getCurrentDate()

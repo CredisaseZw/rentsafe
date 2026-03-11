@@ -4,14 +4,12 @@ import type { Payload } from "@/types";
 import type { UseMutateFunction } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react"
 import { toast } from "sonner";
-import useClient from "../general/useClient";
-import useURLParamFilter from "./useURLParamFilter";
+import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
 
 function useAddPropertyExpenseDialogue(propertyExpense?: PropertyExpense) {
     const [open, setOpen ] = useState(false);
     const [loading, setLoading] = useState(false)
-    const queryClient = useClient();
-    const {getUrlParams} = useURLParamFilter()
+    const {updateCache} = useOptimisticCacheUpdate()
     const [expenseAcc, setExpenseAcc] = useState<number |  undefined>(propertyExpense?.expense_account);
     const defaultValue = useMemo(()=> propertyExpense?.expense_account_name, []) 
     const onSelectAccount = (acc : TrustGLAccount) =>{
@@ -59,29 +57,11 @@ function useAddPropertyExpenseDialogue(propertyExpense?: PropertyExpense) {
         mutate(PAYLOAD, {
             onError : (error) => handleAxiosError("Error occurred adding property expense.", error),
             onSuccess : async(response)=>{
-                const params = getUrlParams()
-                await queryClient.cancelQueries({ queryKey: ['property-expenses'] })
-                
-                if (mode === "create") {
-                    queryClient.setQueryData(["property-expenses", params], (prev: any) => {
-                        if (!prev) return prev;
-                        return {
-                            ...prev,
-                            count : prev.count + 1,
-                            results: [...prev.results, response]
-                        }
-                    })
-                } else if(mode === "update"){
-                    queryClient.setQueryData(["property-expenses", params], (prev: any) => {
-                        if (!prev) return prev;
-                        return {
-                            ...prev,
-                            results: prev.results.map((item: any) => 
-                                item.id === response.id ? response : item
-                            )
-                        }
-                    })
-                }
+                updateCache({
+                    key : ["property-expenses"],
+                    response,
+                    mode
+                })
                 toast.success(`${mode === "create" && "New "} Expense successfully ${mode}d`)
                 setOpen(false);
             },

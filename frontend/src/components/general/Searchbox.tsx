@@ -3,10 +3,10 @@ import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useSearchBox from "@/hooks/components/useSearchBox";
 interface SearchboxProps {
-   placeholder: string;
+   placeholder?: string;
 }
 
-function Searchbox({ placeholder }: SearchboxProps) {
+function Searchbox({ placeholder= "Search by name" }: SearchboxProps) {
   const {
     searchValue,
     setSearchValue,

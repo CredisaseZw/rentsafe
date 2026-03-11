@@ -766,7 +766,7 @@ export const handleAxiosError = (
 };
 
 export const handleDeletion = async (prefixLink: string, id: number) => {
-  const response = await api.delete(`${prefixLink}/${id}/`)
+  const response = await api.delete(`${prefixLink}${id}/`)
   return response.data
 }
 

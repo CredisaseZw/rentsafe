@@ -67,6 +67,7 @@ export function TableBase({
                )}
                {
                   !isLoading &&
+                  !isError &&
                   isEmpty && (
                      <EmptyTableResponse colSpan={headers?.length ?? 1}/>
                   )

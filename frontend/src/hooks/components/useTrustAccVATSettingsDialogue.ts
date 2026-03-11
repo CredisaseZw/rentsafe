@@ -3,7 +3,6 @@ import React, { useState } from "react"
 import useAddTrustAccVATSettings from "../apiHooks/useAddTrustAccVATSettings";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
-import useURLParamFilter from "./useURLParamFilter";
 import { toast } from "sonner";
 
 function useTrustAccVATSettingsDialogue(vatSetting?: VATRow) {
@@ -11,7 +10,6 @@ function useTrustAccVATSettingsDialogue(vatSetting?: VATRow) {
     const [loading, setLoading] = useState(false);
     const {mutate} = useAddTrustAccVATSettings()
     const {updateCache} = useOptimisticCacheUpdate()
-    const {getUrlParams} = useURLParamFilter()
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -48,10 +46,9 @@ function useTrustAccVATSettingsDialogue(vatSetting?: VATRow) {
         mutate(payload, {
             onSuccess : (response: VATRow[])=>{
                 toast.success(`${mode === "create" && "New "}Vat Setting successfully ${mode}d`);
-                const params = getUrlParams();
                 const newData = Array.isArray(response) ? response[0] : response
                 updateCache({
-                    key : ["trust-acc-vat-settings", params],
+                    key : ["trust-acc-vat-settings"],
                     response : newData,
                     mode : mode
                 });

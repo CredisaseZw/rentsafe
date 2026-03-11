@@ -8,15 +8,13 @@ DialogContent,
 DialogHeader,
 DialogTitle,
 DialogDescription,
-DialogFooter,
 } from "@/components/ui/dialog";
 import ColumnsContainer from "@/components/general/ColumnsContainer";
 import { Plus } from "lucide-react";
 import useAddAccountingSectorDialog from "@/hooks/components/useAddAccountingSectorDialog";
 import type { AccountSector } from "@/types";
 import EditIcon from "@/components/general/EditIcon";
-import useCreateAccountSectors from "@/hooks/apiHooks/useCreateAccountSectors";
-
+import CustomDialogFooter from "@/components/general/CustomDialogFooter";
 interface props{
     initial?: AccountSector
 }
@@ -28,7 +26,6 @@ export default function AddAccountingSectorDialog({initial}:props) {
         setOpen,
         handleSubmit
     } = useAddAccountingSectorDialog(initial)
-    const createAccountingSector = useCreateAccountSectors();
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -54,7 +51,7 @@ export default function AddAccountingSectorDialog({initial}:props) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <form id="add-sector-form" onSubmit={(e)=>handleSubmit(e, createAccountingSector)} >
+                <form id="add-sector-form" onSubmit={(e)=>handleSubmit(e)} >
                     <ColumnsContainer numberOfCols={2} marginClass="mt-5" gapClass="gap-5">
                         <div className="form-group">
                             <Label htmlFor="name" className="required">Name</Label>
@@ -74,15 +71,11 @@ export default function AddAccountingSectorDialog({initial}:props) {
                         </div>
                     </ColumnsContainer>
                 </form>
-
-                <DialogFooter>
-                    <Button variant="ghost" onClick={() => setOpen(false)}>
-                        Cancel
-                    </Button>
-                    <Button type="submit" form = {"add-sector-form"} disabled={loading}>
-                        {loading ? "Saving..." : "Save"}
-                    </Button>
-                </DialogFooter>
+                
+                <CustomDialogFooter
+                    loading = {loading}
+                    form="add-sector-form"
+                />
             </DialogContent>
         </Dialog>
     )

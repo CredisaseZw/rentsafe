@@ -7,8 +7,10 @@ import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
 import AddAccountingSectorDialog from "@/components/routes/rent-safe/accounting/settings/accounting-sectors/AddAccountingSectorDialog"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { ACCOUNTING_SECTOR_HEADERS, DELETION_LINKS } from "@/constants"
+import { ACCOUNTING_SECTOR_HEADERS } from "@/constants"
+import { BASE_ACCOUNT_SECTORS } from "@/constants/base-links"
 import useAccountSectors from "@/hooks/components/useAccountSectors"
+import useOptimisticCacheUpdate from "@/hooks/components/useOptimisticCacheUpdate"
 import { handleDeletion } from "@/lib/utils"
 
 function AccountsSectors() {
@@ -18,6 +20,7 @@ function AccountsSectors() {
     error,
     pagination,
   } = useAccountSectors();
+  const {updateCache} = useOptimisticCacheUpdate()
   return (
     <div>
       <Header title="Account Sectors"/>
@@ -60,9 +63,13 @@ function AccountsSectors() {
                       initial={s}
                     />
                     <DeleteDialogue
-                      keyStore="accountSectors"
+                      keyStore={()=> updateCache({
+                        key : [BASE_ACCOUNT_SECTORS.keyStoreValue],
+                        mode : "deletion",
+                        id:s.id
+                      })}
                       value="Account Sector"
-                      mutationFunc={()=> handleDeletion(DELETION_LINKS.ACCOUNT_SECTORS, s.id)}  
+                      mutationFunc={()=> handleDeletion(BASE_ACCOUNT_SECTORS.link, s.id)}  
                     />
                   </TableCell>
                 </TableRow>

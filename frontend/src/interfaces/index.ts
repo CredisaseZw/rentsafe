@@ -591,3 +591,20 @@ export interface TrustAccExchangeRate {
   effective_date: string
   created_by: string
 }
+
+export interface TrustAccSalesItem {
+  id: number;
+  item_code: string;
+  name: string;
+  unit_name: string;
+  category: string;
+  price: string;
+  price_including_tax: string;
+  vat_price: string;
+  currency: string;
+  is_active: boolean;
+  tax_type: string;
+  income_account: number | null;
+  cost_of_sales_account: number | null;
+  inventory_account: number | null;
+}

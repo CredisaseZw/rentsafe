@@ -3,27 +3,35 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { handleAxiosError } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import useGetTrustAccountSectors from "@/hooks/apiHooks/useGetTrustAccountSectors";
 import type { AccountSector } from "@/types";
+import useQueryResults from "@/hooks/apiHooks/useQueryResults";
+import { BASE_TRUST_ACCOUNT_SECTORS } from "@/constants/base-links";
+import type { Response } from "@/interfaces";
+interface TrustAccountSectorsResponse extends Response {
+  results : AccountSector[]
+}
 
 interface props {
     onSelectAccount?: (acc: AccountSector) => void
     defaultValue? : string
 }
-
+//
+///
 function AutoCompleteTrustAccountSectors({defaultValue, onSelectAccount }:props) {
     const [searchValue, setSearchValue] = useState(defaultValue ?? "");
     const [open, setOpen] = useState(false);
     const [debouncedSearch, setDebouncedSearch] = useState("")
     const [hasUserInteracted, setHasUserInteracted] = useState(false)
-    const { data, error, isLoading } = useGetTrustAccountSectors({
-        ...(
-            debouncedSearch &&
-            {
-                search : debouncedSearch
-            }
-        )
-    }, hasUserInteracted && !!debouncedSearch)
+    const { data, error, isLoading } = useQueryResults<TrustAccountSectorsResponse>({
+        keyStoreValue : BASE_TRUST_ACCOUNT_SECTORS.keyStoreValue,
+        link : BASE_TRUST_ACCOUNT_SECTORS.link,
+        params : {
+            ...( debouncedSearch &&
+                { search : debouncedSearch }
+            )
+        }, 
+        enabled : hasUserInteracted && !!debouncedSearch
+    })
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -34,7 +42,7 @@ function AutoCompleteTrustAccountSectors({defaultValue, onSelectAccount }:props)
     }, [searchValue])
     
     useEffect(()=>{
-        if(handleAxiosError("Error fetching trust-general-ledgers", error)) return;
+        if(handleAxiosError("Error fetching account sector", error)) return;
     }, [error])
 
     return (

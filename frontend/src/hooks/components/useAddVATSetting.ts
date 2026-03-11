@@ -16,7 +16,7 @@ export default function useAddVATSetting(vatSetting: VATRow | undefined){
     ) => {
         e.preventDefault()
         setLoading(true)
-        const MODE = !!vatSetting ? "update" : "create";
+        const MODE = vatSetting ? "update" : "create";
         const formData= getFormDataObject(e);
         let vatData:VATRow = {
             rate: Number(formData.rate),

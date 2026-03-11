@@ -71,6 +71,8 @@ import TrustAccountingGLDetailedStatements from "@/routes/rent-safe/trust-accoun
 import TrustAccountingGLListing from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLListing";
 import TrustAccountVatSettings from "@/routes/rent-safe/trust-accounting/settings/TrustAccountVatSettings";
 import TrustAccountCurrencyRates from "@/routes/rent-safe/trust-accounting/settings/TrustAccountCurrencyRates";
+import TrustAccountingSalesItems from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesItems";
+import TrustAccountingSalesCategories from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesCategories";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -544,11 +546,24 @@ export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
             pageComponent : TrustAccountingSalesCashSales
          },
          {
+            label : "Sales Items",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-items",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-items",
+            pageComponent : TrustAccountingSalesItems
+         },
+         {
+            label : "Sales Categories",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-categories",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-categories",
+            pageComponent : TrustAccountingSalesCategories
+         },
+         {
             label : "Sales Reports",
             path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-reports",
             segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-reports",
             pageComponent : TrustAccountingSalesReports
          },
+       
 
       ]
    },

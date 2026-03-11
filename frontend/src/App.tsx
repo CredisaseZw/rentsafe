@@ -15,26 +15,26 @@ export default function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
          <ReactQueryProvider>
             <BrowserRouter>
-               <IndividualDialogProvider>
-                  <CompanyDialogProvider>
-                     <CurrencyProvider>
-                        <Routes>
-                           <Route element={<RootLayout />}>
-                              {ROOT_ROUTES.map((route) => (
-                                 <Route key={route.path} path={route.path} element={<route.pageComponent />} />
-                              ))}
-                                 <Route element={<ProtectRoute />}>
-                                    <Route element={<RentsafeLayout />}>
-                                       {SYSTEM_ROUTES.map((route) => (
-                                          <Route key={route.path} path={route.path} element={<route.pageComponent />} />
-                                       ))}
+               <CurrencyProvider>
+                  <IndividualDialogProvider>
+                     <CompanyDialogProvider>
+                           <Routes>
+                              <Route element={<RootLayout />}>
+                                 {ROOT_ROUTES.map((route) => (
+                                    <Route key={route.path} path={route.path} element={<route.pageComponent />} />
+                                 ))}
+                                    <Route element={<ProtectRoute />}>
+                                       <Route element={<RentsafeLayout />}>
+                                          {SYSTEM_ROUTES.map((route) => (
+                                             <Route key={route.path} path={route.path} element={<route.pageComponent />} />
+                                          ))}
+                                    </Route>
                                  </Route>
                               </Route>
-                           </Route>
-                        </Routes>
-                     </CurrencyProvider>
-                  </CompanyDialogProvider>
-               </IndividualDialogProvider>
+                           </Routes>
+                     </CompanyDialogProvider>
+                  </IndividualDialogProvider>
+               </CurrencyProvider>
             </BrowserRouter>
             <Toaster dismissible position="top-left" duration={10 * 1000} />
          </ReactQueryProvider>

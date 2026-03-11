@@ -1,21 +1,35 @@
 import type { AccountSector, GeneralLedgerAccount, Payload } from "@/types";
 import React, { useEffect, useState } from "react"
-import useGetAccountSectors from "./useGetAccountSectors";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import type { UseMutationResult } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router";
 import useClient from "../general/useClient";
-
+import useQueryResults from "./useQueryResults";
+import type { Response } from "@/interfaces";
+import { BASE_ACCOUNT_SECTORS } from "@/constants/base-links";
+interface ASResponse extends Response{
+    results : AccountSector[]
+}
 function useAddGeneralLedgerAccountDialogue(initial: GeneralLedgerAccount | undefined) {
+    const [searchParams] = useSearchParams();
     const [open, setOpen] = useState(false);
     const [sectorsPage,setSectorsPage] = useState(1);
     const [loading,setLoading] = useState(false);
     const [sectors, setSectors] = useState<AccountSector[]>([]);
-    const {data, isLoading, error } = useGetAccountSectors(sectorsPage, null);
-    const [searchParams] = useSearchParams();
+    const {data, isLoading, error } = useQueryResults<ASResponse>({
+        link : BASE_ACCOUNT_SECTORS.link,
+        keyStoreValue : BASE_ACCOUNT_SECTORS.keyStoreValue,
+        params :{
+            page : sectorsPage,
+            ...(
+                searchParams.get("search") &&
+                {search : searchParams.get("search")}
+            )
+        }
+    });
+    
     const queryClient = useClient();
-
     useEffect(()=>{
         if(handleAxiosError("Failed to fetch accounting sectors", error)) return;
         if(!data) return;

@@ -5,8 +5,6 @@ import useAddTrustAccGeneralLedger, { type AddTrustAccGeneralLedgerData } from "
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import { toast } from "sonner";
 import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
-import useURLParamFilter from "./useURLParamFilter";
-
 
 function useAddTrustACCGeneralLedgerDialogue(
     tsaGeneralLedger? : TrustGLAccount
@@ -15,7 +13,6 @@ function useAddTrustACCGeneralLedgerDialogue(
     const [loading, setLoading] = useState(false)
     const [open, setOpen] = useState(false)
     const [isContra, setIsContra] = useState(true);
-    const {getUrlParams} = useURLParamFilter()
     const { updateCache } = useOptimisticCacheUpdate()
     const onSelectAccount = (acc : AccountSector)=> {
         setAccountType(acc.id)
@@ -66,9 +63,8 @@ function useAddTrustACCGeneralLedgerDialogue(
         mutate(payload, {
             onSuccess : (response: TrustGLAccount) =>{
                 toast.success(`${mode === "create" && "New "}General Ledger successfully ${mode}d`);
-                const params = getUrlParams();
                 updateCache({
-                    key : ["trust-general-ledgers", params],
+                    key : ["trust-general-ledgers"],
                     response :  response,
                     mode : mode
                 });
