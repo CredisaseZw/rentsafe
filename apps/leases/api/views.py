@@ -9,7 +9,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.db.models import Q, Sum
+from django.db.models import Case, When, Value, CharField, Q, F, Sum
 from django.utils import timezone
 from apps.common.api.views import BaseViewSet
 from apps.leases.models.landlord import Landlord
@@ -1073,14 +1073,34 @@ class TenantViewSet(BaseViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Optionally restricts the returned tenants to a given lease,
-        by filtering against a `lease_id` query parameter in the URL.
-        """
         queryset = super().get_queryset()
+        search_param = self.request.query_params.get("search")
         lease_id = self.request.query_params.get("lease_id")
-        if lease_id is not None:
+
+        if lease_id:
             queryset = queryset.filter(lease__id=lease_id)
+
+        if search_param:
+            from apps.individuals.models.models import Individual
+            from apps.companies.models.models import CompanyBranch
+
+            queryset = queryset.filter(
+                Q(
+                    content_type__model="individual",
+                    object_id__in=Individual.objects.filter(
+                        Q(first_name__icontains=search_param)
+                        | Q(last_name__icontains=search_param)
+                    ).values_list("id", flat=True),
+                )
+                | Q(
+                    content_type__model="companybranch",
+                    object_id__in=CompanyBranch.objects.filter(
+                        Q(branch_name__icontains=search_param)
+                        | Q(company__registration_name__icontains=search_param)
+                    ).values_list("id", flat=True),
+                )
+            )
+
         return queryset
 
 

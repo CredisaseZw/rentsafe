@@ -36,9 +36,7 @@ class SalesItemFilter(django_filters.FilterSet):
         Search across name and description.
         """
         return queryset.filter(
-            Q(name__icontains=value)
-            | Q(description__icontains=value)
-            | Q(item_code__icontains=value)
+            Q(name__icontains=value) | Q(item_code__icontains=value)
         ).distinct()
 
     def get_category(self, queryset, name, value):

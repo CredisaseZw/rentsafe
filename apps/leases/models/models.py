@@ -733,6 +733,8 @@ class LeaseTenant(BaseModel):
     def phone_number(self):
         phone = None
         if self.content_type == "individual":
+            from apps.individuals.models.models import IndividualContactDetail
+
             queryset = IndividualContactDetail.objects.filter(individual=self.object_id)
             if queryset.exists():
                 phone = queryset.last().mobile_number

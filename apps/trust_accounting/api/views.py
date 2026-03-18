@@ -128,9 +128,9 @@ class TrustExchangeRateViewSet(BaseViewSet):
         latest_rate = self.request.query_params.get("latest_rate")
 
         if base_currency:
-            queryset = queryset.filter(base_currency_id=base_currency)
+            queryset = queryset.filter(base_currency__currency_code=base_currency)
         if target_currency:
-            queryset = queryset.filter(target_currency_id=target_currency)
+            queryset = queryset.filter(target_currency__currency_code=target_currency)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == "true")
         if latest_rate is not None and latest_rate.lower() == "true":
