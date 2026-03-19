@@ -7,7 +7,8 @@ import { TableBase } from "@/components/general/TableBase"
 import AddPropertyListingDialogue from "@/components/routes/rent-safe/trust-accounting/gl-listings/AddPropertyListingDialogue"
 import { Button } from "@/components/ui/button"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { DELETION_LINKS, TRUST_ACCOUNTS_PROPERTY_EXPENSES_HEADERS } from "@/constants"
+import { TRUST_ACCOUNTS_PROPERTY_EXPENSES_HEADERS } from "@/constants"
+import { TRUST_ACC_PROPERTY_EXPENSES } from "@/constants/base-links"
 import usePropertyExpenses from "@/hooks/components/usePropertyExpenses"
 import { getSummaryDate, handleDeletion } from "@/lib/utils"
 import { Trash } from "lucide-react"
@@ -62,7 +63,7 @@ function TrustAccountPropertySettings() {
                                 Delete
                               </Button>
                             }
-                            mutationFunc={()=> handleDeletion(DELETION_LINKS.PROPERTY_EXPENSE, property.id)}
+                            mutationFunc={()=> handleDeletion(TRUST_ACC_PROPERTY_EXPENSES.link, property.id)}
                             keyStore={()=>onDelete(property.id)}
                             value="Property Expense"
                           />

@@ -1,15 +1,16 @@
 import type { PropertyExpense, TrustGLAccount } from "@/interfaces";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
-import type { Payload } from "@/types";
-import type { UseMutateFunction } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react"
 import { toast } from "sonner";
 import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
+import useMutateResults from "../apiHooks/useMutateResults";
+import { TRUST_ACC_PROPERTY_EXPENSES } from "@/constants/base-links";
 
 function useAddPropertyExpenseDialogue(propertyExpense?: PropertyExpense) {
     const [open, setOpen ] = useState(false);
     const [loading, setLoading] = useState(false)
     const {updateCache} = useOptimisticCacheUpdate()
+    const { mutate } = useMutateResults();
     const [expenseAcc, setExpenseAcc] = useState<number |  undefined>(propertyExpense?.expense_account);
     const defaultValue = useMemo(()=> propertyExpense?.expense_account_name, []) 
     const onSelectAccount = (acc : TrustGLAccount) =>{
@@ -18,7 +19,6 @@ function useAddPropertyExpenseDialogue(propertyExpense?: PropertyExpense) {
 
     const onSubmit = (
         e: React.FormEvent<HTMLFormElement>,
-        mutate :  UseMutateFunction<PropertyExpense, Error, Payload, unknown>
     )=>{
         const mode = propertyExpense ? "update" : "create";
         const data = getFormDataObject(e)
@@ -50,10 +50,12 @@ function useAddPropertyExpenseDialogue(propertyExpense?: PropertyExpense) {
                 mode === "update" &&
                 {id : propertyExpense?.id}
             ),
+            link : TRUST_ACC_PROPERTY_EXPENSES.link,
             data: payloadData,
             mode
         }
         setLoading(true);
+        
         mutate(PAYLOAD, {
             onError : (error) => handleAxiosError("Error occurred adding property expense.", error),
             onSuccess : async(response)=>{

@@ -5,7 +5,7 @@ import type { Response } from "@/interfaces";
 import useQueryResults from "../apiHooks/useQueryResults";
 import { BASE_TRUST_ACC_SALES_ITEMS } from "@/constants/base-links";
 
-interface TrustAccountSalesItemsResponse extends Response {
+export interface TrustAccountSalesItemsResponse extends Response {
   results : TrustAccSalesItem[]
 }
 

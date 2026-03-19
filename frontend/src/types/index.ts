@@ -1,6 +1,5 @@
 import type { Address } from "@/interfaces";
 import type { AxiosResponse } from "axios";
-import type { LucideIcon } from "lucide-react";
 
 export type Route = {
    label: string;
@@ -22,15 +21,7 @@ export type Option = {
    value: string,
    subOptions?: Option[]
 }
-export type DashboardCardProp = {
-   value: string | number | React.ReactElement;
-   subTitle: number | string | React.ReactElement;
-   layoutScheme: {
-      icon: LucideIcon;
-      color: string;
-   };
-   valueAsChild?: boolean
-}
+
 export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
 
 export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";
@@ -574,6 +565,7 @@ export type Delete = {
 export type Payload = {
    mode: "update" | "create" | string,
    id?: number
+   link?: string
    data: any
 }
 export interface AddAccountingSectorPayload extends Payload {

@@ -16,8 +16,8 @@ function useTrustAccountingGLListing() {
         isLoading,
         error
     } = useQueryResults<GLResponse>({
-        keyStoreValue : BASE_TRUST_ACC_GENERAL_LEDGER.link,
-        link : BASE_TRUST_ACC_GENERAL_LEDGER.keyStoreValue
+        keyStoreValue : BASE_TRUST_ACC_GENERAL_LEDGER.keyStoreValue,
+        link : BASE_TRUST_ACC_GENERAL_LEDGER.link
     });
 
     useEffect(()=>{ 

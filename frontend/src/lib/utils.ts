@@ -908,3 +908,54 @@ export const getUsername = (): string | undefined =>{
 
   return undefined;
 }
+
+export const computeRowTotal = (price: number, quantity: number, vatRate: number) => {
+  const qty = quantity > 0 ? quantity : 1;
+  const subtotal = price * qty;
+  const vatAmount = subtotal * (vatRate / 100);
+  return round2(subtotal + vatAmount);
+};
+
+export const computeTotals = (rows: InvoicePreview[], discount: string) => {
+  if (!rows.length || rows.every((r) => !r.itemCode)) {
+    return { subtotal: 0, vat: 0, total: 0 };
+  }
+
+  let subtotal = 0;
+  let vat = 0;
+  let total = 0;
+
+  for (const row of rows) {
+    const price = parseMoney(row.price);
+    const qty = Number(row.quantity) || 1;
+    const vatRate = row.vat_amount || 0;
+
+    const rowSubtotal = price * qty;
+    const rowVat = rowSubtotal * (vatRate / 100);
+    const rowTotal = computeRowTotal(price, qty, vatRate);
+
+    subtotal += rowSubtotal;
+    vat += rowVat;
+    total += rowTotal;
+  }
+
+  const discountNum = Number(discount);
+  const effectiveDiscount =
+    isNaN(discountNum) || discountNum <= 0 ? 0 : discountNum;
+
+  const totalAfterDiscount = Math.max(0, total - effectiveDiscount);
+
+  return {
+    subtotal: round2(subtotal),
+    vat: round2(vat),
+    total: round2(totalAfterDiscount),
+  };
+};
+export const getVatRate = (basePrice: number, priceIncVat: number) => {
+  if (basePrice <= 0) return 0;
+
+  const vatAmount = priceIncVat - basePrice;
+  const vatRate = (vatAmount / basePrice) * 100;
+
+  return Number(vatRate.toFixed(2));
+};

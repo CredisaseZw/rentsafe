@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { api } from "@/api/axios";
 import type { VATPayload, } from "@/types";
 
-export default function useAddVATSettings(){
-    return useMutation({
+export default function useCreateVATSettings(){
+    const {mutate} =  useMutation({
         mutationFn : async(payload: VATPayload)=>{
             const response = 
             payload.mode === "create"
@@ -12,4 +12,7 @@ export default function useAddVATSettings(){
             return response.data
         }
     })
+    return {
+        mutate
+    }
 }

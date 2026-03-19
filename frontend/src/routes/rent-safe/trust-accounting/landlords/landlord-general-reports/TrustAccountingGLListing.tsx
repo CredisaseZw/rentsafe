@@ -7,12 +7,12 @@ import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
 import AddTrustACCGeneralLedgerDialogue from "@/components/routes/rent-safe/trust-accounting/gl-listings/AddTrustACCGeneralLedgerDialogue"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { DELETION_LINKS, TRUST_ACCOUNT_GENERAL_LEDGERS } from "@/constants"
+import { TRUST_ACCOUNT_GENERAL_LEDGERS } from "@/constants"
+import { BASE_TRUST_ACC_GENERAL_LEDGER } from "@/constants/base-links"
 import useOptimisticCacheUpdate from "@/hooks/components/useOptimisticCacheUpdate"
 import useTrustAccountingGLListing from "@/hooks/components/useTrustAccountingGLListing"
 import { handleDeletion } from "@/lib/utils"
 import { Trash } from "lucide-react"
-
 
 function TrustAccountingGLListing() {
   const {
@@ -24,7 +24,7 @@ function TrustAccountingGLListing() {
   const {updateCache} = useOptimisticCacheUpdate()
   return (
     <div >
-      <Header title="Trust Account General Ledgers"/>
+      <Header title="Trust Account General Ledgers" variant="success"/>
       <div className="main-card flex flex-col gap-5">
         <ColumnsContainer numberOfCols={2}>
             <SectionHeader
@@ -67,7 +67,7 @@ function TrustAccountingGLListing() {
                           <span className="text-red-600 text-sm">Delete</span>
                         </div>
                       }
-                      mutationFunc={()=> handleDeletion(DELETION_LINKS.TRUST_ACC_GENERAL_LEDGER, acc.id)}
+                      mutationFunc={()=> handleDeletion(BASE_TRUST_ACC_GENERAL_LEDGER.link, acc.id)}
                       keyStore={()=> updateCache({
                         key : ["trust-general-ledgers"],
                         id : acc.id,

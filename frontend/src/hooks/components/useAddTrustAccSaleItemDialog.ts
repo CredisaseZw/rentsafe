@@ -1,12 +1,17 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
-import type { TrustAccSalesItem } from "@/interfaces"
+import type { PaginationData, TrustAccSalesItem, TrustGLAccount } from "@/interfaces"
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import React, { useEffect, useState } from "react"
-import useGetTrustAccVATSettings from "../apiHooks/useGetTrustAccVATSettings";
 import type { Payload, VATRow } from "@/types";
 import { toast } from "sonner";
-import useAddTrustAccSalesItem from "../apiHooks/useAddTrustAccSalesItem";
 import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
+import { BASE_TRUST_ACC_SALES_ITEMS, TRUST_ACC_VAT_SETTINGS } from "@/constants/base-links";
+import useQueryResults from "../apiHooks/useQueryResults";
+import useMutateResults from "../apiHooks/useMutateResults";
+import {useDebouncedCallback} from "use-debounce"
+interface VATResponse extends PaginationData{
+    results: VATRow[]
+}
 
 function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
     const {currencies, currency, currencyLoading } = useCurrency()
@@ -15,15 +20,32 @@ function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
     const [loading, setLoading] = useState(false);
     const [vatPage, setVatPage] = useState(1);
     const {updateCache} = useOptimisticCacheUpdate();
-    const { mutate } = useAddTrustAccSalesItem()
+    const { mutate } = useMutateResults()
     const [formData, setFormData] = useState({
         category_id: String(sales_item?.category ?? ""),
-        currency_id : String(sales_item?.currency ?? currency?.id),
-        vat_id:  String(sales_item?.tax_type ?? "")
+        currency_id : String(currency?.id),
+        vat_id: "",
+        cost_of_sales_account_id : null
     });
-    const {data, error} = useGetTrustAccVATSettings({
-        page :vatPage
+     const {data, error} = useQueryResults<VATResponse>({
+        keyStoreValue : TRUST_ACC_VAT_SETTINGS.keyStoreValue,
+        link:TRUST_ACC_VAT_SETTINGS.link,
+        params : {
+            page : vatPage
+        }
     })
+
+    useEffect(()=>{
+        if(!sales_item) return;
+        const itemCurrency = currencies.find((c)=> c.currency_code === sales_item.currency)?.id
+        onHandleChange("currency_id", String(itemCurrency))
+    }, [sales_item])
+    
+    const getItemVatAcc  = useDebouncedCallback(()=>{
+        if(!sales_item) return;
+        const itemVat = vatAccounts.find(v=> v.name === sales_item.tax_type)?.id
+        onHandleChange("vat_id", String(itemVat))
+    }, 500)
 
     useEffect(()=>{
         if(handleAxiosError("An error occurred fetching VAT accounts",error)) return;
@@ -38,13 +60,19 @@ function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
         })
 
         if(pagination.next) setVatPage(p=> p + 1)
+        if(sales_item) getItemVatAcc();
     }, [data, error, vatPage])
 
-    const onHandleChange = (key:string, value: string) =>{
+
+    const onHandleChange = (key:string, value: unknown) =>{
         setFormData((p)=> ({
             ...p,
             [key] : value
         }))
+    }
+
+    const onSelectCostOfSalesAccount = (acc: TrustGLAccount) =>{
+        onHandleChange("cost_of_sales_account_id", acc.id)
     }
 
     const onSubmit = ( e: React.FormEvent<HTMLFormElement>)=> {
@@ -67,7 +95,11 @@ function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
             category_id: Number(formData.category_id),
             unit_price: Number(data.unit_price),
             currency_id: Number(formData.currency_id),
-            tax_type_id: Number(formData.vat_id)
+            tax_type_id: Number(formData.vat_id),
+            ...(
+                formData.cost_of_sales_account_id ?
+                { cost_of_sales_account_id : formData.cost_of_sales_account_id} : {}
+            )
         }
 
         if(mode === "update"){
@@ -77,7 +109,11 @@ function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
                 category_id: Number(sales_item?.category),
                 unit_price: Number(sales_item?.price),
                 currency_id: Number(sales_item?.currency),
-                tax_type_id: Number(sales_item?.tax_type)
+                tax_type_id: Number(sales_item?.tax_type),
+                ...(
+                    sales_item?.cost_of_sales_account &&
+                    { cost_of_sales_account_id : sales_item.cost_of_sales_account}
+                )
             }
             const changes = handleTrackChangedFields(initialData, payloadData)
             if(!changes) return
@@ -86,6 +122,7 @@ function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
 
         const payload:Payload = {
             mode,
+            link : BASE_TRUST_ACC_SALES_ITEMS.link, 
             data : payloadData,
             ...(
                 mode === "update" &&
@@ -120,7 +157,8 @@ function useAddTrustAccSaleItemDialog(sales_item?:TrustAccSalesItem) {
         open,
         setOpen,
         onSubmit,
-        onHandleChange
+        onHandleChange,
+        onSelectCostOfSalesAccount
 
     }
 }

@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import useGetPropertyExpenses from "../apiHooks/useGetPropertyExpenses"
 import type { PaginationData, PropertyExpense } from "@/interfaces";
 import { handleAxiosError } from "@/lib/utils";
 import useClient from "../general/useClient";
 import useURLParamFilter from "./useURLParamFilter";
+import useQueryResults from "../apiHooks/useQueryResults";
+import { TRUST_ACC_PROPERTY_EXPENSES } from "@/constants/base-links";
+
+interface PropertyExpensesResponse extends PaginationData{
+    results: PropertyExpense[]
+}
 
 function usePropertyExpenses() {
     const [propertyExpenses, setPropertyExpenses] = useState<PropertyExpense[]>([]);
@@ -15,7 +20,10 @@ function usePropertyExpenses() {
         isLoading,
         isError,
         error
-    } = useGetPropertyExpenses();
+    } = useQueryResults<PropertyExpensesResponse>({
+        link : TRUST_ACC_PROPERTY_EXPENSES.link,
+        keyStoreValue : TRUST_ACC_PROPERTY_EXPENSES.keyStoreValue
+    });
     
     useEffect(()=>{
         if(handleAxiosError("An error occurred fetching property expenses.", error)) return;

@@ -8,7 +8,8 @@ import SectionHeader from "@/components/general/SectionHeader"
 import { TableBase } from "@/components/general/TableBase"
 import AddTrustAccSaleItemDialog from "@/components/routes/rent-safe/trust-accounting/sales/AddTrustAccSaleItemDialog"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { DELETION_LINKS, TRUST_ACC_SALES_ITEMS_HEADERS } from "@/constants"
+import { TRUST_ACC_SALES_ITEMS_HEADERS } from "@/constants"
+import { BASE_TRUST_ACC_SALES_ITEMS } from "@/constants/base-links"
 import useOptimisticCacheUpdate from "@/hooks/components/useOptimisticCacheUpdate"
 import useTrustAccountingSalesItems from "@/hooks/components/useTrustAccountingSalesItems"
 import { handleDeletion } from "@/lib/utils"
@@ -54,6 +55,7 @@ function TrustAccountingSalesItems() {
                                 <TableCell>{item.name}</TableCell>
                                 <TableCell>{item.unit_name}</TableCell>
                                 <TableCell>{item.category}</TableCell>
+                                <TableCell>{item.cost_of_sales_account ?? "N/A"}</TableCell>
                                 <TableCell>{item.tax_type}</TableCell>
                                 <TableCell className="text-end">{item.currency} {item.price}</TableCell>
                                 <TableCell className="text-end">{item.currency} {item.price_including_tax}</TableCell>
@@ -62,7 +64,7 @@ function TrustAccountingSalesItems() {
                                         <AddTrustAccSaleItemDialog salesItem={item}/>
                                         <DeleteDialogue
                                             trigger = {<DeleteTrigger/>}
-                                            mutationFunc={()=> handleDeletion(DELETION_LINKS.TRUST_ACC_SALES_ITEM, item.id)}
+                                            mutationFunc={()=> handleDeletion(BASE_TRUST_ACC_SALES_ITEMS.link, item.id)}
                                             keyStore={()=>updateCache({
                                                 mode : "deletion",
                                                 key : ["trust-account-sales-items"],

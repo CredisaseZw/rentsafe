@@ -1,10 +1,11 @@
 import type { TrustGLAccount } from "@/interfaces";
 import type { AccountSector, Payload } from "@/types";
 import React, { useState } from "react"
-import useAddTrustAccGeneralLedger, { type AddTrustAccGeneralLedgerData } from "../apiHooks/useAddTrustAccGeneralLedger";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import { toast } from "sonner";
 import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
+import useMutateResults from "../apiHooks/useMutateResults";
+import { BASE_TRUST_ACC_GENERAL_LEDGER } from "@/constants/base-links";
 
 function useAddTrustACCGeneralLedgerDialogue(
     tsaGeneralLedger? : TrustGLAccount
@@ -17,7 +18,7 @@ function useAddTrustACCGeneralLedgerDialogue(
     const onSelectAccount = (acc : AccountSector)=> {
         setAccountType(acc.id)
     }
-    const {mutate} = useAddTrustAccGeneralLedger();
+    const {mutate} = useMutateResults();
     
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault()
@@ -33,7 +34,7 @@ function useAddTrustACCGeneralLedgerDialogue(
             return;
         }
 
-        let payloadData:AddTrustAccGeneralLedgerData = {
+        let payloadData = {
             account_name : data.account_name.toString().trim(),
             account_type_id : accountType,
             is_contra_account : isContra
@@ -54,6 +55,7 @@ function useAddTrustACCGeneralLedgerDialogue(
         setLoading(true)
         const payload:Payload = {
             mode,
+            link: BASE_TRUST_ACC_GENERAL_LEDGER.link,
             data : payloadData,
             ...(
                 mode === "update" &&

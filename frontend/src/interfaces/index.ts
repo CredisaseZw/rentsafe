@@ -605,6 +605,22 @@ export interface TrustAccSalesItem {
   is_active: boolean;
   tax_type: string;
   income_account: number | null;
-  cost_of_sales_account: number | null;
+  cost_of_sales_account: string | null;
   inventory_account: number | null;
 }
+
+export type LeaseTenantObject = {
+  id: number;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  tin_number: string | null;
+  vat_number: string | null;
+  primary_address: Address | null;
+};
+
+export type LeaseTenant = {
+  id: number;
+  tenant_type: "individual" | "company";
+  tenant_object: LeaseTenantObject;
+};

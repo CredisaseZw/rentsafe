@@ -1,30 +1,27 @@
 import { useEffect, useState } from "react"
 import { Input } from "../ui/input"
-import { Label } from "../ui/label"
 import { handleAxiosError } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import type { Category } from "@/types";
 import useQueryResults from "@/hooks/apiHooks/useQueryResults";
-import { BASE_TRUST_ACC_SALES_CATEGORIES } from "@/constants/base-links";
-import type { Response } from "@/interfaces";
+import { LEASE_TENANTS } from "@/constants/base-links";
+import type { InvoiceCustomerDetails, LeaseTenant, Response } from "@/interfaces";
 
-interface TrustAccountCategoriesResponse extends Response {
-  results : Category[]
+interface LeaseTenantResponse extends Response {
+  results : LeaseTenant[]
 }
 
 interface props {
-    onSelectAccount?: (item: Category) => void
-    defaultValue? : string
+    onSelectBiller?: (item: InvoiceCustomerDetails) => void
 }
 
-function AutoCompleteTrustAccSalesCategories({defaultValue, onSelectAccount }:props) {
-    const [searchValue, setSearchValue] = useState(defaultValue ?? "");
+function AutoCompleteTenantLeaseClient({ onSelectBiller }:props) {
+    const [searchValue, setSearchValue] = useState("");
     const [open, setOpen] = useState(false);
     const [debouncedSearch, setDebouncedSearch] = useState("")
     const [hasUserInteracted, setHasUserInteracted] = useState(false)
-    const { data, error, isLoading } = useQueryResults<TrustAccountCategoriesResponse>({
-        link : BASE_TRUST_ACC_SALES_CATEGORIES.link,
-        keyStoreValue: BASE_TRUST_ACC_SALES_CATEGORIES.keyStoreValue,
+    const { data, error, isLoading } = useQueryResults<LeaseTenantResponse>({
+        link : LEASE_TENANTS.link,
+        keyStoreValue: LEASE_TENANTS.keyStoreValue,
         params : {
             ...( debouncedSearch &&
             { search : debouncedSearch }
@@ -46,7 +43,6 @@ function AutoCompleteTrustAccSalesCategories({defaultValue, onSelectAccount }:pr
 
     return (
     <div className="form-group w-full relative">
-        <Label className="required">Category</Label>
         <Input
             required
             value={searchValue}
@@ -57,10 +53,9 @@ function AutoCompleteTrustAccSalesCategories({defaultValue, onSelectAccount }:pr
                 setSearchValue(value);
                 setOpen(!!value);
             }}
-            placeholder="e.g Accessories"
+            placeholder="e.g John Doe"
             onFocus={()=>setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 100)}
-
         />
         {
             open &&
@@ -88,12 +83,24 @@ function AutoCompleteTrustAccSalesCategories({defaultValue, onSelectAccount }:pr
                         className="border-color text-left w-full border-b px-2 py-3 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
-                           onSelectAccount?.(item);
+                            const tenant:InvoiceCustomerDetails = {
+                                id: item.id,
+                                full_name: item.tenant_object.full_name,
+                                phone: item.tenant_object.phone_number,
+                                email: item.tenant_object.email,
+                                tin_number: item.tenant_object.tin_number,
+                                vat_number: item.tenant_object.vat_number,
+                                account_number: null,
+                                industry: null,
+                                customer_type : item.tenant_type,
+                                address: item.tenant_object.primary_address
+                            } 
+                           onSelectBiller?.(tenant);
                            setOpen(false);
-                           setSearchValue(item.name ?? "")
+                           setSearchValue(item.tenant_object.full_name ?? "")
                         }}
                      >
-                        {item.code} - {item.name}
+                        {item.tenant_object.full_name}
                      </button>
                 ))}
             </div>
@@ -103,4 +110,4 @@ function AutoCompleteTrustAccSalesCategories({defaultValue, onSelectAccount }:pr
   )
 }
 
-export default AutoCompleteTrustAccSalesCategories
+export default AutoCompleteTenantLeaseClient

@@ -126,7 +126,6 @@ export const DELETION_LINKS = {
   INVOICE : "/api/accounting/invoices/",
   CREDIT_NOTE : "/api/accounting/credit-notes/",
   PROPERTIES : "/api/properties/",
-  PROPERTY_EXPENSE : "/api/trust-accounting/property-expenses/",
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -813,6 +812,7 @@ export const TRUST_ACC_SALES_ITEMS_HEADERS:Header[] = [
   {name : "Name", textAlign : "left"},
   {name : "Unit Name", textAlign : "left"},
   {name : "Category", textAlign : "left"},
+  {name : "Sales Account", textAlign : "left"},
   {name : "Tax Acc", textAlign : "left"},
   {name : "Price", textAlign : "end"},
   {name : "Price inc Tax", textAlign : "end"},

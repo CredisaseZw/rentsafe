@@ -4,7 +4,7 @@ import type { Payload } from "@/types";
 import { handleAxiosError } from "@/lib/utils";
 
 export default function useRequestBillerUpdate(){
-    return useMutation({
+    const {mutate} = useMutation({
         mutationFn : async(payload:Payload) =>{
             const URL  = payload.mode === "individual" 
             ? `/api/individuals/${payload.id}/`
@@ -15,4 +15,5 @@ export default function useRequestBillerUpdate(){
         },
         onError: (error) => handleAxiosError("Failed to update biller", error), 
     });
+    return {mutateBillerInfo : mutate}
 }

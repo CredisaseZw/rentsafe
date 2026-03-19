@@ -60,6 +60,7 @@ function AutoCompleteTrustAccountSectors({defaultValue, onSelectAccount }:props)
             }}
             placeholder="e.g rental income"
             onFocus={()=>setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 100)}
         />
         {
             open &&

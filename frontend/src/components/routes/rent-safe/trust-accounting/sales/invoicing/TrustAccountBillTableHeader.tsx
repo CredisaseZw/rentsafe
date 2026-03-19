@@ -27,7 +27,9 @@ function TrustAccountBillTableHeader({title, total, subTotal}:props) {
                     <InvoicesFilter/>
                 </div>
                 <div className="self-center">
-                    <AddBillingInformationDialogue/>
+                    <AddBillingInformationDialogue
+                        isTrustAcc = {true}
+                    />
                 </div>
             </div>
         </ColumnsContainer>

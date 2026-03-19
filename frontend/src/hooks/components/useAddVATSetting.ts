@@ -1,18 +1,18 @@
 import { getFormDataObject, handleAxiosError } from "@/lib/utils";
-import type { VATPayload, VATRow } from "@/types";
-import type { UseMutationResult } from "@tanstack/react-query";
+import type {  VATPayload, VATRow } from "@/types";
 import { useState } from "react";
 import useClient from "../general/useClient";
 import { toast } from "sonner";
+import useCreateVATSettings from "../apiHooks/useCreateVATSettings";
 
 export default function useAddVATSetting(vatSetting: VATRow | undefined){
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const queryClient = useClient();
+    const { mutate } = useCreateVATSettings();
 
     const handleSubmit = (
-        e:React.FormEvent<HTMLFormElement>,
-        mutation : UseMutationResult<any, Error, VATPayload, unknown>
+        e:React.FormEvent<HTMLFormElement>
     ) => {
         e.preventDefault()
         setLoading(true)
@@ -49,7 +49,7 @@ export default function useAddVATSetting(vatSetting: VATRow | undefined){
             ...(MODE === "update" && {id: Number(vatSetting?.id)})
         }
 
-        mutation.mutate(payload, {
+        mutate(payload, {
             onSuccess : ()=>{
                 queryClient.invalidateQueries({queryKey : ["VATSettings"]})
                 toast.success(`VAT setting ${MODE === "create" ? "created" : "updated"} successfully`);

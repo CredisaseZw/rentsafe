@@ -26,6 +26,7 @@ import {
 import LoadingIndicator from "@/components/general/LoadingIndicator"
 import ButtonSpinner from "@/components/general/ButtonSpinner"
 import AutoCompleteTrustAccSalesCategories from "@/components/general/AutoCompleteTrustAccSalesCategories"
+import SearchTrustGeneralLedger from "@/components/general/SearchTrustGeneralLedger"
 
 interface props {
     salesItem?: TrustAccSalesItem
@@ -40,7 +41,8 @@ function AddTrustAccSaleItemDialog({salesItem}:props) {
         open,
         setOpen,
         onSubmit,
-        onHandleChange
+        onHandleChange,
+        onSelectCostOfSalesAccount
     } = useAddTrustAccSaleItemDialog(salesItem);
   return (
     <Dialog
@@ -120,6 +122,7 @@ function AddTrustAccSaleItemDialog({salesItem}:props) {
                     <div className="form-group">
                         <Label className="required">Unit Price</Label>
                         <Input
+                            defaultValue={salesItem?.price ?? ""}
                             required
                             type ="number"
                             step={"0.01"}
@@ -155,6 +158,11 @@ function AddTrustAccSaleItemDialog({salesItem}:props) {
                         </SelectContent>
                     </Select>
                 </div>
+                <SearchTrustGeneralLedger
+                    defaultValue={salesItem?.cost_of_sales_account ?? ""}
+                    onSelectAccount={onSelectCostOfSalesAccount}
+                    isSubLedger = {false}
+                />
             </form>
 
             <DialogFooter>

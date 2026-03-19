@@ -1,14 +1,15 @@
-import type { Payload, VATRow } from "@/types";
+import type { VATRow } from "@/types";
 import React, { useState } from "react"
-import useAddTrustAccVATSettings from "../apiHooks/useAddTrustAccVATSettings";
 import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
 import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
 import { toast } from "sonner";
+import useMutateResults from "../apiHooks/useMutateResults";
+import { TRUST_ACC_VAT_SETTINGS } from "@/constants/base-links";
 
 function useTrustAccVATSettingsDialogue(vatSetting?: VATRow) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const {mutate} = useAddTrustAccVATSettings()
+    const {mutate} = useMutateResults()
     const {updateCache} = useOptimisticCacheUpdate()
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -34,8 +35,9 @@ function useTrustAccVATSettingsDialogue(vatSetting?: VATRow) {
             payloadData = changed
         }
         setLoading(true);
-        const payload:Payload = {
+        const payload = {
             mode,
+            link: TRUST_ACC_VAT_SETTINGS.link,
             data: mode === "create" ? [payloadData] : payloadData,
             ...(
                 mode === "update" &&

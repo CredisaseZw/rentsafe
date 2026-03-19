@@ -2,21 +2,19 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Button } from "@/components/ui/button"
 import { Plus, Send } from "lucide-react"
 import ButtonSpinner from "@/components/general/ButtonSpinner"
-import useRequestBillerUpdate from "@/hooks/apiHooks/useRequestBillerUpdate"
 import BillingDocumentTotalsTable from "@/components/general/BillingDocumentTotalsTable"
 import BillingDocumentHeader from "@/components/general/BillingDocumentHeader"
 import useBillingDocumentForm from "@/hooks/components/useBillingDocumentForm"
-import useCreateBillingDocument from "@/hooks/apiHooks/useCreateBillingDocument"
+import TrustAccBillingDocumentTotalsTable from "@/components/general/TrustAccBillingDocumentTotalsTable"
 
 interface props {
     title?: string | "Add Invoice"
     defaultInvoiceType?: "proforma" | "fiscal" | "recurring" | undefined
     type? : "invoice" | "creditNote"
+    isTrustAcc?: boolean
 }
 
-function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice", type = "invoice"}: props) {
-    const updateBiller = useRequestBillerUpdate();
-    const createInvoice = useCreateBillingDocument(type);
+function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice", type = "invoice", isTrustAcc = false}: props) {
     const {
         handleOnChangeFormData,
         onSelectBiller,
@@ -30,10 +28,9 @@ function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice
         onSave,
         open,
     } = useBillingDocumentForm({
-        createBillMutation:createInvoice,
         defaultInvoiceType,
         type,
-        updateBiller
+        isTrustAcc,
     })
     
     return (
@@ -55,13 +52,16 @@ function AddBillingInformationDialogue({defaultInvoiceType, title = "Add Invoice
                             onSelectBiller={onSelectBiller}   
                             setSearchItem={setSearchItem}
                             setFormData={setFormData}
+                            isTrustAcc = {isTrustAcc}
                             isType = {type === "invoice"}
                             isDescription = {type === "creditNote"}
                         />
                         <div className="mt-5">
-                           <BillingDocumentTotalsTable
-                                ref = {rowsRef}
-                            />
+                        {
+                            !isTrustAcc 
+                            ? <BillingDocumentTotalsTable ref = {rowsRef} />
+                            : <TrustAccBillingDocumentTotalsTable ref={rowsRef}/>
+                        }
                         </div>
                         <div className="mt-5 flex flex-row justify-end gap-5">
                             <DialogClose asChild>

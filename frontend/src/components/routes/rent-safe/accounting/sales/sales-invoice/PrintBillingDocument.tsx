@@ -1,7 +1,6 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { DialogClose } from "@radix-ui/react-dialog";
 import Button  from "@/components/general/Button";
 import { Printer, PrinterIcon } from "lucide-react";
 import type { CashSale, CreditNote, Invoice } from "@/interfaces";

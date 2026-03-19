@@ -6,23 +6,24 @@ import { Loader2 } from "lucide-react";
 import type { TrustGLAccount, TrustSubGLAccount } from "@/interfaces";
 import type { Response } from "@/interfaces";
 import useQueryResults from "@/hooks/apiHooks/useQueryResults";
-import { TRUST_ACC_SUB_GENERAL_LEDGER } from "@/constants/base-links";
+import { BASE_TRUST_ACC_GENERAL_LEDGER, TRUST_ACC_SUB_GENERAL_LEDGER } from "@/constants/base-links";
 interface SubGLResponse extends Response {
     results : TrustSubGLAccount[]
 }
 interface props {
     onSelectAccount?: (acc: TrustGLAccount) => void
     defaultValue? : string
+    isSubLedger?: boolean
 }
 
-function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
+function SearchTrustGeneralLedger({defaultValue, onSelectAccount, isSubLedger }:props) {
     const [searchValue, setSearchValue] = useState(defaultValue ?? "");
     const [open, setOpen] = useState(false);
     const [debouncedSearch, setDebouncedSearch] = useState("")
     const [hasUserInteracted, setHasUserInteracted] = useState(false)
     const { data, error, isLoading } = useQueryResults<SubGLResponse>({
-        link :TRUST_ACC_SUB_GENERAL_LEDGER.link,
-        keyStoreValue: TRUST_ACC_SUB_GENERAL_LEDGER.keyStoreValue,
+        link : isSubLedger ? TRUST_ACC_SUB_GENERAL_LEDGER.link : BASE_TRUST_ACC_GENERAL_LEDGER.link,
+        keyStoreValue: isSubLedger ? TRUST_ACC_SUB_GENERAL_LEDGER.keyStoreValue : BASE_TRUST_ACC_GENERAL_LEDGER.keyStoreValue,
         params : {
             account_type : "expense",
             ...( debouncedSearch &&
@@ -58,6 +59,7 @@ function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
             }}
             placeholder="e.g rental income"
             onFocus={()=>setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 100)}
         />
         {
             open &&
@@ -100,4 +102,4 @@ function SearchSubTrustGeneralLedger({defaultValue, onSelectAccount }:props) {
   )
 }
 
-export default SearchSubTrustGeneralLedger
+export default SearchTrustGeneralLedger

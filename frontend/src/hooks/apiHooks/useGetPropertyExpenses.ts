@@ -25,7 +25,6 @@ function useGetPropertyExpenses(
         },
         enabled
     })
-
     return {
         data,
         isLoading,
