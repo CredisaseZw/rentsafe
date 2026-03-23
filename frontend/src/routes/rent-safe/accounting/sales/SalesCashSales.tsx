@@ -4,12 +4,10 @@ import BillingDocumentTotalsTable from "@/components/general/BillingDocumentTota
 import Button from "@/components/general/Button"
 import { Send } from "lucide-react"
 import useBillingDocumentForm from "@/hooks/components/useBillingDocumentForm"
-import useRequestBillerUpdate from "@/hooks/apiHooks/useRequestBillerUpdate"
 import useCreateCashSale from "@/hooks/apiHooks/useCreateCashSale"
 import ButtonSpinner from "@/components/general/ButtonSpinner"
 
 function SalesCashSales() {
-  const updateBiller = useRequestBillerUpdate()
   const createCashSale = useCreateCashSale()
   const{
     rowsRef,
@@ -25,7 +23,6 @@ function SalesCashSales() {
     setFormData,
     onSave,
   } = useBillingDocumentForm({
-    updateBiller : updateBiller,
     type : "cashSale",
     createCashSale : createCashSale
   })
