@@ -13,7 +13,7 @@ import ColumnsContainer from "@/components/general/ColumnsContainer"
 import Fieldset from "@/components/general/Fieldset"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useState } from "react"
-import useFilter from "@/hooks/components/useFilter"
+import useInvoiceFilters from "@/hooks/components/useInvoiceFilters"
 
 export default function InvoicesFilter() {
   const [filter, setFilter] = useState({
@@ -38,7 +38,7 @@ export default function InvoicesFilter() {
     handleChange,
     applyFilters,
     onClearFilter,
-  } = useFilter(filter, setFilter)
+  } = useInvoiceFilters(filter, setFilter)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

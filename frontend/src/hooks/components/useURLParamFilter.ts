@@ -7,7 +7,7 @@ function useURLParamFilter() {
       const new_params = new URLSearchParams(searchParams);
 
       Object.entries(filters).forEach(([key, value]) =>{
-        if(value === "default"  || value === "all"){
+        if(value === "all" || value === "" || value === "false"){
           new_params.delete(key);
         } else {
           new_params.set(key, value)
@@ -25,8 +25,8 @@ function useURLParamFilter() {
         return true
     }
     
-    function setSingleURLParam(param:string, value : string){
-      const new_params = new URLSearchParams(searchParams)
+    function setSingleURLParam(param:string, value : string, reset:boolean= false){
+      const new_params =!reset ? new URLSearchParams(searchParams) : new URLSearchParams();
       new_params.set(param, value)
       setSearchParams(new_params)
     }

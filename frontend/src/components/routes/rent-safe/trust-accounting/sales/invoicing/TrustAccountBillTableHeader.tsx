@@ -1,8 +1,8 @@
 import ColumnsContainer from '@/components/general/ColumnsContainer'
 import Searchbox from '@/components/general/Searchbox'
 import SectionHeader from '@/components/general/SectionHeader'
-import InvoicesFilter from '../../../accounting/sales/sales-invoice/InvoicesFilter'
 import AddBillingInformationDialogue from '../../../accounting/sales/sales-invoice/AddBillingInformationDialogue'
+import TrustInvoicesFilter from './TrustInvoicesFilter'
 
 interface props {
     title : string,
@@ -24,7 +24,7 @@ function TrustAccountBillTableHeader({title, total, subTotal}:props) {
                     placeholder={title + " ID"}
                 />
                 <div className="self-center">
-                    <InvoicesFilter/>
+                    <TrustInvoicesFilter/>
                 </div>
                 <div className="self-center">
                     <AddBillingInformationDialogue

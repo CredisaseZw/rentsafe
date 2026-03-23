@@ -39,6 +39,11 @@ export const TRUST_ACC_PROPERTY_EXPENSES = {
   [KEY_VALUE]: "property-expenses"
 }
 
+export const TRUST_ACC_INVOICES = {
+  link : "/api/trust-accounting/invoices/",
+  [KEY_VALUE] : "trust-acc-invoices"
+}
+
 export const LEASE_TENANTS = {
   link : "/api/leases/tenants/",
   [KEY_VALUE] : "lease-tenants"

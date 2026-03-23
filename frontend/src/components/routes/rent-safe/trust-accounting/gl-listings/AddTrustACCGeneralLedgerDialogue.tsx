@@ -47,6 +47,14 @@ function AddTrustACCGeneralLedgerDialogue({tsaGeneralLedger} : props) {
             </DialogHeader>
             <form onSubmit={(e)=> onSubmit(e)} id = "add-trust-general-acc" className="flex flex-col gap-4"> 
                 <div className="form-group">
+                    <Label>Account Number</Label>
+                    <Input 
+                        name="account_number"
+                        defaultValue={tsaGeneralLedger?.account_number}
+                        placeholder="e.g T0001"
+                    />
+                </div>
+                <div className="form-group">
                     <Label className="required">Account Name </Label>
                     <Input 
                         required

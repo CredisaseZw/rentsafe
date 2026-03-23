@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router"
 import type { ChangeEvent } from "react"
 
-export default function useFilter(filter:any, setFilter:any) {
+export default function useInvoiceFilters(filter:any, setFilter:any) {
   const [open, setOpen] = useState(false)
   const { currencies } = useCurrency()
   const [searchParams, setSearchParams] = useSearchParams()

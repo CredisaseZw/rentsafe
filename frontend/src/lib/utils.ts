@@ -1,5 +1,5 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
-import type { Address, BranchContact } from "@/interfaces";
+import type { Address, BranchContact, TrustAccInvoiceList } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
 import type { CashSalesRow, InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
@@ -958,4 +958,20 @@ export const getVatRate = (basePrice: number, priceIncVat: number) => {
   const vatRate = (vatAmount / basePrice) * 100;
 
   return Number(vatRate.toFixed(2));
+};
+export const transformTrustAddSingleInvoice = (invoice: any): TrustAccInvoiceList => {
+  return {
+    id: invoice.id,
+    document_number: invoice.document_number,
+    is_taxed: invoice.is_taxed,
+    invoice_number: invoice.invoice_number,
+    status_display: invoice.status_display,
+    invoice_date: invoice.invoice_date,
+    tenant_name: invoice.tenant?.tenant_object?.full_name || "",
+    subtotal: invoice.subtotal,
+    tax_total: invoice.tax_total,
+    total_amount: invoice.total_amount,
+    currency_code: invoice.currency_code,
+    is_overdue: invoice.is_overdue,
+  };
 };

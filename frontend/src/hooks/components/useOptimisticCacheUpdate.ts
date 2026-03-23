@@ -25,7 +25,7 @@ function useOptimisticCacheUpdate() {
                 return {
                     ...prev,
                     count: prev.count + 1,
-                    results: [...prev.results, response]
+                    results: [response, ...prev.results]
                 }
             })
         } else if (mode === "update") {

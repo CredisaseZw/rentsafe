@@ -12,7 +12,6 @@ import {
 import { EllipsisVertical } from 'lucide-react'
 import MutateInvoiceStatus from './MutateInvoiceStatus'
 import DeleteDialogue from '../../../../../general/DeleteDialogue'
-//import AddInvoiceDialogue from '../routes/rent-safe/accounting/sales/sales-invoice/AddInvoiceDialogue'
 import { getRefetchInvoices } from '@/store/invoiceStore'
 import PrintBillingDocument from './PrintBillingDocument'
 

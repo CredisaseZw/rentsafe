@@ -15,6 +15,7 @@ import TenantStatement from "@/routes/rent-safe/tenants/TenantStatement";
 import Property from "@/routes/rent-safe/properties/Property";
 import SalesInvoice from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoice";
 import SalesCreditNote from "@/routes/rent-safe/accounting/sales/SalesCreditNotes/SalesCreditNote";
+import TrustAccountingSalesSingleInvoice from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesSingleInvoice";
 
 export const SERVICES: Service[] = [
   {
@@ -59,6 +60,12 @@ export const SYSTEM_ROUTES: Route[] = [
     label : "Sales Credit Note",
     path : `${RENTSAFE_PRE_SEG}/accounting/sales/credit_note/:credit_note_id`,
     pageComponent : SalesCreditNote
+  },
+  {
+    label : "Trust Accounting Single Invoice",
+    path :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/invoicing/:invoice_id",
+    pageComponent :  TrustAccountingSalesSingleInvoice
+
   }
 ]
 
@@ -615,6 +622,17 @@ export const TERMINATED_HEADERS:Header[] = [
   },
   
 ]
+export const TRUST_ACC_INVOICE_STATUSES: Option[] = [
+  { label: "Draft", value: "draft" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Paid", value: "paid" },
+  { label: "Partially Paid", value: "partially_paid" },
+  { label: "Canceled", value: "canceled" },
+  { label: "Overdue", value: "overdue" },
+  { label: "Written Off", value: "written_off" },
+];
+
 export const INVOICE_STATUSES:Option[] = [
   { label: "Pending Invoices", value: "pending" },
   { label: "All Paid Invoices", value: "paid" }
@@ -696,8 +714,13 @@ export const INVOICE_MUTATION_STATUSES = {
     description : "This action will convert the invoice from proforma. This cannot be undone.",
     btnText : "Fiscalize Invoice",
     successMessage : "Invoice successfully fiscalized"
-
   },
+  POST_TO_LEDGER :{
+    heading :  "Post invoice to ledger account?",
+    description : "This action will post the invoice to a ledger account. This cannot be undone.",
+    btnText : "Post to ledger",
+    successMessage : "Invoice successfully posted to ledger"
+  }
 }
 
 export const INVOICE_STATUS_VARIANT: Record<string, any> = {
@@ -779,10 +802,10 @@ export const CASH_BOOK_RECEIPT_HEADERS: Header[] = [
 ]
 
 export const TRUST_ACCOUNT_INVOICE_LIST_HEADERS: Header[] = [
-  { name: "Date Created", textAlign: "center" },
   { name: "Invoice No.", textAlign: "center" },
-  { name: "Landlord", textAlign: "left" },
-  { name: "Tenant", textAlign: "left" },
+  { name: "Tenant Name", textAlign: "left" },
+  { name: "Date Created", textAlign: "left" },
+  { name: "Status", textAlign: "center" },
   { name: "Currency", textAlign: "center" },
   { name: "Amount (Excl. VAT)", textAlign: "end" },
   { name: "VAT", textAlign: "end" },

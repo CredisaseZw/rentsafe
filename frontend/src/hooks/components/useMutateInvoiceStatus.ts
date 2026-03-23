@@ -1,29 +1,81 @@
-import type { UseMutationResult } from "@tanstack/react-query";
 import { useState } from "react"
-import type { InvoiceMutationParams } from "../apiHooks/useInvoiceMutations";
 import { toast } from "sonner";
 import { INVOICE_MUTATION_STATUSES, } from "@/constants";
 import { handleAxiosError } from "@/lib/utils";
 import { getRefetchInvoices } from "@/store/invoiceStore";
 import useClient from "../general/useClient";
 import { useSearchParams } from "react-router";
+import useInvoiceMutations from "../apiHooks/useInvoiceMutations";
+import useURLParamFilter from "./useURLParamFilter";
 
-export default function useMutateInvoiceStatus(id: number, mode: string, invoiceMode? : string, successCallBack? : ()=>void){
+export default function useMutateInvoiceStatus(
+    id: number, 
+    mode: string, 
+    invoiceMode? : string, 
+    successCallBack? : ()=>void,
+    isTrustAcc?: boolean,
+    defaultAmount?: number
+){
+
     const [open, setOpen] = useState(false);
     const queryClient = useClient();
     const [loading, setLoading] = useState(false);
     const [searchParams] = useSearchParams();
+    const [mutationData, setMutationData] = useState({
+        amount : String(defaultAmount ?? ""),
+        reason : ""
+    });
+    const {getUrlParams} = useURLParamFilter();
+    const {mutate} = useInvoiceMutations();
 
-    const handleMarkInvoice = (
-        mutateInvoice: UseMutationResult<any, Error, InvoiceMutationParams, unknown>
-    )=>{
+    const onHandleChange =(key:string, value: string)=> {
+        setMutationData((p)=>({
+            ...p,
+            [key] :value
+        }))
+    }
+    const handleMarkInvoice = ()=>{
+        const markTrustAcc = mode === "MARK" && isTrustAcc 
+        
+        if(markTrustAcc && !mutationData.amount){
+            toast.error("Amount is required")
+            return;
+        }   
+
         setLoading(true);
-        mutateInvoice.mutate({ id, mode }, {
+        const payload = {
+            id,
+            mode,
+            isTrustAcc,
+            ...(
+                markTrustAcc &&
+                {data : {
+                    amount : Number(mutationData.amount)
+                }}
+            ),
+            ...(
+                mode  === "CANCEL" && isTrustAcc &&
+                {data : {
+                    reason : mutationData.reason
+                }}
+            )
+        }
+
+
+        mutate(payload, {
             onSuccess : ()=>{
-                getRefetchInvoices?.();
-                const page = Number(searchParams.get("page") || 1);
-                queryClient.invalidateQueries({queryKey : ["invoices",`${invoiceMode}`, page, `?invoice_type__in=${invoiceMode?.split("_")[0]}&page=${page}`]})
-                toast.success(INVOICE_MUTATION_STATUSES[mode as keyof typeof INVOICE_MUTATION_STATUSES].successMessage)
+                if(!isTrustAcc){
+                    getRefetchInvoices?.();
+                    const page = Number(searchParams.get("page") || 1);
+                    queryClient.invalidateQueries({queryKey : ["invoices",`${invoiceMode}`, page, `?invoice_type__in=${invoiceMode?.split("_")[0]}&page=${page}`]})
+                    toast.success(INVOICE_MUTATION_STATUSES[mode as keyof typeof INVOICE_MUTATION_STATUSES].successMessage)  
+                } else{
+                    const params = getUrlParams();
+                    const LIST_KEY = ["trust-acc-invoices", params];
+                    const SINGLE_KEY = [`trust_invoice_${id}`, params]
+                    queryClient.invalidateQueries({queryKey : SINGLE_KEY})
+                    queryClient.invalidateQueries({queryKey : LIST_KEY})
+                }
                 successCallBack?.()
                 setOpen(false);
             },
@@ -32,10 +84,12 @@ export default function useMutateInvoiceStatus(id: number, mode: string, invoice
         })
     }
     return {
+        mutationData,
         invoiceMode,
         loading,
         open,
         setOpen,
+        onHandleChange,
         handleMarkInvoice
     }
 }

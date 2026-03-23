@@ -37,11 +37,12 @@ function useAddTrustACCGeneralLedgerDialogue(
         let payloadData = {
             account_name : data.account_name.toString().trim(),
             account_type_id : accountType,
-            is_contra_account : isContra
-
+            account_number  : data.account_number ?? "",
+            is_contra_account : isContra,
         }
         if (mode=== "update"){
             const initialData = {
+                account_number : tsaGeneralLedger?.account_number,
                 account_name : tsaGeneralLedger?.account_name,
                 account_type_id : tsaGeneralLedger?.account_type_id,
                 is_contra_account :tsaGeneralLedger?.is_system_account

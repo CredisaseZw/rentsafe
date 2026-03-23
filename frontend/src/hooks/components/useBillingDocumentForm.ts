@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import type { Biller,  CashSale, CreditNote, InvoiceCustomerDetails } from "@/interfaces";
+import type { Biller,  CashSale, CreditNote, InvoiceCustomerDetails,} from "@/interfaces";
 import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, onClearFilter, validateBill, validateCashSale } from "@/lib/utils";
 import type { CashSalesRow, InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { Invoice } from "@/interfaces";
@@ -12,6 +12,8 @@ import { useSearchParams } from "react-router";
 import { useUpdateBillerStore } from "@/store/updateBillerStore";
 import useRequestBillerUpdate from "../apiHooks/useRequestBillerUpdate";
 import useCreateBillingDocument from "../apiHooks/useCreateBillingDocument";
+import { TRUST_ACC_INVOICES } from "@/constants/base-links";
+import useURLParamFilter from "./useURLParamFilter";
 
 interface props{
   defaultInvoiceType? : "proforma" | "fiscal" | "recurring" | undefined,
@@ -34,6 +36,7 @@ export default function useBillingDocumentForm({
   const [openPrintCashSale, setOpenPrintCashSale] = useState(false)
   const [newCashSale, setNewCashSale] = useState<CashSale>({} as CashSale);
   const [loading, setLoading] = useState(false);
+  const {getUrlParams} = useURLParamFilter()
   const [searchItem, setSearchItem] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page") || 1);
@@ -103,16 +106,22 @@ export default function useBillingDocumentForm({
     setLoading(true)
     mutateBill(billPayload.current!,{
       onSuccess : (data: Invoice | CreditNote)=> {
-        onClearFilter?.(setSearchParams);
-        const key = type === "invoice"
-        ? ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]
-        : ["creditNotes", page,`?page=${page}`]
-        queryClient.invalidateQueries({queryKey : key})
+        if(isTrustAcc){
+          const params = getUrlParams()
+          const full_key = [TRUST_ACC_INVOICES.keyStoreValue, params]
+          queryClient.invalidateQueries({queryKey : full_key})
+
+        } else {
+          onClearFilter?.(setSearchParams);
+          const key = type === "invoice"
+          ? ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]
+          : ["creditNotes", page,`?page=${page}`]
+          queryClient.invalidateQueries({queryKey : key})
+        }
         const m =  `New ${type} ${data.document_number} created successfully`
         toast.success(m)
         billPayload.current = null
         setOpen(false)
-
       },
       onError: (error)=> handleAxiosError(`Failed to create ${type}`,error),
       onSettled: ()=> setLoading(false)
