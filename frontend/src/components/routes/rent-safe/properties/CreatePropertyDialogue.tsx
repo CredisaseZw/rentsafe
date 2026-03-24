@@ -28,7 +28,6 @@ function CreatePropertyDialogue({property, trigger}: props) {
             }
         </DialogTrigger>
         <DialogContent 
-            onInteractOutside={(e)=> e.preventDefault()}
             className="sm:max-w-[900px] sm:max-h-[80vh] overflow-y-auto">
             <DialogHeader>
                 <DialogTitle>Create property</DialogTitle>

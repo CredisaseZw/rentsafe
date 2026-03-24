@@ -6,7 +6,7 @@ interface props {
 }
 function EditIcon({ size = 15, className }: props) {
   return (
-    <Edit size={size} className={`text-gray-700 dark:text-white ${className}`}/>
+    <Edit size={size} className={`text-gray-700 self-center dark:text-white ${className}`}/>
   )
 }
 

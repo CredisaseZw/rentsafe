@@ -1,5 +1,5 @@
 import EmptyComponent from "@/components/general/EmptyComponent";
-import type { Address, BranchContact } from "@/interfaces";
+import type { Address, BranchContact, TrustAccInvoiceList } from "@/interfaces";
 import type { AddressPayload, ContactPayload } from "@/interfaces/form-payloads";
 import type { CashSalesRow, InvoicePreview, Landlord, LeaseOpeningBalanceData, LeasePayload, NavLink, Route, Tenant, TenantPayload } from "@/types";
 import { clsx, type ClassValue } from "clsx";
@@ -766,7 +766,7 @@ export const handleAxiosError = (
 };
 
 export const handleDeletion = async (prefixLink: string, id: number) => {
-  const response = await api.delete(`${prefixLink}/${id}/`)
+  const response = await api.delete(`${prefixLink}${id}/`)
   return response.data
 }
 
@@ -908,3 +908,70 @@ export const getUsername = (): string | undefined =>{
 
   return undefined;
 }
+
+export const computeRowTotal = (price: number, quantity: number, vatRate: number) => {
+  const qty = quantity > 0 ? quantity : 1;
+  const subtotal = price * qty;
+  const vatAmount = subtotal * (vatRate / 100);
+  return round2(subtotal + vatAmount);
+};
+
+export const computeTotals = (rows: InvoicePreview[], discount: string) => {
+  if (!rows.length || rows.every((r) => !r.itemCode)) {
+    return { subtotal: 0, vat: 0, total: 0 };
+  }
+
+  let subtotal = 0;
+  let vat = 0;
+  let total = 0;
+
+  for (const row of rows) {
+    const price = parseMoney(row.price);
+    const qty = Number(row.quantity) || 1;
+    const vatRate = row.vat_amount || 0;
+
+    const rowSubtotal = price * qty;
+    const rowVat = rowSubtotal * (vatRate / 100);
+    const rowTotal = computeRowTotal(price, qty, vatRate);
+
+    subtotal += rowSubtotal;
+    vat += rowVat;
+    total += rowTotal;
+  }
+
+  const discountNum = Number(discount);
+  const effectiveDiscount =
+    isNaN(discountNum) || discountNum <= 0 ? 0 : discountNum;
+
+  const totalAfterDiscount = Math.max(0, total - effectiveDiscount);
+
+  return {
+    subtotal: round2(subtotal),
+    vat: round2(vat),
+    total: round2(totalAfterDiscount),
+  };
+};
+export const getVatRate = (basePrice: number, priceIncVat: number) => {
+  if (basePrice <= 0) return 0;
+
+  const vatAmount = priceIncVat - basePrice;
+  const vatRate = (vatAmount / basePrice) * 100;
+
+  return Number(vatRate.toFixed(2));
+};
+export const transformTrustAddSingleInvoice = (invoice: any): TrustAccInvoiceList => {
+  return {
+    id: invoice.id,
+    document_number: invoice.document_number,
+    is_taxed: invoice.is_taxed,
+    invoice_number: invoice.invoice_number,
+    status_display: invoice.status_display,
+    invoice_date: invoice.invoice_date,
+    tenant_name: invoice.tenant?.tenant_object?.full_name || "",
+    subtotal: invoice.subtotal,
+    tax_total: invoice.tax_total,
+    total_amount: invoice.total_amount,
+    currency_code: invoice.currency_code,
+    is_overdue: invoice.is_overdue,
+  };
+};

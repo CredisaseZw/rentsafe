@@ -1,39 +1,62 @@
-import { Card, CardContent} from "@/components/ui/card";
-import { COLOR_CLASSES } from "@/constants";
-import type { LucideIcon } from "lucide-react";
-import React from "react";
+import { cn } from "@/lib/utils"
+import type { LucideIcon } from "lucide-react"
 
-interface props {
-  value: string | React.ReactElement;
-  subTitle: number | string | React.ReactElement;
-  layoutScheme: {
-    icon: LucideIcon;
-    color: string;
-  };
-  valueAsChild?: React.ReactNode | false;
+type Variant = "blue" | "success" | "warning" | "danger" | "pink"
+
+export interface DashboardCardProps {
+  title: string
+  value: number | string
+  icon: LucideIcon
+  variant?: Variant
+  size?: "default" | "sm"
 }
 
-function DashboardCard({ value, subTitle, layoutScheme, valueAsChild = false }: props) {
-  const Icon = layoutScheme.icon;
-  const color = COLOR_CLASSES[layoutScheme.color] ?? COLOR_CLASSES["blue"];
+export function DashboardCard({
+  title,
+  value,
+  icon: Icon,
+  variant = "blue",
+  size = "default"
+}: DashboardCardProps) {
+
+  const variants: Record<Variant, { icon: string; bg: string }> = {
+    blue: {
+      icon: "text-blue-700",
+      bg: "bg-blue-100",
+    },
+    success: {
+      icon: "text-emerald-700",
+      bg: "bg-emerald-100",
+    },
+    warning: {
+      icon: "text-amber-700",
+      bg: "bg-amber-100",
+    },
+    danger: {
+      icon: "text-red-700",
+      bg: "bg-red-100",
+    },
+    pink: {
+      icon: "text-pink-700",
+      bg: "bg-pink-100",
+    },
+  }
 
   return (
-    <Card className="rounded-md border-color">
-      <CardContent className="flex flex-row items-center gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-full ${color.bg}`}>
-          <Icon className={color.text} />
-        </div>
-        <div className="flex flex-col">
-          {valueAsChild ? (
-            <>{value}</>
-          ) : (
-            <h1 className="text-2xl font-semibold text-gray-700 dark:text-gray-100">{value}</h1>
-          )}
-          <span className="mt-1 text-sm uppercase text-gray-500 dark:text-gray-2001">{subTitle}</span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+    <div className="bg-white border border-color shadow-sm hover:shadow-md transition p-6 flex justify-between items-center">
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className={cn(
+          "font-bold mt-2 text-gray-900",
+          size === "default" ? "text-3xl" : "text-xl"
+          )}>
+          {value}
+        </p>
+      </div>
 
-export default DashboardCard;
+      <div className={cn("p-3 rounded-xl", variants[variant].bg)}>
+        <Icon className={cn("w-6 h-6", variants[variant].icon)} />
+      </div>
+    </div>
+  )
+}

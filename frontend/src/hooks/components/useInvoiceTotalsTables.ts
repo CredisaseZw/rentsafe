@@ -3,56 +3,12 @@ import type { Cashbook, CashSalesRow, Currency, InvoicePreview, PaymentMethod, S
 import { useState, useImperativeHandle, useEffect, useRef } from "react";
 import type React from "react";
 import { toast } from "sonner";
-import { handleAxiosError, parseMoney, round2 } from "@/lib/utils";
+import { computeRowTotal, computeTotals, handleAxiosError, parseMoney, round2 } from "@/lib/utils";
 import useGetPaymentMethods from "../apiHooks/useGetPaymentMethods";
 import useGetCashbook from "../apiHooks/useGetCashbook";
 import useGetLatestCurrentSetting from "../apiHooks/useGetLatestCurrentSetting";
 import type { ConfirmRatePrompt } from "@/interfaces";
 import { fetchRate } from "../apiHooks/useGetCurrencyRate";
-
-const computeRowTotal = (price: number, quantity: number, vatRate: number) => {
-  const qty = quantity > 0 ? quantity : 1;
-  const subtotal = price * qty;
-  const vatAmount = subtotal * (vatRate / 100);
-  return round2(subtotal + vatAmount);
-};
-
-const computeTotals = (rows: InvoicePreview[], discount: string) => {
-  if (!rows.length || rows.every((r) => !r.itemCode)) {
-    return { subtotal: 0, vat: 0, total: 0 };
-  }
-
-  let subtotal = 0;
-  let vat = 0;
-  let total = 0;
-
-  for (const row of rows) {
-    const price = parseMoney(row.price);
-    const qty = Number(row.quantity) || 1;
-    const vatRate = row.vat_amount || 0;
-
-    const rowSubtotal = price * qty;
-    const rowVat = rowSubtotal * (vatRate / 100);
-    const rowTotal = computeRowTotal(price, qty, vatRate);
-
-    subtotal += rowSubtotal;
-    vat += rowVat;
-    total += rowTotal;
-  }
-
-  const discountNum = Number(discount);
-  const effectiveDiscount =
-    isNaN(discountNum) || discountNum <= 0 ? 0 : discountNum;
-
-  const totalAfterDiscount = Math.max(0, total - effectiveDiscount);
-
-  return {
-    subtotal: round2(subtotal),
-    vat: round2(vat),
-    total: round2(totalAfterDiscount),
-  };
-};
-
 
 function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: boolean | undefined) {
     // VARIABLES 
@@ -219,9 +175,12 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
                     handleAxiosError("An error occurred fetching rate",error);
                 }
 
-                const rate = data && data?.results.length > 0
-                ? data?.results[0].current_rate
-                : "1"
+                const rate =
+                data && data.results.length > 0
+                    ? "current_rate" in data.results[0]
+                    ? data.results[0].current_rate
+                    : data.results[0].rate
+                    : "1";
                 
                 const prompt: ConfirmRatePrompt = {
                     itemName: item.name,
@@ -287,7 +246,12 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
                         if (error) {
                             handleAxiosError("An error occurred fetching rate", error);
                         }
-                        effectiveRate = data?.results?.[0]?.current_rate ?? "1"
+                       const first = data?.results?.[0];
+
+                        effectiveRate = first && "current_rate" in first
+                        ? first.current_rate
+                        : "1";
+                        
                         return {
                             itemName: row.searchSalesItem,
                             from: row.itemCurrency,
@@ -392,7 +356,7 @@ function useInvoiceTotalsTables(ref: React.ForwardedRef<unknown>, isCashSale: bo
         if(handleAxiosError("Failed to fetch payment methods", paymentMethodsError)) return;
 
         if(paymentMethodsData){
-            setPaymentMethods(paymentMethodsData);
+            setPaymentMethods(paymentMethodsData.results);
         }
     }, [paymentMethodsData, paymentMethodsError])
 

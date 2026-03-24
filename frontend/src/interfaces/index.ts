@@ -1,4 +1,4 @@
-import type {  Currency, SalesItem, Tenant } from "@/types";
+import type {  AccountSector, Currency, SalesItem, Tenant } from "@/types";
 import type { LucideIcon } from "lucide-react";
 
 export interface Service {
@@ -559,4 +559,173 @@ export interface CashSaleProps {
       setOpen :  React.Dispatch<React.SetStateAction<boolean>>
    },
    cashSale:CashSale
+}
+export interface TrustGLAccount {
+  id: number;
+  account_number: string;
+  account_name: string;
+  account_type: AccountSector;
+  account_type_id: number;
+  is_system_account: boolean;
+}
+
+export interface TrustSubGLAccount extends TrustGLAccount{
+   account_subtype: string | null,
+   is_contra_account: boolean,
+}
+
+export interface PropertyExpense{
+  id: number;
+  expense: string;
+  expense_account: number;
+  expense_account_name: string;
+  expense_account_number: string;
+  date_created: string;
+  date_updated: string; 
+}
+export interface TrustAccExchangeRate {
+  id: number
+  base_currency: string
+  target_currency: string
+  rate: string
+  effective_date: string
+  created_by: string
+}
+
+export interface TrustAccSalesItem {
+  id: number;
+  item_code: string;
+  name: string;
+  unit_name: string;
+  category: string;
+  price: string;
+  price_including_tax: string;
+  vat_price: string;
+  currency: string;
+  is_active: boolean;
+  tax_type: string;
+  income_account: number | null;
+  cost_of_sales_account: string | null;
+  inventory_account: number | null;
+}
+
+export interface LeaseTenantObject  {
+  id: number;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  tin_number: string | null;
+  vat_number: string | null;
+  primary_address: Address | null;
+};
+
+export interface LeaseTenant  {
+  id: number;
+  tenant_type: "individual" | "company";
+  tenant_object: LeaseTenantObject;
+};
+
+export interface TrustAccInvoiceList  {
+   id: number;
+   document_number: string;
+   is_taxed: boolean;
+   invoice_number: string;
+   status_display: string;
+   invoice_date: string;
+   tenant_name: string;
+   subtotal: string;   
+   tax_total: string;  
+   total_amount: string;
+   currency_code: string;
+   is_overdue: boolean;
+};
+
+export interface TrustAccInvoicesTabProps {
+   mode: string
+   isError : boolean,
+   invoices : TrustAccInvoiceList[],
+   isLoading : boolean,
+   pagination : PaginationData | undefined,
+}
+
+export interface TrustAccInvoice {
+  id: number;
+  currency_code: string;
+  currency_symbol: string;
+  invoice_type_display: string;
+  status_display: string;
+  is_overdue: boolean;
+  line_items: TrustAccLineItem[];
+  lease: TrustAccLease | null;
+  tenant: LeaseTenant | null;
+  landlord: any;
+  date_created: string;
+  date_updated: string;
+
+  invoice_number: string;
+  document_number: string;
+  invoice_type: string;
+  status: string;
+
+  is_recurring: boolean;
+  frequency: string;
+  next_invoice_date: string | null;
+
+  invoice_date: string;
+  due_date: string;
+  posted_date: string | null;
+
+  period_from: string | null;
+  period_to: string | null;
+
+  exchange_rate: string;
+
+  discount_amount: string;
+  discount_percentage: string;
+
+  is_taxed: boolean;
+
+  subtotal: string;
+  tax_total: string;
+  total_amount: string;
+
+  amount_paid: string;
+  balance_due: string;
+
+  terms: string | null;
+  notes: string | null;
+  reference: string | null;
+
+  approved_date: string | null;
+
+  is_invoiced: boolean;
+
+  created_by: number;
+  updated_by: number | null;
+
+  original_invoice: number | null;
+  currency: number;
+
+  journal_entry: any;
+  approved_by: number | null;
+}
+export interface TrustAccLease {
+  id: number;
+  lease_id: string;
+  unit: number;
+  start_date: string;
+  end_date: string | null;
+  status: string;
+  landlord: number;
+}
+
+export interface TrustAccLineItem {
+  invoice: number;
+  sales_item_name: string;
+  quantity: string;
+  unit_price: string;
+  vat_amount: string;
+  total_vat: number;
+  total_price_excluding_vat: number;
+  total_price: string;
 }

@@ -1,16 +1,16 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { DialogClose } from "@radix-ui/react-dialog";
 import Button  from "@/components/general/Button";
 import { Printer, PrinterIcon } from "lucide-react";
-import type { CashSale, CreditNote, Invoice } from "@/interfaces";
+import type { CashSale, CreditNote, Invoice, TrustAccInvoice } from "@/interfaces";
 import BillingPrint from "./BillingPrint";
+import TrustAccBillPrint from "../../../trust-accounting/sales/invoicing/TrustAccBillPrint";
 
 interface props{
   open? : boolean,
   setOpen? :  React.Dispatch<React.SetStateAction<boolean>>
-  bill : CashSale | Invoice | CreditNote 
+  bill : CashSale | Invoice | CreditNote | TrustAccInvoice 
   billTitle : string
 }
 
@@ -41,16 +41,22 @@ function PrintBillingDocument({open, bill, setOpen, billTitle}:props) {
         </DialogTrigger>
       }
       <DialogContent 
-        onInteractOutside={(e)=> e.preventDefault()}
         className="sm:max-w-[1000px] sm:max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Print {billTitle.toLowerCase() ?? "invoice"}.</DialogTitle>
           <DialogDescription>Do you wish to print this {billTitle.toLowerCase() ?? "invoice"}?</DialogDescription>
         </DialogHeader>
          <div ref={printRef}>
-          <BillingPrint
-            bill={bill}
-          />
+          {
+            "invoice_type_display" in bill ?
+            <TrustAccBillPrint
+              bill={bill}
+            />
+            :  <BillingPrint
+                bill={bill}
+              />
+          }
+         
         </div>
         <DialogFooter>
           <DialogClose>

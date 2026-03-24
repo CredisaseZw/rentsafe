@@ -67,6 +67,12 @@ import TrustAccountingLandlordsAgedAnalysis from "@/routes/rent-safe/trust-accou
 import TrustAccountingLandlordsProfitAndLoss from "@/routes/rent-safe/trust-accounting/landlords/landlord-report/TrustAccountingLandlordsProfitAndLoss";
 import TrustAccountingTenantBalances from "@/routes/rent-safe/trust-accounting/tenant/TrustAccountingTenantBalances";
 import TrustAccountPropertySettings from "@/routes/rent-safe/trust-accounting/settings/gl-listings/TrustAccountPropertySettings";
+import TrustAccountingGLDetailedStatements from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLDetailedStatements";
+import TrustAccountingGLListing from "@/routes/rent-safe/trust-accounting/landlords/landlord-general-reports/TrustAccountingGLListing";
+import TrustAccountVatSettings from "@/routes/rent-safe/trust-accounting/settings/TrustAccountVatSettings";
+import TrustAccountCurrencyRates from "@/routes/rent-safe/trust-accounting/settings/TrustAccountCurrencyRates";
+import TrustAccountingSalesItems from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesItems";
+import TrustAccountingSalesCategories from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesCategories";
 
 export const ROOT_NAVLINKS: NavLink[] = [
    {
@@ -540,11 +546,24 @@ export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
             pageComponent : TrustAccountingSalesCashSales
          },
          {
+            label : "Sales Items",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-items",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-items",
+            pageComponent : TrustAccountingSalesItems
+         },
+         {
+            label : "Sales Categories",
+            path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-categories",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-categories",
+            pageComponent : TrustAccountingSalesCategories
+         },
+         {
             label : "Sales Reports",
             path : RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-reports",
             segment :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/sales-reports",
             pageComponent : TrustAccountingSalesReports
          },
+       
 
       ]
    },
@@ -642,6 +661,25 @@ export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
                }
             ]
          },
+         {
+            label : "General Ledger",
+            segment :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers",
+            subLinks: [
+               {
+                  label : "Detailed Statement",
+                  segment : RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/detailed-statements",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/detailed-statements",
+                  pageComponent : TrustAccountingGLDetailedStatements
+               },
+               {
+                  label : "General Ledgers Listing",
+                  segment : RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/gl-listing",
+                  path :  RENTSAFE_PRE_SEG + "/trust-accounting/landlords/general-ledgers/gl-listing",
+                  pageComponent : TrustAccountingGLListing
+               },
+
+            ]  
+         }
       ]
    },
    {
@@ -659,6 +697,18 @@ export const RENTSAFE_TRUST_ACCOUNTING_NAVLINKS:NavLink[] = [
                   pageComponent : TrustAccountPropertySettings
                }
             ]
+         },
+         {
+            label : "V.A.T Settings",
+            path: RENTSAFE_PRE_SEG + "/trust-accounting/settings/vat-settings",
+            segment: RENTSAFE_PRE_SEG + "/trust-accounting/settings/vat-settings",
+            pageComponent : TrustAccountVatSettings
+         },
+         {
+            label :"Currency Rates",
+            path: RENTSAFE_PRE_SEG + "/trust-accounting/settings/currency-rates",
+            segment: RENTSAFE_PRE_SEG + "/trust-accounting/settings/currency-rates",
+            pageComponent : TrustAccountCurrencyRates
          }
       ]
    }

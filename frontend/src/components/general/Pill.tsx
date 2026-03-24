@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface PillProps {
    children: React.ReactNode;
-   variant: "success" | "primary" | "danger" | "warning" | "ghost" | string;
+   variant: "success" | "primary" | "danger" | "warning" | "ghost" | "outline" | string;
    className?: string;
 }
 
@@ -13,17 +13,19 @@ const variants: Record<string, string> = {
    primary: "bg-blue-100 text-blue-900 dark:text-blue-500 dark:bg-blue-800/10",
    danger: "bg-red-100 text-red-900 dark:text-red-500 dark:bg-red-800/10",
    warning: "bg-amber-100 text-amber-900 dark:text-amber-500 dark:bg-amber-800/10",
+   outline: "bg-transparent border border-gray-300 text-gray-700 dark:border-gray-700 dark:text-gray-300",
 };
 
 Pill.defaultProps = {
    variant: "primary",
 };
+
 function Pill({ variant, children, className }: PillProps) {
    return (
       <div
          className={cn(
             "inline-block h-fit w-fit rounded-full px-3 py-1 text-sm font-medium",
-            variants[variant],
+            variants[variant] || variants.primary, 
             className,
          )}
       >

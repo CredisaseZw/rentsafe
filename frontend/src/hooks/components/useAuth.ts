@@ -48,10 +48,13 @@ export default function useAuth() {
       login.mutate(loginForm, {
          onSuccess: (data) => {
             if(data.is_verified){
+               
                if(currencies.length === 0) onCurrencyRetch?.();
+
                if(!getCookie("token")) setCookie("token", JSON.stringify(data), { expires: 4 });
                const next = new URLSearchParams(location.search).get("next");
                navigate(next || "/services/rent-safe", { replace: true });
+            
             } else{
                setError("Account is Not verified")
             }

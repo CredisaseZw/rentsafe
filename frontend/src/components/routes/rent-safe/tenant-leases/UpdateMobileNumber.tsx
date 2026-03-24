@@ -58,7 +58,7 @@ function UpdateMobileNumber({ updateIndividual, open, setOpen, setUpdateIndividu
 
   return (
     <Dialog open={open} onOpenChange={setOpen} >
-      <DialogContent onInteractOutside={(e)=> e.preventDefault()} >
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-gray-800 dark:text-white">Update Mobile number</DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-white mt-5">

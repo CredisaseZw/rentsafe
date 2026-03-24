@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MONTHS, YEARS } from "@/constants"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import useFilter from "@/hooks/components/useFilter"
+import useInvoiceFilters from "@/hooks/components/useInvoiceFilters"
 
 export default function CreditNotesFilter() {
   const [filter, setFilter] = useState({
@@ -25,7 +25,7 @@ export default function CreditNotesFilter() {
     handleChange,
     applyFilters,
     onClearFilter,
-  } = useFilter(filter, setFilter)
+  } = useInvoiceFilters(filter, setFilter)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

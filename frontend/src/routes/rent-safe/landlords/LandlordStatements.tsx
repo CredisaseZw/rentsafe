@@ -1,48 +1,12 @@
-import DashboardCard from "@/components/general/DashboardCard";
-import { User, Building, BadgeCent, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import Button from "@/components/general/Button";
 import PropertyStatementContainer from "@/components/general/PropertyStatementContainer";
 import Header from "@/components/general/Header";
-import ColumnsContainer from "@/components/general/ColumnsContainer";
 
 function LandlordStatements() {
-   // let {_} = useLandlordStatement();
-
    return (
       <div className="">
-         <ColumnsContainer numberOfCols={3}>
-            <DashboardCard
-               value="10"
-               subTitle="Landlords"
-               layoutScheme={{
-                  icon: User,
-                  color: "green",
-               }}
-            />
-            <DashboardCard
-               value="15"
-               subTitle="Properties"
-               layoutScheme={{
-                  icon: Building,
-                  color: "amber",
-               }}
-            />
-            <DashboardCard
-               valueAsChild={true}
-               value={
-                  <div className="flex flex-col gap-2">
-                     <span className="text-md font-semibold text-gray-700">US$36,366,3</span>
-                     <span className="text-md font-semibold text-gray-700">ZWL$36,366,3</span>
-                  </div>
-               }
-               subTitle="Rent Owing"
-               layoutScheme={{
-                  icon: BadgeCent,
-                  color: "purple",
-               }}
-            />
-         </ColumnsContainer>
-
+         <Header title="Landlord Statement"/>
          <div className="flex w-full justify-center">
             <div className="border-color dim-card mt-10 h-fit w-fit border">
                <h1 className="text-center text-2xl font-bold text-gray-700 dark:text-gray-200">Selection</h1>

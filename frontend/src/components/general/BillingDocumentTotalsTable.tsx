@@ -234,11 +234,11 @@ const BillingDocumentTotalsTable = forwardRef(({isCashSales, cashSaleProps}: pro
                                         <LoadingIndicator />
                                     </SelectItem>
                                 }
-                                {
+                                {   
                                     paymentMethods.length !== 0 &&
                                     !paymentMethodsLoading &&
-                                    paymentMethods.map((p, idx)=>(
-                                        <SelectItem value={p.id.toString()} key={idx}>{p.payment_method_name.toUpperCase()}</SelectItem>
+                                    paymentMethods?.map((p, idx)=>(
+                                        <SelectItem value={p.id.toString()} key={idx}>{p.name?.toUpperCase()}</SelectItem>
                                     ))
                                 }
                             </SelectContent>

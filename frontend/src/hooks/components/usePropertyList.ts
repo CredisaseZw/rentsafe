@@ -1,53 +1,46 @@
 import { useState, useEffect } from "react";
-import type { DashboardCardProp, Property } from "@/types";
+import type { Property } from "@/types";
 import type { PaginationData } from "@/interfaces";
 import { BadgeCent, DoorOpen, HouseIcon, Users, Wrench } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { handleAxiosError,  } from "@/lib/utils";
 import getPropertyList from "../apiHooks/useGetPropertyList";
+import type { DashboardCardProps } from "@/components/general/DashboardCard";
 
 function usePropertyList() {
    const [searchParams] = useSearchParams();
    const page = parseInt(searchParams.get("page") || "1");
    const search = searchParams.get("search") || "";
    const { propertiesError, propertiesLoading, propertyRows } = getPropertyList(page, search ,true);
-   const [SummaryCards] = useState<DashboardCardProp[]>(
+   const [SummaryCards] = useState<DashboardCardProps[]>(
       [
-         {  subTitle: "Total Properties", 
+         {  title: "Total Properties", 
             value: 35,
-            layoutScheme : {
-               icon: HouseIcon,
-               color: "blue",
-            }
+            icon: HouseIcon,
+            variant: "blue",
+            
          },
-         {  subTitle: "Occupied",
+         {  title: "Occupied",
             value: 28,
-            layoutScheme : {
-               icon: Users,
-               color: "red",
-            }
-
+            icon: Users,
+            variant: "warning",
           },
-         {  subTitle: "Vacant",
+         {  title: "Vacant",
             value: 5,
-            layoutScheme :{
-               icon: DoorOpen,
-               color : "purple"
-            }
+            icon: DoorOpen,
+            variant : "success"
+            
           },
-         { subTitle: "Maintenance",
+         { title: "Maintenance",
             value: 2,
-            layoutScheme : {
-               icon : Wrench,
-               color : "amber"
-            }
+            icon : Wrench,
+            variant : "danger"
+            
           },
-         {  subTitle: "Monthly Revenue",
+         {  title: "Monthly Revenue",
             value: "$8,500",
-            layoutScheme : {
-               icon : BadgeCent,
-               color : "green"
-            }
+            icon : BadgeCent,
+            variant : "pink"
          },
       ]
    );

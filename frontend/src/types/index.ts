@@ -1,6 +1,5 @@
 import type { Address } from "@/interfaces";
 import type { AxiosResponse } from "axios";
-import type { LucideIcon } from "lucide-react";
 
 export type Route = {
    label: string;
@@ -22,15 +21,7 @@ export type Option = {
    value: string,
    subOptions?: Option[]
 }
-export type DashboardCardProp = {
-   value: string | number | React.ReactElement;
-   subTitle: number | string | React.ReactElement;
-   layoutScheme: {
-      icon: LucideIcon;
-      color: string;
-   };
-   valueAsChild?: boolean
-}
+
 export type AddressType = "physical" | "postal" | "billing" | "work" | "other";
 
 export type CompanyLegalStatus = "private" | "public" | "government" | "ngo" | "other";
@@ -222,7 +213,7 @@ export interface Lease {
    landlord_opening_balances_data?: [{
       id: 7,
       landlord: Landlord
-      amount: Number,
+      amount: number,
       commission_percentage: string,
       operating_costs_inclusive: boolean
 
@@ -291,6 +282,8 @@ export interface Currency {
    currency_code: string;
    symbol: string;
    currency_name: string;
+   is_active?: boolean;
+   is_base_currency?: boolean
 }
 
 export interface LeaseResponse {
@@ -402,7 +395,9 @@ export interface SuburbPayload {
 
 export interface PaymentMethod {
    id: number,
+   name?:string,
    payment_method_name: string
+   description?: string
 }
 export interface Currency {
    id: number,
@@ -430,9 +425,9 @@ export type ReceiptLease = {
    lease_id: string,
    id: number,
    is_rent_variable?: boolean;
-   rentOwing: Number,
+   rentOwing: number,
    customerName: string,
-   currentRentOwing?: Number,
+   currentRentOwing?: number,
    payment_date?: string,
    payment_method_id?: number,
    reference?: string,
@@ -476,9 +471,12 @@ export type SetCurrencySettings = {
 
 export type VATRow = {
    id?: number,
-   rate?: string | number,
+   name?: string,
+   code?:string
    description?: string,
+   rate?: string | number,
    vat_applicable?: boolean
+   is_active?: boolean
 }
 
 export type VATPayload = {
@@ -517,6 +515,8 @@ export type AccountSector = {
    id: number;
    code: string;
    name: string;
+   account_type? : string,
+   is_system?: boolean
 };
 
 export type SaleAccount = {
@@ -565,6 +565,7 @@ export type Delete = {
 export type Payload = {
    mode: "update" | "create" | string,
    id?: number
+   link?: string
    data: any
 }
 export interface AddAccountingSectorPayload extends Payload {

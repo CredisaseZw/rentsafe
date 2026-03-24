@@ -13,7 +13,6 @@ DialogFooter,
 import useAddVATSetting from "@/hooks/components/useAddVATSetting";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit, Plus } from "lucide-react";
-import useAddVATSettings from "@/hooks/apiHooks/useAddVATSettings";
 import type { VATRow } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -28,7 +27,6 @@ export default function AddVATSettingDialog({vatSetting}: props) {
         setOpen,
         handleSubmit
     } = useAddVATSetting(vatSetting)
-    const addVATSetting = useAddVATSettings()
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -39,14 +37,14 @@ export default function AddVATSettingDialog({vatSetting}: props) {
                     : <Button asChild >Add VAT <Plus size={15}/></Button>
                 }
             </DialogTrigger>
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-[560px]">
+            <DialogContent className="sm:max-w-[560px]">
                 <DialogHeader>
                     <DialogTitle>VAT Settings</DialogTitle>
                     <DialogDescription className="text-gray-500 dark:text-white">
                         Configure value-added tax for this account.
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={(e)=>handleSubmit(e, addVATSetting)} className="space-y-8 mt-2">
+                <form onSubmit={(e)=>handleSubmit(e)} className="space-y-8 mt-2">
                     <div className="form-group">
                         <Label className="text-gray-700 dark:text-white required">VAT Rate (%)</Label>
                         <Input

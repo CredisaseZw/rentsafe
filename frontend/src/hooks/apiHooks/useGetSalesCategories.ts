@@ -9,7 +9,7 @@ interface Response {
     results: Category[]
 }
 
-export default function useGetSalesCategories(page:Number){
+export default function useGetSalesCategories(page:number){
     const {data, isLoading, error, refetch} = useQuery<Response>({
         queryKey : ["salesCategories", page],
         queryFn : async()=>{

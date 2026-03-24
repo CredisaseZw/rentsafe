@@ -1,4 +1,4 @@
-import Button from "@/components/general/Button";
+import {Button} from "@/components/ui/button";
 import Logo from "@/components/general/Logo";
 import { LogIn } from "lucide-react";
 import { useNavigate } from "react-router";
@@ -30,7 +30,7 @@ export default function Home() {
             <Logo />
          </div>
          <div className="flex w-full justify-center">
-            <Button onClick={checkAuth} className="flex flex-row gap-3">
+            <Button onClick={checkAuth} size={"lg"}>
                Login
                <LogIn />
             </Button>

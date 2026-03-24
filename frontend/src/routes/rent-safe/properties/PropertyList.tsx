@@ -12,9 +12,9 @@ import {
 import { TableBase } from "@/components/general/TableBase";
 import { TableCell, TableRow } from "@/components/ui/table";
 import EmptyResults from "@/components/general/EmptyResults";
-import type { DashboardCardProp, Option, Property } from "@/types";
+import type { Option, Property } from "@/types";
 import usePropertyList from "@/hooks/components/usePropertyList";
-import DashboardCard from "@/components/general/DashboardCard";
+import {DashboardCard} from "@/components/general/DashboardCard";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RENTSAFE_PRE_SEG } from "@/constants/navlinks";
 import { Link } from "react-router";
@@ -37,11 +37,13 @@ function PropertyList() {
       <div className="">
          <div className="summary-container w-full">
             <ColumnsContainer numberOfCols={5}>
-               {SummaryCards.map((card:DashboardCardProp, index:number) => (
+               {SummaryCards.map((card, index:number) => (
                   <DashboardCard key={index} 
-                     subTitle={card.subTitle}
+                     title={card.title}
                      value={String(card.value)}  
-                     layoutScheme={card.layoutScheme}/>
+                     variant={card.variant}
+                     icon={card.icon}                     
+                  />
                ))}
             </ColumnsContainer>
             <div className="main-card">

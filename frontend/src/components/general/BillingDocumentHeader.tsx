@@ -8,11 +8,13 @@ import type{ Option } from "@/types"
 import AutoCompleteClient from "@/components/general/AutoCompleteClient"
 import type { Biller, InvoiceCustomerDetails } from '@/interfaces'
 import UpdateBillerConfirmationDialogue from '@/components/routes/rent-safe/accounting/sales/sales-invoice/UpdateBillerConfirmationDialogue'
+import AutoCompleteTenantLeaseClient from './AutoCompleteTenantLeaseClient'
 interface props {
     formData: Biller,
     searchItem: string;
     isRep?: boolean;
     isType?: boolean;
+    isTrustAcc?: boolean;
     isDescription?:boolean;
     setFormData: React.Dispatch<React.SetStateAction<Biller>>;
     setSearchItem: React.Dispatch<React.SetStateAction<string>>;
@@ -23,6 +25,7 @@ interface props {
 function BillingDocumentHeader({
     isRep,
     formData,
+    isTrustAcc,
     searchItem,
     isType,
     isDescription,
@@ -84,17 +87,23 @@ function BillingDocumentHeader({
                                 }
                             </SelectContent>
                         </Select>
-                        <AutoCompleteClient
-                            clientType = {formData.selector_type}
-                            onSelectValue = {onSelectBiller}
-                            setSearchItem = {setSearchItem}
-                            placeHolder='e.g John Doe'
-                            searchItem = {searchItem}
-                            isRequired = {false}
-                            displayValue='name'
-                            sector="customer"                        
-                            createClient
-                        />
+                        {
+                            isTrustAcc 
+                            ? <AutoCompleteTenantLeaseClient
+                                onSelectBiller={onSelectBiller}
+                            /> 
+                            : <AutoCompleteClient
+                                clientType = {formData.selector_type}
+                                onSelectValue = {onSelectBiller}
+                                setSearchItem = {setSearchItem}
+                                placeHolder='e.g John Doe'
+                                searchItem = {searchItem}
+                                isRequired = {false}
+                                displayValue='name'
+                                sector="customer"                        
+                                createClient
+                            />
+                        }
                     </div> 
                 </div>
                 <div className="flex flex-row gap-5 justify-between">

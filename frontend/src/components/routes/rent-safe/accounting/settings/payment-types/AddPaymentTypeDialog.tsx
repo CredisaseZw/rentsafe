@@ -22,7 +22,7 @@ export default function AddPaymentTypeDialog() {
                     Add payment type
                 </Button>
             </DialogTrigger>
-            <DialogContent onInteractOutside={(e)=> e.preventDefault()} className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                    <DialogTitle>Add payment type</DialogTitle>
                     <DialogDescription>Add a new payment type.</DialogDescription>

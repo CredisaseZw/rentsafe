@@ -33,7 +33,7 @@ function AddSaleCategoryDialogue({refetch, initial}:props) {
                     : <Button asChild>Add Sale Category <Plus size={15}/></Button>
                 }
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]" onInteractOutside={(e)=> e.preventDefault()}>
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <h3 className="text-lg font-medium">Add Sale Category</h3>
                 </DialogHeader>    

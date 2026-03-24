@@ -87,7 +87,7 @@ export default function AutoCompleteCompanySearchInput({ elementName, closeDialo
                      <button
                         key={result.id}
                         type="button"
-                        className="border-color w-full border-b bg-white px-2 py-3 last:border-b-0 hover:bg-gray-200"
+                        className="border-color w-full border-b px-2 py-3 last:border-b-0 hover:bg-gray-200 dark:bg-zinc-900 dark:hover:bg-zinc-950"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                            setSelectedCompany(result);

@@ -21,7 +21,7 @@ function DeleteDialogue({mutationFunc, keyStore, value, trigger, successCallBack
                 : <Trash size={15} className="text-red-600"/>
             }
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[450px]" onInteractOutside={(e)=> e.preventDefault()}>
+        <DialogContent className="sm:max-w-[450px]">
             <DialogHeader>
                 <DialogTitle className='text-lg font-semibold'>Delete {value}</DialogTitle>
                 <DialogDescription className='text-sm text-muted-foreground'>

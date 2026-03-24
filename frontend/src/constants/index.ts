@@ -9,7 +9,13 @@ import {
   RENTSAFE_ACCOUNTING_NAVLINKS,
   ROOT_NAVLINKS,
   RENTSAFE_TRUST_ACCOUNTING_NAVLINKS,
+  RENTSAFE_PRE_SEG,
 } from "./navlinks";
+import TenantStatement from "@/routes/rent-safe/tenants/TenantStatement";
+import Property from "@/routes/rent-safe/properties/Property";
+import SalesInvoice from "@/routes/rent-safe/accounting/sales/SalesInvoicing/SalesInvoice";
+import SalesCreditNote from "@/routes/rent-safe/accounting/sales/SalesCreditNotes/SalesCreditNote";
+import TrustAccountingSalesSingleInvoice from "@/routes/rent-safe/trust-accounting/sales/TrustAccountingSalesSingleInvoice";
 
 export const SERVICES: Service[] = [
   {
@@ -33,6 +39,36 @@ export const RENTSAFE_ROUTES: Route[] = navlinksToRoutes([
   ...RENTSAFE_TRUST_ACCOUNTING_NAVLINKS
 ]);
 
+export const SYSTEM_ROUTES: Route[] = [
+  ...RENTSAFE_ROUTES,
+  {
+    label : "Tenant Statement",
+    path : `${RENTSAFE_PRE_SEG}/tenants/tenant-statement/:lease_id`,
+    pageComponent : TenantStatement
+  },
+  {
+    label : "Property",
+    path :`${RENTSAFE_PRE_SEG}/properties/property-list/:property_id`,
+    pageComponent : Property
+  },
+  {
+    label : "Sales Invoice",
+    path:`${RENTSAFE_PRE_SEG}/accounting/sales/invoicing/:invoice_id`,
+    pageComponent : SalesInvoice
+  },
+  {
+    label : "Sales Credit Note",
+    path : `${RENTSAFE_PRE_SEG}/accounting/sales/credit_note/:credit_note_id`,
+    pageComponent : SalesCreditNote
+  },
+  {
+    label : "Trust Accounting Single Invoice",
+    path :  RENTSAFE_PRE_SEG + "/trust-accounting/sales/invoicing/:invoice_id",
+    pageComponent :  TrustAccountingSalesSingleInvoice
+
+  }
+]
+
 export const ROOT_ROUTES: Route[] = navlinksToRoutes(ROOT_NAVLINKS);
 
 export const PRIMARY_GRADIENT = "from-PRIMARY to-SECONDARY bg-gradient-to-br";
@@ -44,6 +80,8 @@ export const PAYMENT_STATUS_CLASSIFICATIONS = [
   { label: "High Risk+", className: "bg-[firebrick] text-white" },
   { label: "Non Payer", className: "bg-[black] text-white" },
 ];
+
+export const DEFAULT_CURRENCY_CODE = "USD"
 
 export const INDUSTRIES = [
   "Agriculture",
@@ -75,6 +113,8 @@ export const MODAL_WIDTHS = {
 
 export const ALL_ADDRESS_TYPES: AddressType[] = ["physical", "postal", "billing", "work", "other"];
 
+export const DIALOG_DESCRIPTION =  "Complete all mandatory fields to proceed with saving."
+
 export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] = [
   "private",
   "public",
@@ -84,15 +124,15 @@ export const ALL_POSSIBLE_COMPANY_LEGAL_STATUSES: readonly CompanyLegalStatus[] 
 ];
 
 export const DELETION_LINKS = {
-  SALES_ITEMS : "/api/accounting/items",
-  VAT_SETTINGS : "/api/accounting/vat-settings",
-  SALES_CATEGORIES: "/api/accounting/sales-categories",
-  ACCOUNT_SECTORS : "/api/accounting/account-sectors",
-  CASH_BOOK : "/api/accounting/cash-books",
-  GENERAL_LEDGER : "/api/accounting/ledger-accounts",
-  INVOICE : "/api/accounting/invoices",
-  CREDIT_NOTE : "/api/accounting/credit-notes",
-  PROPERTIES : "/api/properties"
+  SALES_ITEMS : "/api/accounting/items/",
+  VAT_SETTINGS : "/api/accounting/vat-settings/",
+  SALES_CATEGORIES: "/api/accounting/sales-categories/",
+  ACCOUNT_SECTORS : "/api/accounting/account-sectors/",
+  CASH_BOOK : "/api/accounting/cash-books/",
+  GENERAL_LEDGER : "/api/accounting/ledger-accounts/",
+  INVOICE : "/api/accounting/invoices/",
+  CREDIT_NOTE : "/api/accounting/credit-notes/",
+  PROPERTIES : "/api/properties/",
 }
 
 export const COLOR_CLASSES: Record<string, { bg: string; text: string }> = {
@@ -582,6 +622,17 @@ export const TERMINATED_HEADERS:Header[] = [
   },
   
 ]
+export const TRUST_ACC_INVOICE_STATUSES: Option[] = [
+  { label: "Draft", value: "draft" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Paid", value: "paid" },
+  { label: "Partially Paid", value: "partially_paid" },
+  { label: "Canceled", value: "canceled" },
+  { label: "Overdue", value: "overdue" },
+  { label: "Written Off", value: "written_off" },
+];
+
 export const INVOICE_STATUSES:Option[] = [
   { label: "Pending Invoices", value: "pending" },
   { label: "All Paid Invoices", value: "paid" }
@@ -663,8 +714,13 @@ export const INVOICE_MUTATION_STATUSES = {
     description : "This action will convert the invoice from proforma. This cannot be undone.",
     btnText : "Fiscalize Invoice",
     successMessage : "Invoice successfully fiscalized"
-
   },
+  POST_TO_LEDGER :{
+    heading :  "Post invoice to ledger account?",
+    description : "This action will post the invoice to a ledger account. This cannot be undone.",
+    btnText : "Post to ledger",
+    successMessage : "Invoice successfully posted to ledger"
+  }
 }
 
 export const INVOICE_STATUS_VARIANT: Record<string, any> = {
@@ -709,6 +765,8 @@ export const TRUST_ACCOUNTS_TENANT_STATEMENT_HEADERS:Header[] =[
 ]
 export const TRUST_ACCOUNTS_PROPERTY_EXPENSES_HEADERS:Header[] =[
   { name : "Expense", textAlign:"left"},
+  { name : "Account Expense Name", textAlign : "left"},
+  { name : "Date Created", textAlign : "left"},
   { name : "Actions", textAlign: "end"}
 ];
 export const TRUST_ACCOUNTS_TENANT_DC_JOURNAL_HEADERS: Header[] = [
@@ -744,13 +802,48 @@ export const CASH_BOOK_RECEIPT_HEADERS: Header[] = [
 ]
 
 export const TRUST_ACCOUNT_INVOICE_LIST_HEADERS: Header[] = [
-  { name: "Date Created", textAlign: "center" },
   { name: "Invoice No.", textAlign: "center" },
-  { name: "Landlord", textAlign: "left" },
-  { name: "Tenant", textAlign: "left" },
+  { name: "Tenant Name", textAlign: "left" },
+  { name: "Date Created", textAlign: "left" },
+  { name: "Status", textAlign: "center" },
   { name: "Currency", textAlign: "center" },
   { name: "Amount (Excl. VAT)", textAlign: "end" },
   { name: "VAT", textAlign: "end" },
   { name: "Amount (Incl. VAT)", textAlign: "end" },
   { name: "Action", textAlign: "center" },
+]
+
+export const TRUST_ACCOUNT_GENERAL_LEDGERS: Header[] = [
+  { name: "Account Number", textAlign: "left" },
+  { name: "Account Name", textAlign: "left", },
+  { name: "Type", textAlign: "left", },
+  { name: "System Account", textAlign: "center", },
+  {name : "Action"}
+];
+
+export const TRUST_ACC_VAT_SETTINGS_HEADERS: Header[] = [
+  {name: "ID"},
+  {name : "Name", textAlign : "left"},
+  {name : "Code", textAlign : "left"},
+  {name : "Description", textAlign : "left"},
+  {name : "Rate"},
+  {name : "Action"}
+]
+
+export const TRUST_ACC_SALES_ITEMS_HEADERS:Header[] = [
+  {name: "Item Code", textAlign : "left"},
+  {name : "Name", textAlign : "left"},
+  {name : "Unit Name", textAlign : "left"},
+  {name : "Category", textAlign : "left"},
+  {name : "Sales Account", textAlign : "left"},
+  {name : "Tax Acc", textAlign : "left"},
+  {name : "Price", textAlign : "end"},
+  {name : "Price inc Tax", textAlign : "end"},
+  {name : "Action", textAlign : "center"},
+]
+
+export const TRUST_ACC_SALES_CATEGORIES_HEADERS:Header[] = [
+  {name: "Code", textAlign : "left"},
+  {name: "Name", textAlign : "left"},
+  {name: "Action"}
 ]

@@ -1,0 +1,93 @@
+import type { TrustGLAccount } from "@/interfaces";
+import type { AccountSector, Payload } from "@/types";
+import React, { useState } from "react"
+import { getFormDataObject, handleAxiosError, handleTrackChangedFields } from "@/lib/utils";
+import { toast } from "sonner";
+import useOptimisticCacheUpdate from "./useOptimisticCacheUpdate";
+import useMutateResults from "../apiHooks/useMutateResults";
+import { BASE_TRUST_ACC_GENERAL_LEDGER } from "@/constants/base-links";
+
+function useAddTrustACCGeneralLedgerDialogue(
+    tsaGeneralLedger? : TrustGLAccount
+) {
+    const [accountType, setAccountType] = useState(tsaGeneralLedger?.account_type_id ?? undefined)
+    const [loading, setLoading] = useState(false)
+    const [open, setOpen] = useState(false)
+    const [isContra, setIsContra] = useState(true);
+    const { updateCache } = useOptimisticCacheUpdate()
+    const onSelectAccount = (acc : AccountSector)=> {
+        setAccountType(acc.id)
+    }
+    const {mutate} = useMutateResults();
+    
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) =>{
+        e.preventDefault()
+        const mode = tsaGeneralLedger ? "update" : "create"
+        const data = getFormDataObject(e);
+        
+       if (!accountType || !data.account_name) {
+            toast.error(
+                !accountType
+                ? "Account sector is required"
+                : "Account name is required"
+            );
+            return;
+        }
+
+        let payloadData = {
+            account_name : data.account_name.toString().trim(),
+            account_type_id : accountType,
+            account_number  : data.account_number ?? "",
+            is_contra_account : isContra,
+        }
+        if (mode=== "update"){
+            const initialData = {
+                account_number : tsaGeneralLedger?.account_number,
+                account_name : tsaGeneralLedger?.account_name,
+                account_type_id : tsaGeneralLedger?.account_type_id,
+                is_contra_account :tsaGeneralLedger?.is_system_account
+            }
+            const changes = handleTrackChangedFields(initialData, payloadData)
+            if(!changes) return;
+
+            payloadData = changes
+        }
+
+        setLoading(true)
+        const payload:Payload = {
+            mode,
+            link: BASE_TRUST_ACC_GENERAL_LEDGER.link,
+            data : payloadData,
+            ...(
+                mode === "update" &&
+                {id : tsaGeneralLedger?.id}
+            )
+        }
+        mutate(payload, {
+            onSuccess : (response: TrustGLAccount) =>{
+                toast.success(`${mode === "create" && "New "}General Ledger successfully ${mode}d`);
+                updateCache({
+                    key : ["trust-general-ledgers"],
+                    response :  response,
+                    mode : mode
+                });
+                setOpen(false)
+                return
+            },
+            onError : (error) => handleAxiosError("Failed to add general ledger", error),
+            onSettled : ()=> setLoading(false)       
+        })
+    }
+
+    return {
+        onSelectAccount,
+        setIsContra,
+        onSubmit,
+        setOpen,
+        isContra,
+        loading,
+        open
+  }
+}
+
+export default useAddTrustACCGeneralLedgerDialogue

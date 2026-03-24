@@ -7,7 +7,7 @@ interface VATSettingsResponse extends Response{
     results: VATRow[];
 }
 
-export default function useGetVATSettings(page:Number){
+export default function useGetVATSettings(page:number){
     const {data, isLoading, error} = useQuery<VATSettingsResponse>({
         queryKey : ["VATSettings", page],
         queryFn : async()=>{

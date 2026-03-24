@@ -111,10 +111,11 @@ function AutoCompleteClient({
                   className="mt-2"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
-                    clientType === "individual" ||
-                    clientType === "tenant"
-                    ? setOpenIndividualDialogue(true)
-                    : setOpenCompanyDialogue(true)
+                    if(clientType === "individual" || clientType === "tenant") {
+                      setOpenIndividualDialogue(true)
+                    } else{
+                      setOpenCompanyDialogue(true)
+                    }
                     setOpen(false);
                   }}
                 >

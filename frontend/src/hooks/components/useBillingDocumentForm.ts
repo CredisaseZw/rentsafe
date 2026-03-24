@@ -1,4 +1,5 @@
-import type { Biller,  CashSale, CreditNote, InvoiceCustomerDetails } from "@/interfaces";
+/* eslint-disable react-hooks/rules-of-hooks */
+import type { Biller,  CashSale, CreditNote, InvoiceCustomerDetails,} from "@/interfaces";
 import { formatAddress, getCurrentDate, getSummaryDate, handleAxiosError, onClearFilter, validateBill, validateCashSale } from "@/lib/utils";
 import type { CashSalesRow, InvoicePreview, InvoiceTotals, Payload } from "@/types";
 import type { Invoice } from "@/interfaces";
@@ -9,6 +10,10 @@ import { toast } from "sonner";
 import {useTrackBiller} from "./useTrackBiller";
 import { useSearchParams } from "react-router";
 import { useUpdateBillerStore } from "@/store/updateBillerStore";
+import useRequestBillerUpdate from "../apiHooks/useRequestBillerUpdate";
+import useCreateBillingDocument from "../apiHooks/useCreateBillingDocument";
+import { TRUST_ACC_INVOICES } from "@/constants/base-links";
+import useURLParamFilter from "./useURLParamFilter";
 
 interface props{
   defaultInvoiceType? : "proforma" | "fiscal" | "recurring" | undefined,
@@ -16,19 +21,22 @@ interface props{
   updateBiller? : UseMutationResult<any, Error, Payload, unknown>,
   createCashSale? : UseMutationResult<any, Error, Payload, unknown>,
   type? : "invoice" | "creditNote" | "cashSale",
+  isTrustAcc?: boolean
 }
 
 export default function useBillingDocumentForm({
   defaultInvoiceType,
-  createBillMutation,
   createCashSale,
-  updateBiller,
-  type
+  type,
+  isTrustAcc
 }:props){
+  const {mutateBillerInfo} = useRequestBillerUpdate()
+  const {mutateBill} = useCreateBillingDocument(type, isTrustAcc)
   const [open, setOpen] = useState(false);
   const [openPrintCashSale, setOpenPrintCashSale] = useState(false)
   const [newCashSale, setNewCashSale] = useState<CashSale>({} as CashSale);
   const [loading, setLoading] = useState(false);
+  const {getUrlParams} = useURLParamFilter()
   const [searchItem, setSearchItem] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page") || 1);
@@ -96,18 +104,24 @@ export default function useBillingDocumentForm({
 
   const createBill = () =>{
     setLoading(true)
-    createBillMutation?.mutate(billPayload.current!,{
+    mutateBill(billPayload.current!,{
       onSuccess : (data: Invoice | CreditNote)=> {
-        onClearFilter?.(setSearchParams);
-        const key = type === "invoice"
-        ? ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]
-        : ["creditNotes", page,`?page=${page}`]
-        queryClient.invalidateQueries({queryKey : key})
+        if(isTrustAcc){
+          const params = getUrlParams()
+          const full_key = [TRUST_ACC_INVOICES.keyStoreValue, params]
+          queryClient.invalidateQueries({queryKey : full_key})
+
+        } else {
+          onClearFilter?.(setSearchParams);
+          const key = type === "invoice"
+          ? ["invoices",`${defaultInvoiceType ?? "fiscal"}_invoices`, page, `?invoice_type__in=${defaultInvoiceType ?? "fiscal"}&page=${page}`]
+          : ["creditNotes", page,`?page=${page}`]
+          queryClient.invalidateQueries({queryKey : key})
+        }
         const m =  `New ${type} ${data.document_number} created successfully`
         toast.success(m)
         billPayload.current = null
         setOpen(false)
-
       },
       onError: (error)=> handleAxiosError(`Failed to create ${type}`,error),
       onSettled: ()=> setLoading(false)
@@ -126,7 +140,7 @@ export default function useBillingDocumentForm({
     if (!billPayload.current) return;
     if(permission === "allow" && updateBillerPayload.current){
       if(updateOnce === 0){
-        updateBiller?.mutate(updateBillerPayload.current!, {
+        mutateBillerInfo(updateBillerPayload.current!, {
             onSuccess : ()=>{
               toast.success("Biller updated Successfully")
               setUpdateOnce((p) => p + 1);
@@ -166,7 +180,7 @@ export default function useBillingDocumentForm({
       if(validateCashSale(cashSale)) return;
     }
 
-    const ITEMS = rows.map((item) => ({ sales_item_id: Number(item.salesItem), quantity: Number(item.quantity), }));
+    const ITEMS = rows.map((item) => ({ sales_item: Number(item.salesItem), quantity: Number(item.quantity), }));
     
     if(type === "cashSale"){
       cashSalePayload = {
@@ -200,13 +214,23 @@ export default function useBillingDocumentForm({
       : null;
 
     const PayloadData = {
-      is_individual: formData.biller_type === "individual",
-      customer_id: formData.biller_id,
-      currency_id: totals?.currency_id,
+      ...(
+        isTrustAcc ?
+        {
+          status : "pending",
+          tenant :formData.biller_id,
+          lease : 1, // remove lease later
+          discount_amount : Number(totals?.discount || 0),
+        }:
+        {
+      customer: formData.biller_id,
       discount: type === "invoice"
         ? -Number(totals?.discount || 0)
         : Number(totals?.discount || 0),
-      items: ITEMS,
+        }
+      ),
+      currency: totals?.currency_id,      
+      line_items: ITEMS,
       ...extraPayload
     };
  
@@ -214,6 +238,7 @@ export default function useBillingDocumentForm({
       data : PayloadData,
       mode
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {biller_id, invoice_type, biller_type, selector_type, issue_date,...BILLER} = formData
     const { UPDATE } = useTrackBiller( billerCopy, BILLER, formData.biller_type);
     const isUpdate = Boolean(UPDATE && Object.keys(UPDATE).length > 0);
