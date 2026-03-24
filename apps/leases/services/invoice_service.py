@@ -5,10 +5,10 @@ from django.db import transaction
 from dateutil.relativedelta import relativedelta
 from apps.accounting.models.models import (
     Invoice,
-    TransactionLineItem,
+    # TransactionLineItem,
     SalesItem,
     SalesCategory,
-    VATSetting,
+    # VATSetting,
     GeneralLedgerAccount,
     Customer,
 )
@@ -115,10 +115,10 @@ class LeaseInvoiceService:
                     )
 
                     # Get or create a default VAT setting (0% for now)
-                    vat_setting, _ = VATSetting.objects.get_or_create(
-                        rate=Decimal("0.00"),
-                        defaults={"description": "No VAT", "vat_applicable": False},
-                    )
+                    # vat_setting, _ = VATSetting.objects.get_or_create(
+                    #     rate=Decimal("0.00"),
+                    #     defaults={"description": "No VAT", "vat_applicable": False},
+                    # )
 
                     # Add line items for each active charge
                     for charge in lease.charges.filter(
@@ -136,21 +136,21 @@ class LeaseInvoiceService:
                                 "unit_price_currency": lease.currency,
                                 "price": charge.amount,
                                 "unit_name": "Unit",
-                                "tax_configuration": vat_setting,
+                                # "tax_configuration": vat_setting,
                                 "sales_account": sales_account,
                             },
                         )
 
-                        # Create line item
-                        TransactionLineItem.objects.create(
-                            content_type=ContentType.objects.get_for_model(Invoice),
-                            object_id=invoice.id,
-                            sales_item=sales_item,
-                            quantity=1,
-                            unit_price=charge.amount,
-                            vat_amount=Decimal("0.00"),
-                            total_price=charge.amount,
-                        )
+                        # # Create line item
+                        # TransactionLineItem.objects.create(
+                        #     content_type=ContentType.objects.get_for_model(Invoice),
+                        #     object_id=invoice.id,
+                        #     sales_item=sales_item,
+                        #     quantity=1,
+                        #     unit_price=charge.amount,
+                        #     vat_amount=Decimal("0.00"),
+                        #     total_price=charge.amount,
+                        # )
 
                     # Update invoice totals
                     invoice.update_totals()
@@ -189,13 +189,13 @@ class LeaseInvoiceService:
             sales_category, _ = SalesCategory.objects.get_or_create(
                 name="Opening Balances", defaults={"code": "OPENBAL"}
             )
-            vat_setting, _ = VATSetting.objects.get_or_create(
-                rate=Decimal("0.00"),
-                defaults={
-                    "description": "No VAT for opening balances",
-                    "vat_applicable": False,
-                },
-            )
+            # vat_setting, _ = VATSetting.objects.get_or_create(
+            #     rate=Decimal("0.00"),
+            #     defaults={
+            #         "description": "No VAT for opening balances",
+            #         "vat_applicable": False,
+            #     },
+            # )
 
             sales_item, created = SalesItem.objects.get_or_create(
                 name="Opening Balance",
@@ -204,7 +204,7 @@ class LeaseInvoiceService:
                     "unit_price_currency": lease.currency,
                     "price": Decimal("0.00"),
                     "unit_name": "Balance",
-                    "tax_configuration": vat_setting,
+                    # "tax_configuration": vat_setting,
                     "sales_account": sales_account,
                 },
             )
@@ -236,15 +236,15 @@ class LeaseInvoiceService:
                     created_by=lease.created_by,
                 )
 
-                TransactionLineItem.objects.create(
-                    content_type=ContentType.objects.get_for_model(Invoice),
-                    object_id=invoice.id,
-                    sales_item=sales_item,
-                    quantity=1,
-                    unit_price=opening_balance.outstanding_balance,
-                    vat_amount=Decimal("0.00"),
-                    total_price=opening_balance.outstanding_balance,
-                )
+                # TransactionLineItem.objects.create(
+                #     content_type=ContentType.objects.get_for_model(Invoice),
+                #     object_id=invoice.id,
+                #     sales_item=sales_item,
+                #     quantity=1,
+                #     unit_price=opening_balance.outstanding_balance,
+                #     vat_amount=Decimal("0.00"),
+                #     total_price=opening_balance.outstanding_balance,
+                # )
 
                 invoice.update_totals()
                 created_invoices.append(invoice)
@@ -285,15 +285,15 @@ class LeaseInvoiceService:
                         )
 
                         # Create a single line item for this specific balance
-                        TransactionLineItem.objects.create(
-                            content_type=ContentType.objects.get_for_model(Invoice),
-                            object_id=invoice.id,
-                            sales_item=sales_item,
-                            quantity=1,
-                            unit_price=balance_amount,
-                            vat_amount=Decimal("0.00"),
-                            total_price=balance_amount,
-                        )
+                        # TransactionLineItem.objects.create(
+                        #     content_type=ContentType.objects.get_for_model(Invoice),
+                        #     object_id=invoice.id,
+                        #     sales_item=sales_item,
+                        #     quantity=1,
+                        #     unit_price=balance_amount,
+                        #     vat_amount=Decimal("0.00"),
+                        #     total_price=balance_amount,
+                        # )
 
                         # Update the invoice totals
                         invoice.update_totals()
