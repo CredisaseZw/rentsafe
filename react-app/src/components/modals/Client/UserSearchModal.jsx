@@ -12,9 +12,9 @@ export default function UserSearchModal({ show, handleClose, handleProceed }) {
       lastName: res.surname,
       identificationNumber: res.national_id,
       identificationType: "nationalid",
-      // email: 'client@client.com',
-      // mobile: '263779586059',
-      // address: '2312 Chiredzi',
+      email: res.email,
+      mobile: res.mobile,
+      address: res.address,
       // access_level: 'admin',
     });
   }

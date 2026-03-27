@@ -2634,9 +2634,10 @@ def create_user(request):
                     password=hash_password,
                 )
                 user.save()
-                user_id = CustomUser.objects.get(email=data.get("userEmail")).user_id
+                user_id = data.get("userEmail")
                 # send email with logins details
-                send_auth_email.delay(
+                print("got here creating....")
+                send_auth_email(
                     user_id,
                     user_password,
                     data.get("userEmail"),
@@ -2671,7 +2672,8 @@ def create_user(request):
                 )
                 user.save()
                 # send email
-                send_auth_email.delay(
+                print("this works...")
+                send_auth_email(
                     data.get("userEmail"),
                     user_password,
                     data.get("userEmail"),
@@ -2696,7 +2698,7 @@ def client_users(request):
         return render(request, "Client/Users/Index", props={})
     if request.user.is_superuser:
         client_id = request.user.company
-        users = CustomUser.objects.filter(company=int(client_id))
+        users = CustomUser.objects.filter(company=int(client_id), is_active=True)
         user_list = []
         if users:
             user_dic = {}
@@ -2737,8 +2739,12 @@ def destroy_user(request):
             return redirect("client-users")
         else:
             # delete user
-            user = CustomUser.objects.filter(id=data.get("userId"))
-            user.delete()
+            user = CustomUser.objects.filter(id=data.get("userId")).first()
+            try:
+                user.delete()
+            except:
+                user.is_active = False
+                user.save()
 
         return redirect("client-users")
     else:
