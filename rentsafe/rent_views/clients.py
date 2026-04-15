@@ -4451,7 +4451,7 @@ def client_statements_new(request):
         paginator = Paginator(
             object_list=Lease.objects.filter(
                 lease_giver=request.user.company,
-                lease_activator=request.user.id,
+                # lease_activator=request.user.id,
                 reg_ID_Number__in=query_ids,
             ).order_by("created_date"),
             per_page=items_per_page,

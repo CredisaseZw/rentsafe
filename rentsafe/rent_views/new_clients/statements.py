@@ -185,14 +185,9 @@ def creditor_statements(request):
 def detailed_creditor_statement(request, creditor_id):
     statement_rows = []
     reg_id_number = request.GET.get("reg_id_number")
-
     landlord = Landlord.objects.filter(landlord_id=creditor_id).last()
-
+    incoming_lease_id = request.GET.get("lease_id")
     # Get all leases for this landlord
-    landlord_leases = Landlord.objects.filter(
-        landlord_name=landlord.landlord_name, user_id=request.user.id
-    ).values_list("lease_id", flat=True)
-    lease_ids = list(landlord_leases)
     # Get landlord info (use any landlord record with this reg_ID_Number)
 
     creditor_name = landlord.landlord_name if landlord else "Unknown"
@@ -213,28 +208,26 @@ def detailed_creditor_statement(request, creditor_id):
     running_balance = opening_balance
     # Get all receipts for all leases of this landlord
     all_receipts = (
-        LeaseReceiptBreakdown.objects.filter(lease_id__in=lease_ids)
+        LeaseReceiptBreakdown.objects.filter(lease_id=incoming_lease_id)
         .exclude(receipt_number="Opening Balance")
         .order_by("date_received")
     )
+    lease = Lease.objects.filter(lease_id=incoming_lease_id).first()
     # Process each receipt
+    tenant_name = "Unknown Tenant"
+    if lease:
+        if lease.is_individual:
+            tenant = Individual.objects.filter(
+                identification_number=lease.reg_ID_Number
+            ).first()
+            if tenant:
+                tenant_name = f"{tenant.firstname} {tenant.surname}"
+        elif lease.is_company:
+            tenant = Company.objects.filter(id=lease.reg_ID_Number).first()
+            if tenant:
+                tenant_name = tenant.registration_name
     for receipt in all_receipts:
         # Get lease and tenant info
-        lease = Lease.objects.filter(lease_id=receipt.lease_id).first()
-        tenant_name = "Unknown Tenant"
-
-        if lease:
-            if lease.is_individual:
-                tenant = Individual.objects.filter(
-                    identification_number=lease.reg_ID_Number
-                ).first()
-                if tenant:
-                    tenant_name = f"{tenant.firstname} {tenant.surname}"
-            elif lease.is_company:
-                tenant = Company.objects.filter(id=lease.reg_ID_Number).first()
-                if tenant:
-                    tenant_name = tenant.registration_name
-
         # Process different types of receipts
         if receipt.receipt_number.startswith("Disbursement receipted"):
             running_balance -= float(receipt.amount_paid)
@@ -243,11 +236,11 @@ def detailed_creditor_statement(request, creditor_id):
         elif receipt.receipt_number.startswith("Creditor DBT"):
             running_balance -= float(receipt.amount_paid)
             amount = -float(receipt.amount_paid)  # Negative for debits
-            description = receipt.receipt_number
+            description = receipt.description or ""
         elif receipt.receipt_number.startswith("Creditor CRD"):
             running_balance += float(receipt.amount_paid)
             amount = float(receipt.amount_paid)  # Positive for credits
-            description = receipt.receipt_number
+            description = receipt.description or ""
         else:
             running_balance += float(receipt.base_amount)
             amount = float(receipt.base_amount)  # Positive for rent received

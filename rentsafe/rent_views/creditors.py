@@ -1,4 +1,3 @@
-
 import json
 from datetime import date, datetime, timedelta
 
@@ -21,6 +20,7 @@ from rentsafe.models import *
 from rentsafe.rent_views.company import generate_otp
 from rentsafe.serializers import *
 
+
 def get_client_company_journals(request):
     if request.method != "POST":
         return JsonResponse(
@@ -40,6 +40,7 @@ def get_client_company_journals(request):
             return JsonResponse(
                 {"error": "company not found", "status": "failed"}, safe=False
             )
+
 
 def get_creditor_journals(request):
     if request.method != "POST":
@@ -61,6 +62,7 @@ def get_creditor_journals(request):
         return JsonResponse(
             {"result": "No creditor found.", "status": "failed"}, safe=False
         )
+
 
 def creditor_debit_journal(request):
 
@@ -85,24 +87,32 @@ def creditor_debit_journal(request):
             date_error = op_balance_error = False
             for item in data["rows"]:
                 lease_id = item.get("leaseId")
-                print('lease_id')
-                print(lease_id)
                 debit_amount = float(item.get("debitAmount"))
                 details = item.get("details")
                 end_balance = item.get("endBalance")
                 date = item.get("date")
-                creditor_balance_ob = LeaseReceiptBreakdown.objects.filter(lease_id=lease_id)
+                creditor_balance_ob = LeaseReceiptBreakdown.objects.filter(
+                    lease_id=lease_id
+                )
                 if creditor_balance_ob:
-                    if creditor_balance_ob.first().created_at.date() <= datetime.strptime(date, "%Y-%m-%d").date() < max_date:
-                        total_amount = creditor_balance_ob.last().total_amount - debit_amount
+                    if (
+                        creditor_balance_ob.first().created_at.date()
+                        <= datetime.strptime(date, "%Y-%m-%d").date()
+                        < max_date
+                    ):
+                        total_amount = (
+                            creditor_balance_ob.last().total_amount - debit_amount
+                        )
                         new_breakdown = LeaseReceiptBreakdown(
-                            lease_id=creditor_balance_ob.first().lease_id,
+                            lease_id=lease_id,
                             total_amount=total_amount,
                             landlord_id=creditor_balance_ob.first().landlord_id,
-                            receipt_number="Creditor DBT#" + str(random.randint(1000, 9999)),
+                            receipt_number="Creditor DBT#"
+                            + str(random.randint(1000, 9999)),
                             amount_paid=debit_amount,
+                            description=details or "",
                             date_received=date,
-                        )   
+                        )
                         new_breakdown.save()
                         # lease_debit_journal = LeasePayments(
                         #     lease_id=lease_id,
@@ -135,9 +145,10 @@ def creditor_debit_journal(request):
             return JsonResponse({"status": "success"}, safe=False)
     return render(request, "Client/Accounting/AccountAdjustment/CreditorDebitJournal")
 
-def creditor_credit_journal(request,lease_no=None):
+
+def creditor_credit_journal(request, lease_no=None):
     if request.method == "POST":
-        
+
         lease_id, account_balance, debit_amount, details, end_balance, date = (
             "",
             "",
@@ -146,10 +157,27 @@ def creditor_credit_journal(request,lease_no=None):
             "",
             "",
         )
-        
+
         if lease_no:
-            last_balance = LeaseReceiptBreakdown.objects.filter(lease_id=lease_no).last()
-            data ={'rows': [{'id': 1, 'date': datetime.now().date(), 'customerType': 'individual', 'customerName': 'N/A', 'details': 'Cleared balance after termination', 'accountBalance': f'{last_balance.total_amount}', 'creditAmount': f'{last_balance.total_amount}', 'endBalance': '', 'leaseId': lease_no, 'endDate': timezone.now()}]}
+            last_balance = LeaseReceiptBreakdown.objects.filter(
+                lease_id=lease_no
+            ).last()
+            data = {
+                "rows": [
+                    {
+                        "id": 1,
+                        "date": datetime.now().date(),
+                        "customerType": "individual",
+                        "customerName": "N/A",
+                        "details": "Cleared balance after termination",
+                        "accountBalance": f"{last_balance.total_amount}",
+                        "creditAmount": f"{last_balance.total_amount}",
+                        "endBalance": "",
+                        "leaseId": lease_no,
+                        "endDate": timezone.now(),
+                    }
+                ]
+            }
         else:
             try:
                 data = json.loads(request.body)
@@ -172,27 +200,31 @@ def creditor_credit_journal(request,lease_no=None):
                     lease_id = lease_no
                     date = f"{today}"
                     credit_amount = last_balance.total_amount
-                    end_balance =0
-                    
+                    end_balance = 0
+
                 creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(
                     lease_id=lease_id
                 )
                 if creditor_opening_balance.last():
-                    
+
                     if (
                         creditor_opening_balance.first().created_at.date()
                         <= datetime.strptime(date, "%Y-%m-%d").date()
                         < max_date
                     ):
-                        creditor_balance = creditor_opening_balance.last().total_amount + credit_amount
+                        creditor_balance = (
+                            creditor_opening_balance.last().total_amount + credit_amount
+                        )
                         new_breakdown = LeaseReceiptBreakdown(
                             lease_id=lease_id,
                             total_amount=creditor_balance,
                             landlord_id=creditor_opening_balance.first().landlord_id,
-                            receipt_number="Creditor CRD#" + str(random.randint(1000, 9999)),
+                            receipt_number="Creditor CRD#"
+                            + str(random.randint(1000, 9999)),
                             amount_paid=credit_amount,
+                            description=details or "",
                             date_received=date,
-                        )   
+                        )
                         new_breakdown.save()
                         # lease_credit_journal = LeasePayments(
                         #     lease_id=lease_id,

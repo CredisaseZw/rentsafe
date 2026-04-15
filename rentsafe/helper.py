@@ -400,36 +400,42 @@ def get_creditor_helper(data, request, creditors_data):
     searchValue = data["searchValue"].upper()
     first_name = searchValue.split()[0]
     surname = searchValue.split()[1] if len(searchValue.split()) > 1 else ""
+    creditors_data = []
+    uploader_user = CustomUser.objects.filter(id=request.user.id).first()
+    upload_user_company = uploader_user.company if uploader_user else None
     if searchValue[:4].isdigit():
         result = Landlord.objects.filter(
-            Q(reg_ID_Number__icontains=searchValue)
-        ).first()
+            reg_ID_Number__icontains=searchValue, user_id=request.user.id
+        ).all()
     elif surname != first_name:
-        result = Landlord.objects.filter(landlord_name__icontains=first_name).first()
-    uploader_user_company = CustomUser.objects.filter(id=result.user_id).first()
+        result = Landlord.objects.filter(
+            landlord_name__icontains=first_name, user_id=request.user.id
+        ).all()
     # if request.user.company == uploader_user_company.company:
-    creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(
-        lease_id=result.lease_id
-    )
-    creditors_data = {
-        "opening_balance": (
-            creditor_opening_balance.last().total_amount
-            if creditor_opening_balance
-            else 0
-        ),
-        "opening_balance_date": (
-            creditor_opening_balance.first().created_at
-            if creditor_opening_balance
-            else None
-        ),
-        "full_name": f"{result.landlord_name}",
-        "lease_id": (
-            creditor_opening_balance.first().lease_id
-            if creditor_opening_balance
-            else None
-        ),
-    }
-    return JsonResponse([creditors_data], safe=False)
+    for res in result:
+        creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(
+            lease_id=res.lease_id,
+        )
+        creditor_data = {
+            "opening_balance": (
+                creditor_opening_balance.last().total_amount
+                if creditor_opening_balance
+                else 0
+            ),
+            "opening_balance_date": (
+                creditor_opening_balance.first().created_at
+                if creditor_opening_balance
+                else None
+            ),
+            "full_name": f"{res.landlord_name} -lease# {res.lease_id}",
+            "lease_id": (
+                creditor_opening_balance.first().lease_id
+                if creditor_opening_balance
+                else None
+            ),
+        }
+        creditors_data.append(creditor_data)
+    return JsonResponse(creditors_data, safe=False)
 
 
 def get_individual_journals_helper(data, request, individual_data):

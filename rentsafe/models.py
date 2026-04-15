@@ -377,6 +377,7 @@ class LeaseReceiptBreakdown(models.Model):
     lease_id = models.CharField(max_length=255)
     receipt_number = models.CharField(max_length=255, default="Rcpt")
     total_amount = models.FloatField(default=0)
+    description = models.CharField(max_length=255, null=True, blank=True)
     base_amount = models.FloatField(default=0)
     date_received = models.DateField(default=date.today)
     commission = models.FloatField(default=0)
