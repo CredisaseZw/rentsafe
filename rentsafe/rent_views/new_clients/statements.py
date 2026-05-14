@@ -134,6 +134,10 @@ def creditor_statements(request):
     leases = paginator.get_page(page)
     for lease in leases:
         landlord = Landlord.objects.filter(lease_id=lease.lease_id).first()
+        if landlord and not landlord.landlord_id:
+            landlord.landlord_id = getattr(lease, "landlord_id", None)
+            landlord.save(update_fields=["landlord_id"])
+
         creditor_name = "N/A"
         if landlord:
             creditor_name = landlord.landlord_name
@@ -154,6 +158,7 @@ def creditor_statements(request):
                         if tenant
                         else f"Lease ID - {lease.lease_id}"
                     )
+
                 elif lease.is_company:
                     tenant = Company.objects.filter(id=lease.reg_ID_Number).first()
                     tenant_name = (
@@ -289,10 +294,18 @@ def disbursements(request):
         lease_receipts: list[LeaseReceiptBreakdown] = []
 
         # Querying Landlord details with search_value
-        landlord_details = Landlord.objects.filter(
-            Q(reg_ID_Number__iexact=search_value)
-            | Q(landlord_name__icontains=search_value)
-        ).first()
+        number_part_in_search = re.search(r"\d+", search_value)
+
+        number = number_part_in_search.group() if number_part_in_search else None
+        if number:
+            landlord_details = Landlord.objects.filter(
+                Q(reg_ID_Number__iexact=search_value) | Q(lease_id__iexact=number)
+            ).first()
+        else:
+            landlord_details = Landlord.objects.filter(
+                Q(reg_ID_Number__iexact=search_value)
+                | Q(landlord_name__icontains=search_value)
+            ).first()
         if landlord_details:
             # Find Lease associated with landlord
             if lease_ob := Lease.objects.filter(
@@ -303,6 +316,25 @@ def disbursements(request):
                     lease_receipts = LeaseReceiptBreakdown.objects.filter(
                         lease_id=lease_item.lease_id
                     ).last()
+                    if lease_item.is_individual:
+                        tenant = Individual.objects.filter(
+                            identification_number=lease_item.reg_ID_Number
+                        ).first()
+                        tenant_name = (
+                            f"{tenant.firstname} {tenant.surname}"
+                            if tenant
+                            else "Unknown Tenant"
+                        )
+                    elif lease_item.is_company:
+                        tenant = Company.objects.filter(
+                            id=lease_item.reg_ID_Number
+                        ).first()
+                        tenant_name = (
+                            tenant.registration_name if tenant else "Unknown Tenant"
+                        )
+
+                    if getattr(lease_receipts, "total_amount", 0) <= 0:
+                        continue
                     disbursement = {
                         "date": (
                             lease_receipts.date_received
@@ -312,12 +344,13 @@ def disbursements(request):
                         "landlord_name": landlord_details.landlord_name,
                         "landlord_id": landlord_details.landlord_id,
                         "lease_id": lease_item.lease_id,
+                        "tenant_name": tenant_name,
                         "amount": (
                             round(float(lease_receipts.total_amount), 2)
                             if lease_receipts
                             else landlord_details.opening_balance
                         ),
-                        "reg_number": landlord_details.reg_ID_Number,
+                        "reg_number": "",  # landlord_details.reg_ID_Number,
                     }
                     disbursement_data.append(disbursement)
 
@@ -345,6 +378,12 @@ def create_disbursement(request):
             landlord_balance = LeaseReceiptBreakdown.objects.filter(
                 lease_id=row["lease_id"]
             ).last()
+            lease_obj = Lease.objects.filter(lease_id=row["lease_id"]).first()
+            if (
+                not lease_obj.lease_giver != request.user.company
+                and lease_obj.lease_activator != request.user.id
+            ):
+                return JsonResponse({"error": "Unauthorized"}, status=403)
             amount_paid = row["amount_paid"]
             date_to_use = row["date"]
             if landlord_balance:
@@ -367,43 +406,67 @@ def create_disbursement(request):
             with contextlib.suppress(Exception):
                 disbursement = Disbursement(
                     user_id=user_id,
-                    date=row["date"],
-                    creditor_id=row["creditor"],
-                    ref=row["ref"],
-                    details=row["details"],
-                    amount_paid=row["amount_paid"],
+                    date=row.get("date", datetime.now().date()),
+                    creditor_id=row.get("landlord_id", None),
+                    ref=row.get("ref", ""),
+                    details=row.get("details", ""),
+                    amount_paid=row.get("amount_paid", 0),
                 )
                 disbursement.save()
             landlord_obj = Landlord.objects.filter(
-                landlord_id=landlord_balance.landlord_id
+                lease_id=landlord_balance.lease_id
             ).first()
             creditor_company = Company.objects.filter(id=request.user.company).first()
-            lease_obj = Lease.objects.filter(lease_id=row["lease_id"]).first()
+            company_name = getattr(creditor_company, "trading_name", "").title() or (
+                request.user.firstname if request.user else "Rental Manager"
+            )
             if landlord_obj:
+
                 if landlord_obj.is_individual:
-                    tenant = Individual.objects.filter(
+                    landlord = Individual.objects.filter(
                         identification_number=landlord_obj.reg_ID_Number
                     ).first()
-                    tenant_name = (
-                        f"{tenant.firstname} {tenant.surname}" if tenant else "Creditor"
+                    landlord_name = (
+                        f"{landlord.firstname} {landlord.surname}"
+                        if landlord
+                        else "Creditor"
                     )
-                    phone_or_email = tenant.mobile
+                    phone_or_email = landlord.mobile
                     contact_type = "individual"
                 else:
-                    tenant = Company.objects.filter(id=landlord_obj.id).first()
-                    tenant_name = tenant.registration_name if tenant else "Creditor"
-                    tenant_email = CompanyProfile.objects.filter(
-                        company_id=tenant.id
+                    landlord = Company.objects.filter(id=landlord_obj.id).first()
+                    landlord_name = (
+                        landlord.registration_name if landlord else "Creditor"
+                    )
+                    landlord_email = CompanyProfile.objects.filter(
+                        company=landlord.id
                     ).first()
-                    phone_or_email = tenant_email.email if tenant_email else None
+                    phone_or_email = landlord_email.email if landlord_email else None
                     contact_type = "company"
-                registration_message = f"From {creditor_company.registration_name.title()}.Hallo {tenant_name}.This is a confirmation  of payment to you of {lease_obj.currency.upper()}{amount_paid} on {date_to_use} for {lease_obj.address}."
+                if not landlord_obj.landlord_id:
+                    landlord_obj.landlord_id = landlord.id if landlord else None
+                    landlord_obj.save(update_fields=["landlord_id"])
+                    if not lease_obj.landlord_id:
+                        lease_obj.landlord_id = landlord.id if landlord else None
+                        lease_obj.save(update_fields=["landlord_id"])
+
+                other_landlord_profiles = Landlord.objects.filter(
+                    reg_ID_Number=landlord_obj.reg_ID_Number
+                ).exclude(lease_id=landlord_balance.lease_id)
+                for other_profile in other_landlord_profiles:
+                    if not other_profile.landlord_id:
+                        other_profile.landlord_id = landlord.id
+                        other_profile.save(update_fields=["landlord_id"])
+                        if not lease_obj.landlord_id:
+                            lease_obj.landlord_id = landlord.id
+                            lease_obj.save(update_fields=["landlord_id"])
+                registration_message = f"From {company_name}.Hallo {landlord_name}.This is a confirmation  of payment to you of {lease_obj.currency.upper()}{amount_paid} on {date_to_use} for {lease_obj.address}."
                 send_otp.delay(
                     "",
                     "",
                     phone_or_email,
                     request.user.id,
-                    tenant.id,
+                    landlord.id,
                     contact_type,
                     settings.PAYMENT_RECEIPT,
                     registration_message,

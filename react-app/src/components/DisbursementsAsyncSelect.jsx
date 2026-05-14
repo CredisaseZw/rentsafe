@@ -9,7 +9,7 @@ function fetchData(inputValue, cb) {
     .post(reverseUrl("disbursements"), { search_value: inputValue })
     .then((res) => {
       let data = res.data.disbursements.map((item) => ({
-        label: `${item.landlord_name} - ${item.reg_number} (Lease: ${item.lease_id} - $${item.amount})`,
+        label: `${item.landlord_name} - (Lease: ${item.tenant_name} - $${item.amount})`,
         value: item.landlord_id,
         ...item,
       }));

@@ -839,7 +839,7 @@ def edit_lease(request):
                 ).first()
             else:
                 landlord_ob = None
-        if agent_details:
+        if agent_details and landlord_ob:
             agent_details.agent_commission = data.get("commission")
             agent_details.landlord_id = landlord_ob.id if landlord_ob else None
             agent_details.reg_ID_Number = data.get("regIdNumber")
@@ -909,7 +909,9 @@ def edit_lease(request):
             lease.lease_period = data.get("leasePeriod")
             lease.payment_period_start = data.get("paymentPeriodStart")
             lease.payment_period_end = new_payment_end
-            lease.landlord_id = landlord_ob.id if landlord_ob else None
+            lease.landlord_id = (
+                landlord_ob.id if landlord_ob else getattr(lease, "landlord_id", None)
+            )
             lease.rent_variables = data.get("rentVariable")
             lease.save()
             messages.success(request, "successfully updated lease")
