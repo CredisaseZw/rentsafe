@@ -94,6 +94,15 @@ def creditor_debit_journal(request):
                 creditor_balance_ob = LeaseReceiptBreakdown.objects.filter(
                     lease_id=lease_id
                 )
+                lease_ob = Lease.objects.filter(lease_id=lease_id).first()
+                if lease_ob and lease_ob.lease_giver != request.user.company and lease_ob.lease_activator != request.user.id:
+                    return JsonResponse(
+                        {
+                            "error": "You are not authorized to make adjustments for this lease.",
+                            "status": "failed",
+                        },
+                        safe=False,
+                    )
                 if creditor_balance_ob:
                     if (
                         creditor_balance_ob.first().created_at.date()
@@ -205,6 +214,15 @@ def creditor_credit_journal(request, lease_no=None):
                 creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(
                     lease_id=lease_id
                 )
+                lease_ob = Lease.objects.filter(lease_id=lease_id).first()
+                if lease_ob and lease_ob.lease_giver != request.user.company and lease_ob.lease_activator != request.user.id:
+                    return JsonResponse(
+                        {
+                            "error": "You are not authorized to make adjustments for this lease.",
+                            "status": "failed",
+                        },
+                        safe=False,
+                    )
                 if creditor_opening_balance.last():
 
                     if (

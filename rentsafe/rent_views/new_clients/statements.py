@@ -295,7 +295,7 @@ def disbursements(request):
 
         # Querying Landlord details with search_value
         number_part_in_search = re.search(r"\d+", search_value)
-
+        print("the incoming search value is ", search_value)
         number = number_part_in_search.group() if number_part_in_search else None
         if number:
             landlord_details = Landlord.objects.filter(
@@ -307,15 +307,29 @@ def disbursements(request):
                 | Q(landlord_name__icontains=search_value)
             ).first()
         if landlord_details:
+            print("landlord details found ", landlord_details.landlord_name)
             # Find Lease associated with landlord
-            if lease_ob := Lease.objects.filter(
-                landlord_id=landlord_details.landlord_id
-            ).all():
+            try:
+                print("about to query leases")
+
+                lease_ob = Lease.objects.filter(
+                    landlord_id=landlord_details.landlord_id
+                )
+
+            except Exception as e:
+                print("LEASE ERROR:", str(e))
+                return JsonResponse(
+                    {"error": str(e)},
+                    status=500,
+                )
+            if lease_ob:
                 for lease_item in lease_ob:
                     # Fetch Lease Receipt Breakdown
                     lease_receipts = LeaseReceiptBreakdown.objects.filter(
                         lease_id=lease_item.lease_id
                     ).last()
+                    if not lease_receipts:
+                        continue
                     if lease_item.is_individual:
                         tenant = Individual.objects.filter(
                             identification_number=lease_item.reg_ID_Number
@@ -332,9 +346,6 @@ def disbursements(request):
                         tenant_name = (
                             tenant.registration_name if tenant else "Unknown Tenant"
                         )
-
-                    if getattr(lease_receipts, "total_amount", 0) <= 0:
-                        continue
                     disbursement = {
                         "date": (
                             lease_receipts.date_received
@@ -353,7 +364,11 @@ def disbursements(request):
                         "reg_number": "",  # landlord_details.reg_ID_Number,
                     }
                     disbursement_data.append(disbursement)
-
+                else:
+                    print(
+                        "no lease details found for landlord ",
+                        landlord_details.landlord_name,
+                    )
         props = {"disbursements": disbursement_data}
 
     return JsonResponse(props, status=200, safe=False)
@@ -380,7 +395,7 @@ def create_disbursement(request):
             ).last()
             lease_obj = Lease.objects.filter(lease_id=row["lease_id"]).first()
             if (
-                not lease_obj.lease_giver != request.user.company
+                lease_obj.lease_giver != request.user.company
                 and lease_obj.lease_activator != request.user.id
             ):
                 return JsonResponse({"error": "Unauthorized"}, status=403)
@@ -434,7 +449,9 @@ def create_disbursement(request):
                     phone_or_email = landlord.mobile
                     contact_type = "individual"
                 else:
-                    landlord = Company.objects.filter(id=landlord_obj.id).first()
+                    landlord = Company.objects.filter(
+                        id=landlord_obj.landlord_id
+                    ).first()
                     landlord_name = (
                         landlord.registration_name if landlord else "Creditor"
                     )

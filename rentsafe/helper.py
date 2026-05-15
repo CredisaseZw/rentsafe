@@ -401,21 +401,31 @@ def get_creditor_helper(data, request, creditors_data):
     first_name = searchValue.split()[0]
     surname = searchValue.split()[1] if len(searchValue.split()) > 1 else ""
     creditors_data = []
+    
     uploader_user = CustomUser.objects.filter(id=request.user.id).first()
     upload_user_company = uploader_user.company if uploader_user else None
     if searchValue[:4].isdigit():
         result = Landlord.objects.filter(
-            reg_ID_Number__icontains=searchValue, user_id=request.user.id
+            reg_ID_Number__icontains=searchValue, #user_id=request.user.id
         ).all()
     elif surname != first_name:
         result = Landlord.objects.filter(
-            landlord_name__icontains=first_name, user_id=request.user.id
+            landlord_name__icontains=first_name, #user_id=request.user.id
         ).all()
     # if request.user.company == uploader_user_company.company:
     for res in result:
         creditor_opening_balance = LeaseReceiptBreakdown.objects.filter(
             lease_id=res.lease_id,
         )
+        lease_object = Lease.objects.filter(lease_id=res.lease_id).first()
+        if lease_object and lease_object.is_individual:
+            tenant_ob = Individual.objects.filter(
+                identification_number=lease_object.reg_ID_Number
+            ).first()
+            tenant_name = f"{tenant_ob.firstname} {tenant_ob.surname}" if tenant_ob else "Tenant"
+        else:
+            tenant_ob = Company.objects.filter(id=lease_object.reg_ID_Number).first()
+            tenant_name = tenant_ob.trading_name if tenant_ob else "Tenant"
         creditor_data = {
             "opening_balance": (
                 creditor_opening_balance.last().total_amount
@@ -427,7 +437,7 @@ def get_creditor_helper(data, request, creditors_data):
                 if creditor_opening_balance
                 else None
             ),
-            "full_name": f"{res.landlord_name} -lease# {res.lease_id}",
+            "full_name": f"{res.landlord_name} - Lease: {tenant_name}",
             "lease_id": (
                 creditor_opening_balance.first().lease_id
                 if creditor_opening_balance
